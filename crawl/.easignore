@@ -1,0 +1,26 @@
+# VCS / IDE
+.git/
+.vscode/
+.idea/
+.vs/
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Expo local state
+.expo/
+.expo-shared/
+
+# Builds & caches
+dist/
+build/
+android/
+ios/
+
+# Node
+node_modules/
+
+# Env files (don’t upload secrets)
+.env
+.env.*

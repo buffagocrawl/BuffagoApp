@@ -1,0 +1,91 @@
+﻿// app.config.js
+/** @type {import('@expo/config').ExpoConfig} */
+module.exports = ({ config }) => ({
+  ...config,
+  name: "BuffaGo",
+  slug: "buffago",
+  scheme: "buffago",
+  version: "1.0.2",
+
+  icon: "./assets/icon.png",
+  splash: {
+    image: "./assets/splash.png",
+    resizeMode: "contain",
+    backgroundColor: "#ffffff",
+  },
+
+  // Strongly recommended once you ship both platforms:
+  // Keeps OTA updates compatible with native builds.
+  runtimeVersion: {
+    policy: "appVersion",
+  },
+
+  ios: {
+    supportsTablet: false,
+    bundleIdentifier: "com.buffago.app",
+    buildNumber: "2",
+  
+    config: {
+      googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_API_KEY,
+    },
+  
+    infoPlist: {
+      NSLocationWhenInUseUsageDescription:
+        "BuffaGo uses your location to verify you’re at a wing stop so you can rate wings and progress through crawls.",
+      LSApplicationQueriesSchemes: ["fb", "fbauth2"],
+      ITSAppUsesNonExemptEncryption: false,
+    },
+  },
+
+  android: {
+    package: "com.buffago.app",
+    versionCode: 5,
+
+    // Fine, but note: Expo Location will add what it needs.
+    // Keeping explicit permission is OK.
+    permissions: ["ACCESS_FINE_LOCATION"],
+
+    adaptiveIcon: {
+      foregroundImage: "./assets/adaptive-icon.png",
+      backgroundColor: "#ffffff",
+    },
+
+    config: {
+      googleMaps: {
+        // Read at build time by RN Maps config plugin
+        apiKey: process.env.EXPO_PUBLIC_GOOGLE_API_KEY,
+      },
+    },
+
+    intentFilters: [
+      // OAuth / magic-link callback (PKCE code flow)
+      {
+        action: "VIEW",
+        category: ["BROWSABLE", "DEFAULT"],
+        data: [{ scheme: "buffago", host: "auth", pathPrefix: "/callback" }],
+      },
+      // Password recovery deep link
+      {
+        action: "VIEW",
+        category: ["BROWSABLE", "DEFAULT"],
+        data: [{ scheme: "buffago", host: "auth", pathPrefix: "/reset" }],
+      },
+    ],
+  },
+
+  plugins: [
+    "expo-router",
+    "expo-font",
+    "expo-location",
+    // If you later use the Expo Facebook module, add "expo-facebook" too.
+  ],
+
+  extra: {
+    ...config.extra,
+    supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL ?? null,
+    supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? null,
+    eas: { projectId: "f08e790e-af47-4fc1-ba5e-707a0a15f7be" },
+  },
+
+  userInterfaceStyle: "dark",
+});
