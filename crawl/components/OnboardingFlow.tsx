@@ -8,11 +8,11 @@ import {
   Button,
   TextInput,
   ActivityIndicator,
+  Tooltip,
   useTheme,
-  Dialog,
-  Portal,
 } from 'react-native-paper';
-import SliderRowPretty from './SliderRowPretty';
+import RatingWizardDialog from './RatingWizardDialog';
+import WingmanAddDialog from './WingmanAddDialog';
 import { supabase } from '../lib/supabase';
 
 type StateRow = {
@@ -42,6 +42,11 @@ type QuickRating = {
   sauce: number | null;
   meat: number | null;
   overall: number | null;
+};
+
+type RatingTagOption = {
+  id: number;
+  tag: string;
 };
 
 const ONBOARDING_DONE_KEY = 'buffago:onboarding_done_v3';
@@ -249,9 +254,8 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
   const [pickedDest, setPickedDest] = useState<DestRow | null>(null);
 
   const [addOpen, setAddOpen] = useState(false);
-  const [addName, setAddName] = useState('');
-  const [addAddress, setAddAddress] = useState('');
-  const [addSaving, setAddSaving] = useState(false);
+  const [wingmanDisabledAfterQueue, setWingmanDisabledAfterQueue] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   const [rating, setRating] = useState<QuickRating>({
     crispiness: null,
@@ -259,48 +263,10 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
     meat: null,
     overall: null,
   });
+  const [ratingTags, setRatingTags] = useState<RatingTagOption[]>([]);
+  const [ratingSaving, setRatingSaving] = useState(false);
+  const [ratingError, setRatingError] = useState('');
 
-  // NEW: step 3 is now a 4-page micro flow
-  const [ratingPage, setRatingPage] = useState<number>(0);
-
-  const RATING_PAGES = useMemo(
-    () => [
-      {
-        key: 'sauce' as const,
-        title: 'Sauce',
-        blurb: 'Flavor balance, heat, and how well it clings to the wing.',
-        badLabel: 'Bleh',
-        goodLabel: 'Unforgettable',
-      },
-      {
-        key: 'crispiness' as const,
-        title: 'Crispiness',
-        blurb: 'Crunch factor. No soggy breading. No sad skin.',
-        badLabel: 'Soggy',
-        goodLabel: 'Crunchy',
-      },
-      {
-        key: 'meat' as const,
-        title: 'Chicken Quality',
-        blurb: 'Juicy, tender, and clean texture. The chicken itself.',
-        badLabel: 'Foul',
-        goodLabel: 'Five star',
-      },
-      {
-        key: 'overall' as const,
-        title: 'Overall Experience',
-        blurb: 'The full vibe. Taste, aroma, presentation, and satisfaction.',
-        badLabel: 'Never again',
-        goodLabel: 'Back tomorrow',
-      },
-    ],
-    []
-  );
-
-  // Reset rating page whenever we enter step 3
-  useEffect(() => {
-    if (step === 3) setRatingPage(0);
-  }, [step]);
 
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewRoute, setPreviewRoute] = useState<any>(null);
@@ -357,6 +323,19 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
     let alive = true;
 
     (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (alive) setUserId(data?.session?.user?.id ?? null);
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+
+    (async () => {
       try {
         setLoadingStates(true);
         const { data, error } = await supabase
@@ -373,6 +352,36 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
         setStates([]);
       } finally {
         if (alive) setLoadingStates(false);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('destination_tags')
+          .select('id, tag')
+          .order('tag', { ascending: true });
+
+        if (error) throw error;
+        if (!alive) return;
+
+        setRatingTags(
+          ((data as any[]) || []).map((row) => ({
+            id: Number(row.id),
+            tag: String(row.tag || '').trim(),
+          })).filter((row) => Number.isFinite(row.id) && row.tag)
+        );
+      } catch {
+        if (!alive) return;
+        setRatingTags([]);
       }
     })();
 
@@ -439,9 +448,14 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
     } catch {}
   };
 
-  const loadRestaurantsForState = async (state_id: number) => {
+  const loadRestaurantsForState = async (
+    state_id: number,
+    options: { clearPickedDest?: boolean } = {}
+  ) => {
+    const { clearPickedDest = true } = options;
+
     setLoadingDests(true);
-    setPickedDest(null);
+    if (clearPickedDest) setPickedDest(null);
     setDests([]);
     setDestQ('');
 
@@ -470,64 +484,75 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
 
   const canSubmitRating = !!pickedDest?.id;
 
-  const submitOnboardingRating = async () => {
+  const submitOnboardingRating = async (payload: any) => {
     try {
       const destId = pickedDest?.id ?? null;
-      if (!destId) return;
+      if (!destId) {
+        setRatingError('Choose a restaurant before finishing your rating.');
+        return;
+      }
 
+      setRatingError('');
+      const finalScores = payload?.scores ?? {};
       const isPseudo = String(destId).startsWith('new:');
 
-      const payload = {
+      const nextRating = {
+        crispiness: asInt(finalScores.crispiness ?? 1),
+        sauce: asInt(finalScores.sauce ?? 1),
+        meat: asInt(finalScores.meat ?? 1),
+        overall: asInt(finalScores.overall ?? 1),
+      };
+
+      setRating(nextRating);
+
+      const seedPayload = {
         destination_id: destId,
-        crispiness: asInt(rating.crispiness ?? 7),
-        sauce: asInt(rating.sauce ?? 7),
-        meat: asInt(rating.meat ?? 7),
-        overall: asInt(rating.overall ?? 7),
+        state_id: pickedState?.state_id ?? null,
+        state_code: pickedState?.state_code ?? null,
+        crispiness: nextRating.crispiness,
+        sauce: nextRating.sauce,
+        meat: nextRating.meat,
+        overall: nextRating.overall,
+        tag_id: payload?.selectedTagId ?? null,
+        would_order_again: payload?.wouldOrderAgain == null ? null : Boolean(payload.wouldOrderAgain),
+        sauce_style: payload?.sauceStyle ?? null,
+        flavor_vibe: Array.isArray(payload?.flavorVibe) ? payload.flavorVibe : [],
+        spice_level: asInt(payload?.spiceLevel ?? null),
+        wings_eaten: payload?.wingsEaten == null ? null : asInt(payload.wingsEaten),
         onboarding_seed: true,
         coin_rating: true,
         local_only: isPseudo,
         created_at: new Date().toISOString(),
       };
 
-      await AsyncStorage.setItem(ONBOARDING_SEED_RATING_KEY, JSON.stringify(payload));
-    } catch {}
+      await AsyncStorage.setItem(ONBOARDING_SEED_RATING_KEY, JSON.stringify(seedPayload));
+      setStep(4);
+    } catch (e) {
+      console.warn('submitOnboardingRating failed:', e);
+      setRatingError('Could not save that rating. Please try again.');
+    }
   };
 
-  const saveNewRestaurantSuggestion = async () => {
-    if (!pickedState?.state_id) return;
-    const name = (addName || '').trim();
-    if (!name) return;
+  const pickWingmanDestination = async (row: DestRow) => {
+    if (!row?.id) return;
 
-    setAddSaving(true);
-    try {
-      const local = {
-        state_id: pickedState.state_id,
-        state_code: pickedState.state_code ?? null,
-        state_name: pickedState.state_name ?? null,
-        restaurant_name: name,
-        address: (addAddress || '').trim() || null,
-        created_at: new Date().toISOString(),
-      };
+    const dest: DestRow = {
+      id: row.id,
+      name: row.name ?? 'Wing Spot',
+      address: row.address ?? null,
+      city: row.city ?? null,
+      lat: row.lat ?? null,
+      lng: row.lng ?? null,
+    };
 
-      await AsyncStorage.setItem(ONBOARDING_DEST_SUGGESTION_KEY, JSON.stringify(local));
+    setPickedDest(dest);
+    setRatingError('');
+    await saveDest(dest);
+    setAddOpen(false);
+    setStep(3);
 
-      const pseudoDest: DestRow = {
-        id: `new:${Date.now()}`,
-        name: name,
-        address: local.address,
-        city: null,
-      };
-
-      setPickedDest(pseudoDest);
-      await saveDest(pseudoDest);
-
-      setAddOpen(false);
-      setAddName('');
-      setAddAddress('');
-
-      setStep(3);
-    } finally {
-      setAddSaving(false);
+    if (pickedState?.state_id) {
+      loadRestaurantsForState(pickedState.state_id, { clearPickedDest: false });
     }
   };
 
@@ -586,13 +611,6 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
     }
 
     if (step === 3) {
-      if (ratingPage < RATING_PAGES.length - 1) {
-        setRatingPage((p) => p + 1);
-        return;
-      }
-
-      await submitOnboardingRating();
-      setStep(4);
       return;
     }
 
@@ -622,11 +640,6 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
   const goBack = () => {
     if (step === 0) return;
 
-    if (step === 3 && ratingPage > 0) {
-      setRatingPage((p) => Math.max(0, p - 1));
-      return;
-    }
-
     setStep((s) => Math.max(0, s - 1));
   };
 
@@ -638,6 +651,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
   const pickRestaurant = useCallback(
     async (d: DestRow) => {
       setPickedDest(d);
+      setRatingError('');
 
       if (pickedState) {
         await saveState(pickedState);
@@ -651,7 +665,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
 
   return (
     <View style={[styles.wrap, { backgroundColor: colors.background }]}>
-      {step !== 0 ? (
+      {step !== 0 && step !== 3 ? (
         <View style={{ paddingTop: 6, flexDirection: 'row', alignItems: 'center' }}>
           <Pressable onPress={goBack} hitSlop={12} style={{ paddingVertical: 8, paddingHorizontal: 8 }}>
             <Text style={{ fontWeight: '900' }}>Back</Text>
@@ -887,18 +901,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
                 })}
 
                 {!filteredDests?.length ? (
-                  <Pressable
-                    onPress={() => pickedState?.state_id && setAddOpen(true)}
-                    style={({ pressed }) => [
-                      {
-                        paddingVertical: 18,
-                        paddingHorizontal: 16,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        opacity: pressed ? 0.85 : 1,
-                      },
-                    ]}
-                  >
+                  <View style={{ paddingVertical: 18, paddingHorizontal: 16, alignItems: 'center' }}>
                     <Text
                       style={{
                         textAlign: 'center',
@@ -908,16 +911,35 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
                     >
                       No Matches
                     </Text>
-                    <Text
-                      style={{
-                        textAlign: 'center',
-                        marginTop: 4,
-                        opacity: pickedState?.state_id ? 0.75 : 0.4,
-                      }}
-                    >
-                      Tap here to add a restaurant
-                    </Text>
-                  </Pressable>
+                  </View>
+                ) : null}
+
+                {pickedState?.state_id ? (
+                  <View style={{ padding: 12 }}>
+                    {wingmanDisabledAfterQueue ? (
+                      <Tooltip
+                        title="Please rate an existing BuffaGo restaurant."
+                        enterTouchDelay={0}
+                        leaveTouchDelay={1800}
+                      >
+                        <Pressable onPress={() => {}}>
+                          <View pointerEvents="none">
+                            <Button mode="contained" icon="robot-outline" disabled>
+                              Finish Onboarding to use Wingman
+                            </Button>
+                          </View>
+                        </Pressable>
+                      </Tooltip>
+                    ) : (
+                      <Button
+                        mode="contained"
+                        icon="robot-outline"
+                        onPress={() => setAddOpen(true)}
+                      >
+                        Add with Wingman
+                      </Button>
+                    )}
+                  </View>
                 ) : null}
               </ScrollView>
             )}
@@ -925,136 +947,102 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
 
           <ProgressDots step={step} total={TOTAL_STEPS} />
 
-          <Portal>
-            <Dialog
-              visible={addOpen}
-              onDismiss={() => setAddOpen(false)}
-              style={{ borderRadius: 18, alignSelf: 'center', width: '92%', maxWidth: 520 }}
-            >
-              <Dialog.Title style={{ textAlign: 'center', fontWeight: '900' }}>
-                Add a restaurant
-              </Dialog.Title>
-              <Dialog.Content>
-                <TextInput
-                  value={addName}
-                  onChangeText={setAddName}
-                  mode="outlined"
-                  placeholder="Restaurant name"
-                  style={{ marginBottom: 10 }}
-                />
-                <TextInput
-                  value={addAddress}
-                  onChangeText={setAddAddress}
-                  mode="outlined"
-                  placeholder="Optional address"
-                />
-                <Text style={{ marginTop: 10, opacity: 0.7 }}>
-                  This helps us expand coverage faster.
-                </Text>
-              </Dialog.Content>
-              <Dialog.Actions style={{ justifyContent: 'space-between' }}>
-                <Button onPress={() => setAddOpen(false)} disabled={addSaving}>
-                  Close
-                </Button>
-                <Button
-                  onPress={saveNewRestaurantSuggestion}
-                  loading={addSaving}
-                  disabled={addSaving || !addName.trim()}
-                >
-                  Save and rate
-                </Button>
-              </Dialog.Actions>
-            </Dialog>
-          </Portal>
+          <WingmanAddDialog
+            visible={addOpen}
+            onDismiss={() => setAddOpen(false)}
+            initialRestaurant={destQ}
+            initialStateId={pickedState?.state_id ?? null}
+            initialStateCode={pickedState?.state_code ?? null}
+            userId={userId}
+            onPickDestination={pickWingmanDestination}
+            manualReviewQueuedMessage={
+              "We couldn't find anything online confirming they have wings on the menu, so we're adding it to the queue. For onboarding, please pick a BuffaGo restaurant for your first rating."
+            }
+            showCloseOnResultMessage
+            onManualReviewQueued={async (suggestion: any) => {
+              try {
+                const restaurantName = String(suggestion?.restaurant_name || destQ || '').trim();
+                if (!userId && restaurantName) {
+                  await AsyncStorage.setItem(
+                    ONBOARDING_DEST_SUGGESTION_KEY,
+                    JSON.stringify({
+                      state_id: suggestion?.state_id ?? pickedState?.state_id ?? null,
+                      restaurant_name: restaurantName,
+                      address: suggestion?.address ?? null,
+                      saved_at: new Date().toISOString(),
+                    })
+                  );
+                }
+              } catch {}
+              setWingmanDisabledAfterQueue(true);
+              setDestQ('');
+              setPickedDest(null);
+            }}
+          />
         </View>
       ) : null}
 
       {step === 3 ? (
         <View style={styles.screen}>
-          {(() => {
-            const page = RATING_PAGES[ratingPage];
-            const isLast = ratingPage === RATING_PAGES.length - 1;
-            const value = (rating as any)[page.key] ?? 7;
+          <View style={styles.center}>
+            <Text style={styles.title}>Rate your wings</Text>
+            <Text style={styles.body}>
+              {pickedDest?.name ? `How was ${pickedDest.name}?` : 'Rate this wing spot'}
+            </Text>
 
-            return (
-              <>
-                <Text style={styles.title}>Rate your wings</Text>
-                <Text style={styles.body}>
-                  {pickedDest?.name ? `How is ${pickedDest.name}?` : 'Rate their wings'}
-                </Text>
+            <View
+              style={{
+                width: '100%',
+                maxWidth: 520,
+                padding: 14,
+                borderRadius: 18,
+                backgroundColor: 'rgba(255,255,255,0.06)',
+                borderWidth: 1,
+                borderColor: 'rgba(255,255,255,0.10)',
+                marginTop: 16,
+              }}
+            >
+              <Text style={{ fontWeight: '900', textAlign: 'center', marginBottom: 8 }}>
+                Same BuffaGo rating flow everywhere
+              </Text>
+              <Text style={{ textAlign: 'center', opacity: 0.82, lineHeight: 20 }}>
+                Crawl, home, Buffacoins, and onboarding now all use the same wing rating experience.
+              </Text>
+            </View>
 
-                <View style={{ height: 10 }} />
+            <View style={{ height: 18 }} />
 
-                <View
-                  style={{
-                    width: '100%',
-                    maxWidth: 520,
-                    alignSelf: 'center',
-                    padding: 14,
-                    borderRadius: 18,
-                    backgroundColor: 'rgba(255,255,255,0.06)',
-                    borderWidth: 1,
-                    borderColor: 'rgba(255,255,255,0.10)',
-                  }}
-                >
-                  <Text style={{ fontWeight: '900', textAlign: 'center' }}>
-                    {ratingPage + 1} of {RATING_PAGES.length}
-                  </Text>
+            <Text style={{ textAlign: 'center', opacity: 0.7 }}>
+              Use the back arrow in the rating dialog if you want to return to restaurant selection.
+            </Text>
 
-                  <View style={{ height: 10 }} />
+            {!!ratingError ? (
+              <Text style={{ textAlign: 'center', color: '#d32f2f', fontWeight: '800', marginTop: 10 }}>
+                {ratingError}
+              </Text>
+            ) : null}
 
-                  <Text style={{ fontSize: 20, fontWeight: '900', textAlign: 'center' }}>{page.title}</Text>
+            <ProgressDots step={step} total={TOTAL_STEPS} />
+          </View>
 
-                  <Text style={{ textAlign: 'center', opacity: 0.82, marginTop: 8, lineHeight: 20 }}>
-                    {page.blurb}
-                  </Text>
-                </View>
-
-                <ScrollView style={{ marginTop: 10 }} contentContainerStyle={{ paddingBottom: 18 }}>
-                  <SliderRowPretty
-                    label={page.title}
-                    value={value}
-                    onChange={(v: number) =>
-                      setRating((r) => ({
-                        ...r,
-                        [page.key]: v,
-                      }))
-                    }
-                    description=""
-                    badLabel={page.badLabel}
-                    goodLabel={page.goodLabel}
-                  />
-                </ScrollView>
-
-                <View style={[styles.bottomRow, { justifyContent: 'space-between' }]}>
-                  <Button
-                    mode="outlined"
-                    onPress={() => setRatingPage((p) => Math.max(0, p - 1))}
-                    disabled={ratingPage === 0}
-                    style={{ flex: 1, borderRadius: 16 }}
-                    contentStyle={{ paddingVertical: 10 }}
-                  >
-                    Back
-                  </Button>
-
-                  <View style={{ width: 10 }} />
-
-                  <Button
-                    mode="contained"
-                    onPress={goNext}
-                    disabled={!canSubmitRating}
-                    style={[styles.primaryBtn, { flex: 1 }]}
-                    contentStyle={{ paddingVertical: 10 }}
-                  >
-                    {isLast ? 'Finish rating' : 'Next'}
-                  </Button>
-                </View>
-
-                <ProgressDots step={step} total={TOTAL_STEPS} />
-                <ProgressDots step={ratingPage} total={RATING_PAGES.length} />
-              </>
-            );
-          })()}
+          <RatingWizardDialog
+            visible={step === 3}
+            destinationName={pickedDest?.name || 'Rate your wings'}
+            tagOptions={ratingTags}
+            saving={ratingSaving}
+            onDismiss={() => {
+              if (!ratingSaving) goBack();
+            }}
+            onFinalize={async (payload: any) => {
+              setRatingSaving(true);
+              try {
+                await submitOnboardingRating(payload);
+              } finally {
+                setRatingSaving(false);
+              }
+            }}
+            finalizeLabel="Finish rating"
+          />
         </View>
       ) : null}
 
@@ -1080,7 +1068,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
             }}
           >
             <Text style={{ fontWeight: '900', marginBottom: 6 }}>
-              Crawls are your preselected routes to follow. They're designed to help you find new local gems!
+              Crawls are your preselected routes to follow. They&apos;re designed to help you find new local gems!
             </Text>
 
             <Text style={{ opacity: 0.82, lineHeight: 20 }}>
@@ -1144,7 +1132,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
           >
             <Text style={{ fontWeight: '900', marginBottom: 6 }}>Stepping stones</Text>
             <Text style={{ opacity: 0.8 }}>
-              Each stop is a tile. Go to the first restaraunt. Eat. Have Fun. Rate it. Unlock the next tile! Try the next tile another day or tackle it right away. It's up to you.
+              Each stop is a tile. Go to the first restaraunt. Eat. Have Fun. Rate it. Unlock the next tile! Try the next tile another day or tackle it right away. It&apos;s up to you.
             </Text>
           </View>
 
@@ -1160,7 +1148,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
           >
             <Text style={{ fontWeight: '900', marginBottom: 6 }}>Tip</Text>
             <Text style={{ opacity: 0.8 }}>
-              If trying to complete a crawl in a single day, there's no shame in splitting the smallest wing-size with a friend at each destination.
+              If trying to complete a crawl in a single day, there&apos;s no shame in splitting the smallest wing-size with a friend at each destination.
             </Text>
           </View>
 
@@ -1193,7 +1181,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
           <Text style={styles.title}>Are you ready?</Text>
 
           <Text style={styles.body}>
-            Let's get your wing journey officialy started!
+            Let&apos;s get your wing journey officialy started!
           </Text>
 
           <View style={{ height: 14 }} />

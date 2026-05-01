@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, Pressable, ScrollView, FlatList, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
-import { Button, Dialog, ProgressBar, Text, useTheme } from 'react-native-paper';
+import { Button, Dialog, Portal, ProgressBar, Text, useTheme } from 'react-native-paper';
 
 /** Clamp a score to integer 1–10 */
 const toNumber = (v, def = 5) => {
@@ -252,6 +252,7 @@ export default function RatingWizardDialog({
   saving = false,
   onDismiss,
   onFinalize,
+  finalizeLabel = 'Finalize',
 }) {
   const theme = useTheme();
   const surface = theme.colors.surface;
@@ -332,16 +333,17 @@ export default function RatingWizardDialog({
   };
 
   return (
-    <Dialog
-      visible={visible}
-      onDismiss={() => {
-        if (!saving) onDismiss?.();
-      }}
-      style={[styles.dialog, { backgroundColor: surface }]}
-    >
-      <DialogHeaderArrow title={destinationName || 'Rate this stop'} onBack={goBack} />
+    <Portal>
+      <Dialog
+        visible={visible}
+        onDismiss={() => {
+          if (!saving) onDismiss?.();
+        }}
+        style={[styles.dialog, { backgroundColor: surface }]}
+      >
+        <DialogHeaderArrow title={destinationName || 'Rate this stop'} onBack={goBack} />
 
-      <Dialog.Content>
+        <Dialog.Content>
         <ProgressBar progress={(step + 1) / totalSteps} style={styles.ratingProgress} />
 
         <View style={{ marginTop: 16 }}>
@@ -525,10 +527,11 @@ export default function RatingWizardDialog({
         </Button>
 
         <Button mode="contained" loading={saving} disabled={saving} onPress={goNext}>
-          {step < totalSteps - 1 ? 'Next' : 'Finalize'}
+          {step < totalSteps - 1 ? 'Next' : finalizeLabel}
         </Button>
       </Dialog.Actions>
-    </Dialog>
+      </Dialog>
+    </Portal>
   );
 }
 
@@ -538,6 +541,8 @@ const styles = StyleSheet.create({
     width: '92%',
     maxWidth: 520,
     borderRadius: 16,
+    maxHeight: '88%',
+    marginTop: 24,
   },
   dialogHeader: {
     paddingHorizontal: 10,

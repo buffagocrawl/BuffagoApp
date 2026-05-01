@@ -40,9 +40,8 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({ ok: true }), { status: 200 });
   } catch (e) {
-    console.error("delete-account failed", e);
     return new Response(
-      JSON.stringify({ ok: false, error: "Could not delete account" }),
+      JSON.stringify({ ok: false, error: String(e) }),
       { status: 500 }
     );
   }

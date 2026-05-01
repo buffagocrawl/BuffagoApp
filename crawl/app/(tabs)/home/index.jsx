@@ -16,7 +16,7 @@ import { Text, Button, useTheme, Dialog, Portal, Avatar, TextInput } from 'react
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as Crypto from 'expo-crypto';
-
+import WingmanAddDialog from '../../../components/WingmanAddDialog';
 import { supabase } from '../../../lib/supabase.js';
 import WelcomeWizard from '../../../components/WelcomeWizard';
 import DestinationPickerWizard from '../../../components/DestinationPickerWizard';
@@ -345,6 +345,8 @@ export default function Home() {
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [searchOverride, setSearchOverride] = useState(null); // { label, latitude, longitude }
+  const [wingmanOpen, setWingmanOpen] = useState(false);
+  const [wingmanStateCtx, setWingmanStateCtx] = useState(null);
 
   // Stats dialog
   const [statsOpen, setStatsOpen] = useState(false);
@@ -1149,6 +1151,44 @@ export default function Home() {
       console.warn('saveCurrentStateCache failed:', e?.message || e);
     }
   }, []);
+
+  const getWingmanStateContext = useCallback(async () => {
+    if (hudStats?.stateId && hudStats?.stateAbbrev) {
+      return {
+        stateId: Number(hudStats.stateId),
+        stateCode: String(hudStats.stateAbbrev),
+      };
+    }
+
+    try {
+      const raw = await AsyncStorage.getItem('buffago:currentState');
+      const parsed = raw ? JSON.parse(raw) : null;
+
+      if (parsed?.state_id && parsed?.state_code) {
+        return {
+          stateId: Number(parsed.state_id),
+          stateCode: String(parsed.state_code),
+        };
+      }
+    } catch (e) {
+      console.warn('getWingmanStateContext failed:', e?.message || e);
+    }
+
+    return null;
+  }, [hudStats?.stateId, hudStats?.stateAbbrev]);
+
+  useEffect(() => {
+    let alive = true;
+
+    (async () => {
+      const ctx = await getWingmanStateContext();
+      if (alive) setWingmanStateCtx(ctx);
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, [getWingmanStateContext, searchOpen]);
 
   /**
    * HUD refresh (Level + XP, Wingdex stats, top 50)
@@ -2077,8 +2117,12 @@ export default function Home() {
       return;
     }
 
+    const ADMIN_ID = '23898359-306a-4dd3-91f0-da66da19ccfc';
+    const isAdmin = session?.user?.id === ADMIN_ID;
+    
     const milesAway = closest?.distanceM != null ? metersToMiles(closest.distanceM) : null;
-    if (milesAway == null || milesAway > 0.1) {
+    
+    if (!isAdmin && (milesAway == null || milesAway > 0.1)) {
       Alert.alert(
         'Not close enough',
         'You must be within 0.1 miles to rate this spot. Or head to the Wingdex if you have Buffacoins!'
@@ -2115,8 +2159,10 @@ export default function Home() {
       const meat = Number(scores.meat ?? scores.meatiness ?? scores.meat_factor);
       const overall = Number(scores.overall ?? scores.total ?? scores.score);
 
-      const nums = [crispiness, sauce, meat, overall].filter((n) => Number.isFinite(n));
-      const weightScore = nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : null;
+      const weightScore =
+        [crispiness, sauce, meat, overall].every((n) => Number.isFinite(n))
+          ? (crispiness * 2) + (sauce * 2) + (meat * 2) + (overall * 4)
+          : null;
 
       const tagId =
         payload?.selectedTagId ??
@@ -2125,6 +2171,51 @@ export default function Home() {
         payload?.tagId ??
         payload?.tag?.id ??
         null;
+
+      const wouldOrderAgain =
+        payload?.wouldOrderAgain == null ? null : Boolean(payload.wouldOrderAgain);
+
+      const wingsEatenRaw =
+        payload?.wingsEaten ??
+        payload?.wings_eaten ??
+        payload?.wings ??
+        null;
+
+      const wingsEaten =
+        wingsEatenRaw == null || wingsEatenRaw === ''
+          ? 0
+          : Math.max(0, Math.round(Number(wingsEatenRaw) || 0));
+
+      const sauceStyleRaw =
+        payload?.sauceStyle ??
+        payload?.sauce_style ??
+        null;
+
+      const sauceStyle = [1, 2, 3].includes(Number(sauceStyleRaw))
+        ? Number(sauceStyleRaw)
+        : null;
+
+      const spiceLevelRaw =
+        payload?.spiceLevel ??
+        payload?.spice_level ??
+        null;
+
+      const spiceLevel = Number.isFinite(Number(spiceLevelRaw))
+        ? Math.max(1, Math.min(10, Math.round(Number(spiceLevelRaw))))
+        : null;
+
+      const flavorVibeRaw =
+        payload?.flavorVibe ??
+        payload?.flavor_vibe ??
+        [];
+
+      const flavorVibe = Array.isArray(flavorVibeRaw)
+        ? [...new Set(
+            flavorVibeRaw
+              .map((v) => Number(v))
+              .filter((v) => Number.isInteger(v) && v >= 1 && v <= 6)
+          )].slice(0, 2)
+        : [];
 
       setHomeRateSaving(true);
       try {
@@ -2153,6 +2244,11 @@ export default function Home() {
           meat: Number.isFinite(meat) ? meat : null,
           overall: Number.isFinite(overall) ? overall : null,
           tag_id: tagId,
+          wings_eaten: wingsEaten,
+          sauce_style: sauceStyle,
+          flavor_vibe: flavorVibe.length ? flavorVibe : null,
+          spice_level: spiceLevel,
+          would_order_again: wouldOrderAgain,
         };
 
         const { error: ratingErr } = await supabase.from('destination_ratings').insert(insertRow);
@@ -2231,6 +2327,12 @@ export default function Home() {
     return () => clearTimeout(t);
   }, [searchText, runSearch]);
 
+  const closeRestaurantSearch = useCallback(() => {
+    setSearchOpen(false);
+    setSearchText('');
+    setSearchResults([]);
+  }, []);
+
   const pickSearchResult = useCallback(
     async (row) => {
       if (!row?.id) return;
@@ -2269,11 +2371,9 @@ export default function Home() {
           : null
       );
   
-      setSearchOpen(false);
-      setSearchText('');
-      setSearchResults([]);
+      closeRestaurantSearch();
     },
-    [coords?.latitude, coords?.longitude]
+    [closeRestaurantSearch, coords?.latitude, coords?.longitude]
   );
   if (onboardingLoading) return null;
 
@@ -2290,7 +2390,7 @@ export default function Home() {
   return (
     <LocationGate>
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-        <ScrollView contentContainerStyle={styles.scroll}>
+        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           {/* Header */}
           <View style={styles.headerRow}>
             <Pressable
@@ -2546,11 +2646,7 @@ export default function Home() {
         <Portal>
           <Dialog
             visible={searchOpen}
-            onDismiss={() => {
-              setSearchOpen(false);
-              setSearchText('');
-              setSearchResults([]);
-            }}
+            onDismiss={closeRestaurantSearch}
             style={{ borderRadius: 18, alignSelf: 'center', width: '92%', maxWidth: 520 }}
           >
             <Dialog.Title style={{ textAlign: 'center', fontWeight: '900' }}>
@@ -2599,9 +2695,30 @@ export default function Home() {
                     ) : null}
 
                     {!searchResults?.length && !!searchText.trim() ? (
-                      <Text style={{ textAlign: 'center', opacity: 0.75, paddingVertical: 14 }}>
-                        No matches.
-                      </Text>
+                      <View style={{ paddingVertical: 14, alignItems: 'center', gap: 10 }}>
+                        <Text style={{ textAlign: 'center', opacity: 0.75 }}>
+                          No matches in BuffaGo yet.
+                        </Text>
+
+                      </View>
+                    ) : null}
+
+                    {!!searchText.trim() ? (
+                      <View style={{ paddingVertical: 12, alignItems: 'center', gap: 8 }}>
+                        {isSignedIn ? (
+                          <Button
+                            mode="contained"
+                            onPress={() => setWingmanOpen(true)}
+                            icon="robot-outline"
+                          >
+                            Add with Wingman
+                          </Button>
+                        ) : (
+                          <Text style={{ textAlign: 'center', opacity: 0.75 }}>
+                            Sign in to add a restaurant with Wingman.
+                          </Text>
+                        )}
+                      </View>
                     ) : null}
                   </ScrollView>
                 )}
@@ -2614,11 +2731,7 @@ export default function Home() {
 
             <Dialog.Actions style={{ justifyContent: 'center' }}>
               <Button
-                onPress={() => {
-                  setSearchOpen(false);
-                  setSearchText('');
-                  setSearchResults([]);
-                }}
+                onPress={closeRestaurantSearch}
               >
                 Close
               </Button>
@@ -2987,6 +3100,19 @@ export default function Home() {
           }}
         />
 
+        <WingmanAddDialog
+          visible={wingmanOpen}
+          onDismiss={() => {
+            setWingmanOpen(false);
+            closeRestaurantSearch();
+          }}
+          initialRestaurant={searchText}
+          initialStateId={wingmanStateCtx?.stateId ?? null}
+          initialStateCode={wingmanStateCtx?.stateCode ?? null}
+          userId={session?.user?.id ?? null}
+          onPickDestination={pickSearchResult}
+        />
+
         <CoinRewardModal
           visible={coinRewardOpen}
           coins={COIN_REWARD_AMOUNT}
@@ -3001,7 +3127,7 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  scroll: { padding: 20, paddingBottom: 28, gap: 14 },
+  scroll: { padding: 16, paddingBottom: 10, gap: 10 },
 
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   leftArea: { width: 36, alignItems: 'flex-start', justifyContent: 'center' },

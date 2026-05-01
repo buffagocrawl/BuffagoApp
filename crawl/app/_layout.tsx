@@ -126,8 +126,8 @@ function AppShell() {
    const pathname = usePathname(); // 
 
   // ---- Boot splash gate ----
-  const MIN_SPLASH_MS = 10000;
-  const SETTLE_MS = 500;
+  const MIN_SPLASH_MS = 3500;
+  const SETTLE_MS = 250;
 
   const [bootDone, setBootDone] = useState(false);
   const [minTimeDone, setMinTimeDone] = useState(false);

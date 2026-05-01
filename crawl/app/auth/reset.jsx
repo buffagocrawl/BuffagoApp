@@ -160,10 +160,24 @@ export default function ResetCallback() {
       clearInterval(retryTimerRef.current);
     };
   }, [url, params, router]);
+
+  // Minimal on-screen debug (redact tokens yourself if you screenshot)
+  const debug = (() => {
+    try {
+      const safe = { url, params: Object.keys(params || {}).length };
+      return JSON.stringify(safe, null, 2);
+    } catch {
+      return String(url || "");
+    }
+  })();
+
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 16 }}>
       <ActivityIndicator />
       <Text style={{ marginTop: 12, textAlign: "center" }}>{msg}</Text>
+      <Text selectable style={{ marginTop: 16, fontSize: 12, opacity: 0.6 }} numberOfLines={6}>
+        Debug → {debug}
+      </Text>
     </View>
   );
 }

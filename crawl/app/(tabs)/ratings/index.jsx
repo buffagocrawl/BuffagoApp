@@ -14,7 +14,6 @@ import {
   Animated,
   Modal,
 } from 'react-native';
-import Slider from '@react-native-community/slider';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
@@ -33,6 +32,7 @@ import {
   useTheme,
 } from 'react-native-paper';
 import { useRouter, useFocusEffect } from 'expo-router';
+import RatingWizardDialog from '../../../components/RatingWizardDialog';
 import { supabase } from '../../../lib/supabase.js';
 import { useLocationCtx } from '../../../providers/LocationProvider';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -495,6 +495,14 @@ export default function PublicRatingsScreen() {
   const [rows, setRows] = useState([]);
 
   const [tagNameById, setTagNameById] = useState({});
+  const ratingTagOptions = useMemo(
+    () =>
+      Object.entries(tagNameById).map(([id, tag]) => ({
+        id: Number(id),
+        tag,
+      })),
+    [tagNameById]
+  );
   // selectedTagId:
   // - null       => no specific tag filter
   // - 'my'       => only places you've rated, sorted by your rating desc
@@ -550,43 +558,6 @@ export default function PublicRatingsScreen() {
   const [coinRatingDest, setCoinRatingDest] = useState(null);
   const [coinSubmitting, setCoinSubmitting] = useState(false);
 
-  // rating wizard state
-  const [ratingStep, setRatingStep] = useState(0);
-  const totalRatingSteps = 5; // keep it tight
-
-  const [scores, setScores] = useState({
-    sauce: 7,
-    crispiness: 7,
-    meat: 7,
-    overall: 7,
-  });
-  const [wouldOrderAgain, setWouldOrderAgain] = useState(null);
-
-  const wizardCopy = useMemo(
-    () => ({
-      sauce: {
-        desc: 'How tasty and balanced was the sauce? Think flavor, heat, and cling.',
-        bad: 'Bleh',
-        good: 'Unforgettable',
-      },
-      crispiness: {
-        desc: 'How crunchy were the wings? No one wants soggy breading.',
-        bad: 'Soggy',
-        good: 'Crunchy',
-      },
-      meat: {
-        desc: 'How juicy and high-quality was the chicken itself?',
-        bad: 'Foul',
-        good: 'Five-star',
-      },
-      overall: {
-        desc: 'The wing experience — presentation, aroma, and vibe, all rolled together.',
-        bad: 'Never Again',
-        good: 'Back Tomorrow',
-      },
-    }),
-    []
-  );
 
   const statusColorFor = useCallback(
     (destinationId) => {
@@ -1025,12 +996,6 @@ export default function PublicRatingsScreen() {
     }
   }, [fetchAll]);
 
-  const resetCoinWizard = useCallback(() => {
-    setRatingStep(0);
-    setScores({ sauce: 7, crispiness: 7, meat: 7, overall: 7 });
-    setWouldOrderAgain(null);
-  }, []);
-  
   // ✅ coin-rate for any nearby restaurant 
   const canRateWithCoins = useCallback(
     (item) => {
@@ -1077,30 +1042,28 @@ export default function PublicRatingsScreen() {
 
       // 3) Has enough coins
       setCoinRatingDest(item);
-      resetCoinWizard();
       setCoinRateOpen(true);
     },
-    [user?.id, buffacoinBalance, resetCoinWizard, coinCostByDest, myCoinRated]
+    [user?.id, buffacoinBalance, coinCostByDest, myCoinRated]
   );
 
-  const computeWeightScore = useCallback(() => {
-    const sauce = Number(scores.sauce ?? 0);
-    const crispiness = Number(scores.crispiness ?? 0);
-    const meat = Number(scores.meat ?? 0);
-    const overall = Number(scores.overall ?? 0);
-  
-    // 2/2/2/4 weighting => max 100 when all are 10
+  const computeWeightScoreFromScores = useCallback((inputScores) => {
+    const sauce = Number(inputScores?.sauce ?? 0);
+    const crispiness = Number(inputScores?.crispiness ?? 0);
+    const meat = Number(inputScores?.meat ?? 0);
+    const overall = Number(inputScores?.overall ?? 0);
+
     const raw = (sauce * 2) + (crispiness * 2) + (meat * 2) + (overall * 4);
-  
     const safe = Number.isFinite(raw) ? raw : 0;
+
     return Math.max(0, Math.min(100, Math.round(safe)));
-  }, [scores]);
+  }, []);
 
 
-  const submitCoinRating = useCallback(async () => {
+  const submitCoinRating = useCallback(async (payload) => {
   if (!user?.id || !coinRatingDest?.destination_id) return;
 
-  if (wouldOrderAgain === null) {
+  if (payload?.wouldOrderAgain === null) {
     Alert.alert('Quick one', 'Would you go back again? 👍 / 👎');
     return;
   }
@@ -1150,17 +1113,30 @@ export default function PublicRatingsScreen() {
     }
 
     // 3) Build rating payload
-    const weightScore = computeWeightScore();
+    const finalScores = payload?.scores ?? {};
+    const weightScore = computeWeightScoreFromScores(finalScores);
+
+    const safeWingsEaten = payload?.wingsEaten == null ? null : Math.max(0, Number(payload.wingsEaten));
+    const safeSauceStyle = payload?.sauceStyle == null ? null : Number(payload.sauceStyle);
+    const safeFlavorVibe = Array.isArray(payload?.flavorVibe)
+      ? payload.flavorVibe.map((v) => Number(v)).filter((v) => Number.isFinite(v)).slice(0, 2)
+      : [];
+    const safeSpiceLevel = payload?.spiceLevel == null ? null : Number(payload.spiceLevel);
 
     const insertPayload = {
       crawl_id: crawlId,
       destination_id: coinRatingDest.destination_id,
       user_id: user.id,
-      sauce: Number(scores.sauce),
-      crispiness: Number(scores.crispiness),
-      meat: Number(scores.meat),
-      overall: Number(scores.overall),
-      would_order_again: Boolean(wouldOrderAgain),
+      sauce: Number(finalScores.sauce),
+      crispiness: Number(finalScores.crispiness),
+      meat: Number(finalScores.meat),
+      overall: Number(finalScores.overall),
+      would_order_again: payload?.wouldOrderAgain == null ? null : Boolean(payload.wouldOrderAgain),
+      tag_id: payload.selectedTagId ?? null,
+      wings_eaten: Number.isFinite(safeWingsEaten) ? safeWingsEaten : null,
+      sauce_style: Number.isFinite(safeSauceStyle) ? safeSauceStyle : null,
+      flavor_vibe: safeFlavorVibe.length ? safeFlavorVibe : null,
+      spice_level: Number.isFinite(safeSpiceLevel) ? safeSpiceLevel : null,
       is_buffacoin: true,
     };
 
@@ -1208,10 +1184,10 @@ export default function PublicRatingsScreen() {
           ...r,
           count: nextCount,
           avgWeight: nextAvg,
-          avgSauce: bumpAvg10(r.avgSauce, Number(scores.sauce)),
-          avgCrisp: bumpAvg10(r.avgCrisp, Number(scores.crispiness)),
-          avgMeat: bumpAvg10(r.avgMeat, Number(scores.meat)),
-          avgOverall: bumpAvg10(r.avgOverall, Number(scores.overall)),
+          avgSauce: bumpAvg10(r.avgSauce, Number(finalScores.sauce)),
+          avgCrisp: bumpAvg10(r.avgCrisp, Number(finalScores.crispiness)),
+          avgMeat: bumpAvg10(r.avgMeat, Number(finalScores.meat)),
+          avgOverall: bumpAvg10(r.avgOverall, Number(finalScores.overall)),
           ratedByMe: true,
           myAvgWeight: weightScore,
         };
@@ -1237,10 +1213,10 @@ export default function PublicRatingsScreen() {
         ...prev,
         count: nextCount,
         avgWeight: nextAvg,
-        avgSauce: bumpAvg10(prev.avgSauce, Number(scores.sauce)),
-        avgCrisp: bumpAvg10(prev.avgCrisp, Number(scores.crispiness)),
-        avgMeat: bumpAvg10(prev.avgMeat, Number(scores.meat)),
-        avgOverall: bumpAvg10(prev.avgOverall, Number(scores.overall)),
+        avgSauce: bumpAvg10(prev.avgSauce, Number(finalScores.sauce)),
+        avgCrisp: bumpAvg10(prev.avgCrisp, Number(finalScores.crispiness)),
+        avgMeat: bumpAvg10(prev.avgMeat, Number(finalScores.meat)),
+        avgOverall: bumpAvg10(prev.avgOverall, Number(finalScores.overall)),
         ratedByMe: true,
         myAvgWeight: weightScore,
       };
@@ -1269,10 +1245,10 @@ export default function PublicRatingsScreen() {
     setPendingCoinBalance(safeNewBal);
     setPendingSummary({
       weightScore,
-      sauce: Number(scores.sauce),
-      crispiness: Number(scores.crispiness),
-      meat: Number(scores.meat),
-      overall: Number(scores.overall),
+      sauce: Number(finalScores.sauce),
+      crispiness: Number(finalScores.crispiness),
+      meat: Number(finalScores.meat),
+      overall: Number(finalScores.overall),
     });
     setCoinCelebrateOpen(true);
   } finally {
@@ -1284,10 +1260,9 @@ export default function PublicRatingsScreen() {
   currentState,
   stateCodeFilter,
   coinRatingDest?.stateCode,
-  wouldOrderAgain,
-  scores,
   buffacoinBalance,
-  computeWeightScore,
+  computeWeightScoreFromScores,
+  playCoinDelta,
 ]);
 
 
@@ -1579,8 +1554,8 @@ export default function PublicRatingsScreen() {
           renderItem={renderItem}
           contentContainerStyle={{
             padding: 16,
-            paddingBottom: 40,
-            paddingTop: headerHeight + 8,
+            paddingBottom: 8,
+            paddingTop: headerHeight,
           }}
           ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
@@ -1944,116 +1919,18 @@ export default function PublicRatingsScreen() {
         </Dialog>
       </Portal>
 
-      {/* Buffacoin Rating Wizard */}
-      <Portal>
-        <Dialog visible={coinRateOpen} onDismiss={() => setCoinRateOpen(false)} style={styles.dialog}>
-          <Dialog.Title style={{ textAlign: 'center' }}>
-            {coinRatingDest?.name ? `Rate • ${coinRatingDest.name}` : 'Rate'}
-          </Dialog.Title>
-          <Dialog.Content>
-            <ProgressBar progress={(ratingStep + 1) / totalRatingSteps} style={styles.ratingProgress} />
+      <RatingWizardDialog
+        visible={coinRateOpen}
+        destinationName={coinRatingDest?.name ? `Rate • ${coinRatingDest.name}` : 'Rate'}
+        tagOptions={ratingTagOptions}
+        saving={coinSubmitting}
+        finalizeLabel={`Spend ${Math.max(1, Number(coinCostForActive || 1))} 🪙 & Submit`}
+        onDismiss={() => {
+          if (!coinSubmitting) setCoinRateOpen(false);
+        }}
+        onFinalize={submitCoinRating}
+      />
 
-            <View style={{ marginTop: 16 }}>
-              {ratingStep === 0 && (
-                <SliderRowPretty
-                  label="Sauce"
-                  value={scores.sauce}
-                  onChange={(v) => setScores((s) => ({ ...s, sauce: v }))}
-                  description={wizardCopy.sauce.desc}
-                  badLabel={wizardCopy.sauce.bad}
-                  goodLabel={wizardCopy.sauce.good}
-                />
-              )}
-
-              {ratingStep === 1 && (
-                <SliderRowPretty
-                  label="Crispiness"
-                  value={scores.crispiness}
-                  onChange={(v) => setScores((s) => ({ ...s, crispiness: v }))}
-                  description={wizardCopy.crispiness.desc}
-                  badLabel={wizardCopy.crispiness.bad}
-                  goodLabel={wizardCopy.crispiness.good}
-                />
-              )}
-
-              {ratingStep === 2 && (
-                <SliderRowPretty
-                  label="Chicken Quality"
-                  value={scores.meat}
-                  onChange={(v) => setScores((s) => ({ ...s, meat: v }))}
-                  description={wizardCopy.meat.desc}
-                  badLabel={wizardCopy.meat.bad}
-                  goodLabel={wizardCopy.meat.good}
-                />
-              )}
-
-              {ratingStep === 3 && (
-                <SliderRowPretty
-                  label="Overall Experience"
-                  value={scores.overall}
-                  onChange={(v) => setScores((s) => ({ ...s, overall: v }))}
-                  description={wizardCopy.overall.desc}
-                  badLabel={wizardCopy.overall.bad}
-                  goodLabel={wizardCopy.overall.good}
-                />
-              )}
-
-              {ratingStep === 4 && (
-                <View>
-                  <StepTitle>Go back again?</StepTitle>
-                  <View style={styles.thumbRow}>
-                    <Pressable
-                      onPress={() => setWouldOrderAgain(true)}
-                      style={[styles.thumbChoice, wouldOrderAgain === true && styles.thumbChoiceOn]}
-                    >
-                      <Text style={styles.thumbIcon}>👍</Text>
-                      <Text style={styles.thumbText}>Yes</Text>
-                    </Pressable>
-
-                    <Pressable
-                      onPress={() => setWouldOrderAgain(false)}
-                      style={[styles.thumbChoice, wouldOrderAgain === false && styles.thumbChoiceOn]}
-                    >
-                      <Text style={styles.thumbIcon}>👎</Text>
-                      <Text style={styles.thumbText}>No</Text>
-                    </Pressable>
-                  </View>
-                  <StepDesc>Quick gut-check — would you come back for these wings?</StepDesc>
-                </View>
-              )}
-            </View>
-          </Dialog.Content>
-
-          <Dialog.Actions style={{ justifyContent: 'space-between' }}>
-            <Button
-              mode="outlined"
-              disabled={coinSubmitting || ratingStep === 0}
-              onPress={() => setRatingStep((s) => Math.max(0, s - 1))}
-            >
-              Back
-            </Button>
-
-            {ratingStep < totalRatingSteps - 1 ? (
-              <Button
-                mode="contained"
-                disabled={coinSubmitting}
-                onPress={() => setRatingStep((s) => Math.min(totalRatingSteps - 1, s + 1))}
-              >
-                Next
-              </Button>
-            ) : (
-                <Button
-                  mode="contained"
-                  loading={coinSubmitting}
-                  disabled={coinSubmitting}
-                  onPress={submitCoinRating}
-                >
-                  {`Spend ${Math.max(1, Number(coinCostForActive || 1))} 🪙 & Submit`}
-                </Button>
-            )}
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
     </SafeAreaView>
   );
 }
@@ -2066,7 +1943,7 @@ const styles = StyleSheet.create({
   right: 0,
   top: 0,
   paddingHorizontal: 16,
-  paddingBottom: 4,
+  paddingBottom: 0,
 },
   headerTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   title: { fontWeight: '800' },

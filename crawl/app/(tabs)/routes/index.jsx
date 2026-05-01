@@ -1133,8 +1133,8 @@ export default function RoutesIndex() {
           renderItem={renderItem}
           contentContainerStyle={{
             padding: 16,
-            paddingBottom: 40,
-            paddingTop: 16 + headerHeight,
+            paddingBottom: 20,
+            paddingTop: 8 + headerHeight,
           }}
           ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
@@ -1521,7 +1521,7 @@ export default function RoutesIndex() {
 
 /* ---------------- styles ---------------- */
 const styles = StyleSheet.create({
-  header: { paddingHorizontal: 16, paddingTop: 32, paddingBottom: 10 },
+  header: { paddingHorizontal: 16, paddingTop: 32, paddingBottom: 6 },
   headerTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   title: { fontWeight: '800' },
   subtitle: { opacity: 0.7, marginTop: 2 },

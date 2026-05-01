@@ -36,12 +36,9 @@ yarn-error.*
 *.env
 *.env.*
 test.env*
-!.env.example
 
 # local IDE / tool state
 .vs/
-.vscode/
-.idea/
 
 # Supabase local state
 supabase/.temp/
