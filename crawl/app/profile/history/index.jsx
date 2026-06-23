@@ -9,6 +9,8 @@ import { ActivityIndicator, Card, Text, Button, Divider, ProgressBar, useTheme }
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../../../lib/supabase.js';
+import { trackEvent } from '../../../lib/analytics';
+import FriendProfileActions from '../../../components/FriendProfileActions';
 
 /* ---------------- helpers ---------------- */
 
@@ -188,11 +190,9 @@ export default function HistoryIndex() {
       }
 
       try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('user_id, username')
-          .eq('user_id', viewUserId)
-          .maybeSingle();
+        const { data, error } = await supabase.rpc('get_safe_social_profile', {
+          p_target_user_id: viewUserId,
+        });
 
         if (cancelled) return;
 
@@ -200,7 +200,7 @@ export default function HistoryIndex() {
           console.warn('view user profile fetch failed:', error.message || error);
           setViewUserProfile(null);
         } else {
-          setViewUserProfile(data ?? null);
+          setViewUserProfile(Array.isArray(data) ? data[0] ?? null : data ?? null);
         }
       } catch (e) {
         if (!cancelled) {
@@ -298,6 +298,17 @@ export default function HistoryIndex() {
       setRatings([]);
       setRatingAlignment({ closest: null, farthest: null });
       return;
+    }
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const viewerId = sessionData?.session?.user?.id ?? null;
+    if (viewerId && viewerId !== userId) {
+      const { data: safeProfile, error: accessError } = await supabase.rpc('get_safe_social_profile', {
+        p_target_user_id: userId,
+      });
+      if (accessError) throw accessError;
+      const allowed = Array.isArray(safeProfile) ? safeProfile[0] : safeProfile;
+      if (!allowed) throw new Error('This profile is unavailable because of privacy settings.');
     }
 
     const { data: crawlsRows, error: cErr } = await supabase
@@ -454,10 +465,30 @@ export default function HistoryIndex() {
 
   useFocusEffect(
     useCallback(() => {
+      trackEvent({
+        eventName: 'profile_opened',
+        screen: 'profile_history',
+        userId: viewUserId ?? session?.user?.id ?? null,
+        metadata: {
+          source_screen: 'journey_tab',
+          viewing_self: isViewingSelf,
+        },
+      });
+      if (!isViewingSelf && viewUserId) {
+        trackEvent({
+          eventName: 'friend_profile_opened',
+          screen: 'profile_history',
+          userId: session?.user?.id ?? null,
+          metadata: {
+            target_user_id: viewUserId,
+            source_surface: toStr(params?.sourceSurface) || 'profile',
+          },
+        });
+      }
       if (!viewUserId) return;
       if (!didInitialLoadRef.current) return;
       fetchAll(viewUserId);
-    }, [viewUserId, fetchAll])
+    }, [viewUserId, fetchAll, session?.user?.id, isViewingSelf, params?.sourceSurface])
   );
 
   const onRefresh = useCallback(async () => {
@@ -837,6 +868,13 @@ export default function HistoryIndex() {
           </Text>
         </View>
 
+        {!isViewingSelf && session?.user?.id && viewUserProfile?.user_id ? (
+          <FriendProfileActions
+            targetUserId={viewUserProfile.user_id}
+            sourceSurface={toStr(params?.sourceSurface) || 'profile'}
+          />
+        ) : null}
+
         {loading ? (
           <View style={styles.center}>
             <ActivityIndicator />
@@ -1073,7 +1111,15 @@ export default function HistoryIndex() {
                   icon="trophy"
                   style={{ borderRadius: 12, marginBottom: 10 }}
                   contentStyle={{ paddingVertical: 6 }}
-                  onPress={() => router.push('/profile/history/BadgesScreen')}
+                  onPress={() => {
+                    trackEvent({
+                      eventName: 'badge_viewed',
+                      screen: 'profile_history',
+                      userId: session?.user?.id ?? null,
+                      metadata: { source_screen: 'profile_history', badge_id: null },
+                    });
+                    router.push('/profile/history/BadgesScreen');
+                  }}
                 >
                   Badges
                 </Button>

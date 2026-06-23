@@ -1,0 +1,428 @@
+table_name,column_name,data_type
+00_Open_Work,source,text
+00_Open_Work,status,text
+00_Open_Work,item_count,integer
+analytics_agent_growth_opportunities,opportunity_type,text
+analytics_agent_growth_opportunities,destination_id,uuid
+analytics_agent_growth_opportunities,route_id,uuid
+analytics_agent_growth_opportunities,state_id,integer
+analytics_agent_growth_opportunities,event_date,date
+analytics_agent_growth_opportunities,signal_count,bigint
+analytics_agent_growth_opportunities,context,jsonb
+analytics_agent_restaurant_summary,destination_id,uuid
+analytics_agent_restaurant_summary,destination_name,text
+analytics_agent_restaurant_summary,city,text
+analytics_agent_restaurant_summary,state_id,integer
+analytics_agent_restaurant_summary,rating_count,bigint
+analytics_agent_restaurant_summary,avg_weight_score,numeric
+analytics_agent_restaurant_summary,avg_overall,numeric
+analytics_agent_restaurant_summary,last_rated_at,timestamp with time zone
+analytics_agent_restaurant_summary,profile_views_30d,bigint
+analytics_agent_restaurant_summary,directions_taps_30d,bigint
+analytics_agent_restaurant_summary,rating_starts_30d,bigint
+analytics_agent_restaurant_summary,event_rating_completions_30d,bigint
+analytics_agent_restaurant_summary,shares_30d,bigint
+analytics_agent_route_summary,route_id,uuid
+analytics_agent_route_summary,title,text
+analytics_agent_route_summary,city,text
+analytics_agent_route_summary,is_public,boolean
+analytics_agent_route_summary,is_token_route,boolean
+analytics_agent_route_summary,all_crawls,bigint
+analytics_agent_route_summary,completed_crawls,bigint
+analytics_agent_route_summary,last_crawl_at,timestamp with time zone
+analytics_agent_route_summary,unique_identities_30d,bigint
+analytics_agent_route_summary,crawl_views_30d,bigint
+analytics_agent_route_summary,crawl_starts_30d,bigint
+analytics_agent_route_summary,crawl_completions_30d,bigint
+analytics_agent_route_summary,ratings_completed_30d,bigint
+analytics_crawl_funnel_daily,event_date,date
+analytics_crawl_funnel_daily,crawl_started,bigint
+analytics_crawl_funnel_daily,crawl_viewed,bigint
+analytics_crawl_funnel_daily,crawl_resumed,bigint
+analytics_crawl_funnel_daily,crawl_saved,bigint
+analytics_crawl_funnel_daily,crawl_completed,bigint
+analytics_crawl_funnel_daily,crawl_abandoned,bigint
+analytics_crawl_funnel_daily,crawl_ratings_completed,bigint
+analytics_crawl_funnel_daily,rough_completion_rate,numeric
+analytics_daily_active_users,event_date,date
+analytics_daily_active_users,signed_in_users,bigint
+analytics_daily_active_users,anonymous_users,bigint
+analytics_daily_active_users,active_identities,bigint
+analytics_daily_active_users,sessions,bigint
+analytics_daily_active_users,total_events,bigint
+analytics_daily_active_users,app_opens,bigint
+analytics_daily_active_users,screen_views,bigint
+analytics_destination_performance_daily,event_date,date
+analytics_destination_performance_daily,destination_id,uuid
+analytics_destination_performance_daily,unique_identities,bigint
+analytics_destination_performance_daily,profile_views,bigint
+analytics_destination_performance_daily,directions_taps,bigint
+analytics_destination_performance_daily,rating_starts,bigint
+analytics_destination_performance_daily,rating_completions,bigint
+analytics_destination_performance_daily,shares,bigint
+analytics_discovery_daily,event_date,date
+analytics_discovery_daily,restaurant_searches_with_results,bigint
+analytics_discovery_daily,restaurant_search_empty,bigint
+analytics_discovery_daily,restaurant_search_failed,bigint
+analytics_discovery_daily,restaurant_search_result_selected,bigint
+analytics_discovery_daily,restaurant_profile_views,bigint
+analytics_discovery_daily,directions_taps,bigint
+analytics_discovery_daily,map_opens,bigint
+analytics_discovery_daily,failures,bigint
+analytics_discovery_daily,slow_screens,bigint
+analytics_rating_funnel_daily,event_date,date
+analytics_rating_funnel_daily,rating_started,bigint
+analytics_rating_funnel_daily,rating_completed,bigint
+analytics_rating_funnel_daily,rating_not_completed,bigint
+analytics_rating_funnel_daily,rating_abandoned,bigint
+analytics_rating_funnel_daily,rating_failed,bigint
+analytics_rating_funnel_daily,rating_validation_failed,bigint
+analytics_rating_funnel_daily,completion_rate,numeric
+analytics_route_performance_daily,event_date,date
+analytics_route_performance_daily,route_id,uuid
+analytics_route_performance_daily,unique_identities,bigint
+analytics_route_performance_daily,crawl_views,bigint
+analytics_route_performance_daily,crawl_starts,bigint
+analytics_route_performance_daily,crawl_saves,bigint
+analytics_route_performance_daily,crawl_completions,bigint
+analytics_route_performance_daily,ratings_completed,bigint
+analytics_route_performance_daily,leaderboard_views,bigint
+analytics_social_opt_out_by_account_age,account_age_bucket,text
+analytics_social_opt_out_by_account_age,total_users,bigint
+analytics_social_opt_out_by_account_age,total_users_opted_out,bigint
+analytics_social_opt_out_by_account_age,opt_out_rate,numeric
+analytics_social_opt_out_by_facebook_link,facebook_connected,boolean
+analytics_social_opt_out_by_facebook_link,total_users,bigint
+analytics_social_opt_out_by_facebook_link,total_users_opted_out,bigint
+analytics_social_opt_out_by_facebook_link,opt_out_rate,numeric
+analytics_social_opt_out_summary,total_users,bigint
+analytics_social_opt_out_summary,total_users_opted_out,bigint
+analytics_social_opt_out_summary,opt_out_rate,numeric
+badge_catalog,id,bigint
+badge_catalog,code,text
+badge_catalog,name,text
+badge_catalog,description,text
+badge_catalog,icon,text
+badge_catalog,xp_reward,integer
+badge_catalog,category,text
+badge_catalog,tier,integer
+badge_catalog,is_active,boolean
+buffacoin_ledger,id,uuid
+buffacoin_ledger,user_id,uuid
+buffacoin_ledger,delta,integer
+buffacoin_ledger,reason,text
+buffacoin_ledger,crawl_id,uuid
+buffacoin_ledger,state_id,integer
+buffacoin_ledger,destination_id,uuid
+buffacoin_ledger,created_at,timestamp with time zone
+buffacoin_wallets,user_id,uuid
+buffacoin_wallets,balance,integer
+buffacoin_wallets,updated_at,timestamp with time zone
+buffacoin_wallets,created_at,timestamp with time zone
+crawl_coverage_public,crawl_id,uuid
+crawl_coverage_public,user_id,uuid
+crawl_coverage_public,route_id,uuid
+crawl_coverage_public,status,text
+crawl_coverage_public,start_time,timestamp with time zone
+crawl_coverage_public,end_time,timestamp with time zone
+crawl_coverage_public,stop_count,integer
+crawl_coverage_public,rated_count,bigint
+crawl_coverage_public,pct_rated,numeric
+crawl_public,crawl_id,uuid
+crawl_public,user_id,uuid
+crawl_public,route_id,uuid
+crawl_public,status,text
+crawl_public,start_time,timestamp with time zone
+crawl_public,end_time,timestamp with time zone
+crawl_weekly_streak,user_id,uuid
+crawl_weekly_streak,current_streak_weeks,bigint
+crawls,crawl_id,uuid
+crawls,route_id,uuid
+crawls,user_id,uuid
+crawls,status,text
+crawls,start_time,timestamp with time zone
+crawls,end_time,timestamp with time zone
+crawls,crawl_type,text
+crawls,is_solo,boolean
+custom_restaurant_sourcing,id,uuid
+custom_restaurant_sourcing,state_id,integer
+custom_restaurant_sourcing,restaurant_name,text
+custom_restaurant_sourcing,ratings,jsonb
+custom_restaurant_sourcing,prefs_snapshot,jsonb
+custom_restaurant_sourcing,created_at,timestamp with time zone
+custom_restaurant_sourcing,user_id,uuid
+daily_xp_claims,id,bigint
+daily_xp_claims,user_id,uuid
+daily_xp_claims,claimed_at,timestamp with time zone
+daily_xp_claims,claim_date,date
+debug_logs,id,uuid
+debug_logs,created_at,timestamp with time zone
+debug_logs,device_id,text
+debug_logs,user_id,uuid
+debug_logs,scope,text
+debug_logs,event,text
+debug_logs,detail,jsonb
+destination_ratings,id,uuid
+destination_ratings,destination_id,uuid
+destination_ratings,crawl_id,uuid
+destination_ratings,user_id,uuid
+destination_ratings,crispiness,smallint
+destination_ratings,sauce,smallint
+destination_ratings,meat,smallint
+destination_ratings,overall,smallint
+destination_ratings,weight_score,numeric
+destination_ratings,created_at,timestamp with time zone
+destination_ratings,tag_id,bigint
+destination_ratings,wings_eaten,smallint
+destination_ratings,sauce_style,smallint
+destination_ratings,flavor_vibe,ARRAY
+destination_ratings,spice_level,smallint
+destination_ratings,would_order_again,boolean
+destination_ratings,is_buffacoin,boolean
+destination_suggestions,id,uuid
+destination_suggestions,user_id,uuid
+destination_suggestions,state_id,integer
+destination_suggestions,restaurant_name,text
+destination_suggestions,address,text
+destination_suggestions,created_at,timestamp with time zone
+destination_tags,id,bigint
+destination_tags,tag,text
+destination_tags,created_at,timestamp with time zone
+destinations,id,uuid
+destinations,name,text
+destinations,address,text
+destinations,lat,numeric
+destinations,lng,numeric
+destinations,city,text
+destinations,created_by,uuid
+destinations,created_at,timestamp with time zone
+destinations,state_id,integer
+fun_facts,id,uuid
+fun_facts,text,text
+fun_facts,source,text
+fun_facts,is_active,boolean
+fun_facts,created_at,timestamp with time zone
+lb_total_destinations,total_destinations,integer
+lb_total_routes,total_routes,integer
+lb_user_badges_counts,user_id,uuid
+lb_user_badges_counts,badges_count,integer
+lb_user_destinations_rated,user_id,uuid
+lb_user_destinations_rated,distinct_destinations,bigint
+lb_user_routes_completed,user_id,uuid
+lb_user_routes_completed,completed_routes,bigint
+level_thresholds,level,integer
+level_thresholds,xp_required,integer
+level_thresholds,level_title,text
+onboarding_analytics,id,uuid
+onboarding_analytics,session_id,uuid
+onboarding_analytics,user_id,uuid
+onboarding_analytics,step,text
+onboarding_analytics,started_at,timestamp with time zone
+onboarding_analytics,finished_at,timestamp with time zone
+onboarding_analytics,duration_ms,integer
+onboarding_analytics,state_id,integer
+onboarding_analytics,picked_destination_id,uuid
+onboarding_analytics,created_custom,boolean
+onboarding_analytics,created_account,boolean
+onboarding_analytics,skipped,boolean
+ratings_per_crawl_user,crawl_id,uuid
+ratings_per_crawl_user,user_id,uuid
+ratings_per_crawl_user,rated_count,bigint
+route_ordered_destinations,route_id,uuid
+route_ordered_destinations,destination_id,uuid
+route_ordered_destinations,stop_order,integer
+route_stop_counts,route_id,uuid
+route_stop_counts,stop_count,integer
+route_submissions,id,uuid
+route_submissions,user_id,uuid
+route_submissions,stop1,text
+route_submissions,stop2,text
+route_submissions,stop3,text
+route_submissions,stop4,text
+route_submissions,stop5,text
+route_submissions,created_at,timestamp with time zone
+route_submissions,status,text
+route_travel_tag,id,smallint
+route_travel_tag,travel,text
+routes,id,uuid
+routes,title,text
+routes,city,text
+routes,created_by,uuid
+routes,is_public,boolean
+routes,stop1_id,uuid
+routes,stop2_id,uuid
+routes,stop3_id,uuid
+routes,stop4_id,uuid
+routes,stop5_id,uuid
+routes,created_at,timestamp with time zone
+routes,travel_tag_id,smallint
+routes,is_token_route,boolean
+socially_visible_crawls,crawl_id,uuid
+socially_visible_crawls,route_id,uuid
+socially_visible_crawls,user_id,uuid
+socially_visible_crawls,status,text
+socially_visible_crawls,start_time,timestamp with time zone
+socially_visible_crawls,end_time,timestamp with time zone
+socially_visible_crawls,crawl_type,text
+socially_visible_crawls,is_solo,boolean
+socially_visible_destination_ratings,id,uuid
+socially_visible_destination_ratings,destination_id,uuid
+socially_visible_destination_ratings,crawl_id,uuid
+socially_visible_destination_ratings,user_id,uuid
+socially_visible_destination_ratings,crispiness,smallint
+socially_visible_destination_ratings,sauce,smallint
+socially_visible_destination_ratings,meat,smallint
+socially_visible_destination_ratings,overall,smallint
+socially_visible_destination_ratings,weight_score,numeric
+socially_visible_destination_ratings,created_at,timestamp with time zone
+socially_visible_destination_ratings,tag_id,bigint
+socially_visible_destination_ratings,wings_eaten,smallint
+socially_visible_destination_ratings,sauce_style,smallint
+socially_visible_destination_ratings,flavor_vibe,ARRAY
+socially_visible_destination_ratings,spice_level,smallint
+socially_visible_destination_ratings,would_order_again,boolean
+socially_visible_destination_ratings,is_buffacoin,boolean
+socially_visible_users,user_id,uuid
+socially_visible_users,username,text
+socially_visible_users,avatar_url,text
+socially_visible_users,created_at,timestamp with time zone
+socially_visible_users,xp,integer
+socially_visible_users,facebook_connected,boolean
+socially_visible_users,facebook_connected_at,timestamp with time zone
+states,state_id,integer
+states,state_code,character
+states,state_name,text
+user_badges,user_id,uuid
+user_badges,badge_id,bigint
+user_badges,earned_at,timestamp with time zone
+user_contactus,id,uuid
+user_contactus,user_id,uuid
+user_contactus,note,text
+user_contactus,created_at,timestamp with time zone
+user_contactus,status,text
+user_events,id,uuid
+user_events,occurred_at,timestamp with time zone
+user_events,received_at,timestamp with time zone
+user_events,user_id,uuid
+user_events,anonymous_id,text
+user_events,session_id,uuid
+user_events,event_name,text
+user_events,screen,text
+user_events,platform,text
+user_events,app_version,text
+user_events,state_id,integer
+user_events,route_id,uuid
+user_events,crawl_id,uuid
+user_events,destination_id,uuid
+user_events,metadata,jsonb
+user_feedback,id,uuid
+user_feedback,user_id,uuid
+user_feedback,note,text
+user_feedback,created_at,timestamp with time zone
+user_feedback,status,text
+user_meta,user_id,uuid
+user_meta,daily_claim_streak,integer
+user_meta,last_daily_claim_at,timestamp with time zone
+user_meta,created_at,timestamp with time zone
+user_meta,updated_at,timestamp with time zone
+user_preferences,user_id,uuid
+user_preferences,wing_piece,smallint
+user_preferences,sauce_pref,smallint
+user_preferences,spicy_pref,smallint
+user_preferences,prep_pref,smallint
+user_preferences,created_at,timestamp with time zone
+user_preferences,updated_at,timestamp with time zone
+user_wing_battle_votes,user_id,uuid
+user_wing_battle_votes,battle_id,bigint
+user_wing_battle_votes,choice,smallint
+user_wing_battle_votes,created_at,timestamp with time zone
+user_wing_battle_votes,updated_at,timestamp with time zone
+user_with_level,user_id,uuid
+user_with_level,xp,integer
+user_with_level,level,integer
+users,user_id,uuid
+users,avatar_url,text
+users,created_at,timestamp with time zone
+users,username,text
+users,xp,integer
+users,taste_persona,text
+users,facebook_connected,boolean
+users,facebook_provider_id,text
+users,facebook_connected_at,timestamp with time zone
+users,social_opt_out,boolean
+users_check_profile,user_id,uuid
+users_check_profile,seen_at,timestamp with time zone
+users_check_route,user_id,uuid
+users_check_route,seen_at,timestamp with time zone
+v_badges_for_user,user_id,uuid
+v_badges_for_user,badge_id,bigint
+v_badges_for_user,code,text
+v_badges_for_user,name,text
+v_badges_for_user,description,text
+v_badges_for_user,icon,text
+v_badges_for_user,xp_reward,integer
+v_badges_for_user,earned_at,timestamp with time zone
+v_badges_for_user,earned,boolean
+v_social_feed,user_id,uuid
+v_social_feed,weight_score,numeric
+v_social_feed,created_at,timestamp with time zone
+v_social_feed,destination_id,uuid
+v_social_feed,destination_name,text
+v_social_feed,destination_city,text
+v_social_feed,destination_state_id,integer
+v_social_feed,username,text
+wing_battle_options,id,bigint
+wing_battle_options,label,text
+wing_battle_options,left_option,text
+wing_battle_options,right_option,text
+wing_battle_options,is_active,boolean
+wing_battle_options,sort_order,integer
+wing_battle_options,created_at,timestamp with time zone
+wing_battle_options_active,id,bigint
+wing_battle_options_active,label,text
+wing_battle_options_active,left_option,text
+wing_battle_options_active,right_option,text
+wingman_intake_logs,id,uuid
+wingman_intake_logs,user_id,uuid
+wingman_intake_logs,raw_input,text
+wingman_intake_logs,state_id,integer
+wingman_intake_logs,ai_name,text
+wingman_intake_logs,ai_city,text
+wingman_intake_logs,ai_state,text
+wingman_intake_logs,ai_confidence,numeric
+wingman_intake_logs,place_found,boolean
+wingman_intake_logs,place_name,text
+wingman_intake_logs,place_address,text
+wingman_intake_logs,place_lat,numeric
+wingman_intake_logs,place_lng,numeric
+wingman_intake_logs,wings_probability,numeric
+wingman_intake_logs,wings_confidence,text
+wingman_intake_logs,decision,text
+wingman_intake_logs,decision_reason,text
+wingman_intake_logs,destination_id,uuid
+wingman_intake_logs,suggestion_id,uuid
+wingman_intake_logs,ai_raw_response,jsonb
+wingman_intake_logs,place_raw_response,jsonb
+wingman_intake_logs,created_at,timestamp with time zone
+wingman_intake_logs,restaurant_name,text
+wingman_intake_logs,city_input,text
+wingman_intake_logs,extra_info,text
+xp_ledger,id,uuid
+xp_ledger,user_id,uuid
+xp_ledger,amount,integer
+xp_ledger,source,text
+xp_ledger,reason,text
+xp_ledger,idempotency_key,text
+xp_ledger,destination_id,uuid
+xp_ledger,crawl_id,uuid
+xp_ledger,route_id,uuid
+xp_ledger,badge_id,bigint
+xp_ledger,battle_id,bigint
+xp_ledger,challenge_id,uuid
+xp_ledger,referral_id,uuid
+xp_ledger,level_before,integer
+xp_ledger,level_after,integer
+xp_ledger,xp_before,integer
+xp_ledger,xp_after,integer
+xp_ledger,metadata,jsonb
+xp_ledger,created_at,timestamp with time zone

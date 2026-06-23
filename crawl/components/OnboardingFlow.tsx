@@ -14,6 +14,7 @@ import {
 import RatingWizardDialog from './RatingWizardDialog';
 import WingmanAddDialog from './WingmanAddDialog';
 import { supabase } from '../lib/supabase';
+import { trackEvent } from '../lib/analytics';
 
 type StateRow = {
   state_id: number;
@@ -232,6 +233,11 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
 
   const [step, setStep] = useState<number>(0);
   const TOTAL_STEPS = 8;
+  const completedRef = useRef(false);
+  const stepRef = useRef(0);
+  const userIdRef = useRef<string | null>(null);
+  const pickedStateRef = useRef<StateRow | null>(null);
+  const pickedDestRef = useRef<DestRow | null>(null);
 
   const prefact = (params?.prefact || '').toString();
 
@@ -271,10 +277,30 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewRoute, setPreviewRoute] = useState<any>(null);
 
+  useEffect(() => {
+    stepRef.current = step;
+    userIdRef.current = userId;
+    pickedStateRef.current = pickedState;
+    pickedDestRef.current = pickedDest;
+  }, [step, userId, pickedState, pickedDest]);
+
   const complete = async () => {
     try {
       await AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1');
     } catch {}
+    completedRef.current = true;
+    await trackEvent({
+      eventName: 'onboarding_completed',
+      screen: 'onboarding',
+      userId,
+      stateId: pickedState?.state_id ?? null,
+      destinationId: pickedDest?.id && !String(pickedDest.id).startsWith('new:') ? pickedDest.id : null,
+      metadata: {
+        final_step: step,
+        created_account: false,
+        picked_destination: !!pickedDest?.id,
+      },
+    });
     safeComplete();
   };
 
@@ -282,9 +308,55 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
     try {
       await AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1');
     } catch {}
+    completedRef.current = true;
+    await trackEvent({
+      eventName: 'onboarding_account_prompt_selected',
+      screen: 'onboarding',
+      userId,
+      stateId: pickedState?.state_id ?? null,
+      metadata: { step },
+    });
     router.push('/auth/login');
     safeComplete();
   };
+
+  useEffect(() => {
+    trackEvent({
+      eventName: 'onboarding_started',
+      screen: 'onboarding',
+      userId,
+      metadata: { prefact_present: !!prefact },
+    });
+    return () => {
+      if (completedRef.current) return;
+      trackEvent({
+        eventName: 'onboarding_abandoned',
+        screen: 'onboarding',
+        userId: userIdRef.current,
+        stateId: pickedStateRef.current?.state_id ?? null,
+        destinationId:
+          pickedDestRef.current?.id && !String(pickedDestRef.current.id).startsWith('new:')
+            ? pickedDestRef.current.id
+            : null,
+        metadata: {
+          flow_step: stepRef.current,
+          total_steps: TOTAL_STEPS,
+        },
+      });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    trackEvent({
+      eventName: 'onboarding_step_viewed',
+      screen: 'onboarding',
+      userId,
+      stateId: pickedState?.state_id ?? null,
+      destinationId: pickedDest?.id && !String(pickedDest.id).startsWith('new:') ? pickedDest.id : null,
+      metadata: { step, total_steps: TOTAL_STEPS },
+    });
+  }, [step, userId, pickedState?.state_id, pickedDest?.id]);
 
   useEffect(() => {
     let alive = true;
@@ -526,9 +598,52 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
       };
 
       await AsyncStorage.setItem(ONBOARDING_SEED_RATING_KEY, JSON.stringify(seedPayload));
+      await trackEvent({
+        eventName: 'rating_completed',
+        screen: 'onboarding',
+        userId,
+        stateId: pickedState?.state_id ?? null,
+        destinationId: isPseudo ? null : destId,
+        metadata: {
+          source: 'onboarding_seed',
+          local_only: isPseudo,
+          tag_id: payload?.selectedTagId ?? null,
+          would_order_again: payload?.wouldOrderAgain == null ? null : Boolean(payload.wouldOrderAgain),
+        },
+      });
+      await trackEvent({
+        eventName: 'rating_submitted',
+        screen: 'onboarding',
+        userId,
+        stateId: pickedState?.state_id ?? null,
+        destinationId: isPseudo ? null : destId,
+        metadata: {
+          source: 'onboarding_seed',
+          local_only: isPseudo,
+          tag_id: payload?.selectedTagId ?? null,
+          would_order_again: payload?.wouldOrderAgain == null ? null : Boolean(payload.wouldOrderAgain),
+        },
+      });
       setStep(4);
     } catch (e) {
       console.warn('submitOnboardingRating failed:', e);
+      await trackEvent({
+        eventName: 'rating_validation_failed',
+        screen: 'onboarding',
+        userId,
+        stateId: pickedState?.state_id ?? null,
+        metadata: { source: 'onboarding_seed', error: String(e?.message || e) },
+      });
+      await trackEvent({
+        eventName: 'error_shown',
+        screen: 'onboarding',
+        userId,
+        stateId: pickedState?.state_id ?? null,
+        metadata: {
+          source: 'onboarding_seed',
+          error_message: String(e?.message || e),
+        },
+      });
       setRatingError('Could not save that rating. Please try again.');
     }
   };
@@ -548,6 +663,14 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
     setPickedDest(dest);
     setRatingError('');
     await saveDest(dest);
+    await trackEvent({
+      eventName: 'onboarding_destination_selected',
+      screen: 'onboarding',
+      userId,
+      stateId: pickedState?.state_id ?? null,
+      destinationId: dest.id,
+      metadata: { source: 'wingman' },
+    });
     setAddOpen(false);
     setStep(3);
 
@@ -657,10 +780,26 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
         await saveState(pickedState);
       }
       await saveDest(d);
+      await trackEvent({
+        eventName: 'onboarding_destination_selected',
+        screen: 'onboarding',
+        userId,
+        stateId: pickedState?.state_id ?? null,
+        destinationId: d.id,
+        metadata: { source: 'restaurant_list' },
+      });
+      await trackEvent({
+        eventName: 'restaurant_selected',
+        screen: 'onboarding',
+        userId,
+        stateId: pickedState?.state_id ?? null,
+        destinationId: d.id,
+        metadata: { source_screen: 'onboarding', source: 'restaurant_list' },
+      });
 
       setStep(3);
     },
-    [pickedState]
+    [pickedState, userId]
   );
 
   return (
@@ -806,6 +945,16 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
                             setStatePickerOpen(false);
                             setStateQ('');
                             await saveState(s);
+                            await trackEvent({
+                              eventName: 'onboarding_state_selected',
+                              screen: 'onboarding',
+                              userId,
+                              stateId: s.state_id,
+                              metadata: {
+                                state_code: s.state_code ?? null,
+                                state_name: s.state_name ?? null,
+                              },
+                            });
                           }}
                           style={({ pressed }) => [
                             styles.row,
@@ -1213,6 +1362,14 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
                 <Text style={{ fontWeight: '900' }}>Social Feed</Text>
                 <Text style={{ opacity: 0.82, lineHeight: 20, marginTop: 4 }}>
                   Share wing wins, crawl completions, and discover spots other people are hyped about.
+                </Text>
+              </View>
+
+              <View>
+                <Text style={{ fontWeight: '900' }}>Friends & privacy</Text>
+                <Text style={{ opacity: 0.82, lineHeight: 20, marginTop: 4 }}>
+                  Social features are optional. Add friends by mutual approval, or opt out in Settings to hide
+                  from leaderboards, feeds, friend search, and friend activity.
                 </Text>
               </View>
 

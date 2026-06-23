@@ -17,10 +17,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as Crypto from 'expo-crypto';
 import WingmanAddDialog from '../../../components/WingmanAddDialog';
+import FeedbackState from '../../../components/ui/FeedbackState';
 import { supabase } from '../../../lib/supabase.js';
 import WelcomeWizard from '../../../components/WelcomeWizard';
 import DestinationPickerWizard from '../../../components/DestinationPickerWizard';
 import RatingWizardDialog from '../../../components/RatingWizardDialog';
+import { trackEvent } from '../../../lib/analytics';
 
 import { useOnboardingGate } from '../../../hooks/useOnboardingGate';
 import LocationGate from '../../../components/LocationGate';
@@ -31,6 +33,8 @@ import { nyDateString } from '../../../utils/nyDate';
 
 const SEARCH_RADIUS_M = 160934; // 100 miles
 const MS_5_MIN = 30 * 1000;
+const HOME_NEXT_SPOT_KEY = 'buffago:homeNextSpot';
+const HOME_NEXT_SPOT_EVENT = 'buffago:home_next_spot_selected';
 
 const BUFFAGO_ORANGE = '#FF7A18';
 const clamp01 = (n) => Math.max(0, Math.min(1, Number(n) || 0));
@@ -53,6 +57,8 @@ const haversine = (lat1, lon1, lat2, lon2) => {
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 };
+
+const metersToMiles = (m) => (Number.isFinite(Number(m)) ? Number(m) / 1609.34 : null);
 
 const MS_24_HOURS = 24 * 60 * 60 * 1000;
 
@@ -344,6 +350,7 @@ export default function Home() {
   const [searchText, setSearchText] = useState('');
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
+  const lastRestaurantSearchStartedRef = useRef('');
   const [searchOverride, setSearchOverride] = useState(null); // { label, latitude, longitude }
   const [wingmanOpen, setWingmanOpen] = useState(false);
   const [wingmanStateCtx, setWingmanStateCtx] = useState(null);
@@ -429,7 +436,7 @@ export default function Home() {
 
   const openWelcomeWizard = useCallback(() => {
     setWelcomeOpen(true);
-  }, []);
+  }, [session?.user?.id]);
 
   const onboardingRedirectedRef = useRef(false);
   useEffect(() => {
@@ -496,6 +503,14 @@ export default function Home() {
    */
   const openRestaurantPeek = useCallback(async (destinationId) => {
     if (!destinationId) return;
+
+    trackEvent({
+      eventName: 'restaurant_profile_viewed',
+      screen: 'home',
+      userId: session?.user?.id ?? null,
+      destinationId,
+      metadata: { source: 'home_peek' },
+    });
 
     setPeekOpen(true);
     setPeekLoading(true);
@@ -651,7 +666,7 @@ export default function Home() {
     } finally {
       setPeekLoading(false);
     }
-  }, []);
+  }, [session?.user?.id]);
 
   // Fun-fact rotator (loader only)
   const FUN_FACTS = useRef([
@@ -1616,6 +1631,12 @@ export default function Home() {
         .filter(Boolean);
 
       if (!payload.length) {
+        await trackEvent({
+          eventName: 'wing_battle_abandoned',
+          screen: 'home',
+          userId: session.user.id,
+          metadata: { battle_count: battleIds.length, reason: 'no_votes' },
+        });
         setBattleDialogOpen(false);
         return;
       }
@@ -1635,12 +1656,30 @@ export default function Home() {
       }).length;
       const completeAfter = battleIds.length > 0 && answeredAfter === battleIds.length;
 
+      await trackEvent({
+        eventName: completeAfter ? 'wing_battle_completed' : 'wing_battle_vote_submitted',
+        screen: 'home',
+        userId: session.user.id,
+        metadata: {
+          battle_count: battleIds.length,
+          answered_before: answeredBefore,
+          answered_after: answeredAfter,
+          newly_completed: !completeBefore && completeAfter,
+        },
+      });
+
       setBattleDialogOpen(false);
 
       if (!completeBefore && completeAfter) {
         await awardBattleCoins();
       }
     } catch (e) {
+      await trackEvent({
+        eventName: 'wing_battle_failed',
+        screen: 'home',
+        userId: session?.user?.id ?? null,
+        metadata: { error: e?.message || String(e) },
+      });
       console.warn('saveBattle failed:', e?.message || e);
       Alert.alert('Error', e?.message ?? 'Could not save your Wing Battle votes.');
     } finally {
@@ -1812,7 +1851,77 @@ export default function Home() {
     return null;
   }, [coords?.latitude, coords?.longitude, searchOverride?.latitude, searchOverride?.longitude]);
 
-  const metersToMiles = (m) => (Number.isFinite(Number(m)) ? Number(m) / 1609.34 : null);
+  const applyHomeNextSpot = useCallback(
+    async (spot) => {
+      if (!spot?.id) return;
+
+      const lat = spot?.lat != null ? Number(spot.lat) : null;
+      const lng = spot?.lng != null ? Number(spot.lng) : null;
+      const userLat = coords?.latitude != null ? Number(coords.latitude) : null;
+      const userLng = coords?.longitude != null ? Number(coords.longitude) : null;
+      const distM =
+        userLat != null && userLng != null && lat != null && lng != null
+          ? haversine(userLat, userLng, lat, lng)
+          : null;
+
+      manualClosestRef.current = true;
+      setClosest({
+        id: spot.id,
+        name: spot.name ?? 'Wing Spot',
+        address: spot.address ?? null,
+        city: spot.city ?? null,
+        lat,
+        lng,
+        distanceM: distM,
+      });
+
+      setSearchOverride(
+        lat != null && lng != null
+          ? {
+              label: `${spot.name ?? 'Wing Spot'}${spot.city ? `, ${spot.city}` : ''}`,
+              latitude: lat,
+              longitude: lng,
+            }
+          : null
+      );
+
+      await trackEvent({
+        eventName: 'restaurant_selected',
+        screen: 'home',
+        userId: session?.user?.id ?? null,
+        destinationId: spot.id,
+        metadata: {
+          source_screen: 'ratings',
+          source: spot.source ?? 'wingdex_detail',
+          distance_from_user: distM,
+          distance_miles: distM != null ? metersToMiles(distM) : null,
+        },
+      });
+    },
+    [coords?.latitude, coords?.longitude, session?.user?.id]
+  );
+
+  const loadHomeNextSpot = useCallback(async () => {
+    try {
+      const raw = await AsyncStorage.getItem(HOME_NEXT_SPOT_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+      if (parsed?.id) await applyHomeNextSpot(parsed);
+    } catch (e) {
+      console.warn('loadHomeNextSpot failed:', e?.message || e);
+    }
+  }, [applyHomeNextSpot]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadHomeNextSpot();
+      return undefined;
+    }, [loadHomeNextSpot])
+  );
+
+  useEffect(() => {
+    const sub = DeviceEventEmitter.addListener(HOME_NEXT_SPOT_EVENT, applyHomeNextSpot);
+    return () => sub.remove();
+  }, [applyHomeNextSpot]);
 
   // Only refresh the distance text for the current closest card.
   const refreshClosestDistanceOnly = useCallback(() => {
@@ -1949,11 +2058,29 @@ export default function Home() {
     const lng = Number(closest.lng);
     const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${lat},${lng}`)}`;
     try {
+      await trackEvent({
+        eventName: 'directions_tapped',
+        screen: 'home',
+        userId: session?.user?.id ?? null,
+        destinationId: closest?.id ?? null,
+        metadata: {
+          source: 'closest_restaurant_card',
+          distance_miles: closest?.distanceM != null ? metersToMiles(closest.distanceM) : null,
+          map_provider: 'google_maps_url',
+        },
+      });
       await Linking.openURL(url);
     } catch (e) {
+      await trackEvent({
+        eventName: 'external_maps_failed',
+        screen: 'home',
+        userId: session?.user?.id ?? null,
+        destinationId: closest?.id ?? null,
+        metadata: { error: e?.message || String(e) },
+      });
       console.warn('openDirections failed:', e?.message || e);
     }
-  }, [closest?.lat, closest?.lng]);
+  }, [closest?.lat, closest?.lng, closest?.id, closest?.distanceM, session?.user?.id]);
 
   // ---------- load tags for wizard ----------
   const loadHomeTagOptions = useCallback(async () => {
@@ -2109,7 +2236,22 @@ export default function Home() {
   const openHomeRatingWizard = useCallback(async () => {
     if (!closest?.id) return;
 
+    trackEvent({
+      eventName: 'primary_cta_clicked',
+      screen: 'home',
+      userId: session?.user?.id ?? null,
+      destinationId: closest?.id ?? null,
+      metadata: { cta_name: 'rate_closest_spot', source_screen: 'home' },
+    });
+
     if (alreadyRatedThis) {
+      trackEvent({
+        eventName: 'rating_validation_failed',
+        screen: 'home',
+        userId: session?.user?.id ?? null,
+        destinationId: closest?.id ?? null,
+        metadata: { reason: 'already_rated_recently' },
+      });
       Alert.alert(
         'Already rated',
         `You rated this spot ${fmt2(homeRated?.score)}.`
@@ -2123,6 +2265,13 @@ export default function Home() {
     const milesAway = closest?.distanceM != null ? metersToMiles(closest.distanceM) : null;
     
     if (!isAdmin && (milesAway == null || milesAway > 0.1)) {
+      trackEvent({
+        eventName: 'rating_validation_failed',
+        screen: 'home',
+        userId: session?.user?.id ?? null,
+        destinationId: closest?.id ?? null,
+        metadata: { reason: 'too_far', distance_miles: milesAway },
+      });
       Alert.alert(
         'Not close enough',
         'You must be within 0.1 miles to rate this spot. Or head to the Wingdex if you have Buffacoins!'
@@ -2132,16 +2281,23 @@ export default function Home() {
 
     setHomeRateDest({ id: closest.id, name: closest.name || 'Wing Spot' });
     if (!homeTagOptions?.length) await loadHomeTagOptions();
+    await trackEvent({
+      eventName: 'rating_started',
+      screen: 'home',
+      userId: session?.user?.id ?? null,
+      destinationId: closest.id,
+      metadata: { source: 'closest_restaurant_card', distance_miles: milesAway },
+    });
     setHomeRateOpen(true);
   }, [
     closest?.id,
     closest?.name,
     closest?.distanceM,
-    metersToMiles,
     homeTagOptions?.length,
     loadHomeTagOptions,
     alreadyRatedThis,
     homeRated?.score,
+    session?.user?.id,
   ]);
 
   // ---------- save rating from Home wizard ----------
@@ -2254,6 +2410,35 @@ export default function Home() {
         const { error: ratingErr } = await supabase.from('destination_ratings').insert(insertRow);
         if (ratingErr) throw ratingErr;
 
+        await trackEvent({
+          eventName: 'rating_completed',
+          screen: 'home',
+          userId: uid,
+          destinationId: destId,
+          crawlId,
+          metadata: {
+            source: 'closest_restaurant_card',
+            tag_id: tagId,
+            weight_score: weightScore,
+            would_order_again: wouldOrderAgain,
+            is_guest: !uid,
+          },
+        });
+        await trackEvent({
+          eventName: 'rating_submitted',
+          screen: 'home',
+          userId: uid,
+          destinationId: destId,
+          crawlId,
+          metadata: {
+            source: 'closest_restaurant_card',
+            tag_id: tagId,
+            weight_score: weightScore,
+            would_order_again: wouldOrderAgain,
+            is_guest: !uid,
+          },
+        });
+
         // ---------- NEW: immediately reflect "already rated" on Home ----------
         const displayScore = Number.isFinite(Number(weightScore)) ? Number(weightScore) : null;
 
@@ -2278,13 +2463,32 @@ export default function Home() {
           await openRestaurantPeek(destId);
         } catch {}
       } catch (e) {
+        await trackEvent({
+          eventName: 'rating_failed',
+          screen: 'home',
+          userId: uid,
+          destinationId: destId,
+          crawlId,
+          metadata: { source: 'closest_restaurant_card', error: e?.message || String(e) },
+        });
+        await trackEvent({
+          eventName: 'error_shown',
+          screen: 'home',
+          userId: uid,
+          destinationId: destId,
+          crawlId,
+          metadata: {
+            source: 'closest_restaurant_card',
+            error_message: e?.message || String(e),
+          },
+        });
         console.warn('saveHomeRating failed:', e?.message || e);
         Alert.alert('Error', e?.message ?? 'Could not save your rating.');
       } finally {
         setHomeRateSaving(false);
       }
     },
-    [homeRateDest?.id, session?.user?.id, refreshHud, openRestaurantPeek, saveGuestHomeRated]
+    [homeRateDest?.id, session?.user?.id, refreshHud, openRestaurantPeek, saveGuestHomeRated, refreshHomeRatedForClosest]
   );
 
   const runSearch = useCallback(async (q) => {
@@ -2296,6 +2500,19 @@ export default function Home() {
 
     setSearchLoading(true);
     try {
+      if (lastRestaurantSearchStartedRef.current !== text) {
+        lastRestaurantSearchStartedRef.current = text;
+        await trackEvent({
+          eventName: 'restaurant_search_started',
+          screen: 'home',
+          userId: session?.user?.id ?? null,
+          metadata: {
+            source: 'home_swap_spot',
+            query_length: text.length,
+          },
+        });
+      }
+
       const { data, error } = await supabase
         .from('destinations')
         .select('id, name, address, city, lat, lng')
@@ -2303,6 +2520,29 @@ export default function Home() {
         .limit(20);
 
       if (error) throw error;
+
+      await trackEvent({
+        eventName: (data || []).length ? 'restaurant_search_results_viewed' : 'restaurant_search_empty',
+        screen: 'home',
+        userId: session?.user?.id ?? null,
+        metadata: {
+          source: 'home_swap_spot',
+          query_length: text.length,
+          result_count: (data || []).length,
+        },
+      });
+      if (!(data || []).length) {
+        await trackEvent({
+          eventName: 'empty_state_shown',
+          screen: 'home',
+          userId: session?.user?.id ?? null,
+          metadata: {
+            state: 'restaurant_search_empty',
+            source: 'home_swap_spot',
+            query_length: text.length,
+          },
+        });
+      }
 
       setSearchResults(
         (data || []).map((d) => ({
@@ -2315,12 +2555,27 @@ export default function Home() {
         }))
       );
     } catch (e) {
+      await trackEvent({
+        eventName: 'restaurant_search_failed',
+        screen: 'home',
+        userId: session?.user?.id ?? null,
+        metadata: { source: 'home_swap_spot', query_length: text.length, error: e?.message || String(e) },
+      });
+      await trackEvent({
+        eventName: 'error_shown',
+        screen: 'home',
+        userId: session?.user?.id ?? null,
+        metadata: {
+          source: 'home_swap_spot',
+          error_message: e?.message || String(e),
+        },
+      });
       console.warn('runSearch failed:', e?.message || e);
       setSearchResults([]);
     } finally {
       setSearchLoading(false);
     }
-  }, []);
+  }, [session?.user?.id]);
 
   useEffect(() => {
     const t = setTimeout(() => runSearch(searchText), 250);
@@ -2347,6 +2602,28 @@ export default function Home() {
           : null;
   
       manualClosestRef.current = true;
+      await trackEvent({
+        eventName: 'restaurant_search_result_selected',
+        screen: 'home',
+        userId: session?.user?.id ?? null,
+        destinationId: row.id,
+        metadata: {
+          source: 'home_swap_spot',
+          distance_miles: distM != null ? metersToMiles(distM) : null,
+        },
+      });
+      await trackEvent({
+        eventName: 'restaurant_selected',
+        screen: 'home',
+        userId: session?.user?.id ?? null,
+        destinationId: row.id,
+        metadata: {
+          source_screen: 'home',
+          source: 'home_swap_spot',
+          distance_from_user: distM,
+          distance_miles: distM != null ? metersToMiles(distM) : null,
+        },
+      });
 
       setClosest({
         id: row.id,
@@ -2373,7 +2650,7 @@ export default function Home() {
   
       closeRestaurantSearch();
     },
-    [closeRestaurantSearch, coords?.latitude, coords?.longitude]
+    [closeRestaurantSearch, coords?.latitude, coords?.longitude, session?.user?.id]
   );
   if (onboardingLoading) return null;
 
@@ -2587,15 +2864,24 @@ export default function Home() {
                 ) : null}
               </>
             ) : (
-              <View style={{ alignItems: 'center', paddingVertical: 12 }}>
-                <Text style={{ opacity: 0.85, textAlign: 'center' }}>
-                  No destinations found near you yet.
-                </Text>
-                <View style={{ height: 10 }} />
-                <Button mode="outlined" onPress={() => setSearchOpen(true)} icon="magnify">
-                  Search a town or restaurant
-                </Button>
-              </View>
+              <FeedbackState
+                compact
+                icon="map-marker-question-outline"
+                title="No wing spot nearby yet"
+                body="Search a restaurant, pick a town, or add a missing spot so BuffaGo can point you somewhere useful."
+                actionLabel="Search"
+                onAction={() => {
+                  trackEvent({
+                    eventName: 'primary_cta_clicked',
+                    screen: 'home',
+                    userId: session?.user?.id ?? null,
+                    metadata: { cta_name: 'search_from_empty_closest', source_screen: 'home' },
+                  });
+                  setSearchOpen(true);
+                }}
+                secondaryLabel="Pick Area"
+                onSecondary={() => setDestinationWizardOpen(true)}
+              />
             )}
           </View>
 

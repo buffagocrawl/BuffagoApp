@@ -17,6 +17,17 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 import { supabase } from '../../../lib/supabase.js';
+import { trackEvent } from '../../../lib/analytics';
+import { filterSociallyVisibleRows } from '../../../lib/socialVisibility';
+import {
+  getFriends,
+  getFriendsFeed,
+  getFriendsLeaderboard,
+  markFriendActivitySeen,
+} from '../../../lib/friends';
+import { useSocialBadges } from '../../../hooks/useSocialBadges';
+import FriendsPanel from '../../../components/FriendsPanel';
+import FeedbackState from '../../../components/ui/FeedbackState';
 
 const ADMIN_ID = '23898359-306a-4dd3-91f0-da66da19ccfc';
 const TOKEN_SRC = require('../../../assets/Buffago-token.png');
@@ -339,12 +350,17 @@ export default function Leaderboards() {
   const router = useRouter();
 
   const goToJourney = useCallback(
-    (userId) => {
+    (userId, sourceSurface = 'leaderboard') => {
       if (!userId) return;
+      trackEvent({
+        eventName: 'friend_profile_opened',
+        screen: 'leaderboards',
+        metadata: { target_user_id: userId, source_surface: sourceSurface },
+      });
   
       router.push({
         pathname: '/profile/history',
-        params: { userId: String(userId) },
+        params: { userId: String(userId), sourceSurface },
       });
     },
     [router]
@@ -352,7 +368,8 @@ export default function Leaderboards() {
 
 
   // Top-level mode tabs
-  const [mode, setMode] = useState('feed'); // 'feed' | 'leaderboards'
+  const [mode, setMode] = useState('feed'); // 'feed' | 'leaderboards' | 'friends'
+  const socialBadges = useSocialBadges();
 
   // Social scope (default state)
   const [feedScope, setFeedScope] = useState('state'); // 'state' | 'all' | 'friends'
@@ -409,6 +426,9 @@ export default function Leaderboards() {
   // Leaderboards state-scoped ratings
   const [stateRatings, setStateRatings] = useState([]);
   const [stateRatingsLoading, setStateRatingsLoading] = useState(false);
+  const [friendRatings, setFriendRatings] = useState([]);
+  const [friendRatingsLoading, setFriendRatingsLoading] = useState(false);
+  const [friendScopeIds, setFriendScopeIds] = useState(new Set());
 
   // Drilldown modal (leaderboards)
   const [modalOpen, setModalOpen] = useState(false);
@@ -449,8 +469,19 @@ export default function Leaderboards() {
   useFocusEffect(
     useCallback(() => {
       readStateCache();
+      trackEvent({
+        eventName:
+          mode === 'feed' ? 'social_feed_viewed' : mode === 'friends' ? 'friends_tab_opened' : 'leaderboard_viewed',
+        screen: 'leaderboards',
+        userId: viewerId ?? null,
+        stateId: stateId ?? null,
+        metadata: {
+          mode,
+          scope: mode === 'feed' ? feedScope : mode === 'leaderboards' ? lbScope : 'friends',
+        },
+      });
       return undefined;
-    }, [readStateCache])
+    }, [readStateCache, mode, feedScope, lbScope, stateId, viewerId])
   );
 
   // Initial boot: try cache first; if missing, do the old geo flow
@@ -599,9 +630,17 @@ export default function Leaderboards() {
         setLoading(true);
         setError('');
 
+        const { data: visibleUsers, error: visibleErr } = await supabase
+          .from('socially_visible_users')
+          .select('user_id, username');
+
+        if (visibleErr) throw visibleErr;
+
+        const visibleIds = new Set((visibleUsers || []).map((u) => u.user_id).filter(Boolean));
+
         // 1) destination_ratings (exclude guests/admin)
         const { data: dr, error: e1 } = await supabase
-          .from('destination_ratings')
+          .from('socially_visible_destination_ratings')
           .select('user_id, destination_id, crawl_id, tag_id, weight_score, created_at')
           .not('user_id', 'is', null)
           .neq('user_id', ADMIN_ID);
@@ -620,7 +659,7 @@ export default function Leaderboards() {
             .select('user_id, xp, level')
             .neq('user_id', ADMIN_ID);
 
-          if (!eLvl && Array.isArray(lvl)) levelRows = lvl;
+          if (!eLvl && Array.isArray(lvl)) levelRows = filterSociallyVisibleRows(lvl, visibleIds);
         } catch {
           levelRows = null;
         }
@@ -637,10 +676,8 @@ export default function Leaderboards() {
 
         // 2b) usernames for labels — exclude admin
         try {
-          const { data: usersData, error: eUsers } = await supabase
-            .from('users')
-            .select('user_id, username')
-            .neq('user_id', ADMIN_ID);
+          const usersData = (visibleUsers || []).filter((u) => u.user_id !== ADMIN_ID);
+          const eUsers = null;
 
           if (!eUsers && Array.isArray(usersData)) {
             for (const u of usersData) {
@@ -673,7 +710,7 @@ export default function Leaderboards() {
         // 3) Crawls (optional)
         try {
           const { data: crawls, error: cErr } = await supabase
-            .from('crawls')
+            .from('socially_visible_crawls')
             .select('crawl_id, user_id, route_id, status, start_time, end_time')
             .not('user_id', 'is', null)
             .neq('user_id', ADMIN_ID);
@@ -711,7 +748,7 @@ export default function Leaderboards() {
         // 5) Per-user destinations rated (global) via RPC preferred
         try {
           const { data: destsRated } = await supabase.rpc('lb_user_destinations_rated');
-          setDestsRatedMap(rowsToMap(destsRated, 'user_id', 'distinct_destinations'));
+          setDestsRatedMap(rowsToMap(filterSociallyVisibleRows(destsRated, visibleIds), 'user_id', 'distinct_destinations'));
         } catch {
           const byUser = groupBy(dr, (r) => r.user_id);
           const drMap = new Map();
@@ -726,7 +763,9 @@ export default function Leaderboards() {
           const { data: badgeCounts, error: bErr } = await supabase
             .from('lb_user_badges_counts')
             .select('user_id, badges_count');
-          if (!bErr && Array.isArray(badgeCounts)) setBadgesCountMap(rowsToMap(badgeCounts, 'user_id', 'badges_count'));
+          if (!bErr && Array.isArray(badgeCounts)) {
+            setBadgesCountMap(rowsToMap(filterSociallyVisibleRows(badgeCounts, visibleIds), 'user_id', 'badges_count'));
+          }
           else setBadgesCountMap(new Map());
         } catch {
           setBadgesCountMap(new Map());
@@ -738,7 +777,10 @@ export default function Leaderboards() {
             .from('crawl_weekly_streak')
             .select('user_id, current_streak_weeks');
           if (!sErr && Array.isArray(streakRows)) {
-            const filtered = streakRows.filter((r) => r.user_id !== ADMIN_ID);
+            const filtered = filterSociallyVisibleRows(
+              streakRows.filter((r) => r.user_id !== ADMIN_ID),
+              visibleIds
+            );
             setStreakWeeksMap(rowsToMap(filtered, 'user_id', 'current_streak_weeks'));
           } else {
             setStreakWeeksMap(new Map());
@@ -752,7 +794,6 @@ export default function Leaderboards() {
         setLoading(false);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ---------- Social Feed queries (v_social_feed) ----------
@@ -766,24 +807,27 @@ export default function Leaderboards() {
         const from = page * 10;
         const to = from + 9;
 
-        let q = supabase
-          .from('v_social_feed')
-          .select(
-          'user_id, weight_score, created_at, destination_id, destination_name, destination_city, destination_state_id, username'  
-          )
-          .neq('user_id', ADMIN_ID)
-          .order('created_at', { ascending: false })
-          .range(from, to);
-
         const scope = feedScope;
+        let rows;
 
-        if (scope === 'state' && stateId) q = q.eq('destination_state_id', stateId);
+        if (scope === 'friends') {
+          rows = await getFriendsFeed({ limit: 10, offset: from });
+        } else {
+          let q = supabase
+            .from('v_social_feed')
+            .select(
+              'user_id, weight_score, created_at, destination_id, destination_name, destination_city, destination_state_id, username'
+            )
+            .neq('user_id', ADMIN_ID)
+            .order('created_at', { ascending: false })
+            .range(from, to);
 
-        const { data, error: qErr } = await q;
-        if (qErr) throw qErr;
+          if (scope === 'state' && stateId) q = q.eq('destination_state_id', stateId);
 
-        const rowsRaw = Array.isArray(data) ? data : [];
-        const rows = await attachTokenFlagsToFeedRows(rowsRaw);
+          const { data, error: qErr } = await q;
+          if (qErr) throw qErr;
+          rows = await attachTokenFlagsToFeedRows(Array.isArray(data) ? data : []);
+        }
         const merged = reset ? rows : [...(feedRows || []), ...rows];
 
         setFeedRows(merged);
@@ -800,9 +844,17 @@ export default function Leaderboards() {
 
   useEffect(() => {
     if (mode !== 'feed') return;
-    if (feedScope === 'friends') return;
     if (feedScope === 'state' && !stateId && stateDetecting) return;
     fetchFeedPage({ reset: true });
+    if (feedScope === 'friends') {
+      trackEvent({
+        eventName: 'friends_filter_selected_social_feed',
+        screen: 'leaderboards',
+        userId: viewerId,
+        metadata: { state_filter: null },
+      });
+      markFriendActivitySeen('activity').finally(() => socialBadges.refresh());
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, feedScope, stateId, stateDetecting]);
 
@@ -867,6 +919,56 @@ export default function Leaderboards() {
     };
   }, [lbScope, stateId]);
 
+  useEffect(() => {
+    let alive = true;
+    if (lbScope !== 'friends') return undefined;
+
+    (async () => {
+      setFriendRatingsLoading(true);
+      try {
+        const [rows, friends] = await Promise.all([getFriendsLeaderboard(), getFriends()]);
+        if (!alive) return;
+        setFriendRatings(rows);
+        setFriendScopeIds(new Set([viewerId, ...friends.map((friend) => friend.user_id)].filter(Boolean)));
+        setUsersMap((current) => {
+          const next = new Map(current);
+          for (const friend of friends) {
+            next.set(friend.user_id, {
+              ...(next.get(friend.user_id) || {}),
+              username: friend.username || next.get(friend.user_id)?.username || null,
+            });
+          }
+          for (const row of rows) {
+            next.set(row.user_id, {
+              ...(next.get(row.user_id) || {}),
+              username: row.username || next.get(row.user_id)?.username || null,
+              xp: Number(row.xp || 0),
+            });
+          }
+          return next;
+        });
+        trackEvent({
+          eventName: 'friends_filter_selected_leaderboard',
+          screen: 'leaderboards',
+          userId: viewerId,
+          metadata: { state_filter: null },
+        });
+      } catch (e) {
+        if (alive) {
+          setFriendRatings([]);
+          setFriendScopeIds(new Set(viewerId ? [viewerId] : []));
+          setError(e?.userMessage || e?.message || 'Could not load friends leaderboard.');
+        }
+      } finally {
+        if (alive) setFriendRatingsLoading(false);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, [lbScope, viewerId]);
+
   // ---------- names ----------
   const nameOf = (uid) => {
     const meta = usersMap.get(uid);
@@ -879,15 +981,17 @@ export default function Leaderboards() {
   // ---------- leaderboards scoped ratings ----------
   const ratingsForBoards = useMemo(() => {
     if (lbScope === 'state') return stateRatings;
+    if (lbScope === 'friends') return friendRatings;
     return ratings;
-  }, [lbScope, stateRatings, ratings]);
+  }, [lbScope, stateRatings, friendRatings, ratings]);
 
   const ratingsByUserScoped = useMemo(() => groupBy(ratingsForBoards, (r) => r.user_id), [ratingsForBoards]);
 
   const usersInScope = useMemo(() => {
+    if (lbScope === 'friends') return friendScopeIds;
     const ids = new Set((ratingsForBoards || []).map((r) => r.user_id).filter(Boolean));
     return ids;
-  }, [ratingsForBoards]);
+  }, [lbScope, friendScopeIds, ratingsForBoards]);
 
   // ---------- Social Feed -> open rating details ----------
   const openRatingDetails = useCallback(
@@ -1096,6 +1200,7 @@ export default function Leaderboards() {
         <Avatar.Text
           size={34}
           label={initials(uname)}
+          onPress={() => goToJourney(row?.user_id, 'social_feed')}
           style={{
             backgroundColor: theme.colors.elevation?.level1 ?? (theme.dark ? '#2a2a2a' : '#f1f3f5'),
           }}
@@ -1132,6 +1237,21 @@ export default function Leaderboards() {
 
   const showNewAppEmpty = feedScope === 'state' && !feedLoading && !feedError && (feedRows?.length || 0) === 0;
 
+  useEffect(() => {
+    if (!showNewAppEmpty) return;
+    trackEvent({
+      eventName: 'empty_state_shown',
+      screen: 'leaderboards',
+      userId: viewerId ?? null,
+      stateId: stateId ?? null,
+      metadata: {
+        state: 'social_feed_empty',
+        mode,
+        scope: feedScope,
+      },
+    });
+  }, [showNewAppEmpty, viewerId, stateId, mode, feedScope]);
+
   // ---------- render ----------
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -1148,6 +1268,7 @@ export default function Leaderboards() {
             options={[
               { label: 'Social Feed', value: 'feed' },
               { label: 'Leaderboards', value: 'leaderboards' },
+              { label: socialBadges.total ? `Friends (${socialBadges.total})` : 'Friends', value: 'friends' },
             ]}
           />
         </View>
@@ -1161,17 +1282,20 @@ export default function Leaderboards() {
                 options={[
                   { label: stateDetecting ? 'Locating…' : stateName, value: 'state', disabled: stateDetecting },
                   { label: 'All', value: 'all' },
-                  { label: 'Friends (Soon)', value: 'friends', disabled: true },
+                  { label: 'Friends', value: 'friends', disabled: !viewerId },
                 ]}
               />
             </View>
 
             {feedError ? (
-              <Card style={[styles.card, { backgroundColor: theme.colors.elevation?.level2 ?? (theme.dark ? '#1f1f1f' : '#fff') }]}>
-                <Card.Content>
-                  <Text style={{ color: theme.colors.error }}>Error: {feedError}</Text>
-                </Card.Content>
-              </Card>
+              <FeedbackState
+                compact
+                icon="alert-circle-outline"
+                title="Could not load the feed"
+                body={feedError}
+                actionLabel="Retry"
+                onAction={() => fetchFeedPage({ reset: true })}
+              />
             ) : null}
 
             {feedLoading && (feedRows?.length || 0) === 0 ? (
@@ -1200,7 +1324,13 @@ export default function Leaderboards() {
             {(feedRows?.length || 0) > 0 ? (
               <Card style={[styles.card, { backgroundColor: theme.colors.elevation?.level2 ?? (theme.dark ? '#1f1f1f' : '#fff') }]}>
                 <Card.Title
-                  title={feedScope === 'all' ? 'Latest Ratings' : `Latest in ${stateName}`}
+                  title={
+                    feedScope === 'all'
+                      ? 'Latest Ratings'
+                      : feedScope === 'friends'
+                      ? 'Latest from Wing Friends'
+                      : `Latest in ${stateName}`
+                  }
                   titleVariant="titleMedium"
                   titleStyle={{ color: textColor }}
                 />
@@ -1225,8 +1355,18 @@ export default function Leaderboards() {
                 </Card.Content>
               </Card>
             ) : null}
+            {feedScope === 'friends' && !feedLoading && !feedError && !feedRows.length ? (
+              <FeedbackState
+                compact
+                icon="account-group-outline"
+                title="No friend ratings yet"
+                body="Your friends haven’t rated wings here yet."
+                actionLabel="Open Friends"
+                onAction={() => setMode('friends')}
+              />
+            ) : null}
           </>
-        ) : (
+        ) : mode === 'leaderboards' ? (
           <>
             <View style={styles.subHeaderWrap}>
               <TogglePills
@@ -1235,7 +1375,7 @@ export default function Leaderboards() {
                 options={[
                   { label: stateId ? stateName : 'Your State', value: 'state', disabled: !stateId },
                   { label: 'All', value: 'all' },
-                  { label: 'Friends (Soon)', value: 'friends', disabled: true },
+                  { label: 'Friends', value: 'friends', disabled: !viewerId },
                 ]}
               />
 
@@ -1245,14 +1385,11 @@ export default function Leaderboards() {
                 </Text>
               ) : null}
 
-              {lbScope === 'friends' ? (
-                <Text style={{ color: textColor, opacity: 0.7, marginTop: 6, textAlign: 'center' }}>
-                  Friends leaderboards are coming soon.
-                </Text>
-              ) : null}
             </View>
 
-            {lbScope === 'friends' ? null : loading || (lbScope === 'state' && stateRatingsLoading) ? (
+            {loading ||
+            (lbScope === 'state' && stateRatingsLoading) ||
+            (lbScope === 'friends' && friendRatingsLoading) ? (
               <View style={{ alignItems: 'center', padding: 24 }}>
                 <ActivityIndicator />
                 <Text style={{ marginTop: 8, color: textColor }}>Loading leaderboards…</Text>
@@ -1329,6 +1466,12 @@ export default function Leaderboards() {
               </>
             )}
           </>
+        ) : (
+          <FriendsPanel
+            pendingBadge={socialBadges.pendingInvites}
+            activityBadge={socialBadges.unseenFriendActivity}
+            onBadgeChange={socialBadges.refresh}
+          />
         )}
 
         {/* Leaderboards Drilldown modal */}

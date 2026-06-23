@@ -26,6 +26,8 @@ import { getWalkingPath } from '../../../utils/walkRoute';
 import { createSoloCrawl } from '../../../utils/crawls';
 import { fetchRandomFunFact } from '../../../utils/funFacts';
 import RoutesWelcomeWizard from '../../../components/RoutesWelcomeWizard';
+import FeedbackState from '../../../components/ui/FeedbackState';
+import { trackEvent } from '../../../lib/analytics';
 
 const SEARCH_RADIUS_M = 160934; // 100 miles
 
@@ -603,6 +605,21 @@ export default function RoutesIndex() {
     return list;
   }, [routesRaw, selectedTag, selectedStatus, activeProgressByRoute, hasCompleted]);
 
+  useEffect(() => {
+    if (loading) return;
+    if (filtered.length) return;
+    trackEvent({
+      eventName: 'empty_state_shown',
+      screen: 'routes',
+      userId: session?.user?.id ?? null,
+      metadata: {
+        state: 'routes_no_results',
+        selected_status: selectedStatus ?? null,
+        selected_tag: selectedTag?.label ?? null,
+      },
+    });
+  }, [filtered.length, loading, selectedStatus, selectedTag?.label, session?.user?.id]);
+
   // map preview
   const buildMapPreview = useCallback(async (routeItem) => {
     if (!routeItem?.stops?.length) {
@@ -628,6 +645,17 @@ export default function RoutesIndex() {
 
   const openMapDialog = useCallback(
     async (item) => {
+      trackEvent({
+        eventName: 'map_opened',
+        screen: 'routes',
+        userId: session?.user?.id ?? null,
+        routeId: item?.id ?? null,
+        metadata: {
+          source: 'route_preview',
+          stop_count: item?.stops?.length ?? 0,
+          city: item?.city ?? null,
+        },
+      });
       setOpenMap(false);
       setMapCoords([]);
       setMapPath([]);
@@ -637,7 +665,7 @@ export default function RoutesIndex() {
         setOpenMap(true);
       });
     },
-    [buildMapPreview]
+    [buildMapPreview, session?.user?.id]
   );
 
   const fitPreviewMap = () => {
@@ -659,6 +687,18 @@ export default function RoutesIndex() {
       setSelectingRoute(true);
 
       try {
+        await trackEvent({
+          eventName: 'primary_cta_clicked',
+          screen: 'routes',
+          userId: session?.user?.id ?? null,
+          routeId: routeItem.id,
+          metadata: {
+            cta_name: activeProgressByRoute?.[routeItem.id] ? 'resume_crawl' : 'begin_crawl',
+            source_screen: 'routes',
+            city: routeItem?.city ?? null,
+          },
+        });
+
         let prefact = '';
         try {
           prefact = (await fetchRandomFunFact()) || '';
@@ -701,6 +741,14 @@ export default function RoutesIndex() {
         const existingCrawlId = progress?.crawl_id ?? null;
 
         if (existingCrawlId) {
+          await trackEvent({
+            eventName: 'crawl_started',
+            screen: 'routes',
+            userId: userId ?? null,
+            routeId: routeItem.id,
+            crawlId: existingCrawlId,
+            metadata: { flow_step: 'resume_existing', source_screen: 'routes' },
+          });
           router.replace({ pathname: `/crawl/${existingCrawlId}`, params: { prefact } });
           return;
         }
@@ -714,16 +762,34 @@ export default function RoutesIndex() {
         }
 
         const row = await createSoloCrawl({ routeId: routeItem.id, userId: userId || null });
+        await trackEvent({
+          eventName: 'crawl_started',
+          screen: 'routes',
+          userId: userId ?? null,
+          routeId: routeItem.id,
+          crawlId: row?.crawl_id ?? null,
+          metadata: { flow_step: 'created', source_screen: 'routes' },
+        });
 
         router.replace({ pathname: `/crawl/${row.crawl_id}`, params: { prefact } });
       } catch (e) {
         console.warn('startOrResumeCrawlFromList failed:', e?.message || e);
+        await trackEvent({
+          eventName: 'error_shown',
+          screen: 'routes',
+          userId: session?.user?.id ?? null,
+          routeId: routeItem?.id ?? null,
+          metadata: {
+            error_message: e?.message || String(e),
+            source: 'start_or_resume_crawl',
+          },
+        });
         Alert.alert('Error', e?.message ?? 'Could not start the crawl.');
       } finally {
         setTimeout(() => setSelectingRoute(false), 400);
       }
     },
-    [router, selectingRoute, activeProgressByRoute, hasCompleted, FUN_FACTS, factIndex]
+    [router, selectingRoute, activeProgressByRoute, hasCompleted, FUN_FACTS, factIndex, session?.user?.id]
   );
 
   // completed overview
@@ -937,6 +1003,17 @@ export default function RoutesIndex() {
       .filter(Boolean);
 
     setAllMarkers(items);
+    trackEvent({
+      eventName: 'map_opened',
+      screen: 'routes',
+      userId: session?.user?.id ?? null,
+      metadata: {
+        source: 'routes_all_map',
+        result_count: items.length,
+        selected_status: selectedStatus ?? null,
+        selected_tag: selectedTag?.label ?? null,
+      },
+    });
     setOpenAllMap(true);
 
     requestAnimationFrame(() => {
@@ -947,7 +1024,7 @@ export default function RoutesIndex() {
         });
       }
     });
-  }, [filtered]);
+  }, [filtered, selectedStatus, selectedTag?.label, session?.user?.id]);
 
   // render item
   const renderItem = ({ item }) => {
@@ -959,13 +1036,21 @@ export default function RoutesIndex() {
 
     const cardBg = isActive ? themed.cardYellow : visited ? themed.cardGreen : themed.cardNeutral;
 
+    const progressPct = totalStops > 0 ? Math.max(0, Math.min(1, hits / totalStops)) : 0;
+    const ctaLabel = isActive ? 'Resume' : visited ? 'Review' : 'Start';
+
     return (
       <Card style={[styles.card, { backgroundColor: cardBg }]} mode="elevated" onPress={() => handleOpenDetails(item)}>
-        <Card.Content style={styles.rowBetween}>
-          <View style={{ flex: 1, paddingRight: 8 }}>
-            <Text variant="titleMedium" style={styles.name}>
+        <Card.Content style={styles.routeCardContent}>
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <View style={styles.routeTitleRow}>
+            <Text variant="titleMedium" style={[styles.name, styles.routeName]} numberOfLines={2}>
               {item.title}
             </Text>
+              <View style={[styles.routeCtaPill, { backgroundColor: isActive ? '#F9A825' : visited ? '#2E7D32' : '#FF6F00' }]}>
+                <Text style={styles.routeCtaText} numberOfLines={1}>{ctaLabel}</Text>
+              </View>
+            </View>
 
             <View style={styles.statusRow}>
               {visited && !isActive ? (
@@ -986,7 +1071,7 @@ export default function RoutesIndex() {
                   textStyle={{ color: themed.onYellow, fontWeight: '700' }}
                   icon="progress-clock"
                 >
-                  You've stopped at {hits} of {totalStops}
+                  You have stopped at {hits} of {totalStops}
                 </Chip>
               ) : null}
             </View>
@@ -1008,6 +1093,10 @@ export default function RoutesIndex() {
                 {Number.isFinite(Number(item.distanceMi)) ? ` • ${fmt1(item.distanceMi)} mi away` : ''}
               </Text>
             </View>
+
+            {isActive ? (
+              <ProgressBar progress={progressPct} style={styles.routeProgress} />
+            ) : null}
           </View>
         </Card.Content>
       </Card>
@@ -1155,9 +1244,24 @@ export default function RoutesIndex() {
             if (dy < -HIDE_THRESHOLD) showHeader();
           }}
           ListEmptyComponent={
-            <View style={{ alignItems: 'center', marginTop: 24 }}>
-              <Text>No routes found for this filter near you.</Text>
-            </View>
+            <FeedbackState
+              style={{ marginTop: 24 }}
+              icon="map-marker-path"
+              title="No crawls match this view"
+              body="Clear a filter, open the map, or submit a route that deserves to become a wing quest."
+              actionLabel="Submit route"
+              onAction={() => {
+                trackEvent({
+                  eventName: 'primary_cta_clicked',
+                  screen: 'routes',
+                  userId: session?.user?.id ?? null,
+                  metadata: { cta_name: 'submit_route_empty', source_screen: 'routes' },
+                });
+                openSubmit();
+              }}
+              secondaryLabel="View map"
+              onSecondary={openAllRoutesMap}
+            />
           }
           ListFooterComponent={
             <View style={{ paddingTop: 16, paddingBottom: 24 }}>
@@ -1532,6 +1636,20 @@ const styles = StyleSheet.create({
   rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   name: { fontWeight: '700' },
   muted: { opacity: 0.7 },
+  routeCardContent: { paddingVertical: 14, paddingHorizontal: 14 },
+  routeName: { flex: 1, minWidth: 0, paddingRight: 8 },
+  routeTitleRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' },
+  routeCtaPill: {
+    borderRadius: 999,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    minWidth: 54,
+    maxWidth: 76,
+    flexShrink: 0,
+    alignItems: 'center',
+  },
+  routeCtaText: { color: '#fff', fontWeight: '900', fontSize: 11 },
+  routeProgress: { height: 7, borderRadius: 999, marginTop: 10 },
 
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 },
 

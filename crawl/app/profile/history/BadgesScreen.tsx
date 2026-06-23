@@ -11,6 +11,7 @@ import {
   useTheme,
 } from 'react-native-paper';
 import { supabase } from '../../../lib/supabase.js';
+import { trackEvent } from '../../../lib/analytics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
@@ -225,6 +226,11 @@ export default function BadgesScreen() {
     let alive = true;
     (async () => {
       if (!alive) return;
+      await trackEvent({
+        eventName: 'badge_viewed',
+        screen: 'badges',
+        metadata: { source_screen: 'profile_history', badge_id: null },
+      });
       await loadAll();
     })();
     return () => { alive = false; };
@@ -251,7 +257,21 @@ export default function BadgesScreen() {
     const chipTx = isEarned ? earnedBadgeTxt: lockedBadgeTxt;
 
     return (
-      <Pressable onPress={() => setActive(item)} style={{ flex: 1 / 3, padding: CELL_PAD }}>
+      <Pressable
+        onPress={() => {
+          trackEvent({
+            eventName: 'badge_viewed',
+            screen: 'badges',
+            metadata: {
+              badge_id: item.badge_id,
+              badge_code: item.code,
+              earned: isEarned,
+            },
+          });
+          setActive(item);
+        }}
+        style={{ flex: 1 / 3, padding: CELL_PAD }}
+      >
         <View style={{ alignItems: 'center' }}>
           {/* Shield + icon */}
           <Shield

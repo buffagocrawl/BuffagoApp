@@ -11,12 +11,16 @@ import {
   Pressable,
   Image,
   Alert,
+  Share,
   Animated,
   Modal,
+  DeviceEventEmitter,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Slider from '@react-native-community/slider';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   ActivityIndicator,
@@ -33,9 +37,16 @@ import {
 } from 'react-native-paper';
 import { useRouter, useFocusEffect } from 'expo-router';
 import RatingWizardDialog from '../../../components/RatingWizardDialog';
+import WingmanAddDialog from '../../../components/WingmanAddDialog';
+import FeedbackState from '../../../components/ui/FeedbackState';
 import { supabase } from '../../../lib/supabase.js';
+import { trackEvent } from '../../../lib/analytics';
 import { useLocationCtx } from '../../../providers/LocationProvider';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+
+const WINGDEX_HINT_DISMISSED_KEY = 'buffago:wingdex_hint_dismissed';
+const HOME_NEXT_SPOT_KEY = 'buffago:homeNextSpot';
+const HOME_NEXT_SPOT_EVENT = 'buffago:home_next_spot_selected';
 
 /* ---------------- helpers ---------------- */
 const fmt2 = (n) => {
@@ -130,7 +141,7 @@ const US_STATES = [
 ];
 
 /* ---------- compact UI bits for the drill-down ---------- */
-function ScoreHeader({ value }) {
+function ScoreHeader({ value, label = 'BuffaGo Score', subLabel = 'Weighted out of 100' }) {
   const { colors, dark } = useTheme();
   const themed = useMemo(() => {
     // surfaceVariant can be too light depending on theme config, so pin dark mode to elevation/surface.
@@ -143,9 +154,9 @@ function ScoreHeader({ value }) {
 
   return (
     <View style={[styles.scoreHeader, { backgroundColor: themed.headerBg }]}>
-      <Text style={[styles.scoreHeaderLabel, { color: themed.headerText }]}>BuffaGo Score</Text>
+      <Text style={[styles.scoreHeaderLabel, { color: themed.headerText }]}>{label}</Text>
       <Text style={[styles.scoreHeaderValue, { color: themed.accent }]}>{fmt2(value)}</Text>
-      <Text style={[styles.scoreHeaderSub, { color: themed.sub }]}>Weighted out of 100</Text>
+      <Text style={[styles.scoreHeaderSub, { color: themed.sub }]}>{subLabel}</Text>
     </View>
   );
 }
@@ -284,6 +295,18 @@ const deriveTown = (address) => {
   return null;
 };
 
+const formatRatingDate = (value) => {
+  if (!value) return 'Recently';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'Recently';
+
+  return date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+};
+
 /* ---------- Buffacoin rating wizard UI ---------- */
 const clamp01 = (n) => Math.max(0, Math.min(1, n));
 
@@ -377,7 +400,7 @@ export default function PublicRatingsScreen() {
     }, [setTabsHidden])
   );
 
-  const { coords, status } = useLocationCtx();
+  const { coords, status, askPermission } = useLocationCtx();
   const { colors, dark } = useTheme();
 
   // ✅ celebration + delayed coin apply
@@ -456,6 +479,16 @@ export default function PublicRatingsScreen() {
   useCallback(() => {
     // refresh coin count any time Wingdex gains focus
       refreshCoins();
+      trackEvent({
+        eventName: 'wingdex_opened',
+        screen: 'ratings',
+        userId: user?.id ?? null,
+        metadata: {
+          source_screen: 'tab_bar',
+          location_mode: locationMode,
+          state: currentState ?? stateCodeFilter ?? null,
+        },
+      });
     }, [refreshCoins])
   );
 
@@ -528,14 +561,21 @@ export default function PublicRatingsScreen() {
   const [stateCodeFilter, setStateCodeFilter] = useState(null);
 
   const [statePickerOpen, setStatePickerOpen] = useState(false);
+  const [wingmanOpen, setWingmanOpen] = useState(false);
+  const [wingmanStateCtx, setWingmanStateCtx] = useState(null);
 
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(null);
 
   const [query, setQuery] = useState('');
+  const lastTrackedQueryRef = useRef('');
+  const lastSearchStartedRef = useRef('');
+  const lastEmptyStateCtaShownRef = useRef('');
 
   const [routesForActive, setRoutesForActive] = useState([]);
   const [routesLoading, setRoutesLoading] = useState(false);
+  const [recentRatings, setRecentRatings] = useState([]);
+  const [recentRatingsLoading, setRecentRatingsLoading] = useState(false);
 
   const [openMap, setOpenMap] = useState(false);
   const allMapRef = useRef(null);
@@ -557,6 +597,70 @@ export default function PublicRatingsScreen() {
   const [coinRateOpen, setCoinRateOpen] = useState(false);
   const [coinRatingDest, setCoinRatingDest] = useState(null);
   const [coinSubmitting, setCoinSubmitting] = useState(false);
+  const [wingdexHintVisible, setWingdexHintVisible] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+
+    (async () => {
+      try {
+        const dismissed = await AsyncStorage.getItem(WINGDEX_HINT_DISMISSED_KEY);
+        if (alive && dismissed !== 'true') setWingdexHintVisible(true);
+      } catch {
+        if (alive) setWingdexHintVisible(true);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, [user?.id]);
+
+  const dismissWingdexHint = useCallback(async () => {
+    setWingdexHintVisible(false);
+    try {
+      await AsyncStorage.setItem(WINGDEX_HINT_DISMISSED_KEY, 'true');
+    } catch {
+      // Non-critical. The hint can show again if persistence fails.
+    }
+  }, []);
+
+  const getWingmanStateContext = useCallback(async () => {
+    const stateCode = currentState || stateCodeFilter || null;
+    if (!stateCode) return null;
+
+    const { data, error } = await supabase
+      .from('states')
+      .select('state_id, state_code')
+      .eq('state_code', stateCode)
+      .maybeSingle();
+
+    if (error) {
+      console.warn('Wingdex state lookup failed', error.message || error);
+      return { stateId: null, stateCode };
+    }
+
+    return {
+      stateId: data?.state_id ? Number(data.state_id) : null,
+      stateCode: data?.state_code ? String(data.state_code) : stateCode,
+    };
+  }, [currentState, stateCodeFilter]);
+
+  const openWingman = useCallback(async (source = 'wingdex') => {
+    trackEvent({
+      eventName: 'add_restaurant_opened',
+      screen: 'ratings',
+      userId: user?.id ?? null,
+      metadata: {
+        source,
+        visible_result_count: filteredRef.current?.length ?? 0,
+        location_mode: locationMode,
+      },
+    });
+    const ctx = await getWingmanStateContext();
+    setWingmanStateCtx(ctx);
+    setWingmanOpen(true);
+  }, [getWingmanStateContext, locationMode, user?.id]);
 
 
   const statusColorFor = useCallback(
@@ -570,6 +674,16 @@ export default function PublicRatingsScreen() {
   const filteredRef = useRef([]);
   const openRestaurantsMap = useCallback(() => {
     setMapLegendFilter(null);
+    trackEvent({
+      eventName: 'map_opened',
+      screen: 'ratings',
+      userId: user?.id ?? null,
+      metadata: {
+        source: 'wingdex',
+        result_count: filteredRef.current?.length ?? 0,
+        location_mode: locationMode,
+      },
+    });
     setOpenMap(true);
 
     requestAnimationFrame(() => {
@@ -584,7 +698,7 @@ export default function PublicRatingsScreen() {
         });
       }
     });
-  }, []);
+  }, [locationMode, user?.id]);
 
   const applyLocationFilter = useCallback(
     (dataIn) => {
@@ -695,6 +809,87 @@ export default function PublicRatingsScreen() {
   useEffect(() => {
     filteredRef.current = filtered;
   }, [filtered]);
+
+  useEffect(() => {
+    const text = query.trim();
+    if (text.length < 2) return;
+
+    const t = setTimeout(() => {
+      if (lastSearchStartedRef.current !== text) {
+        lastSearchStartedRef.current = text;
+        trackEvent({
+          eventName: 'restaurant_search_started',
+          screen: 'ratings',
+          userId: user?.id ?? null,
+          metadata: {
+            source: 'wingdex',
+            query_length: text.length,
+            location_mode: locationMode,
+          },
+        });
+      }
+
+      const key = `${text}:${filtered.length}:${locationMode}:${selectedTagId ?? 'none'}`;
+      if (lastTrackedQueryRef.current === key) return;
+      lastTrackedQueryRef.current = key;
+
+      trackEvent({
+        eventName: filtered.length ? 'restaurant_search_results_viewed' : 'restaurant_search_empty',
+        screen: 'ratings',
+        userId: user?.id ?? null,
+        metadata: {
+          source: 'wingdex',
+          query_length: text.length,
+          result_count: filtered.length,
+          location_mode: locationMode,
+          selected_tag_id: selectedTagId ?? null,
+        },
+      });
+    }, 700);
+
+    return () => clearTimeout(t);
+  }, [query, filtered.length, locationMode, selectedTagId, user?.id]);
+
+  useEffect(() => {
+    if (loading || filtered.length) {
+      lastEmptyStateCtaShownRef.current = '';
+      return;
+    }
+
+    const emptyStateKey = [
+      query.trim(),
+      locationMode,
+      stateCodeFilter ?? 'none',
+      selectedTagId ?? 'none',
+      radiusMiles,
+    ].join(':');
+    if (lastEmptyStateCtaShownRef.current === emptyStateKey) return;
+    lastEmptyStateCtaShownRef.current = emptyStateKey;
+
+    trackEvent({
+      eventName: 'empty_state_cta_shown',
+      screen: 'ratings',
+      userId: user?.id ?? null,
+      metadata: {
+        state: 'wingdex_no_results',
+        cta_name: 'add_restaurant_empty_wingdex',
+        query_length: query.trim().length,
+        location_mode: locationMode,
+        state_code: stateCodeFilter ?? null,
+        radius_miles: locationMode === 'radius' ? radiusMiles : null,
+        selected_tag_id: selectedTagId ?? null,
+      },
+    });
+  }, [
+    filtered.length,
+    loading,
+    locationMode,
+    query,
+    radiusMiles,
+    selectedTagId,
+    stateCodeFilter,
+    user?.id,
+  ]);
 
   const fetchAll = useCallback(async () => {
     const { data: userData } = await supabase.auth.getUser();
@@ -1042,9 +1237,207 @@ export default function PublicRatingsScreen() {
 
       // 3) Has enough coins
       setCoinRatingDest(item);
+      await trackEvent({
+        eventName: 'primary_cta_clicked',
+        screen: 'ratings',
+        userId: user.id,
+        destinationId: item.destination_id,
+        metadata: { cta_name: 'rate_with_buffacoin', source_screen: 'ratings', coin_cost: cost },
+      });
+      await trackEvent({
+        eventName: 'rating_started',
+        screen: 'ratings',
+        userId: user.id,
+        destinationId: item.destination_id,
+        metadata: { source: 'wingdex_buffacoin', coin_cost: cost },
+      });
       setCoinRateOpen(true);
     },
     [user?.id, buffacoinBalance, coinCostByDest, myCoinRated]
+  );
+
+  const shareRating = useCallback(async (item) => {
+    const score = Number(item?.myAvgWeight);
+    if (!item?.name || !Number.isFinite(score)) return;
+
+    const place = [item.town, item.stateCode].filter(Boolean).join(', ');
+    const message = [
+      `I rated ${item.name} ${fmt2(score)}/100 on BuffaGo.`,
+      place ? `Location: ${place}.` : null,
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    try {
+      await Share.share({
+        title: `My BuffaGo rating for ${item.name}`,
+        message,
+      });
+      await trackEvent({
+        eventName: 'share_completed',
+        screen: 'ratings',
+        userId: user?.id ?? null,
+        destinationId: item.destination_id ?? null,
+        metadata: { content_type: 'rating', source: 'wingdex' },
+      });
+    } catch (e) {
+      await trackEvent({
+        eventName: 'share_failed',
+        screen: 'ratings',
+        userId: user?.id ?? null,
+        destinationId: item.destination_id ?? null,
+        metadata: { content_type: 'rating', error: e?.message || String(e) },
+      });
+      console.warn('share rating failed', e?.message || e);
+    }
+  }, [user?.id]);
+
+  const fetchRecentRatingsForDestination = useCallback(async (destinationId) => {
+    if (!destinationId) {
+      setRecentRatings([]);
+      return;
+    }
+
+    setRecentRatingsLoading(true);
+    try {
+      const { data: ratings, error } = await supabase
+        .from('destination_ratings')
+        .select('user_id, weight_score, crispiness, sauce, meat, overall, created_at, is_buffacoin')
+        .eq('destination_id', destinationId)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (error) {
+        console.warn('recent ratings fetch failed', error.message || error);
+        setRecentRatings([]);
+        return;
+      }
+
+      const userIds = Array.from(
+        new Set((ratings || []).map((r) => r?.user_id).filter(Boolean))
+      );
+      const namesByUser = new Map();
+
+      if (userIds.length) {
+        const { data: users, error: usersErr } = await supabase
+          .from('users')
+          .select('user_id, username')
+          .in('user_id', userIds);
+
+        if (usersErr) {
+          console.warn('recent rating users fetch failed', usersErr.message || usersErr);
+        } else {
+          for (const u of users || []) {
+            if (u?.user_id) namesByUser.set(u.user_id, u?.username || null);
+          }
+        }
+      }
+
+      setRecentRatings(
+        (ratings || []).map((r) => ({
+          ...r,
+          displayName:
+            r?.user_id && user?.id && r.user_id === user.id
+              ? 'You'
+              : namesByUser.get(r?.user_id)?.trim?.() || 'BuffaGo user',
+        }))
+      );
+    } finally {
+      setRecentRatingsLoading(false);
+    }
+  }, [user?.id]);
+
+  const openDestinationDetail = useCallback(
+    (item) => {
+      setActive(item);
+      setOpen(true);
+      trackEvent({
+        eventName: 'restaurant_profile_viewed',
+        screen: 'ratings',
+        userId: user?.id ?? null,
+        destinationId: item?.destination_id ?? null,
+        metadata: {
+          source: 'wingdex_list',
+          rating_count: item?.count ?? null,
+          avg_weight_score: item?.avgWeight ?? null,
+          distance_miles: item?.distanceMi ?? null,
+        },
+      });
+      trackEvent({
+        eventName: 'restaurant_selected',
+        screen: 'ratings',
+        userId: user?.id ?? null,
+        destinationId: item?.destination_id ?? null,
+        metadata: {
+          source_screen: 'ratings',
+          source: 'wingdex_list',
+          rating_count: item?.count ?? null,
+          distance_from_user: item?.distanceMi != null ? Number(item.distanceMi) * 1609.34 : null,
+          distance_miles: item?.distanceMi ?? null,
+        },
+      });
+      fetchRoutesForDestination(item.destination_id);
+      fetchRecentRatingsForDestination(item.destination_id);
+    },
+    [fetchRecentRatingsForDestination, fetchRoutesForDestination, user?.id]
+  );
+
+  const expandRadius = useCallback(() => {
+    const currentIndex = RADIUS_OPTIONS.findIndex((mi) => mi === radiusMiles);
+    const nextRadius = RADIUS_OPTIONS[Math.min(RADIUS_OPTIONS.length - 1, Math.max(0, currentIndex) + 1)];
+
+    setRadiusMiles(nextRadius ?? 25);
+    setLocationMode('radius');
+    setStateCodeFilter(null);
+  }, [RADIUS_OPTIONS, radiusMiles]);
+
+  const handleWingmanPickDestination = useCallback(
+    async (row) => {
+      setWingmanOpen(false);
+      await fetchAll();
+
+      if (!row?.id) return;
+
+      let stateCode = wingmanStateCtx?.stateCode || currentState || stateCodeFilter || null;
+      if (!stateCode && row?.state_id) {
+        const { data, error } = await supabase
+          .from('states')
+          .select('state_code')
+          .eq('state_id', row.state_id)
+          .maybeSingle();
+
+        if (error) {
+          console.warn('Wingdex destination state lookup failed', error.message || error);
+        }
+
+        stateCode = data?.state_code ? String(data.state_code) : null;
+      }
+
+      const item = {
+        destination_id: row.id,
+        name: row.name || 'New restaurant',
+        lat: Number.isFinite(Number(row.lat)) ? Number(row.lat) : null,
+        lng: Number.isFinite(Number(row.lng)) ? Number(row.lng) : null,
+        address: row.address ?? null,
+        stateCode,
+        distanceMi: null,
+        count: 0,
+        avgWeight: null,
+        avgCrisp: null,
+        avgSauce: null,
+        avgMeat: null,
+        avgOverall: null,
+        topTag: null,
+        topTags: [],
+        countsByTag: {},
+        myAvgWeight: null,
+        ratedByMe: false,
+        town: deriveTown(row.address ?? null) || row.city || null,
+      };
+
+      await onPressCoinRate(item);
+    },
+    [currentState, fetchAll, onPressCoinRate, stateCodeFilter, wingmanStateCtx?.stateCode]
   );
 
   const computeWeightScoreFromScores = useCallback((inputScores) => {
@@ -1058,6 +1451,43 @@ export default function PublicRatingsScreen() {
 
     return Math.max(0, Math.min(100, Math.round(safe)));
   }, []);
+
+  const pickAsHomeNextSpot = useCallback(async (item) => {
+    if (!item?.destination_id) return;
+
+    const payload = {
+      id: item.destination_id,
+      name: item.name ?? 'Wing Spot',
+      address: item.address ?? null,
+      city: item.town ?? item.city ?? null,
+      lat: item.lat ?? null,
+      lng: item.lng ?? null,
+      selectedAt: Date.now(),
+      source: 'wingdex_detail',
+    };
+
+    try {
+      await AsyncStorage.setItem(HOME_NEXT_SPOT_KEY, JSON.stringify(payload));
+      DeviceEventEmitter.emit(HOME_NEXT_SPOT_EVENT, payload);
+      await trackEvent({
+        eventName: 'primary_cta_clicked',
+        screen: 'ratings',
+        userId: user?.id ?? null,
+        destinationId: item.destination_id,
+        metadata: {
+          cta_name: 'want_this_spot_next',
+          source_screen: 'ratings',
+          source: 'wingdex_detail',
+          distance_miles: item?.distanceMi ?? null,
+        },
+      });
+      setOpen(false);
+      router.push('/(tabs)/home');
+    } catch (e) {
+      console.warn('pickAsHomeNextSpot failed', e?.message || e);
+      Alert.alert('Could not update Home', 'Try again in a moment.');
+    }
+  }, [router, user?.id]);
 
 
   const submitCoinRating = useCallback(async (payload) => {
@@ -1143,12 +1573,51 @@ export default function PublicRatingsScreen() {
     // 4) Insert rating
     const { error: insErr } = await supabase.from('destination_ratings').insert(insertPayload);
     if (insErr) {
+      await trackEvent({
+        eventName: 'rating_failed',
+        screen: 'ratings',
+        userId: user.id,
+        destinationId: coinRatingDest.destination_id,
+        crawlId,
+        metadata: { source: 'wingdex_buffacoin', error: insErr.message || String(insErr) },
+      });
       console.warn('destination_ratings insert failed', insErr.message || insErr);
       Alert.alert('Rating', insErr.message || 'Could not submit rating.');
       return;
     }
 
     // ✅ keep "rated by me" sets correct immediately
+    await trackEvent({
+      eventName: 'rating_completed',
+      screen: 'ratings',
+      userId: user.id,
+      destinationId: coinRatingDest.destination_id,
+      crawlId,
+      metadata: {
+        source: 'wingdex_buffacoin',
+        state_code: stateCode,
+        coin_cost: spendTimes,
+        weight_score: weightScore,
+        tag_id: payload.selectedTagId ?? null,
+        would_order_again: payload?.wouldOrderAgain == null ? null : Boolean(payload.wouldOrderAgain),
+      },
+    });
+    await trackEvent({
+      eventName: 'rating_submitted',
+      screen: 'ratings',
+      userId: user.id,
+      destinationId: coinRatingDest.destination_id,
+      crawlId,
+      metadata: {
+        source: 'wingdex_buffacoin',
+        state: stateCode,
+        coin_cost: spendTimes,
+        weight_score: weightScore,
+        tag_id: payload.selectedTagId ?? null,
+        would_order_again: payload?.wouldOrderAgain == null ? null : Boolean(payload.wouldOrderAgain),
+      },
+    });
+
     setMyCoinRated((prev) => {
       const next = new Set(prev);
       next.add(coinRatingDest.destination_id);
@@ -1163,6 +1632,7 @@ export default function PublicRatingsScreen() {
     
     // ✅ optimistic rating update (list + drilldown) so it feels instant
     const destId = coinRatingDest.destination_id;
+    await fetchRecentRatingsForDestination(destId);
     
     setRows((prev) =>
       (prev || []).map((r) => {
@@ -1260,8 +1730,10 @@ export default function PublicRatingsScreen() {
   currentState,
   stateCodeFilter,
   coinRatingDest?.stateCode,
+  coinCostForActive,
   buffacoinBalance,
   computeWeightScoreFromScores,
+  fetchRecentRatingsForDestination,
   playCoinDelta,
 ]);
 
@@ -1282,6 +1754,7 @@ export default function PublicRatingsScreen() {
 
     const displayAvg = hasRatings ? fmt2(item.avgWeight) : '—';
     const showCoinRate = canRateWithCoins(item);
+    const ratedWithCoin = myCoinRated.has(item.destination_id);
 
     const destIdStr = String(item.destination_id);
     const coinCost = Math.max(1, Number(coinCostByDest?.[destIdStr] ?? 1));
@@ -1292,21 +1765,18 @@ export default function PublicRatingsScreen() {
           styles.card,
           { backgroundColor: themed.neutralCard },
           ratedByMe && {
-            backgroundColor: themed.ratedCardBg,
+            backgroundColor: themed.neutralCard,
             borderWidth: 1,
             borderColor: themed.ratedBorder,
           },
         ]}
-        mode="elevated"
-        onPress={() => {
-          setActive(item);
-          setOpen(true);
-          fetchRoutesForDestination(item.destination_id);
-        }}
+        mode="outlined"
+        onPress={() => openDestinationDetail(item)}
       >
       <Card.Content style={styles.cardContent}>
         {/* LINE 1: centered name */}
         <View style={styles.nameLine}>
+          <View style={styles.restaurantIdentity}>
           <Text
             variant="titleMedium"
             numberOfLines={1}
@@ -1314,6 +1784,15 @@ export default function PublicRatingsScreen() {
           >
             {item.name}
           </Text>
+          <Text
+            variant="bodySmall"
+            numberOfLines={1}
+            style={[styles.locationLine, { color: themed.muted }]}
+          >
+            {[item.town, item.stateCode].filter(Boolean).join(', ') || 'Location pending'}
+            {distText}
+          </Text>
+          </View>
         
           <Text
             variant="bodySmall"
@@ -1363,8 +1842,14 @@ export default function PublicRatingsScreen() {
                 contentStyle={styles.rateBtnInlineContent}
                 labelStyle={styles.rateBtnInlineLabel}
               >
-                {`Rate ${coinCost}`}
+                {`Rate · ${coinCost}`}
               </Button>
+            ) : ratedByMe ? (
+              <View style={[styles.ratedInlineChip, { backgroundColor: themed.ratedChipBg }]}>
+                <Text style={[styles.ratedInlineChipText, { color: themed.ratedChipText }]}>
+                  {ratedWithCoin ? 'Rated With Coin' : 'Rated'}
+                </Text>
+              </View>
             ) : (
               <View style={{ height: 34, width: 92 }} />
             )}
@@ -1388,6 +1873,40 @@ export default function PublicRatingsScreen() {
     if (locationMode === 'radius') return `${radiusMiles} mi`;
     return 'Location';
   }, [locationMode, stateCodeFilter, radiusMiles]);
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (query.trim()) count += 1;
+    if (selectedTagId != null) count += 1;
+    if (locationMode !== 'all') count += 1;
+    return count;
+  }, [locationMode, query, selectedTagId]);
+
+  const wingdexContextLabel = useMemo(() => {
+    if (locationMode === 'all') return 'Showing all places';
+    if (locationMode === 'state' && stateCodeFilter) return `Showing ${stateCodeFilter}`;
+    if (locationMode === 'radius') return `Showing places within ${radiusMiles} mi`;
+    return 'Showing Wingdex places';
+  }, [locationMode, radiusMiles, stateCodeFilter]);
+
+  const dashboardMetrics = useMemo(() => {
+    const visibleCount = filtered.length;
+    const ratedVisible = filtered.filter((r) => (r.count ?? 0) > 0).length;
+    const completedVisible = filtered.filter((r) => r.ratedByMe || myRated.has(r.destination_id)).length;
+    const scored = filtered
+      .map((r) => Number(r.avgWeight))
+      .filter((n) => Number.isFinite(n));
+    const avgScore = scored.length
+      ? scored.reduce((sum, n) => sum + n, 0) / scored.length
+      : null;
+
+    return {
+      visibleCount,
+      ratedVisible,
+      completedVisible,
+      avgScore,
+    };
+  }, [filtered, myRated]);
 
   const showCoinHeader = Boolean(user?.id);
   const TokenIcon = useCallback(
@@ -1431,7 +1950,7 @@ export default function PublicRatingsScreen() {
               Wingdex
             </Text>
             <Text variant="bodySmall" style={styles.subtitle}>
-              Sorted by {sortLabel}
+              {wingdexContextLabel} · sorted by {sortLabel}
             </Text>
           </View>
           <View style={{ position: 'relative' }}>
@@ -1479,9 +1998,25 @@ export default function PublicRatingsScreen() {
           style={{ marginTop: 10, borderRadius: 12 }}
         />
 
+        {wingdexHintVisible ? (
+          <View style={[styles.hintPanel, { backgroundColor: colors.surfaceVariant }]}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.hintTitle}>Wingdex workspace</Text>
+              <Text style={[styles.hintText, { color: colors.onSurface }]}>
+                Review coverage, add missing restaurants, and rate prior visits with Buffacoins.
+              </Text>
+            </View>
+            <Button compact onPress={dismissWingdexHint}>
+              Got it
+            </Button>
+          </View>
+        ) : null}
+
         <View style={styles.filterSectionHeader}>
           <Text style={styles.filterSectionTitle}>Location</Text>
-          <Text style={styles.filterSectionSub}>{locationLabel}</Text>
+          <Text style={styles.filterSectionSub}>
+            {locationLabel}{activeFilterCount ? ` · Filters ${activeFilterCount}` : ''}
+          </Text>
         </View>
 
         <ScrollView
@@ -1554,15 +2089,46 @@ export default function PublicRatingsScreen() {
           renderItem={renderItem}
           contentContainerStyle={{
             padding: 16,
-            paddingBottom: 8,
+            paddingBottom: Math.max(96, insets.bottom + 92),
             paddingTop: headerHeight,
           }}
           ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           ListEmptyComponent={
-            <View style={{ alignItems: 'center', marginTop: 24 }}>
-              <Text>No ratings yet.</Text>
-            </View>
+            <FeedbackState
+              style={styles.emptyState}
+              icon="map-search-outline"
+              title={locationMode === 'radius' ? 'No wing spots in this radius' : 'No Wingdex matches'}
+              body="Broaden the search, jump to a state, or add the missing restaurant so your local Wingdex gets better."
+              actionLabel="Add restaurant"
+              onAction={() => {
+                trackEvent({
+                  eventName: 'empty_state_cta_clicked',
+                  screen: 'ratings',
+                  userId: user?.id ?? null,
+                  metadata: {
+                    state: 'wingdex_no_results',
+                    cta_name: 'add_restaurant_empty_wingdex',
+                    source_screen: 'ratings',
+                    query_length: query.trim().length,
+                    location_mode: locationMode,
+                    state_code: stateCodeFilter ?? null,
+                    radius_miles: locationMode === 'radius' ? radiusMiles : null,
+                    selected_tag_id: selectedTagId ?? null,
+                  },
+                });
+                openWingman('wingdex_empty_state');
+              }}
+              secondaryLabel={locationMode === 'radius' ? 'Expand radius' : 'View all'}
+              onSecondary={() => {
+                if (locationMode === 'radius') {
+                  expandRadius();
+                  return;
+                }
+                setLocationMode('all');
+                setStateCodeFilter(null);
+              }}
+            />
           }
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -1591,6 +2157,24 @@ export default function PublicRatingsScreen() {
           scrollEventThrottle={16}
         />
       )}
+
+      {!loading && status !== 'granted' ? (
+        <View
+          pointerEvents="box-none"
+          style={[
+            styles.bottomCtaWrap,
+            {
+              paddingBottom: Math.max(10, insets.bottom + 6),
+              backgroundColor: colors.background,
+            },
+          ]}
+        >
+          <Button mode="contained" icon="crosshairs-gps" onPress={askPermission}>
+            Enable location
+          </Button>
+        </View>
+      ) : null}
+
       {/* Drill-down modal (full screen) */}
       <Portal>
         <Modal
@@ -1638,7 +2222,11 @@ export default function PublicRatingsScreen() {
                   paddingBottom: Math.max(18, insets.bottom + 18),
                 }}
               >
-              <ScoreHeader value={active.avgWeight} />
+              <ScoreHeader
+                value={active.avgWeight}
+                label="BuffaGo Score"
+                subLabel="Average weighted score"
+              />
       
               <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 6 }}>
                 <Text style={{ color: colors.onSurface, opacity: 0.7, textAlign: 'center' }}>
@@ -1651,15 +2239,26 @@ export default function PublicRatingsScreen() {
                     {active.address}
                   </Text>
                 ) : null}
+
+                <Button
+                  mode="contained"
+                  icon="flag-checkered"
+                  onPress={() => pickAsHomeNextSpot(active)}
+                  style={styles.nextSpotButton}
+                  contentStyle={{ height: 46 }}
+                  uppercase={false}
+                >
+                  I want this spot next
+                </Button>
               </View>
       
               {Number.isFinite(Number(active?.myAvgWeight)) ? (
                 <>
                   <Divider style={{ marginVertical: 12 }} />
-      
+
                   <View style={styles.yourScoreRow}>
                     <Text style={styles.yourScoreLabel}>Your Score</Text>
-      
+
                     <View style={[styles.yourScorePill, { backgroundColor: colors.surfaceVariant }]}>
                       <Text style={[styles.yourScoreValue, { color: colors.onSurface }]}>
                         {fmt2(active.myAvgWeight)}
@@ -1667,12 +2266,21 @@ export default function PublicRatingsScreen() {
                       <Text style={styles.yourScoreSub}>/ 100</Text>
                     </View>
                   </View>
+
+                  <Button
+                    mode="contained-tonal"
+                    icon="share-variant"
+                    onPress={() => shareRating(active)}
+                    style={styles.shareRatingButton}
+                  >
+                    Share rating
+                  </Button>
                 </>
               ) : null}
       
               <Divider style={{ marginVertical: 12 }} />
-      
-              <Text style={styles.sectionTitle}>Averages</Text>
+
+              <Text style={styles.sectionTitle}>Average scores</Text>
               <View style={styles.metricsGrid}>
                 <MetricPretty label="Crispiness" value={active.avgCrisp} />
                 <MetricPretty label="Sauce" value={active.avgSauce} />
@@ -1685,6 +2293,42 @@ export default function PublicRatingsScreen() {
               <Text style={styles.sectionTitle}>Top tags</Text>
               <TagChips items={active.topTags} />
       
+              <Divider style={{ marginVertical: 12 }} />
+
+              <Text style={styles.sectionTitle}>Recent ratings</Text>
+              {recentRatingsLoading ? (
+                <View style={{ alignItems: 'center', paddingVertical: 8 }}>
+                  <ActivityIndicator />
+                </View>
+              ) : recentRatings.length === 0 ? (
+                <Text style={{ color: colors.onSurface, opacity: 0.7 }}>
+                  No recent ratings yet.
+                </Text>
+              ) : (
+                <View style={styles.recentRatingsList}>
+                  {recentRatings.map((rating, idx) => (
+                    <View
+                      key={`${rating.user_id || 'guest'}-${rating.created_at || idx}`}
+                      style={[styles.recentRatingRow, { borderColor: 'rgba(255,255,255,0.10)' }]}
+                    >
+                      <View style={{ flex: 1, minWidth: 0 }}>
+                        <Text numberOfLines={1} style={styles.recentRatingName}>
+                          {rating.displayName}
+                          {rating.is_buffacoin ? ' · Coin' : ''}
+                        </Text>
+                        <Text style={[styles.recentRatingDate, { color: colors.onSurface }]}>
+                          {formatRatingDate(rating.created_at)}
+                        </Text>
+                      </View>
+                      <View style={styles.recentRatingScoreBox}>
+                        <Text style={styles.recentRatingScore}>{fmt2(rating.weight_score)}</Text>
+                        <Text style={styles.recentRatingScoreSub}>score</Text>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              )}
+
               <Divider style={{ marginVertical: 12 }} />
       
               <Text style={styles.sectionTitle}>In Crawls</Text>
@@ -1802,10 +2446,8 @@ export default function PublicRatingsScreen() {
                         }}
                         anchor={{ x: 0.5, y: 0.5 }}
                         onPress={() => {
-                          setActive(r);
-                          setOpen(true);
+                          openDestinationDetail(r);
                           setOpenMap(false);
-                          fetchRoutesForDestination(r.destination_id);
                         }}
                       >
                         <View style={[styles.legendDot, { backgroundColor: color, borderColor: '#fff' }]} />
@@ -1879,6 +2521,13 @@ export default function PublicRatingsScreen() {
               Buffacoins let you rate restaurants  without the proximity check. This is perfect for “I was there at some point” moments.
             </Text>
 
+            <View style={[styles.infoCallout, { backgroundColor: colors.surfaceVariant }]}>
+              <Text style={styles.infoCalloutTitle}>Rate anywhere</Text>
+              <Text style={[styles.infoCalloutText, { color: colors.onSurface }]}>
+                Buffacoins let you rate restaurants without the check-in distance requirement.
+              </Text>
+            </View>
+
             <View style={{ marginTop: 12 }}>
               <Text style={{ fontWeight: '900' }}>How to earn them</Text>
               <Text style={{ marginTop: 6, opacity: 0.85 }}>
@@ -1894,7 +2543,7 @@ export default function PublicRatingsScreen() {
 
             {!user?.id ? (
               <View style={{ marginTop: 12 }}>
-                <Text style={{ opacity: 0.85 }}>Sign in to earn Buffacoins and keep your progress.</Text>
+                <Text style={{ opacity: 0.85 }}>Sign in to keep your Wingdex progress and earn Buffacoins.</Text>
               </View>
             ) : null}
           </Dialog.Content>
@@ -1919,6 +2568,43 @@ export default function PublicRatingsScreen() {
         </Dialog>
       </Portal>
 
+      <Portal>
+        <Dialog visible={coinCelebrateOpen} onDismiss={() => setCoinCelebrateOpen(false)} style={styles.dialog}>
+          <Dialog.Title style={{ textAlign: 'center' }}>Added to your Wingdex</Dialog.Title>
+          <Dialog.Content>
+            <View style={[styles.successScorePanel, { backgroundColor: colors.surfaceVariant }]}>
+              <Text style={styles.successScoreLabel}>BuffaGo Score</Text>
+              <Text style={styles.successScoreValue}>{fmt2(pendingSummary?.weightScore)}</Text>
+            </View>
+            <Text style={{ opacity: 0.78, textAlign: 'center', marginTop: 12 }}>
+              Your rating was saved and your Buffacoin balance is now {pendingCoinBalance ?? buffacoinBalance}.
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions style={{ justifyContent: 'space-between' }}>
+            <Button
+              mode="outlined"
+              onPress={() => {
+                setCoinCelebrateOpen(false);
+                setPendingSummary(null);
+                setPendingCoinBalance(null);
+              }}
+            >
+              Rate another
+            </Button>
+            <Button
+              mode="contained"
+              onPress={() => {
+                setCoinCelebrateOpen(false);
+                setPendingSummary(null);
+                setPendingCoinBalance(null);
+              }}
+            >
+              Done
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+
       <RatingWizardDialog
         visible={coinRateOpen}
         destinationName={coinRatingDest?.name ? `Rate • ${coinRatingDest.name}` : 'Rate'}
@@ -1929,6 +2615,22 @@ export default function PublicRatingsScreen() {
           if (!coinSubmitting) setCoinRateOpen(false);
         }}
         onFinalize={submitCoinRating}
+      />
+
+      <WingmanAddDialog
+        visible={wingmanOpen}
+        onDismiss={() => setWingmanOpen(false)}
+        initialStateId={wingmanStateCtx?.stateId ?? null}
+        initialStateCode={wingmanStateCtx?.stateCode ?? null}
+        userId={user?.id ?? null}
+        onPickDestination={handleWingmanPickDestination}
+        onManualReviewQueued={() => {
+          setWingmanOpen(false);
+          Alert.alert(
+            'Queued for review',
+            'Wingman sent that restaurant to the BuffaGo team for review.'
+          );
+        }}
       />
 
     </SafeAreaView>
@@ -1946,8 +2648,8 @@ const styles = StyleSheet.create({
   paddingBottom: 0,
 },
   headerTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  title: { fontWeight: '800' },
-  subtitle: { opacity: 0.7, marginTop: 2 },
+  title: { fontWeight: '900', letterSpacing: 0 },
+  subtitle: { opacity: 0.68, marginTop: 2, lineHeight: 17 },
   yourScoreRow: {
   flexDirection: 'row',
   alignItems: 'center',
@@ -1979,6 +2681,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
   },
+  shareRatingButton: {
+    borderRadius: 8,
+    alignSelf: 'center',
+    marginTop: 12,
+  },
+  nextSpotButton: {
+    borderRadius: 8,
+    marginTop: 14,
+    alignSelf: 'stretch',
+  },
   coinPill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1989,6 +2701,61 @@ const styles = StyleSheet.create({
   },
   coinImg: { width: 34, height: 34 },
   coinCount: { fontWeight: '900' },
+
+  hintPanel: {
+    marginTop: 10,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  hintTitle: {
+    fontWeight: '900',
+    fontSize: 13,
+  },
+  hintText: {
+    opacity: 0.72,
+    fontSize: 12,
+    lineHeight: 16,
+    marginTop: 2,
+  },
+  coinEducationRow: {
+    marginTop: 8,
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  coinEducationTitle: {
+    fontWeight: '900',
+    fontSize: 13,
+  },
+  coinEducationText: {
+    opacity: 0.7,
+    fontSize: 12,
+    marginTop: 2,
+  },
+  metricsSummaryRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 10,
+  },
+  metricTile: {
+    flex: 1,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+  },
+  metricTileValue: {
+    fontWeight: '900',
+    fontSize: 18,
+  },
+  metricTileLabel: {
+    opacity: 0.68,
+    fontSize: 11,
+    marginTop: 2,
+  },
 
   filterSectionHeader: {
     flexDirection: 'row',
@@ -2001,7 +2768,45 @@ const styles = StyleSheet.create({
 
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 
-  card: { borderRadius: 16 },
+  emptyState: {
+    alignItems: 'center',
+    marginTop: 24,
+    paddingHorizontal: 22,
+  },
+  emptyStateTitle: {
+    fontWeight: '900',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  emptyStateText: {
+    opacity: 0.75,
+    textAlign: 'center',
+    marginTop: 8,
+    lineHeight: 20,
+  },
+  emptyWingmanButton: {
+    borderRadius: 12,
+    marginTop: 14,
+  },
+  emptyActionsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 12,
+  },
+  bottomCtaWrap: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingTop: 10,
+    paddingHorizontal: 16,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: 'rgba(255,255,255,0.12)',
+  },
+
+  card: { borderRadius: 8, borderColor: 'rgba(255,255,255,0.12)' },
   rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   name: { fontWeight: '700' },
   muted: { opacity: 0.7, marginTop: 2 },
@@ -2070,6 +2875,38 @@ const styles = StyleSheet.create({
 
   tagChipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   tagChip: { borderRadius: 999 },
+  recentRatingsList: {
+    gap: 8,
+  },
+  recentRatingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+  recentRatingName: {
+    fontWeight: '900',
+  },
+  recentRatingDate: {
+    opacity: 0.62,
+    fontSize: 12,
+    marginTop: 2,
+  },
+  recentRatingScoreBox: {
+    alignItems: 'flex-end',
+    marginLeft: 12,
+  },
+  recentRatingScore: {
+    fontWeight: '900',
+    fontSize: 16,
+  },
+  recentRatingScoreSub: {
+    opacity: 0.62,
+    fontSize: 11,
+  },
 
   inlineChipWrap: {
     marginTop: 6,
@@ -2108,9 +2945,9 @@ cardContent: {
 },
 
 nameCentered: {
-  fontWeight: '800',
-  textAlign: 'center',
-  marginBottom: 6,
+  fontWeight: '900',
+  textAlign: 'left',
+  marginBottom: 2,
 },
 
 metaRow: {
@@ -2143,19 +2980,40 @@ rateBtnInlineContent: {
   height: 34,
 },
 
-rateBtnInlineLabel: {
+  rateBtnInlineLabel: {
   fontWeight: '800',
+  fontSize: 12,
+},
+ratedInlineChip: {
+  height: 34,
+  minWidth: 92,
+  borderRadius: 999,
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingHorizontal: 12,
+},
+ratedInlineChipText: {
+  fontWeight: '900',
   fontSize: 12,
 },
 nameLine: {
   flexDirection: 'row',
-  alignItems: 'baseline',
-  justifyContent: 'flex-start',
+  alignItems: 'flex-start',
+  justifyContent: 'space-between',
   gap: 6,
-  marginBottom: 6,
+  marginBottom: 8,
+},
+restaurantIdentity: {
+  flex: 1,
+  minWidth: 0,
+  paddingRight: 8,
+},
+locationLine: {
+  opacity: 0.62,
+  fontSize: 12,
 },
 nameRatingsInline: {
-  opacity: 0.7,
+  opacity: 0.62,
   fontWeight: '700',
 },
 scoreBadgeCompact: {
@@ -2163,7 +3021,7 @@ scoreBadgeCompact: {
   alignItems: 'center',
   paddingVertical: 5,
   paddingHorizontal: 10,
-  borderRadius: 12,
+  borderRadius: 8,
 },
 
 scoreBadgeTextCompact: {
@@ -2267,6 +3125,33 @@ drillHeaderTitle: {
   height: '100%',
   margin: 0,
   borderRadius: 0,
+  },
+  infoCallout: {
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 12,
+  },
+  infoCalloutTitle: {
+    fontWeight: '900',
+    marginBottom: 3,
+  },
+  infoCalloutText: {
+    opacity: 0.78,
+    lineHeight: 18,
+  },
+  successScorePanel: {
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  successScoreLabel: {
+    fontWeight: '800',
+    opacity: 0.75,
+  },
+  successScoreValue: {
+    fontWeight: '900',
+    fontSize: 30,
+    marginTop: 2,
   },
   thumbChoiceOn: { borderColor: '#FF6F00', backgroundColor: 'rgba(255,111,0,0.18)' },
   thumbIcon: { fontSize: 26 },

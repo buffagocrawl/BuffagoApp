@@ -21,6 +21,6 @@ ios/
 # Node
 node_modules/
 
-# Env files (don’t upload secrets)
+# Env files
 .env
 .env.*

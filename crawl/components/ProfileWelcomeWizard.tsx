@@ -1,6 +1,6 @@
 ﻿import React, { useMemo, useState, useCallback } from 'react';
 import { View } from 'react-native';
-import { Portal, Dialog, Text, Button, Chip, ProgressBar, useTheme } from 'react-native-paper';
+import { Portal, Dialog, Text, Button, Chip, ProgressBar } from 'react-native-paper';
 import { useXpToast } from '../providers/XpToastProvider';
 import { grantXp } from '../utils/xp';
 
@@ -24,7 +24,6 @@ export default function ProfileWelcomeWizard({
   onSkip?: () => void;
   onAfterXpAward?: (amount: number) => void | Promise<void>; // ⬅ NEW
 }) {
-  const { colors } = useTheme();
   const xpToast = useXpToast();
   const [i, setI] = useState(0);
 
@@ -32,7 +31,10 @@ export default function ProfileWelcomeWizard({
     try {
       const amount = 5;
       const reason = 'Welcome bonus';
-      const nx = await grantXp(amount, reason);
+      const nx = await grantXp(amount, reason, null, {
+        source: 'welcome_bonus',
+        sourceScreen: 'profile',
+      });
       if (nx != null) {
         xpToast.show(amount, reason);
         await onAfterXpAward?.(amount); // ⬅ trigger parent refresh immediately
@@ -55,11 +57,15 @@ export default function ProfileWelcomeWizard({
         ),
         bullets: [
           '+25 Rate a destination',
+          '+50 First rating',
+          '+25 New restaurant',
+          '+50 New city',
+          '+150 New state',
           '+5 Add a tag',
           '+15 First rating of the day',
           '+100 Complete a crawl',
           '+50 First time doing a route',
-          '+500 Linking to FB',
+          '+50 Linking to FB',
         ],
         chips: ['XP', 'Levels', 'Toasts'],
         footer: (
@@ -105,18 +111,18 @@ export default function ProfileWelcomeWizard({
         ),
       },
       {
-        title: '📣 Coming Soon',
+        title: '👥 Wing Friends',
         body: (
           <Text style={{ textAlign: 'center', fontSize: 16, lineHeight: 22 }}>
-            <Text style={{ fontWeight: '700' }}>Facebook linking</Text> to share crawls, invite
-            friends, and earn bonus XP for social wins.
+            Add friends by mutual approval to compare rankings and see friend activity. Social features are
+            optional, and Settings can hide you from feeds, leaderboards, and friend discovery.
           </Text>
         ),
-        bullets: ['Share your crawl', 'Invite friends', 'Bonus XP'],
-        chips: ['FB', 'Sharing', 'Bonuses'],
+        bullets: ['Mutual approval', 'Friend rankings', 'Privacy controls'],
+        chips: ['Friends', 'Activity', 'Optional'],
         footer: (
           <Text style={{ textAlign: 'center', opacity: 0.7, marginTop: 8 }}>
-            Keep an eye on updates!
+            Open Social → Friends to get started.
           </Text>
         ),
       },

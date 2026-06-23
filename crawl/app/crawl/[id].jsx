@@ -18,6 +18,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { supabase } from '../../lib/supabase.js';
+import { trackEvent } from '../../lib/analytics';
 import RatingWizardDialog from '../../components/RatingWizardDialog';
 import { useLocationCtx } from '../../providers/LocationProvider';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -114,8 +115,18 @@ async function openExternalDirections(lat, lng, mode = 'driving') {
       ? `http://maps.apple.com/?daddr=${la},${lo}&dirflg=${dirFlag}`
       : `google.navigation:q=${la},${lo}&mode=${dirFlag}`;
 
+    await trackEvent({
+      eventName: 'directions_tapped',
+      screen: 'crawl',
+      metadata: { mode, source: 'crawl_stop' },
+    });
     await Linking.openURL(url);
   } catch (e) {
+    await trackEvent({
+      eventName: 'external_maps_failed',
+      screen: 'crawl',
+      metadata: { mode, error: e?.message || String(e) },
+    });
     console.warn('openExternalDirections failed:', e?.message || e);
   }
 }
@@ -710,7 +721,25 @@ export default function CrawlScreen() {
 
         setCrawl(crawlRow);
         setRouteMeta({ title, stops, travelMode });
+        await trackEvent({
+          eventName: isResume ? 'crawl_resumed' : 'crawl_viewed',
+          screen: 'crawl',
+          userId: crawlRow?.user_id ?? null,
+          crawlId: crawlRow?.crawl_id ?? null,
+          routeId: crawlRow?.route_id ?? null,
+          metadata: {
+            status: crawlRow?.status ?? null,
+            total_stops: stops?.length ?? 0,
+            load_duration_ms: Date.now() - start,
+          },
+        });
       } catch (e) {
+        await trackEvent({
+          eventName: 'screen_load_failed',
+          screen: 'crawl',
+          crawlId,
+          metadata: { error: e?.message || String(e) },
+        });
         Alert.alert('Error', e.message ?? String(e));
       } finally {
         if (mounted) setLoading(false);
@@ -720,7 +749,7 @@ export default function CrawlScreen() {
     return () => {
       mounted = false;
     };
-  }, [crawlId]);
+  }, [crawlId, isResume]);
 
   /** Load existing ratings (ids + scores) */
   useEffect(() => {
@@ -879,6 +908,15 @@ export default function CrawlScreen() {
   const openRating = async (dest) => {
     setActiveDest(dest);
     loadTagsForDestination(dest.id);
+    await trackEvent({
+      eventName: 'rating_started',
+      screen: 'crawl',
+      userId: session?.user?.id ?? null,
+      destinationId: dest?.id ?? null,
+      crawlId: crawl?.crawl_id ?? null,
+      routeId: crawl?.route_id ?? null,
+      metadata: { source: 'crawl_stop', stop_order: dest?.ord ?? null },
+    });
     setRateVisible(true);
   };
 
@@ -929,6 +967,15 @@ export default function CrawlScreen() {
           await hapticReject();
 
           const miles = Number.isFinite(dist) ? (dist / 1609.34).toFixed(2) : '—';
+          await trackEvent({
+            eventName: 'rating_validation_failed',
+            screen: 'crawl',
+            userId: session?.user?.id ?? null,
+            destinationId: dest?.id ?? null,
+            crawlId: crawl?.crawl_id ?? null,
+            routeId: crawl?.route_id ?? null,
+            metadata: { reason: 'too_far', distance_miles: Number.isFinite(dist) ? dist / 1609.34 : null },
+          });
           Alert.alert(
             'Still too far away',
             `You must be within .1 miles of this stop to rate it.\nCurrent: ~${miles} mi`,
@@ -999,6 +1046,57 @@ export default function CrawlScreen() {
         flavor_vibe: Array.isArray(wizard?.flavorVibe) && wizard.flavorVibe.length ? wizard.flavorVibe : null,
       };
 
+      let ratingMilestones = {
+        firstRating: false,
+        newDestination: false,
+        newCity: false,
+        newState: false,
+        destinationCity: null,
+        destinationStateId: null,
+      };
+
+      if (userId) {
+        try {
+          const [{ data: destProfile }, { data: priorRows }] = await Promise.all([
+            supabase
+              .from('destinations')
+              .select('city, state_id')
+              .eq('id', activeDest.id)
+              .maybeSingle(),
+            supabase
+              .from('destination_ratings')
+              .select('destination_id, destination:destination_id ( city, state_id )')
+              .eq('user_id', userId),
+          ]);
+
+          const rows = Array.isArray(priorRows) ? priorRows : [];
+          const destinationCity = destProfile?.city ? String(destProfile.city).trim() : null;
+          const destinationStateId = destProfile?.state_id ?? null;
+          const priorDestinationIds = new Set(rows.map((r) => r.destination_id).filter(Boolean));
+          const priorCities = new Set(
+            rows
+              .map((r) => (r?.destination?.city ? String(r.destination.city).trim().toLowerCase() : null))
+              .filter(Boolean)
+          );
+          const priorStateIds = new Set(
+            rows
+              .map((r) => r?.destination?.state_id)
+              .filter((sid) => sid != null)
+          );
+
+          ratingMilestones = {
+            firstRating: rows.length === 0,
+            newDestination: !priorDestinationIds.has(activeDest.id),
+            newCity: rows.length > 0 && !!destinationCity && !priorCities.has(destinationCity.toLowerCase()),
+            newState: rows.length > 0 && destinationStateId != null && !priorStateIds.has(destinationStateId),
+            destinationCity,
+            destinationStateId,
+          };
+        } catch (e) {
+          console.warn('[XP] milestone precheck failed', e?.message || e);
+        }
+      }
+
       let error;
 
       if (userId) {
@@ -1018,6 +1116,52 @@ export default function CrawlScreen() {
       }
 
       if (error) throw error;
+
+      await trackEvent({
+        eventName: 'rating_completed',
+        screen: 'crawl',
+        userId,
+        destinationId: activeDest.id,
+        crawlId: crawl.crawl_id,
+        routeId: crawl?.route_id ?? null,
+        metadata: {
+          source: 'crawl_stop',
+          stop_order: activeDest?.ord ?? null,
+          tag_id: wizard?.selectedTagId ?? null,
+          weight_score: buffaScore,
+          would_order_again: wizard?.wouldOrderAgain == null ? null : !!wizard.wouldOrderAgain,
+          is_guest: !userId,
+        },
+      });
+      await trackEvent({
+        eventName: 'rating_submitted',
+        screen: 'crawl',
+        userId,
+        destinationId: activeDest.id,
+        crawlId: crawl.crawl_id,
+        routeId: crawl?.route_id ?? null,
+        metadata: {
+          source: 'crawl_stop',
+          flow_step: activeDest?.ord ?? null,
+          tag_id: wizard?.selectedTagId ?? null,
+          weight_score: buffaScore,
+          would_order_again: wizard?.wouldOrderAgain == null ? null : !!wizard.wouldOrderAgain,
+          is_guest: !userId,
+        },
+      });
+      await trackEvent({
+        eventName: 'crawl_step_completed',
+        screen: 'crawl',
+        userId,
+        destinationId: activeDest.id,
+        crawlId: crawl.crawl_id,
+        routeId: crawl?.route_id ?? null,
+        metadata: {
+          flow_step: activeDest?.ord ?? null,
+          total_stops: routeMeta?.stops?.length ?? null,
+          weight_score: buffaScore,
+        },
+      });
 
       let q = supabase
         .from('destination_ratings')
@@ -1051,7 +1195,18 @@ export default function CrawlScreen() {
       const awards = [];
 
       try {
-        const nx = await grantXp(XP.RATE_DEST, 'Rated a destination');
+        const nx = await grantXp(XP.RATE_DEST, 'Rated a destination', null, {
+          source: 'rating',
+          sourceScreen: 'crawl',
+          idempotencyKey: `rating:${userId || 'guest'}:${activeDest.id}:${crawl?.crawl_id || 'none'}`,
+          destinationId: activeDest.id,
+          crawlId: crawl?.crawl_id ?? null,
+          routeId: crawl?.route_id ?? null,
+          metadata: {
+            is_buffacoin: false,
+            rating_source: 'crawl',
+          },
+        });
         if (nx != null) awards.push({ amount: XP.RATE_DEST, reason: 'Rated a destination' });
       } catch (e) {
         console.warn('[XP] rating grant failed', e?.message || e);
@@ -1059,10 +1214,94 @@ export default function CrawlScreen() {
 
       if (wizard?.selectedTagId != null) {
         try {
-          const nx = await grantXp(XP.ADD_TAGS, 'Added tag');
+          const nx = await grantXp(XP.ADD_TAGS, 'Added tag', null, {
+            source: 'rating_detail',
+            sourceScreen: 'crawl',
+            idempotencyKey: `rating_detail:tag:${userId || 'guest'}:${activeDest.id}:${crawl?.crawl_id || 'none'}`,
+            destinationId: activeDest.id,
+            crawlId: crawl?.crawl_id ?? null,
+            routeId: crawl?.route_id ?? null,
+            metadata: {
+              tag_id: wizard.selectedTagId,
+              rating_source: 'crawl',
+            },
+          });
           if (nx != null) awards.push({ amount: XP.ADD_TAGS, reason: 'Added tag' });
         } catch (e) {
           console.warn('[XP] tag grant failed', e?.message || e);
+        }
+      }
+
+      if (ratingMilestones.firstRating) {
+        try {
+          const nx = await grantXp(XP.FIRST_RATING, 'First rating', null, {
+            source: 'first_rating',
+            sourceScreen: 'crawl',
+            idempotencyKey: `first_rating:${userId}`,
+            destinationId: activeDest.id,
+            crawlId: crawl?.crawl_id ?? null,
+            routeId: crawl?.route_id ?? null,
+          });
+          if (nx != null) awards.push({ amount: XP.FIRST_RATING, reason: 'First rating' });
+        } catch (e) {
+          console.warn('[XP] first-rating grant failed', e?.message || e);
+        }
+      }
+
+      if (ratingMilestones.newDestination) {
+        try {
+          const nx = await grantXp(XP.NEW_DESTINATION, 'New restaurant', null, {
+            source: 'new_destination',
+            sourceScreen: 'crawl',
+            idempotencyKey: `new_destination:${userId}:${activeDest.id}`,
+            destinationId: activeDest.id,
+            crawlId: crawl?.crawl_id ?? null,
+            routeId: crawl?.route_id ?? null,
+          });
+          if (nx != null) awards.push({ amount: XP.NEW_DESTINATION, reason: 'New restaurant' });
+        } catch (e) {
+          console.warn('[XP] new-destination grant failed', e?.message || e);
+        }
+      }
+
+      if (ratingMilestones.newCity) {
+        try {
+          const cityKey = String(ratingMilestones.destinationCity || '').trim().toLowerCase();
+          const nx = await grantXp(XP.FIRST_CITY, 'New city', null, {
+            source: 'new_city',
+            sourceScreen: 'crawl',
+            idempotencyKey: `new_city:${userId}:${cityKey}`,
+            destinationId: activeDest.id,
+            crawlId: crawl?.crawl_id ?? null,
+            routeId: crawl?.route_id ?? null,
+            metadata: {
+              city: ratingMilestones.destinationCity,
+              state_id: ratingMilestones.destinationStateId,
+            },
+          });
+          if (nx != null) awards.push({ amount: XP.FIRST_CITY, reason: 'New city' });
+        } catch (e) {
+          console.warn('[XP] new-city grant failed', e?.message || e);
+        }
+      }
+
+      if (ratingMilestones.newState) {
+        try {
+          const nx = await grantXp(XP.FIRST_STATE, 'New state', null, {
+            source: 'new_state',
+            sourceScreen: 'crawl',
+            idempotencyKey: `new_state:${userId}:${ratingMilestones.destinationStateId}`,
+            destinationId: activeDest.id,
+            crawlId: crawl?.crawl_id ?? null,
+            routeId: crawl?.route_id ?? null,
+            metadata: {
+              city: ratingMilestones.destinationCity,
+              state_id: ratingMilestones.destinationStateId,
+            },
+          });
+          if (nx != null) awards.push({ amount: XP.FIRST_STATE, reason: 'New state' });
+        } catch (e) {
+          console.warn('[XP] new-state grant failed', e?.message || e);
         }
       }
 
@@ -1070,7 +1309,19 @@ export default function CrawlScreen() {
         const todayKey = `xp-daily-first-${new Date().toISOString().slice(0, 10)}`;
         const got = await AsyncStorage.getItem(todayKey);
         if (!got) {
-          const nx = await grantXp(XP.DAILY_FIRST, 'Daily first rating');
+          const dateKey = new Date().toISOString().slice(0, 10);
+          const nx = await grantXp(XP.DAILY_FIRST, 'Daily first rating', null, {
+            source: 'daily_first_rating',
+            sourceScreen: 'crawl',
+            idempotencyKey: `daily_first_rating:${userId || 'guest'}:${dateKey}`,
+            destinationId: activeDest.id,
+            crawlId: crawl?.crawl_id ?? null,
+            routeId: crawl?.route_id ?? null,
+            metadata: {
+              rating_source: 'crawl',
+              claim_date: dateKey,
+            },
+          });
           if (nx != null) {
             awards.push({ amount: XP.DAILY_FIRST, reason: 'Daily first rating' });
             await AsyncStorage.setItem(todayKey, '1');
@@ -1089,6 +1340,27 @@ export default function CrawlScreen() {
       loadPresenceAllSteps();
       loadLeaderboard();
     } catch (e) {
+      await trackEvent({
+        eventName: 'rating_failed',
+        screen: 'crawl',
+        userId: session?.user?.id ?? null,
+        destinationId: activeDest?.id ?? null,
+        crawlId: crawl?.crawl_id ?? null,
+        routeId: crawl?.route_id ?? null,
+        metadata: { source: 'crawl_stop', error: e?.message || String(e) },
+      });
+      await trackEvent({
+        eventName: 'error_shown',
+        screen: 'crawl',
+        userId: session?.user?.id ?? null,
+        destinationId: activeDest?.id ?? null,
+        crawlId: crawl?.crawl_id ?? null,
+        routeId: crawl?.route_id ?? null,
+        metadata: {
+          source: 'crawl_stop',
+          error_message: e?.message || String(e),
+        },
+      });
       Alert.alert('Save failed', e.message ?? String(e));
     } finally {
       setSaving(false);
@@ -1222,6 +1494,14 @@ export default function CrawlScreen() {
   const deleteEmptyCrawlAndLeave = async () => {
     try {
       if (crawl?.crawl_id) {
+        await trackEvent({
+          eventName: 'crawl_abandoned',
+          screen: 'crawl',
+          userId: session?.user?.id ?? null,
+          crawlId: crawl.crawl_id,
+          routeId: crawl?.route_id ?? null,
+          metadata: { reason: 'left_without_ratings' },
+        });
         const { error } = await supabase.from('crawls').delete().eq('crawl_id', crawl.crawl_id);
         if (error) throw error;
       }
@@ -1260,9 +1540,32 @@ export default function CrawlScreen() {
         await awardCrawlCoins({ start_time: crawl?.start_time, end_time: endIso });
       }
 
+      await trackEvent({
+        eventName: 'crawl_completed',
+        screen: 'crawl',
+        userId: session?.user?.id ?? null,
+        crawlId: crawl.crawl_id,
+        routeId: crawl?.route_id ?? null,
+        metadata: {
+          total_stops: routeMeta?.stops?.length ?? null,
+          rated_count: ratedDestIds?.size ?? null,
+          was_already_completed: completeBefore,
+        },
+      });
+
       const awards = [];
       try {
-        const nx = await grantXp(XP.COMPLETE_CRAWL, 'Completed a crawl');
+        const nx = await grantXp(XP.COMPLETE_CRAWL, 'Completed a crawl', null, {
+          source: 'crawl_completed',
+          sourceScreen: 'crawl',
+          idempotencyKey: `crawl_completed:${session?.user?.id || 'guest'}:${crawl.crawl_id}`,
+          crawlId: crawl.crawl_id,
+          routeId: crawl?.route_id ?? null,
+          metadata: {
+            total_stops: routeMeta?.stops?.length ?? null,
+            rated_count: ratedDestIds?.size ?? null,
+          },
+        });
         if (nx != null) awards.push({ amount: XP.COMPLETE_CRAWL, reason: 'Completed a crawl' });
       } catch (e) {
         console.warn('[XP] complete grant failed', e?.message || e);
@@ -1273,7 +1576,13 @@ export default function CrawlScreen() {
           const routeKey = `xp-route-first-${crawl.route_id}`;
           const seen = await AsyncStorage.getItem(routeKey);
           if (!seen) {
-            const nx2 = await grantXp(XP.FIRST_TIME_ROUTE, 'First time this route');
+            const nx2 = await grantXp(XP.FIRST_TIME_ROUTE, 'First time this route', null, {
+              source: 'first_route',
+              sourceScreen: 'crawl',
+              idempotencyKey: `first_route:${session?.user?.id || 'guest'}:${crawl.route_id}`,
+              crawlId: crawl.crawl_id,
+              routeId: crawl.route_id,
+            });
             if (nx2 != null) {
               awards.push({ amount: XP.FIRST_TIME_ROUTE, reason: 'First time this route' });
               await AsyncStorage.setItem(routeKey, '1');
@@ -1289,6 +1598,17 @@ export default function CrawlScreen() {
       await buildCrawlReport(crawl.crawl_id);
       setReportOpen(true);
     } catch (e) {
+      await trackEvent({
+        eventName: 'error_shown',
+        screen: 'crawl',
+        userId: session?.user?.id ?? null,
+        crawlId: crawl?.crawl_id ?? null,
+        routeId: crawl?.route_id ?? null,
+        metadata: {
+          source: 'complete_crawl',
+          error_message: e?.message || String(e),
+        },
+      });
       Alert.alert('Error', e.message ?? String(e));
     }
   };
@@ -1299,6 +1619,14 @@ export default function CrawlScreen() {
     try {
       const { error } = await supabase.from('crawls').update({ status: 'in_progress' }).eq('crawl_id', crawl.crawl_id);
       if (error) throw error;
+      await trackEvent({
+        eventName: 'crawl_saved',
+        screen: 'crawl',
+        userId: session?.user?.id ?? null,
+        crawlId: crawl.crawl_id,
+        routeId: crawl?.route_id ?? null,
+        metadata: { rated_count: ratedDestIds?.size ?? null },
+      });
       router.replace('/home');
     } catch (e) {
       Alert.alert('Save failed', e.message ?? String(e));
@@ -1317,7 +1645,7 @@ export default function CrawlScreen() {
     setPresenceLoading(true);
     try {
       const { data: activeCrawls, error: cErr } = await supabase
-        .from('crawls')
+        .from('socially_visible_crawls')
         .select('crawl_id, user_id')
         .eq('route_id', crawl.route_id)
         .is('end_time', null)
@@ -1336,7 +1664,7 @@ export default function CrawlScreen() {
       const crawlIds = crawlsWithUsers.map((c) => c.crawl_id);
 
       const { data: ratings, error: rErr } = await supabase
-        .from('destination_ratings')
+        .from('socially_visible_destination_ratings')
         .select('crawl_id, destination_id')
         .in('crawl_id', crawlIds);
 
@@ -1383,7 +1711,7 @@ export default function CrawlScreen() {
       }
 
       const { data: users, error: uErr } = await supabase
-        .from('users')
+        .from('socially_visible_users')
         .select('user_id, username')
         .in('user_id', allIds);
 
@@ -1427,7 +1755,7 @@ export default function CrawlScreen() {
     setLbLoading(true);
     try {
       const { data: rows, error } = await supabase
-        .from('crawls')
+        .from('socially_visible_crawls')
         .select('crawl_id, user_id, start_time, end_time')
         .eq('route_id', crawl.route_id)
         .not('end_time', 'is', null)
@@ -1449,7 +1777,7 @@ export default function CrawlScreen() {
 
       if (ids.length) {
         const { data: profs, error: pErr } = await supabase
-          .from('users')
+          .from('socially_visible_users')
           .select('user_id, username')
           .in('user_id', ids);
 
@@ -1566,6 +1894,14 @@ export default function CrawlScreen() {
 
             <Pressable
               onPress={() => {
+                trackEvent({
+                  eventName: 'leaderboard_viewed',
+                  screen: 'crawl',
+                  userId: session?.user?.id ?? null,
+                  crawlId: crawl?.crawl_id ?? null,
+                  routeId: crawl?.route_id ?? null,
+                  metadata: { source: 'crawl_finishers' },
+                });
                 setLbOpen(true);
                 loadLeaderboard();
               }}
@@ -1688,8 +2024,15 @@ export default function CrawlScreen() {
               ) : (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
                 {stepMates.map((u) => (
-                  <View
+                  <Pressable
                     key={u.user_id}
+                    onPress={() => {
+                      setPresenceOpen(false);
+                      router.push({
+                        pathname: '/profile/history',
+                        params: { userId: u.user_id, sourceSurface: 'crawl' },
+                      });
+                    }}
                     style={{ alignItems: 'center', width: 86, paddingVertical: 8, opacity: 0.95 }}
                   >
                     {u.avatar_url ? (
@@ -1703,7 +2046,7 @@ export default function CrawlScreen() {
                     >
                       {u.label}
                     </Text>
-                  </View>
+                  </Pressable>
                 ))}
                 </View>
               )}
@@ -1728,8 +2071,16 @@ export default function CrawlScreen() {
                   </Text>
 
                   {lbRows.slice(0, 25).map((r, idx) => (
-                    <View
+                    <Pressable
                       key={`${r.user_id || 'guest'}-${idx}`}
+                      disabled={!r.user_id}
+                      onPress={() => {
+                        setLbOpen(false);
+                        router.push({
+                          pathname: '/profile/history',
+                          params: { userId: r.user_id, sourceSurface: 'crawl' },
+                        });
+                      }}
                       style={{
                         flexDirection: 'row',
                         alignItems: 'center',
@@ -1756,7 +2107,7 @@ export default function CrawlScreen() {
                           Finished <Text style={{ fontWeight: '900' }}>{fmtFinishDate(r.end_time)}</Text>
                         </Text>
                       </View>
-                    </View>
+                    </Pressable>
                   ))}
                 </>
               )}

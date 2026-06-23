@@ -4,12 +4,14 @@
     import { MaterialCommunityIcons } from '@expo/vector-icons';
     import { supabase } from '../../lib/supabase.js';
     import { useSafeAreaInsets } from 'react-native-safe-area-context';
+    import { useSocialBadges } from '../../hooks/useSocialBadges';
 
     export default function TabsLayout() {
       const theme = useTheme();
       const insets = useSafeAreaInsets();
 
       const [signedIn, setSignedIn] = useState(false);
+      const socialBadges = useSocialBadges();
 
       useEffect(() => {
         let alive = true;
@@ -117,6 +119,8 @@
             options={{
               title: 'Social',
               tabBarLabel: 'Social',
+              tabBarBadge: signedIn && socialBadges.total > 0 ? socialBadges.total : undefined,
+              tabBarBadgeStyle: { backgroundColor: theme.colors.error, color: theme.colors.onError },
               tabBarIcon: ({ color }) => (
                 <MaterialCommunityIcons
                   name="account-group"

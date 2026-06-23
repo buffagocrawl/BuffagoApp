@@ -9,9 +9,13 @@ async function formatWingmanFunctionError(error) {
   const response = error?.context;
 
   if (!response || typeof response.clone !== 'function') return fallback;
+  if (response.status === 429) return 'Too many requests. Give it a little time and try again.';
 
   try {
     const body = await response.clone().json();
+    if (response.status === 429 || String(body?.error || '').toLowerCase().includes('too many requests')) {
+      return 'Too many requests. Give it a little time and try again.';
+    }
     if (body?.error) return body.details ? `${body.error} ${body.details}` : String(body.error);
   } catch {
     try {
@@ -50,6 +54,8 @@ export default function WingmanAddDialog({
   const [message, setMessage] = useState('');
   const [candidate, setCandidate] = useState(null);
   const searchInFlightRef = useRef(false);
+  const insertInFlightRef = useRef(false);
+  const verifyInFlightRef = useRef(false);
   const wasVisibleRef = useRef(false);
 
   useEffect(() => {
@@ -66,6 +72,8 @@ export default function WingmanAddDialog({
     setMessage('');
     setCandidate(null);
     searchInFlightRef.current = false;
+    insertInFlightRef.current = false;
+    verifyInFlightRef.current = false;
     setStep('state');
   }, [visible, initialRestaurant, initialStateId, initialStateCode]);
 
@@ -188,7 +196,9 @@ export default function WingmanAddDialog({
 
   const insertWingmanDestination = useCallback(async (row) => {
     if (!row?.name || !stateId) return;
+    if (insertInFlightRef.current) return;
 
+    insertInFlightRef.current = true;
     setLoading(true);
     setMessage('Wingman is adding that restaurant.');
 
@@ -229,6 +239,7 @@ export default function WingmanAddDialog({
       setStep('result');
     } finally {
       setLoading(false);
+      insertInFlightRef.current = false;
     }
   }, [city, extraInfo, handleUseDestination, stateCode, stateId]);
 
@@ -269,13 +280,19 @@ export default function WingmanAddDialog({
 
   const verifyWingsAndAdd = useCallback(async (row) => {
     if (!row?.name || !stateId || !stateCode) return;
+    if (verifyInFlightRef.current) return;
 
+    verifyInFlightRef.current = true;
     setLoading(true);
     const firstPassScore = candidate?.result?.ai?.wingsProbability ?? 0;
 
     if (firstPassScore >= 0.75) {
-      await insertWingmanDestination(row);
-      return;
+      try {
+        await insertWingmanDestination(row);
+        return;
+      } finally {
+        verifyInFlightRef.current = false;
+      }
     }
 
     setMessage('Hold on while Wingman does a deeper dive to see if they have wings on their menu.');
@@ -300,6 +317,12 @@ export default function WingmanAddDialog({
 
       const wingsProbability = result?.ai?.wingsProbability ?? 0;
 
+      if (String(result?.error || '').toLowerCase().includes('too many requests')) {
+        setMessage('Too many requests. Give it a little time and try again.');
+        setStep('result');
+        return;
+      }
+
       if (wingsProbability >= 0.75 && result?.place?.found) {
         const added = await insertWingmanDestination({
           ...row,
@@ -321,10 +344,16 @@ export default function WingmanAddDialog({
       await sendManualReview(result, row);
     } catch (e) {
       console.warn('verifyWingsAndAdd failed:', e);
-      setMessage(String(e?.message || e || 'Wingman could not verify wings for that restaurant.'));
+      const errorMessage = String(e?.message || e || 'Wingman could not verify wings for that restaurant.');
+      setMessage(
+        errorMessage.toLowerCase().includes('too many requests')
+          ? 'Too many requests. Give it a little time and try again.'
+          : errorMessage
+      );
       setStep('result');
     } finally {
       setLoading(false);
+      verifyInFlightRef.current = false;
     }
   }, [
     city,
@@ -380,6 +409,12 @@ export default function WingmanAddDialog({
         (result?.decisionReason === 'low_confidence_ai' ||
           result?.decisionReason === 'invalid_ai_response' ||
           result?.decisionReason === 'place_not_found');
+
+      if (String(result?.error || '').toLowerCase().includes('too many requests')) {
+        setMessage('Too many requests. Give it a little time and try again.');
+        setStep('result');
+        return;
+      }
 
       if (!result?.success) {
         if (!city?.trim()) {
@@ -454,7 +489,12 @@ export default function WingmanAddDialog({
       setStep('result');
     } catch (e) {
       console.warn('runWingman failed:', e);
-      setMessage(String(e?.message || e || 'Wingman hit a problem. Please try again.'));
+      const errorMessage = String(e?.message || e || 'Wingman hit a problem. Please try again.');
+      setMessage(
+        errorMessage.toLowerCase().includes('too many requests')
+          ? 'Too many requests. Give it a little time and try again.'
+          : errorMessage
+      );
       setStep('result');
     } finally {
       setLoading(false);
@@ -594,6 +634,7 @@ export default function WingmanAddDialog({
             <Button
               mode="contained"
               style={{ flex: 1 }}
+              disabled={loading}
               onPress={() => {
                 if (candidate.type === 'existing') {
                   handleUseDestination(candidate.row);
@@ -609,6 +650,7 @@ export default function WingmanAddDialog({
             <Button
               mode="outlined"
               style={{ flex: 1 }}
+              disabled={loading}
               onPress={() => {
                 if (!city?.trim()) {
                   setStep('city');

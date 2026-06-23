@@ -123,6 +123,7 @@ export class WingmanService {
       return result;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown Wingman error';
+      const isRateLimited = message.toLowerCase().includes('too many requests');
 
       const errorResult: WingmanResult = {
         success: false,
@@ -137,8 +138,9 @@ export class WingmanService {
         candidates: [],
         decision: 'error',
         decisionReason: 'system_error',
-        userMessage:
-          'Wingman hit a problem while checking that restaurant. Please try again in a moment.',
+        userMessage: isRateLimited
+          ? 'Too many requests. Give it a little time and try again.'
+          : 'Wingman hit a problem while checking that restaurant. Please try again in a moment.',
         shouldInsertDestination: false,
         shouldInsertSuggestion: false,
         destinationInsert: null,
@@ -210,6 +212,10 @@ export class WingmanService {
       return fallback;
     }
 
+    if ((response as Response).status === 429) {
+      return 'Too many requests. Give it a little time and try again.';
+    }
+
     try {
       const body = await (response as Response).clone().json();
 
@@ -223,6 +229,10 @@ export class WingmanService {
           typeof record.details === 'string' && record.details.trim()
             ? record.details.trim()
             : null;
+
+        if ((response as Response).status === 429 || message.toLowerCase().includes('too many requests')) {
+          return 'Too many requests. Give it a little time and try again.';
+        }
 
         return details ? `${message} ${details}` : message;
       }

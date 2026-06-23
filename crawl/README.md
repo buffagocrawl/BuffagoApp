@@ -1,50 +1,82 @@
-# Welcome to your Expo app 👋
+# BuffaGo Mobile App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Expo mobile client for BuffaGo, a gamified wing-crawl discovery and rating app.
 
-## Get started
+## Stack
 
-1. Install dependencies
+- Expo and React Native
+- Expo Router
+- React Native Paper
+- Supabase Auth and Postgres
+- React Query
+- Google Maps / Directions
+- Supabase Edge Functions for privileged AI and account workflows
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Local Setup
 
 ```bash
-npm run reset-project
+npm install
+cp .env.example .env
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Use a development build or emulator for the full native map/location experience.
 
-## Learn more
+## Environment
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+EXPO_PUBLIC_SUPABASE_URL=
+EXPO_PUBLIC_SUPABASE_ANON_KEY=
+EXPO_PUBLIC_GOOGLE_API_KEY=
+EXPO_PUBLIC_STRICT_ENV=false
+EXPO_PUBLIC_USE_PROXY=false
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Values prefixed with `EXPO_PUBLIC_` are visible in the mobile bundle. Keep
+OpenAI keys, Supabase service role keys, and unrestricted Google Places keys in
+Supabase Edge Function secrets only.
 
-## Join the community
+## App Modules
 
-Join our community of developers creating universal apps.
+- `app/`: Expo Router screens.
+- `components/`: shared UI and workflow components.
+- `hooks/`: Supabase-backed route, crawl, and onboarding hooks.
+- `lib/Wingman/`: client service wrapper for AI-assisted restaurant intake.
+- `supabase/functions/`: server-side privileged workflows.
+- `supabase/migrations/`: database and policy changes.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## iOS Splash Screen
+
+iOS uses `assets/images/BuffaGo-splash.png` through the
+`expo-splash-screen` config plugin in `app.config.js`. The source is a
+lossless 1024×1024 PNG displayed inside a 320-point square with `contain`.
+Expo generates 1×, 2×, and 3× iOS launch assets (up to 960×960), so the
+source is not enlarged on current Retina iPhones. The app forces dark UI
+mode, but the launch screen intentionally uses one opaque branded cream
+image in both system appearances. A separate Expo `dark` splash is not
+configured because Expo would change iOS interface style to `Automatic`.
+
+The legacy top-level `splash` config remains in place for Android. Do not
+replace `assets/splash.png` as part of an iOS-only change because Android's
+checked-in splash resources are generated from that path.
+
+To update the iOS splash later:
+
+1. Export a square, lossless PNG at 1024×1024 or larger. Keep important
+   artwork comfortably inside the square safe area.
+2. Replace `assets/images/BuffaGo-splash.png`, keeping the filename, or
+   update its iOS image path in `app.config.js`.
+3. Keep `imageWidth` at or below one third of the source pixel width so the
+   generated 3× asset is downsampled rather than upscaled.
+4. Regenerate native iOS files with `npx expo prebuild --platform ios
+   --clean` or create a new EAS iOS build. Splash changes are native and do
+   not ship through an over-the-air JavaScript update.
+5. Test a release/dev build; Expo Go does not reliably represent the final
+   native launch screen.
+
+## Portfolio Signal
+
+This codebase is strongest as evidence of mobile product ownership plus
+platform thinking: auth, maps, user-generated content, gamification, Edge
+Functions, data quality controls, and AI-assisted validation all support one
+coherent real-world workflow.

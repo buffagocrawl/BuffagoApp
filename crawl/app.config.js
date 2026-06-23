@@ -5,7 +5,7 @@ module.exports = ({ config }) => ({
   name: "BuffaGo",
   slug: "buffago",
   scheme: "buffago",
-  version: "1.0.2",
+  version: "1.0.3",
 
   icon: "./assets/icon.png",
   splash: {
@@ -23,7 +23,7 @@ module.exports = ({ config }) => ({
   ios: {
     supportsTablet: false,
     bundleIdentifier: "com.buffago.app",
-    buildNumber: "2",
+    buildNumber: "9",
   
     config: {
       googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_API_KEY,
@@ -73,10 +73,35 @@ module.exports = ({ config }) => ({
     ],
   },
 
+  androidNavigationBar: {
+    backgroundColor: "#050607",
+    barStyle: "light-content",
+    enforceContrast: false,
+  },
+
+  androidStatusBar: {
+    backgroundColor: "#050607",
+    barStyle: "light-content",
+  },
+
   plugins: [
     "expo-router",
     "expo-font",
     "expo-location",
+    "expo-web-browser",
+    [
+      "expo-splash-screen",
+      {
+        // iOS only: 320 pt generates 320/640/960 px launch assets from
+        // the 1024 px source. Android continues using the legacy splash config.
+        ios: {
+          image: "./assets/images/BuffaGo-splash.png",
+          imageWidth: 320,
+          resizeMode: "contain",
+          backgroundColor: "#FFFBE9",
+        },
+      },
+    ],
     // If you later use the Expo Facebook module, add "expo-facebook" too.
   ],
 

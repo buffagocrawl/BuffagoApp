@@ -16,6 +16,7 @@ import {
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase.js';
+import { filterSociallyVisibleRows } from '../../lib/socialVisibility';
 
 const ADMIN_ID = '23898359-306a-4dd3-91f0-da66da19ccfc';
 const LEVEL_XP_STEP = 100; // 1 level per 100 XP
@@ -389,9 +390,17 @@ export default function Leaderboards() {
         setLoading(true);
         setError('');
 
+        const { data: visibleUsers, error: visibleErr } = await supabase
+          .from('socially_visible_users')
+          .select('user_id, username');
+
+        if (visibleErr) throw visibleErr;
+
+        const visibleIds = new Set((visibleUsers || []).map((u) => u.user_id).filter(Boolean));
+
         // 1) destination_ratings (exclude guests/admin)
         const { data: dr, error: e1 } = await supabase
-          .from('destination_ratings')
+          .from('socially_visible_destination_ratings')
           .select(
             'user_id, destination_id, crawl_id, tag_id, weight_score, created_at'
           )
@@ -408,8 +417,11 @@ export default function Leaderboards() {
             .neq('user_id', ADMIN_ID);
 
         const map = new Map();
-        if (!eUsers && Array.isArray(usersData)) {
-          for (const u of usersData) {
+        const socialUsersData = Array.isArray(usersData)
+          ? filterSociallyVisibleRows(usersData, visibleIds)
+          : [];
+        if (!eUsers && Array.isArray(socialUsersData)) {
+          for (const u of socialUsersData) {
             map.set(u.user_id, {
               username: u.username || null,
               xp: u.xp ?? 0,
@@ -425,7 +437,7 @@ export default function Leaderboards() {
               .from('users')
               .select('user_id, username, xp')
               .in('user_id', ids);
-            for (const u of someUsers || []) {
+            for (const u of filterSociallyVisibleRows(someUsers || [], visibleIds)) {
               map.set(u.user_id, {
                 username: u.username || null,
                 xp: u.xp ?? 0,
@@ -439,7 +451,7 @@ export default function Leaderboards() {
         try {
           const { data: crawls, error: cErr } =
             await supabase
-              .from('crawls')
+              .from('socially_visible_crawls')
               .select(
                 'crawl_id, user_id, route_id, status, start_time, end_time'
               )
@@ -545,14 +557,14 @@ export default function Leaderboards() {
           ]);
           setRoutesCompletedMap(
             rowsToMap(
-              routesCompleted,
+              filterSociallyVisibleRows(routesCompleted, visibleIds),
               'user_id',
               'completed_routes'
             )
           );
           setDestsRatedMap(
             rowsToMap(
-              destsRated,
+              filterSociallyVisibleRows(destsRated, visibleIds),
               'user_id',
               'distinct_destinations'
             )
@@ -602,7 +614,7 @@ export default function Leaderboards() {
           if (!bErr && Array.isArray(badgeCounts)) {
             setBadgesCountMap(
               rowsToMap(
-                badgeCounts,
+                filterSociallyVisibleRows(badgeCounts, visibleIds),
                 'user_id',
                 'badges_count'
               )
@@ -649,7 +661,7 @@ export default function Leaderboards() {
             );
             setStreakWeeksMap(
               rowsToMap(
-                filtered,
+                filterSociallyVisibleRows(filtered, visibleIds),
                 'user_id',
                 'current_streak_weeks'
               )

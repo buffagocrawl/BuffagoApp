@@ -13,9 +13,23 @@ import { View, Linking as RNLinking, Pressable, ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import Constants from 'expo-constants';
-import * as Linking from 'expo-linking';
 import { supabase } from '../../lib/supabase';
+import { dbg } from '../../lib/debugLog';
+import { trackEvent } from '../../lib/analytics';
+import {
+  clearFacebookFlowState,
+  facebookConfigChecklist,
+  getFacebookRedirectUrl,
+  runFacebookOAuth,
+  sanitizeAuthError,
+} from '../../lib/facebookOAuth';
+import { canUserAppearSocially } from '../../lib/socialVisibility';
+import {
+  getFacebookIdentity,
+  grantFacebookLinkRewardOnce,
+  persistFacebookConnection,
+  readFacebookConnection,
+} from '../../lib/socialAccounts';
 import {
   Text,
   Button,
@@ -30,6 +44,7 @@ import {
   Dialog,
   Appbar,
   TextInput,
+  Switch,
 } from 'react-native-paper';
 
 // Complete any pending auth sessions
@@ -45,19 +60,6 @@ function getFacebookAvatarUrlFromIdentities(identities = []) {
   const fbId = data?.id || data?.user_id || data?.sub;
   const graph = fbId ? `https://graph.facebook.com/${fbId}/picture?type=large` : null;
   return direct || graph || null;
-}
-
-// Redirect URL that works in Expo Go + standalone builds
-function getRedirectUrl() {
-  // Expo Go => exp://.../--/auth/callback
-  const created = Linking.createURL('auth/callback');
-  const nativeUrl = 'buffago://auth/callback';
-
-  // In Expo Go, you MUST use exp:// (custom schemes won't round-trip reliably)
-  if (Constants.appOwnership === 'expo') return created;
-
-  // In dev-client/standalone, prefer the custom scheme
-  return nativeUrl;
 }
 
 // Local username rules
@@ -81,6 +83,8 @@ export default function UserSettings() {
   const [initialized, setInitialized] = useState(false);
   const [identities, setIdentities] = useState([]);
   const [hasFacebook, setHasFacebook] = useState(false);
+  const [facebookConnectedAt, setFacebookConnectedAt] = useState(null);
+  const [facebookStatusSource, setFacebookStatusSource] = useState('unknown');
   const [linking, setLinking] = useState(false);
   const [snackMsg, setSnackMsg] = useState('');
   const [snackVisible, setSnackVisible] = useState(false);
@@ -92,6 +96,9 @@ export default function UserSettings() {
   // Username state
   const [userRowLoading, setUserRowLoading] = useState(false);
   const [username, setUsername] = useState(null);
+  const [socialOptOut, setSocialOptOut] = useState(false);
+  const [socialOptOutSaving, setSocialOptOutSaving] = useState(false);
+  const socialOptOutViewedRef = useRef(false);
   const [usernameDialogOpen, setUsernameDialogOpen] = useState(false);
   const [usernameDraft, setUsernameDraft] = useState('');
   const [usernameSaving, setUsernameSaving] = useState(false);
@@ -181,7 +188,27 @@ export default function UserSettings() {
     const { data: userData } = await supabase.auth.getUser();
     const ids = userData?.user?.identities ?? [];
     setIdentities(ids);
-    setHasFacebook(ids.some((i) => i?.provider === 'facebook'));
+
+    if (currentSession?.user?.id) {
+      const persisted = await readFacebookConnection(currentSession.user.id);
+      const identityConnected = Boolean(getFacebookIdentity(ids));
+      setHasFacebook(persisted.connected || (persisted.source === 'read_error' && identityConnected));
+      setFacebookConnectedAt(persisted.connectedAt);
+      setFacebookStatusSource(persisted.source);
+      await dbg(
+        'facebook_final_ui_state',
+        {
+          persistedConnected: persisted.connected,
+          identityConnected,
+          source: persisted.source,
+        },
+        'facebook'
+      );
+    } else {
+      setHasFacebook(false);
+      setFacebookConnectedAt(null);
+      setFacebookStatusSource('none');
+    }
   }, []);
 
   const loadUserRow = useCallback(async () => {
@@ -194,7 +221,7 @@ export default function UserSettings() {
 
       const { data: row, error } = await supabase
         .from('users')
-        .select('username')
+        .select('username, social_opt_out')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -203,6 +230,30 @@ export default function UserSettings() {
       const u = row?.username ?? null;
       setUsername(u);
       setUsernameDraft(u ?? '');
+      setSocialOptOut(Boolean(row?.social_opt_out));
+
+      if (!socialOptOutViewedRef.current) {
+        const currentValue = Boolean(row?.social_opt_out);
+        socialOptOutViewedRef.current = true;
+        await dbg(
+          'social_opt_out_setting_viewed',
+          {
+            value: currentValue,
+            canAppearSocially: canUserAppearSocially({ social_opt_out: currentValue }),
+            source_screen: 'settings',
+          },
+          'privacy'
+        );
+        trackEvent({
+          eventName: 'social_opt_out_setting_viewed',
+          screen: 'settings',
+          userId: user.id,
+          metadata: {
+            current_value: currentValue,
+            source_screen: 'settings',
+          },
+        });
+      }
     } catch (e) {
       console.log('[users load error]', e);
     } finally {
@@ -271,6 +322,80 @@ export default function UserSettings() {
     }
   }, [draftPrefs, showToast]);
 
+  const saveSocialOptOut = useCallback(
+    async (nextValue) => {
+      if (!session?.user?.id || socialOptOutSaving) return;
+
+      const userId = session.user.id;
+      const previousValue = Boolean(socialOptOut);
+      const next = Boolean(nextValue);
+
+      setSocialOptOut(next);
+      setSocialOptOutSaving(true);
+
+      await dbg(
+        'social_opt_out_setting_changed_attempt',
+        {
+          previous_value: previousValue,
+          next_value: next,
+          source_screen: 'settings',
+        },
+        'privacy'
+      );
+
+      try {
+        const { error } = await supabase
+          .from('users')
+          .update({ social_opt_out: next })
+          .eq('user_id', userId);
+
+        if (error) throw error;
+
+        const timestamp = new Date().toISOString();
+        await dbg(
+          'social_opt_out_database_update_success',
+          {
+            previous_value: previousValue,
+            next_value: next,
+            source_screen: 'settings',
+            timestamp,
+          },
+          'privacy'
+        );
+
+        trackEvent({
+          eventName: next ? 'social_opt_out_enabled' : 'social_opt_out_disabled',
+          screen: 'settings',
+          userId,
+          metadata: {
+            user_id: userId,
+            previous_value: previousValue,
+            source_screen: 'settings',
+            timestamp,
+          },
+        });
+
+        showToast(next ? 'Social features hidden.' : 'Social features visible again.');
+      } catch (e) {
+        setSocialOptOut(previousValue);
+        await dbg(
+          'social_opt_out_database_update_failure',
+          {
+            previous_value: previousValue,
+            attempted_value: next,
+            source_screen: 'settings',
+            message: e?.message || 'unknown',
+          },
+          'privacy'
+        );
+        showToast(`Privacy setting failed: ${e?.message ?? 'Unknown error'}`);
+      } finally {
+        setSocialOptOutSaving(false);
+      }
+    },
+    [session?.user?.id, showToast, socialOptOut, socialOptOutSaving]
+  );
+
   const labelForPref = useCallback(
     (field, value) => {
       const meta = PREF_LABELS[field];
@@ -296,24 +421,26 @@ export default function UserSettings() {
       const user = data?.user;
       if (!user) return;
 
-      const ids = user?.identities ?? [];
-      const isFB = ids.some((i) => i?.provider === 'facebook');
-      if (!isFB) return;
+      const isFB = Boolean(getFacebookIdentity(user));
+      if (!isFB) {
+        await dbg('facebook_badge_skipped_no_identity', {}, 'facebook');
+        return;
+      }
 
       awardedRef.current = true;
 
-      await supabase.rpc('xp_add', {
-        amount: 50,
-        reason: 'link_facebook',
-        user_id: user.id,
-      });
-      await supabase.rpc('earn_badge', {
-        badge_key: 'link_facebook',
-        user_id: user.id,
-      });
-
-      showToast('Facebook connected! +50 XP and badge earned.');
-    } catch {
+      const reward = await grantFacebookLinkRewardOnce(user.id);
+      if (reward.granted) {
+        showToast('Facebook connected! +50 XP and badge earned.');
+      } else {
+        showToast('Facebook connected.');
+      }
+    } catch (e) {
+      await dbg(
+        'facebook_badge_grant_failed',
+        { message: e?.message || 'unknown' },
+        'facebook'
+      );
       // non-critical
     }
   }, [showToast]);
@@ -341,7 +468,27 @@ export default function UserSettings() {
       await refreshUserAndIdentities();
 
       if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
-        await maybeAwardFacebookBadge();
+        const user = newSession?.user;
+        if (user?.id && getFacebookIdentity(user)) {
+          try {
+            const persisted = await readFacebookConnection(user.id);
+            const saved = await persistFacebookConnection(user, {
+              previousConnected: persisted.connected,
+              previousConnectedAt: persisted.connectedAt,
+            });
+            setHasFacebook(true);
+            setFacebookConnectedAt(saved.connectedAt);
+            setFacebookStatusSource('users');
+            if (saved.newlyConnected) await maybeAwardFacebookBadge();
+          } catch (e) {
+            await dbg(
+              'facebook_auth_event_profile_sync_failed',
+              { message: e?.message || 'unknown' },
+              'facebook'
+            );
+            showToast(`Facebook connected, but profile sync failed: ${e?.message ?? 'Unknown error'}`);
+          }
+        }
       }
     });
 
@@ -349,7 +496,7 @@ export default function UserSettings() {
       mounted = false;
       sub?.subscription?.unsubscribe?.();
     };
-  }, [refreshUserAndIdentities, router, maybeAwardFacebookBadge]);
+  }, [refreshUserAndIdentities, router, maybeAwardFacebookBadge, showToast]);
 
   // If user not logged in once initialized, bounce to home
   useEffect(() => {
@@ -374,46 +521,72 @@ export default function UserSettings() {
   const handleLoginWithFacebook = useCallback(async () => {
     try {
       setLinking(true);
-
-      const redirectUrl = getRedirectUrl();
-
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'facebook',
-        options: {
-          redirectTo: redirectUrl,
-          scopes: 'public_profile,email',
-          skipBrowserRedirect: true,
+      const { data: sessionData } = await supabase.auth.getSession();
+      const hasSession = Boolean(sessionData?.session?.user?.id);
+      const currentUserId = sessionData?.session?.user?.id || null;
+      trackEvent({
+        eventName: 'facebook_connect_button_tapped',
+        screen: 'settings',
+        userId: currentUserId,
+        metadata: {
+          mode: hasSession ? 'link_identity' : 'sign_in',
+          redirect_kind: getFacebookRedirectUrl().startsWith('exp://') ? 'expo' : 'native',
         },
       });
 
-      if (error) throw error;
+      const mode = hasSession ? 'link_identity' : 'sign_in';
+      const result = await runFacebookOAuth({
+        mode,
+        currentUserId,
+        returnPath: hasSession ? '/user' : '/(tabs)/home',
+        screen: 'settings',
+      });
 
-      const authUrl = data?.url;
-      if (!authUrl) throw new Error('No auth URL returned from Supabase');
-
-      const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
-
-      if (result?.type === 'success' && result.url) {
-        const { error: exchErr } = await supabase.auth.exchangeCodeForSession(result.url);
-        if (exchErr) throw exchErr;
-
-        showToast('Facebook connected!');
+      if (result.outcome === 'callback') {
+        trackEvent({
+          eventName: 'facebook_oauth_redirect_received',
+          screen: 'settings',
+          userId: currentUserId,
+          metadata: { mode },
+        });
+        router.replace('/auth/callback');
         return;
       }
 
-      if (result?.type === 'cancel' || result?.type === 'dismiss') {
+      if (result.outcome === 'cancelled') {
+        trackEvent({
+          eventName: 'facebook_oauth_no_redirect',
+          screen: 'settings',
+          userId: currentUserId,
+          metadata: { result_type: result.resultType || null, mode },
+        });
         showToast('Facebook sign-in cancelled.');
         return;
       }
 
-      throw new Error(`Unexpected auth result: ${result?.type || 'unknown'}`);
+      throw new Error(`Unexpected Facebook auth result: ${result.resultType || result.outcome}`);
     } catch (e) {
       console.log('[FB OAuth error]', e);
+      await clearFacebookFlowState();
+      await dbg(
+        'facebook_oauth_failed',
+        {
+          ...sanitizeAuthError(e),
+          config: facebookConfigChecklist(getFacebookRedirectUrl()),
+          finalOutcome: 'failed',
+        },
+        'facebook'
+      );
+      trackEvent({
+        eventName: 'facebook_oauth_failed',
+        screen: 'settings',
+        metadata: sanitizeAuthError(e),
+      });
       showToast(`Facebook login failed: ${e?.message ?? 'Unknown error'}`);
     } finally {
       setLinking(false);
     }
-  }, [showToast]);
+  }, [router, showToast]);
 
   /* ----------------- Account Deletion ----------------- */
 
@@ -788,7 +961,13 @@ export default function UserSettings() {
                 <View style={{ marginTop: 6 }}>
                   <Text variant="labelSmall" style={{ opacity: 0.8 }}>
                     Facebook: {hasFacebook ? 'Connected' : 'Not linked'}
+                    {hasFacebook && facebookConnectedAt ? ` since ${new Date(facebookConnectedAt).toLocaleDateString()}` : ''}
                   </Text>
+                  {facebookStatusSource === 'read_error' ? (
+                    <Text variant="labelSmall" style={{ opacity: 0.7 }}>
+                      Connection detected, but profile sync needs database setup.
+                    </Text>
+                  ) : null}
                 </View>
               )}
             </View>
@@ -907,10 +1086,40 @@ export default function UserSettings() {
           </List.Section>
         </Card>
 
+        {/* Social Privacy */}
+        {session ? (
+          <Card style={{ borderRadius: 16 }}>
+            <List.Section>
+              <List.Subheader>Social Privacy</List.Subheader>
+              <Divider />
+
+              <List.Item
+                title="Hide From Social"
+                description="Optional social features are off when enabled. You are hidden from leaderboards, feeds, friend search, friend activity, and profile friend actions."
+                titleNumberOfLines={1}
+                descriptionNumberOfLines={3}
+                style={{ paddingRight: 8, paddingVertical: 10 }}
+                titleStyle={{ fontWeight: '700' }}
+                descriptionStyle={{ lineHeight: 18 }}
+                left={(p) => <List.Icon {...p} icon="eye-off-outline" />}
+                right={() => (
+                  <View style={{ justifyContent: 'center', paddingLeft: 8 }}>
+                    <Switch
+                      value={socialOptOut}
+                      disabled={socialOptOutSaving}
+                      onValueChange={saveSocialOptOut}
+                    />
+                  </View>
+                )}
+              />
+            </List.Section>
+          </Card>
+        ) : null}
+
         {/* Facebook login / link */}
         {(!session || !hasFacebook) && (
           <Button mode="contained" style={{ borderRadius: 12 }} icon="facebook" disabled={linking} onPress={handleLoginWithFacebook}>
-            {linking ? <ActivityIndicator animating /> : 'Continue with Facebook (Coming soon)'}
+            {linking ? <ActivityIndicator animating /> : 'Connect Facebook'}
           </Button>
         )}
 

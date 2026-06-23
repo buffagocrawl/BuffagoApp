@@ -27,6 +27,13 @@ import {
 import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase.js';
 import { dbg } from '../../lib/debugLog';
+import {
+  clearFacebookFlowState,
+  facebookConfigChecklist,
+  getFacebookRedirectUrl,
+  runFacebookOAuth,
+  sanitizeAuthError,
+} from '../../lib/facebookOAuth';
 
 // Handoff page (Netlify) includes trailing slash
 const RESET_HANDOFF_URL = 'https://curious-quokka-dbae0b.netlify.app/';
@@ -392,6 +399,46 @@ export default function EmailAuthScreen() {
     }
   };
 
+  const onFacebook = async () => {
+    setBusy(true);
+    try {
+      const result = await runFacebookOAuth({
+        mode: 'sign_in',
+        currentUserId: null,
+        returnPath: '/(tabs)/home',
+        screen: 'auth/login',
+      });
+
+      if (result.outcome === 'callback') {
+        router.replace('/auth/callback');
+        return;
+      }
+
+      if (result.outcome === 'cancelled') {
+        show('Facebook sign-in cancelled.');
+        return;
+      }
+
+      throw new Error(`Unexpected Facebook auth result: ${result.resultType || result.outcome}`);
+    } catch (e) {
+      await clearFacebookFlowState();
+      await dbg(
+        'facebook_oauth_failed',
+        {
+          mode: 'sign_in',
+          screen: 'auth/login',
+          finalOutcome: 'failed',
+          ...sanitizeAuthError(e),
+          config: facebookConfigChecklist(getFacebookRedirectUrl()),
+        },
+        'facebook'
+      );
+      show(e?.message || 'Facebook sign-in failed');
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const onSignIn = async () => {
     if (!emailValid || !pwdValid) return;
 
@@ -535,6 +582,10 @@ export default function EmailAuthScreen() {
                 Continue with Google
               </Button>
               )}
+
+              <Button mode="outlined" icon="facebook" onPress={onFacebook} disabled={busy} style={styles.oauthBtn}>
+                Continue with Facebook
+              </Button>
 
               {/* ✅ Then choose manual path */}
               <Text style={styles.orText}>or continue with email</Text>

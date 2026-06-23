@@ -1,12 +1,13 @@
 ﻿// app/_layout.tsx
 import * as WebBrowser from 'expo-web-browser';
-WebBrowser.maybeCompleteAuthSession();
-
 import 'react-native-reanimated';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Linking from 'expo-linking';
 import { Stack, usePathname } from 'expo-router'; 
 import { StatusBar } from 'expo-status-bar';
+import * as SystemUI from 'expo-system-ui';
 
 // Theme + Providers
 import { ThemeProvider } from '../providers/ThemeProvider';
@@ -22,13 +23,28 @@ import {
 } from '@react-navigation/native';
 
 import QueryProvider from '../providers/QueryProvider';
-import { AuthProvider } from '../providers/AuthProvider';
+import { AuthProvider, useAuth } from '../providers/AuthProvider';
 import LocationProvider from '../providers/LocationProvider';
 import XpToastProvider from '../providers/XpToastProvider';
 
 import { supabase } from '../lib/supabase';
+import { dbg } from '../lib/debugLog';
+import {
+  describeUrl,
+  OAUTH_FLOW_ID_KEY,
+  OAUTH_FLOW_MODE_KEY,
+  OAUTH_FLOW_STARTED_AT_KEY,
+  OAUTH_RETURN_URL_KEY,
+} from '../lib/facebookOAuth';
+import { installAppLifecycleTracking, rotateAnalyticsSession, trackEvent, trackScreenViewed } from '../lib/analytics';
 import { useOnboardingGate } from '../hooks/useOnboardingGate';
 import OnboardingFlow from '../components/OnboardingFlow';
+
+WebBrowser.maybeCompleteAuthSession();
+
+const ANDROID_SYSTEM_BAR_BACKGROUND = '#050607';
+const APP_STARTUP_STARTED_AT = Date.now();
+const IOS_SPLASH_ASSET = 'assets/images/BuffaGo-splash.png';
 
 /**
  * Fun-fact boot splash (JS-only).
@@ -123,7 +139,11 @@ function AppBootSplash() {
  */
 function AppShell() {
   const paperTheme = usePaperTheme();
-   const pathname = usePathname(); // 
+  const pathname = usePathname();
+  const { user } = useAuth();
+  const lastTrackedPathRef = useRef<string | null>(null);
+  const appOpenTrackedRef = useRef(false);
+  const initialPathRef = useRef<string | null>(pathname || null);
 
   // ---- Boot splash gate ----
   const MIN_SPLASH_MS = 3500;
@@ -132,6 +152,7 @@ function AppShell() {
   const [bootDone, setBootDone] = useState(false);
   const [minTimeDone, setMinTimeDone] = useState(false);
   const [appReady, setAppReady] = useState(false);
+  const startupLoggedRef = useRef(false);
 
   // Onboarding gate
   const { loading: onboardingLoading, shouldShowIntro, markIntroSeen } = useOnboardingGate();
@@ -185,6 +206,72 @@ function AppShell() {
     };
   }, [bootDone, minTimeDone]);
 
+  useEffect(() => {
+    if (!appReady) return;
+
+    const startupDurationMs = Date.now() - APP_STARTUP_STARTED_AT;
+    if (!startupLoggedRef.current) {
+      startupLoggedRef.current = true;
+      console.info('[startup] Splash initialization complete', {
+        duration_ms: startupDurationMs,
+        platform: Platform.OS,
+        ios_splash_asset: Platform.OS === 'ios' ? IOS_SPLASH_ASSET : undefined,
+      });
+    }
+
+    let alive = true;
+    const cleanup = installAppLifecycleTracking();
+
+    (async () => {
+      if (appOpenTrackedRef.current) return;
+      appOpenTrackedRef.current = true;
+      await rotateAnalyticsSession();
+      if (!alive) return;
+      await trackEvent({
+        eventName: 'app_opened',
+        screen: initialPathRef.current,
+        userId: user?.id ?? null,
+        metadata: {
+          source: 'cold_start',
+          startup_duration_ms: startupDurationMs,
+          splash_asset: Platform.OS === 'ios' ? IOS_SPLASH_ASSET : null,
+        },
+      });
+    })();
+
+    return () => {
+      alive = false;
+      cleanup?.();
+    };
+  }, [appReady, user?.id]);
+
+  useEffect(() => {
+    if (!appReady || !pathname) return;
+    if (lastTrackedPathRef.current === pathname) return;
+    lastTrackedPathRef.current = pathname;
+    trackScreenViewed(pathname, { user_id_present: !!user?.id });
+  }, [appReady, pathname, user?.id]);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+
+    SystemUI.setBackgroundColorAsync(ANDROID_SYSTEM_BAR_BACKGROUND).catch((error) => {
+      console.warn(
+        '[system-ui] Android navigation bar/theme initialization failed',
+        error?.message || error
+      );
+      trackEvent({
+        eventName: 'system_ui_initialization_failed',
+        screen: 'app_root',
+        metadata: {
+          component: 'android_navigation_bar',
+          background_color: ANDROID_SYSTEM_BAR_BACKGROUND,
+          error_message: error?.message || String(error),
+        },
+      });
+    });
+  }, []);
+
   if (!appReady) return <AppBootSplash />;
 
   const navTheme = {
@@ -212,6 +299,12 @@ function AppShell() {
             {onboardingOpen && !hideOnboardingOverlay ? (
               <OnboardingFlow
                 onComplete={async () => {
+                  await trackEvent({
+                    eventName: 'onboarding_completed',
+                    screen: 'onboarding',
+                    userId: user?.id ?? null,
+                    metadata: { source: 'root_overlay' },
+                  });
                   await markIntroSeen();
                   setOnboardingOpen(false);
                 }}
@@ -256,6 +349,36 @@ function AppShell() {
  * Root provider tree wrapping the whole app.
  */
 export default function RootLayout() {
+  useEffect(() => {
+    const cacheOAuthCallback = async (url: string | null) => {
+      if (!url || !String(url).includes('auth/callback')) return;
+      await AsyncStorage.setItem(OAUTH_RETURN_URL_KEY, url);
+      const [flowId, mode, startedAtRaw] = await AsyncStorage.multiGet([
+        OAUTH_FLOW_ID_KEY,
+        OAUTH_FLOW_MODE_KEY,
+        OAUTH_FLOW_STARTED_AT_KEY,
+      ]);
+      const startedAt = Number(startedAtRaw?.[1]);
+      await dbg(
+        'oauth_deep_link_received_at_root',
+        {
+          flowId: flowId?.[1] || null,
+          mode: mode?.[1] || null,
+          callback: describeUrl(url),
+          elapsedMs: Number.isFinite(startedAt) && startedAt > 0 ? Date.now() - startedAt : null,
+        },
+        mode?.[1] ? 'facebook' : 'auth'
+      );
+    };
+
+    const subscription = Linking.addEventListener('url', ({ url }) => {
+      cacheOAuthCallback(url).catch(() => {});
+    });
+    Linking.getInitialURL().then(cacheOAuthCallback).catch(() => {});
+
+    return () => subscription.remove();
+  }, []);
+
   return (
     <ThemeProvider>
       <AuthProvider>

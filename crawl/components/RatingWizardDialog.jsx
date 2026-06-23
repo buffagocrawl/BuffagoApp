@@ -288,6 +288,23 @@ export default function RatingWizardDialog({
     []
   );
 
+  const stepLabel = useMemo(() => {
+    return [
+      'Style',
+      sauceStyle === 1 ? 'Rub score' : 'Sauce score',
+      'Crispiness',
+      'Chicken',
+      'Overall',
+      'Flavor',
+      'Heat',
+      'Count',
+      'Tag',
+      'Comeback',
+    ][step];
+  }, [sauceStyle, step]);
+
+  const nextLabel = step < totalSteps - 1 ? 'Next' : finalizeLabel;
+
   // Reset state on open, so every destination starts clean
   useEffect(() => {
     if (!visible) return;
@@ -344,6 +361,12 @@ export default function RatingWizardDialog({
         <DialogHeaderArrow title={destinationName || 'Rate this stop'} onBack={goBack} />
 
         <Dialog.Content>
+        <View style={styles.progressMetaRow}>
+          <Text style={styles.progressMetaText}>
+            Step {step + 1} of {totalSteps}
+          </Text>
+          <Text style={styles.progressMetaText}>{stepLabel}</Text>
+        </View>
         <ProgressBar progress={(step + 1) / totalSteps} style={styles.ratingProgress} />
 
         <View style={{ marginTop: 16 }}>
@@ -526,8 +549,8 @@ export default function RatingWizardDialog({
           {step === 0 ? 'Cancel' : 'Back'}
         </Button>
 
-        <Button mode="contained" loading={saving} disabled={saving} onPress={goNext}>
-          {step < totalSteps - 1 ? 'Next' : finalizeLabel}
+        <Button mode="contained" loading={saving} disabled={saving} onPress={goNext} contentStyle={styles.nextButtonContent}>
+          {nextLabel}
         </Button>
       </Dialog.Actions>
       </Dialog>
@@ -568,6 +591,20 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 999,
     marginBottom: 4,
+  },
+  progressMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  progressMetaText: {
+    fontSize: 12,
+    fontWeight: '800',
+    opacity: 0.68,
+  },
+  nextButtonContent: {
+    minWidth: 96,
   },
   stepTitle: {
     textAlign: 'center',

@@ -47,6 +47,8 @@ type PlaceCandidate = {
   userRatingsTotal: number | null;
 };
 
+type AdminClient = ReturnType<typeof createClient>;
+
 function parseCityState(address: string | null) {
   if (!address) return { city: null, state: null };
 
@@ -103,6 +105,97 @@ async function requireUserId(req: Request) {
   return { userId: data.user.id, error: null };
 }
 
+async function getOptionalUserId(req: Request, admin: AdminClient) {
+  const authHeader = req.headers.get('Authorization');
+
+  if (!authHeader?.startsWith('Bearer ')) {
+    return null;
+  }
+
+  const jwt = authHeader.replace('Bearer ', '').trim();
+  if (!jwt) return null;
+
+  const { data, error } = await admin.auth.getUser(jwt);
+  return error ? null : data?.user?.id ?? null;
+}
+
+function getClientIp(req: Request) {
+  const forwardedFor = req.headers.get('x-forwarded-for');
+  const firstForwardedIp = forwardedFor?.split(',')[0]?.trim();
+
+  return (
+    firstForwardedIp ||
+    req.headers.get('cf-connecting-ip')?.trim() ||
+    req.headers.get('x-real-ip')?.trim() ||
+    null
+  );
+}
+
+function isObviouslySpammyInput(input: string) {
+  const normalized = input.trim();
+  const lettersAndNumbers = normalized.replace(/[^a-z0-9]/gi, '');
+  const letters = normalized.replace(/[^a-z]/gi, '');
+
+  if (normalized.length > 200) return true;
+  if (lettersAndNumbers.length < 3 || letters.length < 2) return true;
+  if (/(.)\1{7,}/i.test(normalized)) return true;
+  if (/https?:\/\/|www\.|<script|<\/script/i.test(normalized)) return true;
+
+  const uniqueChars = new Set(lettersAndNumbers.toLowerCase()).size;
+  return lettersAndNumbers.length >= 12 && uniqueChars <= 2;
+}
+
+async function enforceRateLimit(params: {
+  admin: AdminClient;
+  feature: string;
+  userId: string | null;
+  ipAddress: string | null;
+}) {
+  const { admin, feature, userId } = params;
+  const ipAddress = params.ipAddress || 'unknown';
+  const now = Date.now();
+  const hourAgo = new Date(now - 60 * 60 * 1000).toISOString();
+  const dayAgo = new Date(now - 24 * 60 * 60 * 1000).toISOString();
+  const hourlyLimit = userId ? 10 : 3;
+  const dailyLimit = userId ? 30 : 10;
+
+  const baseCountQuery = (since: string) => {
+    let query = admin
+      .from('api_rate_limits')
+      .select('id', { count: 'exact', head: true })
+      .eq('feature', feature)
+      .gte('created_at', since);
+
+    query = userId ? query.eq('user_id', userId) : query.eq('ip_address', ipAddress);
+    return query;
+  };
+
+  const [{ count: hourlyCount, error: hourlyError }, { count: dailyCount, error: dailyError }] =
+    await Promise.all([baseCountQuery(hourAgo), baseCountQuery(dayAgo)]);
+
+  if (hourlyError || dailyError) {
+    console.error('RATE LIMIT ERROR:', hourlyError?.message || dailyError?.message);
+    throw new Error('Unable to check rate limit.');
+  }
+
+  if ((hourlyCount ?? 0) >= hourlyLimit || (dailyCount ?? 0) >= dailyLimit) {
+    return false;
+  }
+
+  const { error: insertError } = await admin.from('api_rate_limits').insert({
+    user_id: userId,
+    ip_address: ipAddress,
+    feature,
+  });
+
+  if (insertError) {
+    console.error('RATE LIMIT INSERT ERROR:', insertError.message);
+    throw new Error('Unable to record rate limit.');
+  }
+
+  return true;
+}
+
 async function resolvePlaceCandidate(params: {
   restaurant: string;
   state: string;
@@ -150,6 +243,51 @@ async function resolvePlaceCandidate(params: {
     rating: asNumber(first.rating),
     userRatingsTotal: asNumber(first.user_ratings_total),
   };
+}
+
+async function findExistingDestinationMatch(params: {
+  admin: AdminClient;
+  restaurant: string;
+  stateId?: number | null;
+  city?: string | null;
+}) {
+  const restaurant = params.restaurant.trim();
+  const stateId = params.stateId ? Number(params.stateId) : null;
+  const city = params.city?.trim() || null;
+
+  if (!restaurant || !stateId || Number.isNaN(stateId)) return null;
+
+  const baseSelect = 'id, name, address, city, lat, lng, state_id';
+
+  if (city) {
+    const { data, error } = await params.admin
+      .from('destinations')
+      .select(baseSelect)
+      .eq('state_id', stateId)
+      .ilike('name', `%${restaurant}%`)
+      .ilike('city', `%${city}%`)
+      .limit(1);
+
+    if (error) {
+      console.warn('Existing destination city lookup failed:', error.message);
+    } else if (data?.[0]) {
+      return data[0];
+    }
+  }
+
+  const { data, error } = await params.admin
+    .from('destinations')
+    .select(baseSelect)
+    .eq('state_id', stateId)
+    .ilike('name', `%${restaurant}%`)
+    .limit(1);
+
+  if (error) {
+    console.warn('Existing destination lookup failed:', error.message);
+    return null;
+  }
+
+  return data?.[0] ?? null;
 }
 
 function buildWingmanPrompt(params: {
@@ -325,6 +463,7 @@ Deno.serve(async (req) => {
   try {
     const body = (await req.json()) as RequestBody;
     const action = body.action || 'validate';
+    const admin = createAdminClient();
     let authenticatedUserId: string | null = null;
 
     const restaurant =
@@ -347,8 +486,16 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: 'Missing restaurant in request body.' }, 400);
     }
 
+    if (isObviouslySpammyInput(restaurant)) {
+      return jsonResponse({ error: 'Enter a real restaurant name to search.' }, 400);
+    }
+
     if (!state) {
       return jsonResponse({ error: 'Missing stateId or stateCode in request body.' }, 400);
+    }
+
+    if (extraInfo && isObviouslySpammyInput(`${restaurant} ${extraInfo}`)) {
+      return jsonResponse({ error: 'Enter real restaurant details to search.' }, 400);
     }
 
     if (action === 'insertDestination') {
@@ -358,6 +505,47 @@ Deno.serve(async (req) => {
 
       const auth = await requireUserId(req);
       authenticatedUserId = auth.userId;
+    } else {
+      authenticatedUserId = await getOptionalUserId(req, admin);
+    }
+
+    const existingDestination =
+      action === 'validate'
+        ? await findExistingDestinationMatch({
+            admin,
+            restaurant,
+            stateId: body.stateId ?? null,
+            city,
+          })
+        : null;
+
+    if (existingDestination) {
+      return jsonResponse({
+        normalized_name: existingDestination.name ?? restaurant,
+        city: existingDestination.city ?? city,
+        state,
+        address: existingDestination.address ?? null,
+        lat: existingDestination.lat ?? null,
+        lng: existingDestination.lng ?? null,
+        is_real_restaurant: true,
+        confidence: 0.95,
+        wings_probability: 0.75,
+        category: 'existing_destination',
+        reasoning: 'Matched an existing BuffaGo destination before calling OpenAI.',
+        needs_city: false,
+        needs_more_info: false,
+      });
+    }
+
+    const withinLimit = await enforceRateLimit({
+      admin,
+      feature: 'wingman',
+      userId: authenticatedUserId,
+      ipAddress: getClientIp(req),
+    });
+
+    if (!withinLimit) {
+      return jsonResponse({ error: 'Too many requests. Try again in a bit.' }, 429);
     }
 
     const place = await resolvePlaceCandidate({
@@ -532,7 +720,6 @@ Deno.serve(async (req) => {
         }, 422);
       }
 
-      const admin = createAdminClient();
       const insertPayload = {
         name: result.normalized_name,
         address: result.address,
