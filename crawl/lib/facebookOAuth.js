@@ -4,6 +4,7 @@ import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
 import { dbg } from './debugLog';
+import { trackEvent } from './analytics';
 import { supabase } from './supabase';
 
 export const OAUTH_RETURN_URL_KEY = 'buffago:oauth:return_url';
@@ -14,8 +15,35 @@ export const OAUTH_FLOW_MODE_KEY = 'buffago:oauth:flow_mode';
 export const OAUTH_FLOW_STARTED_AT_KEY = 'buffago:oauth:started_at';
 
 const ANDROID_REDIRECT_GRACE_MS = 1800;
+const NATIVE_FACEBOOK_GRACE_MS = 2400;
 
 const elapsedMs = (startedAt) => Math.max(0, Date.now() - startedAt);
+
+function facebookNativeUrl(authUrl) {
+  if (!authUrl) return null;
+  try {
+    return `fb://facewebmodal/f?href=${encodeURIComponent(String(authUrl))}`;
+  } catch {
+    return null;
+  }
+}
+
+async function emitFacebookLog(eventName, detail = {}, screen = null) {
+  const payload = {
+    provider: 'facebook',
+    device_platform: Platform.OS,
+    ...detail,
+  };
+
+  try {
+    console.info(`[facebook] ${eventName}`, payload);
+  } catch {}
+
+  await Promise.allSettled([
+    dbg(eventName, payload, 'facebook'),
+    trackEvent({ eventName, screen, metadata: payload }),
+  ]);
+}
 
 export function getFacebookRedirectUrl() {
   const created = Linking.createURL('auth/callback');
@@ -141,6 +169,16 @@ export async function runFacebookOAuth({
   const common = { flowId, mode, screen };
 
   await storeFlowState({ flowId, mode, returnPath, currentUserId, startedAt });
+  await emitFacebookLog(
+    'facebook_link_start',
+    {
+      ...common,
+      target_url: null,
+      redirect_url: redirectUrl,
+      app_info: facebookAppInfo(),
+    },
+    screen
+  );
   await dbg('facebook_button_tapped', {
     ...common,
     ...facebookAppInfo(),
@@ -186,6 +224,18 @@ export async function runFacebookOAuth({
       : await supabase.auth.signInWithOAuth({ provider: 'facebook', options });
 
   if (response.error) {
+    await emitFacebookLog(
+      'facebook_link_failure',
+      {
+        ...common,
+        phase: 'oauth_request',
+        error: response.error?.message || 'Unknown OAuth error',
+        stack: sanitizeAuthError(response.error).stack,
+        redirect_url: redirectUrl,
+        target_url: null,
+      },
+      screen
+    );
     await dbg('facebook_oauth_request_failed', {
       ...common,
       ...sanitizeAuthError(response.error),
@@ -195,18 +245,67 @@ export async function runFacebookOAuth({
   }
 
   const authUrl = response.data?.url || null;
+  if (!redirectUrl) {
+    await emitFacebookLog(
+      'facebook_link_missing_redirect',
+      {
+        ...common,
+        target_url: authUrl,
+        redirect_url: null,
+      },
+      screen
+    );
+    throw new Error('Facebook redirect URL is missing');
+  }
+
+  await emitFacebookLog(
+    'facebook_link_open_url',
+    {
+      ...common,
+      target_url: authUrl,
+      redirect_url: redirectUrl,
+    },
+    screen
+  );
+
   await dbg('facebook_oauth_request_succeeded', {
     ...common,
     hasProviderUrl: Boolean(authUrl),
     providerUrl: authUrl ? describeUrl(authUrl) : null,
     elapsedMs: elapsedMs(startedAt),
   }, 'facebook');
-  if (!authUrl) throw new Error('No Facebook provider URL returned from Supabase');
+  if (!authUrl) {
+    await emitFacebookLog(
+      'facebook_link_failure',
+      {
+        ...common,
+        phase: 'oauth_url_missing',
+        error: 'No Facebook provider URL returned from Supabase',
+        stack: null,
+        target_url: null,
+        redirect_url: redirectUrl,
+      },
+      screen
+    );
+    throw new Error('No Facebook provider URL returned from Supabase');
+  }
 
   try {
     await WebBrowser.warmUpAsync?.();
     await WebBrowser.mayInitWithUrlAsync?.(authUrl);
   } catch (error) {
+    await emitFacebookLog(
+      'facebook_link_failure',
+      {
+        ...common,
+        phase: 'browser_warmup',
+        error: error?.message || 'Browser warmup failed',
+        stack: sanitizeAuthError(error).stack,
+        target_url: authUrl,
+        redirect_url: redirectUrl,
+      },
+      screen
+    );
     await dbg('facebook_browser_warmup_failed', {
       ...common,
       ...sanitizeAuthError(error),
@@ -223,6 +322,16 @@ export async function runFacebookOAuth({
     if (!url || !String(url).startsWith(redirectUrl)) return;
     observedRedirectUrl = url;
     AsyncStorage.setItem(OAUTH_RETURN_URL_KEY, url).catch(() => {});
+    emitFacebookLog(
+      'facebook_link_callback_received',
+      {
+        ...common,
+        callback: describeUrl(url),
+        target_url: authUrl,
+        redirect_url: redirectUrl,
+      },
+      screen
+    ).catch(() => {});
     dbg('facebook_redirect_deep_link_received', {
       ...common,
       callback: describeUrl(url),
@@ -240,6 +349,72 @@ export async function runFacebookOAuth({
 
   let result;
   try {
+    const nativeUrl = facebookNativeUrl(authUrl);
+    await emitFacebookLog(
+      'facebook_link_native_attempt',
+      {
+        ...common,
+        native_url: nativeUrl,
+        target_url: authUrl,
+        redirect_url: redirectUrl,
+      },
+      screen
+    );
+
+    if (nativeUrl) {
+      try {
+        await Linking.openURL(nativeUrl);
+        await Promise.race([redirectPromise, wait(NATIVE_FACEBOOK_GRACE_MS)]);
+        if (!observedRedirectUrl) {
+          await emitFacebookLog(
+            'facebook_link_timeout',
+            {
+              ...common,
+              phase: 'native_wait',
+              target_url: authUrl,
+              redirect_url: redirectUrl,
+            },
+            screen
+          );
+        }
+      } catch (error) {
+        await emitFacebookLog(
+          'facebook_link_failure',
+          {
+            ...common,
+            phase: 'native_open',
+            error: error?.message || 'Native Facebook app open failed',
+            stack: sanitizeAuthError(error).stack,
+            target_url: authUrl,
+            redirect_url: redirectUrl,
+          },
+          screen
+        );
+      }
+    }
+
+    if (observedRedirectUrl) {
+      await AsyncStorage.setItem(OAUTH_RETURN_URL_KEY, observedRedirectUrl);
+      await dbg('facebook_callback_handoff_ready', {
+        ...common,
+        callback: describeUrl(observedRedirectUrl),
+        elapsedMs: elapsedMs(startedAt),
+      }, 'facebook');
+      return { outcome: 'callback', callbackUrl: observedRedirectUrl, flowId, startedAt };
+    }
+
+    if (!observedRedirectUrl) {
+      await emitFacebookLog(
+        'facebook_link_browser_opened',
+        {
+          ...common,
+          target_url: authUrl,
+          redirect_url: redirectUrl,
+        },
+        screen
+      );
+    }
+
     result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
     await dbg('facebook_browser_session_result', {
       ...common,
@@ -260,6 +435,18 @@ export async function runFacebookOAuth({
       await Promise.race([redirectPromise, wait(ANDROID_REDIRECT_GRACE_MS)]);
     }
   } catch (error) {
+    await emitFacebookLog(
+      'facebook_link_failure',
+      {
+        ...common,
+        phase: 'browser_session',
+        error: error?.message || 'Browser session failed',
+        stack: sanitizeAuthError(error).stack,
+        target_url: authUrl,
+        redirect_url: redirectUrl,
+      },
+      screen
+    );
     await dbg('facebook_browser_session_error', {
       ...common,
       ...sanitizeAuthError(error),
@@ -286,6 +473,31 @@ export async function runFacebookOAuth({
 
   const outcome =
     result?.type === 'cancel' || result?.type === 'dismiss' ? 'cancelled' : 'failed';
+  if (outcome === 'cancelled') {
+    await emitFacebookLog(
+      'facebook_link_cancelled',
+      {
+        ...common,
+        browser_result_type: result?.type || null,
+        target_url: authUrl,
+        redirect_url: redirectUrl,
+        observed_redirect: Boolean(observedRedirectUrl),
+      },
+      screen
+    );
+  } else {
+    await emitFacebookLog(
+      'facebook_link_timeout',
+      {
+        ...common,
+        browser_result_type: result?.type || null,
+        target_url: authUrl,
+        redirect_url: redirectUrl,
+        observed_redirect: Boolean(observedRedirectUrl),
+      },
+      screen
+    );
+  }
   await dbg('facebook_flow_finished', {
     ...common,
     outcome,

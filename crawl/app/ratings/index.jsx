@@ -1,7 +1,8 @@
 // app/ratings/index.jsx
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
-import { View, FlatList, RefreshControl, StyleSheet, ScrollView, DeviceEventEmitter } from 'react-native';
+import { View, FlatList, RefreshControl, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   ActivityIndicator,
   Card,
@@ -17,6 +18,7 @@ import {
 } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { supabase } from '../../lib/supabase.js';
+import { trackEvent } from '../../lib/analytics';
 import { useLocationCtx } from '../../providers/LocationProvider';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
@@ -58,6 +60,8 @@ const deriveStateCode = (address) => {
 
   return null;
 };
+
+const TAG_FILTER_STORAGE_KEY = 'buffago:wingdex:selected_tags';
 
 /* ---------- compact UI bits for the drill-down ---------- */
 function ScoreHeader({ value }) {
@@ -176,11 +180,10 @@ export default function PublicRatingsScreen() {
   const [rows, setRows] = useState([]);
 
   const [tagNameById, setTagNameById] = useState({});
-  // selectedTagId:
-  // - null       => no specific tag filter
-  // - 'my'       => only places you've rated, sorted by your rating desc
-  // - number(id) => filter by that tag, sort by overall score desc
-  const [selectedTagId, setSelectedTagId] = useState(null);
+  const [selectedTagIds, setSelectedTagIds] = useState([]);
+  const [tagFilterOpen, setTagFilterOpen] = useState(false);
+  const [ratedByMeOnly, setRatedByMeOnly] = useState(false);
+  const tagFilterOpenPrevRef = useRef(false);
 
   // Derived from GPS + nearest destination; used to filter by state via address
   const [currentState, setCurrentState] = useState(null);
@@ -201,15 +204,6 @@ export default function PublicRatingsScreen() {
 
   const [openMap, setOpenMap] = useState(false);
   const allMapRef = useRef(null);
-
-  useEffect(() => {
-  const sub = DeviceEventEmitter.addListener('buffago:coins_refresh', async () => {
-    // call whatever you already use to load coin balance
-    await refreshCoins(); // <-- replace with your actual function name
-  });
-
-    return () => sub.remove();
-  }, [refreshCoins]);
   
 
   // ✅ Apply Home->Ratings parameters:
@@ -228,19 +222,72 @@ export default function PublicRatingsScreen() {
     // Apply query
     if (qParam) setQuery(String(qParam));
 
-    // Apply tag
-    if (!tagParam || tagParam === 'all') setSelectedTagId(null);
-    else if (tagParam === 'my') setSelectedTagId('my');
-    else {
+    // Apply legacy tag params as a single preselected tag.
+    if (!tagParam || tagParam === 'all') {
+      setSelectedTagIds([]);
+      setRatedByMeOnly(false);
+    } else if (tagParam === 'my') {
+      setRatedByMeOnly(true);
+    } else {
       const n = Number(tagParam);
-      if (Number.isFinite(n)) setSelectedTagId(n);
-      else setSelectedTagId(null);
+      if (Number.isFinite(n)) setSelectedTagIds([n]);
+      else setSelectedTagIds([]);
     }
 
     // Close any open dialogs; user is coming from another screen
     setOpen(false);
     setActive(null);
   }, [qParam, tagParam]);
+
+  useEffect(() => {
+    let alive = true;
+
+    (async () => {
+      try {
+        const raw = await AsyncStorage.getItem(TAG_FILTER_STORAGE_KEY);
+        if (!alive || !raw) return;
+
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return;
+
+        const ids = Array.from(
+          new Set(
+            parsed
+              .map((v) => Number(v))
+              .filter((v) => Number.isFinite(v))
+          )
+        );
+        if (ids.length) setSelectedTagIds(ids);
+      } catch {
+        // Ignore corrupt persisted state.
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    AsyncStorage.setItem(TAG_FILTER_STORAGE_KEY, JSON.stringify(selectedTagIds)).catch(() => {});
+  }, [selectedTagIds]);
+
+  useEffect(() => {
+    if (!tagFilterOpen || tagFilterOpenPrevRef.current) {
+      tagFilterOpenPrevRef.current = tagFilterOpen;
+      return;
+    }
+    tagFilterOpenPrevRef.current = true;
+    trackEvent({
+      eventName: 'wingdex_tag_filter_opened',
+      screen: 'ratings',
+      metadata: {
+        selected_tags: Array.from(selectedTagSet).map((id) => tagNameById[id] ?? String(id)),
+        state: useStateFilter ? currentState : null,
+        distance: useStateFilter ? null : radiusMiles,
+      },
+    });
+  }, [currentState, radiusMiles, selectedTagSet, tagFilterOpen, tagNameById, useStateFilter]);
 
   const statusColorFor = useCallback(
     (destinationId) => {
@@ -263,7 +310,7 @@ export default function PublicRatingsScreen() {
         });
       }
     });
-  }, []); // filtered captured from render; no dep to avoid loops
+  }, [filtered]);
 
   /* ---------- FACET PIPELINE ---------- */
 
@@ -285,12 +332,6 @@ export default function PublicRatingsScreen() {
       data = data.filter((r) => (r.name || '').toLowerCase().includes(q));
     }
 
-    // ignore 'my' here so tags reflect full set; only apply when a numeric tag is selected
-    if (typeof selectedTagId === 'number') {
-      const tagIdStr = String(selectedTagId);
-      data = data.filter((r) => r.countsByTag && Number(r.countsByTag[tagIdStr]) > 0);
-    }
-
     return data;
   }, [
     rows,
@@ -298,7 +339,6 @@ export default function PublicRatingsScreen() {
     coords?.latitude,
     coords?.longitude,
     query,
-    selectedTagId,
     useStateFilter,
     currentState,
   ]);
@@ -325,6 +365,18 @@ export default function PublicRatingsScreen() {
       .slice(0, 25);
   }, [rowsForFacetCounts, tagNameById]);
 
+  const selectedTagSet = useMemo(() => new Set(selectedTagIds.map((id) => Number(id)).filter(Number.isFinite)), [selectedTagIds]);
+
+  const activeTagSummary = useMemo(() => {
+    if (!selectedTagSet.size) return 'Any tag';
+    const names = Array.from(selectedTagSet)
+      .map((id) => tagNameById[id] ?? `Tag ${id}`)
+      .slice(0, 3);
+    return names.length === 0
+      ? 'Any tag'
+      : `${names.join(', ')}${selectedTagSet.size > names.length ? '…' : ''}`;
+  }, [selectedTagSet, tagNameById]);
+
   /* ---------- MAIN LIST (FILTER + SORT) ---------- */
 
   const filtered = useMemo(() => {
@@ -345,8 +397,7 @@ export default function PublicRatingsScreen() {
       data = data.filter((r) => (r.name || '').toLowerCase().includes(q));
     }
 
-    // "Rated by you": only those, sort by your avg (fallback overall)
-    if (selectedTagId === 'my') {
+    if (ratedByMeOnly) {
       return data
         .filter((r) => r.ratedByMe)
         .slice()
@@ -357,11 +408,16 @@ export default function PublicRatingsScreen() {
         });
     }
 
-    // concrete tag: filter, sort by overall weighted desc
-    if (typeof selectedTagId === 'number') {
-      const tagIdStr = String(selectedTagId);
+    const hasSelectedTags = selectedTagSet.size > 0;
+    if (hasSelectedTags) {
       return data
-        .filter((r) => r.countsByTag && Number(r.countsByTag[tagIdStr]) > 0)
+        .filter((r) => {
+          const counts = r.countsByTag || {};
+          for (const tagId of selectedTagSet) {
+            if (Number(counts[String(tagId)] ?? 0) > 0) return true;
+          }
+          return false;
+        })
         .slice()
         .sort((a, b) => (b.avgWeight ?? 0) - (a.avgWeight ?? 0));
     }
@@ -386,7 +442,8 @@ export default function PublicRatingsScreen() {
   }, [
     rows,
     query,
-    selectedTagId,
+    selectedTagSet,
+    ratedByMeOnly,
     radiusMiles,
     coords?.latitude,
     coords?.longitude,
@@ -755,17 +812,19 @@ export default function PublicRatingsScreen() {
 
             {/* Tag context */}
             {hasRatings ? (
-              typeof selectedTagId === 'number' ? (
+              selectedTagSet.size > 0 ? (
                 (() => {
-                  const tagIdStr = String(selectedTagId);
-                  const cnt = Number(item.countsByTag?.[tagIdStr] ?? 0);
-                  const tagName =
-                    tagsForFilter.find((t) => t.id === selectedTagId)?.name ?? 'Tag';
+                  const tags = Array.from(selectedTagSet).slice(0, 3);
+                  const matchedCount = tags.reduce((sum, id) => sum + Number(item.countsByTag?.[String(id)] ?? 0), 0);
                   return (
                     <Text variant="bodySmall" style={styles.tagLine}>
-                      {tagName}:{' '}
-                      <Text style={styles.tagHighlight}>{cnt}</Text> tagged rating
-                      {cnt === 1 ? '' : 's'}
+                      Matches {selectedTagSet.size > 1 ? 'tags' : 'tag'}:{' '}
+                      <Text style={styles.tagHighlight}>
+                        {tags.map((id) => tagNameById[id] ?? 'Tag').join(', ')}
+                      </Text>
+                      {' · '}
+                      <Text style={styles.tagHighlight}>{matchedCount}</Text> rating
+                      {matchedCount === 1 ? '' : 's'}
                     </Text>
                   );
                 })()
@@ -830,11 +889,73 @@ export default function PublicRatingsScreen() {
   };
 
   const sortLabel =
-    selectedTagId === 'my'
+    ratedByMeOnly
       ? 'your ratings (highest first)'
-      : typeof selectedTagId === 'number'
-      ? 'overall score for tag'
+      : selectedTagSet.size > 0
+      ? 'overall score for selected tags'
       : 'overall score';
+
+  useEffect(() => {
+    trackEvent({
+      eventName: 'wingdex_filtered_results_count',
+      screen: 'ratings',
+      metadata: {
+        selected_tags: Array.from(selectedTagSet).map((id) => tagNameById[id] ?? String(id)),
+        state: useStateFilter ? currentState : null,
+        distance: useStateFilter ? null : radiusMiles,
+        result_count: filtered.length,
+        search: query || null,
+        rated_by_me_only: ratedByMeOnly,
+      },
+    });
+  }, [filtered.length, currentState, query, ratedByMeOnly, radiusMiles, selectedTagSet, tagNameById, useStateFilter]);
+
+  const toggleTagSelection = useCallback(
+    (tagId) => {
+      setTagFilterOpen(true);
+      trackEvent({
+        eventName: selectedTagSet.has(tagId) ? 'wingdex_tag_deselected' : 'wingdex_tag_selected',
+        screen: 'ratings',
+        metadata: {
+          selected_tags: selectedTagSet.has(tagId)
+            ? Array.from(selectedTagSet)
+                .filter((id) => id !== tagId)
+                .map((id) => tagNameById[id] ?? String(id))
+            : Array.from(new Set([...selectedTagSet, tagId])).map((id) => tagNameById[id] ?? String(id)),
+          state: useStateFilter ? currentState : null,
+          distance: useStateFilter ? null : radiusMiles,
+          tag_id: tagId,
+        },
+      });
+
+      setSelectedTagIds((prev) => {
+        const next = new Set(prev.map((id) => Number(id)).filter(Number.isFinite));
+        if (next.has(tagId)) next.delete(tagId);
+        else next.add(tagId);
+        return Array.from(next).sort((a, b) => a - b);
+      });
+    },
+    [currentState, radiusMiles, selectedTagSet, tagNameById, useStateFilter]
+  );
+
+  const clearFilters = useCallback(() => {
+    setSelectedTagIds([]);
+    setRatedByMeOnly(false);
+    setQuery('');
+    setUseStateFilter(false);
+    setRadiusMiles(100);
+    setTagFilterOpen(false);
+    trackEvent({
+      eventName: 'wingdex_tag_filter_cleared',
+      screen: 'ratings',
+      metadata: {
+        selected_tags: [],
+        state: null,
+        distance: 100,
+        result_count: rows.length,
+      },
+    });
+  }, [rows.length]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
@@ -897,44 +1018,77 @@ export default function PublicRatingsScreen() {
           ))}
         </ScrollView>
 
-        {/* Tag + "Rated by you" filters */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{ marginTop: 6 }}
-          contentContainerStyle={{ paddingRight: 16 }}
-        >
-          <Chip
-            selected={selectedTagId == null}
-            onPress={() => setSelectedTagId(null)}
-            style={styles.chip}
-          >
-            All tags
-          </Chip>
+        <View style={styles.tagFilterPanel}>
+          <View style={styles.tagFilterHeader}>
+            <Pressable
+              onPress={() => setTagFilterOpen((prev) => !prev)}
+              style={({ pressed }) => [styles.tagFilterToggle, pressed && { opacity: 0.85 }]}
+            >
+              <View style={{ flex: 1 }}>
+                <Text style={styles.tagFilterTitle}>Tags</Text>
+                <Text style={styles.tagFilterSubtitle} numberOfLines={1}>
+                  {activeTagSummary}
+                </Text>
+              </View>
+              <Text style={styles.tagFilterChevron}>{tagFilterOpen ? '▴' : '▾'}</Text>
+            </Pressable>
 
-          <Chip
-            selected={selectedTagId === 'my'}
-            onPress={() =>
-              setSelectedTagId(selectedTagId === 'my' ? null : 'my')
-            }
-            style={styles.chip}
-          >
-            Rated by you
-          </Chip>
+            <Button compact mode="text" onPress={clearFilters} style={styles.clearBtn}>
+              Clear Filters
+            </Button>
+          </View>
 
-          {tagsForFilter.map((t) => (
+          <View style={styles.tagFilterControls}>
             <Chip
-              key={t.id}
-              selected={selectedTagId === t.id}
-              onPress={() =>
-                setSelectedTagId(selectedTagId === t.id ? null : t.id)
-              }
+              selected={ratedByMeOnly}
+              onPress={() => setRatedByMeOnly((prev) => !prev)}
               style={styles.chip}
             >
-              {t.name} ({t.distinctCount})
+              Rated by you
             </Chip>
-          ))}
-        </ScrollView>
+            {!tagFilterOpen && selectedTagSet.size === 0 ? (
+              <Text style={styles.tagFilterHint}>Open tags to narrow results by flavor profile.</Text>
+            ) : null}
+          </View>
+
+          {tagFilterOpen ? (
+            <View style={styles.tagChipWrap}>
+              <Chip
+                selected={selectedTagIds.length === 0}
+                onPress={() => {
+                  setSelectedTagIds([]);
+                  trackEvent({
+                    eventName: 'wingdex_tag_filter_cleared',
+                    screen: 'ratings',
+                    metadata: {
+                      selected_tags: [],
+                      state: useStateFilter ? currentState : null,
+                      distance: useStateFilter ? null : radiusMiles,
+                      result_count: filtered.length,
+                    },
+                  });
+                }}
+                style={styles.chip}
+              >
+                All tags
+              </Chip>
+
+              {tagsForFilter.map((t) => {
+                const selected = selectedTagSet.has(t.id);
+                return (
+                  <Chip
+                    key={t.id}
+                    selected={selected}
+                    onPress={() => toggleTagSelection(t.id)}
+                    style={styles.chip}
+                  >
+                    {t.name} ({t.distinctCount})
+                  </Chip>
+                );
+              })}
+            </View>
+          ) : null}
+        </View>
       </View>
 
       {loading ? (
@@ -1272,6 +1426,53 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   tagChip: { borderRadius: 999 },
+  tagFilterPanel: {
+    marginTop: 6,
+    gap: 8,
+  },
+  tagFilterHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  tagFilterToggle: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 14,
+    backgroundColor: 'rgba(127,127,127,0.08)',
+  },
+  tagFilterTitle: {
+    fontWeight: '900',
+    fontSize: 14,
+  },
+  tagFilterSubtitle: {
+    opacity: 0.72,
+    fontSize: 12,
+    marginTop: 2,
+  },
+  tagFilterChevron: {
+    fontSize: 16,
+    fontWeight: '900',
+    opacity: 0.7,
+  },
+  tagFilterControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flexWrap: 'wrap',
+  },
+  tagFilterHint: {
+    opacity: 0.68,
+    fontSize: 12,
+    flexShrink: 1,
+  },
+  clearBtn: {
+    borderRadius: 999,
+  },
 
   inlineChipWrap: { marginTop: 6 },
   youRatedChip: { borderRadius: 999 },

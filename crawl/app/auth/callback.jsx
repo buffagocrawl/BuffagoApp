@@ -1,6 +1,6 @@
 ﻿// app/auth/callback.jsx
 import { useEffect, useRef, useState } from 'react';
-import { View, ActivityIndicator, Text } from 'react-native';
+import { View, ActivityIndicator, Text, Platform } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as Linking from 'expo-linking';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -330,7 +330,51 @@ export default function AuthCallback() {
             { flowId, mode: flowMode, elapsedMs: Date.now() - flowStartedAt },
             flowMode ? 'facebook' : 'auth'
           );
+          if (flowMode) {
+            await dbg(
+              'facebook_link_missing_redirect',
+              {
+                flowId,
+                mode: flowMode,
+                device_platform: Platform.OS,
+                elapsedMs: Date.now() - flowStartedAt,
+              },
+              'facebook'
+            );
+            await trackEvent({
+              eventName: 'facebook_link_missing_redirect',
+              screen: 'auth/callback',
+              metadata: {
+                flow_id: flowId,
+                mode: flowMode,
+                device_platform: Platform.OS,
+              },
+            });
+          }
           throw new Error('No OAuth callback URL found');
+        }
+
+        if (flowMode) {
+          await dbg(
+            'facebook_link_callback_received',
+            {
+              flowId,
+              mode: flowMode,
+              callback: describeUrl(url),
+              device_platform: Platform.OS,
+              elapsedMs: Date.now() - flowStartedAt,
+            },
+            'facebook'
+          );
+          await trackEvent({
+            eventName: 'facebook_link_callback_received',
+            screen: 'auth/callback',
+            metadata: {
+              flow_id: flowId,
+              mode: flowMode,
+              device_platform: Platform.OS,
+            },
+          });
         }
 
         const returnPath = (await AsyncStorage.getItem(OAUTH_RETURN_PATH_KEY)) || null;
@@ -518,6 +562,31 @@ export default function AuthCallback() {
                 newly_connected: savedFacebook.newlyConnected,
               },
             });
+            await dbg(
+              'facebook_link_success',
+              {
+                flowId,
+                mode: flowMode,
+                userId: user.id,
+                persistedConnected: savedFacebook.connected,
+                newlyConnected: savedFacebook.newlyConnected,
+                device_platform: Platform.OS,
+                elapsedMs: Date.now() - flowStartedAt,
+              },
+              'facebook'
+            );
+            await trackEvent({
+              eventName: 'facebook_link_success',
+              screen: 'auth/callback',
+              userId: user.id,
+              metadata: {
+                flow_id: flowId,
+                mode: flowMode,
+                persisted_connected: savedFacebook.connected,
+                newly_connected: savedFacebook.newlyConnected,
+                device_platform: Platform.OS,
+              },
+            });
 
             if (savedFacebook.newlyConnected) {
               await grantFacebookLinkRewardOnce(user.id);
@@ -568,6 +637,32 @@ export default function AuthCallback() {
       } catch (e) {
         const msg = String(e?.message || e);
         console.warn('OAuth callback failed', msg);
+        if (flowMode) {
+          await dbg(
+            'facebook_link_failure',
+            {
+              flowId,
+              mode: flowMode,
+              provider: 'facebook',
+              device_platform: Platform.OS,
+              ...sanitizeAuthError(e),
+              elapsedMs: Date.now() - flowStartedAt,
+              callbackProcessingMs: Date.now() - callbackStartedAt,
+            },
+            'facebook'
+          );
+          await trackEvent({
+            eventName: 'facebook_link_failure',
+            screen: 'auth/callback',
+            metadata: {
+              flow_id: flowId,
+              mode: flowMode,
+              provider: 'facebook',
+              device_platform: Platform.OS,
+              ...sanitizeAuthError(e),
+            },
+          });
+        }
         await dbg(
           flowMode ? 'facebook_flow_finished' : 'oauth_callback_failed',
           {

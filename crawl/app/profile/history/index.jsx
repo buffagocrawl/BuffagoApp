@@ -2,15 +2,15 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ProfileWelcomeWizard from '../../../components/ProfileWelcomeWizard';
-import { View, FlatList, StyleSheet, ScrollView, RefreshControl, Alert } from 'react-native';
+import { View, FlatList, StyleSheet, ScrollView, RefreshControl, Alert, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { TouchableOpacity } from 'react-native';
 import { ActivityIndicator, Card, Text, Button, Divider, ProgressBar, useTheme } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../../../lib/supabase.js';
 import { trackEvent } from '../../../lib/analytics';
 import FriendProfileActions from '../../../components/FriendProfileActions';
+import ScreenHeader from '../../../components/ScreenHeader';
 
 /* ---------------- helpers ---------------- */
 
@@ -98,6 +98,8 @@ export default function HistoryIndex() {
   const isDark = !!theme.dark;
 
   const didInitialLoadRef = useRef(false);
+  const journeyOpenedAtRef = useRef(Date.now());
+  const journeyRenderTrackedRef = useRef(false);
 
   const cardBg = theme.colors.elevation?.level2 ?? (isDark ? '#1f1f1f' : '#f7f7f8');
   const surfaceBg = theme.colors.surface;
@@ -613,6 +615,42 @@ export default function HistoryIndex() {
   const hasCompletedCrawls = completedCrawls.length > 0;
   const hasRatings = ratings.length > 0;
 
+  useFocusEffect(
+    useCallback(() => {
+      journeyOpenedAtRef.current = Date.now();
+      journeyRenderTrackedRef.current = false;
+
+      trackEvent({
+        eventName: 'journey_screen_viewed',
+        screen: 'journey',
+        userId: session?.user?.id ?? null,
+        metadata: {
+          viewing_self: isViewingSelf,
+          has_view_user_id: Boolean(viewUserId),
+          source_surface: toStr(params?.sourceSurface) || 'journey_tab',
+        },
+      });
+
+      return undefined;
+    }, [isViewingSelf, params?.sourceSurface, session?.user?.id, viewUserId])
+  );
+
+  const handleRootLayout = useCallback(() => {
+    if (journeyRenderTrackedRef.current) return;
+    journeyRenderTrackedRef.current = true;
+
+    trackEvent({
+      eventName: 'journey_screen_render_time',
+      screen: 'journey',
+      userId: session?.user?.id ?? null,
+      metadata: {
+        render_time_ms: Math.max(0, Date.now() - journeyOpenedAtRef.current),
+        viewing_self: isViewingSelf,
+        has_view_user_id: Boolean(viewUserId),
+      },
+    });
+  }, [isViewingSelf, session?.user?.id, viewUserId]);
+
   const handleDeleteCrawl = useCallback(async (crawl_id) => {
     setCrawls((arr) => arr.filter((c) => c.crawl_id !== crawl_id));
 
@@ -854,38 +892,32 @@ export default function HistoryIndex() {
 
   return (
     <HistoryErrorBoundary fallback={fallbackUI}>
-      <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-        {authReady && wizardChecked && wizardVisible && (isViewingSelf || !session?.user?.id) && (
-          <ProfileWelcomeWizard visible onDone={markProfileWizardSeen} onSkip={markProfileWizardSeen} />
-        )}
+      <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }} edges={['top']}>
+        <View style={{ flex: 1 }} onLayout={handleRootLayout}>
+          {authReady && wizardChecked && wizardVisible && (isViewingSelf || !session?.user?.id) && (
+            <ProfileWelcomeWizard visible onDone={markProfileWizardSeen} onSkip={markProfileWizardSeen} />
+          )}
 
-        <View style={styles.header}>
-          <Text variant="headlineSmall" style={styles.title}>
-            {headerTitle}
-          </Text>
-          <Text variant="bodySmall" style={styles.subtitle}>
-            {headerSubtitle}
-          </Text>
-        </View>
+          <ScreenHeader title={headerTitle} subtitle={headerSubtitle} />
 
-        {!isViewingSelf && session?.user?.id && viewUserProfile?.user_id ? (
-          <FriendProfileActions
-            targetUserId={viewUserProfile.user_id}
-            sourceSurface={toStr(params?.sourceSurface) || 'profile'}
-          />
-        ) : null}
+          {!isViewingSelf && session?.user?.id && viewUserProfile?.user_id ? (
+            <FriendProfileActions
+              targetUserId={viewUserProfile.user_id}
+              sourceSurface={toStr(params?.sourceSurface) || 'profile'}
+            />
+          ) : null}
 
-        {loading ? (
-          <View style={styles.center}>
-            <ActivityIndicator />
-          </View>
-        ) : (
-          <ScrollView
-            style={{ flex: 1 }}
-            contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-            keyboardShouldPersistTaps="handled"
-          >
+          {loading ? (
+            <View style={styles.center}>
+              <ActivityIndicator />
+            </View>
+          ) : (
+            <ScrollView
+              style={{ flex: 1 }}
+              contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
+              refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+              keyboardShouldPersistTaps="handled"
+            >
             <View style={styles.tilesRow}>
               <TouchableOpacity
                 activeOpacity={hasCompletedCrawls ? 0.7 : 1}
@@ -1104,114 +1136,115 @@ export default function HistoryIndex() {
               </View>
             </View>
 
-            <View style={{ marginTop: 16 }}>
-              {isViewingSelf && (
-                <Button
-                  mode="contained-tonal"
-                  icon="trophy"
-                  style={{ borderRadius: 12, marginBottom: 10 }}
-                  contentStyle={{ paddingVertical: 6 }}
-                  onPress={() => {
-                    trackEvent({
-                      eventName: 'badge_viewed',
-                      screen: 'profile_history',
-                      userId: session?.user?.id ?? null,
-                      metadata: { source_screen: 'profile_history', badge_id: null },
-                    });
-                    router.push('/profile/history/BadgesScreen');
-                  }}
-                >
-                  Badges
-                </Button>
-              )}
+              <View style={{ marginTop: 16 }}>
+                {isViewingSelf && (
+                  <Button
+                    mode="contained-tonal"
+                    icon="trophy"
+                    style={{ borderRadius: 12, marginBottom: 10 }}
+                    contentStyle={{ paddingVertical: 6 }}
+                    onPress={() => {
+                      trackEvent({
+                        eventName: 'badge_viewed',
+                        screen: 'profile_history',
+                        userId: session?.user?.id ?? null,
+                        metadata: { source_screen: 'profile_history', badge_id: null },
+                      });
+                      router.push('/profile/history/BadgesScreen');
+                    }}
+                  >
+                    Badges
+                  </Button>
+                )}
 
-              {isViewingSelf && (
-                <Button
-                  mode="outlined"
-                  style={{ borderRadius: 12 }}
-                  contentStyle={{ paddingVertical: 6 }}
-                  onPress={async () => {
-                    if (viewUserId) await fetchAll(viewUserId);
-                    setDialogMode('active');
-                    setDialogOpen(true);
-                  }}
-                  disabled={activeCrawls.length === 0}
-                >
-                  In Progress Crawls
-                </Button>
-              )}
-            </View>
-          </ScrollView>
-        )}
-
-        {/* ✅ iOS-safe: unmount the overlay completely when closed */}
-        {dialogOpen ? (
-          <Card style={[styles.dialogCard, { backgroundColor: surfaceBg }]}>
-            <View style={styles.dialogHeader}>
-              <TouchableOpacity
-                onPress={() => setDialogOpen(false)}
-                activeOpacity={0.7}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                style={styles.dialogBackBtn}
-              >
-                <MaterialCommunityIcons name="arrow-left" size={26} color={theme.colors.primary} />
-              </TouchableOpacity>
-
-              <Text variant="titleMedium" numberOfLines={1} style={styles.dialogTitle}>
-                {dialogMode === 'active'
-                  ? 'In Progress Crawls'
-                  : dialogMode === 'completed'
-                  ? 'Completed Crawls'
-                  : 'Your Ratings (YTD)'}
-              </Text>
-
-              <View style={styles.dialogRightSpacer} />
-            </View>
-
-            <Divider />
-
-            {dialogMode === 'ratings' ? (
-              (() => {
-                const ytdRatings = ratings.filter((r) => {
-                  const d = r?.created_at ? new Date(r.created_at) : null;
-                  return d && !isNaN(d) && d.getFullYear() === nowYear;
-                });
-
-                if (!ytdRatings.length) {
-                  return (
-                    <View style={{ alignItems: 'center', padding: 16 }}>
-                      <Text>No ratings yet this year.</Text>
-                    </View>
-                  );
-                }
-
-                return (
-                  <FlatList
-                    data={ytdRatings}
-                    keyExtractor={(it, idx) =>
-                      `${String(it.destination_id ?? 'dest')}-${String(it.created_at ?? idx)}-${idx}`
-                    }
-                    renderItem={({ item }) => <RatingRow item={item} />}
-                    ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
-                    contentContainerStyle={{ padding: 12, paddingBottom: 16 }}
-                  />
-                );
-              })()
-            ) : listForDialog.length === 0 ? (
-              <View style={{ alignItems: 'center', padding: 16 }}>
-                <Text>No crawls in this bucket.</Text>
+                {isViewingSelf && (
+                  <Button
+                    mode="outlined"
+                    style={{ borderRadius: 12 }}
+                    contentStyle={{ paddingVertical: 6 }}
+                    onPress={async () => {
+                      if (viewUserId) await fetchAll(viewUserId);
+                      setDialogMode('active');
+                      setDialogOpen(true);
+                    }}
+                    disabled={activeCrawls.length === 0}
+                  >
+                    In Progress Crawls
+                  </Button>
+                )}
               </View>
-            ) : (
-              <FlatList
-                data={listForDialog}
-                keyExtractor={(it, idx) => String(it?.crawl_id ?? it?.destination_id ?? it?.created_at ?? idx)}
-                renderItem={({ item }) => <CrawlRow item={item} />}
-                ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
-                contentContainerStyle={{ padding: 12, paddingBottom: 16 }}
-              />
-            )}
-          </Card>
-        ) : null}
+            </ScrollView>
+          )}
+
+          {/* ✅ iOS-safe: unmount the overlay completely when closed */}
+          {dialogOpen ? (
+            <Card style={[styles.dialogCard, { backgroundColor: surfaceBg }]}>
+              <View style={styles.dialogHeader}>
+                <TouchableOpacity
+                  onPress={() => setDialogOpen(false)}
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  style={styles.dialogBackBtn}
+                >
+                  <MaterialCommunityIcons name="arrow-left" size={26} color={theme.colors.primary} />
+                </TouchableOpacity>
+
+                <Text variant="titleMedium" numberOfLines={1} style={styles.dialogTitle}>
+                  {dialogMode === 'active'
+                    ? 'In Progress Crawls'
+                    : dialogMode === 'completed'
+                    ? 'Completed Crawls'
+                    : 'Your Ratings (YTD)'}
+                </Text>
+
+                <View style={styles.dialogRightSpacer} />
+              </View>
+
+              <Divider />
+
+              {dialogMode === 'ratings' ? (
+                (() => {
+                  const ytdRatings = ratings.filter((r) => {
+                    const d = r?.created_at ? new Date(r.created_at) : null;
+                    return d && !isNaN(d) && d.getFullYear() === nowYear;
+                  });
+
+                  if (!ytdRatings.length) {
+                    return (
+                      <View style={{ alignItems: 'center', padding: 16 }}>
+                        <Text>No ratings yet this year.</Text>
+                      </View>
+                    );
+                  }
+
+                  return (
+                    <FlatList
+                      data={ytdRatings}
+                      keyExtractor={(it, idx) =>
+                        `${String(it.destination_id ?? 'dest')}-${String(it.created_at ?? idx)}-${idx}`
+                      }
+                      renderItem={({ item }) => <RatingRow item={item} />}
+                      ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+                      contentContainerStyle={{ padding: 12, paddingBottom: 16 }}
+                    />
+                  );
+                })()
+              ) : listForDialog.length === 0 ? (
+                <View style={{ alignItems: 'center', padding: 16 }}>
+                  <Text>No crawls in this bucket.</Text>
+                </View>
+              ) : (
+                <FlatList
+                  data={listForDialog}
+                  keyExtractor={(it, idx) => String(it?.crawl_id ?? it?.destination_id ?? it?.created_at ?? idx)}
+                  renderItem={({ item }) => <CrawlRow item={item} />}
+                  ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+                  contentContainerStyle={{ padding: 12, paddingBottom: 16 }}
+                />
+              )}
+            </Card>
+          ) : null}
+        </View>
       </SafeAreaView>
     </HistoryErrorBoundary>
   );
@@ -1222,10 +1255,6 @@ export default function HistoryIndex() {
 const ORANGE = '#FF6F00';
 
 const styles = StyleSheet.create({
-  header: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4 },
-  title: { fontWeight: '800' },
-  subtitle: { opacity: 0.7, marginTop: 2 },
-
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 
   card: { borderRadius: 16 },

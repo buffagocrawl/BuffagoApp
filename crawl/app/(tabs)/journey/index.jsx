@@ -5,14 +5,12 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActivityIndicator, Button, Text } from 'react-native-paper';
 import { supabase } from '../../../lib/supabase.js';
-import { useTheme } from 'react-native-paper';
 
 // ✅ app/(tabs)/journey -> app/profile/history
 import HistoryScreen from '../../profile/history/index.jsx';
 
 export default function JourneyTab() {
   const router = useRouter();
-  const theme = useTheme();
 
   const [ready, setReady] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
@@ -90,12 +88,6 @@ export default function JourneyTab() {
     );
   }
 
-  // ✅ Signed in: render History inside the tab (tab bar remains)
-  return (
- <SafeAreaView style={{ flex: 1 }} edges={['top']}>
-   <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }} edges={['top']}>
-     <HistoryScreen />
-   </SafeAreaView>
- </SafeAreaView>
-  );
+  // Signed in: HistoryScreen owns the header/layout and already handles safe area.
+  return <HistoryScreen />;
 }
