@@ -11,6 +11,8 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError, available_timezones
 from dotenv import load_dotenv
 import yaml
 
+from logging_utils import log_event
+
 BASE_DIR: Final[Path] = Path(__file__).resolve().parent
 ENV_FILE: Final[Path] = BASE_DIR / ".env"
 CONFIG_FILE: Final[Path] = BASE_DIR / "config.yaml"
@@ -308,21 +310,27 @@ def get_mode_plan(mode: str) -> ModePlan:
 
 
 def log_startup_state(logger: logging.Logger, config: JalapenoConfig, mode: str, env_loaded: bool) -> None:
-    logger.info("startup | agent=%s | mode=%s", config.agent_name, mode)
-    logger.info("env loaded | env_file=%s | loaded=%s", ENV_FILE, env_loaded)
-    logger.info("config file loaded | config_file=%s", CONFIG_FILE)
-    logger.info("config snapshot | %s", _public_snapshot(config))
-    logger.info("Facebook Page ID present: %s", bool(config.facebook_page_id))
-    logger.info("Instagram Business Account ID present: %s", bool(config.instagram_business_account_id))
-    logger.info("dry-run/test/production safety status | posting_allowed=%s", False)
+    log_event(logger, "startup", agent_name=config.agent_name, mode=mode)
+    log_event(logger, "env_loaded", env_file=ENV_FILE, loaded=env_loaded)
+    log_event(logger, "config_file_loaded", config_file=CONFIG_FILE)
+    log_event(logger, "config_snapshot", **_public_snapshot(config))
+    log_event(
+        logger,
+        "account_presence_checked",
+        facebook_page_id_present=bool(config.facebook_page_id),
+        instagram_business_account_id_present=bool(config.instagram_business_account_id),
+    )
+    log_event(logger, "safety_status", posting_allowed=False, dry_run=True)
 
 
 def log_mode_plan(logger: logging.Logger, plan: ModePlan) -> None:
-    logger.info(
-        "selected mode | mode=%s | blocked=%s | posting_allowed=%s | meta_api_allowed=%s | image_generation_allowed=%s",
-        plan.name,
-        plan.blocked,
-        plan.posting_allowed,
-        plan.meta_api_allowed,
-        plan.image_generation_allowed,
+    log_event(
+        logger,
+        "selected_mode",
+        mode=plan.name,
+        blocked=plan.blocked,
+        posting_allowed=plan.posting_allowed,
+        meta_api_allowed=plan.meta_api_allowed,
+        image_generation_allowed=plan.image_generation_allowed,
+        description=plan.description,
     )

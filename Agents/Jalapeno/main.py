@@ -17,10 +17,12 @@ from config import (
     validate_phase1_environment,
     warn_missing_future_secrets,
 )
+from logging_utils import log_event
+from validation import validate_phase2_environment
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Jalapeno Instagram agent Phase 1 runner")
+    parser = argparse.ArgumentParser(description="Jalapeno Instagram agent Phase 2 foundation runner")
     mode_group = parser.add_mutually_exclusive_group(required=True)
     mode_group.add_argument("--validate", action="store_true", help="Validate env and config without external calls")
     mode_group.add_argument("--dry-run", action="store_true", help="Log the planned work without publishing")
@@ -34,8 +36,10 @@ def run_validate() -> int:
     env_loaded = load_env_file()
     print(f"Env loaded: {env_loaded}")
     config = load_configuration()
+    logger = initialize_logging(config)
     validate_phase1_environment()
-    warn_missing_future_secrets()
+    validate_phase2_environment(config, logger=logger)
+    warn_missing_future_secrets(logger)
     print(f"Config loaded: {CONFIG_FILE}")
     print("Validation succeeded")
     print(f"Mode: {config.default_mode}")
@@ -52,9 +56,23 @@ def run_dry_run() -> int:
     log_startup_state(logger, config, plan.name, env_loaded)
     log_mode_plan(logger, plan)
     warn_missing_future_secrets(logger)
-    logger.info("dry-run schedule | timezone=%s | buffago_post_time=%s | meme_post_time=%s", config.timezone, config.buffago_post_time, config.meme_post_time)
-    logger.info("dry-run target accounts | facebook_page_id=%s | instagram_business_account_id=%s", config.facebook_page_id, config.instagram_business_account_id)
-    logger.info("dry-run safety status | publishing blocked=%s | meta endpoints skipped=%s", True, True)
+    log_event(logger, "dry_run_schedule_loaded", timezone=config.timezone, buffago_post_time=config.buffago_post_time, meme_post_time=config.meme_post_time)
+    log_event(
+        logger,
+        "dry_run_targets_loaded",
+        facebook_page_id_present=bool(config.facebook_page_id),
+        instagram_business_account_id_present=bool(config.instagram_business_account_id),
+    )
+    log_event(
+        logger,
+        "run_completed",
+        agent_name=config.agent_name,
+        stage="run",
+        status="skipped",
+        dry_run=True,
+        posting_blocked=True,
+        meta_endpoints_skipped=True,
+    )
     return 0
 
 
@@ -68,9 +86,27 @@ def run_test_mode() -> int:
     log_startup_state(logger, config, plan.name, env_loaded)
     log_mode_plan(logger, plan)
     warn_missing_future_secrets(logger)
+    log_event(logger, "candidate_generation_started", stage="candidate_generation", status="simulated", dry_run=True)
     for step in SIMULATION_STEPS:
         logger.info("test simulation step | step=%s", step)
-    logger.info("test safety status | posting disabled=%s | meta api disabled=%s | image generation disabled=%s", True, True, True)
+    log_event(
+        logger,
+        "candidate_generation_completed",
+        stage="candidate_generation",
+        status="simulated",
+        dry_run=True,
+    )
+    log_event(
+        logger,
+        "run_completed",
+        agent_name=config.agent_name,
+        stage="run",
+        status="completed",
+        dry_run=True,
+        posting_disabled=True,
+        meta_api_disabled=True,
+        image_generation_disabled=True,
+    )
     return 0
 
 

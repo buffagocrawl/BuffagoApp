@@ -21,6 +21,8 @@ from config import (  # noqa: E402
     warn_missing_future_secrets,
 )
 import config as config_module  # noqa: E402
+from logging_utils import format_structured_log, log_event  # noqa: E402
+from validation import validate_phase2_environment  # noqa: E402
 from main import build_parser, run_production_placeholder  # noqa: E402
 
 
@@ -162,3 +164,81 @@ def test_secrets_are_not_printed_in_logs(tmp_path: Path) -> None:
     output = stream.getvalue()
     for value in STRUCTURAL_ENV_VALUES.values():
         assert value not in output
+
+
+def test_structured_log_format_includes_key_value_fields() -> None:
+    message = format_structured_log(
+        "run_started",
+        run_id="abc",
+        agent_name="Jalapeno",
+        dry_run=True,
+        duration_ms=12,
+    )
+
+    assert message == "run_started | run_id=abc | agent_name=Jalapeno | dry_run=true | duration_ms=12"
+
+
+def test_phase2_validation_can_create_and_complete_a_run(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SUPABASE_URL", "https://example.supabase.co")
+    monkeypatch.setenv("SUPABASE_SERVICE_ROLE_KEY", "service-role-key")
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+
+    class FakeSupabaseClient:
+        def __init__(self) -> None:
+            self.inserted: list[dict[str, object]] = []
+            self.updated: list[dict[str, object]] = []
+
+        def table_exists(self, table_name: str) -> bool:
+            return table_name in {
+                "jalapeno_runs",
+                "jalapeno_post_candidates",
+                "jalapeno_posts",
+                "jalapeno_errors",
+                "jalapeno_post_metrics",
+                "jalapeno_settings",
+            }
+
+        def fetch_rows(self, table_name: str, *, filters=None, select="*"):
+            assert table_name == "jalapeno_settings"
+            return [
+                {"setting_key": "posting_enabled", "setting_value": False},
+                {"setting_key": "dry_run", "setting_value": True},
+                {"setting_key": "instagram_enabled", "setting_value": False},
+                {"setting_key": "buffago_post_time", "setting_value": "16:00"},
+                {"setting_key": "meme_post_time", "setting_value": "20:00"},
+                {"setting_key": "timezone", "setting_value": "America/New_York"},
+                {"setting_key": "text_model", "setting_value": "gpt-4.1-mini"},
+                {"setting_key": "image_model", "setting_value": "gpt-image-1"},
+                {"setting_key": "temperature", "setting_value": 0.7},
+                {"setting_key": "max_candidates", "setting_value": 5},
+                {"setting_key": "max_retries", "setting_value": 3},
+                {"setting_key": "prompt_version", "setting_value": "phase2-v1"},
+                {"setting_key": "workflow_version", "setting_value": "phase2-v1"},
+                {"setting_key": "default_hashtag_count", "setting_value": 8},
+                {"setting_key": "default_image_size", "setting_value": "1024x1024"},
+                {"setting_key": "storage_bucket", "setting_value": "jalapeno-media"},
+                {"setting_key": "metrics_collection_enabled", "setting_value": False},
+            ]
+
+        def insert_row(self, table_name: str, payload):
+            self.inserted.append({"table": table_name, "payload": payload})
+            run_id = payload.get("run_id", "00000000-0000-0000-0000-000000000000")
+            return [payload | {"run_id": run_id}]
+
+        def update_rows(self, table_name: str, filters, payload):
+            self.updated.append({"table": table_name, "filters": filters, "payload": payload})
+            return [payload]
+
+    fake_client = FakeSupabaseClient()
+    stream = StringIO()
+    logger = initialize_logging(replace(config, log_directory=PROJECT_DIR / "logs"), stream=stream)
+
+    result = validate_phase2_environment(config, logger=logger, client=fake_client)  # type: ignore[arg-type]
+
+    assert result.connected is True
+    assert result.validation_run_id is not None
+    assert any(item["table"] == "jalapeno_runs" for item in fake_client.inserted)
+    assert any(item["table"] == "jalapeno_runs" for item in fake_client.updated)
+    output = stream.getvalue()
+    assert "validation_started" in output
+    assert "validation_completed" in output
