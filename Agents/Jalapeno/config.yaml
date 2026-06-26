@@ -1,0 +1,18 @@
+agent:
+  name: Jalapeno
+  channel: instagram
+  brand: Buffago
+
+timezone: America/New_York
+
+posting:
+  buffago_post_time: "16:00"
+  meme_post_time: "20:00"
+
+runtime:
+  default_mode: dry-run
+  test_mode_never_posts: true
+
+logging:
+  level: INFO
+  directory: logs
