@@ -1,0 +1,33 @@
+{
+  "candidate_count_min": 5,
+  "candidate_count_max": 10,
+  "preferred_candidate_count": 7,
+  "duplicate_similarity_threshold": 0.72,
+  "scoring_weights": {
+    "originality": 20,
+    "likelihood_of_engagement": 20,
+    "brand_fit": 15,
+    "uses_recent_buffago_activity": 10,
+    "current_relevance": 10,
+    "visual_potential": 10,
+    "conversation_starter": 5,
+    "gamification_potential": 5,
+    "cta_quality": 5
+  },
+  "memory_adjustments": {
+    "diversity_bonus": 6,
+    "theme_rotation_bonus": 4,
+    "seasonal_bonus": 4,
+    "community_activity_bonus": 4,
+    "freshness_bonus": 4,
+    "unexpectedness_bonus": 3,
+    "recent_trend_bonus": 4,
+    "recently_used_theme_penalty": 6,
+    "recently_used_cta_penalty": 4,
+    "recently_used_restaurant_penalty": 5,
+    "recently_used_caption_style_penalty": 3,
+    "recently_used_hook_penalty": 3,
+    "recently_used_visual_style_penalty": 3,
+    "duplicate_penalty": 35
+  }
+}

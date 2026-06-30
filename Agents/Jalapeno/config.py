@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import logging
 import os
+import re
+import tempfile
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -26,7 +28,6 @@ REQUIRED_ENV_VARS: Final[tuple[str, ...]] = (
 )
 
 FUTURE_SECRET_ENV_VARS: Final[tuple[str, ...]] = (
-    "OPENAI_API_KEY",
     "SUPABASE_SERVICE_ROLE_KEY",
     "META_APP_SECRET",
     "META_LONG_LIVED_ACCESS_TOKEN",
@@ -59,6 +60,85 @@ class JalapenoConfig:
     log_directory: Path
     facebook_page_id: str
     instagram_business_account_id: str
+    image: "ImageConfig"
+    branding: "BrandingConfig"
+    storage: "StorageConfig"
+    cleanup: "CleanupConfig"
+    instagram: "InstagramConfig"
+    publishing: "PublishingConfig"
+    notifications: "NotificationsConfig"
+
+
+@dataclass(frozen=True, slots=True)
+class ImageConfig:
+    default_aspect_ratio: str
+    default_width: int
+    default_height: int
+    square_width: int
+    square_height: int
+    temp_dir: Path
+    output_format: str
+    quality: int
+
+
+@dataclass(frozen=True, slots=True)
+class BrandingConfig:
+    enabled: bool
+    logo_path: Path | None
+    placement: str
+    opacity: float
+    margin_px: int
+    max_width_percent: int
+    border_enabled: bool
+    accent_color: str
+    label_text: str
+
+
+@dataclass(frozen=True, slots=True)
+class StorageConfig:
+    provider: str
+    bucket: str
+    public: bool
+
+
+@dataclass(frozen=True, slots=True)
+class CleanupConfig:
+    cleanup_temp_files: bool
+    keep_failed_images: bool
+
+
+@dataclass(frozen=True, slots=True)
+class InstagramConfig:
+    enabled: bool
+    dry_run: bool
+    ig_user_id_secret_name: str
+    access_token_secret_name: str
+    api_version: str
+    quality_threshold: int
+
+
+@dataclass(frozen=True, slots=True)
+class PublishingConfig:
+    container_poll_max_attempts: int
+    container_poll_wait_seconds: int
+    container_poll_timeout_seconds: int
+    publish_max_retries: int
+    retry_backoff_seconds: int
+    retryable_error_codes: tuple[str, ...]
+    fail_run_on_publish_failure: bool
+
+
+@dataclass(frozen=True, slots=True)
+class NotificationChannelsConfig:
+    console: bool
+    email: bool
+    webhook: bool
+
+
+@dataclass(frozen=True, slots=True)
+class NotificationsConfig:
+    enabled: bool
+    channels: NotificationChannelsConfig
 
 
 @dataclass(frozen=True, slots=True)
@@ -116,6 +196,42 @@ def _require_bool(data: dict[str, Any], key: str) -> bool:
     return value
 
 
+def _optional_string(data: dict[str, Any], key: str, default: str = "") -> str:
+    value = data.get(key)
+    if value is None:
+        return default
+    if not isinstance(value, str):
+        raise ConfigError(f"Missing or invalid config value: {key}")
+    return value.strip()
+
+
+def _require_int(data: dict[str, Any], key: str) -> int:
+    value = data.get(key)
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ConfigError(f"Missing or invalid config value: {key}")
+    return value
+
+
+def _require_string_list(data: dict[str, Any], key: str) -> tuple[str, ...]:
+    value = data.get(key)
+    if not isinstance(value, list) or any(not isinstance(item, str) or not item.strip() for item in value):
+        raise ConfigError(f"Missing or invalid config value: {key}")
+    return tuple(item.strip() for item in value)
+
+
+def _require_float(data: dict[str, Any], key: str) -> float:
+    value = data.get(key)
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ConfigError(f"Missing or invalid config value: {key}")
+    return float(value)
+
+
+def _parse_color(value: str, key: str) -> str:
+    if not re.fullmatch(r"#[0-9A-Fa-f]{6}", value):
+        raise ConfigError(f"Invalid color format for {key}; expected #RRGGBB")
+    return value.upper()
+
+
 def _parse_time(value: str, key: str) -> str:
     try:
         datetime.strptime(value, "%H:%M")
@@ -134,6 +250,17 @@ def _parse_timezone(value: str) -> str:
             "Timezone data is unavailable; install tzdata to validate IANA timezones"
         ) from exc
     return value
+
+
+def _resolve_temp_dir(value: str) -> Path:
+    temp_dir = Path(value)
+    if os.name != "nt":
+        return temp_dir
+    normalized = value.replace("\\", "/").strip().lower()
+    if normalized == "/tmp" or normalized.startswith("/tmp/"):
+        suffix = Path(value.replace("\\", "/").lstrip("/")).parts[1:]
+        return Path(tempfile.gettempdir(), *suffix)
+    return temp_dir
 
 
 def _timezone_database_is_available() -> bool:
@@ -183,6 +310,13 @@ def load_configuration(
     posting = _require_mapping(raw, "posting")
     runtime = _require_mapping(raw, "runtime")
     logging_section = _require_mapping(raw, "logging")
+    instagram_section = _require_mapping(raw, "instagram")
+    publishing_section = _require_mapping(raw, "publishing")
+    notifications_section = _require_mapping(raw, "notifications")
+    image_section = _require_mapping(raw, "image")
+    branding_section = _require_mapping(raw, "branding")
+    storage_section = _require_mapping(raw, "storage")
+    cleanup_section = _require_mapping(raw, "cleanup")
 
     agent_name = _require_string(agent, "name")
     channel = _require_string(agent, "channel")
@@ -195,6 +329,58 @@ def load_configuration(
     test_mode_never_posts = _require_bool(runtime, "test_mode_never_posts")
     log_level = _require_string(logging_section, "level").upper()
     log_directory = Path(_require_string(logging_section, "directory"))
+    image_config = ImageConfig(
+        default_aspect_ratio=_require_string(image_section, "default_aspect_ratio"),
+        default_width=_require_int(image_section, "default_width"),
+        default_height=_require_int(image_section, "default_height"),
+        square_width=_require_int(image_section, "square_width"),
+        square_height=_require_int(image_section, "square_height"),
+        temp_dir=_resolve_temp_dir(_require_string(image_section, "temp_dir")),
+        output_format=_require_string(image_section, "output_format").lower(),
+        quality=_require_int(image_section, "quality"),
+    )
+    branding_config = BrandingConfig(
+        enabled=_require_bool(branding_section, "enabled"),
+        logo_path=Path(path_value) if (path_value := _optional_string(branding_section, "logo_path", "")) else None,
+        placement=_require_string(branding_section, "placement"),
+        opacity=_require_float(branding_section, "opacity"),
+        margin_px=_require_int(branding_section, "margin_px"),
+        max_width_percent=_require_int(branding_section, "max_width_percent"),
+        border_enabled=_require_bool(branding_section, "border_enabled"),
+        accent_color=_parse_color(_require_string(branding_section, "accent_color"), "branding.accent_color"),
+        label_text=_optional_string(branding_section, "label_text", "Buffago"),
+    )
+    storage_config = StorageConfig(
+        provider=_require_string(storage_section, "provider").lower(),
+        bucket=_require_string(storage_section, "bucket"),
+        public=_require_bool(storage_section, "public"),
+    )
+    cleanup_config = CleanupConfig(
+        cleanup_temp_files=_require_bool(cleanup_section, "cleanup_temp_files"),
+        keep_failed_images=_require_bool(cleanup_section, "keep_failed_images"),
+    )
+    instagram_config = InstagramConfig(
+        enabled=_require_bool(instagram_section, "enabled"),
+        dry_run=_require_bool(instagram_section, "dry_run"),
+        ig_user_id_secret_name=_require_string(instagram_section, "ig_user_id_secret_name"),
+        access_token_secret_name=_require_string(instagram_section, "access_token_secret_name"),
+        api_version=_require_string(instagram_section, "api_version"),
+        quality_threshold=_require_int(instagram_section, "quality_threshold"),
+    )
+    retryable_error_codes = _require_string_list(publishing_section, "retryable_error_codes")
+    channels_section = notifications_section.get("channels")
+    if isinstance(channels_section, dict):
+        channels_mapping = channels_section
+    else:
+        channels_mapping = notifications_section
+    notifications_config = NotificationsConfig(
+        enabled=_require_bool(notifications_section, "enabled"),
+        channels=NotificationChannelsConfig(
+            console=_require_bool(channels_mapping, "console"),
+            email=_require_bool(channels_mapping, "email"),
+            webhook=_require_bool(channels_mapping, "webhook"),
+        ),
+    )
 
     if channel.lower() != "instagram":
         raise ConfigError("agent.channel must be instagram")
@@ -206,6 +392,33 @@ def load_configuration(
         raise ConfigError("runtime.test_mode_never_posts must be true")
     if log_level not in VALID_LOG_LEVELS:
         raise ConfigError(f"logging.level must be one of: {', '.join(VALID_LOG_LEVELS)}")
+    if instagram_config.quality_threshold < 0 or instagram_config.quality_threshold > 100:
+        raise ConfigError("instagram.quality_threshold must be between 0 and 100")
+    if publishing_section.get("container_poll_timeout_seconds") is None:
+        container_poll_timeout_seconds = _require_int(publishing_section, "container_poll_max_attempts") * _require_int(
+            publishing_section, "container_poll_wait_seconds"
+        )
+    else:
+        container_poll_timeout_seconds = _require_int(publishing_section, "container_poll_timeout_seconds")
+    if container_poll_timeout_seconds <= 0:
+        raise ConfigError("publishing.container_poll_timeout_seconds must be positive")
+    publishing_config = PublishingConfig(
+        container_poll_max_attempts=_require_int(publishing_section, "container_poll_max_attempts"),
+        container_poll_wait_seconds=_require_int(publishing_section, "container_poll_wait_seconds"),
+        container_poll_timeout_seconds=container_poll_timeout_seconds,
+        publish_max_retries=_require_int(publishing_section, "publish_max_retries"),
+        retry_backoff_seconds=_require_int(publishing_section, "retry_backoff_seconds"),
+        retryable_error_codes=retryable_error_codes,
+        fail_run_on_publish_failure=_require_bool(publishing_section, "fail_run_on_publish_failure"),
+    )
+    if publishing_config.container_poll_max_attempts <= 0:
+        raise ConfigError("publishing.container_poll_max_attempts must be positive")
+    if publishing_config.container_poll_wait_seconds <= 0:
+        raise ConfigError("publishing.container_poll_wait_seconds must be positive")
+    if publishing_config.publish_max_retries < 0:
+        raise ConfigError("publishing.publish_max_retries must be non-negative")
+    if publishing_config.retry_backoff_seconds < 0:
+        raise ConfigError("publishing.retry_backoff_seconds must be non-negative")
 
     return JalapenoConfig(
         agent_name=agent_name,
@@ -220,6 +433,13 @@ def load_configuration(
         log_directory=(BASE_DIR / log_directory).resolve() if not log_directory.is_absolute() else log_directory,
         facebook_page_id=os.getenv("FACEBOOK_PAGE_ID", "").strip(),
         instagram_business_account_id=os.getenv("INSTAGRAM_BUSINESS_ACCOUNT_ID", "").strip(),
+        image=image_config,
+        branding=branding_config,
+        storage=storage_config,
+        cleanup=cleanup_config,
+        instagram=instagram_config,
+        publishing=publishing_config,
+        notifications=notifications_config,
     )
 
 
@@ -242,6 +462,17 @@ def _public_snapshot(config: JalapenoConfig) -> dict[str, str]:
         "log_level": config.log_level,
         "facebook_page_id_present": str(bool(config.facebook_page_id)),
         "instagram_business_account_id_present": str(bool(config.instagram_business_account_id)),
+        "image_temp_dir": str(config.image.temp_dir),
+        "image_output_format": config.image.output_format,
+        "storage_provider": config.storage.provider,
+        "storage_bucket": config.storage.bucket,
+        "branding_enabled": str(config.branding.enabled),
+        "cleanup_temp_files": str(config.cleanup.cleanup_temp_files),
+        "instagram_enabled": str(config.instagram.enabled),
+        "instagram_dry_run": str(config.instagram.dry_run),
+        "instagram_api_version": config.instagram.api_version,
+        "publishing_max_retries": str(config.publishing.publish_max_retries),
+        "notifications_enabled": str(config.notifications.enabled),
     }
 
 
@@ -297,11 +528,11 @@ def get_mode_plan(mode: str) -> ModePlan:
         ),
         "production": ModePlan(
             name="production",
-            posting_allowed=False,
-            meta_api_allowed=False,
-            image_generation_allowed=False,
-            blocked=True,
-            description="Safely blocked until Phase 2 implementation",
+            posting_allowed=True,
+            meta_api_allowed=True,
+            image_generation_allowed=True,
+            blocked=False,
+            description="Live scheduled publishing workflow",
         ),
     }
     if normalized not in plans:

@@ -16,3 +16,87 @@ runtime:
 logging:
   level: INFO
   directory: logs
+
+image:
+  default_aspect_ratio: "4:5"
+  default_width: 1080
+  default_height: 1350
+  square_width: 1080
+  square_height: 1080
+  temp_dir: "/tmp/jalapeno/images"
+  output_format: "jpg"
+  quality: 92
+
+branding:
+  enabled: false
+  logo_path: ""
+  placement: "bottom_right"
+  opacity: 0.65
+  margin_px: 32
+  max_width_percent: 12
+  border_enabled: false
+  accent_color: "#F36C21"
+  label_text: "Buffago"
+
+storage:
+  provider: "supabase"
+  bucket: "jalapeno-assets"
+  public: true
+
+cleanup:
+  cleanup_temp_files: true
+  keep_failed_images: true
+
+instagram:
+  enabled: false
+  dry_run: true
+  ig_user_id_secret_name: "instagram_business_account_id"
+  access_token_secret_name: "meta_long_lived_access_token"
+  api_version: "v23.0"
+  quality_threshold: 85
+
+publishing:
+  container_poll_max_attempts: 10
+  container_poll_wait_seconds: 5
+  container_poll_timeout_seconds: 60
+  publish_max_retries: 3
+  retry_backoff_seconds: 30
+  retryable_error_codes:
+    - "POLL_TIMEOUT"
+    - "TRANSIENT"
+    - "RATE_LIMITED"
+    - "TEMPORARY_ERROR"
+  fail_run_on_publish_failure: true
+
+notifications:
+  enabled: true
+  channels:
+    console: true
+    email: false
+    webhook: false
+
+ai:
+  models:
+    production:
+      text: gpt-5.5
+      image: gpt-image-2
+    development:
+      text: gpt-5.4-mini
+      image: gpt-image-2
+  max_output_tokens: 1200
+  timeout_seconds: 75
+  retry_count: 3
+  retry_backoff_seconds: 2.0
+  temperature: 0.7
+  daily_cost_limit_usd:
+  per_run_cost_limit_usd:
+  pricing:
+    gpt-5.5:
+      input_cost_per_million_usd:
+      output_cost_per_million_usd:
+    gpt-5.4-mini:
+      input_cost_per_million_usd:
+      output_cost_per_million_usd:
+    gpt-image-2:
+      input_cost_per_million_usd:
+      output_cost_per_million_usd:

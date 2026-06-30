@@ -1,0 +1,791 @@
+{
+  "all_candidates": [
+    {
+      "adjustments": {
+        "freshness_bonus": 4.0,
+        "theme_rotation_bonus": 4.0
+      },
+      "candidate_id": "afda735f-a05c-4c26-9fe8-5084b0fb8cbb",
+      "category_scores": {
+        "brand_fit": 17.0,
+        "conversation_starter": 4.0,
+        "cta_quality": 5.0,
+        "current_relevance": 6.0,
+        "gamification_potential": 1.0,
+        "likelihood_of_engagement": 15.5,
+        "originality": 20.0,
+        "uses_recent_buffago_activity": 9.5,
+        "visual_potential": 10.0
+      },
+      "cities_mentioned": [
+        "Buffalo"
+      ],
+      "content_type": "restaurant_spotlight",
+      "cta_category": "comment",
+      "current_event_references": [],
+      "duplicate_check": {
+        "comparison_notes": [],
+        "duplicate_score": 0.0,
+        "rejected": false,
+        "rejection_reason": null
+      },
+      "duplicate_reason": null,
+      "duplicate_score": 0.0,
+      "final_score": 91.75,
+      "food_categories": [
+        "wings",
+        "sauce"
+      ],
+      "holiday_references": [],
+      "hook_style": "direct local hook",
+      "image_composition": "single hero plate with short caption space",
+      "metadata": {
+        "prompt_anchors": [
+          "food-first",
+          "local credibility"
+        ]
+      },
+      "mood": "Friendly",
+      "notes": [
+        "originality=20.0",
+        "engagement=15.5",
+        "brand_fit=17.0",
+        "activity=9.5",
+        "relevance=6.0"
+      ],
+      "platform": "instagram",
+      "primary_theme": "restaurant focus",
+      "reason_chosen": "Top restaurant signal plus recent ratings make this the safest food-first anchor.",
+      "rejected_duplicate": false,
+      "restaurants_mentioned": [
+        "Crispy Corner"
+      ],
+      "secondary_theme": "recent ratings",
+      "short_summary": "Spotlight Crispy Corner in Buffalo as a high-signal favorite from recent Buffago activity.",
+      "source_signals": [
+        "recent_ratings",
+        "top_restaurants"
+      ],
+      "sports_references": [],
+      "states_mentioned": [
+        "NY"
+      ],
+      "suggested_caption_angle": "Lead with the restaurant name, then a quick local opinion that invites replies.",
+      "suggested_cta": "Drop your go-to wing spot in the comments.",
+      "suggested_image_concept": "Close-up wing tray at Crispy Corner with crisp texture and warm restaurant lighting.",
+      "target_emotion": "Curious",
+      "visual_style": "realistic",
+      "weighted_total": 83.75,
+      "working_title": "Why Crispy Corner keeps showing up"
+    },
+    {
+      "adjustments": {
+        "freshness_bonus": 4.0,
+        "theme_rotation_bonus": 4.0
+      },
+      "candidate_id": "d0af4cd3-c4d6-481e-afeb-2e520d431b38",
+      "category_scores": {
+        "brand_fit": 14.0,
+        "conversation_starter": 2.0,
+        "cta_quality": 5.0,
+        "current_relevance": 6.0,
+        "gamification_potential": 1.0,
+        "likelihood_of_engagement": 9.5,
+        "originality": 20.0,
+        "uses_recent_buffago_activity": 9.5,
+        "visual_potential": 10.0
+      },
+      "cities_mentioned": [
+        "Rochester"
+      ],
+      "content_type": "hidden_gem",
+      "cta_category": "save",
+      "current_event_references": [],
+      "duplicate_check": {
+        "comparison_notes": [],
+        "duplicate_score": 0.0,
+        "rejected": false,
+        "rejection_reason": null
+      },
+      "duplicate_reason": null,
+      "duplicate_score": 0.0,
+      "final_score": 81.5,
+      "food_categories": [
+        "wings",
+        "local eats"
+      ],
+      "holiday_references": [],
+      "hook_style": "secret tip",
+      "image_composition": "tight composition with subtle depth of field",
+      "metadata": {
+        "prompt_anchors": [
+          "curated",
+          "local insider"
+        ]
+      },
+      "mood": "Friendly",
+      "notes": [
+        "originality=20.0",
+        "engagement=9.5",
+        "brand_fit=14.0",
+        "activity=9.5",
+        "relevance=6.0"
+      ],
+      "platform": "instagram",
+      "primary_theme": "hidden gem",
+      "reason_chosen": "A second restaurant lets the feed feel curated instead of repetitive.",
+      "rejected_duplicate": false,
+      "restaurants_mentioned": [
+        "Wing Vault"
+      ],
+      "secondary_theme": "restaurant discovery",
+      "short_summary": "Frame Wing Vault as the quieter pick worth saving for later.",
+      "source_signals": [
+        "new_restaurants",
+        "top_restaurants"
+      ],
+      "sports_references": [],
+      "states_mentioned": [
+        "NY"
+      ],
+      "suggested_caption_angle": "Make the post feel like a friendly local tip instead of an ad.",
+      "suggested_cta": "Save this for your next crawl.",
+      "suggested_image_concept": "Moody but bright table shot of Wing Vault with wings, celery, and sauce cups.",
+      "target_emotion": "Encouraged",
+      "visual_style": "realistic",
+      "weighted_total": 73.5,
+      "working_title": "Hidden gem: Wing Vault"
+    },
+    {
+      "adjustments": {
+        "theme_rotation_bonus": 4.0
+      },
+      "candidate_id": "8fe9f30d-6831-4c58-baaa-504ce9c99a09",
+      "category_scores": {
+        "brand_fit": 17.0,
+        "conversation_starter": 4.0,
+        "cta_quality": 5.0,
+        "current_relevance": 6.0,
+        "gamification_potential": 1.0,
+        "likelihood_of_engagement": 14.0,
+        "originality": 20.0,
+        "uses_recent_buffago_activity": 4.0,
+        "visual_potential": 10.0
+      },
+      "cities_mentioned": [],
+      "content_type": "funny_observation",
+      "cta_category": "comment",
+      "current_event_references": [],
+      "duplicate_check": {
+        "comparison_notes": [],
+        "duplicate_score": 0.0,
+        "rejected": false,
+        "rejection_reason": null
+      },
+      "duplicate_reason": null,
+      "duplicate_score": 0.0,
+      "final_score": 80.75,
+      "food_categories": [
+        "wings"
+      ],
+      "holiday_references": [],
+      "hook_style": "observational joke",
+      "image_composition": "split-panel or punchline-forward composition",
+      "metadata": {
+        "prompt_anchors": [
+          "lightly sarcastic",
+          "community banter"
+        ]
+      },
+      "mood": "Funny",
+      "notes": [
+        "originality=20.0",
+        "engagement=14.0",
+        "brand_fit=17.0",
+        "activity=4.0",
+        "relevance=6.0"
+      ],
+      "platform": "instagram",
+      "primary_theme": "humor",
+      "reason_chosen": "Humor keeps the brand human and is less likely to feel overproduced.",
+      "rejected_duplicate": false,
+      "restaurants_mentioned": [],
+      "secondary_theme": "wing culture",
+      "short_summary": "A playful observation about how wings quietly multiply napkins, opinions, and group chat energy.",
+      "source_signals": [
+        "trend_topics",
+        "recommended_content_angles"
+      ],
+      "sports_references": [],
+      "states_mentioned": [],
+      "suggested_caption_angle": "Use observational humor with a Buffago-local twist.",
+      "suggested_cta": "Tell us your most chaotic wing order.",
+      "suggested_image_concept": "Meme-style table scene with wings, napkins, and a mildly dramatic reaction shot.",
+      "target_emotion": "Amused",
+      "visual_style": "meme",
+      "weighted_total": 76.75,
+      "working_title": "The wing napkin math problem"
+    },
+    {
+      "adjustments": {
+        "theme_rotation_bonus": 4.0
+      },
+      "candidate_id": "015184e7-168d-402b-b220-f1ca31756a03",
+      "category_scores": {
+        "brand_fit": 14.0,
+        "conversation_starter": 2.0,
+        "cta_quality": 5.0,
+        "current_relevance": 6.0,
+        "gamification_potential": 1.0,
+        "likelihood_of_engagement": 8.0,
+        "originality": 20.0,
+        "uses_recent_buffago_activity": 4.0,
+        "visual_potential": 9.5
+      },
+      "cities_mentioned": [],
+      "content_type": "wing_fact",
+      "cta_category": "save",
+      "current_event_references": [],
+      "duplicate_check": {
+        "comparison_notes": [],
+        "duplicate_score": 0.0,
+        "rejected": false,
+        "rejection_reason": null
+      },
+      "duplicate_reason": null,
+      "duplicate_score": 0.0,
+      "final_score": 70.0,
+      "food_categories": [
+        "wings",
+        "sauce"
+      ],
+      "holiday_references": [],
+      "hook_style": "fact hook",
+      "image_composition": "clean graphic layout with one hero detail",
+      "metadata": {
+        "prompt_anchors": [
+          "educational",
+          "easy to scan"
+        ]
+      },
+      "mood": "Educational",
+      "notes": [
+        "originality=20.0",
+        "engagement=8.0",
+        "brand_fit=14.0",
+        "activity=4.0",
+        "relevance=6.0"
+      ],
+      "platform": "instagram",
+      "primary_theme": "education",
+      "reason_chosen": "Educational posts diversify the feed and give people a reason to save or share.",
+      "rejected_duplicate": false,
+      "restaurants_mentioned": [],
+      "secondary_theme": "wing trivia",
+      "short_summary": "A clean, snackable fact about wings, sauce, or ordering behavior that feels useful without sounding preachy.",
+      "source_signals": [
+        "trend_topics"
+      ],
+      "sports_references": [],
+      "states_mentioned": [],
+      "suggested_caption_angle": "Keep the wording short and give the post one clear takeaway.",
+      "suggested_cta": "Save this for the next debate.",
+      "suggested_image_concept": "Graphic-led food fact card with wings and a minimal Buffago color palette.",
+      "target_emotion": "Informed",
+      "visual_style": "app_marketing",
+      "weighted_total": 66.0,
+      "working_title": "Wing fact worth knowing"
+    },
+    {
+      "adjustments": {
+        "recently_used_visual_style_penalty": -3.0,
+        "theme_rotation_bonus": 4.0
+      },
+      "candidate_id": "8b292e65-7cce-4696-9300-88bfa4bf1154",
+      "category_scores": {
+        "brand_fit": 15.0,
+        "conversation_starter": 5.0,
+        "cta_quality": 5.0,
+        "current_relevance": 6.0,
+        "gamification_potential": 2.0,
+        "likelihood_of_engagement": 12.0,
+        "originality": 20.0,
+        "uses_recent_buffago_activity": 6.5,
+        "visual_potential": 10.0
+      },
+      "cities_mentioned": [
+        "Buffalo",
+        "Rochester"
+      ],
+      "content_type": "community_highlight",
+      "cta_category": "question",
+      "current_event_references": [],
+      "duplicate_check": {
+        "comparison_notes": [],
+        "duplicate_score": 0.0,
+        "rejected": false,
+        "rejection_reason": null
+      },
+      "duplicate_reason": null,
+      "duplicate_score": 0.0,
+      "final_score": 78.75,
+      "food_categories": [],
+      "holiday_references": [],
+      "hook_style": "community opener",
+      "image_composition": "map-forward layout with playful route cues",
+      "metadata": {
+        "prompt_anchors": [
+          "community",
+          "local competition"
+        ]
+      },
+      "mood": "Friendly",
+      "notes": [
+        "originality=20.0",
+        "engagement=12.0",
+        "brand_fit=15.0",
+        "activity=6.5",
+        "relevance=6.0"
+      ],
+      "platform": "instagram",
+      "primary_theme": "community",
+      "reason_chosen": "Community content broadens the account beyond restaurants and signals real local activity.",
+      "rejected_duplicate": false,
+      "restaurants_mentioned": [],
+      "secondary_theme": "local activity",
+      "short_summary": "Highlight the people, states, or local energy behind the Buffago ecosystem without over-explaining it.",
+      "source_signals": [
+        "active_states",
+        "crawl_activity"
+      ],
+      "sports_references": [],
+      "states_mentioned": [
+        "NY",
+        "PA",
+        "OH"
+      ],
+      "suggested_caption_angle": "Focus on the map, the community, and the playful competition between cities.",
+      "suggested_cta": "Which city should get the next spotlight?",
+      "suggested_image_concept": "Community map graphic with local pins and wing markers across active states.",
+      "target_emotion": "Connected",
+      "visual_style": "illustration",
+      "weighted_total": 77.75,
+      "working_title": "Buffago in NY"
+    },
+    {
+      "adjustments": {
+        "theme_rotation_bonus": 4.0
+      },
+      "candidate_id": "ac9c27d2-da4b-4b95-988d-dbb7c280eaa9",
+      "category_scores": {
+        "brand_fit": 17.0,
+        "conversation_starter": 4.0,
+        "cta_quality": 5.0,
+        "current_relevance": 6.0,
+        "gamification_potential": 4.0,
+        "likelihood_of_engagement": 12.0,
+        "originality": 20.0,
+        "uses_recent_buffago_activity": 6.5,
+        "visual_potential": 9.5
+      },
+      "cities_mentioned": [],
+      "content_type": "xp_milestone",
+      "cta_category": "question",
+      "current_event_references": [],
+      "duplicate_check": {
+        "comparison_notes": [],
+        "duplicate_score": 0.0,
+        "rejected": false,
+        "rejection_reason": null
+      },
+      "duplicate_reason": null,
+      "duplicate_score": 0.0,
+      "final_score": 83.75,
+      "food_categories": [
+        "wings"
+      ],
+      "holiday_references": [],
+      "hook_style": "achievement hook",
+      "image_composition": "bold badge-centered layout",
+      "metadata": {
+        "prompt_anchors": [
+          "achievement",
+          "community progress"
+        ]
+      },
+      "mood": "Exciting",
+      "notes": [
+        "originality=20.0",
+        "engagement=12.0",
+        "brand_fit=17.0",
+        "activity=6.5",
+        "relevance=6.0"
+      ],
+      "platform": "instagram",
+      "primary_theme": "gamification",
+      "reason_chosen": "Gamified content helps the feed feel like it belongs to the product, not just the marketing team.",
+      "rejected_duplicate": false,
+      "restaurants_mentioned": [],
+      "secondary_theme": "XP",
+      "short_summary": "Use the XP and streak context to frame a milestone post that rewards participation.",
+      "source_signals": [
+        "xp_streak_milestones",
+        "recent_badges"
+      ],
+      "sports_references": [],
+      "states_mentioned": [],
+      "suggested_caption_angle": "Make it feel like a celebration, not a stat dump.",
+      "suggested_cta": "Who is closest to the next level?",
+      "suggested_image_concept": "Badge-style XP milestone graphic with a wing reward and bold level callout.",
+      "target_emotion": "Motivated",
+      "visual_style": "app_marketing",
+      "weighted_total": 79.75,
+      "working_title": "Someone just crossed a big XP line"
+    },
+    {
+      "adjustments": {
+        "theme_rotation_bonus": 4.0
+      },
+      "candidate_id": "6b4f6213-b127-4a9c-a989-1446b89dc869",
+      "category_scores": {
+        "brand_fit": 15.0,
+        "conversation_starter": 5.0,
+        "cta_quality": 5.0,
+        "current_relevance": 6.0,
+        "gamification_potential": 4.0,
+        "likelihood_of_engagement": 18.0,
+        "originality": 20.0,
+        "uses_recent_buffago_activity": 10.0,
+        "visual_potential": 9.5
+      },
+      "cities_mentioned": [
+        "Buffalo",
+        "Rochester"
+      ],
+      "content_type": "leaderboard",
+      "cta_category": "comment",
+      "current_event_references": [],
+      "duplicate_check": {
+        "comparison_notes": [],
+        "duplicate_score": 0.0,
+        "rejected": false,
+        "rejection_reason": null
+      },
+      "duplicate_reason": null,
+      "duplicate_score": 0.0,
+      "final_score": 92.75,
+      "food_categories": [],
+      "holiday_references": [],
+      "hook_style": "ranking hook",
+      "image_composition": "stacked board with bold labels",
+      "metadata": {
+        "prompt_anchors": [
+          "comparison",
+          "debate starter"
+        ]
+      },
+      "mood": "Competitive",
+      "notes": [
+        "originality=20.0",
+        "engagement=18.0",
+        "brand_fit=15.0",
+        "activity=10.0",
+        "relevance=6.0"
+      ],
+      "platform": "instagram",
+      "primary_theme": "competition",
+      "reason_chosen": "Leaderboards create natural comparison and comments without needing a hard sell.",
+      "rejected_duplicate": false,
+      "restaurants_mentioned": [
+        "Crispy Corner",
+        "Wing Vault"
+      ],
+      "secondary_theme": "local ranking",
+      "short_summary": "Turn ratings or crawl activity into a playful comparison format that invites debate.",
+      "source_signals": [
+        "recent_ratings",
+        "crawl_activity"
+      ],
+      "sports_references": [],
+      "states_mentioned": [
+        "NY",
+        "NY"
+      ],
+      "suggested_caption_angle": "Frame it as a friendly debate rather than a rigid ranking claim.",
+      "suggested_cta": "Who would you move up the board?",
+      "suggested_image_concept": "Leaderboard graphic with wing spots and local city cues.",
+      "target_emotion": "Competitive",
+      "visual_style": "app_marketing",
+      "weighted_total": 88.75,
+      "working_title": "The current wing leaderboard mood"
+    }
+  ],
+  "decision_summary": {
+    "candidate_count": 7,
+    "cost_estimate": 0.0,
+    "duplicate_similarity_threshold": 0.72,
+    "generated_at": "2026-06-30T23:29:58.274881+00:00",
+    "memory_reasoning": [
+      "The last five posts are concentrated around one theme.",
+      "Theme rotation bonus should encourage diversification."
+    ],
+    "model_name": "local-rules",
+    "platform": "instagram",
+    "rejected_duplicate_count": 0,
+    "run_id": "bccc989e-0fdd-494c-8c64-e74201dc29ad",
+    "scheduled_post_type": null,
+    "survivor_count": 7,
+    "token_usage": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0
+    },
+    "winner_reasoning": [
+      "The current wing leaderboard mood: +1.0 trend alignment bonus",
+      "Why Crispy Corner keeps showing up: +2.5 freshness bonus; trend alignment bonus",
+      "Someone just crossed a big XP line: +1.0 trend alignment bonus",
+      "Hidden gem: Wing Vault: +2.5 freshness bonus; trend alignment bonus",
+      "The wing napkin math problem: +1.0 trend alignment bonus",
+      "Buffago in NY: +3.0 community activity bonus; trend alignment bonus",
+      "Wing fact worth knowing: +1.0 trend alignment bonus",
+      "Winner selected for balance of score, freshness, and feed variety: Why Crispy Corner keeps showing up"
+    ]
+  },
+  "generated_at": "2026-06-30T23:29:58.274881+00:00",
+  "run_id": "bccc989e-0fdd-494c-8c64-e74201dc29ad",
+  "runner_up": {
+    "adjustments": {
+      "theme_rotation_bonus": 4.0
+    },
+    "candidate_id": "6b4f6213-b127-4a9c-a989-1446b89dc869",
+    "caption_package": {
+      "alt_text": "app_marketing Instagram image, centered on Crispy Corner, with a competitive mood, crispy wings and sauce, hinting at Buffalo, local New York food scene, in Buffago colors with readable composition for screen readers.",
+      "body": "Turn ratings or crawl activity into a playful comparison format that invites debate. It should feel competitive, simple, and easy to reply to.",
+      "caption": "The current wing leaderboard mood. Turn ratings or crawl activity into a playful comparison format that invites debate. It should feel competitive, simple, and easy to reply to. Who would you move up the board?",
+      "cleanup_notes": [
+        "caption_cleanup prompt reviewed and applied locally.",
+        "Removed banned or overly generic phrasing.",
+        "quality_review prompt reviewed locally.",
+        "Prompt library guidance loaded successfully."
+      ],
+      "cta": "Who would you move up the board?",
+      "emoji_placement": "0 to 2 emojis near the hook or CTA, never in a wall.",
+      "hashtags": [
+        "#Buffago",
+        "#BuffaloWings",
+        "#WingCrawl",
+        "#LocalFood",
+        "#WingCulture",
+        "#WingLeaderboard",
+        "#LocalRanking",
+        "#buffalo",
+        "#ny",
+        "#Wings",
+        "#Sauce",
+        "#BlueCheese"
+      ],
+      "hook": "The current wing leaderboard mood.",
+      "image_prompt": "Create an Instagram-quality image of The current wing leaderboard mood featuring Crispy Corner. Composition: stacked board with bold labels. Lighting: bright natural light with crisp highlights on the food. Camera angle: slightly above eye level for a craveable, mobile-friendly crop. Food realism: ultra-realistic wings with glossy sauce, crisp texture, celery, and sauce cups. Background: local restaurant or regional food setting anchored in Buffalo. Color palette: Buffago-inspired spicy orange, sauce red, cream, black, and warm golden tones. Make it polished, modern, and highly readable on mobile. Negative prompt guidance: No text unless intentional, no fake logos, no alcohol focus, no distorted food, no blurry plates, no extra fingers, no uncanny faces, no political symbols, and no cluttered stock-photo energy.",
+      "quality_review": {
+        "approved": true,
+        "issues": [],
+        "prompt_version": "prompt-library-v1",
+        "score": 92
+      },
+      "spacing": "The current wing leaderboard mood.\n\nTurn ratings or crawl activity into a playful comparison format that invites debate. It should feel competitive, simple, and easy to reply to.\n\nWho would you move up the board?"
+    },
+    "category_scores": {
+      "brand_fit": 15.0,
+      "conversation_starter": 5.0,
+      "cta_quality": 5.0,
+      "current_relevance": 6.0,
+      "gamification_potential": 4.0,
+      "likelihood_of_engagement": 18.0,
+      "originality": 20.0,
+      "uses_recent_buffago_activity": 10.0,
+      "visual_potential": 9.5
+    },
+    "cities_mentioned": [
+      "Buffalo",
+      "Rochester"
+    ],
+    "content_type": "leaderboard",
+    "cta_category": "comment",
+    "current_event_references": [],
+    "duplicate_reason": null,
+    "duplicate_score": 0.0,
+    "final_score": 92.75,
+    "food_categories": [],
+    "holiday_references": [],
+    "hook_style": "ranking hook",
+    "image_composition": "stacked board with bold labels",
+    "metadata": {
+      "prompt_anchors": [
+        "comparison",
+        "debate starter"
+      ]
+    },
+    "mood": "Competitive",
+    "notes": [
+      "originality=20.0",
+      "engagement=18.0",
+      "brand_fit=15.0",
+      "activity=10.0",
+      "relevance=6.0"
+    ],
+    "platform": "instagram",
+    "primary_theme": "competition",
+    "reason_chosen": "Leaderboards create natural comparison and comments without needing a hard sell.",
+    "rejected_duplicate": false,
+    "restaurants_mentioned": [
+      "Crispy Corner",
+      "Wing Vault"
+    ],
+    "scheduled_post_type": null,
+    "secondary_theme": "local ranking",
+    "short_summary": "Turn ratings or crawl activity into a playful comparison format that invites debate.",
+    "source_signals": [
+      "recent_ratings",
+      "crawl_activity"
+    ],
+    "sports_references": [],
+    "states_mentioned": [
+      "NY",
+      "NY"
+    ],
+    "suggested_caption_angle": "Frame it as a friendly debate rather than a rigid ranking claim.",
+    "suggested_cta": "Who would you move up the board?",
+    "suggested_image_concept": "Leaderboard graphic with wing spots and local city cues.",
+    "target_emotion": "Competitive",
+    "visual_style": "app_marketing",
+    "weighted_total": 88.75,
+    "working_title": "The current wing leaderboard mood"
+  },
+  "scheduled_post_type": null,
+  "winner": {
+    "adjustments": {
+      "freshness_bonus": 4.0,
+      "theme_rotation_bonus": 4.0
+    },
+    "alt_text": "realistic Instagram image, centered on Crispy Corner, with a curious mood, crispy wings and sauce, hinting at Buffalo, local New York food scene, featuring wings and sauce, in Buffago colors with readable composition for screen readers.",
+    "candidate_id": "afda735f-a05c-4c26-9fe8-5084b0fb8cbb",
+    "caption": "Why Crispy Corner keeps showing up. Spotlight Crispy Corner in Buffalo as a high-signal favorite from recent Buffago activity. Keep the tone local, food-first, and conversational. Drop your go-to wing spot in the comments.",
+    "caption_package": {
+      "alt_text": "realistic Instagram image, centered on Crispy Corner, with a curious mood, crispy wings and sauce, hinting at Buffalo, local New York food scene, featuring wings and sauce, in Buffago colors with readable composition for screen readers.",
+      "body": "Spotlight Crispy Corner in Buffalo as a high-signal favorite from recent Buffago activity. Keep the tone local, food-first, and conversational.",
+      "caption": "Why Crispy Corner keeps showing up. Spotlight Crispy Corner in Buffalo as a high-signal favorite from recent Buffago activity. Keep the tone local, food-first, and conversational. Drop your go-to wing spot in the comments.",
+      "cleanup_notes": [
+        "caption_cleanup prompt reviewed and applied locally.",
+        "Removed banned or overly generic phrasing.",
+        "quality_review prompt reviewed locally.",
+        "Prompt library guidance loaded successfully."
+      ],
+      "cta": "Drop your go-to wing spot in the comments.",
+      "emoji_placement": "0 to 2 emojis near the hook or CTA, never in a wall.",
+      "hashtags": [
+        "#Buffago",
+        "#BuffaloWings",
+        "#WingCrawl",
+        "#LocalFood",
+        "#WingCulture",
+        "#WingSpotlight",
+        "#RestaurantFind",
+        "#buffalo",
+        "#ny",
+        "#Wings",
+        "#Sauce",
+        "#BlueCheese"
+      ],
+      "hook": "Why Crispy Corner keeps showing up.",
+      "image_prompt": "Create an Instagram-quality image of Why Crispy Corner keeps showing up featuring Crispy Corner. Composition: single hero plate with short caption space. Lighting: bright natural light with crisp highlights on the food. Camera angle: slightly above eye level for a craveable, mobile-friendly crop. Food realism: ultra-realistic wings with glossy sauce, crisp texture, celery, and sauce cups. Background: local restaurant or regional food setting anchored in Buffalo. Color palette: Buffago-inspired spicy orange, sauce red, cream, black, and warm golden tones. Make it polished, modern, and highly readable on mobile. Negative prompt guidance: No text unless intentional, no fake logos, no alcohol focus, no distorted food, no blurry plates, no extra fingers, no uncanny faces, no political symbols, and no cluttered stock-photo energy.",
+      "quality_review": {
+        "approved": true,
+        "issues": [],
+        "prompt_version": "prompt-library-v1",
+        "score": 92
+      },
+      "spacing": "Why Crispy Corner keeps showing up.\n\nSpotlight Crispy Corner in Buffalo as a high-signal favorite from recent Buffago activity. Keep the tone local, food-first, and conversational.\n\nDrop your go-to wing spot in the comments."
+    },
+    "category_scores": {
+      "brand_fit": 17.0,
+      "conversation_starter": 4.0,
+      "cta_quality": 5.0,
+      "current_relevance": 6.0,
+      "gamification_potential": 1.0,
+      "likelihood_of_engagement": 15.5,
+      "originality": 20.0,
+      "uses_recent_buffago_activity": 9.5,
+      "visual_potential": 10.0
+    },
+    "cities_mentioned": [
+      "Buffalo"
+    ],
+    "content_type": "restaurant_spotlight",
+    "cta_category": "comment",
+    "current_event_references": [],
+    "duplicate_reason": null,
+    "duplicate_score": 0.0,
+    "final_score": 91.75,
+    "food_categories": [
+      "wings",
+      "sauce"
+    ],
+    "hashtags": [
+      "#Buffago",
+      "#BuffaloWings",
+      "#WingCrawl",
+      "#LocalFood",
+      "#WingCulture",
+      "#WingSpotlight",
+      "#RestaurantFind",
+      "#buffalo",
+      "#ny",
+      "#Wings",
+      "#Sauce",
+      "#BlueCheese"
+    ],
+    "holiday_references": [],
+    "hook_style": "direct local hook",
+    "image_composition": "single hero plate with short caption space",
+    "image_prompt": "Create an Instagram-quality image of Why Crispy Corner keeps showing up featuring Crispy Corner. Composition: single hero plate with short caption space. Lighting: bright natural light with crisp highlights on the food. Camera angle: slightly above eye level for a craveable, mobile-friendly crop. Food realism: ultra-realistic wings with glossy sauce, crisp texture, celery, and sauce cups. Background: local restaurant or regional food setting anchored in Buffalo. Color palette: Buffago-inspired spicy orange, sauce red, cream, black, and warm golden tones. Make it polished, modern, and highly readable on mobile. Negative prompt guidance: No text unless intentional, no fake logos, no alcohol focus, no distorted food, no blurry plates, no extra fingers, no uncanny faces, no political symbols, and no cluttered stock-photo energy.",
+    "metadata": {
+      "prompt_anchors": [
+        "food-first",
+        "local credibility"
+      ]
+    },
+    "mood": "Friendly",
+    "notes": [
+      "originality=20.0",
+      "engagement=15.5",
+      "brand_fit=17.0",
+      "activity=9.5",
+      "relevance=6.0"
+    ],
+    "platform": "instagram",
+    "primary_theme": "restaurant focus",
+    "reason_chosen": "Top restaurant signal plus recent ratings make this the safest food-first anchor.",
+    "rejected_duplicate": false,
+    "restaurants_mentioned": [
+      "Crispy Corner"
+    ],
+    "scheduled_post_type": null,
+    "secondary_theme": "recent ratings",
+    "short_summary": "Spotlight Crispy Corner in Buffalo as a high-signal favorite from recent Buffago activity.",
+    "source_signals": [
+      "recent_ratings",
+      "top_restaurants"
+    ],
+    "sports_references": [],
+    "states_mentioned": [
+      "NY"
+    ],
+    "suggested_caption_angle": "Lead with the restaurant name, then a quick local opinion that invites replies.",
+    "suggested_cta": "Drop your go-to wing spot in the comments.",
+    "suggested_image_concept": "Close-up wing tray at Crispy Corner with crisp texture and warm restaurant lighting.",
+    "target_emotion": "Curious",
+    "visual_style": "realistic",
+    "weighted_total": 83.75,
+    "working_title": "Why Crispy Corner keeps showing up"
+  }
+}

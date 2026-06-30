@@ -29,7 +29,16 @@ Expo / React Native app
        -> Wingman restaurant intake
        -> account deletion
   -> OpenAI and Google Places used server-side in Edge Functions
+  -> Jalapeno content decision engine and long-term content memory
 ```
+
+## Prompt Library
+
+Jalapeno now keeps its Buffago brand and prompt guidance in standalone markdown files under `prompt_library/` so future agents can reuse the same source of truth without embedding prompt text in code.
+
+The library is versioned and loaded dynamically at runtime by the Jalapeno agent and its validation flow.
+
+Jalapeno's content decision engine also reuses that library for candidate generation, caption cleanup, quality review, and image prompt guidance.
 
 ## AI And Data Quality
 

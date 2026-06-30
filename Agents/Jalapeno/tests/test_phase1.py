@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import replace
+import json
 from io import StringIO
+from datetime import datetime
 from pathlib import Path
 import sys
 
 import pytest
+from zoneinfo import ZoneInfo
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 if str(PROJECT_DIR) not in sys.path:
@@ -21,9 +24,19 @@ from config import (  # noqa: E402
     warn_missing_future_secrets,
 )
 import config as config_module  # noqa: E402
+from data_client import Phase3WindowConfig  # noqa: E402
+from data_snapshot import generate_latest_snapshot  # noqa: E402
 from logging_utils import format_structured_log, log_event  # noqa: E402
-from validation import validate_phase2_environment  # noqa: E402
-from main import build_parser, run_production_placeholder  # noqa: E402
+from validation import validate_content_engine_environment, validate_phase3_environment, validate_phase4_environment  # noqa: E402
+from validation import validate_image_pipeline_environment, validate_phase5_environment, validate_prompt_library_environment  # noqa: E402
+from main import (  # noqa: E402
+    PRODUCTION_POST_TYPE_MAP,
+    _normalize_optional_post_type,
+    _normalize_production_post_type,
+    build_parser,
+    run_dry_run,
+    main,
+)
 
 
 STRUCTURAL_ENV_VALUES = {
@@ -38,7 +51,6 @@ def required_env(monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv(key, value)
     for key in (
         "TIMEZONE",
-        "OPENAI_API_KEY",
         "SUPABASE_URL",
         "SUPABASE_SERVICE_ROLE_KEY",
         "META_APP_ID",
@@ -59,6 +71,28 @@ def test_config_yaml_loads() -> None:
     assert config.buffago_post_time == "16:00"
     assert config.meme_post_time == "20:00"
     assert config.test_mode_never_posts is True
+
+
+def test_image_pipeline_config_sections_load() -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+
+    assert config.image.default_aspect_ratio == "4:5"
+    assert config.image.default_width == 1080
+    assert config.image.default_height == 1350
+    assert config.image.square_width == 1080
+    assert config.image.square_height == 1080
+    assert config.storage.provider == "supabase"
+    assert config.storage.bucket == "jalapeno-assets"
+    assert config.cleanup.cleanup_temp_files is True
+
+
+def test_windows_tmp_image_dir_is_normalized(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(config_module.os, "name", "nt", raising=False)
+    monkeypatch.setattr(config_module.tempfile, "gettempdir", lambda: "C:\\temp-root")
+
+    resolved = config_module._resolve_temp_dir("/tmp/jalapeno/images")
+
+    assert resolved == Path("C:/temp-root/jalapeno/images")
 
 
 def test_time_zone_can_be_overridden_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -97,9 +131,24 @@ def test_required_cli_modes_exist() -> None:
     parser = build_parser()
 
     assert parser.parse_args(["--validate"]).validate is True
+    assert parser.parse_args(["--validate", "--refresh-external-context"]).refresh_external_context is True
+    assert parser.parse_args(["--validate", "--skip-ai"]).skip_ai is True
     assert parser.parse_args(["--dry-run"]).dry_run is True
     assert parser.parse_args(["--test"]).test is True
     assert parser.parse_args(["--production"]).production is True
+
+
+def test_prompt_library_validation_reports_manifest(tmp_path: Path) -> None:
+    stream = StringIO()
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    logger = initialize_logging(replace(config, log_directory=tmp_path / "logs"), stream=stream)
+
+    manifest = validate_prompt_library_environment(logger=logger)
+
+    assert manifest["version"] == "prompt-library-v1"
+    assert len(manifest["files"]) == 10
+    assert "prompt_library_validation_started" in stream.getvalue()
+    assert "prompt_library_validation_completed" in stream.getvalue()
 
 
 def test_test_mode_never_enables_posting() -> None:
@@ -114,10 +163,10 @@ def test_test_mode_never_enables_posting() -> None:
 def test_production_mode_is_blocked() -> None:
     plan = get_mode_plan("production")
 
-    assert plan.blocked is True
-    assert plan.posting_allowed is False
-    assert plan.meta_api_allowed is False
-    assert plan.image_generation_allowed is False
+    assert plan.blocked is False
+    assert plan.posting_allowed is True
+    assert plan.meta_api_allowed is True
+    assert plan.image_generation_allowed is True
 
 
 def test_phase1_environment_validation_requires_structural_values(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -139,17 +188,70 @@ def test_missing_future_secret_warning_is_emitted(capsys: pytest.CaptureFixture[
 
     output = capsys.readouterr().out
     assert "Missing future Phase 2+ secrets" in output
-    assert "OPENAI_API_KEY" in output
+    assert "SUPABASE_SERVICE_ROLE_KEY" in output
 
 
-def test_production_placeholder_exits_safely(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
-    monkeypatch.setattr("main.load_env_file", lambda: False)
-    monkeypatch.setattr("main.warn_missing_future_secrets", lambda *args, **kwargs: [])
+def test_production_post_type_map_is_stable() -> None:
+    assert PRODUCTION_POST_TYPE_MAP == {
+        "buffago": "buffago_post",
+        "meme": "meme_post",
+    }
 
-    assert run_production_placeholder() == 0
 
-    output = capsys.readouterr().out
-    assert "Production mode is not implemented yet." in output
+def test_production_requires_post_type() -> None:
+    with pytest.raises(ConfigError, match="POST_TYPE is required"):
+        _normalize_production_post_type(None)
+
+
+def test_production_rejects_invalid_post_type() -> None:
+    with pytest.raises(ConfigError, match="Invalid POST_TYPE"):
+        _normalize_production_post_type("invalid")
+
+
+def test_production_normalizes_valid_post_type() -> None:
+    assert _normalize_production_post_type(" BuFfAgO ") == "buffago"
+    assert _normalize_production_post_type("meme") == "meme"
+
+
+def test_optional_post_type_allows_blank() -> None:
+    assert _normalize_optional_post_type(None) is None
+    assert _normalize_optional_post_type("   ") is None
+
+
+def test_optional_post_type_reuses_production_validation() -> None:
+    assert _normalize_optional_post_type(" meme ") == "meme"
+    with pytest.raises(ConfigError, match="Invalid POST_TYPE"):
+        _normalize_optional_post_type("wings")
+
+
+def test_main_routes_production_flag_to_production_runner(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("main.run_production", lambda: 0)
+
+    assert main(["--production"]) == 0
+
+
+def test_dry_run_logs_optional_post_type_for_manual_dispatch(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("POST_TYPE", "meme")
+    monkeypatch.setenv("GITHUB_ACTIONS", "true")
+    monkeypatch.setenv("GITHUB_EVENT_NAME", "workflow_dispatch")
+    monkeypatch.setenv("GITHUB_EVENT_SCHEDULE", "")
+    monkeypatch.setenv("GITHUB_RUN_ID", "123456")
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    stream = StringIO()
+    logger = initialize_logging(replace(config, log_directory=tmp_path / "logs"), stream=stream)
+    monkeypatch.setattr("main.initialize_logging", lambda _config: logger)
+
+    assert run_dry_run() == 0
+
+    output = stream.getvalue()
+    assert "selected_mode" in output
+    assert "post_type=meme" in output
+    assert "scheduled_post_type=meme_post" in output
+    assert "run_source=github_actions_manual_dispatch" in output
+    assert "github_run_id=123456" in output
 
 
 def test_secrets_are_not_printed_in_logs(tmp_path: Path) -> None:
@@ -178,67 +280,503 @@ def test_structured_log_format_includes_key_value_fields() -> None:
     assert message == "run_started | run_id=abc | agent_name=Jalapeno | dry_run=true | duration_ms=12"
 
 
-def test_phase2_validation_can_create_and_complete_a_run(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_phase3_snapshot_generates_real_snapshot_and_writes_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("SUPABASE_URL", "https://example.supabase.co")
     monkeypatch.setenv("SUPABASE_SERVICE_ROLE_KEY", "service-role-key")
     config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
 
     class FakeSupabaseClient:
-        def __init__(self) -> None:
-            self.inserted: list[dict[str, object]] = []
-            self.updated: list[dict[str, object]] = []
-
-        def table_exists(self, table_name: str) -> bool:
-            return table_name in {
-                "jalapeno_runs",
-                "jalapeno_post_candidates",
-                "jalapeno_posts",
-                "jalapeno_errors",
-                "jalapeno_post_metrics",
-                "jalapeno_settings",
-            }
-
         def fetch_rows(self, table_name: str, *, filters=None, select="*"):
-            assert table_name == "jalapeno_settings"
-            return [
-                {"setting_key": "posting_enabled", "setting_value": False},
-                {"setting_key": "dry_run", "setting_value": True},
-                {"setting_key": "instagram_enabled", "setting_value": False},
-                {"setting_key": "buffago_post_time", "setting_value": "16:00"},
-                {"setting_key": "meme_post_time", "setting_value": "20:00"},
-                {"setting_key": "timezone", "setting_value": "America/New_York"},
-                {"setting_key": "text_model", "setting_value": "gpt-4.1-mini"},
-                {"setting_key": "image_model", "setting_value": "gpt-image-1"},
-                {"setting_key": "temperature", "setting_value": 0.7},
-                {"setting_key": "max_candidates", "setting_value": 5},
-                {"setting_key": "max_retries", "setting_value": 3},
-                {"setting_key": "prompt_version", "setting_value": "phase2-v1"},
-                {"setting_key": "workflow_version", "setting_value": "phase2-v1"},
-                {"setting_key": "default_hashtag_count", "setting_value": 8},
-                {"setting_key": "default_image_size", "setting_value": "1024x1024"},
-                {"setting_key": "storage_bucket", "setting_value": "jalapeno-media"},
-                {"setting_key": "metrics_collection_enabled", "setting_value": False},
-            ]
-
-        def insert_row(self, table_name: str, payload):
-            self.inserted.append({"table": table_name, "payload": payload})
-            run_id = payload.get("run_id", "00000000-0000-0000-0000-000000000000")
-            return [payload | {"run_id": run_id}]
-
-        def update_rows(self, table_name: str, filters, payload):
-            self.updated.append({"table": table_name, "filters": filters, "payload": payload})
-            return [payload]
+            data = {
+                "users": [
+                    {"user_id": "11111111-1111-1111-1111-111111111111", "social_opt_out": False},
+                    {"user_id": "22222222-2222-2222-2222-222222222222", "social_opt_out": True},
+                ],
+                "states": [
+                    {"state_id": 1, "state_code": "NY", "state_name": "New York"},
+                    {"state_id": 2, "state_code": "PA", "state_name": "Pennsylvania"},
+                ],
+                "destinations": [
+                    {"id": "dest-1", "name": "Crispy Corner", "city": "Buffalo", "state_id": 1, "created_at": "2026-06-20T12:00:00+00:00"},
+                    {"id": "dest-2", "name": "Wing Vault", "city": "Rochester", "state_id": 1, "created_at": "2026-06-21T12:00:00+00:00"},
+                ],
+                "destination_ratings": [
+                    {
+                        "id": "rating-1",
+                        "destination_id": "dest-1",
+                        "user_id": "11111111-1111-1111-1111-111111111111",
+                        "overall": 9,
+                        "weight_score": 8.9,
+                        "created_at": "2026-06-24T12:00:00+00:00",
+                    },
+                    {
+                        "id": "rating-2",
+                        "destination_id": "dest-2",
+                        "user_id": "22222222-2222-2222-2222-222222222222",
+                        "overall": 7,
+                        "weight_score": 7.1,
+                        "created_at": "2026-06-24T12:00:00+00:00",
+                    },
+                ],
+                "analytics_agent_restaurant_summary": [
+                    {
+                        "destination_id": "dest-1",
+                        "destination_name": "Crispy Corner",
+                        "city": "Buffalo",
+                        "state_id": 1,
+                        "rating_count": 42,
+                        "avg_weight_score": 8.8,
+                        "avg_overall": 8.7,
+                        "last_rated_at": "2026-06-24T12:00:00+00:00",
+                    },
+                    {
+                        "destination_id": "dest-2",
+                        "destination_name": "Wing Vault",
+                        "city": "Rochester",
+                        "state_id": 1,
+                        "rating_count": 31,
+                        "avg_weight_score": 8.5,
+                        "avg_overall": 8.3,
+                        "last_rated_at": "2026-06-24T12:00:00+00:00",
+                    },
+                ],
+                "user_events": [
+                    {"state_id": 1, "user_id": "11111111-1111-1111-1111-111111111111", "anonymous_id": None, "occurred_at": "2026-06-24T12:00:00+00:00"},
+                    {"state_id": 2, "user_id": "22222222-2222-2222-2222-222222222222", "anonymous_id": None, "occurred_at": "2026-06-24T12:00:00+00:00"},
+                    {"state_id": 2, "user_id": None, "anonymous_id": "anon-1", "occurred_at": "2026-06-24T12:00:00+00:00"},
+                ],
+                "badge_catalog": [
+                    {"id": 1, "code": "heat_seeker", "name": "Heat Seeker", "description": "Desc", "icon": "fire", "xp_reward": 25, "category": "ratings", "tier": 1, "is_active": True},
+                    {"id": 2, "code": "crawl_captain", "name": "Crawl Captain", "description": "Desc", "icon": "map", "xp_reward": 40, "category": "crawls", "tier": 1, "is_active": True},
+                ],
+                "user_badges": [
+                    {"user_id": "11111111-1111-1111-1111-111111111111", "badge_id": 1, "earned_at": "2026-06-24T12:00:00+00:00"},
+                    {"user_id": "22222222-2222-2222-2222-222222222222", "badge_id": 2, "earned_at": "2026-06-24T12:00:00+00:00"},
+                ],
+                "level_thresholds": [
+                    {"level": 5, "xp_required": 250, "level_title": "Wing Rookie"},
+                    {"level": 10, "xp_required": 750, "level_title": "Wing Regular"},
+                ],
+                "user_with_level": [
+                    {"user_id": "11111111-1111-1111-1111-111111111111", "xp": 900, "level": 10},
+                    {"user_id": "22222222-2222-2222-2222-222222222222", "xp": 1200, "level": 12},
+                ],
+                "crawl_weekly_streak": [
+                    {"user_id": "11111111-1111-1111-1111-111111111111", "current_streak_weeks": 4},
+                    {"user_id": "22222222-2222-2222-2222-222222222222", "current_streak_weeks": 8},
+                ],
+                "socially_visible_crawls": [
+                    {"crawl_id": "crawl-1", "user_id": "11111111-1111-1111-1111-111111111111", "route_id": "route-1", "status": "completed", "start_time": "2026-06-24T12:00:00+00:00", "end_time": "2026-06-24T13:00:00+00:00", "crawl_type": "solo", "is_solo": True},
+                    {"crawl_id": "crawl-2", "user_id": "22222222-2222-2222-2222-222222222222", "route_id": "route-2", "status": "planned", "start_time": "2026-06-24T12:00:00+00:00", "end_time": None, "crawl_type": "group", "is_solo": False},
+                ],
+                "routes": [
+                    {"id": "route-1", "title": "Buffalo Heat Trail", "city": "Buffalo", "stop1_id": "dest-1", "stop2_id": None, "stop3_id": None, "stop4_id": None, "stop5_id": None},
+                    {"id": "route-2", "title": "Rochester Wing Run", "city": "Rochester", "stop1_id": "dest-2", "stop2_id": None, "stop3_id": None, "stop4_id": None, "stop5_id": None},
+                ],
+                "route_ordered_destinations": [
+                    {"route_id": "route-1", "destination_id": "dest-1", "stop_order": 1},
+                    {"route_id": "route-2", "destination_id": "dest-2", "stop_order": 1},
+                ],
+            }
+            return data.get(table_name, [])
 
     fake_client = FakeSupabaseClient()
     stream = StringIO()
     logger = initialize_logging(replace(config, log_directory=PROJECT_DIR / "logs"), stream=stream)
 
-    result = validate_phase2_environment(config, logger=logger, client=fake_client)  # type: ignore[arg-type]
+    result = validate_phase3_environment(
+        config,
+        logger=logger,
+        client=fake_client,  # type: ignore[arg-type]
+        output_path=tmp_path / "latest_snapshot.json",
+        window_config=Phase3WindowConfig(activity_score_threshold=4),
+    )
 
     assert result.connected is True
-    assert result.validation_run_id is not None
-    assert any(item["table"] == "jalapeno_runs" for item in fake_client.inserted)
-    assert any(item["table"] == "jalapeno_runs" for item in fake_client.updated)
+    assert result.is_fallback is False
+    assert result.snapshot_path == str(tmp_path / "latest_snapshot.json")
+    assert result.section_counts["recent_ratings"] == 1
+    assert result.section_counts["recent_badges"] == 1
+    assert (tmp_path / "latest_snapshot.json").exists()
+    snapshot = json.loads((tmp_path / "latest_snapshot.json").read_text(encoding="utf-8"))
+    assert snapshot["is_fallback"] is False
+    assert snapshot["recent_ratings"][0]["restaurant_name"] == "Crispy Corner"
+    assert snapshot["recent_ratings"][0]["state"] == "NY"
+    assert snapshot["recent_badges"][0]["badge_name"] == "Heat Seeker"
+    assert snapshot["crawl_activity"]["total_crawls"] == 1
     output = stream.getvalue()
+    assert "supabase_connection" not in output
     assert "validation_started" in output
     assert "validation_completed" in output
+    assert "opted_out_users_excluded" in output
+
+
+def test_generate_latest_snapshot_uses_fallback_when_supabase_unavailable(tmp_path: Path) -> None:
+    result = generate_latest_snapshot(client=None, output_path=tmp_path / "latest_snapshot.json")
+
+    assert result.is_fallback is True
+    assert result.snapshot["is_fallback"] is True
+    assert (tmp_path / "latest_snapshot.json").exists()
+    snapshot = json.loads((tmp_path / "latest_snapshot.json").read_text(encoding="utf-8"))
+    assert snapshot["is_fallback"] is True
+    assert snapshot["summary"]["activity_score"] > 0
+
+
+def test_generate_latest_snapshot_low_activity_uses_warning_fallback(tmp_path: Path) -> None:
+    class EmptySupabaseClient:
+        def fetch_rows(self, table_name: str, *, filters=None, select="*"):
+            return []
+
+    stream = StringIO()
+    logger = initialize_logging(replace(load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml"), log_directory=tmp_path / "logs"), stream=stream)
+
+    result = generate_latest_snapshot(client=EmptySupabaseClient(), logger=logger, output_path=tmp_path / "latest_snapshot.json")
+
+    assert result.is_fallback is True
+    output = stream.getvalue()
+    assert "snapshot_generation_low_activity" in output
+    assert "snapshot_generation_failed" not in output
+
+
+def test_phase4_external_context_writes_cache_and_reuses_it(tmp_path: Path) -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    stream = StringIO()
+    logger = initialize_logging(replace(config, log_directory=tmp_path / "logs"), stream=stream)
+    current_datetime = datetime(2026, 6, 25, 12, 0, tzinfo=ZoneInfo("America/New_York"))
+    latest_path = tmp_path / "latest_external_context.json"
+
+    first = validate_phase4_environment(
+        config,
+        logger=logger,
+        output_path=latest_path,
+        cache_directory=tmp_path,
+        current_datetime=current_datetime,
+    )
+
+    assert first.context_path == str(latest_path)
+    assert first.cache_path.endswith("external_context_2026-06-25.json")
+    assert first.is_cached is False
+    assert first.signals_used
+
+    first_context = json.loads(latest_path.read_text(encoding="utf-8"))
+    assert first_context["date"] == "2026-06-25"
+    assert first_context["weather"]["weather_available"] is False
+    assert first_context["weather"]["weather_summary"] is None
+    assert "source_summary" in first_context
+    assert first_context["signal_sections"]["trends_context"]["is_fallback"] is True
+
+    second = validate_phase4_environment(
+        config,
+        logger=logger,
+        output_path=latest_path,
+        cache_directory=tmp_path,
+        current_datetime=current_datetime,
+    )
+
+    assert second.is_cached is True
+    assert second.is_fallback is True
+    assert second.cache_path == first.cache_path
+    second_context = json.loads(latest_path.read_text(encoding="utf-8"))
+    assert second_context["is_cached"] is True
+    assert second_context["cache_created_at"] == first_context["cache_created_at"]
+
+    output = stream.getvalue()
+    assert "external_context_started" in output
+    assert "external_cache_checked" in output
+    assert "external_cache_hit" in output
+    assert "external_context_written" in output
+    assert "external_signals_selected" in output
+    assert "external_context_fallback_used" in output
+
+
+def test_phase5_validation_skips_ai_and_writes_outputs(tmp_path: Path) -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    snapshot = generate_latest_snapshot(output_path=tmp_path / "latest_snapshot.json").snapshot
+    external_context = {
+        "agent": "Jalapeno",
+        "phase": 4,
+        "source_summary": {"signals_used": ["fallback_context"], "fallback_used": True},
+    }
+    stream = StringIO()
+    logger = initialize_logging(replace(config, log_directory=tmp_path / "logs"), stream=stream)
+
+    result = validate_phase5_environment(
+        config,
+        snapshot,
+        external_context,
+        logger=logger,
+        skip_ai=True,
+        output_path=tmp_path / "latest_ai_output.json",
+        usage_path=tmp_path / "ai_usage_latest.json",
+    )
+
+    assert result.used_backend is False
+    assert result.used_fallback is True
+    assert (tmp_path / "latest_ai_output.json").exists()
+    assert (tmp_path / "ai_usage_latest.json").exists()
+    output = json.loads((tmp_path / "latest_ai_output.json").read_text(encoding="utf-8"))
+    assert output["text_content"]["content_slot"] == "buffago_post"
+    assert output["image_prompt"]["content_slot"] == "meme_post"
+    assert output["brand_validation"]["passed"] is True
+    log_output = stream.getvalue()
+    assert "ai_generation_started" in log_output
+    assert "ai_text_generation_started" in log_output
+    assert "ai_image_prompt_generation_started" in log_output
+    assert "ai_brand_validation_started" in log_output
+    assert "ai_usage_logged" in log_output
+    assert "ai_fallback_used" in log_output
+
+
+def test_content_engine_validation_runs_dry_run_without_posting(tmp_path: Path) -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    snapshot = generate_latest_snapshot(output_path=tmp_path / "latest_snapshot.json").snapshot
+    external_context = {
+        "agent": "Jalapeno",
+        "phase": 4,
+        "day_of_week": "Saturday",
+        "major_holidays": [],
+        "minor_holidays": [],
+        "food_holidays": [],
+        "local_or_national_events": ["Saturday game day wings", "weekend crawl idea"],
+        "sports_events": ["NBA and NHL playoffs"],
+        "trend_topics": ["Saturday crawl ideas", "weekend plans"],
+        "news_topics": ["new restaurant openings"],
+        "recommended_content_angles": ["Game day wings", "Weekend crawl idea"],
+        "source_summary": {"signals_used": ["trend_topics", "sports_events"], "fallback_used": True},
+    }
+    stream = StringIO()
+    logger = initialize_logging(replace(config, log_directory=tmp_path / "logs"), stream=stream)
+
+    result = validate_content_engine_environment(
+        config,
+        snapshot,
+        external_context,
+        logger=logger,
+        client=None,
+        dry_run=True,
+        output_path=tmp_path / "latest_content_decision.json",
+    )
+
+    assert result.dry_run is True
+    assert result.candidate_count >= 5
+    assert result.winner_candidate_id
+    assert (tmp_path / "latest_content_decision.json").exists()
+    payload = json.loads((tmp_path / "latest_content_decision.json").read_text(encoding="utf-8"))
+    assert payload["winner"]["candidate_id"] == result.winner_candidate_id
+    assert payload["decision_summary"]["candidate_count"] == result.candidate_count
+    assert "content_engine_validation_started" in stream.getvalue()
+    assert "candidate_generation_started" in stream.getvalue()
+    assert "winner_selected" in stream.getvalue()
+    assert "content_saved" in stream.getvalue()
+
+
+def test_content_engine_validation_targets_meme_schedule(tmp_path: Path) -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    snapshot = generate_latest_snapshot(output_path=tmp_path / "latest_snapshot.json").snapshot
+    external_context = {
+        "agent": "Jalapeno",
+        "phase": 4,
+        "day_of_week": "Saturday",
+        "major_holidays": [],
+        "minor_holidays": [],
+        "food_holidays": [],
+        "local_or_national_events": ["Saturday meme energy"],
+        "sports_events": [],
+        "trend_topics": ["wing memes"],
+        "news_topics": [],
+        "recommended_content_angles": ["Meme"],
+        "source_summary": {"signals_used": ["trend_topics"], "fallback_used": True},
+    }
+
+    result = validate_content_engine_environment(
+        config,
+        snapshot,
+        external_context,
+        logger=None,
+        client=None,
+        dry_run=True,
+        output_path=tmp_path / "latest_content_decision_meme.json",
+        scheduled_post_type="meme_post",
+    )
+
+    assert result.result["scheduled_post_type"] == "meme_post"
+    assert result.result["winner"]["scheduled_post_type"] == "meme_post"
+    assert result.result["winner"]["content_type"] == "meme"
+
+
+def test_content_engine_validation_targets_buffago_schedule(tmp_path: Path) -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    snapshot = generate_latest_snapshot(output_path=tmp_path / "latest_snapshot.json").snapshot
+    external_context = {
+        "agent": "Jalapeno",
+        "phase": 4,
+        "day_of_week": "Saturday",
+        "major_holidays": [],
+        "minor_holidays": [],
+        "food_holidays": [],
+        "local_or_national_events": ["Saturday game day wings"],
+        "sports_events": ["NBA playoffs"],
+        "trend_topics": ["weekend wing crawl"],
+        "news_topics": [],
+        "recommended_content_angles": ["Game day wings"],
+        "source_summary": {"signals_used": ["sports_events"], "fallback_used": True},
+    }
+
+    result = validate_content_engine_environment(
+        config,
+        snapshot,
+        external_context,
+        logger=None,
+        client=None,
+        dry_run=True,
+        output_path=tmp_path / "latest_content_decision_buffago.json",
+        scheduled_post_type="buffago_post",
+    )
+
+    assert result.result["scheduled_post_type"] == "buffago_post"
+    assert result.result["winner"]["scheduled_post_type"] == "buffago_post"
+    assert result.result["winner"]["content_type"] != "meme"
+
+
+class _RecordingSupabaseClient:
+    def __init__(self) -> None:
+        self.run_row: dict[str, object] | None = None
+        self.insert_order: list[str] = []
+
+    def fetch_rows(self, table_name: str, *, filters=None, select: str = "*") -> list[dict[str, object]]:
+        if table_name == "jalapeno_runs":
+            return [self.run_row] if self.run_row is not None else []
+        return []
+
+    def insert_row(self, table_name: str, payload):
+        self.insert_order.append(table_name)
+        if table_name == "jalapeno_runs":
+            self.run_row = payload if isinstance(payload, dict) else payload[0]
+        return [payload] if isinstance(payload, dict) else payload
+
+
+class _CandidateFailureSupabaseClient(_RecordingSupabaseClient):
+    def insert_row(self, table_name: str, payload):
+        self.insert_order.append(table_name)
+        if table_name == "jalapeno_runs":
+            self.run_row = payload if isinstance(payload, dict) else payload[0]
+            return [payload] if isinstance(payload, dict) else payload
+        if table_name == "jalapeno_content_candidates":
+            raise RuntimeError("candidate insert failed")
+        return [payload] if isinstance(payload, dict) else payload
+
+
+def test_content_engine_validation_creates_run_before_related_rows(tmp_path: Path) -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    snapshot = generate_latest_snapshot(output_path=tmp_path / "latest_snapshot.json").snapshot
+    external_context = {
+        "agent": "Jalapeno",
+        "phase": 4,
+        "day_of_week": "Saturday",
+        "major_holidays": [],
+        "minor_holidays": [],
+        "food_holidays": [],
+        "local_or_national_events": ["Saturday game day wings"],
+        "sports_events": ["NBA playoffs"],
+        "trend_topics": ["weekend wing crawl"],
+        "news_topics": [],
+        "recommended_content_angles": ["Game day wings"],
+        "source_summary": {"signals_used": ["sports_events"], "fallback_used": True},
+    }
+    client = _RecordingSupabaseClient()
+
+    result = validate_content_engine_environment(
+        config,
+        snapshot,
+        external_context,
+        client=client,
+        dry_run=True,
+        output_path=tmp_path / "latest_content_decision.json",
+    )
+
+    assert result.run_id
+    assert client.insert_order[0] == "jalapeno_runs"
+    assert "jalapeno_content_candidates" in client.insert_order
+    assert "jalapeno_content_decisions" in client.insert_order
+
+
+def test_content_engine_validation_logs_failed_persistence_when_candidate_insert_fails(tmp_path: Path) -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    snapshot = generate_latest_snapshot(output_path=tmp_path / "latest_snapshot.json").snapshot
+    external_context = {
+        "agent": "Jalapeno",
+        "phase": 4,
+        "day_of_week": "Saturday",
+        "major_holidays": [],
+        "minor_holidays": [],
+        "food_holidays": [],
+        "local_or_national_events": ["Saturday game day wings"],
+        "sports_events": ["NHL playoffs"],
+        "trend_topics": ["buffalo wings"],
+        "news_topics": [],
+        "recommended_content_angles": ["Community wing debate"],
+        "source_summary": {"signals_used": ["trend_topics"], "fallback_used": True},
+    }
+    stream = StringIO()
+    logger = initialize_logging(replace(config, log_directory=tmp_path / "logs"), stream=stream)
+    client = _CandidateFailureSupabaseClient()
+
+    validate_content_engine_environment(
+        config,
+        snapshot,
+        external_context,
+        logger=logger,
+        client=client,
+        dry_run=True,
+        output_path=tmp_path / "latest_content_decision.json",
+    )
+
+    log_output = stream.getvalue()
+    assert "content_candidate_persist_failed" in log_output
+    assert "persisted_to_db=false" in log_output
+
+
+def test_image_pipeline_validation_runs_dry_run_without_upload(tmp_path: Path) -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    config = replace(
+        config,
+        image=replace(config.image, temp_dir=tmp_path / "images"),
+        branding=replace(config.branding, enabled=False),
+    )
+    content_decision = {
+        "run_id": "11111111-1111-1111-1111-111111111111",
+        "winner": {
+            "candidate_id": "22222222-2222-2222-2222-222222222222",
+            "content_type": "meme",
+            "visual_style": "meme",
+            "image_prompt": "A playful meme-style wing scene with bold sauce contrast and room for top and bottom text.",
+            "working_title": "Wing debate energy",
+            "suggested_cta": "What side are you on?",
+        },
+        "decision_summary": {"run_id": "11111111-1111-1111-1111-111111111111"},
+    }
+    stream = StringIO()
+    logger = initialize_logging(replace(config, log_directory=tmp_path / "logs"), stream=stream)
+
+    result = validate_image_pipeline_environment(
+        config,
+        content_decision,
+        logger=logger,
+        client=None,
+        output_path=tmp_path / "latest_image_pipeline.json",
+    )
+
+    assert result.temp_dir_ready is True
+    assert result.result["validation_status"] == "passed"
+    assert result.result["public_url"] is None
+    assert result.result["meme_format_applied"] is True
+    assert (tmp_path / "latest_image_pipeline.json").exists()
+    payload = json.loads((tmp_path / "latest_image_pipeline.json").read_text(encoding="utf-8"))
+    assert payload["validation"]["valid"] is True
+    assert payload["result"]["candidate_id"] == "22222222-2222-2222-2222-222222222222"
+    output = stream.getvalue()
+    assert "image_pipeline_validation_started" in output
+    assert "image_pipeline_started" in output
+    assert "image_generation_started" in output
+    assert "meme_format_applied" in output
+    assert "image_pipeline_validation_completed" in output

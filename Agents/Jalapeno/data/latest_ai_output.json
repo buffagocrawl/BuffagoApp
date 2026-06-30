@@ -1,0 +1,452 @@
+{
+  "agent_name": "Jalapeno",
+  "backend_available": true,
+  "brand_result": {
+    "backend_available": true,
+    "errors": [],
+    "model": "gpt-5.4-mini",
+    "output": {
+      "notes": [
+        "The phrase 'Download Buffago and start your next crawl' is a clean CTA and fits the brand.",
+        "Hashtags are relevant and not overly noisy.",
+        "The image prompt also stays safe: social, appetizing, and non-political with no negative humor."
+      ],
+      "passed": true,
+      "reasons": [
+        "The caption stays food-first, local, and centered on wing crawls, badges, and community discovery.",
+        "Tone is playful and Buffago-branded without being mean, corporate, or controversial.",
+        "No politics, tragedy, harassment, sexual content, alcohol focus, or private info are present.",
+        "It avoids fake metrics and fake restaurant endorsements while using real crawl/activity signals."
+      ],
+      "risk_level": "low"
+    },
+    "raw_response": {
+      "errors": [],
+      "model": "gpt-5.4-mini",
+      "output": {
+        "notes": [
+          "The phrase 'Download Buffago and start your next crawl' is a clean CTA and fits the brand.",
+          "Hashtags are relevant and not overly noisy.",
+          "The image prompt also stays safe: social, appetizing, and non-political with no negative humor."
+        ],
+        "passed": true,
+        "reasons": [
+          "The caption stays food-first, local, and centered on wing crawls, badges, and community discovery.",
+          "Tone is playful and Buffago-branded without being mean, corporate, or controversial.",
+          "No politics, tragedy, harassment, sexual content, alcohol focus, or private info are present.",
+          "It avoids fake metrics and fake restaurant endorsements while using real crawl/activity signals."
+        ],
+        "risk_level": "low"
+      },
+      "request_type": "brand_validation",
+      "safety": {
+        "notes": [
+          "The phrase 'Download Buffago and start your next crawl' is a clean CTA and fits the brand.",
+          "Hashtags are relevant and not overly noisy.",
+          "The image prompt also stays safe: social, appetizing, and non-political with no negative humor.",
+          "Deterministic safety scan passed."
+        ],
+        "passed": true,
+        "reasons": [
+          "The caption stays food-first, local, and centered on wing crawls, badges, and community discovery.",
+          "Tone is playful and Buffago-branded without being mean, corporate, or controversial.",
+          "No politics, tragedy, harassment, sexual content, alcohol focus, or private info are present.",
+          "It avoids fake metrics and fake restaurant endorsements while using real crawl/activity signals."
+        ],
+        "risk_level": "low"
+      },
+      "schema_version": "1.0",
+      "success": true,
+      "usage": {
+        "estimated_cost_usd": null,
+        "input_tokens": 4133,
+        "output_tokens": 152,
+        "total_tokens": 4285
+      }
+    },
+    "request_type": "brand_validation",
+    "safety": {
+      "notes": [
+        "The phrase 'Download Buffago and start your next crawl' is a clean CTA and fits the brand.",
+        "Hashtags are relevant and not overly noisy.",
+        "The image prompt also stays safe: social, appetizing, and non-political with no negative humor.",
+        "Deterministic safety scan passed."
+      ],
+      "passed": true,
+      "reasons": [
+        "The caption stays food-first, local, and centered on wing crawls, badges, and community discovery.",
+        "Tone is playful and Buffago-branded without being mean, corporate, or controversial.",
+        "No politics, tragedy, harassment, sexual content, alcohol focus, or private info are present.",
+        "It avoids fake metrics and fake restaurant endorsements while using real crawl/activity signals."
+      ],
+      "risk_level": "low"
+    },
+    "schema_version": "1.0",
+    "success": true,
+    "usage": {
+      "estimated_cost_usd": null,
+      "input_tokens": 4133,
+      "output_tokens": 152,
+      "total_tokens": 4285
+    },
+    "used_fallback": false
+  },
+  "brand_validation": {
+    "notes": [
+      "The phrase 'Download Buffago and start your next crawl' is a clean CTA and fits the brand.",
+      "Hashtags are relevant and not overly noisy.",
+      "The image prompt also stays safe: social, appetizing, and non-political with no negative humor."
+    ],
+    "passed": true,
+    "reasons": [
+      "The caption stays food-first, local, and centered on wing crawls, badges, and community discovery.",
+      "Tone is playful and Buffago-branded without being mean, corporate, or controversial.",
+      "No politics, tragedy, harassment, sexual content, alcohol focus, or private info are present.",
+      "It avoids fake metrics and fake restaurant endorsements while using real crawl/activity signals."
+    ],
+    "risk_level": "low"
+  },
+  "generated_at": "2026-06-30T23:29:57.994876+00:00",
+  "image_prompt": {
+    "brand_safety_notes": [
+      "Keep the joke light and food-first.",
+      "Do not reference specific restaurants as endorsements.",
+      "Avoid alcohol-centered cues.",
+      "No political, offensive, or negative humor.",
+      "Keep it local, social, and wing-obsessed without shaming anyone."
+    ],
+    "composition_notes": "Foreground: stacked wings and sauce cups with vivid texture. Midground: 2-3 friends comparing rankings and laughing. Background: realistic patio/restaurant with soft bokeh. Leave clean top space for meme text. Vertical 4:5 framing optimized for Instagram.",
+    "content_slot": "meme_post",
+    "image_prompt": "Create a bright, highly shareable Instagram meme image in a modern Buffago style: a realistic, colorful wing bar scene on a summer Tuesday evening with patio seating, warm golden hour lighting, a table covered in saucy wings, celery, dips, and a couple of friends mid-laugh while comparing wing ratings on their phones. In the background, subtle restaurant details suggest a local crawl vibe in New York State, with one chalkboard menu, no readable branding, and a lively but not crowded atmosphere. The composition should feel like a perfect midweek wing fix: appetizing food in the foreground, people and patio energy in the midground, soft urban restaurant depth in the background. Use a clean central focal area with negative space near the top for optional meme text, keep faces natural and diverse, and make the wings glossy, crispy, and saucy with strong texture contrast. Camera angle: slightly low 3/4 table-level shot, mobile-friendly framing, vibrant reds, oranges, and warm browns, realistic restaurant lighting, crisp detail on the food, casual social energy, and a playful discovery-first Buffago feel.",
+    "needs_text_overlay": true,
+    "negative_prompt_guidance": "Avoid cartoonish wings, distorted hands, uncanny faces, extra fingers, readable logos, branded packaging, messy clutter, harsh flash, dark moody lighting, overly corporate design, generic stock-photo smiles, low-detail food, text baked into the image, political or edgy symbols, alcohol focus, and anything mean or negative.",
+    "style": "meme",
+    "text_overlay": "Tuesday trivia can wait. Wings cannot."
+  },
+  "image_result": {
+    "backend_available": true,
+    "errors": [],
+    "model": "gpt-5.4-mini",
+    "output": {
+      "brand_safety_notes": [
+        "Keep the joke light and food-first.",
+        "Do not reference specific restaurants as endorsements.",
+        "Avoid alcohol-centered cues.",
+        "No political, offensive, or negative humor.",
+        "Keep it local, social, and wing-obsessed without shaming anyone."
+      ],
+      "composition_notes": "Foreground: stacked wings and sauce cups with vivid texture. Midground: 2-3 friends comparing rankings and laughing. Background: realistic patio/restaurant with soft bokeh. Leave clean top space for meme text. Vertical 4:5 framing optimized for Instagram.",
+      "content_slot": "meme_post",
+      "image_prompt": "Create a bright, highly shareable Instagram meme image in a modern Buffago style: a realistic, colorful wing bar scene on a summer Tuesday evening with patio seating, warm golden hour lighting, a table covered in saucy wings, celery, dips, and a couple of friends mid-laugh while comparing wing ratings on their phones. In the background, subtle restaurant details suggest a local crawl vibe in New York State, with one chalkboard menu, no readable branding, and a lively but not crowded atmosphere. The composition should feel like a perfect midweek wing fix: appetizing food in the foreground, people and patio energy in the midground, soft urban restaurant depth in the background. Use a clean central focal area with negative space near the top for optional meme text, keep faces natural and diverse, and make the wings glossy, crispy, and saucy with strong texture contrast. Camera angle: slightly low 3/4 table-level shot, mobile-friendly framing, vibrant reds, oranges, and warm browns, realistic restaurant lighting, crisp detail on the food, casual social energy, and a playful discovery-first Buffago feel.",
+      "needs_text_overlay": true,
+      "negative_prompt_guidance": "Avoid cartoonish wings, distorted hands, uncanny faces, extra fingers, readable logos, branded packaging, messy clutter, harsh flash, dark moody lighting, overly corporate design, generic stock-photo smiles, low-detail food, text baked into the image, political or edgy symbols, alcohol focus, and anything mean or negative.",
+      "style": "meme",
+      "text_overlay": "Tuesday trivia can wait. Wings cannot."
+    },
+    "raw_response": {
+      "errors": [],
+      "model": "gpt-5.4-mini",
+      "output": {
+        "brand_safety_notes": [
+          "Keep the joke light and food-first.",
+          "Do not reference specific restaurants as endorsements.",
+          "Avoid alcohol-centered cues.",
+          "No political, offensive, or negative humor.",
+          "Keep it local, social, and wing-obsessed without shaming anyone."
+        ],
+        "composition_notes": "Foreground: stacked wings and sauce cups with vivid texture. Midground: 2-3 friends comparing rankings and laughing. Background: realistic patio/restaurant with soft bokeh. Leave clean top space for meme text. Vertical 4:5 framing optimized for Instagram.",
+        "content_slot": "meme_post",
+        "image_prompt": "Create a bright, highly shareable Instagram meme image in a modern Buffago style: a realistic, colorful wing bar scene on a summer Tuesday evening with patio seating, warm golden hour lighting, a table covered in saucy wings, celery, dips, and a couple of friends mid-laugh while comparing wing ratings on their phones. In the background, subtle restaurant details suggest a local crawl vibe in New York State, with one chalkboard menu, no readable branding, and a lively but not crowded atmosphere. The composition should feel like a perfect midweek wing fix: appetizing food in the foreground, people and patio energy in the midground, soft urban restaurant depth in the background. Use a clean central focal area with negative space near the top for optional meme text, keep faces natural and diverse, and make the wings glossy, crispy, and saucy with strong texture contrast. Camera angle: slightly low 3/4 table-level shot, mobile-friendly framing, vibrant reds, oranges, and warm browns, realistic restaurant lighting, crisp detail on the food, casual social energy, and a playful discovery-first Buffago feel.",
+        "needs_text_overlay": true,
+        "negative_prompt_guidance": "Avoid cartoonish wings, distorted hands, uncanny faces, extra fingers, readable logos, branded packaging, messy clutter, harsh flash, dark moody lighting, overly corporate design, generic stock-photo smiles, low-detail food, text baked into the image, political or edgy symbols, alcohol focus, and anything mean or negative.",
+        "style": "meme",
+        "text_overlay": "Tuesday trivia can wait. Wings cannot."
+      },
+      "request_type": "image_prompt",
+      "safety": {
+        "matches": [],
+        "notes": [
+          "Deterministic safety scan passed."
+        ],
+        "passed": true,
+        "reasons": [],
+        "risk_level": "low"
+      },
+      "schema_version": "1.0",
+      "success": true,
+      "usage": {
+        "estimated_cost_usd": null,
+        "input_tokens": 5277,
+        "output_tokens": 448,
+        "total_tokens": 5725
+      }
+    },
+    "request_type": "image_prompt",
+    "safety": {
+      "matches": [],
+      "notes": [
+        "Deterministic safety scan passed."
+      ],
+      "passed": true,
+      "reasons": [],
+      "risk_level": "low"
+    },
+    "schema_version": "1.0",
+    "success": true,
+    "usage": {
+      "estimated_cost_usd": null,
+      "input_tokens": 5277,
+      "output_tokens": 448,
+      "total_tokens": 5725
+    },
+    "used_fallback": false
+  },
+  "run_id": "52f0f027-1671-4098-809c-0b9e125bbcf2",
+  "schema_version": "1.0",
+  "text_content": {
+    "alt_text": "Buffago wing crawl graphic featuring New York cities, wing icons, and badge-style gamification elements.",
+    "brand_safety_notes": [
+      "No negative restaurant commentary",
+      "No politics, tragedy, or controversial references",
+      "No fake metrics or endorsements",
+      "No alcohol-centered framing"
+    ],
+    "caption": "Tuesday called. It wants a wing crawl.\n\nBuffalo, Rochester, and Albany are already putting in work, and the crawl board is getting that dangerous little glow. New spots are popping up, badges are getting claimed, and apparently New York said, \u201cyes, more wings.\u201d\n\nIf your crew is still deciding where to go tonight, this is your sign to build the route, rate the stops, and keep the streak alive. Add it to your list. Compare your rankings. Chase the badge. \ud83c\udfc6\n\nDownload Buffago and start your next crawl.",
+    "confidence_score": 0.93,
+    "content_angle": "Midweek crawl prompt anchored in strong New York wing activity, new restaurant additions, and recent badge unlocks.",
+    "content_slot": "buffago_post",
+    "hashtags": [
+      "#Buffago",
+      "#WingCrawl",
+      "#WingJourney",
+      "#BuffaloNY",
+      "#RochesterNY",
+      "#AlbanyNY",
+      "#CrawlNight",
+      "#WingLovers"
+    ],
+    "image_prompt": "A fun social graphic showing a wing crawl route across New York with Buffalo, Rochester, and Albany pins, wing icons, badge icons, and a playful Tuesday night vibe. Clean, bold typography. Buffago-branded, modern, colorful, food-first.",
+    "post_type": "crawl_prompt",
+    "source_signals_used": [
+      "recent_ratings",
+      "top_restaurants",
+      "new_restaurants",
+      "active_states",
+      "recent_badges",
+      "xp_streak_milestones",
+      "crawl_activity",
+      "local_or_national_events",
+      "trend_topics"
+    ],
+    "why_this_post": "The strongest signals are New York activity, recent crawl momentum, new restaurant additions, and badge/streak progress. A crawl prompt ties those together naturally and fits the Tuesday trivia / midweek wing fix context without needing live sports or holidays."
+  },
+  "text_result": {
+    "backend_available": true,
+    "errors": [],
+    "model": "gpt-5.4-mini",
+    "output": {
+      "alt_text": "Buffago wing crawl graphic featuring New York cities, wing icons, and badge-style gamification elements.",
+      "brand_safety_notes": [
+        "No negative restaurant commentary",
+        "No politics, tragedy, or controversial references",
+        "No fake metrics or endorsements",
+        "No alcohol-centered framing"
+      ],
+      "caption": "Tuesday called. It wants a wing crawl.\n\nBuffalo, Rochester, and Albany are already putting in work, and the crawl board is getting that dangerous little glow. New spots are popping up, badges are getting claimed, and apparently New York said, \u201cyes, more wings.\u201d\n\nIf your crew is still deciding where to go tonight, this is your sign to build the route, rate the stops, and keep the streak alive. Add it to your list. Compare your rankings. Chase the badge. \ud83c\udfc6\n\nDownload Buffago and start your next crawl.",
+      "confidence_score": 0.93,
+      "content_angle": "Midweek crawl prompt anchored in strong New York wing activity, new restaurant additions, and recent badge unlocks.",
+      "content_slot": "buffago_post",
+      "hashtags": [
+        "#Buffago",
+        "#WingCrawl",
+        "#WingJourney",
+        "#BuffaloNY",
+        "#RochesterNY",
+        "#AlbanyNY",
+        "#CrawlNight",
+        "#WingLovers"
+      ],
+      "image_prompt": "A fun social graphic showing a wing crawl route across New York with Buffalo, Rochester, and Albany pins, wing icons, badge icons, and a playful Tuesday night vibe. Clean, bold typography. Buffago-branded, modern, colorful, food-first.",
+      "post_type": "crawl_prompt",
+      "source_signals_used": [
+        "recent_ratings",
+        "top_restaurants",
+        "new_restaurants",
+        "active_states",
+        "recent_badges",
+        "xp_streak_milestones",
+        "crawl_activity",
+        "local_or_national_events",
+        "trend_topics"
+      ],
+      "why_this_post": "The strongest signals are New York activity, recent crawl momentum, new restaurant additions, and badge/streak progress. A crawl prompt ties those together naturally and fits the Tuesday trivia / midweek wing fix context without needing live sports or holidays."
+    },
+    "raw_response": {
+      "errors": [],
+      "model": "gpt-5.4-mini",
+      "output": {
+        "alt_text": "Buffago wing crawl graphic featuring New York cities, wing icons, and badge-style gamification elements.",
+        "brand_safety_notes": [
+          "No negative restaurant commentary",
+          "No politics, tragedy, or controversial references",
+          "No fake metrics or endorsements",
+          "No alcohol-centered framing"
+        ],
+        "caption": "Tuesday called. It wants a wing crawl.\n\nBuffalo, Rochester, and Albany are already putting in work, and the crawl board is getting that dangerous little glow. New spots are popping up, badges are getting claimed, and apparently New York said, \u201cyes, more wings.\u201d\n\nIf your crew is still deciding where to go tonight, this is your sign to build the route, rate the stops, and keep the streak alive. Add it to your list. Compare your rankings. Chase the badge. \ud83c\udfc6\n\nDownload Buffago and start your next crawl.",
+        "confidence_score": 0.93,
+        "content_angle": "Midweek crawl prompt anchored in strong New York wing activity, new restaurant additions, and recent badge unlocks.",
+        "content_slot": "buffago_post",
+        "hashtags": [
+          "#Buffago",
+          "#WingCrawl",
+          "#WingJourney",
+          "#BuffaloNY",
+          "#RochesterNY",
+          "#AlbanyNY",
+          "#CrawlNight",
+          "#WingLovers"
+        ],
+        "image_prompt": "A fun social graphic showing a wing crawl route across New York with Buffalo, Rochester, and Albany pins, wing icons, badge icons, and a playful Tuesday night vibe. Clean, bold typography. Buffago-branded, modern, colorful, food-first.",
+        "post_type": "crawl_prompt",
+        "source_signals_used": [
+          "recent_ratings",
+          "top_restaurants",
+          "new_restaurants",
+          "active_states",
+          "recent_badges",
+          "xp_streak_milestones",
+          "crawl_activity",
+          "local_or_national_events",
+          "trend_topics"
+        ],
+        "why_this_post": "The strongest signals are New York activity, recent crawl momentum, new restaurant additions, and badge/streak progress. A crawl prompt ties those together naturally and fits the Tuesday trivia / midweek wing fix context without needing live sports or holidays."
+      },
+      "request_type": "text_content",
+      "safety": {
+        "matches": [],
+        "notes": [
+          "Deterministic safety scan passed."
+        ],
+        "passed": true,
+        "reasons": [],
+        "risk_level": "low"
+      },
+      "schema_version": "1.0",
+      "success": true,
+      "usage": {
+        "estimated_cost_usd": null,
+        "input_tokens": 5363,
+        "output_tokens": 417,
+        "total_tokens": 5780
+      }
+    },
+    "request_type": "text_content",
+    "safety": {
+      "matches": [],
+      "notes": [
+        "Deterministic safety scan passed."
+      ],
+      "passed": true,
+      "reasons": [],
+      "risk_level": "low"
+    },
+    "schema_version": "1.0",
+    "success": true,
+    "usage": {
+      "estimated_cost_usd": null,
+      "input_tokens": 5363,
+      "output_tokens": 417,
+      "total_tokens": 5780
+    },
+    "used_fallback": false
+  },
+  "usage": {
+    "generated_at": "2026-06-30T23:29:57.992873+00:00",
+    "records": [
+      {
+        "backend_used": true,
+        "chosen_cta": null,
+        "chosen_hashtags": [
+          "#Buffago",
+          "#WingCrawl",
+          "#WingJourney",
+          "#BuffaloNY",
+          "#RochesterNY",
+          "#AlbanyNY",
+          "#CrawlNight",
+          "#WingLovers"
+        ],
+        "content_category": "crawl_prompt",
+        "content_slot": "buffago_post",
+        "estimated_cost_usd": null,
+        "generation_time_ms": 4664,
+        "image_generation_prompt": "A fun social graphic showing a wing crawl route across New York with Buffalo, Rochester, and Albany pins, wing icons, badge icons, and a playful Tuesday night vibe. Clean, bold typography. Buffago-branded, modern, colorful, food-first.",
+        "input_size_chars": 7893,
+        "input_tokens": 5363,
+        "model": "gpt-5.4-mini",
+        "output_size_chars": 1935,
+        "output_tokens": 417,
+        "prompt_name": "buffago_post",
+        "prompt_version": "prompt-library-v1",
+        "rejected_reason": null,
+        "request_type": "text_content",
+        "review_score": 93.0,
+        "total_tokens": 5780,
+        "used_fallback": false
+      },
+      {
+        "backend_used": true,
+        "chosen_cta": null,
+        "chosen_hashtags": null,
+        "content_category": "meme_post",
+        "content_slot": "meme_post",
+        "estimated_cost_usd": null,
+        "generation_time_ms": 4321,
+        "image_generation_prompt": "Create a bright, highly shareable Instagram meme image in a modern Buffago style: a realistic, colorful wing bar scene on a summer Tuesday evening with patio seating, warm golden hour lighting, a table covered in saucy wings, celery, dips, and a couple of friends mid-laugh while comparing wing ratings on their phones. In the background, subtle restaurant details suggest a local crawl vibe in New York State, with one chalkboard menu, no readable branding, and a lively but not crowded atmosphere. The composition should feel like a perfect midweek wing fix: appetizing food in the foreground, people and patio energy in the midground, soft urban restaurant depth in the background. Use a clean central focal area with negative space near the top for optional meme text, keep faces natural and diverse, and make the wings glossy, crispy, and saucy with strong texture contrast. Camera angle: slightly low 3/4 table-level shot, mobile-friendly framing, vibrant reds, oranges, and warm browns, realistic restaurant lighting, crisp detail on the food, casual social energy, and a playful discovery-first Buffago feel.",
+        "input_size_chars": 7893,
+        "input_tokens": 5277,
+        "model": "gpt-5.4-mini",
+        "output_size_chars": 2172,
+        "output_tokens": 448,
+        "prompt_name": "image_generation",
+        "prompt_version": "prompt-library-v1",
+        "rejected_reason": null,
+        "request_type": "image_prompt",
+        "review_score": null,
+        "total_tokens": 5725,
+        "used_fallback": false
+      },
+      {
+        "backend_used": true,
+        "chosen_cta": null,
+        "chosen_hashtags": null,
+        "content_category": "brand_validation",
+        "content_slot": "buffago_post",
+        "estimated_cost_usd": null,
+        "generation_time_ms": 1800,
+        "image_generation_prompt": null,
+        "input_size_chars": 7893,
+        "input_tokens": 4133,
+        "model": "gpt-5.4-mini",
+        "output_size_chars": 688,
+        "output_tokens": 152,
+        "prompt_name": "quality_review",
+        "prompt_version": "prompt-library-v1",
+        "rejected_reason": null,
+        "request_type": "brand_validation",
+        "review_score": 100.0,
+        "total_tokens": 4285,
+        "used_fallback": false
+      }
+    ],
+    "run_id": "52f0f027-1671-4098-809c-0b9e125bbcf2",
+    "totals": {
+      "estimated_cost_usd": null,
+      "input_tokens": 14773,
+      "output_tokens": 1017,
+      "total_tokens": 15790
+    }
+  },
+  "used_backend": true,
+  "used_fallback": false
+}

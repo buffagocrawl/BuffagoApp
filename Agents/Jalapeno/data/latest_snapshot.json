@@ -1,0 +1,257 @@
+{
+  "active_states": [
+    {
+      "anonymous_events": 41,
+      "event_count": 128,
+      "state": "NY",
+      "state_name": "New York",
+      "unique_users": 19
+    },
+    {
+      "anonymous_events": 18,
+      "event_count": 63,
+      "state": "PA",
+      "state_name": "Pennsylvania",
+      "unique_users": 11
+    },
+    {
+      "anonymous_events": 14,
+      "event_count": 51,
+      "state": "OH",
+      "state_name": "Ohio",
+      "unique_users": 9
+    }
+  ],
+  "agent": "Jalapeno",
+  "crawl_activity": {
+    "by_status": [
+      {
+        "count": 12,
+        "status": "completed"
+      },
+      {
+        "count": 4,
+        "status": "in_progress"
+      },
+      {
+        "count": 2,
+        "status": "planned"
+      }
+    ],
+    "by_type": [
+      {
+        "count": 11,
+        "crawl_type": "solo"
+      },
+      {
+        "count": 7,
+        "crawl_type": "group"
+      }
+    ],
+    "recent_crawls": [
+      {
+        "city": "Buffalo",
+        "crawl_type": "solo",
+        "is_solo": true,
+        "route_title": "Buffalo Heat Trail",
+        "start_time": "2026-06-30T23:29:47.179102+00:00",
+        "state": "NY",
+        "status": "completed"
+      },
+      {
+        "city": "Rochester",
+        "crawl_type": "group",
+        "is_solo": false,
+        "route_title": "Rochester Wing Run",
+        "start_time": "2026-06-30T23:29:47.179102+00:00",
+        "state": "NY",
+        "status": "in_progress"
+      },
+      {
+        "city": "Erie",
+        "crawl_type": "solo",
+        "is_solo": true,
+        "route_title": "Lake Erie Lap",
+        "start_time": "2026-06-30T23:29:47.179102+00:00",
+        "state": "PA",
+        "status": "planned"
+      }
+    ],
+    "total_crawls": 18
+  },
+  "generated_at": "2026-06-30T23:29:47.179102+00:00",
+  "is_fallback": true,
+  "new_restaurants": [
+    {
+      "city": "Buffalo",
+      "created_at": "2026-06-30T23:29:47.179102+00:00",
+      "restaurant_name": "Clutch Bar",
+      "state": "NY"
+    },
+    {
+      "city": "Syracuse",
+      "created_at": "2026-06-30T23:29:47.179102+00:00",
+      "restaurant_name": "Sauce Lab",
+      "state": "NY"
+    },
+    {
+      "city": "Rochester",
+      "created_at": "2026-06-30T23:29:47.179102+00:00",
+      "restaurant_name": "Crunch House",
+      "state": "NY"
+    }
+  ],
+  "phase": 3,
+  "recent_badges": [
+    {
+      "badge_category": "ratings",
+      "badge_code": "heat_seeker",
+      "badge_name": "Heat Seeker",
+      "latest_unlocked_at": "2026-06-30T23:29:47.179102+00:00",
+      "unlock_count": 6,
+      "xp_reward": 25
+    },
+    {
+      "badge_category": "crawls",
+      "badge_code": "crawl_captain",
+      "badge_name": "Crawl Captain",
+      "latest_unlocked_at": "2026-06-30T23:29:47.179102+00:00",
+      "unlock_count": 4,
+      "xp_reward": 40
+    },
+    {
+      "badge_category": "streaks",
+      "badge_code": "streak_starter",
+      "badge_name": "Streak Starter",
+      "latest_unlocked_at": "2026-06-30T23:29:47.179102+00:00",
+      "unlock_count": 5,
+      "xp_reward": 15
+    }
+  ],
+  "recent_ratings": [
+    {
+      "city": "Buffalo",
+      "created_at": "2026-06-30T23:29:47.179102+00:00",
+      "overall": 9,
+      "restaurant_name": "Crispy Corner",
+      "state": "NY",
+      "weight_score": 8.9
+    },
+    {
+      "city": "Rochester",
+      "created_at": "2026-06-30T23:29:47.179102+00:00",
+      "overall": 8,
+      "restaurant_name": "Wing Vault",
+      "state": "NY",
+      "weight_score": 8.4
+    },
+    {
+      "city": "Albany",
+      "created_at": "2026-06-30T23:29:47.179102+00:00",
+      "overall": 8,
+      "restaurant_name": "Sauce Street",
+      "state": "NY",
+      "weight_score": 8.1
+    }
+  ],
+  "source": {
+    "opted_out_user_count": 0,
+    "supabase_available": true
+  },
+  "summary": {
+    "active_states_count": 3,
+    "activity_score": 22,
+    "crawl_recent_count": 3,
+    "new_restaurants_count": 3,
+    "recent_badges_count": 3,
+    "recent_ratings_count": 3,
+    "streak_milestones_count": 4,
+    "top_restaurants_count": 3,
+    "xp_milestones_count": 4
+  },
+  "top_restaurants": [
+    {
+      "avg_overall": 8.7,
+      "avg_weight_score": 8.8,
+      "city": "Buffalo",
+      "last_rated_at": "2026-06-30T23:29:47.179102+00:00",
+      "rating_count": 42,
+      "restaurant_name": "Crispy Corner",
+      "state": "NY"
+    },
+    {
+      "avg_overall": 8.3,
+      "avg_weight_score": 8.5,
+      "city": "Rochester",
+      "last_rated_at": "2026-06-30T23:29:47.179102+00:00",
+      "rating_count": 31,
+      "restaurant_name": "Wing Vault",
+      "state": "NY"
+    },
+    {
+      "avg_overall": 8.0,
+      "avg_weight_score": 8.2,
+      "city": "Albany",
+      "last_rated_at": "2026-06-30T23:29:47.179102+00:00",
+      "rating_count": 19,
+      "restaurant_name": "Sauce Street",
+      "state": "NY"
+    }
+  ],
+  "windows": {
+    "active_states_days": 30,
+    "crawl_activity_days": 30,
+    "new_restaurants_days": 7,
+    "recent_badges_days": 7,
+    "recent_ratings_days": 7
+  },
+  "xp_streak_milestones": {
+    "max_level": 22,
+    "max_streak_weeks": 8,
+    "max_xp": 2875,
+    "streak_weeks": [
+      {
+        "streak_weeks": 1,
+        "user_count": 9
+      },
+      {
+        "streak_weeks": 2,
+        "user_count": 6
+      },
+      {
+        "streak_weeks": 4,
+        "user_count": 3
+      },
+      {
+        "streak_weeks": 8,
+        "user_count": 1
+      }
+    ],
+    "xp_levels": [
+      {
+        "level": 5,
+        "level_title": "Wing Rookie",
+        "user_count": 7,
+        "xp_required": 250
+      },
+      {
+        "level": 10,
+        "level_title": "Wing Regular",
+        "user_count": 4,
+        "xp_required": 750
+      },
+      {
+        "level": 15,
+        "level_title": "Sauce Scholar",
+        "user_count": 2,
+        "xp_required": 1500
+      },
+      {
+        "level": 20,
+        "level_title": "Buffago Legend",
+        "user_count": 1,
+        "xp_required": 2500
+      }
+    ]
+  }
+}

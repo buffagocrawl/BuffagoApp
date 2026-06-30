@@ -7,19 +7,57 @@ EAS regenerates it from `app.config.js`, `package.json`, and `package-lock.json`
 ## Native modules have "No variants exist"
 
 If multiple React Native modules are included as Gradle projects but report
-`No matching variant` / `No variants exist`, do not exclude the modules. First
-verify that the Expo SDK patch set is aligned:
+`No matching variant` / `No variants exist`, do not exclude or patch the
+individual modules. This means Gradle discovered the projects but did not
+configure them as Android libraries.
+
+In BuffaGo's EAS Android build, the failure surfaced during
+`gradlew :app:bundleRelease` with `AgpVersionAttr=8.11.0` and these projects:
+
+- `:react-native-async-storage_async-storage`
+- `:react-native-community_slider`
+- `:react-native-gesture-handler`
+- `:react-native-maps`
+- `:react-native-reanimated`
+- `:react-native-safe-area-context`
+- `:react-native-screens`
+- `:react-native-svg`
+- `:react-native-vector-icons`
+- `:react-native-worklets`
+
+That is the signature of an autolinking / generated native project problem, not
+10 separate broken packages.
+
+BuffaGo's failure was caused by an outdated Expo SDK 54 patch set:
+
+- `expo` 54.0.13 bundled `expo-modules-autolinking` 3.0.15.
+- React Native and its Gradle plugin were at 0.81.4.
+- Expo's generated settings included the React Native projects, but that older
+  autolinking/Gradle integration left them without consumable Android variants
+  in the EAS release build.
+
+The fix was to align the existing SDK 54 installation with Expo's supported
+patch versions, not to upgrade SDKs or manually include native projects:
+
+- `expo` ~54.0.35
+- `expo-modules-autolinking` 3.0.26 (transitive)
+- `react-native` and `@react-native/gradle-plugin` 0.81.5
+
+The current generated project uses the expected modern setup:
+
+- `com.facebook.react.settings` and `expo-autolinking-settings` in
+  `android/settings.gradle`
+- `expoAutolinking.rnConfigCommand` for React Native dependency discovery
+- `com.facebook.react` plus `autolinkLibrariesWithApp()` in
+  `android/app/build.gradle`
+- no manual `include` or `projectDir` entries for community native modules
+
+Verify version alignment with:
 
 ```bash
 npx expo-doctor
 npx expo install --check
 ```
-
-BuffaGo hit this after its Expo SDK 54 dependencies and React Native patch
-version drifted behind the supported SDK 54 set. Updating with
-`npx expo install --fix` also updated Expo's autolinking implementation. A
-clean native regeneration then restored project directories that point to each
-package's real `node_modules/<package>/android` library.
 
 After changing Expo, React Native, config plugins, or native dependencies,
 regenerate the ignored Android project:
@@ -34,6 +72,17 @@ Then validate:
 cd android
 ./gradlew clean
 ./gradlew :app:bundleRelease --stacktrace
+```
+
+Because `android/` is ignored and excluded by `.easignore`, editing generated
+Gradle files locally will not affect EAS. Commit `package.json`,
+`package-lock.json`, and config-plugin changes, then use a no-cache EAS build if
+an older failed build may be reusing stale dependency or prebuild state.
+
+If you need the exact cloud build failure again, use:
+
+```bash
+eas build:view <build-id> --json
 ```
 
 Use JDK 17 or 21. If local CMake reports that the NDK `clang` executable does

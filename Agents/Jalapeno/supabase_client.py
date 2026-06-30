@@ -90,6 +90,49 @@ class SupabaseClient:
         result = self.request("PATCH", quote(table_name), params=params, json_payload=payload)
         return result or []
 
+    def _storage_endpoint(self, path: str) -> str:
+        return f"{self.config.url.rstrip('/')}/storage/v1/{path.lstrip('/')}"
+
+    def storage_bucket_exists(self, bucket: str) -> bool:
+        response = self._session.get(
+            self._storage_endpoint(f"bucket/{quote(bucket)}"),
+            headers={
+                "apikey": self.config.service_role_key,
+                "Authorization": f"Bearer {self.config.service_role_key}",
+                "Accept": "application/json",
+            },
+            timeout=self.config.timeout_seconds,
+        )
+        return response.status_code == 200
+
+    def storage_public_url(self, bucket: str, storage_path: str) -> str:
+        return f"{self.config.url.rstrip('/')}/storage/v1/object/public/{quote(bucket)}/{quote(storage_path, safe='/')}"
+
+    def upload_storage_object(
+        self,
+        bucket: str,
+        storage_path: str,
+        *,
+        data: bytes,
+        content_type: str,
+    ) -> dict[str, Any]:
+        response = self._session.put(
+            self._storage_endpoint(f"object/{quote(bucket)}/{quote(storage_path, safe='/')}"),
+            headers={
+                "apikey": self.config.service_role_key,
+                "Authorization": f"Bearer {self.config.service_role_key}",
+                "Content-Type": content_type,
+                "x-upsert": "false",
+            },
+            data=data,
+            timeout=self.config.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise SupabaseError(f"Supabase storage upload failed ({response.status_code}): {response.text}")
+        if not response.content:
+            return {}
+        return response.json()
+
     def upsert_rows(self, table_name: str, payload: dict[str, Any] | list[dict[str, Any]], *, on_conflict: str) -> list[dict[str, Any]]:
         headers = {"Prefer": f"resolution=merge-duplicates,return=representation", "On-Conflict": on_conflict}
         response = self._session.request(

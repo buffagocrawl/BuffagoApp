@@ -1,0 +1,57 @@
+{
+  "aspect_ratio": 0.8,
+  "branding_applied": false,
+  "branding_reason": "branding_disabled",
+  "candidate_id": "afda735f-a05c-4c26-9fe8-5084b0fb8cbb",
+  "cleanup": {
+    "failed_paths": [],
+    "kept_paths": [],
+    "removed_paths": [
+      "C:\\Users\\Brand\\AppData\\Local\\Temp\\jalapeno\\images\\bccc989e-0fdd-494c-8c64-e74201dc29ad_afda735f-a05c-4c26-9fe8-5084b0fb8cbb_20260630T232959321297Z.png",
+      "C:\\Users\\Brand\\AppData\\Local\\Temp\\jalapeno\\images\\bccc989e-0fdd-494c-8c64-e74201dc29ad_afda735f-a05c-4c26-9fe8-5084b0fb8cbb_20260630T232959321297Z.jpg",
+      "C:\\Users\\Brand\\AppData\\Local\\Temp\\jalapeno\\images\\bccc989e-0fdd-494c-8c64-e74201dc29ad_afda735f-a05c-4c26-9fe8-5084b0fb8cbb_20260630T232959321297Z_square.jpg"
+    ]
+  },
+  "cleanup_status": "completed",
+  "content_type": "restaurant_spotlight",
+  "cost_estimate_usd": 0.0,
+  "file_size_bytes": 146224,
+  "format": "JPG",
+  "formatted_feed_path": "C:\\Users\\Brand\\AppData\\Local\\Temp\\jalapeno\\images\\bccc989e-0fdd-494c-8c64-e74201dc29ad_afda735f-a05c-4c26-9fe8-5084b0fb8cbb_20260630T232959321297Z.jpg",
+  "generation_time_ms": 119,
+  "height": 1350,
+  "image_prompt": "Create an Instagram-quality image of Why Crispy Corner keeps showing up featuring Crispy Corner. Composition: single hero plate with short caption space. Lighting: bright natural light with crisp highlights on the food. Camera angle: slightly above eye level for a craveable, mobile-friendly crop. Food realism: ultra-realistic wings with glossy sauce, crisp texture, celery, and sauce cups. Background: local restaurant or regional food setting anchored in Buffalo. Color palette: Buffago-inspired spicy orange, sauce red, cream, black, and warm golden tones. Make it polished, modern, and highly readable on mobile. Negative prompt guidance: No text unless intentional, no fake logos, no alcohol focus, no distorted food, no blurry plates, no extra fingers, no uncanny faces, no political symbols, and no cluttered stock-photo energy.",
+  "image_type": "restaurant",
+  "local_temp_path": "C:\\Users\\Brand\\AppData\\Local\\Temp\\jalapeno\\images\\bccc989e-0fdd-494c-8c64-e74201dc29ad_afda735f-a05c-4c26-9fe8-5084b0fb8cbb_20260630T232959321297Z.png",
+  "meme_bottom_text": null,
+  "meme_format_applied": false,
+  "meme_top_text": null,
+  "model": "gpt-image-2",
+  "post_id": null,
+  "prompt_version": "prompt-library-v1",
+  "public_url": null,
+  "run_id": "bccc989e-0fdd-494c-8c64-e74201dc29ad",
+  "square_fallback_path": "C:\\Users\\Brand\\AppData\\Local\\Temp\\jalapeno\\images\\bccc989e-0fdd-494c-8c64-e74201dc29ad_afda735f-a05c-4c26-9fe8-5084b0fb8cbb_20260630T232959321297Z_square.jpg",
+  "stage_durations_ms": {
+    "formatting": 126,
+    "generation": 119,
+    "validation": 25
+  },
+  "storage_bucket": "jalapeno-assets",
+  "storage_path": null,
+  "upload": null,
+  "uploaded_at": null,
+  "validation": {
+    "aspect_ratio": 0.8,
+    "file_exists": true,
+    "file_size_bytes": 157032,
+    "format": "PNG",
+    "height": 1920,
+    "issues": [],
+    "valid": true,
+    "width": 1536
+  },
+  "validation_issues": [],
+  "validation_status": "passed",
+  "width": 1080
+}
