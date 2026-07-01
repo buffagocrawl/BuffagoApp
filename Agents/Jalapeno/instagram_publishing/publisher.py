@@ -286,6 +286,20 @@ def _persist_publish_state(
         payload["video_asset_id"] = state.post.video_asset_id
     if state.post.public_video_url is not None:
         payload["video_url"] = state.post.public_video_url
+    if state.post.original_video_url is not None:
+        payload["original_video_url"] = state.post.original_video_url
+    if state.post.processed_video_url is not None:
+        payload["processed_video_url"] = state.post.processed_video_url
+    if state.post.original_storage_path is not None:
+        payload["original_storage_path"] = state.post.original_storage_path
+    if state.post.processed_storage_path is not None:
+        payload["processed_storage_path"] = state.post.processed_storage_path
+    if state.post.overlay_text is not None:
+        payload["overlay_text"] = state.post.overlay_text
+    if state.post.overlay_status is not None:
+        payload["overlay_status"] = state.post.overlay_status
+    if state.post.overlay_error is not None:
+        payload["overlay_error"] = state.post.overlay_error
     if state.post.media_kind != "image":
         payload["media_kind"] = state.post.media_kind
     if state.post.media_source is not None:

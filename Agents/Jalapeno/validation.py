@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import tempfile
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -34,6 +36,7 @@ from instagram_publishing.instagram_publishing import (
     run_instagram_publishing_live_environment,
     validate_instagram_publishing_environment as _validate_instagram_publishing_environment,
 )
+from video_overlay import ffmpeg_available, render_overlay_file, select_overlay_text
 
 
 DEFAULT_AI_OUTPUT_PATH: Path = BASE_DIR / "data" / "latest_ai_output.json"
@@ -96,6 +99,15 @@ class ImagePipelineValidationResult:
 class ImagePipelineRunResult:
     output_path: str
     result: dict[str, Any]
+
+
+@dataclass(frozen=True, slots=True)
+class VideoOverlayValidationResult:
+    ffmpeg_available: bool
+    dry_run_render_succeeded: bool
+    processed_storage_writable: bool
+    processed_storage_path: str | None
+    overlay_text: str
 
 
 def validate_prompt_library_environment(*, logger=None) -> dict[str, Any]:
@@ -700,6 +712,97 @@ def validate_image_pipeline_environment(
             "meme_format_applied": result.meme_format_applied,
             "cleanup_status": result.cleanup_status,
         },
+    )
+
+
+def validate_video_overlay_environment(
+    config: JalapenoConfig,
+    *,
+    logger=None,
+    client: SupabaseClient | None = None,
+) -> VideoOverlayValidationResult:
+    log_event(
+        logger,
+        "video_overlay_validation_started",
+        agent_name=config.agent_name,
+        stage="validation",
+        status="started",
+        dry_run=True,
+    )
+    if not ffmpeg_available():
+        message = "FFmpeg is not available. Install ffmpeg before running the 8pm video overlay flow."
+        log_event(logger, "video_overlay_validation_failed", level="error", error=message)
+        raise ConfigError(message)
+
+    overlay_text = select_overlay_text("Daily wing reel because the scroll deserved sauce.\n\n#Buffago #WingNight")
+    processed_storage_path = "processed/validation_probe_texted.mp4"
+    processed_storage_writable = False
+    with tempfile.TemporaryDirectory(prefix="jalapeno-overlay-validation-") as temp_dir_raw:
+        temp_dir = Path(temp_dir_raw)
+        source_path = temp_dir / "validation_source.mp4"
+        output_path = temp_dir / "validation_probe_texted.mp4"
+        source_command = [
+            "ffmpeg",
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-y",
+            "-f",
+            "lavfi",
+            "-i",
+            "color=c=black:s=720x1280:d=1:r=30",
+            "-f",
+            "lavfi",
+            "-i",
+            "anullsrc=channel_layout=stereo:sample_rate=44100",
+            "-shortest",
+            "-c:v",
+            "libx264",
+            "-pix_fmt",
+            "yuv420p",
+            "-c:a",
+            "aac",
+            str(source_path),
+        ]
+        completed = subprocess.run(source_command, capture_output=True, text=True, timeout=60, check=False)
+        if completed.returncode != 0:
+            message = completed.stderr.strip() or completed.stdout.strip() or "FFmpeg validation source generation failed"
+            log_event(logger, "video_overlay_validation_failed", level="error", error=message)
+            raise ConfigError(message)
+        render_overlay_file(source_path, output_path, overlay_text, timeout_seconds=60)
+        if client is not None:
+            if not client.storage_bucket_exists(config.video.bucket):
+                message = f"Video bucket is not accessible: {config.video.bucket}"
+                log_event(logger, "video_overlay_validation_failed", level="error", error=message)
+                raise ConfigError(message)
+            client.upload_storage_object(
+                config.video.bucket,
+                processed_storage_path,
+                data=output_path.read_bytes(),
+                content_type="video/mp4",
+                upsert=True,
+            )
+            processed_storage_writable = True
+
+    log_event(
+        logger,
+        "video_overlay_validation_completed",
+        agent_name=config.agent_name,
+        stage="validation",
+        status="completed",
+        dry_run=True,
+        ffmpeg_available=True,
+        dry_run_render_succeeded=True,
+        processed_storage_writable=processed_storage_writable,
+        processed_storage_path=processed_storage_path if processed_storage_writable else None,
+        overlay_text=overlay_text,
+    )
+    return VideoOverlayValidationResult(
+        ffmpeg_available=True,
+        dry_run_render_succeeded=True,
+        processed_storage_writable=processed_storage_writable,
+        processed_storage_path=processed_storage_path if processed_storage_writable else None,
+        overlay_text=overlay_text,
     )
 
 

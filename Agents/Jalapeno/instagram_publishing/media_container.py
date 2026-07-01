@@ -114,6 +114,13 @@ class ApprovedInstagramPost:
     public_video_url: str | None = None
     video_asset_id: str | None = None
     storage_path: str | None = None
+    original_video_url: str | None = None
+    processed_video_url: str | None = None
+    original_storage_path: str | None = None
+    processed_storage_path: str | None = None
+    overlay_text: str | None = None
+    overlay_status: str | None = None
+    overlay_error: str | None = None
     media_source: str | None = None
     container_id: str | None = None
     published_media_id: str | None = None
@@ -158,7 +165,11 @@ def load_approved_post_from_artifacts(
     alt_text = _string_or_none(winner.get("alt_text")) or _string_or_none(winner.get("accessibility_caption"))
     image_prompt = _string_or_none(winner.get("image_prompt")) or _string_or_none(winner.get("suggested_image_concept"))
     public_image_url = _string_or_none(winner.get("public_image_url")) or _string_or_none(winner.get("image_url")) or _string_or_none(image_result.get("public_url"))
-    public_video_url = _string_or_none(winner.get("public_video_url")) or _string_or_none(winner.get("video_url"))
+    public_video_url = (
+        _string_or_none(winner.get("processed_video_url"))
+        or _string_or_none(winner.get("public_video_url"))
+        or _string_or_none(winner.get("video_url"))
+    )
     media_kind = "reel" if public_video_url or content_decision.get("scheduled_post_type") == "daily_wing_reel" else "image"
     content_type = _string_or_none(winner.get("content_type")) or _string_or_none(winner.get("post_type")) or "instagram"
     image_source = _string_or_none(image_result.get("image_source")) or "unknown"
@@ -212,6 +223,13 @@ def load_approved_post_from_artifacts(
         public_video_url=public_video_url,
         video_asset_id=_string_or_none(winner.get("video_asset_id")),
         storage_path=_string_or_none(winner.get("storage_path")),
+        original_video_url=_string_or_none(winner.get("original_video_url")),
+        processed_video_url=_string_or_none(winner.get("processed_video_url")),
+        original_storage_path=_string_or_none(winner.get("original_storage_path")),
+        processed_storage_path=_string_or_none(winner.get("processed_storage_path")),
+        overlay_text=_string_or_none(winner.get("overlay_text")),
+        overlay_status=_string_or_none(winner.get("overlay_status")),
+        overlay_error=_string_or_none(winner.get("overlay_error")),
         media_source=_string_or_none(winner.get("media_source")),
         container_id=_string_or_none(content_decision.get("container_id")),
         published_media_id=_string_or_none(content_decision.get("published_media_id")),
@@ -289,6 +307,13 @@ def serialize_container_record(record: ApprovedInstagramPost) -> dict[str, Any]:
         "public_video_url": record.public_video_url,
         "video_asset_id": record.video_asset_id,
         "storage_path": record.storage_path,
+        "original_video_url": record.original_video_url,
+        "processed_video_url": record.processed_video_url,
+        "original_storage_path": record.original_storage_path,
+        "processed_storage_path": record.processed_storage_path,
+        "overlay_text": record.overlay_text,
+        "overlay_status": record.overlay_status,
+        "overlay_error": record.overlay_error,
         "media_source": record.media_source,
         "container_id": record.container_id,
         "published_media_id": record.published_media_id,

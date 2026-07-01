@@ -156,6 +156,19 @@ class SupabaseClient:
             raise SupabaseError(f"Supabase storage list failed ({response.status_code}): {response.text}")
         return response.json() if response.content else []
 
+    def download_storage_object(self, bucket: str, storage_path: str) -> bytes:
+        response = self._session.get(
+            self._storage_endpoint(f"object/{quote(bucket)}/{quote(storage_path, safe='/')}"),
+            headers={
+                "apikey": self.config.service_role_key,
+                "Authorization": f"Bearer {self.config.service_role_key}",
+            },
+            timeout=self.config.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise SupabaseError(f"Supabase storage download failed ({response.status_code}): {response.text}")
+        return response.content
+
     def upload_storage_object(
         self,
         bucket: str,
@@ -163,6 +176,7 @@ class SupabaseClient:
         *,
         data: bytes,
         content_type: str,
+        upsert: bool = False,
     ) -> dict[str, Any]:
         response = self._session.put(
             self._storage_endpoint(f"object/{quote(bucket)}/{quote(storage_path, safe='/')}"),
@@ -170,7 +184,7 @@ class SupabaseClient:
                 "apikey": self.config.service_role_key,
                 "Authorization": f"Bearer {self.config.service_role_key}",
                 "Content-Type": content_type,
-                "x-upsert": "false",
+                "x-upsert": "true" if upsert else "false",
             },
             data=data,
             timeout=self.config.timeout_seconds,

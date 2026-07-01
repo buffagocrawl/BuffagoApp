@@ -6,6 +6,7 @@ import os
 import sys
 import time
 from dataclasses import replace
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from uuid import UUID, uuid4
 
@@ -34,6 +35,7 @@ from performance_context import build_performance_context
 from reporting import generate_admin_report
 from supabase_client import SupabaseClient, SupabaseError
 from video_assets import VideoAssetError, VideoAssetRepository
+from video_overlay import apply_overlay_result_to_decision, create_text_overlay_video
 from video_reel_flow import build_reel_content, content_decision_from_reel
 from instagram_publishing.instagram_publishing import run_instagram_publishing_live_environment as run_instagram_publishing
 from validation import (
@@ -44,6 +46,7 @@ from validation import (
     validate_phase4_environment,
     validate_phase5_environment,
     validate_prompt_library_environment,
+    validate_video_overlay_environment,
     run_image_pipeline_live_environment,
 )
 
@@ -52,6 +55,7 @@ PRODUCTION_POST_TYPE_MAP = {
     "buffago": "buffago_post",
     "video": "daily_wing_reel",
 }
+BUFFAGO_POST_CADENCE = timedelta(days=3)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -75,6 +79,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--skip-ai",
         action="store_true",
         help="Skip Phase 5 AI backend calls and use fallback content",
+    )
+    parser.add_argument(
+        "--content-type",
+        choices=sorted(PRODUCTION_POST_TYPE_MAP),
+        help="Select the production content path. Equivalent to POST_TYPE for GitHub Actions.",
     )
     return parser
 
@@ -101,6 +110,67 @@ def _production_scheduled_post_type(post_type: str) -> str:
 
 def _is_video_post(scheduled_post_type: str) -> bool:
     return scheduled_post_type == "daily_wing_reel"
+
+
+def _parse_utc_datetime(value: object) -> datetime | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def _latest_successful_buffago_post_at(client: SupabaseClient) -> datetime | None:
+    rows = client.fetch_rows(
+        "jalapeno_instagram_posts",
+        select="published_at,status,scheduled_post_type",
+        filters={
+            "scheduled_post_type": "eq.buffago_post",
+            "status": "in.(published,published_with_permalink_pending)",
+            "order": "published_at.desc",
+            "limit": 1,
+        },
+    )
+    for row in rows:
+        published_at = _parse_utc_datetime(row.get("published_at"))
+        if published_at is not None:
+            return published_at
+
+    rows = client.fetch_rows(
+        "jalapeno_posts",
+        select="published_at,publish_status,post_type",
+        filters={
+            "post_type": "eq.buffago_post",
+            "publish_status": "in.(published,published_with_permalink_pending)",
+            "order": "published_at.desc",
+            "limit": 1,
+        },
+    )
+    for row in rows:
+        published_at = _parse_utc_datetime(row.get("published_at"))
+        if published_at is not None:
+            return published_at
+    return None
+
+
+def _should_skip_buffago_three_day_run(
+    client: SupabaseClient,
+    *,
+    now: datetime | None = None,
+) -> tuple[bool, datetime | None, float | None]:
+    current_time = now or datetime.now(timezone.utc)
+    if current_time.tzinfo is None:
+        current_time = current_time.replace(tzinfo=timezone.utc)
+    current_time = current_time.astimezone(timezone.utc)
+    last_published_at = _latest_successful_buffago_post_at(client)
+    if last_published_at is None:
+        return False, None, None
+    elapsed = current_time - last_published_at
+    return elapsed < BUFFAGO_POST_CADENCE, last_published_at, elapsed.total_seconds() / 86400
 
 
 def _github_run_source() -> str:
@@ -163,6 +233,20 @@ def _is_backup_worthy_video_publish_failure(exc: Exception) -> bool:
         "not accessible",
     )
     return any(marker in message for marker in media_markers)
+
+
+def _overlay_metadata(result) -> dict[str, object]:
+    return {
+        "original_video_url": result.original_video_url,
+        "processed_video_url": result.processed_video_url,
+        "original_storage_path": result.original_storage_path,
+        "processed_storage_path": result.processed_storage_path,
+        "overlay_text": result.overlay_text,
+        "overlay_status": result.status,
+        "overlay_error": result.error,
+        "video_url": result.publish_video_url,
+        "storage_path": result.publish_storage_path,
+    }
 
 
 def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = False) -> int:
@@ -236,6 +320,12 @@ def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = Fals
     print(f"Image pipeline temp dir: {image_result.temp_dir}")
     print(f"Image pipeline validation temp dir ready: {image_result.temp_dir_ready}")
     print(f"Image pipeline validation status: {image_result.result['validation_status']}")
+    video_overlay_result = validate_video_overlay_environment(config, logger=logger, client=client)
+    print(f"Video overlay FFmpeg available: {video_overlay_result.ffmpeg_available}")
+    print(f"Video overlay dry-run render succeeded: {video_overlay_result.dry_run_render_succeeded}")
+    print(f"Video overlay processed storage writable: {video_overlay_result.processed_storage_writable}")
+    if video_overlay_result.processed_storage_path:
+        print(f"Video overlay validation upload: {video_overlay_result.processed_storage_path}")
     publish_result = validate_instagram_publishing_environment(config, logger=logger)
     print(f"Publish report written: {publish_result.report_path}")
     print(f"Publish dry-run blocked: {publish_result.dry_run_blocked}")
@@ -332,6 +422,13 @@ def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = Fals
             "video_asset_id",
             "storage_path",
             "video_url",
+            "original_video_url",
+            "processed_video_url",
+            "original_storage_path",
+            "processed_storage_path",
+            "overlay_text",
+            "overlay_status",
+            "overlay_error",
             "retry_count",
             "last_publish_attempt_at",
             "published_at",
@@ -376,6 +473,13 @@ def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = Fals
             "media_kind",
             "media_source",
             "storage_path",
+            "original_video_url",
+            "processed_video_url",
+            "original_storage_path",
+            "processed_storage_path",
+            "overlay_text",
+            "overlay_status",
+            "overlay_error",
             "created_at",
         },
         "jalapeno_image_assets": {
@@ -519,10 +623,10 @@ def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = Fals
             print("Warning: no active video assets are available for the 8pm Reel")
     elif client is None:
         print("Warning: jalapeno_video_assets and video bucket not inspected because Supabase is unavailable")
-    print(f"Configured 4pm image post: {config.buffago_post_time} {config.timezone}")
+    print(f"Configured 4pm Buffago cadence post: {config.buffago_post_time} {config.timezone}")
     print(f"Configured 8pm video Reel post: {config.video.post_time} {config.timezone}")
     if config.buffago_post_time != "16:00" or config.video.post_time != "20:00":
-        print("Warning: scheduler config does not match expected 16:00 image and 20:00 video times")
+        print("Warning: scheduler config does not match expected 16:00 Buffago and 20:00 video times")
     print(f"OpenAI key available: {bool(os.getenv('OPENAI_API_KEY', '').strip() or os.getenv('JALAPENO_AI_FUNCTION_URL', '').strip())}")
     print(f"Meta credentials available: {bool(os.getenv(config.instagram.access_token_secret_name, '').strip() and os.getenv(config.instagram.ig_user_id_secret_name, '').strip())}")
     print(f"Instagram business account id present: {bool(config.instagram_business_account_id)}")
@@ -729,10 +833,21 @@ def run_dry_run() -> int:
                 )
                 repository = VideoAssetRepository(client, config, logger=logger)
                 content = build_reel_content(repository, dry_run=True, logger=logger)
+                content_decision = content_decision_from_reel(str(run_uuid), content)
+                overlay_result = create_text_overlay_video(
+                    client,
+                    content.video_asset,
+                    content.caption,
+                    run_id=str(run_uuid),
+                    candidate_id=content.candidate_id,
+                    logger=logger,
+                )
+                apply_overlay_result_to_decision(content_decision, overlay_result)
+                overlay_fields = _overlay_metadata(overlay_result)
                 ensure_selected_post_candidate(
                     client,
                     run_context=run_context,
-                    winner_payload=content_decision_from_reel(str(run_uuid), content)["winner"],
+                    winner_payload=content_decision["winner"],
                     decision_summary={"winner_reasoning": ["Dry-run selected a Supabase video asset."]},
                     logger=logger,
                 )
@@ -748,17 +863,25 @@ def run_dry_run() -> int:
                     image_url=content.video_asset.public_url,
                     media_source="supabase_video_asset",
                     video_asset_id=UUID(content.video_asset.id),
-                    storage_path=content.video_asset.storage_path,
-                    video_url=content.video_asset.public_url,
+                    storage_path=str(overlay_fields["storage_path"]),
+                    video_url=str(overlay_fields["video_url"]),
+                    original_video_url=str(overlay_fields["original_video_url"]),
+                    processed_video_url=overlay_fields["processed_video_url"] if isinstance(overlay_fields["processed_video_url"], str) else None,
+                    original_storage_path=str(overlay_fields["original_storage_path"]),
+                    processed_storage_path=overlay_fields["processed_storage_path"] if isinstance(overlay_fields["processed_storage_path"], str) else None,
+                    overlay_text=str(overlay_fields["overlay_text"]),
+                    overlay_status=str(overlay_fields["overlay_status"]),
+                    overlay_error=overlay_fields["overlay_error"] if isinstance(overlay_fields["overlay_error"], str) else None,
                     publish_status="dry_run",
                     metadata={
                         "dry_run": True,
                         "media_source": "supabase_video_asset",
                         "video_asset_id": content.video_asset.id,
-                        "storage_path": content.video_asset.storage_path,
+                        "storage_path": overlay_fields["storage_path"],
                         "caption_type": content.caption_type,
                         "style": content.video_asset.style,
                         "no_publish": True,
+                        **overlay_fields,
                     },
                 )
                 log_event(
@@ -767,8 +890,12 @@ def run_dry_run() -> int:
                     run_id=str(run_uuid),
                     candidate_id=content.candidate_id,
                     video_asset_id=content.video_asset.id,
-                    storage_path=content.video_asset.storage_path,
-                    video_url=content.video_asset.public_url,
+                    storage_path=overlay_fields["storage_path"],
+                    video_url=overlay_fields["video_url"],
+                    original_storage_path=overlay_fields["original_storage_path"],
+                    processed_storage_path=overlay_fields["processed_storage_path"],
+                    overlay_text=overlay_fields["overlay_text"],
+                    overlay_status=overlay_fields["overlay_status"],
                     caption_preview=content.caption[:140],
                     publish_skipped=True,
                 )
@@ -844,7 +971,7 @@ def run_test_mode() -> int:
     return 0
 
 
-def run_production() -> int:
+def run_production(content_type: str | None = None) -> int:
     started_at = time.perf_counter()
     print(f"Loading env file: {ENV_FILE}")
     env_loaded = load_env_file()
@@ -855,7 +982,7 @@ def run_production() -> int:
     warn_missing_future_secrets(logger)
     print(f"Config loaded: {CONFIG_FILE}")
 
-    post_type = _normalize_production_post_type(os.getenv("POST_TYPE"))
+    post_type = _normalize_production_post_type(content_type or os.getenv("POST_TYPE"))
     scheduled_post_type = _production_scheduled_post_type(post_type)
     run_source = _github_run_source()
     github_metadata = _github_run_metadata()
@@ -952,10 +1079,97 @@ def run_production() -> int:
     )
 
     try:
+        if run_source == "github_actions_scheduler" and scheduled_post_type == "buffago_post" and not runtime_settings.dry_run:
+            should_skip, last_published_at, elapsed_days = _should_skip_buffago_three_day_run(client)
+            if should_skip:
+                duration_ms = int((time.perf_counter() - started_at) * 1000)
+                skip_metadata = {
+                    "mode": "production",
+                    "post_type": post_type,
+                    "scheduled_post_type": scheduled_post_type,
+                    "dry_run": runtime_settings.dry_run,
+                    "run_source": run_source,
+                    "skip_reason": "buffago_three_day_cadence",
+                    "last_successful_buffago_post_at": last_published_at.isoformat() if last_published_at else None,
+                    "elapsed_days": round(elapsed_days, 4) if elapsed_days is not None else None,
+                    "required_elapsed_days": BUFFAGO_POST_CADENCE.days,
+                    **github_metadata,
+                }
+                complete_run(
+                    client,
+                    run_id=UUID(run_id),
+                    duration_ms=duration_ms,
+                    status="skipped",
+                    metadata=skip_metadata,
+                )
+                log_event(
+                    logger,
+                    "buffago_three_day_skipped",
+                    run_id=run_id,
+                    agent_name=config.agent_name,
+                    mode="production",
+                    post_type=post_type,
+                    scheduled_post_type=scheduled_post_type,
+                    run_source=run_source,
+                    last_successful_buffago_post_at=last_published_at.isoformat() if last_published_at else None,
+                    elapsed_days=round(elapsed_days, 4) if elapsed_days is not None else None,
+                    required_elapsed_days=BUFFAGO_POST_CADENCE.days,
+                    duration_ms=duration_ms,
+                )
+                log_event(
+                    logger,
+                    "skipped_run",
+                    run_id=run_id,
+                    agent_name=config.agent_name,
+                    mode="production",
+                    post_type=post_type,
+                    scheduled_post_type=scheduled_post_type,
+                    status="skipped",
+                    reason="buffago_three_day_cadence",
+                    duration_ms=duration_ms,
+                )
+                print("Buffago three-day run skipped")
+                print(f"Last successful Buffago post: {last_published_at.isoformat() if last_published_at else 'none'}")
+                print(f"Elapsed days: {round(elapsed_days, 4) if elapsed_days is not None else 'n/a'}")
+                return 0
+            log_event(
+                logger,
+                "buffago_three_day_run",
+                run_id=run_id,
+                agent_name=config.agent_name,
+                mode="production",
+                post_type=post_type,
+                scheduled_post_type=scheduled_post_type,
+                run_source=run_source,
+                last_successful_buffago_post_at=last_published_at.isoformat() if last_published_at else None,
+                elapsed_days=round(elapsed_days, 4) if elapsed_days is not None else None,
+                required_elapsed_days=BUFFAGO_POST_CADENCE.days,
+            )
         if _is_video_post(scheduled_post_type):
+            if run_source == "github_actions_scheduler":
+                log_event(
+                    logger,
+                    "video_daily_run",
+                    run_id=run_id,
+                    agent_name=config.agent_name,
+                    mode="production",
+                    post_type=post_type,
+                    scheduled_post_type=scheduled_post_type,
+                    run_source=run_source,
+                )
             repository = VideoAssetRepository(client, config, logger=logger)
             content = build_reel_content(repository, dry_run=runtime_settings.dry_run, logger=logger)
             content_decision = content_decision_from_reel(run_id, content)
+            overlay_result = create_text_overlay_video(
+                client,
+                content.video_asset,
+                content.caption,
+                run_id=run_id,
+                candidate_id=content.candidate_id,
+                logger=logger,
+            )
+            apply_overlay_result_to_decision(content_decision, overlay_result)
+            overlay_fields = _overlay_metadata(overlay_result)
             ensure_selected_post_candidate(
                 client,
                 run_context=run_context,
@@ -975,25 +1189,33 @@ def run_production() -> int:
                 image_url=content.video_asset.public_url,
                 media_source="supabase_video_asset",
                 video_asset_id=UUID(content.video_asset.id),
-                storage_path=content.video_asset.storage_path,
-                video_url=content.video_asset.public_url,
+                storage_path=str(overlay_fields["storage_path"]),
+                video_url=str(overlay_fields["video_url"]),
+                original_video_url=str(overlay_fields["original_video_url"]),
+                processed_video_url=overlay_fields["processed_video_url"] if isinstance(overlay_fields["processed_video_url"], str) else None,
+                original_storage_path=str(overlay_fields["original_storage_path"]),
+                processed_storage_path=overlay_fields["processed_storage_path"] if isinstance(overlay_fields["processed_storage_path"], str) else None,
+                overlay_text=str(overlay_fields["overlay_text"]),
+                overlay_status=str(overlay_fields["overlay_status"]),
+                overlay_error=overlay_fields["overlay_error"] if isinstance(overlay_fields["overlay_error"], str) else None,
                 publish_status="drafted" if runtime_settings.dry_run else "publishing",
                 metadata={
                     "media_source": "supabase_video_asset",
                     "video_asset_id": content.video_asset.id,
                     "storage_bucket": content.video_asset.storage_bucket,
-                    "storage_path": content.video_asset.storage_path,
+                    "storage_path": overlay_fields["storage_path"],
                     "caption_type": content.caption_type,
                     "style": content.video_asset.style,
                     "post_type": scheduled_post_type,
                     "no_ai_media_generation": True,
+                    **overlay_fields,
                 },
             )
             content_decision["post_id"] = inserted_post.get("id")
             content_decision["metadata"] = {
                 "media_source": "supabase_video_asset",
                 "video_asset_id": content.video_asset.id,
-                "storage_path": content.video_asset.storage_path,
+                **overlay_fields,
             }
             log_event(
                 logger,
@@ -1002,8 +1224,12 @@ def run_production() -> int:
                 candidate_id=content.candidate_id,
                 post_id=inserted_post.get("id"),
                 video_asset_id=content.video_asset.id,
-                storage_path=content.video_asset.storage_path,
-                video_url=content.video_asset.public_url,
+                storage_path=overlay_fields["storage_path"],
+                video_url=overlay_fields["video_url"],
+                original_storage_path=overlay_fields["original_storage_path"],
+                processed_storage_path=overlay_fields["processed_storage_path"],
+                overlay_text=overlay_fields["overlay_text"],
+                overlay_status=overlay_fields["overlay_status"],
                 dry_run=runtime_settings.dry_run,
                 posting_allowed=runtime_settings.posting_allowed,
                 meta_api_allowed=runtime_settings.meta_api_allowed,
@@ -1076,6 +1302,16 @@ def run_production() -> int:
                     logger=logger,
                 )
                 backup_decision = content_decision_from_reel(run_id, backup_content)
+                backup_overlay_result = create_text_overlay_video(
+                    client,
+                    backup_content.video_asset,
+                    backup_content.caption,
+                    run_id=run_id,
+                    candidate_id=backup_content.candidate_id,
+                    logger=logger,
+                )
+                apply_overlay_result_to_decision(backup_decision, backup_overlay_result)
+                backup_overlay_fields = _overlay_metadata(backup_overlay_result)
                 ensure_selected_post_candidate(
                     client,
                     run_context=run_context,
@@ -1095,21 +1331,34 @@ def run_production() -> int:
                     image_url=backup_content.video_asset.public_url,
                     media_source="supabase_video_asset",
                     video_asset_id=UUID(backup_content.video_asset.id),
-                    storage_path=backup_content.video_asset.storage_path,
-                    video_url=backup_content.video_asset.public_url,
+                    storage_path=str(backup_overlay_fields["storage_path"]),
+                    video_url=str(backup_overlay_fields["video_url"]),
+                    original_video_url=str(backup_overlay_fields["original_video_url"]),
+                    processed_video_url=backup_overlay_fields["processed_video_url"] if isinstance(backup_overlay_fields["processed_video_url"], str) else None,
+                    original_storage_path=str(backup_overlay_fields["original_storage_path"]),
+                    processed_storage_path=backup_overlay_fields["processed_storage_path"] if isinstance(backup_overlay_fields["processed_storage_path"], str) else None,
+                    overlay_text=str(backup_overlay_fields["overlay_text"]),
+                    overlay_status=str(backup_overlay_fields["overlay_status"]),
+                    overlay_error=backup_overlay_fields["overlay_error"] if isinstance(backup_overlay_fields["overlay_error"], str) else None,
                     publish_status="drafted" if runtime_settings.dry_run else "publishing",
                     metadata={
                         "media_source": "supabase_video_asset",
                         "video_asset_id": backup_content.video_asset.id,
                         "storage_bucket": backup_content.video_asset.storage_bucket,
-                        "storage_path": backup_content.video_asset.storage_path,
+                        "storage_path": backup_overlay_fields["storage_path"],
                         "caption_type": backup_content.caption_type,
                         "style": backup_content.video_asset.style,
                         "backup_for_video_asset_id": content.video_asset.id,
                         "no_ai_media_generation": True,
+                        **backup_overlay_fields,
                     },
                 )
                 backup_decision["post_id"] = backup_post.get("id")
+                backup_decision["metadata"] = {
+                    "media_source": "supabase_video_asset",
+                    "video_asset_id": backup_content.video_asset.id,
+                    **backup_overlay_fields,
+                }
                 publish_result = run_instagram_publishing(
                     config,
                     backup_decision,
@@ -1119,6 +1368,7 @@ def run_production() -> int:
                     runtime_settings=runtime_settings,
                 )
                 content = backup_content
+                overlay_fields = backup_overlay_fields
             if publish_result.result.get("status") in {"published", "published_with_permalink_pending"}:
                 repository.increment_used(content.video_asset)
             duration_ms = int((time.perf_counter() - started_at) * 1000)
@@ -1136,7 +1386,11 @@ def run_production() -> int:
                     "publish_status": publish_result.result.get("status"),
                     "media_source": "supabase_video_asset",
                     "video_asset_id": content.video_asset.id,
-                    "storage_path": content.video_asset.storage_path,
+                    "storage_path": overlay_fields["storage_path"],
+                    "original_storage_path": overlay_fields["original_storage_path"],
+                    "processed_storage_path": overlay_fields["processed_storage_path"],
+                    "overlay_text": overlay_fields["overlay_text"],
+                    "overlay_status": overlay_fields["overlay_status"],
                     **github_metadata,
                 },
             )
@@ -1156,6 +1410,11 @@ def run_production() -> int:
                 duration_ms=duration_ms,
                 media_source="supabase_video_asset",
                 video_asset_id=content.video_asset.id,
+                storage_path=overlay_fields["storage_path"],
+                original_storage_path=overlay_fields["original_storage_path"],
+                processed_storage_path=overlay_fields["processed_storage_path"],
+                overlay_text=overlay_fields["overlay_text"],
+                overlay_status=overlay_fields["overlay_status"],
             )
             print(f"Publish report written: {publish_result.report_path}")
             print(f"Publish status: {publish_result.result['status']}")
@@ -1318,7 +1577,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.instagram_publish_live:
             return run_instagram_publish_live()
         if args.production:
-            return run_production()
+            return run_production(content_type=args.content_type)
         if args.metrics:
             return run_metrics()
         if args.daily_report:

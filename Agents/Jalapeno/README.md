@@ -758,29 +758,40 @@ GitHub Actions scheduled workflows do not support `America/New_York` directly in
 
 Current UTC cron entries in the workflow:
 
-- `0 20 * * *` for the scheduled 4:00 PM Eastern Daylight Time Buffago publish
-- `0 0 * * *` for the scheduled 8:00 PM Eastern Daylight Time Supabase video Reel publish
+- `0 0 * * *` for the daily 8:00 PM Eastern Daylight Time Supabase video Reel publish
+- `0 20 * * *` for the 4:00 PM Eastern Daylight Time Buffago cadence check
 
 When Eastern Standard Time resumes, update those cron entries to:
 
-- `0 21 * * *` for 4:00 PM Eastern Standard Time
 - `0 1 * * *` for 8:00 PM Eastern Standard Time
+- `0 21 * * *` for 4:00 PM Eastern Standard Time
 
 Time conversion reference:
 
-- During daylight time, 4:00 PM ET = 20:00 UTC
 - During daylight time, 8:00 PM ET = 00:00 UTC next day
-- During standard time, 4:00 PM ET = 21:00 UTC
+- During daylight time, 4:00 PM ET = 20:00 UTC
 - During standard time, 8:00 PM ET = 01:00 UTC next day
+- During standard time, 4:00 PM ET = 21:00 UTC
 
 Workflow behavior:
 
-- Scheduled 4:00 PM ET runs set `POST_TYPE=buffago` and call `python main.py --production`
-- Scheduled 8:00 PM ET runs set `POST_TYPE=video` and call `python main.py --production`
+- Scheduled 8:00 PM ET runs set `POST_TYPE=video` and call `python main.py --production --content-type video`
+- Scheduled 4:00 PM ET runs set `POST_TYPE=buffago` and call `python main.py --production --content-type buffago`
+- The video scheduler emits `video_daily_run` when it runs.
+- The Buffago scheduler emits `buffago_three_day_run` when it proceeds and `buffago_three_day_skipped` plus `skipped_run` when it exits because fewer than three days have passed.
+- The Buffago cron runs daily, but the three-day cadence is enforced in app logic by checking Supabase for the most recent successful regular Buffago post. This avoids cron day-of-month patterns such as `*/3`, which reset at month boundaries and do not mean "three days since the last successful publish."
 - Manual dispatch exposes a required `post_type` choice with valid values `buffago` and `video`
 - Manual dispatch defaults `publish=false`, which runs `python main.py --dry-run`
-- Manual dispatch can opt into live publishing by setting `publish=true`, which runs `python main.py --production`
+- Manual dispatch can opt into live publishing by setting `publish=true`, which runs `python main.py --production --content-type <post_type>`
 - Current MVP production runs auto-publish and do not wait for manual approval
+
+Manual GitHub UI runs:
+
+1. Open GitHub Actions.
+1. Select `Jalapeno Instagram Schedule`.
+1. Choose `Run workflow`.
+1. Pick `post_type` as `buffago` or `video`.
+1. Leave `publish=false` for the lower-cost dry-run/manual behavior, or set `publish=true` for a live production publish.
 
 Workflow logging:
 

@@ -9,6 +9,7 @@ if str(PROJECT_DIR) not in sys.path:
 
 from config import load_configuration  # noqa: E402
 from video_assets import VideoAssetRepository  # noqa: E402
+from video_overlay import processed_storage_path, select_overlay_text  # noqa: E402
 
 
 class _VideoAssetClient:
@@ -53,3 +54,18 @@ def test_video_asset_repository_filters_to_configured_bucket() -> None:
     assert client.filters is not None
     assert client.filters["storage_bucket"] == "eq.jalapeno-wing-videos"
     assert assets[0].storage_bucket == "jalapeno-wing-videos"
+
+
+def test_overlay_text_uses_caption_hook_without_hashtags() -> None:
+    text = select_overlay_text("Daily wing reel because the scroll deserved sauce.\n\n#Buffago #WingNight")
+
+    assert text == "DAILY WING REEL BECAUSE THE SCROLL DESERVED SAUCE"
+    assert "#" not in text
+
+
+def test_overlay_text_falls_back_for_generic_caption() -> None:
+    assert select_overlay_text("8pm wing check.\n\n#Buffago") == "SAUCY WING NIGHT"
+
+
+def test_processed_storage_path_uses_processed_folder_and_texted_suffix() -> None:
+    assert processed_storage_path("uploads/wings/fire-clip.mp4") == "processed/fire-clip_texted.mp4"

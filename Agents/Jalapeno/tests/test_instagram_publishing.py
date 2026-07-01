@@ -147,6 +147,70 @@ def test_reel_precheck_allows_supabase_video_without_image_validation() -> None:
     assert result.passed is True
 
 
+def test_reel_artifact_uses_processed_video_when_overlay_completed() -> None:
+    content_decision = {
+        "run_id": "11111111-1111-1111-1111-111111111111",
+        "scheduled_post_type": "daily_wing_reel",
+        "winner": {
+            "candidate_id": "22222222-2222-2222-2222-222222222222",
+            "content_type": "daily_wing_reel",
+            "caption": "Daily wing reel because the scroll deserved sauce.",
+            "hashtags": ["buffago"],
+            "image_prompt": "Preloaded Supabase Storage wing video asset; no AI image or video generated.",
+            "approved": True,
+            "public_video_url": "https://example.com/original.mp4",
+            "processed_video_url": "https://example.com/processed/original_texted.mp4",
+            "original_video_url": "https://example.com/original.mp4",
+            "video_asset_id": "44444444-4444-4444-4444-444444444444",
+            "storage_path": "processed/original_texted.mp4",
+            "original_storage_path": "original.mp4",
+            "processed_storage_path": "processed/original_texted.mp4",
+            "overlay_text": "THE SCROLL DESERVED SAUCE",
+            "overlay_status": "completed",
+            "media_source": "supabase_video_asset",
+        },
+    }
+
+    post = load_approved_post_from_artifacts(content_decision, image_pipeline=None)
+
+    assert post.public_video_url == "https://example.com/processed/original_texted.mp4"
+    assert post.original_video_url == "https://example.com/original.mp4"
+    assert post.processed_storage_path == "processed/original_texted.mp4"
+    assert post.overlay_status == "completed"
+
+
+def test_reel_artifact_falls_back_to_original_when_overlay_failed() -> None:
+    content_decision = {
+        "run_id": "11111111-1111-1111-1111-111111111111",
+        "scheduled_post_type": "daily_wing_reel",
+        "winner": {
+            "candidate_id": "22222222-2222-2222-2222-222222222222",
+            "content_type": "daily_wing_reel",
+            "caption": "Daily wing reel because the scroll deserved sauce.",
+            "hashtags": ["buffago"],
+            "image_prompt": "Preloaded Supabase Storage wing video asset; no AI image or video generated.",
+            "approved": True,
+            "public_video_url": "https://example.com/original.mp4",
+            "video_asset_id": "44444444-4444-4444-4444-444444444444",
+            "storage_path": "original.mp4",
+            "original_video_url": "https://example.com/original.mp4",
+            "original_storage_path": "original.mp4",
+            "processed_storage_path": "processed/original_texted.mp4",
+            "overlay_text": "THE SCROLL DESERVED SAUCE",
+            "overlay_status": "failed",
+            "overlay_error": "ffmpeg is not available",
+            "media_source": "supabase_video_asset",
+        },
+    }
+
+    post = load_approved_post_from_artifacts(content_decision, image_pipeline=None)
+
+    assert post.public_video_url == "https://example.com/original.mp4"
+    assert post.processed_video_url is None
+    assert post.overlay_status == "failed"
+    assert post.overlay_error == "ffmpeg is not available"
+
+
 def test_simulated_reel_publish_reports_reels_media_type(tmp_path: Path) -> None:
     config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
     config = replace(

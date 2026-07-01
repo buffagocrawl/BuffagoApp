@@ -325,6 +325,13 @@ def insert_final_post(
     video_asset_id: UUID | None = None,
     storage_path: str | None = None,
     video_url: str | None = None,
+    original_video_url: str | None = None,
+    processed_video_url: str | None = None,
+    original_storage_path: str | None = None,
+    processed_storage_path: str | None = None,
+    overlay_text: str | None = None,
+    overlay_status: str | None = None,
+    overlay_error: str | None = None,
     scheduled_for: datetime | None = None,
     publish_status: str = "drafted",
     metadata: dict[str, Any] | None = None,
@@ -351,6 +358,20 @@ def insert_final_post(
         payload["storage_path"] = storage_path
     if video_url is not None:
         payload["video_url"] = video_url
+    if original_video_url is not None:
+        payload["original_video_url"] = original_video_url
+    if processed_video_url is not None:
+        payload["processed_video_url"] = processed_video_url
+    if original_storage_path is not None:
+        payload["original_storage_path"] = original_storage_path
+    if processed_storage_path is not None:
+        payload["processed_storage_path"] = processed_storage_path
+    if overlay_text is not None:
+        payload["overlay_text"] = overlay_text
+    if overlay_status is not None:
+        payload["overlay_status"] = overlay_status
+    if overlay_error is not None:
+        payload["overlay_error"] = overlay_error
     rows = client.insert_row("jalapeno_posts", payload)
     return rows[0] if rows else payload
 

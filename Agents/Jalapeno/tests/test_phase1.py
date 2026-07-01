@@ -39,6 +39,7 @@ from validation import validate_image_pipeline_environment, validate_phase5_envi
 from main import (  # noqa: E402
     PRODUCTION_POST_TYPE_MAP,
     _is_backup_worthy_video_publish_failure,
+    _should_skip_buffago_three_day_run,
     _normalize_optional_post_type,
     _normalize_production_post_type,
     build_parser,
@@ -147,6 +148,7 @@ def test_required_cli_modes_exist() -> None:
     assert parser.parse_args(["--dry-run"]).dry_run is True
     assert parser.parse_args(["--test"]).test is True
     assert parser.parse_args(["--production"]).production is True
+    assert parser.parse_args(["--production", "--content-type", "video"]).content_type == "video"
 
 
 def test_prompt_library_validation_reports_manifest(tmp_path: Path) -> None:
@@ -266,9 +268,84 @@ def test_optional_post_type_reuses_production_validation() -> None:
 
 
 def test_main_routes_production_flag_to_production_runner(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr("main.run_production", lambda: 0)
+    monkeypatch.setattr("main.run_production", lambda *, content_type=None: 0)
 
     assert main(["--production"]) == 0
+
+
+def test_main_passes_content_type_to_production_runner(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured: dict[str, str | None] = {}
+
+    def fake_run_production(*, content_type: str | None = None) -> int:
+        captured["content_type"] = content_type
+        return 0
+
+    monkeypatch.setattr("main.run_production", fake_run_production)
+
+    assert main(["--production", "--content-type", "video"]) == 0
+    assert captured["content_type"] == "video"
+
+
+class _BuffagoCadenceClient:
+    def __init__(self, instagram_rows: list[dict[str, object]] | None = None, post_rows: list[dict[str, object]] | None = None) -> None:
+        self.instagram_rows = instagram_rows or []
+        self.post_rows = post_rows or []
+
+    def fetch_rows(self, table_name: str, *, filters=None, select: str = "*") -> list[dict[str, object]]:
+        if table_name == "jalapeno_instagram_posts":
+            return self.instagram_rows
+        if table_name == "jalapeno_posts":
+            return self.post_rows
+        return []
+
+
+def test_buffago_three_day_cadence_runs_when_no_prior_success() -> None:
+    should_skip, last_published_at, elapsed_days = _should_skip_buffago_three_day_run(
+        _BuffagoCadenceClient(),  # type: ignore[arg-type]
+        now=datetime(2026, 7, 1, 1, 0, tzinfo=timezone.utc),
+    )
+
+    assert should_skip is False
+    assert last_published_at is None
+    assert elapsed_days is None
+
+
+def test_buffago_three_day_cadence_skips_recent_success() -> None:
+    should_skip, last_published_at, elapsed_days = _should_skip_buffago_three_day_run(
+        _BuffagoCadenceClient(
+            instagram_rows=[
+                {
+                    "published_at": "2026-06-29T01:00:00+00:00",
+                    "status": "published",
+                    "scheduled_post_type": "buffago_post",
+                }
+            ]
+        ),  # type: ignore[arg-type]
+        now=datetime(2026, 7, 1, 1, 0, tzinfo=timezone.utc),
+    )
+
+    assert should_skip is True
+    assert last_published_at == datetime(2026, 6, 29, 1, 0, tzinfo=timezone.utc)
+    assert elapsed_days == 2
+
+
+def test_buffago_three_day_cadence_runs_after_three_days() -> None:
+    should_skip, last_published_at, elapsed_days = _should_skip_buffago_three_day_run(
+        _BuffagoCadenceClient(
+            instagram_rows=[
+                {
+                    "published_at": "2026-06-28T01:00:00Z",
+                    "status": "published",
+                    "scheduled_post_type": "buffago_post",
+                }
+            ]
+        ),  # type: ignore[arg-type]
+        now=datetime(2026, 7, 1, 1, 0, tzinfo=timezone.utc),
+    )
+
+    assert should_skip is False
+    assert last_published_at == datetime(2026, 6, 28, 1, 0, tzinfo=timezone.utc)
+    assert elapsed_days == 3
 
 
 def test_dry_run_logs_optional_post_type_for_manual_dispatch(
