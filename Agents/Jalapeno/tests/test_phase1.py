@@ -26,7 +26,12 @@ from config import (  # noqa: E402
 import config as config_module  # noqa: E402
 from data_client import Phase3WindowConfig  # noqa: E402
 from data_snapshot import generate_latest_snapshot  # noqa: E402
+from ai_schemas import fallback_image_output, normalize_image_output  # noqa: E402
+from content_engine.candidate_generator import CandidateGenerator, ContentCandidate  # noqa: E402
+from content_engine.image_prompt_generator import generate_image_prompt  # noqa: E402
+from content_engine.settings import ContentEngineSettings  # noqa: E402
 from logging_utils import format_structured_log, log_event  # noqa: E402
+from reporting import _daily_body, _weekly_body, generate_admin_report  # noqa: E402
 from validation import validate_content_engine_environment, validate_phase3_environment, validate_phase4_environment  # noqa: E402
 from validation import validate_image_pipeline_environment, validate_phase5_environment, validate_prompt_library_environment  # noqa: E402
 from main import (  # noqa: E402
@@ -528,6 +533,152 @@ def test_phase5_validation_skips_ai_and_writes_outputs(tmp_path: Path) -> None:
     assert "ai_fallback_used" in log_output
 
 
+def test_buffago_image_prompt_includes_food_comedy_and_no_text_guardrails() -> None:
+    candidate = ContentCandidate(
+        candidate_id="11111111-1111-1111-1111-111111111111",
+        content_type="meme",
+        reason_chosen="Humor test",
+        working_title="Flats court is in session",
+        short_summary="A wing debate gets out of hand.",
+        target_emotion="Amused",
+        suggested_cta="What side are you on?",
+        suggested_image_concept="Dramatic wing debate.",
+        suggested_caption_angle="Make the joke visual.",
+        primary_theme="humor",
+        secondary_theme="wing culture",
+        mood="Funny",
+        hook_style="meme hook",
+        cta_category="question",
+        food_categories=["wings"],
+        visual_style="meme",
+    )
+
+    prompt = generate_image_prompt(candidate, snapshot={}, external_context={})
+    lowered = prompt.lower()
+
+    assert "golden crisp edges" in lowered
+    assert "glossy buffalo-orange sauce" in lowered
+    assert "steam" in lowered
+    assert "comedy beat" in lowered
+    assert "active gestures" in lowered
+    assert any(action in lowered for action in ("pointing", "grabbing", "gasping", "cheering", "dropping to knees", "slamming the table", "holding a wing like evidence", "defending a basket", "facepalming", "celebrating"))
+    assert "no visible words" in lowered
+    assert "no captions" in lowered
+    assert "no ui" in lowered
+    assert "static seated conversation" in lowered
+
+
+def test_buffago_image_prompt_metadata_is_added_to_candidate() -> None:
+    candidate = ContentCandidate(
+        candidate_id="22222222-2222-2222-2222-222222222222",
+        content_type="restaurant_spotlight",
+        reason_chosen="Food test",
+        working_title="Crispy Corner close-up",
+        short_summary="Spotlight a wing restaurant.",
+        target_emotion="Hungry",
+        suggested_cta="Drop your go-to wing spot.",
+        suggested_image_concept="Wings in warm restaurant light.",
+        suggested_caption_angle="Food first.",
+        primary_theme="restaurant focus",
+        secondary_theme="recent ratings",
+        mood="Friendly",
+        hook_style="direct local hook",
+        cta_category="comment",
+        restaurants_mentioned=["Crispy Corner"],
+        cities_mentioned=["Buffalo"],
+        food_categories=["wings", "sauce"],
+        visual_style="realistic",
+    )
+
+    generate_image_prompt(candidate, snapshot={}, external_context={})
+
+    for key in ("visual_style", "camera_angle", "scene_type", "comedy_beat", "character_archetype", "wing_focus_level", "prompt_version"):
+        assert candidate.metadata[key]
+    assert candidate.metadata["visual_style"] == "buffago_cinematic_comedy_food_v2"
+
+
+def test_fallback_image_output_uses_scene_direction_metadata_and_no_text() -> None:
+    result = fallback_image_output(
+        content_slot="meme_post",
+        internal_snapshot={},
+        external_context={"source_summary": {"signals_used": ["fallback_context"]}},
+    )
+
+    prompt = result["image_prompt"].lower()
+    assert "courtroom evidence" in prompt or "visual centerpiece" in prompt
+    assert "golden crisp edges" in prompt
+    assert "no visible words" in prompt
+    assert result["needs_text_overlay"] is False
+    assert result["text_overlay"] is None
+    assert result["camera_angle"]
+    assert result["scene_type"]
+    assert result["comedy_beat"]
+    assert result["character_archetype"]
+    assert result["wing_focus_level"]
+    assert result["prompt_version"]
+
+
+def test_normalize_image_output_preserves_supported_visual_metadata() -> None:
+    output = normalize_image_output(
+        {
+            "content_slot": "meme_post",
+            "image_prompt": "Wings in a packed bar, no visible words, no captions, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+            "style": "meme",
+            "needs_text_overlay": False,
+            "text_overlay": None,
+            "composition_notes": "Food and joke are clear.",
+            "negative_prompt_guidance": "No text inside the generated image.",
+            "brand_safety_notes": ["Safe"],
+            "visual_style": "buffago_cinematic_comedy_food_v2",
+            "camera_angle": "bartender POV",
+            "scene_type": "packed sports bar",
+            "comedy_beat": "wing held like evidence",
+            "character_archetype": "The Wing Referee",
+            "wing_focus_level": "maximum",
+            "prompt_version": "prompt-library-v1:buffago-visual-v2",
+        }
+    )
+
+    assert output["visual_style"] == "buffago_cinematic_comedy_food_v2"
+    assert output["camera_angle"] == "bartender POV"
+    assert output["scene_type"] == "packed sports bar"
+    assert output["comedy_beat"] == "wing held like evidence"
+    assert output["character_archetype"] == "The Wing Referee"
+    assert output["wing_focus_level"] == "maximum"
+    assert output["prompt_version"] == "prompt-library-v1:buffago-visual-v2"
+
+
+def test_buffago_prompt_variety_rotates_across_candidates() -> None:
+    generator = CandidateGenerator(ContentEngineSettings(candidate_count_min=5, candidate_count_max=10, preferred_candidate_count=7))
+    candidates = generator.generate_candidates(
+        snapshot={
+            "recent_ratings": [{"restaurant_name": "Crispy Corner", "city": "Buffalo", "state": "NY"}],
+            "top_restaurants": [{"restaurant_name": "Wing Vault", "city": "Rochester", "state": "NY"}],
+            "new_restaurants": [],
+            "active_states": [{"state": "NY"}],
+            "crawl_activity": {"recent_crawls": []},
+            "recent_badges": [],
+            "xp_streak_milestones": {"xp_levels": []},
+        },
+        external_context={
+            "trend_topics": ["wing memes"],
+            "news_topics": [],
+            "recommended_content_angles": ["wing debate"],
+            "sports_events": ["game day"],
+            "major_holidays": [],
+            "minor_holidays": [],
+            "food_holidays": [],
+        },
+        memory_summary={},
+    )
+
+    camera_angles = {candidate.metadata.get("camera_angle") for candidate in candidates}
+    scene_types = {candidate.metadata.get("scene_type") for candidate in candidates}
+
+    assert len(camera_angles) >= 3
+    assert len(scene_types) >= 3
+
+
 def test_content_engine_validation_runs_dry_run_without_posting(tmp_path: Path) -> None:
     config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
     snapshot = generate_latest_snapshot(output_path=tmp_path / "latest_snapshot.json").snapshot
@@ -735,6 +886,60 @@ def test_content_engine_validation_logs_failed_persistence_when_candidate_insert
     log_output = stream.getvalue()
     assert "content_candidate_persist_failed" in log_output
     assert "persisted_to_db=false" in log_output
+
+
+class _EmptyReportingSupabaseClient:
+    def __init__(self) -> None:
+        self.inserted: list[tuple[str, dict[str, object]]] = []
+
+    def fetch_rows(self, table_name: str, *, filters=None, select: str = "*") -> list[dict[str, object]]:
+        return []
+
+    def insert_row(self, table_name: str, payload):
+        self.inserted.append((table_name, payload if isinstance(payload, dict) else payload[0]))
+        return [payload] if isinstance(payload, dict) else payload
+
+
+def test_admin_reports_handle_empty_performance_context(tmp_path: Path) -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    logger = initialize_logging(replace(config, log_directory=tmp_path / "logs"), stream=StringIO())
+    client = _EmptyReportingSupabaseClient()
+    now = datetime(2026, 7, 1, tzinfo=timezone.utc)
+
+    daily_report = generate_admin_report(config, client, report_type="daily", logger=logger, send_email=False, now=now)
+    weekly_report = generate_admin_report(config, client, report_type="weekly", logger=logger, send_email=False, now=now)
+
+    assert daily_report.body
+    assert weekly_report.body
+    assert "Not enough post-performance data yet" in daily_report.body
+    assert "Not enough post-performance data yet" in weekly_report.body
+    assert ("jalapeno_report_logs", daily_report.body) not in client.inserted
+    assert any(table == "jalapeno_report_logs" and row["body"] == daily_report.body for table, row in client.inserted)
+    assert any(table == "jalapeno_report_logs" and row["body"] == weekly_report.body for table, row in client.inserted)
+
+
+def test_admin_report_bodies_tolerate_null_empty_and_malformed_context() -> None:
+    context = {
+        "strong_patterns": [],
+        "weak_patterns": None,
+        "recommended_adjustments": [],
+        "best_posts": None,
+        "worst_posts": {"7d": [None, {"caption": "A real post", "engagement_rate": 0.08}]},
+        "best_categories": None,
+        "worst_categories": [{"wrong": "shape"}],
+        "best_image_styles": "not-a-list",
+        "worst_image_styles": [],
+        "best_cta_types": [None, {"name": "question"}],
+        "source_counts": {"rows": 0},
+    }
+
+    daily_body = _daily_body(runs=[], posts=[], metrics=[], errors=[], context=context, costs={})
+    weekly_body = _weekly_body(runs=[], posts=[], metrics=[], errors=[], context=context, costs={})
+
+    assert "Not enough post-performance data yet" in daily_body
+    assert "Not enough post-performance data yet" in weekly_body
+    assert "No best-post data yet." in weekly_body
+    assert "question" in weekly_body
 
 
 def test_image_pipeline_validation_runs_dry_run_without_upload(tmp_path: Path) -> None:

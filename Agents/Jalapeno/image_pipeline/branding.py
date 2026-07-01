@@ -11,23 +11,9 @@ class BrandingResult:
     applied: bool
     reason: str | None = None
     logo_path: str | None = None
-
-
-def _load_font(size: int) -> ImageFont.ImageFont:
-    from PIL import ImageFont
-
-    candidates = [
-        Path("C:/Windows/Fonts/arialbd.ttf"),
-        Path("C:/Windows/Fonts/segoeuib.ttf"),
-        Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"),
-    ]
-    for candidate in candidates:
-        if candidate.exists():
-            try:
-                return ImageFont.truetype(str(candidate), size=size)
-            except OSError:
-                continue
-    return ImageFont.load_default()
+    asset_loaded: bool = False
+    position: str | None = None
+    scale: float | None = None
 
 
 def _validate_opacity(value: Any) -> float:
@@ -41,21 +27,22 @@ def apply_branding(
     image: Any,
     *,
     branding_config: Any,
-    label_text: str = "Buffago",
+    label_text: str = "",
+    avoid_bottom_text: bool = False,
 ) -> BrandingResult:
     from PIL import Image, ImageDraw
 
     enabled = bool(getattr(branding_config, "enabled", False))
     if not enabled:
-        return BrandingResult(image=image, applied=False, reason="branding_disabled")
+        return BrandingResult(image=image, applied=False, reason="branding_disabled", asset_loaded=False)
 
     logo_path_value = str(getattr(branding_config, "logo_path", "") or "").strip()
     if not logo_path_value or logo_path_value == ".":
-        return BrandingResult(image=image, applied=False, reason="logo_missing")
+        return BrandingResult(image=image, applied=False, reason="logo_missing", asset_loaded=False)
 
     logo_path = Path(logo_path_value)
     if not logo_path.exists():
-        return BrandingResult(image=image, applied=False, reason="logo_missing", logo_path=logo_path_value)
+        return BrandingResult(image=image, applied=False, reason="logo_missing", logo_path=logo_path_value, asset_loaded=False)
 
     opacity = _validate_opacity(getattr(branding_config, "opacity", 0.65))
     placement = str(getattr(branding_config, "placement", "bottom_right") or "bottom_right").strip().lower()
@@ -65,11 +52,16 @@ def apply_branding(
     accent_color = str(getattr(branding_config, "accent_color", "#F36C21") or "#F36C21")
 
     base = image.convert("RGBA")
-    logo = Image.open(logo_path).convert("RGBA")
+    try:
+        logo = Image.open(logo_path).convert("RGBA")
+    except OSError:
+        return BrandingResult(image=image, applied=False, reason="logo_unreadable", logo_path=logo_path_value, asset_loaded=False)
+    original_logo_width = logo.width
     max_logo_width = max(1, int(base.width * (max_width_percent / 100.0)))
     if logo.width > max_logo_width:
         ratio = max_logo_width / logo.width
         logo = logo.resize((max_logo_width, max(1, int(logo.height * ratio))), Image.Resampling.LANCZOS)
+    scale = logo.width / max(original_logo_width, 1)
 
     alpha = logo.getchannel("A")
     alpha = alpha.point(lambda value: int(value * opacity))
@@ -77,7 +69,11 @@ def apply_branding(
 
     if placement != "bottom_right":
         placement = "bottom_right"
-    position = (base.width - logo.width - margin_px, base.height - logo.height - margin_px)
+    x = max(margin_px, base.width - logo.width - margin_px)
+    y = base.height - logo.height - margin_px
+    if avoid_bottom_text:
+        y = max(margin_px, int(base.height * 0.68) - logo.height)
+    position = (x, y)
     if border_enabled:
         border = Image.new("RGBA", base.size, (0, 0, 0, 0))
         border_draw = ImageDraw.Draw(border)
@@ -91,20 +87,12 @@ def apply_branding(
 
     base.alpha_composite(logo, dest=position)
 
-    text_label = str(getattr(branding_config, "label_text", label_text) or label_text).strip()
-    if text_label:
-        draw = ImageDraw.Draw(base)
-        font = _load_font(max(18, int(base.width * 0.022)))
-        text_bbox = draw.textbbox((0, 0), text_label, font=font)
-        text_width = text_bbox[2] - text_bbox[0]
-        text_height = text_bbox[3] - text_bbox[1]
-        text_x = position[0] - text_width - 14
-        text_y = position[1] + max(0, (logo.height - text_height) // 2)
-        draw.rounded_rectangle(
-            (text_x - 10, text_y - 6, text_x + text_width + 10, text_y + text_height + 6),
-            radius=10,
-            fill=(0, 0, 0, 140),
-        )
-        draw.text((text_x, text_y), text_label, fill=(255, 255, 255), font=font)
-
-    return BrandingResult(image=base.convert(image.mode if image.mode != "P" else "RGBA"), applied=True, reason=None, logo_path=str(logo_path))
+    return BrandingResult(
+        image=base.convert(image.mode if image.mode != "P" else "RGBA"),
+        applied=True,
+        reason=None,
+        logo_path=str(logo_path),
+        asset_loaded=True,
+        position=f"{placement}:{position[0]},{position[1]}",
+        scale=round(scale, 4),
+    )

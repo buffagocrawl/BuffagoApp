@@ -52,6 +52,45 @@ def _build_auto_approval_metadata(metadata: dict[str, Any] | None, *, published:
     return enriched
 
 
+def _creative_metadata(content_decision: dict[str, Any], image_pipeline: dict[str, Any] | None) -> dict[str, Any]:
+    winner = content_decision.get("winner") if isinstance(content_decision.get("winner"), dict) else {}
+    decision_summary = content_decision.get("decision_summary") if isinstance(content_decision.get("decision_summary"), dict) else {}
+    image_payload = image_pipeline or {}
+    image_result = image_payload.get("result") if isinstance(image_payload.get("result"), dict) else image_payload
+    metadata = {
+        "category": winner.get("content_type") or winner.get("post_type"),
+        "content_type": winner.get("content_type") or winner.get("post_type"),
+        "prompt_template": decision_summary.get("prompt_version") or decision_summary.get("model_name"),
+        "prompt_reason": winner.get("reason_chosen") or decision_summary.get("content_direction_reason"),
+        "reason_chosen": winner.get("reason_chosen"),
+        "image_prompt": winner.get("image_prompt"),
+        "image_style": winner.get("visual_style") or winner.get("image_style"),
+        "visual_style": winner.get("visual_style"),
+        "cta_type": winner.get("cta_category"),
+        "cta_category": winner.get("cta_category"),
+        "generation_model": decision_summary.get("model_name"),
+        "image_model": image_result.get("model") if isinstance(image_result, dict) else None,
+        "cost_estimate": decision_summary.get("cost_estimate"),
+        "cost_metadata": {
+            "content_cost_estimate": decision_summary.get("cost_estimate"),
+            "image_cost_estimate": image_result.get("cost_estimate_usd") if isinstance(image_result, dict) else None,
+            "token_usage": decision_summary.get("token_usage", {}),
+        },
+        "restaurants_mentioned": winner.get("restaurants_mentioned") or [],
+        "cities_mentioned": winner.get("cities_mentioned") or [],
+        "states_mentioned": winner.get("states_mentioned") or [],
+        "primary_theme": winner.get("primary_theme"),
+        "secondary_theme": winner.get("secondary_theme"),
+        "topic": winner.get("primary_theme") or winner.get("working_title"),
+        "hashtags": winner.get("hashtags") or [],
+        "chosen_idea": winner.get("working_title") or winner.get("short_summary"),
+        "working_title": winner.get("working_title"),
+        "performance_context_used": bool(decision_summary.get("performance_context")),
+        "content_direction_reason": decision_summary.get("content_direction_reason"),
+    }
+    return {key: value for key, value in metadata.items() if value is not None}
+
+
 class _ValidationCandidateClient:
     def __init__(self) -> None:
         self.run_rows: dict[str, dict[str, Any]] = {}
@@ -427,7 +466,7 @@ def run_instagram_publishing_live_environment(
                 image_prompt=approved_post.image_prompt,
                 image_url=approved_post.public_image_url,
                 publish_status="publishing",
-                metadata=approved_post.metadata,
+                metadata={**_creative_metadata(content_decision, image_pipeline), **approved_post.metadata},
             )
             post_id = str(inserted.get("id")) if inserted.get("id") else None
 

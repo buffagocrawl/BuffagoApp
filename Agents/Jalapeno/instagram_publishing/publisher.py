@@ -718,6 +718,21 @@ def publish_instagram_post(
         )
         log_event(
             logger,
+            "failure_alert_required",
+            level="error",
+            run_id=post.run_id,
+            candidate_id=post.candidate_id,
+            post_id=post_id,
+            container_id=state.container_id,
+            published_media_id=state.published_media_id,
+            stage=state.failure_stage,
+            status=state.status,
+            error_type=state.error_code,
+            retry_count=state.retry_count,
+            error=state.failure_reason,
+        )
+        log_event(
+            logger,
             "publish_pipeline_failed",
             level="error",
             run_id=post.run_id,

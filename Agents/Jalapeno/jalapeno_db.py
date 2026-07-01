@@ -491,7 +491,27 @@ def insert_metrics_snapshot(
     engagement_rate: float | None = None,
     raw_metrics: dict[str, Any] | None = None,
     captured_at: datetime | None = None,
+    collected_at: datetime | None = None,
+    post_age_hours: float | None = None,
+    post_age_days: float | None = None,
+    caption: str | None = None,
+    category: str | None = None,
+    prompt_template: str | None = None,
+    prompt_reason: str | None = None,
+    image_prompt: str | None = None,
+    image_style: str | None = None,
+    hashtags: list[str] | None = None,
+    cta_type: str | None = None,
+    generation_model: str | None = None,
+    image_model: str | None = None,
+    cost_metadata: dict[str, Any] | None = None,
+    published_at: datetime | None = None,
+    state: str | list[str] | None = None,
+    restaurant: str | list[str] | None = None,
+    topic: str | None = None,
+    metadata: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    effective_collected_at = collected_at or captured_at or _utcnow()
     payload = {
         "post_id": str(post_id),
         "instagram_media_id": instagram_media_id,
@@ -505,9 +525,76 @@ def insert_metrics_snapshot(
         "follows": follows,
         "engagement_rate": engagement_rate,
         "raw_metrics": raw_metrics or {},
-        "captured_at": captured_at.isoformat() if captured_at else None,
+        "captured_at": effective_collected_at.isoformat(),
+        "collected_at": effective_collected_at.isoformat(),
+        "post_age_hours": post_age_hours,
+        "post_age_days": post_age_days,
+        "caption": caption,
+        "category": category,
+        "prompt_template": prompt_template,
+        "prompt_reason": prompt_reason,
+        "image_prompt": image_prompt,
+        "image_style": image_style,
+        "hashtags": hashtags or [],
+        "cta_type": cta_type,
+        "generation_model": generation_model,
+        "image_model": image_model,
+        "cost_metadata": cost_metadata or {},
+        "published_at": published_at.isoformat() if published_at else None,
+        "state": state,
+        "restaurant": restaurant,
+        "topic": topic,
+        "metadata": metadata or {},
     }
     rows = client.insert_row("jalapeno_post_metrics", payload)
+    return rows[0] if rows else payload
+
+
+def insert_performance_summary(
+    client: SupabaseClient,
+    *,
+    summary_type: str,
+    period_start: datetime,
+    period_end: datetime,
+    summary: dict[str, Any],
+    generated_by_run_id: UUID | None = None,
+) -> dict[str, Any]:
+    payload = {
+        "summary_type": summary_type,
+        "period_start": period_start.isoformat(),
+        "period_end": period_end.isoformat(),
+        "summary": summary,
+        "generated_by_run_id": str(generated_by_run_id) if generated_by_run_id else None,
+    }
+    rows = client.insert_row("jalapeno_performance_summaries", payload)
+    return rows[0] if rows else payload
+
+
+def insert_report_log(
+    client: SupabaseClient,
+    *,
+    report_type: str,
+    subject: str,
+    body: str,
+    period_start: datetime,
+    period_end: datetime,
+    delivery_status: str,
+    recipient: str | None = None,
+    run_id: UUID | None = None,
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    payload = {
+        "run_id": str(run_id) if run_id else None,
+        "report_type": report_type,
+        "subject": subject,
+        "body": body,
+        "period_start": period_start.isoformat(),
+        "period_end": period_end.isoformat(),
+        "delivery_status": delivery_status,
+        "recipient": recipient,
+        "metadata": metadata or {},
+    }
+    rows = client.insert_row("jalapeno_report_logs", payload)
     return rows[0] if rows else payload
 
 
@@ -535,8 +622,13 @@ def insert_image_asset(
     image_prompt: str,
     prompt_quality: int,
     validation_reason: str,
+    prompt_version: str | None = None,
+    generation_time_ms: int | None = None,
+    image_model: str | None = None,
+    metadata: dict[str, Any] | None = None,
     uploaded_at: str | None = None,
     cleanup_status: str = "pending",
+    logger=None,
 ) -> dict[str, Any]:
     payload = {
         "run_id": run_id,
@@ -560,9 +652,19 @@ def insert_image_asset(
         "image_prompt": image_prompt,
         "prompt_quality": prompt_quality,
         "validation_reason": validation_reason,
+        "prompt_version": prompt_version,
+        "generation_time_ms": generation_time_ms,
+        "image_model": image_model,
+        "metadata": metadata,
         "uploaded_at": uploaded_at,
         "cleanup_status": cleanup_status,
     }
+    log_event(
+        logger,
+        "jalapeno_image_asset_insert_payload",
+        table="jalapeno_image_assets",
+        payload_keys=sorted(payload.keys()),
+    )
     rows = client.insert_row("jalapeno_image_assets", payload)
     return rows[0] if rows else payload
 

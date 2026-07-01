@@ -27,6 +27,9 @@ from data_snapshot import generate_latest_snapshot
 from external_context import generate_external_context
 from jalapeno_db import JalapenoRunContext, complete_run, create_run, ensure_selected_post_candidate, fail_run
 from logging_utils import log_event
+from metrics_collector import collect_instagram_metrics
+from performance_context import build_performance_context
+from reporting import generate_admin_report
 from supabase_client import SupabaseClient, SupabaseError
 from validation import (
     validate_content_engine_environment,
@@ -56,6 +59,9 @@ def build_parser() -> argparse.ArgumentParser:
     mode_group.add_argument("--image-pipeline-live", action="store_true", help="Run only the live image pipeline upload and persistence flow")
     mode_group.add_argument("--instagram-publish-live", action="store_true", help="Run only the live Instagram publishing flow")
     mode_group.add_argument("--production", action="store_true", help="Run the live production publishing pipeline")
+    mode_group.add_argument("--metrics", action="store_true", help="Collect Instagram metrics for recent published posts")
+    mode_group.add_argument("--daily-report", action="store_true", help="Generate and optionally email the Jalapeno daily report")
+    mode_group.add_argument("--weekly-report", action="store_true", help="Generate and optionally email the Jalapeno weekly report")
     parser.add_argument(
         "--refresh-external-context",
         action="store_true",
@@ -197,6 +203,86 @@ def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = Fals
     print(f"Publish fake precheck passed: {publish_result.fake_precheck_passed}")
     print(f"Publish fake publish succeeded: {publish_result.fake_publish_succeeded}")
     print(f"Publish retry deduped: {publish_result.retry_no_duplicate}")
+    required_tables = [
+        "jalapeno_runs",
+        "jalapeno_posts",
+        "jalapeno_image_assets",
+        "jalapeno_post_metrics",
+        "jalapeno_instagram_posts",
+        "jalapeno_performance_summaries",
+        "jalapeno_report_logs",
+        "jalapeno_errors",
+    ]
+    missing_tables: list[str] = []
+    if client is not None:
+        for table_name in required_tables:
+            if not client.table_exists(table_name):
+                missing_tables.append(table_name)
+    else:
+        missing_tables = required_tables
+    if missing_tables:
+        print(f"Warning: missing or inaccessible tables: {', '.join(missing_tables)}")
+    else:
+        print("Required tables exist")
+    image_asset_required_columns = {
+        "id",
+        "run_id",
+        "candidate_id",
+        "post_id",
+        "local_temp_path",
+        "storage_bucket",
+        "storage_path",
+        "public_url",
+        "image_type",
+        "content_type",
+        "width",
+        "height",
+        "aspect_ratio",
+        "file_size_bytes",
+        "format",
+        "branding_applied",
+        "meme_format_applied",
+        "validation_status",
+        "image_source",
+        "image_prompt",
+        "prompt_quality",
+        "validation_reason",
+        "prompt_version",
+        "generation_time_ms",
+        "image_model",
+        "metadata",
+        "uploaded_at",
+        "cleanup_status",
+        "created_at",
+        "updated_at",
+    }
+    if client is not None and "jalapeno_image_assets" not in missing_tables:
+        try:
+            image_asset_columns = client.table_columns("jalapeno_image_assets")
+        except SupabaseError as exc:
+            raise ConfigError(str(exc)) from exc
+        missing_image_asset_columns = sorted(image_asset_required_columns - image_asset_columns)
+        if missing_image_asset_columns:
+            message = f"jalapeno_image_assets missing columns: {', '.join(missing_image_asset_columns)}"
+            log_event(logger, "jalapeno_image_assets_schema_validation_failed", level="error", missing_columns=missing_image_asset_columns)
+            raise ConfigError(message)
+        log_event(logger, "jalapeno_image_assets_schema_validation_passed", column_count=len(image_asset_columns))
+        print("jalapeno_image_assets columns exist")
+    elif client is None:
+        print("Warning: jalapeno_image_assets columns not inspected because Supabase is unavailable")
+    print(f"OpenAI key available: {bool(os.getenv('OPENAI_API_KEY', '').strip() or os.getenv('JALAPENO_AI_FUNCTION_URL', '').strip())}")
+    print(f"Meta credentials available: {bool(os.getenv(config.instagram.access_token_secret_name, '').strip() and os.getenv(config.instagram.ig_user_id_secret_name, '').strip())}")
+    print(f"Instagram business account id present: {bool(config.instagram_business_account_id)}")
+    print(f"Facebook page id present: {bool(config.facebook_page_id)}")
+    print(f"Email reporting configured: {bool(os.getenv('REPORT_EMAIL_TO', '').strip() and os.getenv('REPORT_EMAIL_FROM', '').strip() and os.getenv('RESEND_API_KEY', '').strip())}")
+    fallback_path_ready = config.image.temp_dir.exists() or config.image.temp_dir.parent.exists()
+    print(f"Fallback/temp content path ready: {fallback_path_ready}")
+    performance_context = build_performance_context(client, logger=logger, run_id=content_result.run_id).to_dict()
+    print(f"Performance context rows: {performance_context['source_counts']['rows']}")
+    daily_report = generate_admin_report(config, client, report_type="daily", logger=logger, send_email=False, run_id=content_result.run_id)
+    weekly_report = generate_admin_report(config, client, report_type="weekly", logger=logger, send_email=False, run_id=content_result.run_id)
+    print(f"Daily report dry run generated: {bool(daily_report.body)}")
+    print(f"Weekly report dry run generated: {bool(weekly_report.body)}")
     print("Validation succeeded")
     print(f"Mode: {config.default_mode}")
     return 0
@@ -285,6 +371,48 @@ def run_instagram_publish_live() -> int:
     print(f"Publish permalink: {result.result.get('permalink')}")
     print("Live Instagram publish succeeded")
     return 0
+
+
+def _load_live_client_and_config(mode_name: str):
+    print(f"Loading env file: {ENV_FILE}")
+    env_loaded = load_env_file()
+    print(f"Env loaded: {env_loaded}")
+    config = load_configuration()
+    logger = initialize_logging(config)
+    validate_phase1_environment()
+    warn_missing_future_secrets(logger)
+    print(f"Config loaded: {CONFIG_FILE}")
+    has_url = bool(os.getenv("SUPABASE_URL", "").strip())
+    has_service_role_key = bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip())
+    log_event(logger, "supabase_connection_started", mode=mode_name, has_url=has_url, has_service_role_key=has_service_role_key)
+    if not (has_url and has_service_role_key):
+        raise ConfigError("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY")
+    client = SupabaseClient.from_env()
+    client.fetch_rows("users", select="user_id", filters={"limit": 1})
+    log_event(logger, "supabase_connection_success", mode=mode_name, has_connection=True)
+    return config, logger, client
+
+
+def run_metrics() -> int:
+    config, logger, client = _load_live_client_and_config("metrics")
+    result = collect_instagram_metrics(config, client, logger=logger)
+    print(f"Metrics checked posts: {result.checked_posts}")
+    print(f"Metrics snapshots persisted: {result.snapshots_persisted}")
+    print(f"Metrics failures: {result.failures}")
+    if result.action_required:
+        print("Metrics action required: Meta token/auth issue detected")
+        return 2
+    return 0
+
+
+def run_admin_report(report_type: str) -> int:
+    config, logger, client = _load_live_client_and_config(f"{report_type}-report")
+    result = generate_admin_report(config, client, report_type=report_type, logger=logger, send_email=True)
+    print(result.subject)
+    print(result.body)
+    print(f"Report stored: {result.stored}")
+    print(f"Email status: {result.email_status}")
+    return 0 if result.email_status != "failed" else 2
 
 
 def run_dry_run() -> int:
@@ -604,6 +732,12 @@ def main(argv: list[str] | None = None) -> int:
             return run_instagram_publish_live()
         if args.production:
             return run_production()
+        if args.metrics:
+            return run_metrics()
+        if args.daily_report:
+            return run_admin_report("daily")
+        if args.weekly_report:
+            return run_admin_report("weekly")
         parser.error("one mode must be selected")
     except ConfigError as exc:
         print(f"Validation failed: {exc}")

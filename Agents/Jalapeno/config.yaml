@@ -28,15 +28,15 @@ image:
   quality: 92
 
 branding:
-  enabled: false
-  logo_path: ""
+  enabled: true
+  logo_path: "../../crawl/assets/wing-user.png"
   placement: "bottom_right"
-  opacity: 0.65
+  opacity: 0.12
   margin_px: 32
   max_width_percent: 12
   border_enabled: false
   accent_color: "#F36C21"
-  label_text: "Buffago"
+  label_text: ""
 
 storage:
   provider: "supabase"
@@ -79,10 +79,10 @@ ai:
   models:
     production:
       text: gpt-5.5
-      image: gpt-image-2
+      image: gpt-5.4
     development:
       text: gpt-5.4-mini
-      image: gpt-image-2
+      image: gpt-5.4
   max_output_tokens: 1200
   timeout_seconds: 75
   retry_count: 3
@@ -97,6 +97,6 @@ ai:
     gpt-5.4-mini:
       input_cost_per_million_usd:
       output_cost_per_million_usd:
-    gpt-image-2:
+    gpt-5.4:
       input_cost_per_million_usd:
       output_cost_per_million_usd:

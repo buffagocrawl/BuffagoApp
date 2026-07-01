@@ -55,6 +55,22 @@ class CandidateScorer:
         recent_visuals = [str(item) for item in memory_summary.get("recent_visual_styles", []) if str(item).strip()]
         underused_themes = [str(item) for item in memory_summary.get("underused_themes", []) if str(item).strip()]
         community_activity = int(memory_summary.get("community_activity_score", 0) or 0)
+        performance_context = memory_summary.get("performance_context") if isinstance(memory_summary.get("performance_context"), dict) else {}
+        best_categories = {
+            str(item.get("name") or "").strip().lower()
+            for item in performance_context.get("best_categories", [])[:5]
+            if isinstance(item, dict)
+        }
+        weak_styles = {
+            str(item.get("name") or "").strip().lower()
+            for item in performance_context.get("worst_image_styles", [])[:5]
+            if isinstance(item, dict)
+        }
+        best_ctas = {
+            str(item.get("name") or "").strip().lower()
+            for item in performance_context.get("best_cta_types", [])[:5]
+            if isinstance(item, dict)
+        }
 
         category_scores: dict[str, float] = {}
         category_scores["originality"] = max(0.0, 1.0 - duplicate_score) * 20.0
@@ -84,6 +100,10 @@ class CandidateScorer:
             adjustments["freshness_bonus"] = self.settings.memory_adjustments.freshness_bonus
         if any(term in candidate.suggested_caption_angle.lower() for term in ["right now", "today", "weekend", "game day", "crawl"]):
             adjustments["recent_trend_bonus"] = self.settings.memory_adjustments.recent_trend_bonus
+        if candidate.content_type.lower() in best_categories or candidate.primary_theme.lower() in best_categories:
+            adjustments["performance_category_bonus"] = 4.0
+        if candidate.cta_category.lower() in best_ctas:
+            adjustments["performance_cta_bonus"] = 2.0
 
         if candidate.primary_theme.lower() in {theme.lower() for theme in recent_themes[:5]}:
             adjustments["recently_used_theme_penalty"] = -self.settings.memory_adjustments.recently_used_theme_penalty
@@ -95,6 +115,8 @@ class CandidateScorer:
             adjustments["recently_used_hook_penalty"] = -self.settings.memory_adjustments.recently_used_hook_penalty
         if candidate.visual_style.lower() in {style.lower() for style in recent_visuals[:5]}:
             adjustments["recently_used_visual_style_penalty"] = -self.settings.memory_adjustments.recently_used_visual_style_penalty
+        if candidate.visual_style.lower() in weak_styles or candidate.metadata.get("poor_image_style_risk"):
+            adjustments["poor_image_style_penalty"] = -4.0
 
         if duplicate_score > 0.0:
             adjustments["duplicate_penalty"] = -duplicate_score * self.settings.memory_adjustments.duplicate_penalty

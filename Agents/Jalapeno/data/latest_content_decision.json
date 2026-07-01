@@ -2,9 +2,11 @@
   "all_candidates": [
     {
       "adjustments": {
-        "freshness_bonus": 4.0
+        "duplicate_penalty": -0.42,
+        "freshness_bonus": 4.0,
+        "theme_rotation_bonus": 4.0
       },
-      "candidate_id": "68a5405e-e6f2-4093-b1db-21f5a8641d8b",
+      "candidate_id": "ec4239cb-5636-4123-b43a-fc800065b5d9",
       "category_scores": {
         "brand_fit": 17.0,
         "conversation_starter": 4.0,
@@ -12,7 +14,7 @@
         "current_relevance": 6.0,
         "gamification_potential": 1.0,
         "likelihood_of_engagement": 15.5,
-        "originality": 20.0,
+        "originality": 19.76,
         "uses_recent_buffago_activity": 9.5,
         "visual_potential": 10.0
       },
@@ -23,14 +25,17 @@
       "cta_category": "comment",
       "current_event_references": [],
       "duplicate_check": {
-        "comparison_notes": [],
-        "duplicate_score": 0.0,
+        "comparison_notes": [
+          "caption=0.022",
+          "image=0.075"
+        ],
+        "duplicate_score": 0.012,
         "rejected": false,
         "rejection_reason": null
       },
       "duplicate_reason": null,
-      "duplicate_score": 0.0,
-      "final_score": 87.75,
+      "duplicate_score": 0.012,
+      "final_score": 91.09,
       "food_categories": [
         "wings",
         "sauce"
@@ -39,14 +44,23 @@
       "hook_style": "direct local hook",
       "image_composition": "single hero plate with short caption space",
       "metadata": {
+        "camera_angle": "wing festival crowd shot with people gasping, cheering, and pointing at the saucy centerpiece",
+        "character_archetype": "The Ranch Guy",
+        "character_description": "overprotective of ranch, clutching sauce cups like valuables, proud and slightly defensive",
+        "comedy_beat": "the bartender facepalms as a wing debate becomes far too serious for a normal Tuesday",
+        "learning_prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
         "prompt_anchors": [
           "food-first",
           "local credibility"
-        ]
+        ],
+        "prompt_version": "prompt-library-v1:buffago-visual-v2",
+        "scene_type": "packed sports bar",
+        "visual_style": "buffago_cinematic_comedy_food_v2",
+        "wing_focus_level": "maximum"
       },
       "mood": "Friendly",
       "notes": [
-        "originality=20.0",
+        "originality=19.76",
         "engagement=15.5",
         "brand_fit=17.0",
         "activity=9.5",
@@ -74,14 +88,16 @@
       "suggested_image_concept": "Close-up wing tray at Crispy Corner with crisp texture and warm restaurant lighting.",
       "target_emotion": "Curious",
       "visual_style": "realistic",
-      "weighted_total": 83.75,
+      "weighted_total": 83.51,
       "working_title": "Why Crispy Corner keeps showing up"
     },
     {
       "adjustments": {
-        "freshness_bonus": 4.0
+        "duplicate_penalty": -1.33,
+        "freshness_bonus": 4.0,
+        "theme_rotation_bonus": 4.0
       },
-      "candidate_id": "59fceba4-ab35-4f59-9ea3-97608cc582f1",
+      "candidate_id": "69514d05-bb6c-482b-a36e-b15f0d3e7b55",
       "category_scores": {
         "brand_fit": 14.0,
         "conversation_starter": 2.0,
@@ -89,7 +105,7 @@
         "current_relevance": 6.0,
         "gamification_potential": 1.0,
         "likelihood_of_engagement": 9.5,
-        "originality": 20.0,
+        "originality": 19.24,
         "uses_recent_buffago_activity": 9.5,
         "visual_potential": 10.0
       },
@@ -100,14 +116,17 @@
       "cta_category": "save",
       "current_event_references": [],
       "duplicate_check": {
-        "comparison_notes": [],
-        "duplicate_score": 0.0,
+        "comparison_notes": [
+          "caption=0.146",
+          "image=0.085"
+        ],
+        "duplicate_score": 0.038,
         "rejected": false,
         "rejection_reason": null
       },
       "duplicate_reason": null,
-      "duplicate_score": 0.0,
-      "final_score": 77.5,
+      "duplicate_score": 0.038,
+      "final_score": 79.41,
       "food_categories": [
         "wings",
         "local eats"
@@ -116,14 +135,23 @@
       "hook_style": "secret tip",
       "image_composition": "tight composition with subtle depth of field",
       "metadata": {
+        "camera_angle": "overhead chaos shot showing hands reaching, napkins flying, sauce cups sliding, and wings anchoring the frame",
+        "character_archetype": "The Flats Purist",
+        "character_description": "treats flats as the only serious wing choice, precise, smug, and theatrically offended",
+        "comedy_beat": "a newcomer drops to one knee in awe of the first perfect wing while the table erupts around them",
+        "learning_prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
         "prompt_anchors": [
           "curated",
           "local insider"
-        ]
+        ],
+        "prompt_version": "prompt-library-v1:buffago-visual-v2",
+        "scene_type": "restaurant counter with regulars",
+        "visual_style": "buffago_cinematic_comedy_food_v2",
+        "wing_focus_level": "maximum"
       },
       "mood": "Friendly",
       "notes": [
-        "originality=20.0",
+        "originality=19.24",
         "engagement=9.5",
         "brand_fit=14.0",
         "activity=9.5",
@@ -151,12 +179,17 @@
       "suggested_image_concept": "Moody but bright table shot of Wing Vault with wings, celery, and sauce cups.",
       "target_emotion": "Encouraged",
       "visual_style": "realistic",
-      "weighted_total": 73.5,
+      "weighted_total": 72.74,
       "working_title": "Hidden gem: Wing Vault"
     },
     {
-      "adjustments": {},
-      "candidate_id": "04a5f24c-c938-4a48-a0eb-840bfca1afa3",
+      "adjustments": {
+        "diversity_bonus": 6.0,
+        "duplicate_penalty": -0.49,
+        "recently_used_theme_penalty": -6.0,
+        "recently_used_visual_style_penalty": -3.0
+      },
+      "candidate_id": "1655e3b6-5e0d-452b-867e-02ac34d0b6c3",
       "category_scores": {
         "brand_fit": 17.0,
         "conversation_starter": 4.0,
@@ -164,7 +197,7 @@
         "current_relevance": 6.0,
         "gamification_potential": 1.0,
         "likelihood_of_engagement": 14.0,
-        "originality": 20.0,
+        "originality": 19.72,
         "uses_recent_buffago_activity": 4.0,
         "visual_potential": 10.0
       },
@@ -173,14 +206,17 @@
       "cta_category": "comment",
       "current_event_references": [],
       "duplicate_check": {
-        "comparison_notes": [],
-        "duplicate_score": 0.0,
+        "comparison_notes": [
+          "caption=0.05",
+          "image=0.037"
+        ],
+        "duplicate_score": 0.014,
         "rejected": false,
         "rejection_reason": null
       },
       "duplicate_reason": null,
-      "duplicate_score": 0.0,
-      "final_score": 76.75,
+      "duplicate_score": 0.014,
+      "final_score": 72.98,
       "food_categories": [
         "wings"
       ],
@@ -188,14 +224,24 @@
       "hook_style": "observational joke",
       "image_composition": "split-panel or punchline-forward composition",
       "metadata": {
+        "camera_angle": "wing festival crowd shot with people gasping, cheering, and pointing at the saucy centerpiece",
+        "character_archetype": "The Wing Referee",
+        "character_description": "mock-official peacemaker using hand signals and exaggerated judgment over wing disputes",
+        "comedy_beat": "the bartender facepalms as a wing debate becomes far too serious for a normal Tuesday",
+        "diversity_hint": "boost",
+        "learning_prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
         "prompt_anchors": [
           "lightly sarcastic",
           "community banter"
-        ]
+        ],
+        "prompt_version": "prompt-library-v1:buffago-visual-v2",
+        "scene_type": "restaurant counter with regulars",
+        "visual_style": "buffago_cinematic_comedy_food_v2",
+        "wing_focus_level": "maximum"
       },
       "mood": "Funny",
       "notes": [
-        "originality=20.0",
+        "originality=19.72",
         "engagement=14.0",
         "brand_fit=17.0",
         "activity=4.0",
@@ -219,12 +265,15 @@
       "suggested_image_concept": "Meme-style table scene with wings, napkins, and a mildly dramatic reaction shot.",
       "target_emotion": "Amused",
       "visual_style": "meme",
-      "weighted_total": 76.75,
+      "weighted_total": 76.47,
       "working_title": "The wing napkin math problem"
     },
     {
-      "adjustments": {},
-      "candidate_id": "d9d8723e-17fe-4895-9cf6-8f1fc23bacc0",
+      "adjustments": {
+        "duplicate_penalty": -0.735,
+        "theme_rotation_bonus": 4.0
+      },
+      "candidate_id": "b411da15-9869-4176-83e1-ac074c20a1a5",
       "category_scores": {
         "brand_fit": 14.0,
         "conversation_starter": 2.0,
@@ -232,7 +281,7 @@
         "current_relevance": 6.0,
         "gamification_potential": 1.0,
         "likelihood_of_engagement": 8.0,
-        "originality": 20.0,
+        "originality": 19.58,
         "uses_recent_buffago_activity": 4.0,
         "visual_potential": 9.5
       },
@@ -241,14 +290,17 @@
       "cta_category": "save",
       "current_event_references": [],
       "duplicate_check": {
-        "comparison_notes": [],
-        "duplicate_score": 0.0,
+        "comparison_notes": [
+          "caption=0.071",
+          "image=0.066"
+        ],
+        "duplicate_score": 0.021,
         "rejected": false,
         "rejection_reason": null
       },
       "duplicate_reason": null,
-      "duplicate_score": 0.0,
-      "final_score": 66.0,
+      "duplicate_score": 0.021,
+      "final_score": 68.845,
       "food_categories": [
         "wings",
         "sauce"
@@ -257,14 +309,23 @@
       "hook_style": "fact hook",
       "image_composition": "clean graphic layout with one hero detail",
       "metadata": {
+        "camera_angle": "bartender POV from behind the bar watching the argument unfold across a wing basket",
+        "character_archetype": "The Sauce Scientist",
+        "character_description": "curious sauce tinkerer inspecting color, gloss, heat, and texture like a lab result",
+        "comedy_beat": "a heat seeker takes one bite and tries to look brave while the whole restaurant silently clocks the panic",
+        "learning_prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
         "prompt_anchors": [
           "educational",
           "easy to scan"
-        ]
+        ],
+        "prompt_version": "prompt-library-v1:buffago-visual-v2",
+        "scene_type": "neighborhood restaurant booth section",
+        "visual_style": "buffago_cinematic_comedy_food_v2",
+        "wing_focus_level": "high"
       },
       "mood": "Educational",
       "notes": [
-        "originality=20.0",
+        "originality=19.58",
         "engagement=8.0",
         "brand_fit=14.0",
         "activity=4.0",
@@ -287,12 +348,15 @@
       "suggested_image_concept": "Graphic-led food fact card with wings and a minimal Buffago color palette.",
       "target_emotion": "Informed",
       "visual_style": "app_marketing",
-      "weighted_total": 66.0,
+      "weighted_total": 65.58,
       "working_title": "Wing fact worth knowing"
     },
     {
-      "adjustments": {},
-      "candidate_id": "d6554cdb-6542-48b5-9df9-d0d87e16e035",
+      "adjustments": {
+        "duplicate_penalty": -0.805,
+        "theme_rotation_bonus": 4.0
+      },
+      "candidate_id": "4f4f6a78-9b77-43a8-8294-5ce88db6bcc3",
       "category_scores": {
         "brand_fit": 15.0,
         "conversation_starter": 5.0,
@@ -300,7 +364,7 @@
         "current_relevance": 6.0,
         "gamification_potential": 2.0,
         "likelihood_of_engagement": 12.0,
-        "originality": 20.0,
+        "originality": 19.54,
         "uses_recent_buffago_activity": 6.5,
         "visual_potential": 10.0
       },
@@ -312,27 +376,39 @@
       "cta_category": "question",
       "current_event_references": [],
       "duplicate_check": {
-        "comparison_notes": [],
-        "duplicate_score": 0.0,
+        "comparison_notes": [
+          "caption=0.098",
+          "image=0.037"
+        ],
+        "duplicate_score": 0.023,
         "rejected": false,
         "rejection_reason": null
       },
       "duplicate_reason": null,
-      "duplicate_score": 0.0,
-      "final_score": 77.75,
+      "duplicate_score": 0.023,
+      "final_score": 80.485,
       "food_categories": [],
       "holiday_references": [],
       "hook_style": "community opener",
       "image_composition": "map-forward layout with playful route cues",
       "metadata": {
+        "camera_angle": "referee or sports broadcast angle with a mock-serious wing ruling happening at the table",
+        "character_archetype": "The Flats Purist",
+        "character_description": "treats flats as the only serious wing choice, precise, smug, and theatrically offended",
+        "comedy_beat": "one person stands on a booth pointing a saucy wing like courtroom evidence while another shields the basket like treasure",
+        "learning_prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
         "prompt_anchors": [
           "community",
           "local competition"
-        ]
+        ],
+        "prompt_version": "prompt-library-v1:buffago-visual-v2",
+        "scene_type": "tailgate table",
+        "visual_style": "buffago_cinematic_comedy_food_v2",
+        "wing_focus_level": "high"
       },
       "mood": "Friendly",
       "notes": [
-        "originality=20.0",
+        "originality=19.54",
         "engagement=12.0",
         "brand_fit=15.0",
         "activity=6.5",
@@ -360,12 +436,15 @@
       "suggested_image_concept": "Community map graphic with local pins and wing markers across active states.",
       "target_emotion": "Connected",
       "visual_style": "illustration",
-      "weighted_total": 77.75,
+      "weighted_total": 77.29,
       "working_title": "Buffago in NY"
     },
     {
-      "adjustments": {},
-      "candidate_id": "ee1ee12f-fbec-4952-98af-fd5f48adf727",
+      "adjustments": {
+        "duplicate_penalty": -0.665,
+        "theme_rotation_bonus": 4.0
+      },
+      "candidate_id": "0e2d2617-382f-4b30-9a00-000a29413f3a",
       "category_scores": {
         "brand_fit": 17.0,
         "conversation_starter": 4.0,
@@ -373,7 +452,7 @@
         "current_relevance": 6.0,
         "gamification_potential": 4.0,
         "likelihood_of_engagement": 12.0,
-        "originality": 20.0,
+        "originality": 19.62,
         "uses_recent_buffago_activity": 6.5,
         "visual_potential": 9.5
       },
@@ -382,14 +461,17 @@
       "cta_category": "question",
       "current_event_references": [],
       "duplicate_check": {
-        "comparison_notes": [],
-        "duplicate_score": 0.0,
+        "comparison_notes": [
+          "caption=0.075",
+          "image=0.037"
+        ],
+        "duplicate_score": 0.019,
         "rejected": false,
         "rejection_reason": null
       },
       "duplicate_reason": null,
-      "duplicate_score": 0.0,
-      "final_score": 79.75,
+      "duplicate_score": 0.019,
+      "final_score": 82.705,
       "food_categories": [
         "wings"
       ],
@@ -397,14 +479,23 @@
       "hook_style": "achievement hook",
       "image_composition": "bold badge-centered layout",
       "metadata": {
+        "camera_angle": "bartender POV from behind the bar watching the argument unfold across a wing basket",
+        "character_archetype": "The Wing Referee",
+        "character_description": "mock-official peacemaker using hand signals and exaggerated judgment over wing disputes",
+        "comedy_beat": "a newcomer drops to one knee in awe of the first perfect wing while the table erupts around them",
+        "learning_prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
         "prompt_anchors": [
           "achievement",
           "community progress"
-        ]
+        ],
+        "prompt_version": "prompt-library-v1:buffago-visual-v2",
+        "scene_type": "packed sports bar",
+        "visual_style": "buffago_cinematic_comedy_food_v2",
+        "wing_focus_level": "high"
       },
       "mood": "Exciting",
       "notes": [
-        "originality=20.0",
+        "originality=19.62",
         "engagement=12.0",
         "brand_fit=17.0",
         "activity=6.5",
@@ -428,12 +519,15 @@
       "suggested_image_concept": "Badge-style XP milestone graphic with a wing reward and bold level callout.",
       "target_emotion": "Motivated",
       "visual_style": "app_marketing",
-      "weighted_total": 79.75,
+      "weighted_total": 79.37,
       "working_title": "Someone just crossed a big XP line"
     },
     {
-      "adjustments": {},
-      "candidate_id": "94fd6c01-897b-4839-bd10-20354634b120",
+      "adjustments": {
+        "duplicate_penalty": -0.63,
+        "theme_rotation_bonus": 4.0
+      },
+      "candidate_id": "5128c97e-0c57-4e3f-8fc7-b60f7b3108d0",
       "category_scores": {
         "brand_fit": 15.0,
         "conversation_starter": 5.0,
@@ -441,7 +535,7 @@
         "current_relevance": 6.0,
         "gamification_potential": 4.0,
         "likelihood_of_engagement": 18.0,
-        "originality": 20.0,
+        "originality": 19.64,
         "uses_recent_buffago_activity": 10.0,
         "visual_potential": 9.5
       },
@@ -453,27 +547,39 @@
       "cta_category": "comment",
       "current_event_references": [],
       "duplicate_check": {
-        "comparison_notes": [],
-        "duplicate_score": 0.0,
+        "comparison_notes": [
+          "caption=0.071",
+          "image=0.038"
+        ],
+        "duplicate_score": 0.018,
         "rejected": false,
         "rejection_reason": null
       },
       "duplicate_reason": null,
-      "duplicate_score": 0.0,
-      "final_score": 88.75,
+      "duplicate_score": 0.018,
+      "final_score": 91.76,
       "food_categories": [],
       "holiday_references": [],
       "hook_style": "ranking hook",
       "image_composition": "stacked board with bold labels",
       "metadata": {
+        "camera_angle": "booth-level cinematic wide shot with motion blur, packed restaurant energy, and wings in the front focal plane",
+        "character_archetype": "The Drum Defender",
+        "character_description": "big-energy drum supporter, points with conviction and celebrates every saucy bite",
+        "comedy_beat": "a newcomer drops to one knee in awe of the first perfect wing while the table erupts around them",
+        "learning_prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
         "prompt_anchors": [
           "comparison",
           "debate starter"
-        ]
+        ],
+        "prompt_version": "prompt-library-v1:buffago-visual-v2",
+        "scene_type": "neighborhood restaurant booth section",
+        "visual_style": "buffago_cinematic_comedy_food_v2",
+        "wing_focus_level": "high"
       },
       "mood": "Competitive",
       "notes": [
-        "originality=20.0",
+        "originality=19.64",
         "engagement=18.0",
         "brand_fit=15.0",
         "activity=10.0",
@@ -503,20 +609,50 @@
       "suggested_image_concept": "Leaderboard graphic with wing spots and local city cues.",
       "target_emotion": "Competitive",
       "visual_style": "app_marketing",
-      "weighted_total": 88.75,
+      "weighted_total": 88.39,
       "working_title": "The current wing leaderboard mood"
     }
   ],
   "decision_summary": {
     "candidate_count": 7,
+    "content_direction_reason": "No strong historic pattern yet; using current Buffago activity and duplicate avoidance.",
     "cost_estimate": 0.0,
     "duplicate_similarity_threshold": 0.72,
-    "generated_at": "2026-07-01T00:18:24.475851+00:00",
-    "memory_reasoning": [],
+    "generated_at": "2026-07-01T12:06:34.567597+00:00",
+    "memory_reasoning": [
+      "The last five posts are concentrated around one theme.",
+      "Theme rotation bonus should encourage diversification."
+    ],
     "model_name": "local-rules",
+    "performance_context": {
+      "best_categories": [],
+      "best_cta_types": [],
+      "best_hashtag_patterns": [],
+      "best_image_styles": [],
+      "best_posts": {
+        "30d": [],
+        "7d": [],
+        "90d": []
+      },
+      "duplicate_topics_to_avoid": [],
+      "generated_at": "2026-07-01T12:06:34.064378+00:00",
+      "prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
+      "source_counts": {
+        "rows": 0
+      },
+      "strong_patterns": [],
+      "weak_patterns": [],
+      "worst_categories": [],
+      "worst_image_styles": [],
+      "worst_posts": {
+        "30d": [],
+        "7d": [],
+        "90d": []
+      }
+    },
     "platform": "instagram",
     "rejected_duplicate_count": 0,
-    "run_id": "357316f4-6e33-4124-b8d7-a35b7b28718a",
+    "run_id": "78f72259-97dc-46c5-8f6b-b3b3f997057e",
     "scheduled_post_type": null,
     "survivor_count": 7,
     "token_usage": {
@@ -530,16 +666,19 @@
       "Someone just crossed a big XP line: +1.0 trend alignment bonus",
       "Buffago in NY: +3.0 community activity bonus; trend alignment bonus",
       "Hidden gem: Wing Vault: +2.5 freshness bonus; trend alignment bonus",
-      "The wing napkin math problem: +1.0 trend alignment bonus",
+      "The wing napkin math problem: +3.0 trend alignment bonus; theme rotation bonus",
       "Wing fact worth knowing: +1.0 trend alignment bonus",
       "Winner selected for balance of score, freshness, and feed variety: Why Crispy Corner keeps showing up"
     ]
   },
-  "generated_at": "2026-07-01T00:18:24.475851+00:00",
-  "run_id": "357316f4-6e33-4124-b8d7-a35b7b28718a",
+  "generated_at": "2026-07-01T12:06:34.567597+00:00",
+  "run_id": "78f72259-97dc-46c5-8f6b-b3b3f997057e",
   "runner_up": {
-    "adjustments": {},
-    "candidate_id": "94fd6c01-897b-4839-bd10-20354634b120",
+    "adjustments": {
+      "duplicate_penalty": -0.63,
+      "theme_rotation_bonus": 4.0
+    },
+    "candidate_id": "5128c97e-0c57-4e3f-8fc7-b60f7b3108d0",
     "caption_package": {
       "alt_text": "app_marketing Instagram image, centered on Crispy Corner, with a competitive mood, crispy wings and sauce, hinting at Buffalo, local New York food scene, in Buffago colors with readable composition for screen readers.",
       "body": "Turn ratings or crawl activity into a playful comparison format that invites debate. It should feel competitive, simple, and easy to reply to.",
@@ -567,7 +706,7 @@
         "#BlueCheese"
       ],
       "hook": "The current wing leaderboard mood.",
-      "image_prompt": "An illustrated Buffago-style community scene inspired by Buffalo: wing lovers comparing routes, badges, maps, and discovery moments, clean layered composition, energetic but grounded, warm reds and oranges, polished product-marketing art direction, no alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+      "image_prompt": "Ultra realistic cinematic photography with a viral Instagram meme feel, not stock photography. Comedy first, food second, story third, with warm sports bar, brewery, or neighborhood restaurant lighting, highly expressive faces, natural imperfections, visible emotion, motion and action, shallow depth of field, an obvious focal point, background characters reacting naturally, no staged poses, no AI-looking smiles, professional food photography quality, and professional commercial photography quality. In a lively Buffalo wing crawl meetup inside a warm restaurant, wing-crawl regulars compare route ideas while a heroic platter of wings interrupts the planning. The conflict is visually obvious: the group cannot agree on the next stop because the current wings look too good to leave behind. The comedy beat is a newcomer drops to one knee in awe of the first perfect wing while the table erupts around them, with The Drum Defender, big-energy drum supporter, points with conviction and celebrates every saucy bite. Use booth-level cinematic wide shot with motion blur, packed restaurant energy, and wings in the front focal plane. The wings are the visual centerpiece in the foreground or clear focal plane: golden crisp edges, glossy buffalo-orange sauce, visible texture, steam, pepper and seasoning detail, creamy ranch or blue cheese cups nearby, celery and carrots as supporting props. The mood is communal, playful, active, and appetizing, full of triumphant wing confidence and active gestures like grabbing and pointing. Background characters should react naturally with gasps, cheers, facepalms, disbelief, or someone recording on a phone. Avoid a static seated conversation or two people simply sitting across a table; the scene should feel caught mid-action. No alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
       "quality_review": {
         "approved": true,
         "issues": [],
@@ -583,7 +722,7 @@
       "current_relevance": 6.0,
       "gamification_potential": 4.0,
       "likelihood_of_engagement": 18.0,
-      "originality": 20.0,
+      "originality": 19.64,
       "uses_recent_buffago_activity": 10.0,
       "visual_potential": 9.5
     },
@@ -595,21 +734,30 @@
     "cta_category": "comment",
     "current_event_references": [],
     "duplicate_reason": null,
-    "duplicate_score": 0.0,
-    "final_score": 88.75,
+    "duplicate_score": 0.018,
+    "final_score": 91.76,
     "food_categories": [],
     "holiday_references": [],
     "hook_style": "ranking hook",
     "image_composition": "stacked board with bold labels",
     "metadata": {
+      "camera_angle": "booth-level cinematic wide shot with motion blur, packed restaurant energy, and wings in the front focal plane",
+      "character_archetype": "The Drum Defender",
+      "character_description": "big-energy drum supporter, points with conviction and celebrates every saucy bite",
+      "comedy_beat": "a newcomer drops to one knee in awe of the first perfect wing while the table erupts around them",
+      "learning_prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
       "prompt_anchors": [
         "comparison",
         "debate starter"
-      ]
+      ],
+      "prompt_version": "prompt-library-v1:buffago-visual-v2",
+      "scene_type": "neighborhood restaurant booth section",
+      "visual_style": "buffago_cinematic_comedy_food_v2",
+      "wing_focus_level": "high"
     },
     "mood": "Competitive",
     "notes": [
-      "originality=20.0",
+      "originality=19.64",
       "engagement=18.0",
       "brand_fit=15.0",
       "activity=10.0",
@@ -640,16 +788,18 @@
     "suggested_image_concept": "Leaderboard graphic with wing spots and local city cues.",
     "target_emotion": "Competitive",
     "visual_style": "app_marketing",
-    "weighted_total": 88.75,
+    "weighted_total": 88.39,
     "working_title": "The current wing leaderboard mood"
   },
   "scheduled_post_type": null,
   "winner": {
     "adjustments": {
-      "freshness_bonus": 4.0
+      "duplicate_penalty": -0.42,
+      "freshness_bonus": 4.0,
+      "theme_rotation_bonus": 4.0
     },
     "alt_text": "realistic Instagram image, centered on Crispy Corner, with a curious mood, crispy wings and sauce, hinting at Buffalo, local New York food scene, featuring wings and sauce, in Buffago colors with readable composition for screen readers.",
-    "candidate_id": "68a5405e-e6f2-4093-b1db-21f5a8641d8b",
+    "candidate_id": "ec4239cb-5636-4123-b43a-fc800065b5d9",
     "caption": "Why Crispy Corner keeps showing up. Spotlight Crispy Corner in Buffalo as a high-signal favorite from recent Buffago activity. Keep the tone local, food-first, and conversational. Drop your go-to wing spot in the comments.",
     "caption_package": {
       "alt_text": "realistic Instagram image, centered on Crispy Corner, with a curious mood, crispy wings and sauce, hinting at Buffalo, local New York food scene, featuring wings and sauce, in Buffago colors with readable composition for screen readers.",
@@ -678,7 +828,7 @@
         "#BlueCheese"
       ],
       "hook": "Why Crispy Corner keeps showing up.",
-      "image_prompt": "A photorealistic casual wing restaurant scene centered on crispy, saucy chicken wings at Crispy Corner, set in Buffalo, warm natural restaurant lighting, glossy sauce texture, celery and blue cheese nearby, real plates and tables, natural human energy in the background, appetizing food detail, mobile-friendly framing, no alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+      "image_prompt": "Ultra realistic cinematic photography with a viral Instagram meme feel, not stock photography. Comedy first, food second, story third, with warm sports bar, brewery, or neighborhood restaurant lighting, highly expressive faces, natural imperfections, visible emotion, motion and action, shallow depth of field, an obvious focal point, background characters reacting naturally, no staged poses, no AI-looking smiles, professional food photography quality, and professional commercial photography quality. In a busy neighborhood wing restaurant at Crispy Corner in Buffalo, regulars, servers, and a few friends orbit a basket of wings that has become the center of attention. The conflict is visually obvious: everyone is trying to decide who gets the last perfect glossy wing while the basket is protected like treasure. The comedy beat is the bartender facepalms as a wing debate becomes far too serious for a normal Tuesday, with The Ranch Guy, overprotective of ranch, clutching sauce cups like valuables, proud and slightly defensive. Use wing festival crowd shot with people gasping, cheering, and pointing at the saucy centerpiece. The wings are the visual centerpiece in the foreground or clear focal plane: golden crisp edges, glossy buffalo-orange sauce, visible texture, steam, pepper and seasoning detail, creamy ranch or blue cheese cups nearby, celery and carrots as supporting props. The mood is hungry, funny, local, and slightly overdramatic, full of triumphant wing confidence and active gestures like dropping to knees and dropping to knees. Background characters should react naturally with gasps, cheers, facepalms, disbelief, or someone recording on a phone. Avoid a static seated conversation or two people simply sitting across a table; the scene should feel caught mid-action. No alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
       "quality_review": {
         "approved": true,
         "issues": [],
@@ -694,7 +844,7 @@
       "current_relevance": 6.0,
       "gamification_potential": 1.0,
       "likelihood_of_engagement": 15.5,
-      "originality": 20.0,
+      "originality": 19.76,
       "uses_recent_buffago_activity": 9.5,
       "visual_potential": 10.0
     },
@@ -705,8 +855,8 @@
     "cta_category": "comment",
     "current_event_references": [],
     "duplicate_reason": null,
-    "duplicate_score": 0.0,
-    "final_score": 87.75,
+    "duplicate_score": 0.012,
+    "final_score": 91.09,
     "food_categories": [
       "wings",
       "sauce"
@@ -728,16 +878,25 @@
     "holiday_references": [],
     "hook_style": "direct local hook",
     "image_composition": "single hero plate with short caption space",
-    "image_prompt": "A photorealistic casual wing restaurant scene centered on crispy, saucy chicken wings at Crispy Corner, set in Buffalo, warm natural restaurant lighting, glossy sauce texture, celery and blue cheese nearby, real plates and tables, natural human energy in the background, appetizing food detail, mobile-friendly framing, no alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+    "image_prompt": "Ultra realistic cinematic photography with a viral Instagram meme feel, not stock photography. Comedy first, food second, story third, with warm sports bar, brewery, or neighborhood restaurant lighting, highly expressive faces, natural imperfections, visible emotion, motion and action, shallow depth of field, an obvious focal point, background characters reacting naturally, no staged poses, no AI-looking smiles, professional food photography quality, and professional commercial photography quality. In a busy neighborhood wing restaurant at Crispy Corner in Buffalo, regulars, servers, and a few friends orbit a basket of wings that has become the center of attention. The conflict is visually obvious: everyone is trying to decide who gets the last perfect glossy wing while the basket is protected like treasure. The comedy beat is the bartender facepalms as a wing debate becomes far too serious for a normal Tuesday, with The Ranch Guy, overprotective of ranch, clutching sauce cups like valuables, proud and slightly defensive. Use wing festival crowd shot with people gasping, cheering, and pointing at the saucy centerpiece. The wings are the visual centerpiece in the foreground or clear focal plane: golden crisp edges, glossy buffalo-orange sauce, visible texture, steam, pepper and seasoning detail, creamy ranch or blue cheese cups nearby, celery and carrots as supporting props. The mood is hungry, funny, local, and slightly overdramatic, full of triumphant wing confidence and active gestures like dropping to knees and dropping to knees. Background characters should react naturally with gasps, cheers, facepalms, disbelief, or someone recording on a phone. Avoid a static seated conversation or two people simply sitting across a table; the scene should feel caught mid-action. No alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
     "metadata": {
+      "camera_angle": "wing festival crowd shot with people gasping, cheering, and pointing at the saucy centerpiece",
+      "character_archetype": "The Ranch Guy",
+      "character_description": "overprotective of ranch, clutching sauce cups like valuables, proud and slightly defensive",
+      "comedy_beat": "the bartender facepalms as a wing debate becomes far too serious for a normal Tuesday",
+      "learning_prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
       "prompt_anchors": [
         "food-first",
         "local credibility"
-      ]
+      ],
+      "prompt_version": "prompt-library-v1:buffago-visual-v2",
+      "scene_type": "packed sports bar",
+      "visual_style": "buffago_cinematic_comedy_food_v2",
+      "wing_focus_level": "maximum"
     },
     "mood": "Friendly",
     "notes": [
-      "originality=20.0",
+      "originality=19.76",
       "engagement=15.5",
       "brand_fit=17.0",
       "activity=9.5",
@@ -766,7 +925,7 @@
     "suggested_image_concept": "Close-up wing tray at Crispy Corner with crisp texture and warm restaurant lighting.",
     "target_emotion": "Curious",
     "visual_style": "realistic",
-    "weighted_total": 83.75,
+    "weighted_total": 83.51,
     "working_title": "Why Crispy Corner keeps showing up"
   }
 }

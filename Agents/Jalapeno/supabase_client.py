@@ -74,6 +74,38 @@ class SupabaseClient:
             return False
         return True
 
+    def table_columns(self, table_name: str) -> set[str]:
+        try:
+            self.request("GET", quote(table_name), params={"select": "*", "limit": 0})
+        except SupabaseError as exc:
+            raise SupabaseError(f"Unable to inspect columns for {table_name}: {exc}") from exc
+        return set(self._schema_columns(table_name))
+
+    def _schema_columns(self, table_name: str) -> list[str]:
+        response = self._session.request(
+            method="GET",
+            url=self._endpoint(""),
+            timeout=self.config.timeout_seconds,
+            headers={
+                "apikey": self.config.service_role_key,
+                "Authorization": f"Bearer {self.config.service_role_key}",
+                "Accept": "application/openapi+json",
+                "Accept-Profile": self.config.schema,
+            },
+        )
+        if response.status_code >= 400:
+            raise SupabaseError(f"Supabase schema request failed ({response.status_code}): {response.text}")
+        payload = response.json()
+        definitions = payload.get("definitions") if isinstance(payload, dict) else None
+        if not isinstance(definitions, dict):
+            components = payload.get("components") if isinstance(payload, dict) else None
+            definitions = components.get("schemas") if isinstance(components, dict) else None
+        table_definition = definitions.get(table_name) if isinstance(definitions, dict) else None
+        properties = table_definition.get("properties") if isinstance(table_definition, dict) else None
+        if not isinstance(properties, dict):
+            raise SupabaseError(f"Supabase schema did not include table {table_name}")
+        return list(properties.keys())
+
     def fetch_rows(self, table_name: str, *, filters: dict[str, Any] | None = None, select: str = "*") -> list[dict[str, Any]]:
         params: dict[str, Any] = {"select": select}
         if filters:

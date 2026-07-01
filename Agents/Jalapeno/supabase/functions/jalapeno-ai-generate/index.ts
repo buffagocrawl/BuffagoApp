@@ -56,7 +56,7 @@ interface Envelope {
 
 const MODEL_CONFIG = {
   default_text_model: Deno.env.get("JALAPENO_TEXT_MODEL") ?? "gpt-5.5",
-  image_model: Deno.env.get("JALAPENO_IMAGE_MODEL") ?? "gpt-image-2",
+  image_model: Deno.env.get("JALAPENO_IMAGE_MODEL") ?? "gpt-5.4",
   default_validation_model: Deno.env.get("JALAPENO_VALIDATION_MODEL") ?? "gpt-5.4-mini",
   max_output_tokens: Number(Deno.env.get("JALAPENO_MAX_OUTPUT_TOKENS") ?? "1200"),
   timeout_seconds: Number(Deno.env.get("JALAPENO_AI_TIMEOUT_SECONDS") ?? "75"),
@@ -116,6 +116,13 @@ const IMAGE_OUTPUT_SCHEMA = {
     "composition_notes",
     "negative_prompt_guidance",
     "brand_safety_notes",
+    "visual_style",
+    "camera_angle",
+    "scene_type",
+    "comedy_beat",
+    "character_archetype",
+    "wing_focus_level",
+    "prompt_version",
   ],
   properties: {
     content_slot: { type: "string", enum: ["buffago_post", "meme_post"] },
@@ -126,6 +133,13 @@ const IMAGE_OUTPUT_SCHEMA = {
     composition_notes: { type: "string" },
     negative_prompt_guidance: { type: "string" },
     brand_safety_notes: { type: "array", items: { type: "string" } },
+    visual_style: { type: "string" },
+    camera_angle: { type: "string" },
+    scene_type: { type: "string" },
+    comedy_beat: { type: "string" },
+    character_archetype: { type: "string" },
+    wing_focus_level: { type: "string" },
+    prompt_version: { type: "string" },
   },
 };
 
@@ -595,7 +609,7 @@ async function handleTextOrImageRequest(
     }
 
     const systemPrompt = request.request_type === "image_prompt"
-      ? "Generate a production-ready image prompt for Buffago. Return only the structured JSON requested."
+      ? "Generate a production-ready Buffago image prompt as cinematic comedy scene direction. Include supported visual metadata. Return only the structured JSON requested."
       : "Generate a ready-to-post Buffago caption package. Return only the structured JSON requested.";
     const promptLibrary = normalizePromptLibrary(request.prompt_library);
     const promptLibraryVersion = request.prompt_library_version ?? "prompt-library-v1";

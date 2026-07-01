@@ -31,7 +31,7 @@ Phase 6 adds the Image Asset Pipeline:
 - generates an image from the selected winner's final `image_prompt`
 - validates the file and Instagram crop targets
 - formats feed and square variants
-- optionally applies Buffago branding
+- optionally applies the Buffago mascot as subtle branding
 - uploads the final asset to Supabase Storage
 - stores the public URL back on the image asset and decision records
 - cleans up temporary files after successful upload
@@ -45,6 +45,15 @@ Phase 7 adds the Instagram Publishing Pipeline:
 - publishes only when Instagram is explicitly enabled and dry-run is off
 - fetches the published permalink and media metadata
 - stores retry state, failure metadata, and a final report
+
+Phases 12-14 turn Jalapeno into a fuller Instagram content operator:
+
+- collects Instagram performance snapshots for published posts
+- ties metrics back to creative metadata such as category, prompt reason, image style, CTA, hashtags, restaurant, state, models, and costs
+- builds a recent performance context before new content decisions
+- improves image prompts with stricter Buffago visual direction and one quality-regeneration pass
+- persists failure context and action-required states
+- generates daily and weekly admin reports and emails them through Resend when configured
 
 ## Prompt Library
 
@@ -62,6 +71,12 @@ Buffago brand, voice, and reusable prompt instructions live in standalone markdo
 - `prompt_library/prompts/quality_review.md`
 
 Jalapeno loads these files dynamically at runtime, and `python main.py --validate` fails fast if any prompt file is missing.
+
+### Buffago Image Prompt Style
+
+Jalapeno image prompts use `content_engine/visual_prompt_style.py` as the shared visual style system. It keeps Buffago images cinematic, comedic, wing-focused, and non-stock by combining a reusable visual style block, rotating camera and scene variants, visual comedy beats, action cues, recurring character archetypes, and strict no-text-in-generated-image guardrails.
+
+Adjust future image direction in that module first. The local content engine stores `visual_style`, `camera_angle`, `scene_type`, `comedy_beat`, `character_archetype`, `wing_focus_level`, and `prompt_version` in candidate metadata without requiring a database migration.
 
 ## Setup
 
@@ -102,6 +117,14 @@ Meta integration secrets remain separate:
 - `META_APP_ID`
 - `META_APP_SECRET`
 - `META_LONG_LIVED_ACCESS_TOKEN`
+
+Optional report delivery:
+
+- `REPORT_EMAIL_TO`
+- `REPORT_EMAIL_FROM`
+- `RESEND_API_KEY`
+
+If report email config is missing, Jalapeno still generates and stores reports, then prints a console warning that email delivery is disabled.
 
 ## Database Tables
 
@@ -166,15 +189,42 @@ Stores:
 
 ### `jalapeno_post_metrics`
 
-Stores metric snapshots over time.
+Stores historical metric snapshots over time. Rows are appended, not overwritten.
 
 Stores:
 
 - likes, comments, shares, saves
 - reach, impressions, profile visits, follows
 - engagement rate
+- collected/captured timestamp
+- post age in hours and days
+- published timestamp
+- caption, category, prompt template, prompt reason, image prompt, image style, hashtags, CTA type, generation model, image model, cost metadata, topic, restaurant, and state metadata
 - raw metric payload
-- capture time
+
+### `jalapeno_performance_summaries`
+
+Stores daily/weekly learning and report summaries.
+
+Stores:
+
+- summary type
+- report period
+- generated run reference
+- JSON summary containing best/worst posts, categories, image styles, CTA types, costs, and recommendations
+
+### `jalapeno_report_logs`
+
+Stores generated admin reports and delivery state.
+
+Stores:
+
+- report type
+- subject and body
+- period start/end
+- delivery status
+- optional recipient
+- metadata such as duration and email status
 
 ### `jalapeno_content_candidates`
 
@@ -214,7 +264,11 @@ Stores:
 - bucket, storage path, and public URL
 - image type, content type, dimensions, aspect ratio, format, and file size
 - branding and meme formatting flags
+- image prompt, image source, prompt version, prompt quality, generation time, and image model
 - validation, upload, and cleanup state
+- optional JSON metadata for source details, validation issues, cost estimates, and stage durations
+
+Schema note: `20260701000200_jalapeno_image_asset_payload_columns.sql` is an additive backfill migration for the complete image asset insert payload. It uses `ADD COLUMN IF NOT EXISTS`, keeps newly introduced optional columns nullable, and preserves existing rows.
 
 ### `jalapeno_instagram_posts`
 
@@ -286,14 +340,14 @@ The image pipeline also reads these config sections from `config.yaml`:
 - `image.output_format`
 - `image.quality`
 - `branding.enabled`
-- `branding.logo_path`
+- `branding.logo_path` (defaults to the Buffago mascot PNG at `crawl/assets/wing-user.png`)
 - `branding.placement`
-- `branding.opacity`
+- `branding.opacity` (defaults to a subtle 12% mascot opacity)
 - `branding.margin_px`
 - `branding.max_width_percent`
 - `branding.border_enabled`
 - `branding.accent_color`
-- `branding.label_text`
+- `branding.label_text` (kept for backward-compatible config parsing but not rendered)
 - `storage.provider`
 - `storage.bucket`
 - `storage.public`
@@ -368,6 +422,8 @@ The image pipeline also reads these config sections from `config.yaml`:
 - The content decision engine also supports a dry-run path that writes the decision artifact without posting.
 - Instagram publishing is disabled by default with `instagram.enabled=false` and `instagram.dry_run=true`.
 - Validation simulates container creation and publish flow without calling live Instagram endpoints.
+- `--daily-report` and `--weekly-report` can generate reports without email if Resend config is absent.
+- `--metrics` reads Instagram Graph API metrics but never publishes.
 
 ## Retry Model
 
@@ -414,6 +470,14 @@ Validation checks:
 - a fake publish can be simulated without calling live endpoints
 - retry logic does not create duplicate publishes
 - report generation works
+- required Jalapeno tables exist or are reported as missing
+- OpenAI or Jalapeno AI backend availability is reported
+- Meta credentials and Instagram/Facebook IDs are reported
+- report email config is reported as configured or disabled
+- metrics collector dependencies are importable
+- recent performance context can be built
+- daily and weekly reports can be generated in dry-run-safe mode
+- fallback/temp content path is available
 
 To run the same validation without calling the AI backend:
 
@@ -431,11 +495,12 @@ python main.py --validate --refresh-external-context
 
 The reusable content engine is platform-agnostic, but Jalapeno currently uses it for Instagram planning.
 
-1. Load Buffago prompt guidance, snapshot data, external context, and content memory.
+1. Load Buffago prompt guidance, snapshot data, external context, content memory, and recent performance context.
 1. Generate 5 to 10 candidate ideas across post types such as restaurant spotlight, hidden gem, meme, challenge, leaderboard, and community highlight.
 1. Score each candidate with the configurable weighting model.
 1. Compare every candidate against the last 30 published posts and reject near duplicates.
 1. Apply memory-based bonuses and penalties to favor diversity.
+1. Prefer working categories/image styles/CTA patterns and penalize weak recent image styles.
 1. Select a winner and runner-up using both score and human-style editorial judgment.
 1. Generate the final caption package.
 1. Generate 10 to 15 hashtags with branded, local, wing-specific, and restaurant-specific coverage.
@@ -445,6 +510,90 @@ The reusable content engine is platform-agnostic, but Jalapeno currently uses it
 1. Save the published-memory record later when the post actually goes live.
 
 The engine uses configurable weights in `content_engine/decision_config.json`, so future tuning does not require code changes.
+
+## Metrics And Learning
+
+Run metrics collection:
+
+```powershell
+python main.py --metrics
+```
+
+Metrics behavior:
+
+- collects snapshots for posts published around 24 hours old
+- collects snapshots again around 72 hours old
+- refreshes all published posts from the last 30 days
+- stores historical snapshots in `jalapeno_post_metrics`
+- computes engagement rate from likes, comments, saves, shares, and reach/impressions
+- detects token/auth failures and returns an action-required status instead of retrying forever
+- logs rate limit events and defers safely
+
+Before each content decision, Jalapeno builds a learning context from recent snapshots:
+
+- best/worst posts from 7, 30, and 90 days
+- best/worst categories
+- best/worst image styles
+- best CTA types and hashtag patterns
+- duplicate topics to avoid
+- strong and weak creative patterns
+
+That context is stored in the decision summary and used by local scoring so future posts can favor working patterns, avoid recent duplicates, avoid poor image styles, and explain the content direction.
+
+## Admin Reports
+
+Generate a daily report:
+
+```powershell
+python main.py --daily-report
+```
+
+Generate a weekly report:
+
+```powershell
+python main.py --weekly-report
+```
+
+Daily reports include:
+
+- runs in the last 24 hours
+- posts generated, published, skipped, and failed
+- recent metric highlights and best available post
+- cost and token summary
+- recommended adjustment for the next run
+
+Weekly reports include:
+
+- generated and published post tables
+- failures
+- best and worst posts
+- best/worst categories, image styles, and CTA types
+- engagement and cost summary
+- recommended adjustments for the next week
+
+Email delivery uses Resend when `REPORT_EMAIL_TO`, `REPORT_EMAIL_FROM`, and `RESEND_API_KEY` are present. Without those settings, the report is still generated and stored in `jalapeno_report_logs`.
+
+## Failure Handling
+
+Jalapeno handles common failures explicitly:
+
+- missing Supabase data falls back to safe local snapshot content where existing snapshot code supports it
+- OpenAI/image generation failures retry once with a stronger prompt where practical
+- invalid image output fails before publishing and logs `image_quality_review_completed`
+- Meta token/auth errors log `token_expired_detected` and mark action required
+- Instagram publish failures persist safe payload metadata and do not mark posts as published
+- duplicate content logs `duplicate_content_detected` and blocks or penalizes similar candidates
+- rate limits log `rate_limit_retry`
+- run failures persist failure metadata on `jalapeno_runs` and `jalapeno_errors`
+
+## AI Model Configuration
+
+Jalapeno keeps model selection centralized in `config.yaml` under `ai.models`.
+
+- Production image generation defaults to `gpt-5.4`.
+- Development, validation, and dry-run image generation also use `gpt-5.4`.
+- Text generation keeps separate production and development routes.
+- Image pipeline logs include the configured `image_model`.
 
 ## Image Asset Pipeline Workflow
 
@@ -456,7 +605,8 @@ The image asset pipeline reuses the Phase 7 winner and runs as a separate stage.
 1. Save the generated file to the configured temp directory.
 1. Validate file existence, size, format, dimensions, aspect ratio, and corruption safety.
 1. Format the image for Instagram feed output and square fallback output.
-1. Apply Buffago branding only when branding is enabled and a logo exists.
+1. Apply the Buffago mascot PNG as a subtle lower-right watermark when branding is enabled.
+1. Skip branding with a warning, rather than failing the run, if the configured mascot asset cannot be loaded.
 1. Apply meme-specific top and bottom text formatting for meme content.
 1. Upload the final feed image to Supabase Storage when uploads are enabled.
 1. Persist the image asset row and link the public URL back to the winning decision.
@@ -545,10 +695,31 @@ Run the live Instagram publish flow:
 python main.py --instagram-publish-live
 ```
 
+Collect metrics for recent published posts:
+
+```powershell
+python main.py --metrics
+```
+
+Generate reports:
+
+```powershell
+python main.py --daily-report
+python main.py --weekly-report
+```
+
 Run the test suite on Windows:
 
 ```powershell
 python -m pytest
+```
+
+If Windows temp permissions block pytest, use a workspace temp base:
+
+```powershell
+New-Item -ItemType Directory -Force .\tmp | Out-Null
+$env:TMP="$PWD\tmp"; $env:TEMP="$PWD\tmp"
+python -m pytest .\tests -q -p no:cacheprovider --basetemp=.\tmp\jalapeno_pytest
 ```
 
 ## GitHub Actions Schedule
@@ -600,6 +771,7 @@ Required GitHub secrets:
 - `META_APP_SECRET`
 - `META_LONG_LIVED_ACCESS_TOKEN`
 - `OPENAI_API_KEY`
+- optional report secrets: `REPORT_EMAIL_TO`, `REPORT_EMAIL_FROM`, `RESEND_API_KEY`
 
 Notes on secret mapping:
 
@@ -678,6 +850,21 @@ Structured log events are emitted for:
 - publish report created
 - publish notification sent and failed
 - metrics collection started and completed
+- metrics_collection_failed
+- metrics_snapshot_persisted
+- performance_context_built
+- image_quality_review_started
+- image_quality_review_completed
+- image_regeneration_triggered
+- duplicate_content_detected
+- fallback_content_used
+- email_report_generated
+- email_report_sent
+- email_report_failed
+- weekly_summary_generated
+- failure_alert_required
+- rate_limit_retry
+- token_expired_detected
 - content memory loaded and analyzed
 - theme rotation detected
 - diversity bonus applied
@@ -700,6 +887,12 @@ Every log includes as much context as is available at that stage, including:
 - `dry_run`
 - `model_name`
 - `image_model_name`
+- `image_model`
+- `branding_enabled`
+- `branding_asset_path`
+- `branding_asset_loaded`
+- `branding_position`
+- `branding_scale`
 - `prompt_version`
 - `workflow_version`
 - `estimated_cost`

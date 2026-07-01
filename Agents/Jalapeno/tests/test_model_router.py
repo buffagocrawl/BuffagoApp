@@ -123,11 +123,11 @@ def test_manual_local_execution_routes_to_gpt_54_mini() -> None:
     assert decision.routing_reason == "manual_execution"
 
 
-def test_image_model_is_unchanged_across_profiles() -> None:
+def test_image_model_uses_gpt_54_across_profiles() -> None:
     config = load_ai_config()
 
-    assert config.models.production.image == "gpt-image-2"
-    assert config.models.development.image == "gpt-image-2"
+    assert config.models.production.image == "gpt-5.4"
+    assert config.models.development.image == "gpt-5.4"
 
 
 def test_phase5_validation_logs_selected_models(tmp_path: Path) -> None:
@@ -161,5 +161,5 @@ def test_phase5_validation_logs_selected_models(tmp_path: Path) -> None:
     log_output = stream.getvalue()
     assert "model_selected" in log_output
     assert "selected_text_model=gpt-5.4-mini" in log_output
-    assert "selected_image_model=gpt-image-2" in log_output
+    assert "selected_image_model=gpt-5.4" in log_output
     assert "routing_reason=validation_run" in log_output

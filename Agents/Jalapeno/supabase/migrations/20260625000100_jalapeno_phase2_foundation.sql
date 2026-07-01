@@ -248,7 +248,7 @@ INSERT INTO public.jalapeno_settings (
   ('meme_post_time', '"20:00"'::jsonb, 'Default time for meme post generation', false, true),
   ('timezone', '"America/New_York"'::jsonb, 'Primary agent timezone', false, true),
   ('text_model', '"gpt-4.1-mini"'::jsonb, 'Default text generation model', false, true),
-  ('image_model', '"gpt-image-1"'::jsonb, 'Default image generation model', false, true),
+  ('image_model', '"gpt-5.4"'::jsonb, 'Default image generation model', false, true),
   ('temperature', '0.7'::jsonb, 'Default model temperature', false, true),
   ('max_candidates', '5'::jsonb, 'Maximum number of candidates to generate per run', false, true),
   ('max_retries', '3'::jsonb, 'Maximum retry attempts for transient failures', false, true),

@@ -22,6 +22,7 @@ from content_engine.image_prompt_generator import generate_image_prompt
 from content_engine.settings import ContentEngineSettings, load_content_engine_settings
 from content_engine.winner_selector import WinnerSelectionResult, WinnerSelector
 from content_memory import analyze_content_memory, infer_memory_entry_from_post, load_content_memory, load_recent_published_posts, persist_memory_entry
+from performance_context import build_performance_context
 
 
 DEFAULT_DECISION_OUTPUT_PATH = Path(__file__).resolve().parents[1] / "data" / "latest_content_decision.json"
@@ -211,6 +212,7 @@ class ContentDecisionEngine:
         started_at = _utcnow()
         log_event(logger, "candidate_generation_started", run_id=active_run_id, dry_run=dry_run, stage="content_engine", model="local-rules")
         memory_entries, memory_summary, memory_rows = load_content_memory(client, logger=logger, run_id=active_run_id, limit=30)
+        performance_context = build_performance_context(client, logger=logger, run_id=active_run_id).to_dict()
         if memory_summary.reasoning:
             log_event(logger, "content_memory_analyzed", run_id=active_run_id, reasoning=memory_summary.reasoning, community_activity_score=memory_summary.community_activity_score)
         if memory_summary.theme_rotation_needed:
@@ -228,6 +230,7 @@ class ContentDecisionEngine:
                 "recent_visual_styles": memory_summary.recent_visual_styles,
                 "community_activity_score": memory_summary.community_activity_score,
                 "theme_rotation_needed": memory_summary.theme_rotation_needed,
+                "performance_context": performance_context,
             },
             scheduled_post_type=scheduled_post_type,
         )
@@ -244,9 +247,11 @@ class ContentDecisionEngine:
             if duplicate.rejected:
                 log_event(
                     logger,
-                    "candidate_rejected_duplicate",
+                    "duplicate_content_detected",
                     run_id=active_run_id,
                     candidate_id=candidate.candidate_id,
+                    stage="content_engine",
+                    status="rejected",
                     duplicate_similarity=duplicate.duplicate_score,
                     rejection_reason=duplicate.rejection_reason,
                 )
@@ -262,6 +267,7 @@ class ContentDecisionEngine:
                     "recent_visual_styles": memory_summary.recent_visual_styles,
                     "underused_themes": memory_summary.underused_themes,
                     "community_activity_score": memory_summary.community_activity_score,
+                    "performance_context": performance_context,
                 },
                 duplicate_score=duplicate.duplicate_score,
             )
@@ -356,6 +362,12 @@ class ContentDecisionEngine:
             "rejected_duplicate_count": sum(1 for candidate in scored_candidates if candidate.rejected_duplicate),
             "winner_reasoning": selection.reasoning,
             "memory_reasoning": memory_summary.reasoning,
+            "performance_context": performance_context,
+            "content_direction_reason": (
+                performance_context.get("strong_patterns", ["No strong historic pattern yet"])[0]
+                if isinstance(performance_context.get("strong_patterns"), list) and performance_context.get("strong_patterns")
+                else "No strong historic pattern yet; using current Buffago activity and duplicate avoidance."
+            ),
             "platform": "instagram",
             "scheduled_post_type": scheduled_post_type,
         }

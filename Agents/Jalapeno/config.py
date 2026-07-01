@@ -263,6 +263,13 @@ def _resolve_temp_dir(value: str) -> Path:
     return temp_dir
 
 
+def _resolve_config_path(value: str) -> Path:
+    path = Path(value)
+    if path.is_absolute():
+        return path
+    return (BASE_DIR / path).resolve()
+
+
 def _timezone_database_is_available() -> bool:
     try:
         return bool(available_timezones())
@@ -341,14 +348,14 @@ def load_configuration(
     )
     branding_config = BrandingConfig(
         enabled=_require_bool(branding_section, "enabled"),
-        logo_path=Path(path_value) if (path_value := _optional_string(branding_section, "logo_path", "")) else None,
+        logo_path=_resolve_config_path(path_value) if (path_value := _optional_string(branding_section, "logo_path", "")) else None,
         placement=_require_string(branding_section, "placement"),
         opacity=_require_float(branding_section, "opacity"),
         margin_px=_require_int(branding_section, "margin_px"),
         max_width_percent=_require_int(branding_section, "max_width_percent"),
         border_enabled=_require_bool(branding_section, "border_enabled"),
         accent_color=_parse_color(_require_string(branding_section, "accent_color"), "branding.accent_color"),
-        label_text=_optional_string(branding_section, "label_text", "Buffago"),
+        label_text=_optional_string(branding_section, "label_text", ""),
     )
     storage_config = StorageConfig(
         provider=_require_string(storage_section, "provider").lower(),

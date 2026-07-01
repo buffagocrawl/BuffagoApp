@@ -26,7 +26,7 @@ These are optional and can be changed later without touching Jalapeno's local `.
 
 ```powershell
 supabase secrets set JALAPENO_TEXT_MODEL=gpt-5.5
-supabase secrets set JALAPENO_IMAGE_MODEL=gpt-image-2
+supabase secrets set JALAPENO_IMAGE_MODEL=gpt-5.4
 supabase secrets set JALAPENO_VALIDATION_MODEL=gpt-5.5
 supabase secrets set JALAPENO_MAX_OUTPUT_TOKENS=1200
 supabase secrets set JALAPENO_AI_TIMEOUT_SECONDS=75

@@ -195,3 +195,51 @@ class InstagramGraphClient:
             media_id,
         )
         return response
+
+    def get_media_metrics(self, media_id: str) -> dict[str, Any]:
+        if self.simulate:
+            return {
+                "id": media_id,
+                "like_count": 12,
+                "comments_count": 2,
+                "saved": 1,
+                "shares": 1,
+                "reach": 250,
+                "impressions": 310,
+                "source": "simulated",
+            }
+        details_response = self.transport.request(
+            method="GET",
+            url=self._endpoint(media_id),
+            params={
+                "access_token": self.access_token,
+                "fields": "id,caption,like_count,comments_count,permalink,timestamp,media_type",
+            },
+            timeout=self.timeout_seconds,
+        )
+        if details_response.status_code >= 400:
+            raise SupabaseError(f"Instagram Graph API media details failed ({details_response.status_code}): {details_response.text}")
+        details = details_response.json() if details_response.content else {}
+        insights_response = self.transport.request(
+            method="GET",
+            url=self._endpoint(f"{media_id}/insights"),
+            params={
+                "access_token": self.access_token,
+                "metric": "reach,impressions,saved,shares",
+            },
+            timeout=self.timeout_seconds,
+        )
+        if insights_response.status_code >= 400:
+            raise SupabaseError(f"Instagram Graph API media insights failed ({insights_response.status_code}): {insights_response.text}")
+        insights_payload = insights_response.json() if insights_response.content else {}
+        metrics = dict(details)
+        for item in insights_payload.get("data", []) if isinstance(insights_payload, dict) else []:
+            if not isinstance(item, dict):
+                continue
+            name = item.get("name")
+            values = item.get("values")
+            if not isinstance(name, str) or not isinstance(values, list) or not values:
+                continue
+            first_value = values[0] if isinstance(values[0], dict) else {}
+            metrics[name] = first_value.get("value")
+        return metrics

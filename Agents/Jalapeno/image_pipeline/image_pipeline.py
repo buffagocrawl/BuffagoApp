@@ -239,6 +239,9 @@ def _run_image_pipeline_impl(
         content_type=content_type,
         image_type=image_type,
         prompt_version=PROMPT_LIBRARY_VERSION,
+        image_model=image_model,
+        branding_enabled=config.branding.enabled,
+        branding_asset_path=str(config.branding.logo_path) if config.branding.logo_path else None,
     )
     log_event(
         logger,
@@ -261,6 +264,7 @@ def _run_image_pipeline_impl(
         content_type=content_type,
         image_type=image_type,
         model=image_model,
+        image_model=image_model,
         prompt_version=PROMPT_LIBRARY_VERSION,
         image_prompt_preview=_truncate_prompt(image_prompt),
     )
@@ -276,22 +280,64 @@ def _run_image_pipeline_impl(
             allow_placeholder_fallback=dry_run,
         )
     except Exception as exc:
+        retry_prompt = (
+            f"{image_prompt} Regenerate with cleaner composition, more appetizing crisp saucy wings, stronger natural lighting, "
+            "no distorted food, no confusing props, no text, and a clear Instagram-feed focal point."
+        )
         log_event(
             logger,
-            "image_generation_failed",
-            level="error",
+            "image_regeneration_triggered",
+            level="warning",
             run_id=run_id,
             candidate_id=candidate_id,
             content_type=content_type,
             image_type=image_type,
             model=image_model,
-            prompt_version=PROMPT_LIBRARY_VERSION,
-            generation_time_ms=int((time.perf_counter() - generation_started) * 1000),
-            cost_estimate=0.0,
-            image_prompt_preview=_truncate_prompt(image_prompt),
+            retry_count=1,
             error=str(exc),
         )
-        raise
+        try:
+            generated = generate_image(
+                prompt=retry_prompt,
+                content_type=content_type,
+                image_type=image_type,
+                model=image_model,
+                size=(1024, 1536) if image_type != "meme" else (1024, 1024),
+                generation_client=generation_client,
+                cost_estimate_usd=0.0,
+                allow_placeholder_fallback=dry_run,
+            )
+            image_prompt = retry_prompt
+        except Exception as retry_exc:
+            log_event(
+                logger,
+                "image_generation_failed",
+                level="error",
+                run_id=run_id,
+                candidate_id=candidate_id,
+                content_type=content_type,
+                image_type=image_type,
+                model=image_model,
+                prompt_version=PROMPT_LIBRARY_VERSION,
+                generation_time_ms=int((time.perf_counter() - generation_started) * 1000),
+                cost_estimate=0.0,
+                image_prompt_preview=_truncate_prompt(image_prompt),
+                error=str(retry_exc),
+            )
+            raise
+    if generated.image_source != "real_ai" and not dry_run:
+        log_event(
+            logger,
+            "fallback_content_used",
+            level="warning",
+            run_id=run_id,
+            candidate_id=candidate_id,
+            content_type=content_type,
+            image_type=image_type,
+            stage="image_generation",
+            status="fallback",
+            fallback_type=generated.image_source,
+        )
 
     generation_duration_ms = int((time.perf_counter() - generation_started) * 1000)
     timestamp = _utcnow().strftime("%Y%m%dT%H%M%S%fZ")
@@ -307,6 +353,7 @@ def _run_image_pipeline_impl(
         image_type=image_type,
         file_path=local_temp_path,
         model=generated.model,
+        image_model=generated.model,
         image_source=generated.image_source,
         prompt_version=generated.prompt_version,
         generation_time_ms=generation_duration_ms,
@@ -324,6 +371,17 @@ def _run_image_pipeline_impl(
     )
 
     validation_started = time.perf_counter()
+    log_event(
+        logger,
+        "image_quality_review_started",
+        run_id=run_id,
+        candidate_id=candidate_id,
+        content_type=content_type,
+        image_type=image_type,
+        file_path=local_temp_path,
+        stage="image_quality_review",
+        status="started",
+    )
     validation = validate_image_file(
         local_temp_path,
         image_source=generated.image_source,
@@ -353,8 +411,60 @@ def _run_image_pipeline_impl(
         issues=validation.issues,
         content_issues=validation.content_issues,
     )
+    log_event(
+        logger,
+        "image_quality_review_completed",
+        run_id=run_id,
+        candidate_id=candidate_id,
+        content_type=content_type,
+        image_type=image_type,
+        file_path=local_temp_path,
+        stage="image_quality_review",
+        status=validation.status,
+        duration_ms=validation_duration_ms,
+        appetizing=validation.valid,
+        on_brand=validation.prompt_quality >= 70,
+        instagram_ready=validation.valid,
+        quality_notes=validation.issues,
+    )
     if not validation.valid:
-        raise ValueError("; ".join(validation.issues))
+        if dry_run:
+            raise ValueError("; ".join(validation.issues))
+        retry_prompt = (
+            f"{image_prompt} QUALITY FIX: make the wings clearly appetizing, natural, crispy, glossy, well lit, on-brand for Buffago, "
+            "not weird, not distorted, not gross, not confusing, no text in image."
+        )
+        log_event(
+            logger,
+            "image_regeneration_triggered",
+            level="warning",
+            run_id=run_id,
+            candidate_id=candidate_id,
+            content_type=content_type,
+            image_type=image_type,
+            retry_count=1,
+            reason=validation.validation_reason,
+        )
+        generated = generate_image(
+            prompt=retry_prompt,
+            content_type=content_type,
+            image_type=image_type,
+            model=image_model,
+            size=(1024, 1536) if image_type != "meme" else (1024, 1024),
+            generation_client=generation_client,
+            cost_estimate_usd=0.0,
+            allow_placeholder_fallback=False,
+        )
+        image_prompt = retry_prompt
+        generated.image.convert("RGBA").save(local_temp_path, format="PNG", optimize=True)
+        validation = validate_image_file(
+            local_temp_path,
+            image_source=generated.image_source,
+            prompt=image_prompt,
+            allow_non_ai_source=False,
+        )
+        if not validation.valid:
+            raise ValueError("; ".join(validation.issues))
 
     from PIL import Image, ImageOps
 
@@ -395,7 +505,12 @@ def _run_image_pipeline_impl(
         meme_top_text = None
         meme_bottom_text = None
 
-    branding_result: BrandingResult = apply_branding(feed_image, branding_config=config.branding, label_text=config.branding.label_text)
+    branding_result: BrandingResult = apply_branding(
+        feed_image,
+        branding_config=config.branding,
+        label_text=config.branding.label_text,
+        avoid_bottom_text=image_type == "meme",
+    )
     if branding_result.applied:
         log_event(
             logger,
@@ -406,20 +521,31 @@ def _run_image_pipeline_impl(
             image_type=image_type,
             file_path=local_temp_path,
             branding_enabled=True,
-            branding_placement=config.branding.placement,
-            logo_path=branding_result.logo_path,
+            branding_asset_path=branding_result.logo_path,
+            branding_asset_loaded=branding_result.asset_loaded,
+            branding_position=branding_result.position,
+            branding_scale=branding_result.scale,
+            image_model=generated.model,
         )
         feed_image = branding_result.image
     else:
+        log_level = "warning" if branding_result.reason in {"logo_missing", "logo_unreadable"} and config.branding.enabled else "info"
         log_event(
             logger,
             "branding_skipped",
+            level=log_level,
             run_id=run_id,
             candidate_id=candidate_id,
             content_type=content_type,
             image_type=image_type,
             file_path=local_temp_path,
             reason=branding_result.reason,
+            branding_enabled=config.branding.enabled,
+            branding_asset_path=branding_result.logo_path or (str(config.branding.logo_path) if config.branding.logo_path else None),
+            branding_asset_loaded=branding_result.asset_loaded,
+            branding_position=branding_result.position,
+            branding_scale=branding_result.scale,
+            image_model=generated.model,
         )
 
     feed_filename = _safe_filename(run_id, candidate_id, timestamp, f".{config.image.output_format.lower()}")
@@ -495,8 +621,23 @@ def _run_image_pipeline_impl(
             image_prompt=image_prompt,
             prompt_quality=validation.prompt_quality,
             validation_reason=validation.validation_reason,
+            prompt_version=generated.prompt_version,
+            generation_time_ms=generated.generation_time_ms,
+            image_model=generated.model,
+            metadata={
+                "cost_estimate_usd": generated.cost_estimate_usd,
+                "image_source_details": generated.source_details,
+                "validation_issues": list(validation.issues),
+                "content_validation_issues": list(validation.content_issues),
+                "stage_durations_ms": {
+                    "generation": generation_duration_ms,
+                    "validation": validation_duration_ms,
+                    "formatting": formatting_duration_ms,
+                },
+            },
             uploaded_at=upload_result.uploaded_at if upload_result else None,
             cleanup_status="pending",
+            logger=logger,
         )
         link_image_asset_to_decision(
             client,

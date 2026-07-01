@@ -85,7 +85,7 @@ def run_with_retries(
                 raise
             log_event(
                 logger,
-                "publish_retry_scheduled",
+                "rate_limit_retry" if "429" in str(exc) or "rate" in str(exc).lower() or str(error_code) in {"4", "17", "32", "613"} else "publish_retry_scheduled",
                 run_id=run_id,
                 candidate_id=candidate_id,
                 container_id=container_id,

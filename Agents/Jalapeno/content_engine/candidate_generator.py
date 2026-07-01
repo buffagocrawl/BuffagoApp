@@ -6,6 +6,7 @@ from typing import Any
 from uuid import uuid4
 
 from content_engine.settings import ContentEngineSettings
+from content_engine.visual_prompt_style import apply_prompt_metadata, build_buffago_image_direction
 
 
 @dataclass(frozen=True, slots=True)
@@ -99,6 +100,17 @@ class CandidateGenerator:
         xp_levels = list(snapshot.get("xp_streak_milestones", {}).get("xp_levels", []) or [])
         underused_themes = list(memory_summary.get("underused_themes", []) or [])
         recent_ctas = list(memory_summary.get("recent_ctas", []) or [])
+        performance_context = memory_summary.get("performance_context") if isinstance(memory_summary.get("performance_context"), dict) else {}
+        weak_styles = {
+            str(item.get("name") or "").strip().lower()
+            for item in performance_context.get("worst_image_styles", [])[:3]
+            if isinstance(item, dict)
+        }
+        strong_categories = [
+            str(item.get("name") or "").strip().lower()
+            for item in performance_context.get("best_categories", [])[:3]
+            if isinstance(item, dict)
+        ]
 
         candidates = [
             ContentCandidate(
@@ -359,6 +371,19 @@ class CandidateGenerator:
             for candidate in candidates:
                 if candidate.suggested_cta in recent_ctas:
                     candidate.metadata["cta_repeat_risk"] = True
+
+        for candidate in candidates:
+            seed = f"{candidate.candidate_id}:{candidate.content_type}:{candidate.working_title}"
+            apply_prompt_metadata(
+                candidate.metadata,
+                build_buffago_image_direction(seed, content_type=candidate.content_type),
+            )
+            if candidate.visual_style.lower() in weak_styles:
+                candidate.metadata["poor_image_style_risk"] = True
+            if candidate.content_type.lower() in strong_categories or candidate.primary_theme.lower() in strong_categories:
+                candidate.metadata["performance_pattern_match"] = True
+            if performance_context.get("prompt_guidance"):
+                candidate.metadata["learning_prompt_guidance"] = performance_context["prompt_guidance"]
 
         return candidates
 

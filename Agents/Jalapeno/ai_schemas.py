@@ -4,6 +4,12 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any
 
+from content_engine.visual_prompt_style import (
+    apply_prompt_metadata,
+    build_buffago_image_direction,
+    build_scene_direction_prompt,
+)
+
 
 ALLOWED_CONTENT_SLOTS = ("buffago_post", "meme_post")
 ALLOWED_POST_TYPES = (
@@ -60,6 +66,13 @@ IMAGE_PROMPT_OUTPUT_SCHEMA: dict[str, Any] = {
         "composition_notes",
         "negative_prompt_guidance",
         "brand_safety_notes",
+        "visual_style",
+        "camera_angle",
+        "scene_type",
+        "comedy_beat",
+        "character_archetype",
+        "wing_focus_level",
+        "prompt_version",
     ],
     "properties": {
         "content_slot": {"type": "string", "enum": list(ALLOWED_CONTENT_SLOTS)},
@@ -70,6 +83,13 @@ IMAGE_PROMPT_OUTPUT_SCHEMA: dict[str, Any] = {
         "composition_notes": {"type": "string"},
         "negative_prompt_guidance": {"type": "string"},
         "brand_safety_notes": {"type": "array", "items": {"type": "string"}},
+        "visual_style": {"type": "string"},
+        "camera_angle": {"type": "string"},
+        "scene_type": {"type": "string"},
+        "comedy_beat": {"type": "string"},
+        "character_archetype": {"type": "string"},
+        "wing_focus_level": {"type": "string"},
+        "prompt_version": {"type": "string"},
     },
 }
 
@@ -195,7 +215,7 @@ def normalize_image_output(payload: dict[str, Any]) -> dict[str, Any]:
     if text_overlay is not None and (not isinstance(text_overlay, str) or not text_overlay.strip()):
         raise SchemaValidationError("text_overlay must be a string or null")
 
-    return {
+    normalized = {
         "content_slot": content_slot,
         "image_prompt": _require_string(payload.get("image_prompt"), "image_prompt"),
         "style": style,
@@ -205,6 +225,19 @@ def normalize_image_output(payload: dict[str, Any]) -> dict[str, Any]:
         "negative_prompt_guidance": _require_string(payload.get("negative_prompt_guidance"), "negative_prompt_guidance"),
         "brand_safety_notes": _require_string_list(payload.get("brand_safety_notes"), "brand_safety_notes"),
     }
+    for key in (
+        "visual_style",
+        "camera_angle",
+        "scene_type",
+        "comedy_beat",
+        "character_archetype",
+        "wing_focus_level",
+        "prompt_version",
+    ):
+        value = payload.get(key)
+        if isinstance(value, str) and value.strip():
+            normalized[key] = value.strip()
+    return normalized
 
 
 def normalize_brand_validation_output(payload: dict[str, Any]) -> dict[str, Any]:
@@ -234,6 +267,29 @@ def _base_caption(content_slot: str) -> str:
     return "Buffago said wings first, and honestly, that was the correct decision."
 
 
+def _fallback_scene_prompt(content_slot: str, post_type: str) -> tuple[str, dict[str, str]]:
+    direction = build_buffago_image_direction(f"fallback:{content_slot}:{post_type}", content_type=post_type)
+    metadata: dict[str, str] = {}
+    apply_prompt_metadata(metadata, direction)
+    if content_slot == "meme_post" or post_type == "meme":
+        prompt = build_scene_direction_prompt(
+            setting="packed sports bar at peak wing-night noise",
+            characters="two lifelong friends, a facepalming bartender, nearby diners, and someone recording on a phone crowd around a basket of wings",
+            conflict="one friend stands on a booth pointing a saucy wing like courtroom evidence while the other clutches the basket like treasure",
+            mood="absurd, scroll-stopping, mock-serious, and instantly readable without a caption",
+            direction=direction,
+        )
+    else:
+        prompt = build_scene_direction_prompt(
+            setting="warm neighborhood wing restaurant with a busy counter and full booths",
+            characters="regulars and servers react as a steaming platter of wings lands in the foreground",
+            conflict="everyone reaches for the crispiest glossy buffalo wing at the same time and freezes in comedic disbelief",
+            mood="hungry, cinematic, lively, and local",
+            direction=direction,
+        )
+    return prompt, metadata
+
+
 def fallback_text_output(
     *,
     content_slot: str,
@@ -244,7 +300,7 @@ def fallback_text_output(
     if content_slot == "meme_post" or "sports_events" in signals:
         post_type = "meme"
         caption = "Hot take: if wings aren't involved, is it even worth the napkins?"
-        image_prompt = "A funny, bold meme-style wing post with exaggerated sauce, a local diner vibe, and room for witty text overlay."
+        image_prompt, _metadata = _fallback_scene_prompt(content_slot, post_type)
         content_angle = "Buffago meme energy"
         why_this_post = "A safe meme-style post keeps the brand playful without inventing facts."
         hashtags = ["#Buffago", "#WingHumor", "#BuffaloWings", "#LocalFood"]
@@ -252,7 +308,7 @@ def fallback_text_output(
     elif any("holiday" in signal for signal in signals):
         post_type = "food_holiday"
         caption = "A food holiday is basically a public service announcement for wings."
-        image_prompt = "A polished, realistic wing platter with a festive local food-holiday feel, warm lighting, and fresh sauce gloss."
+        image_prompt, _metadata = _fallback_scene_prompt(content_slot, post_type)
         content_angle = "Food holiday wing feature"
         why_this_post = "Food holidays are safe, relevant, and easy to keep brand-first."
         hashtags = ["#Buffago", "#FoodHoliday", "#Wings", "#WingWednesday"]
@@ -260,7 +316,7 @@ def fallback_text_output(
     elif content_slot == "buffago_post":
         post_type = "restaurant_spotlight"
         caption = _base_caption(content_slot)
-        image_prompt = "A mouthwatering close-up of Buffalo wings on a local table, bright sauce sheen, crisp texture, and a warm neighborhood restaurant mood."
+        image_prompt, _metadata = _fallback_scene_prompt(content_slot, post_type)
         content_angle = "Restaurant spotlight"
         why_this_post = "Restaurant spotlight keeps the post food-first and tied to the Buffago lane."
         hashtags = ["#Buffago", "#BuffaloWings", "#WingStop", "#LocalEats"]
@@ -268,7 +324,7 @@ def fallback_text_output(
     else:
         post_type = "community_update"
         caption = "Buffago is here for the wings, the neighborhood, and the people who know a good plate when they see one."
-        image_prompt = "A community-focused wing scene with a friendly local restaurant counter, inviting textures, and a warm Buffago-branded feel."
+        image_prompt, _metadata = _fallback_scene_prompt(content_slot, post_type)
         content_angle = "Community update"
         why_this_post = "Community updates keep the account local and positive without leaning on risky claims."
         hashtags = ["#Buffago", "#LocalFood", "#Wings", "#CommunityEats"]
@@ -301,33 +357,37 @@ def fallback_image_output(
 ) -> dict[str, Any]:
     signals = _signals_used_from_context(external_context)
     if content_slot == "meme_post":
+        image_prompt, metadata = _fallback_scene_prompt(content_slot, "meme")
         return {
             "content_slot": content_slot,
-            "image_prompt": "A meme-style wing graphic with bold sauce splash, high contrast, a clean central subject, and room for punchy text overlay.",
+            "image_prompt": image_prompt,
             "style": "meme",
-            "needs_text_overlay": True,
-            "text_overlay": "Wings are the point",
-            "composition_notes": "Keep the main subject centered, the sauce dramatic, and the text readable on mobile.",
-            "negative_prompt_guidance": "Avoid politics, people-facing tragedy jokes, brand logos, alcohol focus, and cluttered backgrounds.",
+            "needs_text_overlay": False,
+            "text_overlay": None,
+            "composition_notes": "Keep the wings in the foreground or sharp focal plane, make the argument readable through action and reactions, and avoid static table conversation.",
+            "negative_prompt_guidance": "Avoid politics, people-facing tragedy jokes, brand logos, alcohol focus, cluttered backgrounds, text inside the generated image, and stock-photo staging.",
             "brand_safety_notes": [
                 "Meme tone kept positive and local",
                 "No offensive stereotypes",
                 "No fake claims",
             ],
+            **metadata,
         }
+    image_prompt, metadata = _fallback_scene_prompt(content_slot, "restaurant_spotlight")
     return {
         "content_slot": content_slot,
-        "image_prompt": "A realistic, craveable close-up of Buffalo wings on a plate, warm restaurant lighting, visible crisp texture, and a local neighborhood feel.",
+        "image_prompt": image_prompt,
         "style": "realistic",
         "needs_text_overlay": False,
         "text_overlay": None,
-        "composition_notes": "Frame the wings as the hero, leave negative space for social crops, and keep the scene appetizing.",
-        "negative_prompt_guidance": "No politics, no tragedy jokes, no alcohol emphasis, no fake endorsements, no private people data, and no overdesigned stock-photo energy.",
+        "composition_notes": "Frame the wings as the hero, use shallow depth of field, visible steam, expressive background reactions, and clear motion.",
+        "negative_prompt_guidance": "No politics, no tragedy jokes, no alcohol emphasis, no fake endorsements, no private people data, no text inside the generated image, and no overdesigned stock-photo energy.",
         "brand_safety_notes": [
             "Food-first and local",
             "No private user data used",
             "Signals used: " + ", ".join(signals),
         ],
+        **metadata,
     }
 
 

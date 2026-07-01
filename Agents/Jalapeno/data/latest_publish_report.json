@@ -1,10 +1,10 @@
 {
   "candidate_id": "22222222-2222-2222-2222-222222222222",
   "caption_preview": "Buffago test caption",
-  "container_id": "sim-container-816bacba5d9b4cd2853aafdaff704bba",
+  "container_id": "sim-container-b8aa78d3f6264a8688c53f0cc4e3a1a1",
   "content_type": "restaurant_spotlight",
   "cost_estimate": null,
-  "created_at": "2026-07-01T00:18:24.841395+00:00",
+  "created_at": "2026-07-01T12:06:36.338797+00:00",
   "duration_ms": 0,
   "failure_reason": null,
   "hashtags": [
@@ -15,8 +15,8 @@
   "metadata": {
     "publish_status": "published"
   },
-  "permalink": "https://instagram.com/p/sim-media-0/",
-  "published_media_id": "sim-media-0af505fbc25640b898c245f5af5ac612",
+  "permalink": "https://instagram.com/p/sim-media-a/",
+  "published_media_id": "sim-media-a0c1a4c7a5194006b47cee8ae2270667",
   "quality_score": 90,
   "retry_count": 0,
   "run_id": "11111111-1111-1111-1111-111111111111",

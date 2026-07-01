@@ -3,274 +3,436 @@
   "backend_available": true,
   "brand_result": {
     "backend_available": true,
-    "errors": [
-      "HTTPSConnectionPool(host='vhfxnizaxdanmvmouuaf.supabase.co', port=443): Max retries exceeded with url: /functions/v1/jalapeno-ai-generate (Caused by NewConnectionError(\"HTTPSConnection(host='vhfxnizaxdanmvmouuaf.supabase.co', port=443): Failed to establish a new connection: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions\"))"
-    ],
+    "errors": [],
     "model": "gpt-5.4-mini",
     "output": {
       "notes": [
-        "No model call was required for this fallback result",
-        "Safe to continue validation with generated fallback content"
+        "Hashtags are relevant and not overly noisy.",
+        "Image prompt keeps humor playful and food-first; no brand safety issues beyond avoiding any alcohol emphasis in execution."
       ],
       "passed": true,
       "reasons": [
-        "Fallback validation used for brand_validation",
-        "Content slot buffago_post stays in the food-first lane"
+        "Caption is local, food-first, and community-focused around New York wing crawls.",
+        "Tone stays playful and Buffago-branded without attacking restaurants or users.",
+        "Uses real crawl and wing-related signals plus a simple call to action.",
+        "No politics, NSFW, hate, alcohol-centered, or misleading metric claims detected."
       ],
       "risk_level": "low"
     },
-    "raw_response": null,
+    "raw_response": {
+      "errors": [],
+      "model": "gpt-5.4-mini",
+      "output": {
+        "notes": [
+          "Hashtags are relevant and not overly noisy.",
+          "Image prompt keeps humor playful and food-first; no brand safety issues beyond avoiding any alcohol emphasis in execution."
+        ],
+        "passed": true,
+        "reasons": [
+          "Caption is local, food-first, and community-focused around New York wing crawls.",
+          "Tone stays playful and Buffago-branded without attacking restaurants or users.",
+          "Uses real crawl and wing-related signals plus a simple call to action.",
+          "No politics, NSFW, hate, alcohol-centered, or misleading metric claims detected."
+        ],
+        "risk_level": "low"
+      },
+      "request_type": "brand_validation",
+      "safety": {
+        "notes": [
+          "Hashtags are relevant and not overly noisy.",
+          "Image prompt keeps humor playful and food-first; no brand safety issues beyond avoiding any alcohol emphasis in execution.",
+          "Deterministic safety scan passed."
+        ],
+        "passed": true,
+        "reasons": [
+          "Caption is local, food-first, and community-focused around New York wing crawls.",
+          "Tone stays playful and Buffago-branded without attacking restaurants or users.",
+          "Uses real crawl and wing-related signals plus a simple call to action.",
+          "No politics, NSFW, hate, alcohol-centered, or misleading metric claims detected."
+        ],
+        "risk_level": "low"
+      },
+      "schema_version": "1.0",
+      "success": true,
+      "usage": {
+        "estimated_cost_usd": null,
+        "input_tokens": 4021,
+        "output_tokens": 121,
+        "total_tokens": 4142
+      }
+    },
     "request_type": "brand_validation",
     "safety": {
-      "notes": [],
+      "notes": [
+        "Hashtags are relevant and not overly noisy.",
+        "Image prompt keeps humor playful and food-first; no brand safety issues beyond avoiding any alcohol emphasis in execution.",
+        "Deterministic safety scan passed."
+      ],
       "passed": true,
       "reasons": [
-        "Fallback output used"
+        "Caption is local, food-first, and community-focused around New York wing crawls.",
+        "Tone stays playful and Buffago-branded without attacking restaurants or users.",
+        "Uses real crawl and wing-related signals plus a simple call to action.",
+        "No politics, NSFW, hate, alcohol-centered, or misleading metric claims detected."
       ],
       "risk_level": "low"
     },
     "schema_version": "1.0",
-    "success": false,
+    "success": true,
     "usage": {
       "estimated_cost_usd": null,
-      "input_tokens": 0,
-      "output_tokens": 0,
-      "total_tokens": 0
+      "input_tokens": 4021,
+      "output_tokens": 121,
+      "total_tokens": 4142
     },
-    "used_fallback": true
+    "used_fallback": false
   },
   "brand_validation": {
     "notes": [
-      "No model call was required for this fallback result",
-      "Safe to continue validation with generated fallback content"
+      "Hashtags are relevant and not overly noisy.",
+      "Image prompt keeps humor playful and food-first; no brand safety issues beyond avoiding any alcohol emphasis in execution."
     ],
     "passed": true,
     "reasons": [
-      "Fallback validation used for brand_validation",
-      "Content slot buffago_post stays in the food-first lane"
+      "Caption is local, food-first, and community-focused around New York wing crawls.",
+      "Tone stays playful and Buffago-branded without attacking restaurants or users.",
+      "Uses real crawl and wing-related signals plus a simple call to action.",
+      "No politics, NSFW, hate, alcohol-centered, or misleading metric claims detected."
     ],
     "risk_level": "low"
   },
-  "generated_at": "2026-07-01T00:18:24.462775+00:00",
+  "generated_at": "2026-07-01T12:06:33.933921+00:00",
   "image_prompt": {
     "brand_safety_notes": [
-      "Meme tone kept positive and local",
-      "No offensive stereotypes",
-      "No fake claims"
+      "Keep the humor playful and food-first, not mean.",
+      "Use generic sports-night energy without referencing specific teams, scores, or matchups.",
+      "No alcohol-focused framing; drinks can be background only if present and incidental.",
+      "Respectful restaurant vibe: funny chaos, not trash talk."
     ],
-    "composition_notes": "Keep the main subject centered, the sauce dramatic, and the text readable on mobile.",
+    "composition_notes": "Booth-level cinematic wide shot, wing basket centered in the frame, expressive foreground chaos, bartender and diners reacting in the background, warm glow, shallow depth of field, commercial food photography polish with natural mess and movement.",
     "content_slot": "meme_post",
-    "image_prompt": "A meme-style wing graphic with bold sauce splash, high contrast, a clean central subject, and room for punchy text overlay.",
-    "needs_text_overlay": true,
-    "negative_prompt_guidance": "Avoid politics, people-facing tragedy jokes, brand logos, alcohol focus, and cluttered backgrounds.",
-    "style": "meme",
-    "text_overlay": "Wings are the point"
+    "image_prompt": "A packed Buffalo sports bar during a midweek game night, with a wing basket on the table as the absolute center of attention: golden crisp wings coated in glossy buffalo sauce, steam rising, ranch and blue cheese cups, celery and carrots scattered like the table just survived a tiny wing skirmish. In the foreground, one friend is dramatically clutching a drumstick like evidence, another is half-standing in disbelief, and a third is pointing at the basket with mock outrage like the last wing was personally stolen. The bartender in the background facepalms while nearby diners stare, one person records the chaos on a phone, and a TV glow reflects off the room with summer patio and watch-party energy. Shot from a booth-level cinematic angle with shallow depth of field, warm sports bar lighting, lively imperfect expressions, humorous tension, and a clear visual punchline that feels like a viral wing meme, no visible words, no captions, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+    "needs_text_overlay": false,
+    "negative_prompt_guidance": "Avoid visible text, captions, logos, app UI, fake screens, staged stock-photo smiles, overly clean tables, cartoon rendering, abstract shapes, extra limbs, distorted hands, blurry food, dull wings, dry texture, and corporate lifestyle aesthetics.",
+    "style": "realistic",
+    "text_overlay": null
   },
   "image_result": {
     "backend_available": true,
-    "errors": [
-      "HTTPSConnectionPool(host='vhfxnizaxdanmvmouuaf.supabase.co', port=443): Max retries exceeded with url: /functions/v1/jalapeno-ai-generate (Caused by NewConnectionError(\"HTTPSConnection(host='vhfxnizaxdanmvmouuaf.supabase.co', port=443): Failed to establish a new connection: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions\"))"
-    ],
+    "errors": [],
     "model": "gpt-5.4-mini",
     "output": {
       "brand_safety_notes": [
-        "Meme tone kept positive and local",
-        "No offensive stereotypes",
-        "No fake claims"
+        "Keep the humor playful and food-first, not mean.",
+        "Use generic sports-night energy without referencing specific teams, scores, or matchups.",
+        "No alcohol-focused framing; drinks can be background only if present and incidental.",
+        "Respectful restaurant vibe: funny chaos, not trash talk."
       ],
-      "composition_notes": "Keep the main subject centered, the sauce dramatic, and the text readable on mobile.",
+      "composition_notes": "Booth-level cinematic wide shot, wing basket centered in the frame, expressive foreground chaos, bartender and diners reacting in the background, warm glow, shallow depth of field, commercial food photography polish with natural mess and movement.",
       "content_slot": "meme_post",
-      "image_prompt": "A meme-style wing graphic with bold sauce splash, high contrast, a clean central subject, and room for punchy text overlay.",
-      "needs_text_overlay": true,
-      "negative_prompt_guidance": "Avoid politics, people-facing tragedy jokes, brand logos, alcohol focus, and cluttered backgrounds.",
-      "style": "meme",
-      "text_overlay": "Wings are the point"
+      "image_prompt": "A packed Buffalo sports bar during a midweek game night, with a wing basket on the table as the absolute center of attention: golden crisp wings coated in glossy buffalo sauce, steam rising, ranch and blue cheese cups, celery and carrots scattered like the table just survived a tiny wing skirmish. In the foreground, one friend is dramatically clutching a drumstick like evidence, another is half-standing in disbelief, and a third is pointing at the basket with mock outrage like the last wing was personally stolen. The bartender in the background facepalms while nearby diners stare, one person records the chaos on a phone, and a TV glow reflects off the room with summer patio and watch-party energy. Shot from a booth-level cinematic angle with shallow depth of field, warm sports bar lighting, lively imperfect expressions, humorous tension, and a clear visual punchline that feels like a viral wing meme, no visible words, no captions, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+      "needs_text_overlay": false,
+      "negative_prompt_guidance": "Avoid visible text, captions, logos, app UI, fake screens, staged stock-photo smiles, overly clean tables, cartoon rendering, abstract shapes, extra limbs, distorted hands, blurry food, dull wings, dry texture, and corporate lifestyle aesthetics.",
+      "style": "realistic",
+      "text_overlay": null
     },
-    "raw_response": null,
+    "raw_response": {
+      "errors": [],
+      "model": "gpt-5.4-mini",
+      "output": {
+        "brand_safety_notes": [
+          "Keep the humor playful and food-first, not mean.",
+          "Use generic sports-night energy without referencing specific teams, scores, or matchups.",
+          "No alcohol-focused framing; drinks can be background only if present and incidental.",
+          "Respectful restaurant vibe: funny chaos, not trash talk."
+        ],
+        "composition_notes": "Booth-level cinematic wide shot, wing basket centered in the frame, expressive foreground chaos, bartender and diners reacting in the background, warm glow, shallow depth of field, commercial food photography polish with natural mess and movement.",
+        "content_slot": "meme_post",
+        "image_prompt": "A packed Buffalo sports bar during a midweek game night, with a wing basket on the table as the absolute center of attention: golden crisp wings coated in glossy buffalo sauce, steam rising, ranch and blue cheese cups, celery and carrots scattered like the table just survived a tiny wing skirmish. In the foreground, one friend is dramatically clutching a drumstick like evidence, another is half-standing in disbelief, and a third is pointing at the basket with mock outrage like the last wing was personally stolen. The bartender in the background facepalms while nearby diners stare, one person records the chaos on a phone, and a TV glow reflects off the room with summer patio and watch-party energy. Shot from a booth-level cinematic angle with shallow depth of field, warm sports bar lighting, lively imperfect expressions, humorous tension, and a clear visual punchline that feels like a viral wing meme, no visible words, no captions, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+        "needs_text_overlay": false,
+        "negative_prompt_guidance": "Avoid visible text, captions, logos, app UI, fake screens, staged stock-photo smiles, overly clean tables, cartoon rendering, abstract shapes, extra limbs, distorted hands, blurry food, dull wings, dry texture, and corporate lifestyle aesthetics.",
+        "style": "realistic",
+        "text_overlay": null
+      },
+      "request_type": "image_prompt",
+      "safety": {
+        "matches": [],
+        "notes": [
+          "Deterministic safety scan passed."
+        ],
+        "passed": true,
+        "reasons": [],
+        "risk_level": "low"
+      },
+      "schema_version": "1.0",
+      "success": true,
+      "usage": {
+        "estimated_cost_usd": null,
+        "input_tokens": 5783,
+        "output_tokens": 403,
+        "total_tokens": 6186
+      }
+    },
     "request_type": "image_prompt",
     "safety": {
-      "notes": [],
-      "passed": true,
-      "reasons": [
-        "Fallback output used"
+      "matches": [],
+      "notes": [
+        "Deterministic safety scan passed."
       ],
+      "passed": true,
+      "reasons": [],
       "risk_level": "low"
     },
     "schema_version": "1.0",
-    "success": false,
+    "success": true,
     "usage": {
       "estimated_cost_usd": null,
-      "input_tokens": 0,
-      "output_tokens": 0,
-      "total_tokens": 0
+      "input_tokens": 5783,
+      "output_tokens": 403,
+      "total_tokens": 6186
     },
-    "used_fallback": true
+    "used_fallback": false
   },
-  "run_id": "560a3490-4e01-4f87-a9d5-005d0acbf7ef",
+  "run_id": "48d2c90b-f850-4fba-9dae-6fd461f4ec55",
   "schema_version": "1.0",
   "text_content": {
-    "alt_text": "A Buffago-style wing post with a local, food-first tone.",
+    "alt_text": "Buffago graphic showing a New York wing crawl with highlighted spots in Buffalo, Rochester, and Albany.",
     "brand_safety_notes": [
-      "No politics or disaster humor",
-      "No private user data used",
-      "No fake metrics or endorsements"
+      "No restaurant criticism included.",
+      "No politics, alcohol, or controversial references.",
+      "Uses only non-specific sports-season energy and local food discovery."
     ],
-    "caption": "Hot take: if wings aren't involved, is it even worth the napkins?",
-    "confidence_score": 0.78,
-    "content_angle": "Buffago meme energy",
+    "caption": "Midweek sauce check: New York is putting up numbers and the wing trail is not taking a day off. \ud83d\uddfa\ufe0f\n\nCrispy Corner in Buffalo, Wing Vault in Rochester, and Sauce Street in Albany are all keeping the leaderboard busy. Meanwhile, Clutch Bar, Sauce Lab, and Crunch House just joined the map, because apparently wing season does not believe in chill.\n\nGot a spot your crew should crawl next? Drop it in the comments, rate your next wings, and keep your journey moving.",
+    "confidence_score": 0.96,
+    "content_angle": "Highlight active New York wing activity, new restaurant additions, and invite the community to plan the next crawl.",
     "content_slot": "buffago_post",
     "hashtags": [
       "#Buffago",
-      "#WingHumor",
-      "#BuffaloWings",
-      "#LocalFood"
+      "#WingCrawl",
+      "#WingLovers",
+      "#BuffaloNY",
+      "#RochesterNY",
+      "#AlbanyNY",
+      "#NYFood",
+      "#WingJourney"
     ],
-    "image_prompt": "A funny, bold meme-style wing post with exaggerated sauce, a local diner vibe, and room for witty text overlay.",
-    "post_type": "meme",
+    "image_prompt": "A bold, playful Buffago social graphic with a New York wing crawl map, wing icons connecting Buffalo, Rochester, and Albany, and subtle leaderboard elements. Summer patio vibe, bright colors, clean typography, community-first feel.",
+    "post_type": "crawl_prompt",
     "source_signals_used": [
-      "local_or_national_events",
-      "sports_events",
-      "trend_topics",
-      "news_topics"
+      "recent_ratings",
+      "top_restaurants",
+      "new_restaurants",
+      "active_states",
+      "crawl_activity",
+      "day_of_week_hooks",
+      "summer patio season",
+      "where should we crawl next?"
     ],
-    "why_this_post": "A safe meme-style post keeps the brand playful without inventing facts."
+    "why_this_post": "New York is the strongest activity signal across ratings, crawls, and new restaurant additions. A crawl prompt ties the data together while staying local, community-focused, and wing-first."
   },
   "text_result": {
     "backend_available": true,
-    "errors": [
-      "HTTPSConnectionPool(host='vhfxnizaxdanmvmouuaf.supabase.co', port=443): Max retries exceeded with url: /functions/v1/jalapeno-ai-generate (Caused by NewConnectionError(\"HTTPSConnection(host='vhfxnizaxdanmvmouuaf.supabase.co', port=443): Failed to establish a new connection: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions\"))"
-    ],
+    "errors": [],
     "model": "gpt-5.4-mini",
     "output": {
-      "alt_text": "A Buffago-style wing post with a local, food-first tone.",
+      "alt_text": "Buffago graphic showing a New York wing crawl with highlighted spots in Buffalo, Rochester, and Albany.",
       "brand_safety_notes": [
-        "No politics or disaster humor",
-        "No private user data used",
-        "No fake metrics or endorsements"
+        "No restaurant criticism included.",
+        "No politics, alcohol, or controversial references.",
+        "Uses only non-specific sports-season energy and local food discovery."
       ],
-      "caption": "Hot take: if wings aren't involved, is it even worth the napkins?",
-      "confidence_score": 0.78,
-      "content_angle": "Buffago meme energy",
+      "caption": "Midweek sauce check: New York is putting up numbers and the wing trail is not taking a day off. \ud83d\uddfa\ufe0f\n\nCrispy Corner in Buffalo, Wing Vault in Rochester, and Sauce Street in Albany are all keeping the leaderboard busy. Meanwhile, Clutch Bar, Sauce Lab, and Crunch House just joined the map, because apparently wing season does not believe in chill.\n\nGot a spot your crew should crawl next? Drop it in the comments, rate your next wings, and keep your journey moving.",
+      "confidence_score": 0.96,
+      "content_angle": "Highlight active New York wing activity, new restaurant additions, and invite the community to plan the next crawl.",
       "content_slot": "buffago_post",
       "hashtags": [
         "#Buffago",
-        "#WingHumor",
-        "#BuffaloWings",
-        "#LocalFood"
+        "#WingCrawl",
+        "#WingLovers",
+        "#BuffaloNY",
+        "#RochesterNY",
+        "#AlbanyNY",
+        "#NYFood",
+        "#WingJourney"
       ],
-      "image_prompt": "A funny, bold meme-style wing post with exaggerated sauce, a local diner vibe, and room for witty text overlay.",
-      "post_type": "meme",
+      "image_prompt": "A bold, playful Buffago social graphic with a New York wing crawl map, wing icons connecting Buffalo, Rochester, and Albany, and subtle leaderboard elements. Summer patio vibe, bright colors, clean typography, community-first feel.",
+      "post_type": "crawl_prompt",
       "source_signals_used": [
-        "local_or_national_events",
-        "sports_events",
-        "trend_topics",
-        "news_topics"
+        "recent_ratings",
+        "top_restaurants",
+        "new_restaurants",
+        "active_states",
+        "crawl_activity",
+        "day_of_week_hooks",
+        "summer patio season",
+        "where should we crawl next?"
       ],
-      "why_this_post": "A safe meme-style post keeps the brand playful without inventing facts."
+      "why_this_post": "New York is the strongest activity signal across ratings, crawls, and new restaurant additions. A crawl prompt ties the data together while staying local, community-focused, and wing-first."
     },
-    "raw_response": null,
+    "raw_response": {
+      "errors": [],
+      "model": "gpt-5.4-mini",
+      "output": {
+        "alt_text": "Buffago graphic showing a New York wing crawl with highlighted spots in Buffalo, Rochester, and Albany.",
+        "brand_safety_notes": [
+          "No restaurant criticism included.",
+          "No politics, alcohol, or controversial references.",
+          "Uses only non-specific sports-season energy and local food discovery."
+        ],
+        "caption": "Midweek sauce check: New York is putting up numbers and the wing trail is not taking a day off. \ud83d\uddfa\ufe0f\n\nCrispy Corner in Buffalo, Wing Vault in Rochester, and Sauce Street in Albany are all keeping the leaderboard busy. Meanwhile, Clutch Bar, Sauce Lab, and Crunch House just joined the map, because apparently wing season does not believe in chill.\n\nGot a spot your crew should crawl next? Drop it in the comments, rate your next wings, and keep your journey moving.",
+        "confidence_score": 0.96,
+        "content_angle": "Highlight active New York wing activity, new restaurant additions, and invite the community to plan the next crawl.",
+        "content_slot": "buffago_post",
+        "hashtags": [
+          "#Buffago",
+          "#WingCrawl",
+          "#WingLovers",
+          "#BuffaloNY",
+          "#RochesterNY",
+          "#AlbanyNY",
+          "#NYFood",
+          "#WingJourney"
+        ],
+        "image_prompt": "A bold, playful Buffago social graphic with a New York wing crawl map, wing icons connecting Buffalo, Rochester, and Albany, and subtle leaderboard elements. Summer patio vibe, bright colors, clean typography, community-first feel.",
+        "post_type": "crawl_prompt",
+        "source_signals_used": [
+          "recent_ratings",
+          "top_restaurants",
+          "new_restaurants",
+          "active_states",
+          "crawl_activity",
+          "day_of_week_hooks",
+          "summer patio season",
+          "where should we crawl next?"
+        ],
+        "why_this_post": "New York is the strongest activity signal across ratings, crawls, and new restaurant additions. A crawl prompt ties the data together while staying local, community-focused, and wing-first."
+      },
+      "request_type": "text_content",
+      "safety": {
+        "matches": [],
+        "notes": [
+          "Deterministic safety scan passed."
+        ],
+        "passed": true,
+        "reasons": [],
+        "risk_level": "low"
+      },
+      "schema_version": "1.0",
+      "success": true,
+      "usage": {
+        "estimated_cost_usd": null,
+        "input_tokens": 5338,
+        "output_tokens": 382,
+        "total_tokens": 5720
+      }
+    },
     "request_type": "text_content",
     "safety": {
-      "notes": [],
-      "passed": true,
-      "reasons": [
-        "Fallback output used"
+      "matches": [],
+      "notes": [
+        "Deterministic safety scan passed."
       ],
+      "passed": true,
+      "reasons": [],
       "risk_level": "low"
     },
     "schema_version": "1.0",
-    "success": false,
+    "success": true,
     "usage": {
       "estimated_cost_usd": null,
-      "input_tokens": 0,
-      "output_tokens": 0,
-      "total_tokens": 0
+      "input_tokens": 5338,
+      "output_tokens": 382,
+      "total_tokens": 5720
     },
-    "used_fallback": true
+    "used_fallback": false
   },
   "usage": {
-    "generated_at": "2026-07-01T00:18:24.460760+00:00",
+    "generated_at": "2026-07-01T12:06:33.933921+00:00",
     "records": [
       {
-        "backend_used": false,
+        "backend_used": true,
         "chosen_cta": null,
         "chosen_hashtags": [
           "#Buffago",
-          "#WingHumor",
-          "#BuffaloWings",
-          "#LocalFood"
+          "#WingCrawl",
+          "#WingLovers",
+          "#BuffaloNY",
+          "#RochesterNY",
+          "#AlbanyNY",
+          "#NYFood",
+          "#WingJourney"
         ],
-        "content_category": "meme",
+        "content_category": "crawl_prompt",
         "content_slot": "buffago_post",
         "estimated_cost_usd": null,
-        "generation_time_ms": 6093,
-        "image_generation_prompt": "A funny, bold meme-style wing post with exaggerated sauce, a local diner vibe, and room for witty text overlay.",
-        "input_size_chars": 7894,
-        "input_tokens": 0,
+        "generation_time_ms": 6194,
+        "image_generation_prompt": "A bold, playful Buffago social graphic with a New York wing crawl map, wing icons connecting Buffalo, Rochester, and Albany, and subtle leaderboard elements. Summer patio vibe, bright colors, clean typography, community-first feel.",
+        "input_size_chars": 7806,
+        "input_tokens": 5338,
         "model": "gpt-5.4-mini",
-        "output_size_chars": 787,
-        "output_tokens": 0,
+        "output_size_chars": 1805,
+        "output_tokens": 382,
         "prompt_name": "buffago_post",
         "prompt_version": "prompt-library-v1",
-        "rejected_reason": "HTTPSConnectionPool(host='vhfxnizaxdanmvmouuaf.supabase.co', port=443): Max retries exceeded with url: /functions/v1/jalapeno-ai-generate (Caused by NewConnectionError(\"HTTPSConnection(host='vhfxnizaxdanmvmouuaf.supabase.co', port=443): Failed to establish a new connection: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions\"))",
+        "rejected_reason": null,
         "request_type": "text_content",
-        "review_score": 78.0,
-        "total_tokens": 0,
-        "used_fallback": true
+        "review_score": 96.0,
+        "total_tokens": 5720,
+        "used_fallback": false
       },
       {
-        "backend_used": false,
+        "backend_used": true,
         "chosen_cta": null,
         "chosen_hashtags": null,
         "content_category": "meme_post",
         "content_slot": "meme_post",
         "estimated_cost_usd": null,
-        "generation_time_ms": 6029,
-        "image_generation_prompt": "A meme-style wing graphic with bold sauce splash, high contrast, a clean central subject, and room for punchy text overlay.",
-        "input_size_chars": 7894,
-        "input_tokens": 0,
+        "generation_time_ms": 4776,
+        "image_generation_prompt": "A packed Buffalo sports bar during a midweek game night, with a wing basket on the table as the absolute center of attention: golden crisp wings coated in glossy buffalo sauce, steam rising, ranch and blue cheese cups, celery and carrots scattered like the table just survived a tiny wing skirmish. In the foreground, one friend is dramatically clutching a drumstick like evidence, another is half-standing in disbelief, and a third is pointing at the basket with mock outrage like the last wing was personally stolen. The bartender in the background facepalms while nearby diners stare, one person records the chaos on a phone, and a TV glow reflects off the room with summer patio and watch-party energy. Shot from a booth-level cinematic angle with shallow depth of field, warm sports bar lighting, lively imperfect expressions, humorous tension, and a clear visual punchline that feels like a viral wing meme, no visible words, no captions, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+        "input_size_chars": 7806,
+        "input_tokens": 5783,
         "model": "gpt-5.4-mini",
-        "output_size_chars": 603,
-        "output_tokens": 0,
+        "output_size_chars": 2008,
+        "output_tokens": 403,
         "prompt_name": "image_generation",
         "prompt_version": "prompt-library-v1",
-        "rejected_reason": "HTTPSConnectionPool(host='vhfxnizaxdanmvmouuaf.supabase.co', port=443): Max retries exceeded with url: /functions/v1/jalapeno-ai-generate (Caused by NewConnectionError(\"HTTPSConnection(host='vhfxnizaxdanmvmouuaf.supabase.co', port=443): Failed to establish a new connection: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions\"))",
+        "rejected_reason": null,
         "request_type": "image_prompt",
         "review_score": null,
-        "total_tokens": 0,
-        "used_fallback": true
+        "total_tokens": 6186,
+        "used_fallback": false
       },
       {
-        "backend_used": false,
+        "backend_used": true,
         "chosen_cta": null,
         "chosen_hashtags": null,
         "content_category": "brand_validation",
         "content_slot": "buffago_post",
         "estimated_cost_usd": null,
-        "generation_time_ms": 6081,
+        "generation_time_ms": 2945,
         "image_generation_prompt": null,
-        "input_size_chars": 7894,
-        "input_tokens": 0,
+        "input_size_chars": 7806,
+        "input_tokens": 4021,
         "model": "gpt-5.4-mini",
-        "output_size_chars": 286,
-        "output_tokens": 0,
+        "output_size_chars": 558,
+        "output_tokens": 121,
         "prompt_name": "quality_review",
         "prompt_version": "prompt-library-v1",
         "rejected_reason": null,
         "request_type": "brand_validation",
         "review_score": 100.0,
-        "total_tokens": 0,
-        "used_fallback": true
+        "total_tokens": 4142,
+        "used_fallback": false
       }
     ],
-    "run_id": "560a3490-4e01-4f87-a9d5-005d0acbf7ef",
+    "run_id": "48d2c90b-f850-4fba-9dae-6fd461f4ec55",
     "totals": {
       "estimated_cost_usd": null,
-      "input_tokens": 0,
-      "output_tokens": 0,
-      "total_tokens": 0
+      "input_tokens": 15142,
+      "output_tokens": 906,
+      "total_tokens": 16048
     }
   },
-  "used_backend": false,
-  "used_fallback": true
+  "used_backend": true,
+  "used_fallback": false
 }
