@@ -69,7 +69,7 @@ class MetricsCollectionResult:
 
 def _extract_metadata(post: dict[str, Any]) -> dict[str, Any]:
     metadata = post.get("metadata") if isinstance(post.get("metadata"), dict) else {}
-    return {
+    creative = {
         "caption": post.get("generated_caption") or metadata.get("caption"),
         "category": metadata.get("category") or metadata.get("content_type") or post.get("post_type"),
         "prompt_template": metadata.get("prompt_template") or metadata.get("prompt_version"),
@@ -85,6 +85,18 @@ def _extract_metadata(post: dict[str, Any]) -> dict[str, Any]:
         "restaurant": metadata.get("restaurants_mentioned") or metadata.get("restaurant"),
         "topic": metadata.get("primary_theme") or metadata.get("topic"),
     }
+    media_source = post.get("media_source") or metadata.get("media_source")
+    if media_source == "supabase_video_asset":
+        creative.update(
+            {
+                "video_asset_id": post.get("video_asset_id") or metadata.get("video_asset_id"),
+                "caption_type": metadata.get("caption_type"),
+                "video_style": metadata.get("video_style") or metadata.get("style"),
+                "media_source": media_source,
+                "storage_path": post.get("storage_path") or metadata.get("storage_path"),
+            }
+        )
+    return creative
 
 
 def _should_collect(post: dict[str, Any], now: datetime) -> bool:

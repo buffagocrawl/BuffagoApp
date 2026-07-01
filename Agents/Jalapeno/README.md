@@ -270,6 +270,21 @@ Stores:
 
 Schema note: `20260701000200_jalapeno_image_asset_payload_columns.sql` is an additive backfill migration for the complete image asset insert payload. It uses `ADD COLUMN IF NOT EXISTS`, keeps newly introduced optional columns nullable, and preserves existing rows.
 
+### `jalapeno_video_assets`
+
+Stores manually uploaded Supabase Storage videos for the daily 8:00 PM Instagram Reel.
+
+Stores:
+
+- storage bucket and storage path
+- optional public URL override
+- style and caption type hints
+- active flag
+- used count and last used timestamp
+- optional performance score and notes
+
+The `20260701000400_jalapeno_video_assets.sql` migration creates the `jalapeno-wing-videos` public bucket, creates this table, and adds video linkage columns to post, Instagram publish, and metrics tables.
+
 ### `jalapeno_instagram_posts`
 
 Stores the publishing attempt for the final post, including current MVP auto-approval metadata.
@@ -316,6 +331,8 @@ Seeded keys:
 - `instagram_enabled`
 - `buffago_post_time`
 - `meme_post_time`
+- `video_post_time`
+- `video_recent_reuse_days`
 - `timezone`
 - `text_model`
 - `image_model`
@@ -350,6 +367,7 @@ The image pipeline also reads these config sections from `config.yaml`:
 - `branding.label_text` (kept for backward-compatible config parsing but not rendered)
 - `storage.provider`
 - `storage.bucket`
+- `storage.video_bucket`
 - `storage.public`
 - `cleanup.cleanup_temp_files`
 - `cleanup.keep_failed_images`
@@ -618,6 +636,14 @@ Supabase Storage setup:
 - Keep the bucket public if you want direct public URLs.
 - The storage path format is `instagram/{yyyy}/{mm}/{dd}/{run_id}/{filename}`.
 
+Supabase video Reel setup:
+
+- Apply `supabase/migrations/20260701000400_jalapeno_video_assets.sql`.
+- Upload Reel-ready video files to the `jalapeno-wing-videos` bucket, or set `JALAPENO_VIDEO_BUCKET` to the bucket you want to use.
+- Add rows to `public.jalapeno_video_assets` with `storage_bucket`, `storage_path`, `active=true`, and optional `style` / `caption_type` hints.
+- If the table is empty, validation and dry-run will warn clearly; the agent can auto-register root-level video files from the configured bucket.
+- Reuse is avoided for `JALAPENO_VIDEO_RECENT_REUSE_DAYS` when enough active inventory exists.
+
 ## Content Memory
 
 The long-term memory layer tracks published post structure so future runs can avoid repetition and learn what to emphasize.
@@ -653,10 +679,10 @@ Run a Buffago dry-run with the same `POST_TYPE` selection used by the scheduler:
 $env:POST_TYPE="buffago"; python main.py --dry-run
 ```
 
-Run a meme dry-run with the same `POST_TYPE` selection used by the scheduler:
+Run a Reel/video dry-run with the same `POST_TYPE` selection used by the scheduler:
 
 ```powershell
-$env:POST_TYPE="meme"; python main.py --dry-run
+$env:POST_TYPE="video"; python main.py --dry-run
 ```
 
 Run the simulated Phase 1 workflow:
@@ -683,10 +709,10 @@ Run the live Buffago production publish flow:
 $env:POST_TYPE="buffago"; python main.py --production
 ```
 
-Run the live meme production publish flow:
+Run the live Supabase video Reel production publish flow:
 
 ```powershell
-$env:POST_TYPE="meme"; python main.py --production
+$env:POST_TYPE="video"; python main.py --production
 ```
 
 Run the live Instagram publish flow:
@@ -731,7 +757,7 @@ GitHub Actions scheduled workflows do not support `America/New_York` directly in
 Current UTC cron entries in the workflow:
 
 - `0 20 * * *` for the scheduled 4:00 PM Eastern Daylight Time Buffago publish
-- `0 0 * * *` for the scheduled 8:00 PM Eastern Daylight Time meme publish
+- `0 0 * * *` for the scheduled 8:00 PM Eastern Daylight Time Supabase video Reel publish
 
 When Eastern Standard Time resumes, update those cron entries to:
 
@@ -748,8 +774,8 @@ Time conversion reference:
 Workflow behavior:
 
 - Scheduled 4:00 PM ET runs set `POST_TYPE=buffago` and call `python main.py --production`
-- Scheduled 8:00 PM ET runs set `POST_TYPE=meme` and call `python main.py --production`
-- Manual dispatch exposes a required `post_type` choice with valid values `buffago` and `meme`
+- Scheduled 8:00 PM ET runs set `POST_TYPE=video` and call `python main.py --production`
+- Manual dispatch exposes a required `post_type` choice with valid values `buffago` and `video`
 - Manual dispatch defaults `publish=false`, which runs `python main.py --dry-run`
 - Manual dispatch can opt into live publishing by setting `publish=true`, which runs `python main.py --production`
 - Current MVP production runs auto-publish and do not wait for manual approval

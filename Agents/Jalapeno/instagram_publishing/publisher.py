@@ -101,6 +101,9 @@ def precheck_approved_post(
         image_validation_status=post.image_validation_status,
         validation_reason=post.image_validation_reason,
         prompt_quality=post.prompt_quality,
+        media_kind=post.media_kind,
+        video_url=post.public_video_url,
+        media_source=post.media_source,
     )
     reason: str | None = None
     passed = True
@@ -110,15 +113,18 @@ def precheck_approved_post(
     elif post.quality_score < _quality_threshold(config):
         passed = False
         reason = "quality score below threshold"
-    elif post.image_validation_status != "passed":
+    elif post.media_kind == "image" and post.image_validation_status != "passed":
         passed = False
         reason = post.image_validation_reason or "image validation failed"
-    elif post.image_source != "real_ai":
+    elif post.media_kind == "image" and post.image_source != "real_ai":
         passed = False
         reason = f"image source must be real_ai, received {post.image_source}"
-    elif not post.public_image_url:
+    elif post.media_kind == "image" and not post.public_image_url:
         passed = False
         reason = "missing public_image_url"
+    elif post.media_kind == "reel" and not post.public_video_url:
+        passed = False
+        reason = "missing public_video_url"
     elif not post.caption:
         passed = False
         reason = "missing caption"
@@ -148,6 +154,9 @@ def precheck_approved_post(
             image_validation_status=post.image_validation_status,
             validation_reason=post.image_validation_reason,
             prompt_quality=post.prompt_quality,
+            media_kind=post.media_kind,
+            video_url=post.public_video_url,
+            media_source=post.media_source,
         )
     else:
         log_event(
@@ -166,6 +175,9 @@ def precheck_approved_post(
             image_validation_status=post.image_validation_status,
             validation_reason=post.image_validation_reason,
             prompt_quality=post.prompt_quality,
+            media_kind=post.media_kind,
+            video_url=post.public_video_url,
+            media_source=post.media_source,
         )
     return PublishPrecheckResult(passed=passed, reason=reason, duration_ms=duration_ms)
 
@@ -194,6 +206,8 @@ def _build_request_payload(
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     return safe_container_request_payload(
         image_url=post.public_image_url,
+        video_url=post.public_video_url,
+        media_kind=post.media_kind,
         caption=post.caption,
         access_token=access_token,
         user_tags=post.user_tags,
@@ -239,6 +253,16 @@ def _persist_publish_state(
         "response_payload": state.response_payload or {},
         "metadata": dict(state.post.metadata) if isinstance(state.post.metadata, dict) else {},
     }
+    if state.post.video_asset_id is not None:
+        payload["video_asset_id"] = state.post.video_asset_id
+    if state.post.public_video_url is not None:
+        payload["video_url"] = state.post.public_video_url
+    if state.post.media_kind != "image":
+        payload["media_kind"] = state.post.media_kind
+    if state.post.media_source is not None:
+        payload["media_source"] = state.post.media_source
+    if state.post.storage_path is not None:
+        payload["storage_path"] = state.post.storage_path
     if isinstance(state.post.metadata, dict) and state.post.metadata.get("created_at"):
         payload["created_at"] = state.post.metadata.get("created_at")
     upsert_instagram_post(client, payload=payload)
@@ -434,6 +458,19 @@ def publish_instagram_post(
                 post_id=post_id,
                 status="started",
                 duration_ms=0,
+            )
+            log_event(
+                logger,
+                "media_container_request_ready",
+                run_id=post.run_id,
+                candidate_id=post.candidate_id,
+                post_id=post_id,
+                media_kind=post.media_kind,
+                media_source=post.media_source,
+                video_asset_id=post.video_asset_id,
+                storage_path=post.storage_path,
+                video_url=post.public_video_url,
+                status="ready",
             )
             try:
                 container_response: InstagramContainerResponse = graph_client.create_media_container(

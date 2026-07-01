@@ -46,6 +46,9 @@ class PerformanceContext:
     best_image_styles: list[dict[str, Any]]
     worst_image_styles: list[dict[str, Any]]
     best_cta_types: list[dict[str, Any]]
+    best_video_assets: list[dict[str, Any]]
+    worst_video_assets: list[dict[str, Any]]
+    best_caption_types: list[dict[str, Any]]
     best_hashtag_patterns: list[dict[str, Any]]
     duplicate_topics_to_avoid: list[str]
     strong_patterns: list[str]
@@ -63,6 +66,9 @@ class PerformanceContext:
             "best_image_styles": self.best_image_styles,
             "worst_image_styles": self.worst_image_styles,
             "best_cta_types": self.best_cta_types,
+            "best_video_assets": self.best_video_assets,
+            "worst_video_assets": self.worst_video_assets,
+            "best_caption_types": self.best_caption_types,
             "best_hashtag_patterns": self.best_hashtag_patterns,
             "duplicate_topics_to_avoid": self.duplicate_topics_to_avoid,
             "strong_patterns": self.strong_patterns,
@@ -126,6 +132,9 @@ def _post_summary(row: dict[str, Any]) -> dict[str, Any]:
         "category": row.get("category") or row.get("post_type") or row.get("content_type"),
         "image_style": row.get("image_style") or row.get("visual_style"),
         "cta_type": row.get("cta_type") or row.get("cta_category"),
+        "video_asset_id": row.get("video_asset_id"),
+        "caption_type": row.get("caption_type"),
+        "video_style": row.get("video_style"),
         "engagement_rate": row.get("engagement_rate"),
         "reach": row.get("reach"),
         "likes": row.get("likes"),
@@ -172,6 +181,9 @@ def _merged_rows(client: SupabaseClient, *, since: datetime) -> list[dict[str, A
                 "category": metric.get("category") or metadata.get("category") or post.get("post_type"),
                 "image_style": metric.get("image_style") or metadata.get("image_style") or metadata.get("visual_style"),
                 "cta_type": metric.get("cta_type") or metadata.get("cta_type") or metadata.get("cta_category"),
+                "video_asset_id": metric.get("video_asset_id") or metadata.get("video_asset_id"),
+                "caption_type": metric.get("caption_type") or metadata.get("caption_type"),
+                "video_style": metric.get("video_style") or metadata.get("video_style") or metadata.get("style"),
                 "prompt_reason": metric.get("prompt_reason") or metadata.get("prompt_reason") or metadata.get("reason_chosen"),
                 "hashtags": metric.get("hashtags") or post.get("hashtags") or metadata.get("hashtags") or [],
                 "caption": metric.get("caption") or post.get("generated_caption"),
@@ -222,6 +234,9 @@ def build_performance_context(
     best_image_styles = _aggregate(rows, "image_style", reverse=True)
     worst_image_styles = _aggregate(rows, "image_style", reverse=False)
     best_cta_types = _aggregate(rows, "cta_type", reverse=True)
+    best_video_assets = _aggregate(rows, "video_asset_id", reverse=True)
+    worst_video_assets = _aggregate(rows, "video_asset_id", reverse=False)
+    best_caption_types = _aggregate(rows, "caption_type", reverse=True)
     best_hashtags = _hashtags(rows)
     duplicate_topics = []
     for row in rows[:25]:
@@ -261,6 +276,9 @@ def build_performance_context(
         best_image_styles=best_image_styles,
         worst_image_styles=worst_image_styles,
         best_cta_types=best_cta_types,
+        best_video_assets=best_video_assets,
+        worst_video_assets=worst_video_assets,
+        best_caption_types=best_caption_types,
         best_hashtag_patterns=best_hashtags,
         duplicate_topics_to_avoid=duplicate_topics[:12],
         strong_patterns=strong_patterns[:8],

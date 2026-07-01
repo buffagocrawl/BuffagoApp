@@ -54,6 +54,7 @@ class JalapenoConfig:
     timezone: str
     buffago_post_time: str
     meme_post_time: str
+    video_post_time: str
     default_mode: str
     test_mode_never_posts: bool
     log_level: str
@@ -63,6 +64,7 @@ class JalapenoConfig:
     image: "ImageConfig"
     branding: "BrandingConfig"
     storage: "StorageConfig"
+    video: "VideoConfig"
     cleanup: "CleanupConfig"
     instagram: "InstagramConfig"
     publishing: "PublishingConfig"
@@ -99,6 +101,14 @@ class StorageConfig:
     provider: str
     bucket: str
     public: bool
+
+
+@dataclass(frozen=True, slots=True)
+class VideoConfig:
+    bucket: str
+    post_time: str
+    recent_reuse_days: int
+    backup_attempts: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -226,6 +236,15 @@ def _require_float(data: dict[str, Any], key: str) -> float:
     return float(value)
 
 
+def _optional_int(data: dict[str, Any], key: str, default: int) -> int:
+    value = data.get(key)
+    if value is None:
+        return default
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ConfigError(f"Missing or invalid config value: {key}")
+    return value
+
+
 def _parse_color(value: str, key: str) -> str:
     if not re.fullmatch(r"#[0-9A-Fa-f]{6}", value):
         raise ConfigError(f"Invalid color format for {key}; expected #RRGGBB")
@@ -330,8 +349,15 @@ def load_configuration(
     brand = _require_string(agent, "brand")
     timezone_value = os.getenv("TIMEZONE", "").strip() or _require_string(raw, "timezone")
     timezone = _parse_timezone(timezone_value)
-    buffago_post_time = _parse_time(_require_string(posting, "buffago_post_time"), "posting.buffago_post_time")
+    buffago_post_time = _parse_time(
+        os.getenv("JALAPENO_IMAGE_POST_TIME", "").strip() or _require_string(posting, "buffago_post_time"),
+        "posting.buffago_post_time",
+    )
     meme_post_time = _parse_time(_require_string(posting, "meme_post_time"), "posting.meme_post_time")
+    video_post_time = _parse_time(
+        os.getenv("JALAPENO_VIDEO_POST_TIME", "").strip() or _optional_string(posting, "video_post_time", meme_post_time),
+        "posting.video_post_time",
+    )
     default_mode = _require_string(runtime, "default_mode")
     test_mode_never_posts = _require_bool(runtime, "test_mode_never_posts")
     log_level = _require_string(logging_section, "level").upper()
@@ -361,6 +387,18 @@ def load_configuration(
         provider=_require_string(storage_section, "provider").lower(),
         bucket=_require_string(storage_section, "bucket"),
         public=_require_bool(storage_section, "public"),
+    )
+    recent_reuse_days_raw = os.getenv("JALAPENO_VIDEO_RECENT_REUSE_DAYS", "").strip()
+    try:
+        recent_reuse_days = int(recent_reuse_days_raw) if recent_reuse_days_raw else _optional_int(posting, "video_recent_reuse_days", 7)
+    except ValueError as exc:
+        raise ConfigError("JALAPENO_VIDEO_RECENT_REUSE_DAYS must be an integer") from exc
+    video_config = VideoConfig(
+        bucket=os.getenv("JALAPENO_VIDEO_BUCKET", "").strip()
+        or _optional_string(storage_section, "video_bucket", "jalapeno-wing-videos"),
+        post_time=video_post_time,
+        recent_reuse_days=recent_reuse_days,
+        backup_attempts=1,
     )
     cleanup_config = CleanupConfig(
         cleanup_temp_files=_require_bool(cleanup_section, "cleanup_temp_files"),
@@ -434,6 +472,7 @@ def load_configuration(
         timezone=timezone,
         buffago_post_time=buffago_post_time,
         meme_post_time=meme_post_time,
+        video_post_time=video_post_time,
         default_mode=default_mode,
         test_mode_never_posts=test_mode_never_posts,
         log_level=log_level,
@@ -443,6 +482,7 @@ def load_configuration(
         image=image_config,
         branding=branding_config,
         storage=storage_config,
+        video=video_config,
         cleanup=cleanup_config,
         instagram=instagram_config,
         publishing=publishing_config,
@@ -465,6 +505,7 @@ def _public_snapshot(config: JalapenoConfig) -> dict[str, str]:
         "timezone": config.timezone,
         "buffago_post_time": config.buffago_post_time,
         "meme_post_time": config.meme_post_time,
+        "video_post_time": config.video_post_time,
         "default_mode": config.default_mode,
         "log_level": config.log_level,
         "facebook_page_id_present": str(bool(config.facebook_page_id)),
@@ -473,6 +514,7 @@ def _public_snapshot(config: JalapenoConfig) -> dict[str, str]:
         "image_output_format": config.image.output_format,
         "storage_provider": config.storage.provider,
         "storage_bucket": config.storage.bucket,
+        "video_bucket": config.video.bucket,
         "branding_enabled": str(config.branding.enabled),
         "cleanup_temp_files": str(config.cleanup.cleanup_temp_files),
         "instagram_enabled": str(config.instagram.enabled),

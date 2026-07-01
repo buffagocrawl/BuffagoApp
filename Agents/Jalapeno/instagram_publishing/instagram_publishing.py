@@ -70,6 +70,11 @@ def _creative_metadata(content_decision: dict[str, Any], image_pipeline: dict[st
         "cta_category": winner.get("cta_category"),
         "generation_model": decision_summary.get("model_name"),
         "image_model": image_result.get("model") if isinstance(image_result, dict) else None,
+        "media_source": winner.get("media_source"),
+        "video_asset_id": winner.get("video_asset_id"),
+        "storage_path": winner.get("storage_path"),
+        "caption_type": winner.get("caption_type"),
+        "video_style": winner.get("style"),
         "cost_estimate": decision_summary.get("cost_estimate"),
         "cost_metadata": {
             "content_cost_estimate": decision_summary.get("cost_estimate"),
@@ -466,6 +471,10 @@ def run_instagram_publishing_live_environment(
                 hashtags=approved_post.hashtags,
                 image_prompt=approved_post.image_prompt,
                 image_url=approved_post.public_image_url,
+                media_source=approved_post.media_source,
+                video_asset_id=UUID(approved_post.video_asset_id) if approved_post.video_asset_id else None,
+                storage_path=approved_post.storage_path,
+                video_url=approved_post.public_video_url,
                 publish_status="publishing",
                 metadata={**_creative_metadata(content_decision, image_pipeline), **approved_post.metadata},
             )

@@ -9,3 +9,8 @@
 !**/.env.example
 .venv/
 **/logs/*.log
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.tmp/
+Agents/Jalapeno/tmp/

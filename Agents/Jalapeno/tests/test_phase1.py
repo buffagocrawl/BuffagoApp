@@ -76,6 +76,9 @@ def test_config_yaml_loads() -> None:
     assert config.timezone == "America/New_York"
     assert config.buffago_post_time == "16:00"
     assert config.meme_post_time == "20:00"
+    assert config.video_post_time == "20:00"
+    assert config.video.bucket == "jalapeno-wing-videos"
+    assert config.video.recent_reuse_days == 7
     assert config.test_mode_never_posts is True
 
 
@@ -200,7 +203,7 @@ def test_missing_future_secret_warning_is_emitted(capsys: pytest.CaptureFixture[
 def test_production_post_type_map_is_stable() -> None:
     assert PRODUCTION_POST_TYPE_MAP == {
         "buffago": "buffago_post",
-        "meme": "meme_post",
+        "video": "daily_wing_reel",
     }
 
 
@@ -216,7 +219,7 @@ def test_production_rejects_invalid_post_type() -> None:
 
 def test_production_normalizes_valid_post_type() -> None:
     assert _normalize_production_post_type(" BuFfAgO ") == "buffago"
-    assert _normalize_production_post_type("meme") == "meme"
+    assert _normalize_production_post_type("video") == "video"
 
 
 def test_optional_post_type_allows_blank() -> None:
@@ -225,7 +228,7 @@ def test_optional_post_type_allows_blank() -> None:
 
 
 def test_optional_post_type_reuses_production_validation() -> None:
-    assert _normalize_optional_post_type(" meme ") == "meme"
+    assert _normalize_optional_post_type(" video ") == "video"
     with pytest.raises(ConfigError, match="Invalid POST_TYPE"):
         _normalize_optional_post_type("wings")
 
@@ -240,7 +243,7 @@ def test_dry_run_logs_optional_post_type_for_manual_dispatch(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setenv("POST_TYPE", "meme")
+    monkeypatch.setenv("POST_TYPE", "video")
     monkeypatch.setenv("GITHUB_ACTIONS", "true")
     monkeypatch.setenv("GITHUB_EVENT_NAME", "workflow_dispatch")
     monkeypatch.setenv("GITHUB_EVENT_SCHEDULE", "")
@@ -254,8 +257,8 @@ def test_dry_run_logs_optional_post_type_for_manual_dispatch(
 
     output = stream.getvalue()
     assert "selected_mode" in output
-    assert "post_type=meme" in output
-    assert "scheduled_post_type=meme_post" in output
+    assert "post_type=video" in output
+    assert "scheduled_post_type=daily_wing_reel" in output
     assert "run_source=github_actions_manual_dispatch" in output
     assert "github_run_id=123456" in output
 

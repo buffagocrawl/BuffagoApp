@@ -321,6 +321,10 @@ def insert_final_post(
     image_prompt: str | None = None,
     image_storage_path: str | None = None,
     image_url: str | None = None,
+    media_source: str | None = None,
+    video_asset_id: UUID | None = None,
+    storage_path: str | None = None,
+    video_url: str | None = None,
     scheduled_for: datetime | None = None,
     publish_status: str = "drafted",
     metadata: dict[str, Any] | None = None,
@@ -339,6 +343,14 @@ def insert_final_post(
         "publish_status": publish_status,
         "metadata": metadata or {},
     }
+    if media_source is not None:
+        payload["media_source"] = media_source
+    if video_asset_id is not None:
+        payload["video_asset_id"] = str(video_asset_id)
+    if storage_path is not None:
+        payload["storage_path"] = storage_path
+    if video_url is not None:
+        payload["video_url"] = video_url
     rows = client.insert_row("jalapeno_posts", payload)
     return rows[0] if rows else payload
 
@@ -516,6 +528,11 @@ def insert_metrics_snapshot(
     state: str | list[str] | None = None,
     restaurant: str | list[str] | None = None,
     topic: str | None = None,
+    video_asset_id: UUID | str | None = None,
+    caption_type: str | None = None,
+    video_style: str | None = None,
+    media_source: str | None = None,
+    storage_path: str | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     effective_collected_at = collected_at or captured_at or _utcnow()
@@ -553,6 +570,16 @@ def insert_metrics_snapshot(
         "topic": topic,
         "metadata": metadata or {},
     }
+    if video_asset_id is not None:
+        payload["video_asset_id"] = str(video_asset_id)
+    if caption_type is not None:
+        payload["caption_type"] = caption_type
+    if video_style is not None:
+        payload["video_style"] = video_style
+    if media_source is not None:
+        payload["media_source"] = media_source
+    if storage_path is not None:
+        payload["storage_path"] = storage_path
     rows = client.insert_row("jalapeno_post_metrics", payload)
     return rows[0] if rows else payload
 

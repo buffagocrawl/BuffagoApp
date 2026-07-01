@@ -10,7 +10,7 @@ on:
         default: buffago
         options:
           - buffago
-          - meme
+          - video
       publish:
         description: Run the live production publish pipeline
         required: true
@@ -68,7 +68,7 @@ jobs:
                 mode="production"
                 ;;
               "0 0 * * *")
-                post_type="meme"
+                post_type="video"
                 run_label="scheduled_8pm_eastern"
                 mode="production"
                 ;;
@@ -80,9 +80,9 @@ jobs:
           elif [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
             post_type="${{ inputs.post_type }}"
             case "${post_type}" in
-              buffago|meme) ;;
+              buffago|video) ;;
               *)
-                echo "Invalid POST_TYPE '${post_type}'. Valid values: buffago, meme" >&2
+                echo "Invalid POST_TYPE '${post_type}'. Valid values: buffago, video" >&2
                 exit 1
                 ;;
             esac

@@ -25,12 +25,15 @@ from config import (
 from content_engine.content_engine import run_content_decision_engine
 from data_snapshot import generate_latest_snapshot
 from external_context import generate_external_context
-from jalapeno_db import JalapenoRunContext, complete_run, create_run, ensure_selected_post_candidate, fail_run
+from jalapeno_db import JalapenoRunContext, complete_run, create_run, ensure_selected_post_candidate, fail_run, insert_error_row, insert_final_post
 from logging_utils import log_event
 from metrics_collector import collect_instagram_metrics
 from performance_context import build_performance_context
 from reporting import generate_admin_report
 from supabase_client import SupabaseClient, SupabaseError
+from video_assets import VideoAssetError, VideoAssetRepository
+from video_reel_flow import build_reel_content, content_decision_from_reel
+from instagram_publishing.instagram_publishing import run_instagram_publishing_live_environment
 from validation import (
     validate_content_engine_environment,
     validate_instagram_publishing_environment,
@@ -46,7 +49,7 @@ from validation import (
 
 PRODUCTION_POST_TYPE_MAP = {
     "buffago": "buffago_post",
-    "meme": "meme_post",
+    "video": "daily_wing_reel",
 }
 
 
@@ -78,9 +81,9 @@ def build_parser() -> argparse.ArgumentParser:
 def _normalize_production_post_type(raw_value: str | None) -> str:
     value = (raw_value or "").strip().lower()
     if not value:
-        raise ConfigError("POST_TYPE is required for --production. Valid values: buffago, meme")
+        raise ConfigError("POST_TYPE is required for --production. Valid values: buffago, video")
     if value not in PRODUCTION_POST_TYPE_MAP:
-        raise ConfigError(f"Invalid POST_TYPE '{raw_value}'. Valid values: buffago, meme")
+        raise ConfigError(f"Invalid POST_TYPE '{raw_value}'. Valid values: buffago, video")
     return value
 
 
@@ -93,6 +96,10 @@ def _normalize_optional_post_type(raw_value: str | None) -> str | None:
 
 def _production_scheduled_post_type(post_type: str) -> str:
     return PRODUCTION_POST_TYPE_MAP[post_type]
+
+
+def _is_video_post(scheduled_post_type: str) -> bool:
+    return scheduled_post_type == "daily_wing_reel"
 
 
 def _github_run_source() -> str:
@@ -212,6 +219,7 @@ def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = Fals
         "jalapeno_performance_summaries",
         "jalapeno_report_logs",
         "jalapeno_errors",
+        "jalapeno_video_assets",
     ]
     missing_tables: list[str] = []
     if client is not None:
@@ -270,6 +278,45 @@ def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = Fals
         print("jalapeno_image_assets columns exist")
     elif client is None:
         print("Warning: jalapeno_image_assets columns not inspected because Supabase is unavailable")
+    if client is not None:
+        bucket_ok = client.storage_bucket_exists(config.video.bucket)
+        print(f"Video bucket accessible ({config.video.bucket}): {bucket_ok}")
+    if client is not None and "jalapeno_video_assets" not in missing_tables:
+        video_required_columns = {
+            "id",
+            "storage_bucket",
+            "storage_path",
+            "public_url",
+            "style",
+            "caption_type",
+            "active",
+            "used_count",
+            "last_used_at",
+            "performance_score",
+            "notes",
+            "created_at",
+            "updated_at",
+        }
+        video_columns = client.table_columns("jalapeno_video_assets")
+        missing_video_columns = sorted(video_required_columns - video_columns)
+        if missing_video_columns:
+            raise ConfigError(f"jalapeno_video_assets missing columns: {', '.join(missing_video_columns)}")
+        print("jalapeno_video_assets columns exist")
+        try:
+            video_assets = VideoAssetRepository(client, config, logger=logger).ensure_assets_available()
+            active_count = len(video_assets)
+        except Exception as exc:
+            active_count = 0
+            print(f"Warning: video asset availability check failed: {exc}")
+        print(f"Active video assets available: {active_count}")
+        if active_count == 0:
+            print("Warning: no active video assets are available for the 8pm Reel")
+    elif client is None:
+        print("Warning: jalapeno_video_assets and video bucket not inspected because Supabase is unavailable")
+    print(f"Configured 4pm image post: {config.buffago_post_time} {config.timezone}")
+    print(f"Configured 8pm video Reel post: {config.video.post_time} {config.timezone}")
+    if config.buffago_post_time != "16:00" or config.video.post_time != "20:00":
+        print("Warning: scheduler config does not match expected 16:00 image and 20:00 video times")
     print(f"OpenAI key available: {bool(os.getenv('OPENAI_API_KEY', '').strip() or os.getenv('JALAPENO_AI_FUNCTION_URL', '').strip())}")
     print(f"Meta credentials available: {bool(os.getenv(config.instagram.access_token_secret_name, '').strip() and os.getenv(config.instagram.ig_user_id_secret_name, '').strip())}")
     print(f"Instagram business account id present: {bool(config.instagram_business_account_id)}")
@@ -453,6 +500,88 @@ def run_dry_run() -> int:
         run_source=run_source,
         **github_metadata,
     )
+    if scheduled_post_type and _is_video_post(scheduled_post_type):
+        has_url = bool(os.getenv("SUPABASE_URL", "").strip())
+        has_service_role_key = bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip())
+        if has_url and has_service_role_key:
+            try:
+                client = SupabaseClient.from_env()
+                run_uuid = uuid4()
+                run_context = JalapenoRunContext(
+                    run_id=run_uuid,
+                    agent_name=config.agent_name,
+                    post_type=scheduled_post_type,
+                    dry_run=True,
+                    environment="dry-run",
+                    trigger_source=run_source,
+                    git_commit=github_metadata.get("github_sha"),
+                )
+                create_run(
+                    client,
+                    context=run_context,
+                    metadata={"mode": "dry-run", "post_type": post_type, "scheduled_post_type": scheduled_post_type, **github_metadata},
+                )
+                repository = VideoAssetRepository(client, config, logger=logger)
+                content = build_reel_content(repository, logger=logger)
+                ensure_selected_post_candidate(
+                    client,
+                    run_context=run_context,
+                    winner_payload=content_decision_from_reel(str(run_uuid), content)["winner"],
+                    decision_summary={"winner_reasoning": ["Dry-run selected a Supabase video asset."]},
+                    logger=logger,
+                )
+                insert_final_post(
+                    client,
+                    run_id=run_uuid,
+                    candidate_id=UUID(content.candidate_id),
+                    post_type=scheduled_post_type,
+                    chosen_idea="Daily wing Reel dry run",
+                    generated_caption=content.caption,
+                    hashtags=content.hashtags,
+                    image_prompt="Preloaded Supabase Storage wing video asset; no AI image or video generated.",
+                    image_url=content.video_asset.public_url,
+                    media_source="supabase_video_asset",
+                    video_asset_id=UUID(content.video_asset.id),
+                    storage_path=content.video_asset.storage_path,
+                    video_url=content.video_asset.public_url,
+                    publish_status="dry_run",
+                    metadata={
+                        "dry_run": True,
+                        "media_source": "supabase_video_asset",
+                        "video_asset_id": content.video_asset.id,
+                        "storage_path": content.video_asset.storage_path,
+                        "caption_type": content.caption_type,
+                        "style": content.video_asset.style,
+                        "no_publish": True,
+                    },
+                )
+                log_event(
+                    logger,
+                    "dry_run_video_reel_selected",
+                    run_id=str(run_uuid),
+                    candidate_id=content.candidate_id,
+                    video_asset_id=content.video_asset.id,
+                    storage_path=content.video_asset.storage_path,
+                    video_url=content.video_asset.public_url,
+                    caption_preview=content.caption[:140],
+                    publish_skipped=True,
+                )
+            except Exception as exc:
+                log_event(
+                    logger,
+                    "dry_run_video_reel_selection_skipped",
+                    level="warning",
+                    reason=str(exc),
+                    publish_skipped=True,
+                )
+        else:
+            log_event(
+                logger,
+                "dry_run_video_reel_selection_skipped",
+                level="warning",
+                reason="SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY missing",
+                publish_skipped=True,
+            )
     log_event(
         logger,
         "dry_run_targets_loaded",
@@ -597,6 +726,181 @@ def run_production() -> int:
     )
 
     try:
+        if _is_video_post(scheduled_post_type):
+            repository = VideoAssetRepository(client, config, logger=logger)
+            content = build_reel_content(repository, logger=logger)
+            content_decision = content_decision_from_reel(run_id, content)
+            ensure_selected_post_candidate(
+                client,
+                run_context=run_context,
+                winner_payload=content_decision["winner"],
+                decision_summary=content_decision["decision_summary"],
+                logger=logger,
+            )
+            inserted_post = insert_final_post(
+                client,
+                run_id=run_uuid,
+                candidate_id=UUID(content.candidate_id),
+                post_type=scheduled_post_type,
+                chosen_idea="Daily wing Reel",
+                generated_caption=content.caption,
+                hashtags=content.hashtags,
+                image_prompt="Preloaded Supabase Storage wing video asset; no AI image or video generated.",
+                image_url=content.video_asset.public_url,
+                media_source="supabase_video_asset",
+                video_asset_id=UUID(content.video_asset.id),
+                storage_path=content.video_asset.storage_path,
+                video_url=content.video_asset.public_url,
+                publish_status="drafted" if config.instagram.dry_run else "publishing",
+                metadata={
+                    "media_source": "supabase_video_asset",
+                    "video_asset_id": content.video_asset.id,
+                    "storage_bucket": content.video_asset.storage_bucket,
+                    "storage_path": content.video_asset.storage_path,
+                    "caption_type": content.caption_type,
+                    "style": content.video_asset.style,
+                    "post_type": scheduled_post_type,
+                    "no_ai_media_generation": True,
+                },
+            )
+            content_decision["post_id"] = inserted_post.get("id")
+            content_decision["metadata"] = {
+                "media_source": "supabase_video_asset",
+                "video_asset_id": content.video_asset.id,
+                "storage_path": content.video_asset.storage_path,
+            }
+            log_event(
+                logger,
+                "video_reel_publish_started",
+                run_id=run_id,
+                candidate_id=content.candidate_id,
+                post_id=inserted_post.get("id"),
+                video_asset_id=content.video_asset.id,
+                storage_path=content.video_asset.storage_path,
+                video_url=content.video_asset.public_url,
+                dry_run=config.instagram.dry_run,
+            )
+            try:
+                publish_result = run_instagram_publishing_live_environment(
+                    config,
+                    content_decision,
+                    image_pipeline=None,
+                    logger=logger,
+                    client=client,
+                )
+            except Exception as first_exc:
+                insert_error_row(
+                    client,
+                    run_id=UUID(run_id),
+                    post_id=UUID(str(inserted_post["id"])) if inserted_post.get("id") else None,
+                    candidate_id=UUID(content.candidate_id),
+                    stage="video_reel_publish",
+                    error_type=type(first_exc).__name__,
+                    message=str(first_exc),
+                    raw_payload={
+                        "reason": "primary_video_asset_failed",
+                        "video_asset_id": content.video_asset.id,
+                        "storage_path": content.video_asset.storage_path,
+                    },
+                    is_retryable=True,
+                    retry_count=0,
+                )
+                log_event(
+                    logger,
+                    "video_reel_primary_asset_failed_trying_backup",
+                    level="warning",
+                    run_id=run_id,
+                    candidate_id=content.candidate_id,
+                    video_asset_id=content.video_asset.id,
+                    storage_path=content.video_asset.storage_path,
+                    error=str(first_exc),
+                )
+                backup_content = build_reel_content(repository, excluded_ids={content.video_asset.id}, logger=logger)
+                backup_decision = content_decision_from_reel(run_id, backup_content)
+                ensure_selected_post_candidate(
+                    client,
+                    run_context=run_context,
+                    winner_payload=backup_decision["winner"],
+                    decision_summary=backup_decision["decision_summary"],
+                    logger=logger,
+                )
+                backup_post = insert_final_post(
+                    client,
+                    run_id=run_uuid,
+                    candidate_id=UUID(backup_content.candidate_id),
+                    post_type=scheduled_post_type,
+                    chosen_idea="Daily wing Reel backup",
+                    generated_caption=backup_content.caption,
+                    hashtags=backup_content.hashtags,
+                    image_prompt="Preloaded Supabase Storage wing video asset backup; no AI image or video generated.",
+                    image_url=backup_content.video_asset.public_url,
+                    media_source="supabase_video_asset",
+                    video_asset_id=UUID(backup_content.video_asset.id),
+                    storage_path=backup_content.video_asset.storage_path,
+                    video_url=backup_content.video_asset.public_url,
+                    publish_status="publishing",
+                    metadata={
+                        "media_source": "supabase_video_asset",
+                        "video_asset_id": backup_content.video_asset.id,
+                        "storage_bucket": backup_content.video_asset.storage_bucket,
+                        "storage_path": backup_content.video_asset.storage_path,
+                        "caption_type": backup_content.caption_type,
+                        "style": backup_content.video_asset.style,
+                        "backup_for_video_asset_id": content.video_asset.id,
+                        "no_ai_media_generation": True,
+                    },
+                )
+                backup_decision["post_id"] = backup_post.get("id")
+                publish_result = run_instagram_publishing_live_environment(
+                    config,
+                    backup_decision,
+                    image_pipeline=None,
+                    logger=logger,
+                    client=client,
+                )
+                content = backup_content
+            if publish_result.result.get("status") in {"published", "published_with_permalink_pending"}:
+                repository.increment_used(content.video_asset)
+            duration_ms = int((time.perf_counter() - started_at) * 1000)
+            complete_run(
+                client,
+                run_id=UUID(run_id),
+                duration_ms=duration_ms,
+                status="completed",
+                metadata={
+                    "mode": "production",
+                    "post_type": post_type,
+                    "scheduled_post_type": scheduled_post_type,
+                    "dry_run": False,
+                    "run_source": run_source,
+                    "publish_status": publish_result.result.get("status"),
+                    "media_source": "supabase_video_asset",
+                    "video_asset_id": content.video_asset.id,
+                    "storage_path": content.video_asset.storage_path,
+                    **github_metadata,
+                },
+            )
+            log_event(
+                logger,
+                "run_completed",
+                run_id=run_id,
+                agent_name=config.agent_name,
+                mode="production",
+                post_type=post_type,
+                scheduled_post_type=scheduled_post_type,
+                dry_run=False,
+                run_source=run_source,
+                success=True,
+                duration_ms=duration_ms,
+                media_source="supabase_video_asset",
+                video_asset_id=content.video_asset.id,
+            )
+            print(f"Publish report written: {publish_result.report_path}")
+            print(f"Publish status: {publish_result.result['status']}")
+            print(f"Video asset: {content.video_asset.storage_path}")
+            print("Production Reel publish succeeded")
+            return 0
+
         snapshot_result = generate_latest_snapshot(logger=logger, client=client)
         print(f"Snapshot written: {snapshot_result.output_path}")
         external_result = generate_external_context(config, logger=logger)
@@ -682,6 +986,22 @@ def run_production() -> int:
         return 0
     except Exception as exc:
         duration_ms = int((time.perf_counter() - started_at) * 1000)
+        if _is_video_post(scheduled_post_type):
+            try:
+                insert_error_row(
+                    client,
+                    run_id=UUID(run_id),
+                    stage="video_reel_pipeline",
+                    error_type=type(exc).__name__,
+                    message=str(exc),
+                    raw_payload={
+                        "post_type": post_type,
+                        "scheduled_post_type": scheduled_post_type,
+                        "reason": "no_assets" if isinstance(exc, VideoAssetError) and "no_video_assets" in str(exc) else "video_reel_failure",
+                    },
+                )
+            except Exception:
+                pass
         fail_run(
             client,
             run_id=UUID(run_id),

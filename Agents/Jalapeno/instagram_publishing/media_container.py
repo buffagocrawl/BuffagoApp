@@ -110,6 +110,11 @@ class ApprovedInstagramPost:
     location_id: str | None = None
     post_id: str | None = None
     image_asset_id: str | None = None
+    media_kind: str = "image"
+    public_video_url: str | None = None
+    video_asset_id: str | None = None
+    storage_path: str | None = None
+    media_source: str | None = None
     container_id: str | None = None
     published_media_id: str | None = None
     permalink: str | None = None
@@ -153,12 +158,18 @@ def load_approved_post_from_artifacts(
     alt_text = _string_or_none(winner.get("alt_text")) or _string_or_none(winner.get("accessibility_caption"))
     image_prompt = _string_or_none(winner.get("image_prompt")) or _string_or_none(winner.get("suggested_image_concept"))
     public_image_url = _string_or_none(winner.get("public_image_url")) or _string_or_none(winner.get("image_url")) or _string_or_none(image_result.get("public_url"))
+    public_video_url = _string_or_none(winner.get("public_video_url")) or _string_or_none(winner.get("video_url"))
+    media_kind = "reel" if public_video_url or content_decision.get("scheduled_post_type") == "daily_wing_reel" else "image"
     content_type = _string_or_none(winner.get("content_type")) or _string_or_none(winner.get("post_type")) or "instagram"
     image_source = _string_or_none(image_result.get("image_source")) or "unknown"
     image_validation_status = _string_or_none(image_result.get("image_validation_status")) or _string_or_none(image_result.get("validation_status")) or "unknown"
     image_validation_reason = _string_or_none(image_result.get("image_validation_reason"))
-    prompt_quality = _resolve_prompt_quality(image_result)
-    quality_score = _resolve_quality_score(winner, image_result, logger=logger)
+    if media_kind == "reel":
+        prompt_quality = int(_number_or_none(winner.get("prompt_quality")) or 100)
+        quality_score = int(_number_or_none(winner.get("quality_score")) or 90)
+    else:
+        prompt_quality = _resolve_prompt_quality(image_result)
+        quality_score = _resolve_quality_score(winner, image_result, logger=logger)
     approved_value = winner.get("approved")
     if approved_value is None:
         approved_value = decision_summary.get("approved")
@@ -172,8 +183,10 @@ def load_approved_post_from_artifacts(
         raise ValueError("Approved post is missing caption")
     if not image_prompt:
         raise ValueError("Approved post is missing image_prompt")
-    if not public_image_url:
+    if media_kind == "image" and not public_image_url:
         raise ValueError("Approved post is missing public_image_url")
+    if media_kind == "reel" and not public_video_url:
+        raise ValueError("Approved Reel is missing public_video_url")
 
     return ApprovedInstagramPost(
         run_id=run_id,
@@ -182,7 +195,7 @@ def load_approved_post_from_artifacts(
         hashtags=hashtags,
         alt_text=alt_text,
         image_prompt=image_prompt,
-        public_image_url=public_image_url,
+        public_image_url=public_image_url or public_video_url or "",
         content_type=content_type,
         quality_score=quality_score,
         image_source=image_source,
@@ -195,6 +208,11 @@ def load_approved_post_from_artifacts(
         location_id=_string_or_none(winner.get("location_id")),
         post_id=_string_or_none(content_decision.get("post_id")) or _string_or_none(winner.get("post_id")),
         image_asset_id=_string_or_none(image_result.get("image_asset_id")) if isinstance(image_result, dict) else None,
+        media_kind=media_kind,
+        public_video_url=public_video_url,
+        video_asset_id=_string_or_none(winner.get("video_asset_id")),
+        storage_path=_string_or_none(winner.get("storage_path")),
+        media_source=_string_or_none(winner.get("media_source")),
         container_id=_string_or_none(content_decision.get("container_id")),
         published_media_id=_string_or_none(content_decision.get("published_media_id")),
         permalink=_string_or_none(content_decision.get("permalink")) or _string_or_none(winner.get("permalink")),
@@ -216,6 +234,8 @@ def load_approved_post_from_artifacts(
 def safe_container_request_payload(
     *,
     image_url: str,
+    video_url: str | None = None,
+    media_kind: str = "image",
     caption: str,
     access_token: str,
     user_tags: list[dict[str, Any]] | None = None,
@@ -224,10 +244,14 @@ def safe_container_request_payload(
     include_accessibility_caption: bool = False,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     request_payload: dict[str, Any] = {
-        "image_url": image_url,
         "caption": caption,
         "access_token": access_token,
     }
+    if media_kind == "reel":
+        request_payload["media_type"] = "REELS"
+        request_payload["video_url"] = video_url or image_url
+    else:
+        request_payload["image_url"] = image_url
     if user_tags:
         request_payload["user_tags"] = user_tags
     if location_id:
@@ -261,6 +285,11 @@ def serialize_container_record(record: ApprovedInstagramPost) -> dict[str, Any]:
         "location_id": record.location_id,
         "post_id": record.post_id,
         "image_asset_id": record.image_asset_id,
+        "media_kind": record.media_kind,
+        "public_video_url": record.public_video_url,
+        "video_asset_id": record.video_asset_id,
+        "storage_path": record.storage_path,
+        "media_source": record.media_source,
         "container_id": record.container_id,
         "published_media_id": record.published_media_id,
         "permalink": record.permalink,

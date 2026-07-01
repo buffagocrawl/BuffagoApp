@@ -67,18 +67,31 @@ class InstagramGraphClient:
         base = f"https://graph.facebook.com/{self.api_version.strip('/')}"
         return f"{base}/{path.lstrip('/')}"
 
-    def _request(self, method: str, path: str, *, data: dict[str, Any] | None = None) -> dict[str, Any]:
+    def _redact_access_token(self, value: str) -> str:
+        return value.replace(self.access_token, "[redacted]") if self.access_token else value
+
+    def _request(
+        self,
+        method: str,
+        path: str,
+        *,
+        data: dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         if self.simulate:
             raise SupabaseError("Live Graph API requests are disabled in simulation mode")
+        request_params = dict(params or {})
+        if method.upper() == "GET":
+            request_params["access_token"] = self.access_token
         response = self.transport.request(
             method=method.upper(),
             url=self._endpoint(path),
             data=data,
-            params={"access_token": self.access_token} if method.upper() == "GET" else None,
+            params=request_params or None,
             timeout=self.timeout_seconds,
         )
         if response.status_code >= 400:
-            raise SupabaseError(f"Instagram Graph API request failed ({response.status_code}): {response.text}")
+            raise SupabaseError(f"Instagram Graph API request failed ({response.status_code}): {self._redact_access_token(response.text)}")
         if not response.content:
             return {}
         return response.json()
@@ -127,6 +140,7 @@ class InstagramGraphClient:
         response = self._request(
             "GET",
             container_id,
+            params={"fields": "status_code"},
         )
         return response
 
@@ -151,8 +165,8 @@ class InstagramGraphClient:
                 "id": published_media_id,
                 "permalink": container.permalink,
                 "timestamp": published_at,
-                "media_type": "IMAGE",
-                "media_url": container.request_payload.get("image_url"),
+                "media_type": "REELS" if container.request_payload.get("media_type") == "REELS" else "IMAGE",
+                "media_url": container.request_payload.get("video_url") or container.request_payload.get("image_url"),
                 "caption": container.request_payload.get("caption"),
             }
             self._simulated_media[published_media_id] = dict(container.media_details)
@@ -193,6 +207,7 @@ class InstagramGraphClient:
         response = self._request(
             "GET",
             media_id,
+            params={"fields": "id,permalink,timestamp,media_type,media_url,caption"},
         )
         return response
 
@@ -218,7 +233,7 @@ class InstagramGraphClient:
             timeout=self.timeout_seconds,
         )
         if details_response.status_code >= 400:
-            raise SupabaseError(f"Instagram Graph API media details failed ({details_response.status_code}): {details_response.text}")
+            raise SupabaseError(f"Instagram Graph API media details failed ({details_response.status_code}): {self._redact_access_token(details_response.text)}")
         details = details_response.json() if details_response.content else {}
         insights_response = self.transport.request(
             method="GET",
@@ -230,7 +245,7 @@ class InstagramGraphClient:
             timeout=self.timeout_seconds,
         )
         if insights_response.status_code >= 400:
-            raise SupabaseError(f"Instagram Graph API media insights failed ({insights_response.status_code}): {insights_response.text}")
+            raise SupabaseError(f"Instagram Graph API media insights failed ({insights_response.status_code}): {self._redact_access_token(insights_response.text)}")
         insights_payload = insights_response.json() if insights_response.content else {}
         metrics = dict(details)
         for item in insights_payload.get("data", []) if isinstance(insights_payload, dict) else []:

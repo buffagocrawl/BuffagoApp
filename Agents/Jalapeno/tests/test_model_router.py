@@ -59,14 +59,14 @@ def test_scheduled_buffago_post_routes_to_gpt_55() -> None:
     assert decision.routing_reason == "scheduled_production_run"
 
 
-def test_scheduled_meme_post_routes_to_gpt_55() -> None:
+def test_scheduled_video_reel_routes_to_gpt_55() -> None:
     decision = get_text_model(
         load_ai_config(),
         _context(
             execution_source="github_actions_scheduler",
             environment="production",
             scheduled=True,
-            scheduled_post_type="meme_post",
+            scheduled_post_type="daily_wing_reel",
         ),
     )
 

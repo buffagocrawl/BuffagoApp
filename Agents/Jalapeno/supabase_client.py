@@ -140,6 +140,22 @@ class SupabaseClient:
     def storage_public_url(self, bucket: str, storage_path: str) -> str:
         return f"{self.config.url.rstrip('/')}/storage/v1/object/public/{quote(bucket)}/{quote(storage_path, safe='/')}"
 
+    def list_storage_objects(self, bucket: str, *, prefix: str = "", limit: int = 1000) -> list[dict[str, Any]]:
+        response = self._session.post(
+            self._storage_endpoint(f"object/list/{quote(bucket)}"),
+            headers={
+                "apikey": self.config.service_role_key,
+                "Authorization": f"Bearer {self.config.service_role_key}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+            json={"prefix": prefix, "limit": limit, "offset": 0, "sortBy": {"column": "name", "order": "asc"}},
+            timeout=self.config.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise SupabaseError(f"Supabase storage list failed ({response.status_code}): {response.text}")
+        return response.json() if response.content else []
+
     def upload_storage_object(
         self,
         bucket: str,

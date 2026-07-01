@@ -102,7 +102,7 @@ def get_text_model(config: AIConfig, run_context: AIRunContext) -> ModelRoutingD
         run_context.environment == "production"
         and run_context.scheduled
         and run_context.execution_source == "github_actions_scheduler"
-        and run_context.scheduled_post_type in {"buffago_post", "meme_post"}
+        and run_context.scheduled_post_type in {"buffago_post", "daily_wing_reel"}
     )
     if is_production_scheduled:
         selected = _profile(config, "production")
