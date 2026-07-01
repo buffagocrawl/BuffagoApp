@@ -397,9 +397,21 @@ def run_instagram_publishing_live_environment(
 ) -> InstagramPublishingResult:
     started_at = time.perf_counter()
     dry_run = runtime_settings.dry_run if runtime_settings is not None else config.instagram.dry_run
-    posting_allowed = runtime_settings.posting_allowed if runtime_settings is not None else not dry_run
-    meta_api_allowed = runtime_settings.meta_api_allowed if runtime_settings is not None else not dry_run
-    effective_config = replace(config, instagram=replace(config.instagram, dry_run=dry_run))
+    if runtime_settings is not None:
+        instagram_enabled = runtime_settings.instagram_enabled
+        posting_allowed = runtime_settings.posting_allowed
+        meta_api_allowed = runtime_settings.meta_api_allowed
+        dry_run_source = runtime_settings.dry_run_source
+        instagram_enabled_source = runtime_settings.instagram_enabled_source
+        permission_source = "runtime_publish_settings"
+    else:
+        instagram_enabled = bool(config.instagram.enabled)
+        posting_allowed = not dry_run and instagram_enabled
+        meta_api_allowed = not dry_run and instagram_enabled
+        dry_run_source = "config.instagram.dry_run"
+        instagram_enabled_source = "config.instagram.enabled"
+        permission_source = "config"
+    effective_config = replace(config, instagram=replace(config.instagram, enabled=instagram_enabled, dry_run=dry_run))
     log_event(
         logger,
         "publish_pipeline_started",
@@ -408,9 +420,12 @@ def run_instagram_publishing_live_environment(
         status="started",
         duration_ms=0,
         dry_run=dry_run,
+        dry_run_source=dry_run_source,
         posting_allowed=posting_allowed,
         meta_api_allowed=meta_api_allowed,
-        instagram_enabled=effective_config.instagram.enabled,
+        instagram_enabled=instagram_enabled,
+        instagram_enabled_source=instagram_enabled_source,
+        permission_source=permission_source,
     )
     loaded_post = _load_approved_post_from_artifacts(content_decision, image_pipeline=image_pipeline, logger=logger)
     approved_post = replace(
@@ -498,9 +513,12 @@ def run_instagram_publishing_live_environment(
         candidate_id=approved_post.candidate_id,
         post_id=post_id,
         dry_run=dry_run,
+        dry_run_source=dry_run_source,
         posting_allowed=posting_allowed,
         meta_api_allowed=meta_api_allowed,
-        instagram_enabled=effective_config.instagram.enabled,
+        instagram_enabled=instagram_enabled,
+        instagram_enabled_source=instagram_enabled_source,
+        permission_source=permission_source,
     )
     result = publish_instagram_post(
         effective_config,
@@ -512,6 +530,9 @@ def run_instagram_publishing_live_environment(
         simulate=False,
         dry_run=dry_run,
         test_mode=effective_config.default_mode == "test",
+        dry_run_source=dry_run_source,
+        instagram_enabled_source=instagram_enabled_source,
+        permission_source=permission_source,
         post_id=post_id,
         report_path=report_path,
     )

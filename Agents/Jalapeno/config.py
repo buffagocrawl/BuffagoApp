@@ -165,10 +165,12 @@ class ModePlan:
 class RuntimePublishSettings:
     mode: str
     dry_run: bool
+    instagram_enabled: bool
     posting_allowed: bool
     meta_api_allowed: bool
     image_generation_allowed: bool
     dry_run_source: str
+    instagram_enabled_source: str
 
 
 class ConfigError(ValueError):
@@ -629,13 +631,22 @@ def resolve_runtime_publish_settings(
         dry_run = bool(config.instagram.dry_run)
         dry_run_source = "config.instagram.dry_run"
 
+    if plan.name == "production" and not dry_run:
+        instagram_enabled = True
+        instagram_enabled_source = "production_runtime"
+    else:
+        instagram_enabled = bool(config.instagram.enabled)
+        instagram_enabled_source = "config.instagram.enabled"
+
     return RuntimePublishSettings(
         mode=plan.name,
         dry_run=dry_run,
-        posting_allowed=plan.posting_allowed and not dry_run,
-        meta_api_allowed=plan.meta_api_allowed and not dry_run,
+        instagram_enabled=instagram_enabled,
+        posting_allowed=plan.posting_allowed and not dry_run and instagram_enabled,
+        meta_api_allowed=plan.meta_api_allowed and not dry_run and instagram_enabled,
         image_generation_allowed=plan.image_generation_allowed and not dry_run,
         dry_run_source=dry_run_source,
+        instagram_enabled_source=instagram_enabled_source,
     )
 
 

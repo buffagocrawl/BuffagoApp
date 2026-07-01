@@ -84,9 +84,14 @@ def precheck_approved_post(
     *,
     dry_run: bool,
     test_mode: bool,
+    dry_run_source: str = "argument",
+    instagram_enabled_source: str = "config.instagram.enabled",
+    permission_source: str = "config",
     logger=None,
 ) -> PublishPrecheckResult:
     started_at = time.perf_counter()
+    posting_allowed = not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode
+    meta_api_allowed = not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode
     log_event(
         logger,
         "publish_precheck_started",
@@ -95,10 +100,13 @@ def precheck_approved_post(
         post_id=post.post_id,
         status="started",
         dry_run=dry_run,
+        dry_run_source=dry_run_source,
         config_dry_run=config.instagram.dry_run,
-        posting_allowed=not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode,
-        meta_api_allowed=not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode,
+        posting_allowed=posting_allowed,
+        meta_api_allowed=meta_api_allowed,
+        permission_source=permission_source,
         instagram_enabled=config.instagram.enabled,
+        instagram_enabled_source=instagram_enabled_source,
         test_mode=test_mode,
         quality_score=post.quality_score,
         minimum_quality_score=_quality_threshold(config),
@@ -154,10 +162,13 @@ def precheck_approved_post(
             status="passed",
             duration_ms=duration_ms,
             dry_run=dry_run,
+            dry_run_source=dry_run_source,
             config_dry_run=config.instagram.dry_run,
             posting_allowed=True,
             meta_api_allowed=True,
+            permission_source=permission_source,
             instagram_enabled=config.instagram.enabled,
+            instagram_enabled_source=instagram_enabled_source,
             quality_score=post.quality_score,
             minimum_quality_score=_quality_threshold(config),
             image_source=post.image_source,
@@ -180,10 +191,13 @@ def precheck_approved_post(
             duration_ms=duration_ms,
             error=reason,
             dry_run=dry_run,
+            dry_run_source=dry_run_source,
             config_dry_run=config.instagram.dry_run,
             posting_allowed=False,
             meta_api_allowed=False,
+            permission_source=permission_source,
             instagram_enabled=config.instagram.enabled,
+            instagram_enabled_source=instagram_enabled_source,
             quality_score=post.quality_score,
             minimum_quality_score=_quality_threshold(config),
             image_source=post.image_source,
@@ -331,10 +345,15 @@ def publish_instagram_post(
     simulate: bool = False,
     dry_run: bool = True,
     test_mode: bool = False,
+    dry_run_source: str = "argument",
+    instagram_enabled_source: str = "config.instagram.enabled",
+    permission_source: str = "config",
     post_id: str | None = None,
     report_path: Path = DEFAULT_PUBLISH_REPORT_PATH,
 ) -> dict[str, Any]:
     started_at = time.perf_counter()
+    posting_allowed = not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode
+    meta_api_allowed = not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode
     state = PublishPipelineState(
         post=post,
         container_id=post.container_id,
@@ -360,14 +379,26 @@ def publish_instagram_post(
         candidate_id=post.candidate_id,
         post_id=post_id,
         dry_run=dry_run,
+        dry_run_source=dry_run_source,
         config_dry_run=config.instagram.dry_run,
-        posting_allowed=not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode,
-        meta_api_allowed=not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode,
+        posting_allowed=posting_allowed,
+        meta_api_allowed=meta_api_allowed,
+        permission_source=permission_source,
         instagram_enabled=config.instagram.enabled,
+        instagram_enabled_source=instagram_enabled_source,
         test_mode=test_mode,
         simulate=simulate,
     )
-    precheck = precheck_approved_post(config, post, dry_run=dry_run, test_mode=test_mode, logger=logger)
+    precheck = precheck_approved_post(
+        config,
+        post,
+        dry_run=dry_run,
+        test_mode=test_mode,
+        dry_run_source=dry_run_source,
+        instagram_enabled_source=instagram_enabled_source,
+        permission_source=permission_source,
+        logger=logger,
+    )
     if not precheck.passed:
         state.status = "precheck_failed"
         state.failure_stage = "precheck"

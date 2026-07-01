@@ -484,10 +484,12 @@ def test_live_publish_uses_resolved_runtime_dry_run_false(
     runtime_settings = RuntimePublishSettings(
         mode="production",
         dry_run=False,
+        instagram_enabled=True,
         posting_allowed=True,
         meta_api_allowed=True,
         image_generation_allowed=True,
         dry_run_source="JALAPENO_DRY_RUN",
+        instagram_enabled_source="production_runtime",
     )
     content_decision = {
         "run_id": "11111111-1111-1111-1111-111111111111",
@@ -511,7 +513,11 @@ def test_live_publish_uses_resolved_runtime_dry_run_false(
 
     def _fake_publish(config_arg, post, **kwargs):
         seen["config_dry_run"] = config_arg.instagram.dry_run
+        seen["config_enabled"] = config_arg.instagram.enabled
         seen["dry_run"] = kwargs["dry_run"]
+        seen["dry_run_source"] = kwargs["dry_run_source"]
+        seen["instagram_enabled_source"] = kwargs["instagram_enabled_source"]
+        seen["permission_source"] = kwargs["permission_source"]
         seen["test_mode"] = kwargs["test_mode"]
         return {
             "status": "published",
@@ -535,7 +541,11 @@ def test_live_publish_uses_resolved_runtime_dry_run_false(
     assert result.result["status"] == "published"
     assert seen == {
         "config_dry_run": False,
+        "config_enabled": True,
         "dry_run": False,
+        "dry_run_source": "JALAPENO_DRY_RUN",
+        "instagram_enabled_source": "production_runtime",
+        "permission_source": "runtime_publish_settings",
         "test_mode": False,
     }
 

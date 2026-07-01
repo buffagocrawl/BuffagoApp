@@ -438,7 +438,9 @@ The image pipeline also reads these config sections from `config.yaml`:
 - Validation and local simulation must not publish to Instagram.
 - Dry-run logs and DB rows are still created so the audit trail stays realistic.
 - The content decision engine also supports a dry-run path that writes the decision artifact without posting.
-- Instagram publishing is disabled by default with `instagram.enabled=false` and `instagram.dry_run=true`.
+- Instagram publishing is disabled by default for direct/local publisher calls with `instagram.enabled=false` and `instagram.dry_run=true`.
+- Production mode uses the resolved runtime settings as the source of truth: `--production` with `JALAPENO_DRY_RUN=false` resolves `instagram_enabled=true`, `posting_allowed=true`, and `meta_api_allowed=true`.
+- Validation, test, dry-run, and manual workflow dispatch with `publish=false` still resolve `dry_run=true` and cannot publish.
 - Validation simulates container creation and publish flow without calling live Instagram endpoints.
 - `--daily-report` and `--weekly-report` can generate reports without email if Resend config is absent.
 - `--metrics` reads Instagram Graph API metrics but never publishes.
@@ -802,6 +804,7 @@ Required GitHub secrets:
 Notes on secret mapping:
 
 - `INSTAGRAM_BUSINESS_ACCOUNT_ID` is both a Jalapeno-required environment variable and the value used for the Instagram publishing target
+- Scheduled production and manual live publishing set `JALAPENO_DRY_RUN=false` in the workflow; no separate `JALAPENO_INSTAGRAM_ENABLED` secret is required.
 - `SUPABASE_SERVICE_ROLE_KEY` is also reused as the default Jalapeno AI function token when `JALAPENO_AI_FUNCTION_TOKEN` is not separately set
 - No real secret values should be committed to the repository
 

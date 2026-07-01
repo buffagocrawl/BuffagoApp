@@ -862,7 +862,14 @@ def run_production() -> int:
 
     plan = get_mode_plan("production")
     runtime_settings = resolve_runtime_publish_settings(config=config, plan=plan)
-    config = replace(config, instagram=replace(config.instagram, dry_run=runtime_settings.dry_run))
+    config = replace(
+        config,
+        instagram=replace(
+            config.instagram,
+            enabled=runtime_settings.instagram_enabled,
+            dry_run=runtime_settings.dry_run,
+        ),
+    )
     log_event(
         logger,
         "selected_mode",
@@ -876,6 +883,8 @@ def run_production() -> int:
         scheduled_post_type=scheduled_post_type,
         dry_run=runtime_settings.dry_run,
         dry_run_source=runtime_settings.dry_run_source,
+        instagram_enabled=runtime_settings.instagram_enabled,
+        instagram_enabled_source=runtime_settings.instagram_enabled_source,
         run_source=run_source,
     )
     log_event(
@@ -889,7 +898,8 @@ def run_production() -> int:
         posting_allowed=runtime_settings.posting_allowed,
         meta_api_allowed=runtime_settings.meta_api_allowed,
         image_generation_allowed=runtime_settings.image_generation_allowed,
-        instagram_enabled=config.instagram.enabled,
+        instagram_enabled=runtime_settings.instagram_enabled,
+        instagram_enabled_source=runtime_settings.instagram_enabled_source,
         run_source=run_source,
         **github_metadata,
     )
@@ -1008,7 +1018,8 @@ def run_production() -> int:
                     dry_run=runtime_settings.dry_run,
                     posting_allowed=runtime_settings.posting_allowed,
                     meta_api_allowed=runtime_settings.meta_api_allowed,
-                    instagram_enabled=config.instagram.enabled,
+                    instagram_enabled=runtime_settings.instagram_enabled,
+                    instagram_enabled_source=runtime_settings.instagram_enabled_source,
                 )
                 publish_result = run_instagram_publishing(
                     config,

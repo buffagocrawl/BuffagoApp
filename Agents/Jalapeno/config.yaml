@@ -51,7 +51,11 @@ cleanup:
   keep_failed_images: true
 
 instagram:
+  # Safe default for direct/local publisher calls. Production mode resolves its
+  # own live-publish flag from the selected mode plus JALAPENO_DRY_RUN.
   enabled: false
+  # Safe default for direct/local publisher calls. Production mode uses the
+  # resolved runtime dry-run setting instead of this static default.
   dry_run: true
   ig_user_id_secret_name: "instagram_business_account_id"
   access_token_secret_name: "meta_long_lived_access_token"
