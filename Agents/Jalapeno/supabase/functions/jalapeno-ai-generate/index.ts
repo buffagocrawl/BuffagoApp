@@ -56,7 +56,7 @@ interface Envelope {
 
 const MODEL_CONFIG = {
   default_text_model: Deno.env.get("JALAPENO_TEXT_MODEL") ?? "gpt-5.5",
-  image_model: Deno.env.get("JALAPENO_IMAGE_MODEL") ?? "gpt-5.4",
+  image_model: Deno.env.get("JALAPENO_IMAGE_MODEL") ?? "gpt-image-2",
   default_validation_model: Deno.env.get("JALAPENO_VALIDATION_MODEL") ?? "gpt-5.4-mini",
   max_output_tokens: Number(Deno.env.get("JALAPENO_MAX_OUTPUT_TOKENS") ?? "1200"),
   timeout_seconds: Number(Deno.env.get("JALAPENO_AI_TIMEOUT_SECONDS") ?? "75"),

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import json
 import math
 import os
 import re
@@ -11,12 +12,36 @@ from typing import Any, Protocol
 
 import requests
 
+from logging_utils import log_event
 from prompt_library_loader import PROMPT_LIBRARY_VERSION
+
+
+OPENAI_IMAGE_GENERATION_ENDPOINT = "https://api.openai.com/v1/images/generations"
+OPENAI_IMAGE_GENERATION_MODELS = {
+    "gpt-image-2",
+    "gpt-image-1.5",
+    "gpt-image-1",
+    "gpt-image-1-mini",
+    "dall-e-3",
+    "dall-e-2",
+}
+OPENAI_GPT_IMAGE_MODELS = {
+    "gpt-image-2",
+    "gpt-image-1.5",
+    "gpt-image-1",
+    "gpt-image-1-mini",
+}
+OPENAI_GPT_IMAGE_2_MIN_PIXELS = 655_360
+OPENAI_GPT_IMAGE_2_MAX_PIXELS = 8_294_400
 
 
 class ImageGenerationClient(Protocol):
     def generate_image(self, *, prompt: str, model: str, size: tuple[int, int], content_type: str, image_type: str) -> Any:
         ...
+
+
+class OpenAIImageGenerationError(RuntimeError):
+    pass
 
 
 @dataclass(frozen=True, slots=True)
@@ -41,11 +66,17 @@ class OpenAIImageGenerationClient:
         logger=None,
         session: requests.Session | None = None,
         timeout_seconds: int = 300,
+        quality: str = "high",
+        output_format: str = "jpeg",
+        moderation: str = "auto",
     ) -> None:
         self.api_key = api_key
         self.logger = logger
         self._session = session or requests.Session()
         self.timeout_seconds = timeout_seconds
+        self.quality = quality
+        self.output_format = output_format
+        self.moderation = moderation
 
     @classmethod
     def from_env(cls, *, logger=None) -> OpenAIImageGenerationClient | None:
@@ -55,20 +86,26 @@ class OpenAIImageGenerationClient:
         return cls(api_key=api_key, logger=logger)
 
     def generate_image(self, *, prompt: str, model: str, size: tuple[int, int], content_type: str, image_type: str) -> dict[str, Any]:
+        normalized_model = model.strip()
+        request_size = f"{size[0]}x{size[1]}"
+        self._validate_model_and_size(normalized_model, size)
+        payload = self._build_request_payload(
+            prompt=prompt,
+            model=normalized_model,
+            request_size=request_size,
+        )
+        self._log_request_payload(payload)
         response = self._session.post(
-            "https://api.openai.com/v1/images/generations",
+            OPENAI_IMAGE_GENERATION_ENDPOINT,
             headers={
                 "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/json",
             },
-            json={
-                "model": model,
-                "prompt": prompt,
-                "size": f"{size[0]}x{size[1]}",
-            },
+            json=payload,
             timeout=self.timeout_seconds,
         )
-        response.raise_for_status()
+        if not response.ok:
+            self._raise_openai_error(response)
         payload = response.json()
         data = payload.get("data")
         if not isinstance(data, list) or not data:
@@ -82,6 +119,111 @@ class OpenAIImageGenerationClient:
             "revised_prompt": first.get("revised_prompt") if isinstance(first.get("revised_prompt"), str) else None,
             "response_id": payload.get("id") if isinstance(payload.get("id"), str) else None,
         }
+
+    def _validate_model_and_size(self, model: str, size: tuple[int, int]) -> None:
+        if model not in OPENAI_IMAGE_GENERATION_MODELS:
+            supported = ", ".join(sorted(OPENAI_IMAGE_GENERATION_MODELS))
+            raise OpenAIImageGenerationError(
+                "Configured image model is incompatible with the OpenAI Image API endpoint "
+                f"{OPENAI_IMAGE_GENERATION_ENDPOINT}: model={model!r}. "
+                f"Use one of: {supported}. Mainline GPT models such as gpt-5.x must use the Responses API image_generation tool, not /v1/images/generations."
+            )
+        if model == "gpt-image-2":
+            width, height = size
+            pixels = width * height
+            invalid_reasons = []
+            if width > 3840 or height > 3840:
+                invalid_reasons.append("maximum edge must be <= 3840px")
+            if width % 16 != 0 or height % 16 != 0:
+                invalid_reasons.append("both edges must be multiples of 16px")
+            if max(width, height) / min(width, height) > 3:
+                invalid_reasons.append("long edge to short edge ratio must be <= 3:1")
+            if pixels < OPENAI_GPT_IMAGE_2_MIN_PIXELS or pixels > OPENAI_GPT_IMAGE_2_MAX_PIXELS:
+                invalid_reasons.append("total pixels must be between 655360 and 8294400")
+            if invalid_reasons:
+                raise OpenAIImageGenerationError(
+                    f"Configured image size is incompatible with gpt-image-2: size={width}x{height}; "
+                    + "; ".join(invalid_reasons)
+                )
+            return
+        if model in OPENAI_GPT_IMAGE_MODELS and size not in {(1024, 1024), (1024, 1536), (1536, 1024)}:
+            raise OpenAIImageGenerationError(
+                f"Configured image size is incompatible with {model}: size={size[0]}x{size[1]}. "
+                "Supported sizes are 1024x1024, 1024x1536, 1536x1024, or use gpt-image-2 for additional valid resolutions."
+            )
+
+    def _build_request_payload(self, *, prompt: str, model: str, request_size: str) -> dict[str, Any]:
+        payload: dict[str, Any] = {
+            "model": model,
+            "prompt": prompt,
+            "size": request_size,
+        }
+        if model in OPENAI_GPT_IMAGE_MODELS:
+            payload.update(
+                {
+                    "quality": self.quality,
+                    "output_format": self.output_format,
+                    "moderation": self.moderation,
+                }
+            )
+        else:
+            payload["response_format"] = "b64_json"
+        return payload
+
+    def _diagnostic_payload(self, payload: dict[str, Any]) -> dict[str, Any]:
+        prompt = payload.get("prompt")
+        prompt_text = prompt if isinstance(prompt, str) else ""
+        return {
+            "endpoint": OPENAI_IMAGE_GENERATION_ENDPOINT,
+            "model": payload.get("model"),
+            "size": payload.get("size"),
+            "quality": payload.get("quality", "null"),
+            "response_format": payload.get("response_format", "null"),
+            "output_format": payload.get("output_format", "null"),
+            "moderation": payload.get("moderation", "null"),
+            "prompt_length": len(prompt_text),
+            "prompt_preview": prompt_text[:500],
+        }
+
+    def _log_request_payload(self, payload: dict[str, Any]) -> None:
+        diagnostic_payload = self._diagnostic_payload(payload)
+        log_event(
+            self.logger,
+            "openai_image_generation_request",
+            **diagnostic_payload,
+        )
+
+    def _raise_openai_error(self, response: requests.Response) -> None:
+        response_text = response.text
+        parsed_error: Any | None = None
+        invalid_parameter: Any | None = None
+        try:
+            parsed_body = response.json()
+            if isinstance(parsed_body, dict):
+                parsed_error = parsed_body.get("error", parsed_body)
+                if isinstance(parsed_error, dict):
+                    invalid_parameter = parsed_error.get("param")
+        except ValueError:
+            parsed_error = None
+
+        log_event(
+            self.logger,
+            "openai_image_generation_error",
+            level="error",
+            response_status_code=response.status_code,
+            response_text=response_text,
+            parsed_json_error=parsed_error,
+            invalid_parameter=invalid_parameter,
+        )
+        details = [
+            f"OpenAI image generation failed with HTTP {response.status_code}",
+            f"response_text={response_text}",
+        ]
+        if parsed_error is not None:
+            details.append(f"parsed_json_error={json.dumps(parsed_error, sort_keys=True, default=str)}")
+        if invalid_parameter:
+            details.append(f"invalid_parameter={invalid_parameter}")
+        raise OpenAIImageGenerationError(" | ".join(details))
 
 
 def _load_font(size: int, *, bold: bool = False) -> ImageFont.ImageFont:

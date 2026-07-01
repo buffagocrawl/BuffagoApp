@@ -14,11 +14,11 @@ DEFAULT_AI_SECTION: dict[str, Any] = {
     "models": {
         "production": {
             "text": "gpt-5.5",
-            "image": "gpt-5.4",
+            "image": "gpt-image-2",
         },
         "development": {
             "text": "gpt-5.4-mini",
-            "image": "gpt-5.4",
+            "image": "gpt-image-2",
         },
     },
     "max_output_tokens": 1200,
@@ -37,7 +37,7 @@ DEFAULT_AI_SECTION: dict[str, Any] = {
             "input_cost_per_million_usd": None,
             "output_cost_per_million_usd": None,
         },
-        "gpt-5.4": {
+        "gpt-image-2": {
             "input_cost_per_million_usd": None,
             "output_cost_per_million_usd": None,
         },

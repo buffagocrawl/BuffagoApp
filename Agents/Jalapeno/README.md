@@ -590,8 +590,8 @@ Jalapeno handles common failures explicitly:
 
 Jalapeno keeps model selection centralized in `config.yaml` under `ai.models`.
 
-- Production image generation defaults to `gpt-5.4`.
-- Development, validation, and dry-run image generation also use `gpt-5.4`.
+- Production image generation defaults to `gpt-image-2` for the OpenAI Image API.
+- Development, validation, and dry-run image generation also use `gpt-image-2`.
 - Text generation keeps separate production and development routes.
 - Image pipeline logs include the configured `image_model`.
 
