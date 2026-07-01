@@ -30,6 +30,7 @@ from ai_schemas import fallback_image_output, normalize_image_output  # noqa: E4
 from content_engine.candidate_generator import CandidateGenerator, ContentCandidate  # noqa: E402
 from content_engine.image_prompt_generator import generate_image_prompt  # noqa: E402
 from content_engine.settings import ContentEngineSettings  # noqa: E402
+from jalapeno_db import insert_image_asset  # noqa: E402
 from logging_utils import format_structured_log, log_event  # noqa: E402
 from reporting import _daily_body, _weekly_body, generate_admin_report  # noqa: E402
 from validation import validate_content_engine_environment, validate_phase3_environment, validate_phase4_environment  # noqa: E402
@@ -816,6 +817,60 @@ class _CandidateFailureSupabaseClient(_RecordingSupabaseClient):
         if table_name == "jalapeno_content_candidates":
             raise RuntimeError("candidate insert failed")
         return [payload] if isinstance(payload, dict) else payload
+
+
+def test_image_asset_insert_removes_binary_metadata() -> None:
+    class RecordingClient:
+        def __init__(self) -> None:
+            self.payload: dict[str, object] | None = None
+
+        def insert_row(self, table_name: str, payload):
+            assert table_name == "jalapeno_image_assets"
+            json.dumps(payload)
+            self.payload = payload
+            return [payload]
+
+    client = RecordingClient()
+
+    row = insert_image_asset(
+        client,  # type: ignore[arg-type]
+        run_id="11111111-1111-1111-1111-111111111111",
+        candidate_id="22222222-2222-2222-2222-222222222222",
+        local_temp_path="tmp/image.png",
+        storage_bucket="jalapeno-images",
+        storage_path="instagram/2026/07/01/image.jpg",
+        public_url="https://example.test/image.jpg",
+        image_type="restaurant",
+        content_type="restaurant_spotlight",
+        width=1080,
+        height=1350,
+        aspect_ratio=0.8,
+        file_size_bytes=12345,
+        format="JPG",
+        branding_applied=True,
+        meme_format_applied=False,
+        validation_status="passed",
+        image_source="real_ai",
+        image_prompt="A plate of Buffalo wings",
+        prompt_quality=92,
+        validation_reason="valid",
+        metadata={
+            "image_source_details": {
+                "bytes": b"binary image data",
+                "response_id": "img_123",
+                "revised_prompt": "A revised prompt",
+            }
+        },
+    )
+
+    assert row is client.payload
+    assert client.payload is not None
+    metadata = client.payload["metadata"]
+    assert isinstance(metadata, dict)
+    source_details = metadata["image_source_details"]
+    assert isinstance(source_details, dict)
+    assert "bytes" not in source_details
+    assert source_details["response_id"] == "img_123"
 
 
 def test_content_engine_validation_creates_run_before_related_rows(tmp_path: Path) -> None:

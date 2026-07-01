@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -598,6 +600,43 @@ def insert_report_log(
     return rows[0] if rows else payload
 
 
+def _json_safe_payload_value(value: Any) -> Any:
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    if isinstance(value, (bytes, bytearray, memoryview)):
+        return None
+    if isinstance(value, datetime):
+        return value.isoformat()
+    if isinstance(value, (UUID, Path)):
+        return str(value)
+    if isinstance(value, dict):
+        cleaned: dict[str, Any] = {}
+        for key, nested_value in value.items():
+            safe_value = _json_safe_payload_value(nested_value)
+            if safe_value is None and isinstance(nested_value, (bytes, bytearray, memoryview)):
+                continue
+            cleaned[str(key)] = safe_value
+        return cleaned
+    if isinstance(value, (list, tuple, set)):
+        cleaned_items = []
+        for item in value:
+            safe_item = _json_safe_payload_value(item)
+            if safe_item is None and isinstance(item, (bytes, bytearray, memoryview)):
+                continue
+            cleaned_items.append(safe_item)
+        return cleaned_items
+    return str(value)
+
+
+def _ensure_json_serializable_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    cleaned = {key: _json_safe_payload_value(value) for key, value in payload.items()}
+    try:
+        json.dumps(cleaned)
+    except TypeError as exc:  # pragma: no cover - _json_safe_payload_value should prevent this
+        raise TypeError(f"jalapeno_image_assets payload contains a non-JSON-serializable value: {exc}") from exc
+    return cleaned
+
+
 def insert_image_asset(
     client: SupabaseClient,
     *,
@@ -659,6 +698,7 @@ def insert_image_asset(
         "uploaded_at": uploaded_at,
         "cleanup_status": cleanup_status,
     }
+    payload = _ensure_json_serializable_payload(payload)
     log_event(
         logger,
         "jalapeno_image_asset_insert_payload",
