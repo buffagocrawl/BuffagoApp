@@ -13,7 +13,7 @@ if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
 import instagram_publishing.instagram_publishing as publishing_module  # noqa: E402
-from config import load_configuration, initialize_logging  # noqa: E402
+from config import RuntimePublishSettings, load_configuration, initialize_logging  # noqa: E402
 from instagram_publishing.instagram_client import InstagramGraphClient  # noqa: E402
 from instagram_publishing.media_container import ApprovedInstagramPost, load_approved_post_from_artifacts, serialize_container_record  # noqa: E402
 from instagram_publishing.media_container import safe_container_request_payload  # noqa: E402
@@ -471,6 +471,73 @@ def test_live_publish_auto_approves_when_content_decision_is_not_manually_approv
     assert "publish_continuing_without_manual_approval" in log_output
     assert "approval_bypass_enabled=true" in log_output
     assert "approval_status=auto_approved" in log_output
+
+
+def test_live_publish_uses_resolved_runtime_dry_run_false(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("META_LONG_LIVED_ACCESS_TOKEN", "test-access-token")
+    monkeypatch.setenv("INSTAGRAM_BUSINESS_ACCOUNT_ID", "test-ig-user-id")
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    assert config.instagram.dry_run is True
+    runtime_settings = RuntimePublishSettings(
+        mode="production",
+        dry_run=False,
+        posting_allowed=True,
+        meta_api_allowed=True,
+        image_generation_allowed=True,
+        dry_run_source="JALAPENO_DRY_RUN",
+    )
+    content_decision = {
+        "run_id": "11111111-1111-1111-1111-111111111111",
+        "post_id": "33333333-3333-3333-3333-333333333333",
+        "scheduled_post_type": "daily_wing_reel",
+        "winner": {
+            "candidate_id": "22222222-2222-2222-2222-222222222222",
+            "content_type": "daily_wing_reel",
+            "caption": "8pm wing check.",
+            "hashtags": ["buffago", "wingnight"],
+            "image_prompt": "Preloaded Supabase Storage wing video asset; no AI image or video generated.",
+            "approved": True,
+            "public_video_url": "https://example.com/video.mp4",
+            "video_asset_id": "44444444-4444-4444-4444-444444444444",
+            "storage_path": "wings/video.mp4",
+            "media_source": "supabase_video_asset",
+        },
+        "decision_summary": {"approved": True},
+    }
+    seen: dict[str, object] = {}
+
+    def _fake_publish(config_arg, post, **kwargs):
+        seen["config_dry_run"] = config_arg.instagram.dry_run
+        seen["dry_run"] = kwargs["dry_run"]
+        seen["test_mode"] = kwargs["test_mode"]
+        return {
+            "status": "published",
+            "container_id": "sim-container",
+            "published_media_id": "sim-media",
+            "permalink": "https://instagram.com/p/sim-media/",
+        }
+
+    monkeypatch.setattr(publishing_module, "publish_instagram_post", _fake_publish)
+
+    result = publishing_module.run_instagram_publishing_live_environment(
+        config,
+        content_decision,
+        image_pipeline=None,
+        logger=None,
+        client=None,
+        report_path=tmp_path / "report.json",
+        runtime_settings=runtime_settings,
+    )
+
+    assert result.result["status"] == "published"
+    assert seen == {
+        "config_dry_run": False,
+        "dry_run": False,
+        "test_mode": False,
+    }
 
 
 def test_successful_publish_marks_approval_status_published(tmp_path: Path) -> None:

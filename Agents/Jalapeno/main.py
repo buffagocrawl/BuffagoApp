@@ -5,6 +5,7 @@ import json
 import os
 import sys
 import time
+from dataclasses import replace
 from pathlib import Path
 from uuid import UUID, uuid4
 
@@ -19,6 +20,7 @@ from config import (
     load_env_file,
     log_mode_plan,
     log_startup_state,
+    resolve_runtime_publish_settings,
     validate_phase1_environment,
     warn_missing_future_secrets,
 )
@@ -33,7 +35,7 @@ from reporting import generate_admin_report
 from supabase_client import SupabaseClient, SupabaseError
 from video_assets import VideoAssetError, VideoAssetRepository
 from video_reel_flow import build_reel_content, content_decision_from_reel
-from instagram_publishing.instagram_publishing import run_instagram_publishing_live_environment
+from instagram_publishing.instagram_publishing import run_instagram_publishing_live_environment as run_instagram_publishing
 from validation import (
     validate_content_engine_environment,
     validate_instagram_publishing_environment,
@@ -41,7 +43,6 @@ from validation import (
     validate_phase3_environment,
     validate_phase4_environment,
     validate_phase5_environment,
-    run_instagram_publishing_live_environment,
     validate_prompt_library_environment,
     run_image_pipeline_live_environment,
 )
@@ -131,6 +132,37 @@ def _github_run_metadata() -> dict[str, str]:
         if value:
             metadata[field_name] = value
     return metadata
+
+
+def _is_backup_worthy_video_publish_failure(exc: Exception) -> bool:
+    message = str(exc).lower()
+    config_or_state_markers = (
+        "dry_run",
+        "dry-run",
+        "test_mode",
+        "publishing disabled",
+        "instagram publishing disabled",
+        "missing required secret",
+        "approved is false",
+        "quality score",
+        "missing caption",
+        "precheck failed",
+    )
+    if any(marker in message for marker in config_or_state_markers):
+        return False
+    media_markers = (
+        "video",
+        "video_url",
+        "media",
+        "container_create",
+        "container status",
+        "upload",
+        "unsupported",
+        "invalid url",
+        "inaccessible",
+        "not accessible",
+    )
+    return any(marker in message for marker in media_markers)
 
 
 def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = False) -> int:
@@ -579,7 +611,7 @@ def run_instagram_publish_live() -> int:
 
     content_decision = json.loads(decision_path.read_text(encoding="utf-8"))
     image_pipeline = json.loads(image_path.read_text(encoding="utf-8"))
-    result = run_instagram_publishing_live_environment(
+    result = run_instagram_publishing(
         config,
         content_decision,
         image_pipeline,
@@ -696,7 +728,7 @@ def run_dry_run() -> int:
                     metadata={"mode": "dry-run", "post_type": post_type, "scheduled_post_type": scheduled_post_type, **github_metadata},
                 )
                 repository = VideoAssetRepository(client, config, logger=logger)
-                content = build_reel_content(repository, logger=logger)
+                content = build_reel_content(repository, dry_run=True, logger=logger)
                 ensure_selected_post_candidate(
                     client,
                     run_context=run_context,
@@ -829,27 +861,35 @@ def run_production() -> int:
     github_metadata = _github_run_metadata()
 
     plan = get_mode_plan("production")
+    runtime_settings = resolve_runtime_publish_settings(config=config, plan=plan)
+    config = replace(config, instagram=replace(config.instagram, dry_run=runtime_settings.dry_run))
     log_event(
         logger,
         "selected_mode",
         mode=plan.name,
         blocked=plan.blocked,
-        posting_allowed=plan.posting_allowed,
-        meta_api_allowed=plan.meta_api_allowed,
-        image_generation_allowed=plan.image_generation_allowed,
+        posting_allowed=runtime_settings.posting_allowed,
+        meta_api_allowed=runtime_settings.meta_api_allowed,
+        image_generation_allowed=runtime_settings.image_generation_allowed,
         description=plan.description,
         post_type=post_type,
         scheduled_post_type=scheduled_post_type,
-        dry_run=False,
+        dry_run=runtime_settings.dry_run,
+        dry_run_source=runtime_settings.dry_run_source,
         run_source=run_source,
     )
     log_event(
         logger,
-        "production_run_requested",
+        "production_run_dry_run_resolved",
         mode="production",
         post_type=post_type,
         scheduled_post_type=scheduled_post_type,
-        dry_run=False,
+        dry_run=runtime_settings.dry_run,
+        dry_run_source=runtime_settings.dry_run_source,
+        posting_allowed=runtime_settings.posting_allowed,
+        meta_api_allowed=runtime_settings.meta_api_allowed,
+        image_generation_allowed=runtime_settings.image_generation_allowed,
+        instagram_enabled=config.instagram.enabled,
         run_source=run_source,
         **github_metadata,
     )
@@ -870,7 +910,7 @@ def run_production() -> int:
         run_id=run_uuid,
         agent_name=config.agent_name,
         post_type=scheduled_post_type,
-        dry_run=False,
+        dry_run=runtime_settings.dry_run,
         environment="production",
         trigger_source=run_source,
         git_commit=github_metadata.get("github_sha"),
@@ -882,7 +922,7 @@ def run_production() -> int:
             "mode": "production",
             "post_type": post_type,
             "scheduled_post_type": scheduled_post_type,
-            "dry_run": False,
+            "dry_run": runtime_settings.dry_run,
             "run_source": run_source,
             **github_metadata,
         },
@@ -895,14 +935,16 @@ def run_production() -> int:
         mode="production",
         post_type=post_type,
         scheduled_post_type=scheduled_post_type,
-        dry_run=False,
+        dry_run=runtime_settings.dry_run,
+        posting_allowed=runtime_settings.posting_allowed,
+        meta_api_allowed=runtime_settings.meta_api_allowed,
         run_source=run_source,
     )
 
     try:
         if _is_video_post(scheduled_post_type):
             repository = VideoAssetRepository(client, config, logger=logger)
-            content = build_reel_content(repository, logger=logger)
+            content = build_reel_content(repository, dry_run=runtime_settings.dry_run, logger=logger)
             content_decision = content_decision_from_reel(run_id, content)
             ensure_selected_post_candidate(
                 client,
@@ -925,7 +967,7 @@ def run_production() -> int:
                 video_asset_id=UUID(content.video_asset.id),
                 storage_path=content.video_asset.storage_path,
                 video_url=content.video_asset.public_url,
-                publish_status="drafted" if config.instagram.dry_run else "publishing",
+                publish_status="drafted" if runtime_settings.dry_run else "publishing",
                 metadata={
                     "media_source": "supabase_video_asset",
                     "video_asset_id": content.video_asset.id,
@@ -952,17 +994,44 @@ def run_production() -> int:
                 video_asset_id=content.video_asset.id,
                 storage_path=content.video_asset.storage_path,
                 video_url=content.video_asset.public_url,
-                dry_run=config.instagram.dry_run,
+                dry_run=runtime_settings.dry_run,
+                posting_allowed=runtime_settings.posting_allowed,
+                meta_api_allowed=runtime_settings.meta_api_allowed,
             )
             try:
-                publish_result = run_instagram_publishing_live_environment(
+                log_event(
+                    logger,
+                    "video_publish_request_dry_run",
+                    run_id=run_id,
+                    candidate_id=content.candidate_id,
+                    post_id=inserted_post.get("id"),
+                    dry_run=runtime_settings.dry_run,
+                    posting_allowed=runtime_settings.posting_allowed,
+                    meta_api_allowed=runtime_settings.meta_api_allowed,
+                    instagram_enabled=config.instagram.enabled,
+                )
+                publish_result = run_instagram_publishing(
                     config,
                     content_decision,
                     image_pipeline=None,
                     logger=logger,
                     client=client,
+                    runtime_settings=runtime_settings,
                 )
             except Exception as first_exc:
+                if not _is_backup_worthy_video_publish_failure(first_exc):
+                    log_event(
+                        logger,
+                        "video_reel_backup_skipped",
+                        level="warning",
+                        run_id=run_id,
+                        candidate_id=content.candidate_id,
+                        video_asset_id=content.video_asset.id,
+                        storage_path=content.video_asset.storage_path,
+                        reason="config_or_state_failure",
+                        error=str(first_exc),
+                    )
+                    raise
                 insert_error_row(
                     client,
                     run_id=UUID(run_id),
@@ -989,7 +1058,12 @@ def run_production() -> int:
                     storage_path=content.video_asset.storage_path,
                     error=str(first_exc),
                 )
-                backup_content = build_reel_content(repository, excluded_ids={content.video_asset.id}, logger=logger)
+                backup_content = build_reel_content(
+                    repository,
+                    excluded_ids={content.video_asset.id},
+                    dry_run=runtime_settings.dry_run,
+                    logger=logger,
+                )
                 backup_decision = content_decision_from_reel(run_id, backup_content)
                 ensure_selected_post_candidate(
                     client,
@@ -1012,7 +1086,7 @@ def run_production() -> int:
                     video_asset_id=UUID(backup_content.video_asset.id),
                     storage_path=backup_content.video_asset.storage_path,
                     video_url=backup_content.video_asset.public_url,
-                    publish_status="publishing",
+                    publish_status="drafted" if runtime_settings.dry_run else "publishing",
                     metadata={
                         "media_source": "supabase_video_asset",
                         "video_asset_id": backup_content.video_asset.id,
@@ -1025,12 +1099,13 @@ def run_production() -> int:
                     },
                 )
                 backup_decision["post_id"] = backup_post.get("id")
-                publish_result = run_instagram_publishing_live_environment(
+                publish_result = run_instagram_publishing(
                     config,
                     backup_decision,
                     image_pipeline=None,
                     logger=logger,
                     client=client,
+                    runtime_settings=runtime_settings,
                 )
                 content = backup_content
             if publish_result.result.get("status") in {"published", "published_with_permalink_pending"}:
@@ -1045,7 +1120,7 @@ def run_production() -> int:
                     "mode": "production",
                     "post_type": post_type,
                     "scheduled_post_type": scheduled_post_type,
-                    "dry_run": False,
+                    "dry_run": runtime_settings.dry_run,
                     "run_source": run_source,
                     "publish_status": publish_result.result.get("status"),
                     "media_source": "supabase_video_asset",
@@ -1062,7 +1137,9 @@ def run_production() -> int:
                 mode="production",
                 post_type=post_type,
                 scheduled_post_type=scheduled_post_type,
-                dry_run=False,
+                dry_run=runtime_settings.dry_run,
+                posting_allowed=runtime_settings.posting_allowed,
+                meta_api_allowed=runtime_settings.meta_api_allowed,
                 run_source=run_source,
                 success=True,
                 duration_ms=duration_ms,
@@ -1085,7 +1162,7 @@ def run_production() -> int:
             client=client,
             logger=logger,
             run_id=run_id,
-            dry_run=False,
+            dry_run=runtime_settings.dry_run,
             scheduled_post_type=scheduled_post_type,
         )
         content_decision = {
@@ -1118,12 +1195,13 @@ def run_production() -> int:
         print(f"Image pipeline written: {image_result.output_path}")
         print(f"Image pipeline public URL: {image_result.result['public_url']}")
 
-        publish_result = run_instagram_publishing_live_environment(
+        publish_result = run_instagram_publishing(
             config,
             content_decision,
             image_result.result,
             logger=logger,
             client=client,
+            runtime_settings=runtime_settings,
         )
         duration_ms = int((time.perf_counter() - started_at) * 1000)
         complete_run(
@@ -1135,7 +1213,7 @@ def run_production() -> int:
                 "mode": "production",
                 "post_type": post_type,
                 "scheduled_post_type": scheduled_post_type,
-                "dry_run": False,
+                "dry_run": runtime_settings.dry_run,
                 "run_source": run_source,
                 "publish_status": publish_result.result.get("status"),
                 **github_metadata,
@@ -1149,7 +1227,9 @@ def run_production() -> int:
             mode="production",
             post_type=post_type,
             scheduled_post_type=scheduled_post_type,
-            dry_run=False,
+            dry_run=runtime_settings.dry_run,
+            posting_allowed=runtime_settings.posting_allowed,
+            meta_api_allowed=runtime_settings.meta_api_allowed,
             run_source=run_source,
             success=True,
             duration_ms=duration_ms,
@@ -1185,7 +1265,7 @@ def run_production() -> int:
                 "mode": "production",
                 "post_type": post_type,
                 "scheduled_post_type": scheduled_post_type,
-                "dry_run": False,
+                "dry_run": runtime_settings.dry_run,
                 "run_source": run_source,
                 "error": str(exc),
                 **github_metadata,
@@ -1200,7 +1280,9 @@ def run_production() -> int:
             mode="production",
             post_type=post_type,
             scheduled_post_type=scheduled_post_type,
-            dry_run=False,
+            dry_run=runtime_settings.dry_run,
+            posting_allowed=runtime_settings.posting_allowed,
+            meta_api_allowed=runtime_settings.meta_api_allowed,
             run_source=run_source,
             success=False,
             duration_ms=duration_ms,

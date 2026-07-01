@@ -20,6 +20,7 @@ from config import (  # noqa: E402
     get_mode_plan,
     initialize_logging,
     load_configuration,
+    resolve_runtime_publish_settings,
     validate_phase1_environment,
     warn_missing_future_secrets,
 )
@@ -37,6 +38,7 @@ from validation import validate_content_engine_environment, validate_phase3_envi
 from validation import validate_image_pipeline_environment, validate_phase5_environment, validate_prompt_library_environment  # noqa: E402
 from main import (  # noqa: E402
     PRODUCTION_POST_TYPE_MAP,
+    _is_backup_worthy_video_publish_failure,
     _normalize_optional_post_type,
     _normalize_production_post_type,
     build_parser,
@@ -176,6 +178,36 @@ def test_production_mode_is_blocked() -> None:
     assert plan.posting_allowed is True
     assert plan.meta_api_allowed is True
     assert plan.image_generation_allowed is True
+
+
+def test_production_runtime_uses_jalapeno_dry_run_false(monkeypatch: pytest.MonkeyPatch) -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    plan = get_mode_plan("production")
+    monkeypatch.setenv("JALAPENO_DRY_RUN", "false")
+
+    settings = resolve_runtime_publish_settings(config=config, plan=plan)
+
+    assert config.instagram.dry_run is True
+    assert settings.dry_run is False
+    assert settings.posting_allowed is True
+    assert settings.meta_api_allowed is True
+    assert settings.dry_run_source == "JALAPENO_DRY_RUN"
+
+
+def test_non_production_runtime_forces_dry_run() -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+
+    for mode in ("validate", "dry-run", "test"):
+        settings = resolve_runtime_publish_settings(config=config, plan=get_mode_plan(mode), env={"JALAPENO_DRY_RUN": "false"})
+        assert settings.dry_run is True
+        assert settings.posting_allowed is False
+        assert settings.meta_api_allowed is False
+
+
+def test_video_backup_skips_config_state_failures() -> None:
+    assert _is_backup_worthy_video_publish_failure(ConfigError("dry_run enabled")) is False
+    assert _is_backup_worthy_video_publish_failure(ConfigError("missing required secret: token")) is False
+    assert _is_backup_worthy_video_publish_failure(RuntimeError("Instagram Graph API video upload failed")) is True
 
 
 def test_phase1_environment_validation_requires_structural_values(monkeypatch: pytest.MonkeyPatch) -> None:

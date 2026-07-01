@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 from uuid import UUID
 
-from config import JalapenoConfig, ConfigError
+from config import JalapenoConfig, ConfigError, RuntimePublishSettings
 from instagram_publishing.media_container import ApprovedInstagramPost, load_approved_post_from_artifacts as _load_approved_post_from_artifacts
 from instagram_publishing.publisher import (
     DEFAULT_PUBLISH_REPORT_PATH,
@@ -393,8 +393,13 @@ def run_instagram_publishing_live_environment(
     logger=None,
     client: SupabaseClient | None = None,
     report_path: Path = DEFAULT_PUBLISH_REPORT_PATH,
+    runtime_settings: RuntimePublishSettings | None = None,
 ) -> InstagramPublishingResult:
     started_at = time.perf_counter()
+    dry_run = runtime_settings.dry_run if runtime_settings is not None else config.instagram.dry_run
+    posting_allowed = runtime_settings.posting_allowed if runtime_settings is not None else not dry_run
+    meta_api_allowed = runtime_settings.meta_api_allowed if runtime_settings is not None else not dry_run
+    effective_config = replace(config, instagram=replace(config.instagram, dry_run=dry_run))
     log_event(
         logger,
         "publish_pipeline_started",
@@ -402,6 +407,10 @@ def run_instagram_publishing_live_environment(
         candidate_id=str(content_decision.get("winner", {}).get("candidate_id") if isinstance(content_decision.get("winner"), dict) else "unknown"),
         status="started",
         duration_ms=0,
+        dry_run=dry_run,
+        posting_allowed=posting_allowed,
+        meta_api_allowed=meta_api_allowed,
+        instagram_enabled=effective_config.instagram.enabled,
     )
     loaded_post = _load_approved_post_from_artifacts(content_decision, image_pipeline=image_pipeline, logger=logger)
     approved_post = replace(
@@ -425,10 +434,10 @@ def run_instagram_publishing_live_environment(
             client,
             run_context=JalapenoRunContext(
                 run_id=UUID(approved_post.run_id),
-                agent_name=config.agent_name,
+                agent_name=effective_config.agent_name,
                 post_type=approved_post.scheduled_post_type,
-                dry_run=config.instagram.dry_run,
-                environment="production" if not config.instagram.dry_run else "development",
+                dry_run=dry_run,
+                environment="production" if not dry_run else "development",
                 trigger_source="instagram_publish_live",
             ),
             winner_payload={
@@ -480,18 +489,29 @@ def run_instagram_publishing_live_environment(
             )
             post_id = str(inserted.get("id")) if inserted.get("id") else None
 
-    access_token = _read_secret(config.instagram.access_token_secret_name)
-    ig_user_id = _read_secret(config.instagram.ig_user_id_secret_name)
+    access_token = _read_secret(effective_config.instagram.access_token_secret_name)
+    ig_user_id = _read_secret(effective_config.instagram.ig_user_id_secret_name)
+    log_event(
+        logger,
+        "publish_request_dry_run_resolved",
+        run_id=approved_post.run_id,
+        candidate_id=approved_post.candidate_id,
+        post_id=post_id,
+        dry_run=dry_run,
+        posting_allowed=posting_allowed,
+        meta_api_allowed=meta_api_allowed,
+        instagram_enabled=effective_config.instagram.enabled,
+    )
     result = publish_instagram_post(
-        config,
+        effective_config,
         approved_post,
         access_token=access_token,
         ig_user_id=ig_user_id,
         logger=logger,
         client=client,
         simulate=False,
-        dry_run=config.instagram.dry_run,
-        test_mode=config.default_mode == "test",
+        dry_run=dry_run,
+        test_mode=effective_config.default_mode == "test",
         post_id=post_id,
         report_path=report_path,
     )

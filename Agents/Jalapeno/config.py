@@ -161,6 +161,16 @@ class ModePlan:
     description: str
 
 
+@dataclass(frozen=True, slots=True)
+class RuntimePublishSettings:
+    mode: str
+    dry_run: bool
+    posting_allowed: bool
+    meta_api_allowed: bool
+    image_generation_allowed: bool
+    dry_run_source: str
+
+
 class ConfigError(ValueError):
     pass
 
@@ -204,6 +214,15 @@ def _require_bool(data: dict[str, Any], key: str) -> bool:
     if not isinstance(value, bool):
         raise ConfigError(f"Missing or invalid config value: {key}")
     return value
+
+
+def _parse_env_bool(value: str, *, name: str) -> bool:
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "y", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "n", "off"}:
+        return False
+    raise ConfigError(f"{name} must be a boolean value")
 
 
 def _optional_string(data: dict[str, Any], key: str, default: str = "") -> str:
@@ -587,6 +606,37 @@ def get_mode_plan(mode: str) -> ModePlan:
     if normalized not in plans:
         raise ConfigError(f"Unknown mode: {mode}")
     return plans[normalized]
+
+
+def resolve_runtime_publish_settings(
+    *,
+    config: JalapenoConfig,
+    plan: ModePlan,
+    env: dict[str, str] | None = None,
+) -> RuntimePublishSettings:
+    env_values = env if env is not None else os.environ
+    raw_dry_run = env_values.get("JALAPENO_DRY_RUN", "").strip()
+    if plan.name in {"validate", "dry-run", "test"}:
+        dry_run = True
+        dry_run_source = "mode"
+    elif raw_dry_run:
+        dry_run = _parse_env_bool(raw_dry_run, name="JALAPENO_DRY_RUN")
+        dry_run_source = "JALAPENO_DRY_RUN"
+    elif plan.name == "production":
+        dry_run = False
+        dry_run_source = "production_default"
+    else:
+        dry_run = bool(config.instagram.dry_run)
+        dry_run_source = "config.instagram.dry_run"
+
+    return RuntimePublishSettings(
+        mode=plan.name,
+        dry_run=dry_run,
+        posting_allowed=plan.posting_allowed and not dry_run,
+        meta_api_allowed=plan.meta_api_allowed and not dry_run,
+        image_generation_allowed=plan.image_generation_allowed and not dry_run,
+        dry_run_source=dry_run_source,
+    )
 
 
 def log_startup_state(logger: logging.Logger, config: JalapenoConfig, mode: str, env_loaded: bool) -> None:

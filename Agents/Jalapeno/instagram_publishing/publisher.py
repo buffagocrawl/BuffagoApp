@@ -95,6 +95,11 @@ def precheck_approved_post(
         post_id=post.post_id,
         status="started",
         dry_run=dry_run,
+        config_dry_run=config.instagram.dry_run,
+        posting_allowed=not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode,
+        meta_api_allowed=not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode,
+        instagram_enabled=config.instagram.enabled,
+        test_mode=test_mode,
         quality_score=post.quality_score,
         minimum_quality_score=_quality_threshold(config),
         image_source=post.image_source,
@@ -148,6 +153,11 @@ def precheck_approved_post(
             post_id=post.post_id,
             status="passed",
             duration_ms=duration_ms,
+            dry_run=dry_run,
+            config_dry_run=config.instagram.dry_run,
+            posting_allowed=True,
+            meta_api_allowed=True,
+            instagram_enabled=config.instagram.enabled,
             quality_score=post.quality_score,
             minimum_quality_score=_quality_threshold(config),
             image_source=post.image_source,
@@ -169,6 +179,11 @@ def precheck_approved_post(
             status="failed",
             duration_ms=duration_ms,
             error=reason,
+            dry_run=dry_run,
+            config_dry_run=config.instagram.dry_run,
+            posting_allowed=False,
+            meta_api_allowed=False,
+            instagram_enabled=config.instagram.enabled,
             quality_score=post.quality_score,
             minimum_quality_score=_quality_threshold(config),
             image_source=post.image_source,
@@ -338,6 +353,20 @@ def publish_instagram_post(
         request_payload_safe=post.request_payload_safe,
         response_payload=post.response_payload,
     )
+    log_event(
+        logger,
+        "publish_pipeline_dry_run_resolved",
+        run_id=post.run_id,
+        candidate_id=post.candidate_id,
+        post_id=post_id,
+        dry_run=dry_run,
+        config_dry_run=config.instagram.dry_run,
+        posting_allowed=not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode,
+        meta_api_allowed=not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode,
+        instagram_enabled=config.instagram.enabled,
+        test_mode=test_mode,
+        simulate=simulate,
+    )
     precheck = precheck_approved_post(config, post, dry_run=dry_run, test_mode=test_mode, logger=logger)
     if not precheck.passed:
         state.status = "precheck_failed"
@@ -427,6 +456,8 @@ def publish_instagram_post(
             published_media_id=state.published_media_id,
             status="started",
             duration_ms=0,
+            dry_run=dry_run,
+            meta_api_allowed=not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode,
         )
 
         if state.published_media_id:
@@ -458,6 +489,8 @@ def publish_instagram_post(
                 post_id=post_id,
                 status="started",
                 duration_ms=0,
+                dry_run=dry_run,
+                meta_api_allowed=not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode,
             )
             log_event(
                 logger,
@@ -471,6 +504,8 @@ def publish_instagram_post(
                 storage_path=post.storage_path,
                 video_url=post.public_video_url,
                 status="ready",
+                dry_run=dry_run,
+                meta_api_allowed=not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode,
             )
             try:
                 container_response: InstagramContainerResponse = graph_client.create_media_container(
@@ -567,6 +602,8 @@ def publish_instagram_post(
             published_media_id=state.published_media_id,
             status="started",
             duration_ms=0,
+            dry_run=dry_run,
+            meta_api_allowed=not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode,
         )
         try:
             publish_response: InstagramPublishResponse = graph_client.publish_media(state.container_id)

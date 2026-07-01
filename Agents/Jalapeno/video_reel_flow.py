@@ -76,7 +76,13 @@ def generate_reel_caption(asset: VideoAsset, *, now: datetime | None = None) -> 
     return f"{caption}\n\n{' '.join(tags)}", tags, caption_type
 
 
-def build_reel_content(repository: VideoAssetRepository, *, excluded_ids: set[str] | None = None, logger=None) -> VideoReelContent:
+def build_reel_content(
+    repository: VideoAssetRepository,
+    *,
+    excluded_ids: set[str] | None = None,
+    dry_run: bool,
+    logger=None,
+) -> VideoReelContent:
     asset = repository.select_asset(excluded_ids=excluded_ids)
     caption, hashtags, caption_type = generate_reel_caption(asset)
     candidate_id = str(uuid4())
@@ -88,6 +94,7 @@ def build_reel_content(repository: VideoAssetRepository, *, excluded_ids: set[st
         storage_path=asset.storage_path,
         caption_type=caption_type,
         caption_preview=caption[:140],
+        dry_run=dry_run,
     )
     return VideoReelContent(
         candidate_id=candidate_id,
