@@ -268,6 +268,11 @@ def ensure_selected_post_candidate(
                 "decision_summary": decision_summary or {},
                 "persisted_from": "selected_candidate_guard",
             },
+            scores={
+                key: winner_payload.get(key)
+                for key in ("quality_score", "overall_score", "duplicate_score")
+                if isinstance(winner_payload.get(key), (int, float))
+            },
             selected=True,
         )
         mark_selected_candidate(client, run_id=run_context.run_id, candidate_id=candidate_id)
@@ -661,6 +666,7 @@ def insert_image_asset(
     image_prompt: str,
     prompt_quality: int,
     validation_reason: str,
+    quality_score: int | None = None,
     prompt_version: str | None = None,
     generation_time_ms: int | None = None,
     image_model: str | None = None,
@@ -690,6 +696,7 @@ def insert_image_asset(
         "image_source": image_source,
         "image_prompt": image_prompt,
         "prompt_quality": prompt_quality,
+        "quality_score": quality_score,
         "validation_reason": validation_reason,
         "prompt_version": prompt_version,
         "generation_time_ms": generation_time_ms,
@@ -721,6 +728,7 @@ def link_image_asset_to_decision(
     image_prompt: str | None = None,
     image_source: str | None = None,
     prompt_quality: int | None = None,
+    quality_score: int | None = None,
     validation_reason: str | None = None,
 ) -> dict[str, Any]:
     rows = client.fetch_rows(
@@ -743,6 +751,7 @@ def link_image_asset_to_decision(
         "image_prompt": image_prompt,
         "image_source": image_source,
         "prompt_quality": prompt_quality,
+        "quality_score": quality_score,
         "validation_reason": validation_reason,
     }
     update_payload = {

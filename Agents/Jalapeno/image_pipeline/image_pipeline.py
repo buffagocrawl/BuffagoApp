@@ -50,6 +50,7 @@ class ImagePipelineResult:
     validation_status: str
     image_validation_status: str
     image_validation_reason: str
+    quality_score: int
     prompt_quality: int
     width: int
     height: int
@@ -620,6 +621,7 @@ def _run_image_pipeline_impl(
             image_source=generated.image_source,
             image_prompt=image_prompt,
             prompt_quality=validation.prompt_quality,
+            quality_score=validation.prompt_quality,
             validation_reason=validation.validation_reason,
             prompt_version=generated.prompt_version,
             generation_time_ms=generated.generation_time_ms,
@@ -650,6 +652,7 @@ def _run_image_pipeline_impl(
             image_prompt=image_prompt,
             image_source=generated.image_source,
             prompt_quality=validation.prompt_quality,
+            quality_score=validation.prompt_quality,
             validation_reason=validation.validation_reason,
         )
         log_event(
@@ -720,6 +723,7 @@ def _run_image_pipeline_impl(
         validation_status=validation.status,
         image_validation_status=validation.status,
         image_validation_reason=validation.validation_reason,
+        quality_score=validation.prompt_quality,
         prompt_quality=validation.prompt_quality,
         width=feed_image.width,
         height=feed_image.height,
@@ -761,6 +765,7 @@ def _run_image_pipeline_impl(
         image_source=result.image_source,
         image_validation_status=result.image_validation_status,
         image_validation_reason=result.image_validation_reason,
+        quality_score=result.quality_score,
         prompt_quality=result.prompt_quality,
         duration_ms=int((time.perf_counter() - started_at) * 1000),
     )

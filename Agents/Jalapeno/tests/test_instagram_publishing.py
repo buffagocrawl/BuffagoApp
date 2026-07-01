@@ -14,7 +14,7 @@ if str(PROJECT_DIR) not in sys.path:
 
 import instagram_publishing.instagram_publishing as publishing_module  # noqa: E402
 from config import load_configuration, initialize_logging  # noqa: E402
-from instagram_publishing.media_container import ApprovedInstagramPost  # noqa: E402
+from instagram_publishing.media_container import ApprovedInstagramPost, load_approved_post_from_artifacts, serialize_container_record  # noqa: E402
 from instagram_publishing.publisher import precheck_approved_post, publish_instagram_post  # noqa: E402
 from validation import validate_instagram_publishing_environment  # noqa: E402
 
@@ -242,6 +242,9 @@ def test_live_publish_persists_missing_candidate_before_final_post_insert(
     image_pipeline = {
         "result": {
             "public_url": "https://example.com/public-image.jpg",
+            "image_source": "real_ai",
+            "image_validation_status": "passed",
+            "prompt_quality": 90,
         }
     }
 
@@ -298,6 +301,9 @@ def test_live_publish_auto_approves_when_content_decision_is_not_manually_approv
     image_pipeline = {
         "result": {
             "public_url": "https://example.com/meme-image.jpg",
+            "image_source": "real_ai",
+            "image_validation_status": "passed",
+            "prompt_quality": 90,
         }
     }
     seen: dict[str, object] = {}
@@ -377,3 +383,79 @@ def test_successful_publish_marks_approval_status_published(tmp_path: Path) -> N
     assert client.post_rows[0]["metadata"]["approval_status"] == "published"
     assert client.post_rows[0]["metadata"]["approval_required"] is False
     assert client.instagram_post_rows["11111111-1111-1111-1111-111111111111"]["metadata"]["approval_status"] == "published"
+
+
+def test_publish_precheck_receives_image_validation_quality_score_when_winner_score_missing(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    config = replace(
+        config,
+        instagram=replace(config.instagram, enabled=True, dry_run=False),
+        publishing=replace(config.publishing, publish_max_retries=1, retry_backoff_seconds=0),
+    )
+    stream = StringIO()
+    logger = initialize_logging(replace(config, log_directory=tmp_path / "logs"), stream=stream)
+    client = _PublishFlowSupabaseClient()
+    quality_score = 92
+    content_decision = {
+        "run_id": "11111111-1111-1111-1111-111111111111",
+        "scheduled_post_type": "buffago_post",
+        "winner": {
+            "candidate_id": "22222222-2222-2222-2222-222222222222",
+            "content_type": "restaurant_spotlight",
+            "caption": "Buffago test caption",
+            "hashtags": ["buffago", "wingnight"],
+            "image_prompt": "A hero plate of wings",
+            "approved": True,
+        },
+        "decision_summary": {"approved": True},
+    }
+    image_pipeline = {
+        "result": {
+            "public_url": "https://example.com/public-image.jpg",
+            "image_source": "real_ai",
+            "image_validation_status": "passed",
+            "image_validation_reason": "passed",
+        },
+        "validation": {
+            "status": "passed",
+            "prompt_quality": quality_score,
+        },
+    }
+
+    post = load_approved_post_from_artifacts(content_decision, image_pipeline=image_pipeline, logger=logger)
+    persisted_record = serialize_container_record(post)
+    precheck_seen: dict[str, int] = {}
+
+    def _recording_precheck(config_arg, post_arg, **kwargs):
+        precheck_seen["quality_score"] = post_arg.quality_score
+        return precheck_approved_post(config_arg, post_arg, **kwargs)
+
+    monkeypatch.setattr("instagram_publishing.publisher.precheck_approved_post", _recording_precheck)
+
+    result = publish_instagram_post(
+        config,
+        post,
+        access_token="test-access-token",
+        ig_user_id="test-ig-user-id",
+        client=client,
+        simulate=True,
+        dry_run=False,
+        test_mode=False,
+        post_id="33333333-3333-3333-3333-333333333333",
+        report_path=tmp_path / "report.json",
+    )
+
+    assert post.quality_score == quality_score
+    assert persisted_record["quality_score"] == quality_score
+    assert precheck_seen["quality_score"] == quality_score
+    assert result["status"] in {"published", "published_with_permalink_pending"}
+    assert result["report"]["quality_score"] == quality_score
+    persisted_publish = client.instagram_post_rows["11111111-1111-1111-1111-111111111111"]
+    assert persisted_publish["quality_score"] == quality_score
+    assert persisted_publish["prompt_quality"] == quality_score
+    log_output = stream.getvalue()
+    assert "quality_score missing from publish state" in log_output
+    assert f"quality_score={quality_score}" in log_output

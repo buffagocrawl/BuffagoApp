@@ -150,10 +150,11 @@ def _read_secret(secret_name: str) -> str:
 def load_approved_post_from_artifacts(
     content_decision_path: Path = DEFAULT_CONTENT_DECISION_PATH,
     image_pipeline_path: Path = DEFAULT_IMAGE_PIPELINE_PATH,
+    logger=None,
 ) -> ApprovedInstagramPost:
     content_decision = _read_json(content_decision_path)
     image_pipeline = _read_json(image_pipeline_path) if image_pipeline_path.exists() else None
-    return _load_approved_post_from_artifacts(content_decision, image_pipeline=image_pipeline)
+    return _load_approved_post_from_artifacts(content_decision, image_pipeline=image_pipeline, logger=logger)
 
 
 def _build_validation_config(config: JalapenoConfig) -> JalapenoConfig:
@@ -397,7 +398,7 @@ def run_instagram_publishing_live_environment(
         status="started",
         duration_ms=0,
     )
-    loaded_post = _load_approved_post_from_artifacts(content_decision, image_pipeline=image_pipeline)
+    loaded_post = _load_approved_post_from_artifacts(content_decision, image_pipeline=image_pipeline, logger=logger)
     approved_post = replace(
         loaded_post,
         approved=True,

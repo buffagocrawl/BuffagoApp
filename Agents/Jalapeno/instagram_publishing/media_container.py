@@ -6,6 +6,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from logging_utils import log_event
+
 
 def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
@@ -25,6 +27,66 @@ def _list_of_strings(value: Any) -> list[str]:
         if isinstance(item, str) and item.strip():
             items.append(item.strip())
     return items
+
+
+def _number_or_none(value: Any) -> float | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)):
+        return float(value)
+    return None
+
+
+def _resolve_prompt_quality(image_result: dict[str, Any]) -> int:
+    prompt_quality_value = _number_or_none(image_result.get("prompt_quality"))
+    if prompt_quality_value is None and isinstance(image_result.get("validation"), dict):
+        prompt_quality_value = _number_or_none(image_result["validation"].get("prompt_quality"))
+    if prompt_quality_value is None:
+        quality_score_value = _number_or_none(image_result.get("quality_score"))
+        if quality_score_value is not None:
+            prompt_quality_value = quality_score_value
+    if prompt_quality_value is None:
+        raise ValueError("Approved post is missing prompt_quality")
+    return int(round(prompt_quality_value))
+
+
+def _resolve_quality_score(
+    winner: dict[str, Any],
+    image_result: dict[str, Any],
+    *,
+    logger=None,
+) -> int:
+    for key in ("quality_score", "overall_score", "final_score", "score"):
+        value = _number_or_none(winner.get(key))
+        if value is not None:
+            return int(round(value))
+
+    image_score = _number_or_none(image_result.get("quality_score"))
+    if image_score is not None:
+        return int(round(image_score))
+
+    validation_payload = image_result.get("validation") if isinstance(image_result.get("validation"), dict) else {}
+    validation_score = _number_or_none(validation_payload.get("quality_score"))
+    if validation_score is None:
+        validation_score = _number_or_none(validation_payload.get("prompt_quality"))
+    if validation_score is None:
+        validation_score = _number_or_none(image_result.get("prompt_quality"))
+
+    source_object = {
+        "winner": winner,
+        "image_result": image_result,
+    }
+    log_event(
+        logger,
+        "quality_score missing from publish state",
+        level="warning",
+        quality_score=int(round(validation_score)) if validation_score is not None else None,
+        source_object=source_object,
+    )
+    if validation_score is not None:
+        return int(round(validation_score))
+
+    raise ValueError("Approved post is missing quality_score")
 
 
 @dataclass(frozen=True, slots=True)
@@ -75,11 +137,14 @@ def load_approved_post_from_artifacts(
     content_decision: dict[str, Any],
     *,
     image_pipeline: dict[str, Any] | None = None,
+    logger=None,
 ) -> ApprovedInstagramPost:
     winner = _post_dict(content_decision)
     decision_summary = content_decision.get("decision_summary") if isinstance(content_decision.get("decision_summary"), dict) else {}
     image_payload = image_pipeline or {}
     image_result = image_payload.get("result") if isinstance(image_payload.get("result"), dict) else image_payload
+    if image_result is not image_payload and isinstance(image_payload.get("validation"), dict) and "validation" not in image_result:
+        image_result = {**image_result, "validation": image_payload["validation"]}
 
     run_id = _string_or_none(content_decision.get("run_id")) or _string_or_none(winner.get("run_id")) or _string_or_none(decision_summary.get("run_id"))
     candidate_id = _string_or_none(winner.get("candidate_id")) or _string_or_none(winner.get("id")) or _string_or_none(decision_summary.get("winner_candidate_id"))
@@ -92,12 +157,8 @@ def load_approved_post_from_artifacts(
     image_source = _string_or_none(image_result.get("image_source")) or "unknown"
     image_validation_status = _string_or_none(image_result.get("image_validation_status")) or _string_or_none(image_result.get("validation_status")) or "unknown"
     image_validation_reason = _string_or_none(image_result.get("image_validation_reason"))
-    prompt_quality_value = image_result.get("prompt_quality")
-    prompt_quality = int(prompt_quality_value) if isinstance(prompt_quality_value, (int, float)) else 0
-    quality_score_value = winner.get("quality_score")
-    if not isinstance(quality_score_value, (int, float)):
-        quality_score_value = winner.get("overall_score") if isinstance(winner.get("overall_score"), (int, float)) else winner.get("score")
-    quality_score = int(round(float(quality_score_value or 0)))
+    prompt_quality = _resolve_prompt_quality(image_result)
+    quality_score = _resolve_quality_score(winner, image_result, logger=logger)
     approved_value = winner.get("approved")
     if approved_value is None:
         approved_value = decision_summary.get("approved")
