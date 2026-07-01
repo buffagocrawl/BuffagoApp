@@ -531,6 +531,10 @@ def insert_image_asset(
     branding_applied: bool,
     meme_format_applied: bool,
     validation_status: str,
+    image_source: str,
+    image_prompt: str,
+    prompt_quality: int,
+    validation_reason: str,
     uploaded_at: str | None = None,
     cleanup_status: str = "pending",
 ) -> dict[str, Any]:
@@ -552,6 +556,10 @@ def insert_image_asset(
         "branding_applied": branding_applied,
         "meme_format_applied": meme_format_applied,
         "validation_status": validation_status,
+        "image_source": image_source,
+        "image_prompt": image_prompt,
+        "prompt_quality": prompt_quality,
+        "validation_reason": validation_reason,
         "uploaded_at": uploaded_at,
         "cleanup_status": cleanup_status,
     }
@@ -568,6 +576,10 @@ def link_image_asset_to_decision(
     image_public_url: str | None = None,
     image_storage_path: str | None = None,
     image_uploaded_at: str | None = None,
+    image_prompt: str | None = None,
+    image_source: str | None = None,
+    prompt_quality: int | None = None,
+    validation_reason: str | None = None,
 ) -> dict[str, Any]:
     rows = client.fetch_rows(
         "jalapeno_content_decisions",
@@ -586,6 +598,10 @@ def link_image_asset_to_decision(
         "public_url": image_public_url,
         "storage_path": image_storage_path,
         "uploaded_at": image_uploaded_at,
+        "image_prompt": image_prompt,
+        "image_source": image_source,
+        "prompt_quality": prompt_quality,
+        "validation_reason": validation_reason,
     }
     update_payload = {
         "decision_summary": decision_summary,

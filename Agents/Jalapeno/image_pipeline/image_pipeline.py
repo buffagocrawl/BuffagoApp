@@ -18,7 +18,7 @@ from image_pipeline.image_formatter import (
     format_for_instagram,
     save_formatted_image,
 )
-from image_pipeline.image_generator import GeneratedImage, generate_image
+from image_pipeline.image_generator import GeneratedImage, OpenAIImageGenerationClient, generate_image
 from image_pipeline.image_storage import ImageStorageError, ImageUploadResult, SupabaseImageStorage
 from image_pipeline.image_validator import ImageValidationResult, validate_image_file
 from image_pipeline.meme_formatter import MemeFormatResult, format_meme_image
@@ -40,12 +40,17 @@ class ImagePipelineResult:
     content_type: str
     image_type: str
     image_prompt: str
+    image_prompt_preview: str
     model: str
+    image_source: str
     prompt_version: str
     local_temp_path: str
     formatted_feed_path: str
     square_fallback_path: str
     validation_status: str
+    image_validation_status: str
+    image_validation_reason: str
+    prompt_quality: int
     width: int
     height: int
     aspect_ratio: float
@@ -62,9 +67,11 @@ class ImagePipelineResult:
     cost_estimate_usd: float | None
     stage_durations_ms: dict[str, int] = field(default_factory=dict)
     validation_issues: list[str] = field(default_factory=list)
+    content_validation_issues: list[str] = field(default_factory=list)
     branding_reason: str | None = None
     meme_top_text: str | None = None
     meme_bottom_text: str | None = None
+    image_source_details: dict[str, Any] | None = None
 
 
 def _utcnow() -> datetime:
@@ -139,6 +146,13 @@ def _save_image_file(image, path: Path, *, quality: int) -> None:
     save_formatted_image(image, path, quality=quality)
 
 
+def _truncate_prompt(prompt: str, *, limit: int = 240) -> str:
+    cleaned = " ".join(prompt.split()).strip()
+    if len(cleaned) <= limit:
+        return cleaned
+    return f"{cleaned[: limit - 3].rstrip()}..."
+
+
 def _format_meme_text(winner: dict[str, Any]) -> tuple[str, str]:
     top_text = _resolve_text(winner, "working_title", fallback="BUFFAGO WING ENERGY")
     bottom_text = _resolve_text(winner, "suggested_cta", fallback=_resolve_text(winner, "short_summary", fallback=""))
@@ -201,6 +215,8 @@ def _run_image_pipeline_impl(
     temp_dir = Path(config.image.temp_dir)
     temp_dir.mkdir(parents=True, exist_ok=True)
     image_library_prompt = load_prompt_text("image_generation")
+    if generation_client is None and not dry_run:
+        generation_client = OpenAIImageGenerationClient.from_env(logger=logger)
     feed_preset = FormatPreset(
         name="instagram_feed",
         width=config.image.default_width,
@@ -246,6 +262,7 @@ def _run_image_pipeline_impl(
         image_type=image_type,
         model=image_model,
         prompt_version=PROMPT_LIBRARY_VERSION,
+        image_prompt_preview=_truncate_prompt(image_prompt),
     )
     try:
         generated = generate_image(
@@ -253,9 +270,10 @@ def _run_image_pipeline_impl(
             content_type=content_type,
             image_type=image_type,
             model=image_model,
-            size=(1536, 1920 if image_type != "meme" else 1536),
+            size=(1024, 1536) if image_type != "meme" else (1024, 1024),
             generation_client=generation_client,
             cost_estimate_usd=0.0,
+            allow_placeholder_fallback=dry_run,
         )
     except Exception as exc:
         log_event(
@@ -270,6 +288,7 @@ def _run_image_pipeline_impl(
             prompt_version=PROMPT_LIBRARY_VERSION,
             generation_time_ms=int((time.perf_counter() - generation_started) * 1000),
             cost_estimate=0.0,
+            image_prompt_preview=_truncate_prompt(image_prompt),
             error=str(exc),
         )
         raise
@@ -288,9 +307,11 @@ def _run_image_pipeline_impl(
         image_type=image_type,
         file_path=local_temp_path,
         model=generated.model,
+        image_source=generated.image_source,
         prompt_version=generated.prompt_version,
         generation_time_ms=generation_duration_ms,
         cost_estimate=generated.cost_estimate_usd,
+        image_prompt_preview=_truncate_prompt(image_prompt),
     )
     log_event(
         logger,
@@ -303,7 +324,12 @@ def _run_image_pipeline_impl(
     )
 
     validation_started = time.perf_counter()
-    validation = validate_image_file(local_temp_path)
+    validation = validate_image_file(
+        local_temp_path,
+        image_source=generated.image_source,
+        prompt=image_prompt,
+        allow_non_ai_source=dry_run,
+    )
     validation_duration_ms = int((time.perf_counter() - validation_started) * 1000)
     log_event(
         logger,
@@ -313,7 +339,11 @@ def _run_image_pipeline_impl(
         content_type=content_type,
         image_type=image_type,
         file_path=local_temp_path,
-        validation_status="passed" if validation.valid else "failed",
+        validation_status=validation.status,
+        image_validation_status=validation.status,
+        image_validation_reason=validation.validation_reason,
+        image_source=generated.image_source,
+        prompt_quality=validation.prompt_quality,
         width=validation.width,
         height=validation.height,
         aspect_ratio=validation.aspect_ratio,
@@ -321,6 +351,7 @@ def _run_image_pipeline_impl(
         file_size_bytes=validation.file_size_bytes,
         duration_ms=validation_duration_ms,
         issues=validation.issues,
+        content_issues=validation.content_issues,
     )
     if not validation.valid:
         raise ValueError("; ".join(validation.issues))
@@ -355,6 +386,7 @@ def _run_image_pipeline_impl(
             file_path=local_temp_path,
             top_text=meme_top,
             bottom_text=meme_bottom,
+            image_source=generated.image_source,
         )
     else:
         feed_image = format_for_instagram(original_image, preset=feed_preset, image_type=image_type)
@@ -432,6 +464,7 @@ def _run_image_pipeline_impl(
             public_url=public_url,
             storage_bucket=upload_result.bucket,
             storage_path=upload_result.storage_path,
+            image_source=generated.image_source,
             duration_ms=int((time.perf_counter() - upload_started) * 1000),
         )
     elif upload_enabled and not dry_run and client is None:
@@ -457,7 +490,11 @@ def _run_image_pipeline_impl(
             format=feed_path.suffix.lstrip(".").upper(),
             branding_applied=branding_result.applied,
             meme_format_applied=meme_format_applied,
-            validation_status="passed",
+            validation_status=validation.status,
+            image_source=generated.image_source,
+            image_prompt=image_prompt,
+            prompt_quality=validation.prompt_quality,
+            validation_reason=validation.validation_reason,
             uploaded_at=upload_result.uploaded_at if upload_result else None,
             cleanup_status="pending",
         )
@@ -469,6 +506,10 @@ def _run_image_pipeline_impl(
             image_public_url=upload_result.public_url if upload_result else public_url,
             image_storage_path=upload_result.storage_path if upload_result else storage_path,
             image_uploaded_at=upload_result.uploaded_at if upload_result else None,
+            image_prompt=image_prompt,
+            image_source=generated.image_source,
+            prompt_quality=validation.prompt_quality,
+            validation_reason=validation.validation_reason,
         )
         log_event(
             logger,
@@ -528,12 +569,17 @@ def _run_image_pipeline_impl(
         content_type=content_type,
         image_type=image_type,
         image_prompt=image_prompt,
+        image_prompt_preview=_truncate_prompt(image_prompt),
         model=generated.model,
+        image_source=generated.image_source,
         prompt_version=generated.prompt_version,
         local_temp_path=str(local_temp_path),
         formatted_feed_path=str(feed_path),
         square_fallback_path=str(square_path),
-        validation_status="passed",
+        validation_status=validation.status,
+        image_validation_status=validation.status,
+        image_validation_reason=validation.validation_reason,
+        prompt_quality=validation.prompt_quality,
         width=feed_image.width,
         height=feed_image.height,
         aspect_ratio=round(feed_image.width / feed_image.height, 4),
@@ -554,9 +600,11 @@ def _run_image_pipeline_impl(
             "formatting": formatting_duration_ms,
         },
         validation_issues=list(validation.issues),
+        content_validation_issues=list(validation.content_issues),
         branding_reason=branding_result.reason,
         meme_top_text=meme_top_text,
         meme_bottom_text=meme_bottom_text,
+        image_source_details=generated.source_details,
     )
 
     _write_summary(output_path, result=result, validation=validation, upload=upload_result, cleanup=cleanup_result)
@@ -569,6 +617,10 @@ def _run_image_pipeline_impl(
         image_type=image_type,
         file_path=feed_path,
         public_url=result.public_url,
+        image_source=result.image_source,
+        image_validation_status=result.image_validation_status,
+        image_validation_reason=result.image_validation_reason,
+        prompt_quality=result.prompt_quality,
         duration_ms=int((time.perf_counter() - started_at) * 1000),
     )
     return result

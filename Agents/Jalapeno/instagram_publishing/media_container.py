@@ -38,6 +38,10 @@ class ApprovedInstagramPost:
     public_image_url: str
     content_type: str
     quality_score: int
+    image_source: str
+    image_validation_status: str
+    image_validation_reason: str | None
+    prompt_quality: int
     approved: bool
     scheduled_post_type: str | None = None
     user_tags: list[dict[str, Any]] = field(default_factory=list)
@@ -85,6 +89,11 @@ def load_approved_post_from_artifacts(
     image_prompt = _string_or_none(winner.get("image_prompt")) or _string_or_none(winner.get("suggested_image_concept"))
     public_image_url = _string_or_none(winner.get("public_image_url")) or _string_or_none(winner.get("image_url")) or _string_or_none(image_result.get("public_url"))
     content_type = _string_or_none(winner.get("content_type")) or _string_or_none(winner.get("post_type")) or "instagram"
+    image_source = _string_or_none(image_result.get("image_source")) or "unknown"
+    image_validation_status = _string_or_none(image_result.get("image_validation_status")) or _string_or_none(image_result.get("validation_status")) or "unknown"
+    image_validation_reason = _string_or_none(image_result.get("image_validation_reason"))
+    prompt_quality_value = image_result.get("prompt_quality")
+    prompt_quality = int(prompt_quality_value) if isinstance(prompt_quality_value, (int, float)) else 0
     quality_score_value = winner.get("quality_score")
     if not isinstance(quality_score_value, (int, float)):
         quality_score_value = winner.get("overall_score") if isinstance(winner.get("overall_score"), (int, float)) else winner.get("score")
@@ -115,6 +124,10 @@ def load_approved_post_from_artifacts(
         public_image_url=public_image_url,
         content_type=content_type,
         quality_score=quality_score,
+        image_source=image_source,
+        image_validation_status=image_validation_status,
+        image_validation_reason=image_validation_reason,
+        prompt_quality=prompt_quality,
         approved=approved,
         scheduled_post_type=_string_or_none(content_decision.get("scheduled_post_type")) or _string_or_none(winner.get("scheduled_post_type")),
         user_tags=winner.get("user_tags") if isinstance(winner.get("user_tags"), list) else [],
@@ -177,6 +190,10 @@ def serialize_container_record(record: ApprovedInstagramPost) -> dict[str, Any]:
         "public_image_url": record.public_image_url,
         "content_type": record.content_type,
         "quality_score": record.quality_score,
+        "image_source": record.image_source,
+        "image_validation_status": record.image_validation_status,
+        "image_validation_reason": record.image_validation_reason,
+        "prompt_quality": record.prompt_quality,
         "approved": record.approved,
         "scheduled_post_type": record.scheduled_post_type,
         "user_tags": record.user_tags,

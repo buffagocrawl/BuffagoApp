@@ -1,13 +1,17 @@
 from __future__ import annotations
 
+import base64
 import math
+import os
 import re
 import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
 
-from prompt_library_loader import PROMPT_LIBRARY_VERSION, load_prompt_text
+import requests
+
+from prompt_library_loader import PROMPT_LIBRARY_VERSION
 
 
 class ImageGenerationClient(Protocol):
@@ -20,11 +24,64 @@ class GeneratedImage:
     image: Any
     image_prompt: str
     model: str
+    image_source: str
     prompt_version: str
     content_type: str
     image_type: str
     generation_time_ms: int
     cost_estimate_usd: float | None
+    source_details: dict[str, Any] | None = None
+
+
+class OpenAIImageGenerationClient:
+    def __init__(
+        self,
+        *,
+        api_key: str,
+        logger=None,
+        session: requests.Session | None = None,
+        timeout_seconds: int = 120,
+    ) -> None:
+        self.api_key = api_key
+        self.logger = logger
+        self._session = session or requests.Session()
+        self.timeout_seconds = timeout_seconds
+
+    @classmethod
+    def from_env(cls, *, logger=None) -> OpenAIImageGenerationClient | None:
+        api_key = (os.getenv("OPENAI_API_KEY") or "").strip()
+        if not api_key:
+            return None
+        return cls(api_key=api_key, logger=logger)
+
+    def generate_image(self, *, prompt: str, model: str, size: tuple[int, int], content_type: str, image_type: str) -> dict[str, Any]:
+        response = self._session.post(
+            "https://api.openai.com/v1/images/generations",
+            headers={
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": model,
+                "prompt": prompt,
+                "size": f"{size[0]}x{size[1]}",
+            },
+            timeout=self.timeout_seconds,
+        )
+        response.raise_for_status()
+        payload = response.json()
+        data = payload.get("data")
+        if not isinstance(data, list) or not data:
+            raise ValueError("OpenAI image generation returned no image data")
+        first = data[0] if isinstance(data[0], dict) else {}
+        image_base64 = first.get("b64_json")
+        if not isinstance(image_base64, str) or not image_base64.strip():
+            raise ValueError("OpenAI image generation response missing b64_json")
+        return {
+            "bytes": base64.b64decode(image_base64),
+            "revised_prompt": first.get("revised_prompt") if isinstance(first.get("revised_prompt"), str) else None,
+            "response_id": payload.get("id") if isinstance(payload.get("id"), str) else None,
+        }
 
 
 def _load_font(size: int, *, bold: bool = False) -> ImageFont.ImageFont:
@@ -117,28 +174,6 @@ def _draw_scene(draw: ImageDraw.ImageDraw, size: tuple[int, int], *, content_typ
         draw.rounded_rectangle((width * 0.1, height * 0.68, width * 0.9, height * 0.88), radius=24, fill=(255, 255, 255, 60), outline=accent, width=4)
 
 
-def _draw_text_panel(image: Image.Image, *, headline: str, subhead: str, image_type: str, content_type: str) -> None:
-    from PIL import Image, ImageDraw, ImageFilter
-
-    draw = ImageDraw.Draw(image)
-    width, height = image.size
-    panel_height = int(height * 0.23)
-    panel_top = height - panel_height - int(height * 0.06)
-    panel = Image.new("RGBA", image.size, (0, 0, 0, 0))
-    panel_draw = ImageDraw.Draw(panel)
-    panel_draw.rounded_rectangle((int(width * 0.06), panel_top, int(width * 0.94), height - int(height * 0.04)), radius=32, fill=(10, 10, 14, 150))
-    blurred = panel.filter(ImageFilter.GaussianBlur(0.5))
-    image.alpha_composite(blurred)
-
-    headline_font = _load_font(max(34, int(height * 0.043)), bold=True)
-    subhead_font = _load_font(max(24, int(height * 0.024)), bold=False)
-    accent_font = _load_font(max(20, int(height * 0.02)), bold=True)
-
-    draw.text((int(width * 0.1), panel_top + 24), headline, fill=(255, 255, 255), font=headline_font, stroke_width=3, stroke_fill=(0, 0, 0))
-    draw.text((int(width * 0.1), panel_top + 24 + int(height * 0.072)), subhead, fill=(245, 238, 231), font=subhead_font, stroke_width=2, stroke_fill=(0, 0, 0))
-    draw.text((int(width * 0.1), panel_top + panel_height - 28), f"{content_type.replace('_', ' ').title()} | {image_type.title()}", fill=(255, 206, 84), font=accent_font)
-
-
 def _local_render(prompt: str, *, content_type: str, image_type: str, size: tuple[int, int]) -> Image.Image:
     from PIL import Image, ImageDraw
 
@@ -147,22 +182,8 @@ def _local_render(prompt: str, *, content_type: str, image_type: str, size: tupl
     _draw_gradient(base, top, (max(0, top[0] - 10), max(0, top[1] - 8), max(0, top[2] - 4)))
     draw = ImageDraw.Draw(base)
     _draw_scene(draw, size, content_type=content_type, accent=accent, warm=warm)
-
-    prompt_font = _load_font(max(20, int(size[1] * 0.018)), bold=False)
-    title_font = _load_font(max(36, int(size[1] * 0.04)), bold=True)
-    headline = _sanitize_text(prompt.split(".")[0] if prompt else content_type.replace("_", " ").title(), limit=42)
-    subhead = _sanitize_text(prompt, limit=120)
-    draw.text((int(size[0] * 0.08), int(size[1] * 0.08)), headline, fill=(255, 255, 255), font=title_font, stroke_width=3, stroke_fill=(0, 0, 0))
-    draw.multiline_text(
-        (int(size[0] * 0.08), int(size[1] * 0.17)),
-        subhead,
-        fill=(255, 248, 242),
-        font=prompt_font,
-        spacing=8,
-        stroke_width=2,
-        stroke_fill=(0, 0, 0),
-    )
-    _draw_text_panel(base, headline=headline, subhead=_sanitize_text(subhead, limit=90), image_type=image_type, content_type=content_type)
+    if image_type == "meme":
+        draw.rounded_rectangle((int(size[0] * 0.14), int(size[1] * 0.16), int(size[0] * 0.86), int(size[1] * 0.84)), radius=36, outline=(255, 255, 255), width=6)
     return base.convert("RGB")
 
 
@@ -192,6 +213,11 @@ def _coerce_generated_image(value: Any) -> Image.Image | None:
     return None
 
 
+def _extract_generation_response(value: Any) -> tuple[Image.Image | None, dict[str, Any] | None]:
+    metadata: dict[str, Any] | None = value if isinstance(value, dict) else None
+    return _coerce_generated_image(value), metadata
+
+
 def generate_image(
     *,
     prompt: str,
@@ -201,9 +227,13 @@ def generate_image(
     size: tuple[int, int],
     generation_client: ImageGenerationClient | None = None,
     cost_estimate_usd: float | None = 0.0,
+    allow_placeholder_fallback: bool = True,
 ) -> GeneratedImage:
     started = time.perf_counter()
     image: Image.Image | None = None
+    image_source = "mock" if generation_client is None else "fallback"
+    source_details: dict[str, Any] | None = None
+    generation_error: Exception | None = None
     if generation_client is not None:
         try:
             if hasattr(generation_client, "generate_image"):
@@ -232,19 +262,28 @@ def generate_image(
                 )
             else:
                 response = None
-            image = _coerce_generated_image(response)
-        except Exception:
+            image, source_details = _extract_generation_response(response)
+            if image is not None:
+                image_source = "real_ai"
+        except Exception as exc:
+            generation_error = exc
             image = None
     if image is None:
+        if not allow_placeholder_fallback:
+            if generation_error is not None:
+                raise generation_error
+            raise ValueError("No real image generation client result was available")
         image = _local_render(prompt, content_type=content_type, image_type=image_type, size=size)
     generation_time_ms = int((time.perf_counter() - started) * 1000)
     return GeneratedImage(
         image=image,
         image_prompt=prompt,
         model=model,
+        image_source=image_source,
         prompt_version=PROMPT_LIBRARY_VERSION,
         content_type=content_type,
         image_type=image_type,
         generation_time_ms=generation_time_ms,
         cost_estimate_usd=cost_estimate_usd,
+        source_details=source_details,
     )

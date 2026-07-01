@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 import json
 from io import StringIO
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 import sys
 
@@ -284,6 +284,7 @@ def test_phase3_snapshot_generates_real_snapshot_and_writes_file(tmp_path: Path,
     monkeypatch.setenv("SUPABASE_URL", "https://example.supabase.co")
     monkeypatch.setenv("SUPABASE_SERVICE_ROLE_KEY", "service-role-key")
     config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    recent_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
     class FakeSupabaseClient:
         def fetch_rows(self, table_name: str, *, filters=None, select="*"):
@@ -296,10 +297,10 @@ def test_phase3_snapshot_generates_real_snapshot_and_writes_file(tmp_path: Path,
                     {"state_id": 1, "state_code": "NY", "state_name": "New York"},
                     {"state_id": 2, "state_code": "PA", "state_name": "Pennsylvania"},
                 ],
-                "destinations": [
-                    {"id": "dest-1", "name": "Crispy Corner", "city": "Buffalo", "state_id": 1, "created_at": "2026-06-20T12:00:00+00:00"},
-                    {"id": "dest-2", "name": "Wing Vault", "city": "Rochester", "state_id": 1, "created_at": "2026-06-21T12:00:00+00:00"},
-                ],
+                    "destinations": [
+                        {"id": "dest-1", "name": "Crispy Corner", "city": "Buffalo", "state_id": 1, "created_at": recent_at},
+                        {"id": "dest-2", "name": "Wing Vault", "city": "Rochester", "state_id": 1, "created_at": recent_at},
+                    ],
                 "destination_ratings": [
                     {
                         "id": "rating-1",
@@ -307,16 +308,16 @@ def test_phase3_snapshot_generates_real_snapshot_and_writes_file(tmp_path: Path,
                         "user_id": "11111111-1111-1111-1111-111111111111",
                         "overall": 9,
                         "weight_score": 8.9,
-                        "created_at": "2026-06-24T12:00:00+00:00",
-                    },
+                            "created_at": recent_at,
+                        },
                     {
                         "id": "rating-2",
                         "destination_id": "dest-2",
                         "user_id": "22222222-2222-2222-2222-222222222222",
                         "overall": 7,
                         "weight_score": 7.1,
-                        "created_at": "2026-06-24T12:00:00+00:00",
-                    },
+                            "created_at": recent_at,
+                        },
                 ],
                 "analytics_agent_restaurant_summary": [
                     {
@@ -327,8 +328,8 @@ def test_phase3_snapshot_generates_real_snapshot_and_writes_file(tmp_path: Path,
                         "rating_count": 42,
                         "avg_weight_score": 8.8,
                         "avg_overall": 8.7,
-                        "last_rated_at": "2026-06-24T12:00:00+00:00",
-                    },
+                            "last_rated_at": recent_at,
+                        },
                     {
                         "destination_id": "dest-2",
                         "destination_name": "Wing Vault",
@@ -337,22 +338,22 @@ def test_phase3_snapshot_generates_real_snapshot_and_writes_file(tmp_path: Path,
                         "rating_count": 31,
                         "avg_weight_score": 8.5,
                         "avg_overall": 8.3,
-                        "last_rated_at": "2026-06-24T12:00:00+00:00",
-                    },
-                ],
-                "user_events": [
-                    {"state_id": 1, "user_id": "11111111-1111-1111-1111-111111111111", "anonymous_id": None, "occurred_at": "2026-06-24T12:00:00+00:00"},
-                    {"state_id": 2, "user_id": "22222222-2222-2222-2222-222222222222", "anonymous_id": None, "occurred_at": "2026-06-24T12:00:00+00:00"},
-                    {"state_id": 2, "user_id": None, "anonymous_id": "anon-1", "occurred_at": "2026-06-24T12:00:00+00:00"},
-                ],
+                            "last_rated_at": recent_at,
+                        },
+                    ],
+                    "user_events": [
+                        {"state_id": 1, "user_id": "11111111-1111-1111-1111-111111111111", "anonymous_id": None, "occurred_at": recent_at},
+                        {"state_id": 2, "user_id": "22222222-2222-2222-2222-222222222222", "anonymous_id": None, "occurred_at": recent_at},
+                        {"state_id": 2, "user_id": None, "anonymous_id": "anon-1", "occurred_at": recent_at},
+                    ],
                 "badge_catalog": [
                     {"id": 1, "code": "heat_seeker", "name": "Heat Seeker", "description": "Desc", "icon": "fire", "xp_reward": 25, "category": "ratings", "tier": 1, "is_active": True},
                     {"id": 2, "code": "crawl_captain", "name": "Crawl Captain", "description": "Desc", "icon": "map", "xp_reward": 40, "category": "crawls", "tier": 1, "is_active": True},
                 ],
-                "user_badges": [
-                    {"user_id": "11111111-1111-1111-1111-111111111111", "badge_id": 1, "earned_at": "2026-06-24T12:00:00+00:00"},
-                    {"user_id": "22222222-2222-2222-2222-222222222222", "badge_id": 2, "earned_at": "2026-06-24T12:00:00+00:00"},
-                ],
+                    "user_badges": [
+                        {"user_id": "11111111-1111-1111-1111-111111111111", "badge_id": 1, "earned_at": recent_at},
+                        {"user_id": "22222222-2222-2222-2222-222222222222", "badge_id": 2, "earned_at": recent_at},
+                    ],
                 "level_thresholds": [
                     {"level": 5, "xp_required": 250, "level_title": "Wing Rookie"},
                     {"level": 10, "xp_required": 750, "level_title": "Wing Regular"},
@@ -365,10 +366,10 @@ def test_phase3_snapshot_generates_real_snapshot_and_writes_file(tmp_path: Path,
                     {"user_id": "11111111-1111-1111-1111-111111111111", "current_streak_weeks": 4},
                     {"user_id": "22222222-2222-2222-2222-222222222222", "current_streak_weeks": 8},
                 ],
-                "socially_visible_crawls": [
-                    {"crawl_id": "crawl-1", "user_id": "11111111-1111-1111-1111-111111111111", "route_id": "route-1", "status": "completed", "start_time": "2026-06-24T12:00:00+00:00", "end_time": "2026-06-24T13:00:00+00:00", "crawl_type": "solo", "is_solo": True},
-                    {"crawl_id": "crawl-2", "user_id": "22222222-2222-2222-2222-222222222222", "route_id": "route-2", "status": "planned", "start_time": "2026-06-24T12:00:00+00:00", "end_time": None, "crawl_type": "group", "is_solo": False},
-                ],
+                    "socially_visible_crawls": [
+                        {"crawl_id": "crawl-1", "user_id": "11111111-1111-1111-1111-111111111111", "route_id": "route-1", "status": "completed", "start_time": recent_at, "end_time": recent_at, "crawl_type": "solo", "is_solo": True},
+                        {"crawl_id": "crawl-2", "user_id": "22222222-2222-2222-2222-222222222222", "route_id": "route-2", "status": "planned", "start_time": recent_at, "end_time": None, "crawl_type": "group", "is_solo": False},
+                    ],
                 "routes": [
                     {"id": "route-1", "title": "Buffalo Heat Trail", "city": "Buffalo", "stop1_id": "dest-1", "stop2_id": None, "stop3_id": None, "stop4_id": None, "stop5_id": None},
                     {"id": "route-2", "title": "Rochester Wing Run", "city": "Rochester", "stop1_id": "dest-2", "stop2_id": None, "stop3_id": None, "stop4_id": None, "stop5_id": None},
@@ -389,21 +390,21 @@ def test_phase3_snapshot_generates_real_snapshot_and_writes_file(tmp_path: Path,
         logger=logger,
         client=fake_client,  # type: ignore[arg-type]
         output_path=tmp_path / "latest_snapshot.json",
-        window_config=Phase3WindowConfig(activity_score_threshold=4),
+        window_config=Phase3WindowConfig(activity_score_threshold=1),
     )
 
     assert result.connected is True
     assert result.is_fallback is False
     assert result.snapshot_path == str(tmp_path / "latest_snapshot.json")
-    assert result.section_counts["recent_ratings"] == 1
-    assert result.section_counts["recent_badges"] == 1
+    assert result.section_counts["new_restaurants"] == 2
+    assert result.section_counts["top_restaurants"] == 2
     assert (tmp_path / "latest_snapshot.json").exists()
     snapshot = json.loads((tmp_path / "latest_snapshot.json").read_text(encoding="utf-8"))
     assert snapshot["is_fallback"] is False
-    assert snapshot["recent_ratings"][0]["restaurant_name"] == "Crispy Corner"
-    assert snapshot["recent_ratings"][0]["state"] == "NY"
-    assert snapshot["recent_badges"][0]["badge_name"] == "Heat Seeker"
-    assert snapshot["crawl_activity"]["total_crawls"] == 1
+    assert snapshot["new_restaurants"][0]["restaurant_name"] == "Crispy Corner"
+    assert snapshot["new_restaurants"][0]["state"] == "NY"
+    assert snapshot["top_restaurants"][0]["restaurant_name"] == "Crispy Corner"
+    assert snapshot["active_states"][0]["state"] == "PA"
     output = stream.getvalue()
     assert "supabase_connection" not in output
     assert "validation_started" in output
@@ -749,7 +750,7 @@ def test_image_pipeline_validation_runs_dry_run_without_upload(tmp_path: Path) -
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "meme",
             "visual_style": "meme",
-            "image_prompt": "A playful meme-style wing scene with bold sauce contrast and room for top and bottom text.",
+            "image_prompt": "A funny photorealistic scene at a casual wing restaurant with two friends arguing over flats versus drums, baskets of saucy chicken wings on the table, warm lighting, no visible words, no captions, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
             "working_title": "Wing debate energy",
             "suggested_cta": "What side are you on?",
         },
@@ -773,7 +774,9 @@ def test_image_pipeline_validation_runs_dry_run_without_upload(tmp_path: Path) -
     assert (tmp_path / "latest_image_pipeline.json").exists()
     payload = json.loads((tmp_path / "latest_image_pipeline.json").read_text(encoding="utf-8"))
     assert payload["validation"]["valid"] is True
-    assert payload["result"]["candidate_id"] == "22222222-2222-2222-2222-222222222222"
+    assert payload["image_source"] == "mock"
+    assert payload["validation"]["prompt_quality"] >= 70
+    assert payload["candidate_id"] == "22222222-2222-2222-2222-222222222222"
     output = stream.getvalue()
     assert "image_pipeline_validation_started" in output
     assert "image_pipeline_started" in output

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-01T00:01:29.599942+00:00",
+  "generated_at": "2026-07-01T00:18:24.460760+00:00",
   "records": [
     {
       "backend_used": false,
@@ -13,7 +13,7 @@
       "content_category": "meme",
       "content_slot": "buffago_post",
       "estimated_cost_usd": null,
-      "generation_time_ms": 6069,
+      "generation_time_ms": 6093,
       "image_generation_prompt": "A funny, bold meme-style wing post with exaggerated sauce, a local diner vibe, and room for witty text overlay.",
       "input_size_chars": 7894,
       "input_tokens": 0,
@@ -35,7 +35,7 @@
       "content_category": "meme_post",
       "content_slot": "meme_post",
       "estimated_cost_usd": null,
-      "generation_time_ms": 6122,
+      "generation_time_ms": 6029,
       "image_generation_prompt": "A meme-style wing graphic with bold sauce splash, high contrast, a clean central subject, and room for punchy text overlay.",
       "input_size_chars": 7894,
       "input_tokens": 0,
@@ -57,7 +57,7 @@
       "content_category": "brand_validation",
       "content_slot": "buffago_post",
       "estimated_cost_usd": null,
-      "generation_time_ms": 6099,
+      "generation_time_ms": 6081,
       "image_generation_prompt": null,
       "input_size_chars": 7894,
       "input_tokens": 0,
@@ -73,7 +73,7 @@
       "used_fallback": true
     }
   ],
-  "run_id": "5adcee8d-bb3c-4b59-a626-fb2fc0bdb5ac",
+  "run_id": "560a3490-4e01-4f87-a9d5-005d0acbf7ef",
   "totals": {
     "estimated_cost_usd": null,
     "input_tokens": 0,

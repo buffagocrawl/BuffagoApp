@@ -95,6 +95,12 @@ def precheck_approved_post(
         post_id=post.post_id,
         status="started",
         dry_run=dry_run,
+        quality_score=post.quality_score,
+        minimum_quality_score=_quality_threshold(config),
+        image_source=post.image_source,
+        image_validation_status=post.image_validation_status,
+        validation_reason=post.image_validation_reason,
+        prompt_quality=post.prompt_quality,
     )
     reason: str | None = None
     passed = True
@@ -104,6 +110,12 @@ def precheck_approved_post(
     elif post.quality_score < _quality_threshold(config):
         passed = False
         reason = "quality score below threshold"
+    elif post.image_validation_status != "passed":
+        passed = False
+        reason = post.image_validation_reason or "image validation failed"
+    elif post.image_source != "real_ai":
+        passed = False
+        reason = f"image source must be real_ai, received {post.image_source}"
     elif not post.public_image_url:
         passed = False
         reason = "missing public_image_url"
@@ -130,6 +142,12 @@ def precheck_approved_post(
             post_id=post.post_id,
             status="passed",
             duration_ms=duration_ms,
+            quality_score=post.quality_score,
+            minimum_quality_score=_quality_threshold(config),
+            image_source=post.image_source,
+            image_validation_status=post.image_validation_status,
+            validation_reason=post.image_validation_reason,
+            prompt_quality=post.prompt_quality,
         )
     else:
         log_event(
@@ -142,6 +160,12 @@ def precheck_approved_post(
             status="failed",
             duration_ms=duration_ms,
             error=reason,
+            quality_score=post.quality_score,
+            minimum_quality_score=_quality_threshold(config),
+            image_source=post.image_source,
+            image_validation_status=post.image_validation_status,
+            validation_reason=post.image_validation_reason,
+            prompt_quality=post.prompt_quality,
         )
     return PublishPrecheckResult(passed=passed, reason=reason, duration_ms=duration_ms)
 

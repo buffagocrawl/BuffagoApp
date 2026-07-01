@@ -4,7 +4,7 @@
       "adjustments": {
         "freshness_bonus": 4.0
       },
-      "candidate_id": "c8bbb66e-f4b8-436f-ae40-faa58220f51e",
+      "candidate_id": "68a5405e-e6f2-4093-b1db-21f5a8641d8b",
       "category_scores": {
         "brand_fit": 17.0,
         "conversation_starter": 4.0,
@@ -81,7 +81,7 @@
       "adjustments": {
         "freshness_bonus": 4.0
       },
-      "candidate_id": "dfc62ebc-baa1-4e55-80e5-c6ee995f1376",
+      "candidate_id": "59fceba4-ab35-4f59-9ea3-97608cc582f1",
       "category_scores": {
         "brand_fit": 14.0,
         "conversation_starter": 2.0,
@@ -156,7 +156,7 @@
     },
     {
       "adjustments": {},
-      "candidate_id": "3e95465b-72a5-4c1a-ae82-7bb2f76eda9d",
+      "candidate_id": "04a5f24c-c938-4a48-a0eb-840bfca1afa3",
       "category_scores": {
         "brand_fit": 17.0,
         "conversation_starter": 4.0,
@@ -224,7 +224,7 @@
     },
     {
       "adjustments": {},
-      "candidate_id": "878a65b8-dd8c-41f3-be12-d0573308b9a0",
+      "candidate_id": "d9d8723e-17fe-4895-9cf6-8f1fc23bacc0",
       "category_scores": {
         "brand_fit": 14.0,
         "conversation_starter": 2.0,
@@ -292,7 +292,7 @@
     },
     {
       "adjustments": {},
-      "candidate_id": "53f4d008-e357-48df-8cc2-e82738eb1b4d",
+      "candidate_id": "d6554cdb-6542-48b5-9df9-d0d87e16e035",
       "category_scores": {
         "brand_fit": 15.0,
         "conversation_starter": 5.0,
@@ -365,7 +365,7 @@
     },
     {
       "adjustments": {},
-      "candidate_id": "9770d105-0419-408a-8ed9-7007e0eb339f",
+      "candidate_id": "ee1ee12f-fbec-4952-98af-fd5f48adf727",
       "category_scores": {
         "brand_fit": 17.0,
         "conversation_starter": 4.0,
@@ -433,7 +433,7 @@
     },
     {
       "adjustments": {},
-      "candidate_id": "9b45e9ad-f9fc-4dc9-83ec-17aef855c2b0",
+      "candidate_id": "94fd6c01-897b-4839-bd10-20354634b120",
       "category_scores": {
         "brand_fit": 15.0,
         "conversation_starter": 5.0,
@@ -511,12 +511,12 @@
     "candidate_count": 7,
     "cost_estimate": 0.0,
     "duplicate_similarity_threshold": 0.72,
-    "generated_at": "2026-07-01T00:01:29.609057+00:00",
+    "generated_at": "2026-07-01T00:18:24.475851+00:00",
     "memory_reasoning": [],
     "model_name": "local-rules",
     "platform": "instagram",
     "rejected_duplicate_count": 0,
-    "run_id": "ba54a491-b46e-463e-ae1f-8d90cb4d3ac4",
+    "run_id": "357316f4-6e33-4124-b8d7-a35b7b28718a",
     "scheduled_post_type": null,
     "survivor_count": 7,
     "token_usage": {
@@ -535,11 +535,11 @@
       "Winner selected for balance of score, freshness, and feed variety: Why Crispy Corner keeps showing up"
     ]
   },
-  "generated_at": "2026-07-01T00:01:29.609057+00:00",
-  "run_id": "ba54a491-b46e-463e-ae1f-8d90cb4d3ac4",
+  "generated_at": "2026-07-01T00:18:24.475851+00:00",
+  "run_id": "357316f4-6e33-4124-b8d7-a35b7b28718a",
   "runner_up": {
     "adjustments": {},
-    "candidate_id": "9b45e9ad-f9fc-4dc9-83ec-17aef855c2b0",
+    "candidate_id": "94fd6c01-897b-4839-bd10-20354634b120",
     "caption_package": {
       "alt_text": "app_marketing Instagram image, centered on Crispy Corner, with a competitive mood, crispy wings and sauce, hinting at Buffalo, local New York food scene, in Buffago colors with readable composition for screen readers.",
       "body": "Turn ratings or crawl activity into a playful comparison format that invites debate. It should feel competitive, simple, and easy to reply to.",
@@ -567,7 +567,7 @@
         "#BlueCheese"
       ],
       "hook": "The current wing leaderboard mood.",
-      "image_prompt": "Create an Instagram-quality image of The current wing leaderboard mood featuring Crispy Corner. Composition: stacked board with bold labels. Lighting: bright natural light with crisp highlights on the food. Camera angle: slightly above eye level for a craveable, mobile-friendly crop. Food realism: ultra-realistic wings with glossy sauce, crisp texture, celery, and sauce cups. Background: local restaurant or regional food setting anchored in Buffalo. Color palette: Buffago-inspired spicy orange, sauce red, cream, black, and warm golden tones. Make it polished, modern, and highly readable on mobile. Negative prompt guidance: No text unless intentional, no fake logos, no alcohol focus, no distorted food, no blurry plates, no extra fingers, no uncanny faces, no political symbols, and no cluttered stock-photo energy.",
+      "image_prompt": "An illustrated Buffago-style community scene inspired by Buffalo: wing lovers comparing routes, badges, maps, and discovery moments, clean layered composition, energetic but grounded, warm reds and oranges, polished product-marketing art direction, no alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
       "quality_review": {
         "approved": true,
         "issues": [],
@@ -649,7 +649,7 @@
       "freshness_bonus": 4.0
     },
     "alt_text": "realistic Instagram image, centered on Crispy Corner, with a curious mood, crispy wings and sauce, hinting at Buffalo, local New York food scene, featuring wings and sauce, in Buffago colors with readable composition for screen readers.",
-    "candidate_id": "c8bbb66e-f4b8-436f-ae40-faa58220f51e",
+    "candidate_id": "68a5405e-e6f2-4093-b1db-21f5a8641d8b",
     "caption": "Why Crispy Corner keeps showing up. Spotlight Crispy Corner in Buffalo as a high-signal favorite from recent Buffago activity. Keep the tone local, food-first, and conversational. Drop your go-to wing spot in the comments.",
     "caption_package": {
       "alt_text": "realistic Instagram image, centered on Crispy Corner, with a curious mood, crispy wings and sauce, hinting at Buffalo, local New York food scene, featuring wings and sauce, in Buffago colors with readable composition for screen readers.",
@@ -678,7 +678,7 @@
         "#BlueCheese"
       ],
       "hook": "Why Crispy Corner keeps showing up.",
-      "image_prompt": "Create an Instagram-quality image of Why Crispy Corner keeps showing up featuring Crispy Corner. Composition: single hero plate with short caption space. Lighting: bright natural light with crisp highlights on the food. Camera angle: slightly above eye level for a craveable, mobile-friendly crop. Food realism: ultra-realistic wings with glossy sauce, crisp texture, celery, and sauce cups. Background: local restaurant or regional food setting anchored in Buffalo. Color palette: Buffago-inspired spicy orange, sauce red, cream, black, and warm golden tones. Make it polished, modern, and highly readable on mobile. Negative prompt guidance: No text unless intentional, no fake logos, no alcohol focus, no distorted food, no blurry plates, no extra fingers, no uncanny faces, no political symbols, and no cluttered stock-photo energy.",
+      "image_prompt": "A photorealistic casual wing restaurant scene centered on crispy, saucy chicken wings at Crispy Corner, set in Buffalo, warm natural restaurant lighting, glossy sauce texture, celery and blue cheese nearby, real plates and tables, natural human energy in the background, appetizing food detail, mobile-friendly framing, no alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
       "quality_review": {
         "approved": true,
         "issues": [],
@@ -728,7 +728,7 @@
     "holiday_references": [],
     "hook_style": "direct local hook",
     "image_composition": "single hero plate with short caption space",
-    "image_prompt": "Create an Instagram-quality image of Why Crispy Corner keeps showing up featuring Crispy Corner. Composition: single hero plate with short caption space. Lighting: bright natural light with crisp highlights on the food. Camera angle: slightly above eye level for a craveable, mobile-friendly crop. Food realism: ultra-realistic wings with glossy sauce, crisp texture, celery, and sauce cups. Background: local restaurant or regional food setting anchored in Buffalo. Color palette: Buffago-inspired spicy orange, sauce red, cream, black, and warm golden tones. Make it polished, modern, and highly readable on mobile. Negative prompt guidance: No text unless intentional, no fake logos, no alcohol focus, no distorted food, no blurry plates, no extra fingers, no uncanny faces, no political symbols, and no cluttered stock-photo energy.",
+    "image_prompt": "A photorealistic casual wing restaurant scene centered on crispy, saucy chicken wings at Crispy Corner, set in Buffalo, warm natural restaurant lighting, glossy sauce texture, celery and blue cheese nearby, real plates and tables, natural human energy in the background, appetizing food detail, mobile-friendly framing, no alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
     "metadata": {
       "prompt_anchors": [
         "food-first",

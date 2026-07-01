@@ -30,6 +30,10 @@ def _sample_post() -> ApprovedInstagramPost:
         public_image_url="https://example.com/public-image.jpg",
         content_type="restaurant_spotlight",
         quality_score=95,
+        image_source="real_ai",
+        image_validation_status="passed",
+        image_validation_reason=None,
+        prompt_quality=100,
         approved=True,
         scheduled_post_type="buffago_post",
     )
