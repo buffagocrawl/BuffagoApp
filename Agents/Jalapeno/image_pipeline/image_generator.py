@@ -40,7 +40,7 @@ class OpenAIImageGenerationClient:
         api_key: str,
         logger=None,
         session: requests.Session | None = None,
-        timeout_seconds: int = 120,
+        timeout_seconds: int = 300,
     ) -> None:
         self.api_key = api_key
         self.logger = logger
