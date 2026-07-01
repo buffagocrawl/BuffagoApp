@@ -208,6 +208,7 @@ def _persist_publish_state(
         "updated_at": _utcnow().isoformat(),
         "request_payload_safe": state.request_payload_safe or {},
         "response_payload": state.response_payload or {},
+        "metadata": dict(state.post.metadata) if isinstance(state.post.metadata, dict) else {},
     }
     if isinstance(state.post.metadata, dict) and state.post.metadata.get("created_at"):
         payload["created_at"] = state.post.metadata.get("created_at")
@@ -733,6 +734,12 @@ def _finalize_success(
     state.failure_reason = None
     state.error_code = None
     state.error_message = None
+    post_metadata = dict(state.post.metadata) if isinstance(state.post.metadata, dict) else {}
+    if post_metadata.get("approval_bypass_enabled"):
+        post_metadata["approval_required"] = False
+        post_metadata["approval_status"] = "published"
+        state.post.metadata.clear()
+        state.post.metadata.update(post_metadata)
     _persist_publish_state(client, state)
     if client is not None and post_id:
         update_publish_status(
@@ -748,6 +755,7 @@ def _finalize_success(
             instagram_media_type=state.permalink_response.get("media_type") if isinstance(state.permalink_response, dict) else None,
             container_id=state.container_id,
             publish_response=state.response_payload or {},
+            metadata=post_metadata,
         )
     report = create_publish_report(
         run_id=post.run_id,

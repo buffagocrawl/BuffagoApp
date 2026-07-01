@@ -44,6 +44,14 @@ class InstagramPublishingResult:
     result: dict[str, Any]
 
 
+def _build_auto_approval_metadata(metadata: dict[str, Any] | None, *, published: bool = False) -> dict[str, Any]:
+    enriched = dict(metadata) if isinstance(metadata, dict) else {}
+    enriched["approval_bypass_enabled"] = True
+    enriched["approval_required"] = False
+    enriched["approval_status"] = "published" if published else "auto_approved"
+    return enriched
+
+
 class _ValidationCandidateClient:
     def __init__(self) -> None:
         self.run_rows: dict[str, dict[str, Any]] = {}
@@ -346,7 +354,23 @@ def run_instagram_publishing_live_environment(
         status="started",
         duration_ms=0,
     )
-    approved_post = _load_approved_post_from_artifacts(content_decision, image_pipeline=image_pipeline)
+    loaded_post = _load_approved_post_from_artifacts(content_decision, image_pipeline=image_pipeline)
+    approved_post = replace(
+        loaded_post,
+        approved=True,
+        metadata=_build_auto_approval_metadata(loaded_post.metadata),
+    )
+    log_event(
+        logger,
+        "publish_continuing_without_manual_approval",
+        run_id=approved_post.run_id,
+        candidate_id=approved_post.candidate_id,
+        post_id=approved_post.post_id,
+        approval_bypass_enabled=True,
+        approval_required=False,
+        approval_status="auto_approved",
+        original_approved=loaded_post.approved,
+    )
     if client is not None:
         ensure_selected_post_candidate(
             client,
@@ -456,6 +480,9 @@ def run_instagram_publishing_live_environment(
                 "status": result["status"],
                 "container_id": result.get("container_id"),
                 "published_media_id": result.get("published_media_id"),
+                "approval_bypass_enabled": True,
+                "approval_required": False,
+                "approval_status": "published" if result["status"] in {"published", "published_with_permalink_pending"} else "auto_approved",
             },
         )
     log_event(

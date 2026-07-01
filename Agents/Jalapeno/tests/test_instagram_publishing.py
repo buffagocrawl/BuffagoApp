@@ -142,6 +142,7 @@ class _PublishFlowSupabaseClient:
         self.run_rows: dict[str, dict[str, object]] = {}
         self.candidate_rows: dict[str, dict[str, object]] = {}
         self.post_rows: list[dict[str, object]] = []
+        self.instagram_post_rows: dict[str, dict[str, object]] = {}
         self.insert_order: list[str] = []
 
     def fetch_rows(self, table_name: str, *, filters=None, select: str = "*") -> list[dict[str, object]]:
@@ -189,7 +190,25 @@ class _PublishFlowSupabaseClient:
             current.update(payload)
             self.run_rows[run_id] = current
             return [current]
+        if table_name == "jalapeno_posts":
+            post_id = str(filters.get("id", "")).removeprefix("eq.")
+            for index, row in enumerate(self.post_rows):
+                if str(row.get("id")) == post_id:
+                    updated = dict(row)
+                    updated.update(payload)
+                    self.post_rows[index] = updated
+                    return [updated]
+            row = {"id": post_id, **payload}
+            self.post_rows.append(row)
+            return [row]
         return [dict(payload)]
+
+    def upsert_rows(self, table_name: str, payload, on_conflict: str):
+        row = dict(payload)
+        if table_name == "jalapeno_instagram_posts":
+            self.instagram_post_rows[str(row["run_id"])] = row
+            return [row]
+        return [row]
 
 
 def test_live_publish_persists_missing_candidate_before_final_post_insert(
@@ -244,3 +263,113 @@ def test_live_publish_persists_missing_candidate_before_final_post_insert(
     assert client.insert_order[:2] == ["jalapeno_runs", "jalapeno_post_candidates"]
     assert client.insert_order[2] == "jalapeno_posts"
     assert "22222222-2222-2222-2222-222222222222" in client.candidate_rows
+
+
+def test_live_publish_auto_approves_when_content_decision_is_not_manually_approved(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("META_LONG_LIVED_ACCESS_TOKEN", "test-access-token")
+    monkeypatch.setenv("INSTAGRAM_BUSINESS_ACCOUNT_ID", "test-ig-user-id")
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    config = replace(config, instagram=replace(config.instagram, enabled=True, dry_run=False))
+    stream = StringIO()
+    logger = initialize_logging(replace(config, log_directory=tmp_path / "logs"), stream=stream)
+
+    content_decision = {
+        "run_id": "11111111-1111-1111-1111-111111111111",
+        "scheduled_post_type": "meme_post",
+        "winner": {
+            "candidate_id": "22222222-2222-2222-2222-222222222222",
+            "content_type": "meme",
+            "caption": "Buffago meme caption",
+            "hashtags": ["buffago", "meme"],
+            "image_prompt": "A buffalo wing meme",
+            "approved": False,
+        },
+        "decision_summary": {
+            "approved": False,
+        },
+    }
+    image_pipeline = {
+        "result": {
+            "public_url": "https://example.com/meme-image.jpg",
+        }
+    }
+    seen: dict[str, object] = {}
+
+    def _fake_publish(config_arg, post, **kwargs):
+        seen["approved"] = post.approved
+        seen["metadata"] = dict(post.metadata)
+        return {
+            "status": "published",
+            "container_id": "sim-container",
+            "published_media_id": "sim-media",
+            "permalink": "https://instagram.com/p/sim-media/",
+        }
+
+    monkeypatch.setattr(publishing_module, "publish_instagram_post", _fake_publish)
+    result = publishing_module.run_instagram_publishing_live_environment(
+        config,
+        content_decision,
+        image_pipeline,
+        logger=logger,
+        client=None,
+        report_path=tmp_path / "report.json",
+    )
+
+    assert result.result["status"] == "published"
+    assert seen["approved"] is True
+    assert seen["metadata"] == {
+        "approval_bypass_enabled": True,
+        "approval_required": False,
+        "approval_status": "auto_approved",
+    }
+    log_output = stream.getvalue()
+    assert "publish_continuing_without_manual_approval" in log_output
+    assert "approval_bypass_enabled=true" in log_output
+    assert "approval_status=auto_approved" in log_output
+
+
+def test_successful_publish_marks_approval_status_published(tmp_path: Path) -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    config = replace(
+        config,
+        instagram=replace(config.instagram, enabled=True, dry_run=False),
+        publishing=replace(config.publishing, publish_max_retries=1, retry_backoff_seconds=0),
+    )
+    client = _PublishFlowSupabaseClient()
+    client.post_rows.append(
+        {
+            "id": "33333333-3333-3333-3333-333333333333",
+            "run_id": "11111111-1111-1111-1111-111111111111",
+            "candidate_id": "22222222-2222-2222-2222-222222222222",
+            "metadata": {},
+        }
+    )
+    post = replace(
+        _sample_post(),
+        metadata={
+            "approval_bypass_enabled": True,
+            "approval_required": False,
+            "approval_status": "auto_approved",
+        },
+    )
+
+    result = publish_instagram_post(
+        config,
+        post,
+        access_token="test-access-token",
+        ig_user_id="test-ig-user-id",
+        client=client,
+        simulate=True,
+        dry_run=False,
+        test_mode=False,
+        post_id="33333333-3333-3333-3333-333333333333",
+        report_path=tmp_path / "report.json",
+    )
+
+    assert result["status"] in {"published", "published_with_permalink_pending"}
+    assert client.post_rows[0]["metadata"]["approval_status"] == "published"
+    assert client.post_rows[0]["metadata"]["approval_required"] is False
+    assert client.instagram_post_rows["11111111-1111-1111-1111-111111111111"]["metadata"]["approval_status"] == "published"

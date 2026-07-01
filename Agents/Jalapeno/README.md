@@ -39,6 +39,7 @@ Phase 6 adds the Image Asset Pipeline:
 Phase 7 adds the Instagram Publishing Pipeline:
 
 - loads the approved Phase 7 winner and the Phase 8 public image URL
+- defers manual approval in the current MVP and auto-approves production publishes
 - creates an Instagram media container through the Graph API
 - polls the container until it is ready to publish
 - publishes only when Instagram is explicitly enabled and dry-run is off
@@ -144,6 +145,7 @@ Stores:
 - media fields
 - schedule and publish timestamps
 - publish status
+- approval metadata for deferred manual-approval support
 - retry count
 - Instagram IDs and permalink
 - publish response payload
@@ -216,7 +218,7 @@ Stores:
 
 ### `jalapeno_instagram_posts`
 
-Stores the publishing attempt for the approved final post.
+Stores the publishing attempt for the final post, including current MVP auto-approval metadata.
 
 Stores:
 
@@ -349,12 +351,13 @@ The image pipeline also reads these config sections from `config.yaml`:
 ### Instagram publishing lifecycle
 
 1. Load the approved Phase 7 winner and the Phase 8 public image URL.
-1. Reject the publish if approval, quality threshold, caption, image URL, dry-run, or test-mode checks fail.
-1. Create one Instagram media container per approved post.
+1. In the current MVP, defer manual approval and auto-approve production publishes before the publish step.
+1. Reject the publish if quality threshold, caption, image URL, dry-run, or test-mode checks fail.
+1. Create one Instagram media container per auto-approved post.
 1. Poll the container until it reaches `FINISHED`, or fail safely on `ERROR`, `EXPIRED`, or timeout.
 1. Publish the container only once and skip republishing when a media ID already exists.
 1. Fetch the published permalink when available.
-1. Store the publish attempt in `jalapeno_instagram_posts` and update the run with failure metadata when publishing fails.
+1. Store the publish attempt in `jalapeno_instagram_posts`, carry approval metadata forward, and update the run with failure metadata when publishing fails.
 1. Write a final publish report for every attempt.
 
 ## Dry-Run Behavior
@@ -407,6 +410,7 @@ Validation checks:
 - configured secrets can be read without logging their values
 - dry-run blocks publishing
 - a fake approved post passes prechecks
+- the current MVP auto-approval path can continue to publish without manual approval
 - a fake publish can be simulated without calling live endpoints
 - retry logic does not create duplicate publishes
 - report generation works
@@ -577,6 +581,7 @@ Workflow behavior:
 - Manual dispatch exposes a required `post_type` choice with valid values `buffago` and `meme`
 - Manual dispatch defaults `publish=false`, which runs `python main.py --dry-run`
 - Manual dispatch can opt into live publishing by setting `publish=true`, which runs `python main.py --production`
+- Current MVP production runs auto-publish and do not wait for manual approval
 
 Workflow logging:
 

@@ -2,10 +2,9 @@
   "all_candidates": [
     {
       "adjustments": {
-        "freshness_bonus": 4.0,
-        "theme_rotation_bonus": 4.0
+        "freshness_bonus": 4.0
       },
-      "candidate_id": "afda735f-a05c-4c26-9fe8-5084b0fb8cbb",
+      "candidate_id": "c8bbb66e-f4b8-436f-ae40-faa58220f51e",
       "category_scores": {
         "brand_fit": 17.0,
         "conversation_starter": 4.0,
@@ -31,7 +30,7 @@
       },
       "duplicate_reason": null,
       "duplicate_score": 0.0,
-      "final_score": 91.75,
+      "final_score": 87.75,
       "food_categories": [
         "wings",
         "sauce"
@@ -80,10 +79,9 @@
     },
     {
       "adjustments": {
-        "freshness_bonus": 4.0,
-        "theme_rotation_bonus": 4.0
+        "freshness_bonus": 4.0
       },
-      "candidate_id": "d0af4cd3-c4d6-481e-afeb-2e520d431b38",
+      "candidate_id": "dfc62ebc-baa1-4e55-80e5-c6ee995f1376",
       "category_scores": {
         "brand_fit": 14.0,
         "conversation_starter": 2.0,
@@ -109,7 +107,7 @@
       },
       "duplicate_reason": null,
       "duplicate_score": 0.0,
-      "final_score": 81.5,
+      "final_score": 77.5,
       "food_categories": [
         "wings",
         "local eats"
@@ -157,10 +155,8 @@
       "working_title": "Hidden gem: Wing Vault"
     },
     {
-      "adjustments": {
-        "theme_rotation_bonus": 4.0
-      },
-      "candidate_id": "8fe9f30d-6831-4c58-baaa-504ce9c99a09",
+      "adjustments": {},
+      "candidate_id": "3e95465b-72a5-4c1a-ae82-7bb2f76eda9d",
       "category_scores": {
         "brand_fit": 17.0,
         "conversation_starter": 4.0,
@@ -184,7 +180,7 @@
       },
       "duplicate_reason": null,
       "duplicate_score": 0.0,
-      "final_score": 80.75,
+      "final_score": 76.75,
       "food_categories": [
         "wings"
       ],
@@ -227,10 +223,8 @@
       "working_title": "The wing napkin math problem"
     },
     {
-      "adjustments": {
-        "theme_rotation_bonus": 4.0
-      },
-      "candidate_id": "015184e7-168d-402b-b220-f1ca31756a03",
+      "adjustments": {},
+      "candidate_id": "878a65b8-dd8c-41f3-be12-d0573308b9a0",
       "category_scores": {
         "brand_fit": 14.0,
         "conversation_starter": 2.0,
@@ -254,7 +248,7 @@
       },
       "duplicate_reason": null,
       "duplicate_score": 0.0,
-      "final_score": 70.0,
+      "final_score": 66.0,
       "food_categories": [
         "wings",
         "sauce"
@@ -297,11 +291,8 @@
       "working_title": "Wing fact worth knowing"
     },
     {
-      "adjustments": {
-        "recently_used_visual_style_penalty": -3.0,
-        "theme_rotation_bonus": 4.0
-      },
-      "candidate_id": "8b292e65-7cce-4696-9300-88bfa4bf1154",
+      "adjustments": {},
+      "candidate_id": "53f4d008-e357-48df-8cc2-e82738eb1b4d",
       "category_scores": {
         "brand_fit": 15.0,
         "conversation_starter": 5.0,
@@ -328,7 +319,7 @@
       },
       "duplicate_reason": null,
       "duplicate_score": 0.0,
-      "final_score": 78.75,
+      "final_score": 77.75,
       "food_categories": [],
       "holiday_references": [],
       "hook_style": "community opener",
@@ -373,10 +364,8 @@
       "working_title": "Buffago in NY"
     },
     {
-      "adjustments": {
-        "theme_rotation_bonus": 4.0
-      },
-      "candidate_id": "ac9c27d2-da4b-4b95-988d-dbb7c280eaa9",
+      "adjustments": {},
+      "candidate_id": "9770d105-0419-408a-8ed9-7007e0eb339f",
       "category_scores": {
         "brand_fit": 17.0,
         "conversation_starter": 4.0,
@@ -400,7 +389,7 @@
       },
       "duplicate_reason": null,
       "duplicate_score": 0.0,
-      "final_score": 83.75,
+      "final_score": 79.75,
       "food_categories": [
         "wings"
       ],
@@ -443,10 +432,8 @@
       "working_title": "Someone just crossed a big XP line"
     },
     {
-      "adjustments": {
-        "theme_rotation_bonus": 4.0
-      },
-      "candidate_id": "6b4f6213-b127-4a9c-a989-1446b89dc869",
+      "adjustments": {},
+      "candidate_id": "9b45e9ad-f9fc-4dc9-83ec-17aef855c2b0",
       "category_scores": {
         "brand_fit": 15.0,
         "conversation_starter": 5.0,
@@ -473,7 +460,7 @@
       },
       "duplicate_reason": null,
       "duplicate_score": 0.0,
-      "final_score": 92.75,
+      "final_score": 88.75,
       "food_categories": [],
       "holiday_references": [],
       "hook_style": "ranking hook",
@@ -524,15 +511,12 @@
     "candidate_count": 7,
     "cost_estimate": 0.0,
     "duplicate_similarity_threshold": 0.72,
-    "generated_at": "2026-06-30T23:29:58.274881+00:00",
-    "memory_reasoning": [
-      "The last five posts are concentrated around one theme.",
-      "Theme rotation bonus should encourage diversification."
-    ],
+    "generated_at": "2026-07-01T00:01:29.609057+00:00",
+    "memory_reasoning": [],
     "model_name": "local-rules",
     "platform": "instagram",
     "rejected_duplicate_count": 0,
-    "run_id": "bccc989e-0fdd-494c-8c64-e74201dc29ad",
+    "run_id": "ba54a491-b46e-463e-ae1f-8d90cb4d3ac4",
     "scheduled_post_type": null,
     "survivor_count": 7,
     "token_usage": {
@@ -544,20 +528,18 @@
       "The current wing leaderboard mood: +1.0 trend alignment bonus",
       "Why Crispy Corner keeps showing up: +2.5 freshness bonus; trend alignment bonus",
       "Someone just crossed a big XP line: +1.0 trend alignment bonus",
+      "Buffago in NY: +3.0 community activity bonus; trend alignment bonus",
       "Hidden gem: Wing Vault: +2.5 freshness bonus; trend alignment bonus",
       "The wing napkin math problem: +1.0 trend alignment bonus",
-      "Buffago in NY: +3.0 community activity bonus; trend alignment bonus",
       "Wing fact worth knowing: +1.0 trend alignment bonus",
       "Winner selected for balance of score, freshness, and feed variety: Why Crispy Corner keeps showing up"
     ]
   },
-  "generated_at": "2026-06-30T23:29:58.274881+00:00",
-  "run_id": "bccc989e-0fdd-494c-8c64-e74201dc29ad",
+  "generated_at": "2026-07-01T00:01:29.609057+00:00",
+  "run_id": "ba54a491-b46e-463e-ae1f-8d90cb4d3ac4",
   "runner_up": {
-    "adjustments": {
-      "theme_rotation_bonus": 4.0
-    },
-    "candidate_id": "6b4f6213-b127-4a9c-a989-1446b89dc869",
+    "adjustments": {},
+    "candidate_id": "9b45e9ad-f9fc-4dc9-83ec-17aef855c2b0",
     "caption_package": {
       "alt_text": "app_marketing Instagram image, centered on Crispy Corner, with a competitive mood, crispy wings and sauce, hinting at Buffalo, local New York food scene, in Buffago colors with readable composition for screen readers.",
       "body": "Turn ratings or crawl activity into a playful comparison format that invites debate. It should feel competitive, simple, and easy to reply to.",
@@ -614,7 +596,7 @@
     "current_event_references": [],
     "duplicate_reason": null,
     "duplicate_score": 0.0,
-    "final_score": 92.75,
+    "final_score": 88.75,
     "food_categories": [],
     "holiday_references": [],
     "hook_style": "ranking hook",
@@ -664,11 +646,10 @@
   "scheduled_post_type": null,
   "winner": {
     "adjustments": {
-      "freshness_bonus": 4.0,
-      "theme_rotation_bonus": 4.0
+      "freshness_bonus": 4.0
     },
     "alt_text": "realistic Instagram image, centered on Crispy Corner, with a curious mood, crispy wings and sauce, hinting at Buffalo, local New York food scene, featuring wings and sauce, in Buffago colors with readable composition for screen readers.",
-    "candidate_id": "afda735f-a05c-4c26-9fe8-5084b0fb8cbb",
+    "candidate_id": "c8bbb66e-f4b8-436f-ae40-faa58220f51e",
     "caption": "Why Crispy Corner keeps showing up. Spotlight Crispy Corner in Buffalo as a high-signal favorite from recent Buffago activity. Keep the tone local, food-first, and conversational. Drop your go-to wing spot in the comments.",
     "caption_package": {
       "alt_text": "realistic Instagram image, centered on Crispy Corner, with a curious mood, crispy wings and sauce, hinting at Buffalo, local New York food scene, featuring wings and sauce, in Buffago colors with readable composition for screen readers.",
@@ -725,7 +706,7 @@
     "current_event_references": [],
     "duplicate_reason": null,
     "duplicate_score": 0.0,
-    "final_score": 91.75,
+    "final_score": 87.75,
     "food_categories": [
       "wings",
       "sauce"
