@@ -18,14 +18,16 @@ on:
         default: false
   schedule:
     # GitHub Actions cron uses UTC in this workflow format.
-    # These values match Eastern Daylight Time for the current automation:
-    # - 8:00 PM ET video daily run      -> 00:00 UTC next day
-    # - 4:00 PM ET Buffago cadence run -> 20:00 UTC
+    # GitHub documents higher delay/drop risk at the start of every hour:
+    # https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule
+    # These values intentionally run shortly after the hour during Eastern Daylight Time:
+    # - 8:07 PM ET video daily run      -> 00:07 UTC next day
+    # - 4:07 PM ET Buffago cadence run -> 20:07 UTC
     # When Eastern Standard Time resumes, update to:
-    # - 8:00 PM ET video daily run      -> 01:00 UTC next day
-    # - 4:00 PM ET Buffago cadence run -> 21:00 UTC
-    - cron: "0 0 * * *"
-    - cron: "0 20 * * *"
+    # - 8:07 PM ET video daily run      -> 01:07 UTC next day
+    # - 4:07 PM ET Buffago cadence run -> 21:07 UTC
+    - cron: "7 0 * * *"
+    - cron: "7 20 * * *"
 
 jobs:
   jalapeno-instagram:
@@ -43,8 +45,28 @@ jobs:
       FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
       INSTAGRAM_BUSINESS_ACCOUNT_ID: ${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}
       GITHUB_WORKFLOW_RUN_ID: ${{ github.run_id }}
+      JALAPENO_EVENT_SCHEDULE: ${{ github.event.schedule }}
 
     steps:
+      - name: Log GitHub trigger context
+        working-directory: .
+        run: |
+          set -euo pipefail
+
+          echo "github_event=${GITHUB_EVENT_NAME}"
+          echo "github_schedule=${JALAPENO_EVENT_SCHEDULE:-}"
+          echo "current_utc=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          echo "current_et=$(TZ=America/New_York date +"%Y-%m-%dT%H:%M:%S%z")"
+          echo "workflow_name=${GITHUB_WORKFLOW}"
+          echo "branch=${GITHUB_REF_NAME}"
+          echo "run_source=${GITHUB_EVENT_NAME}"
+          echo "repository=${GITHUB_REPOSITORY}"
+          echo "github_actor=${GITHUB_ACTOR}"
+          echo "run_id=${GITHUB_RUN_ID}"
+          echo "run_attempt=${GITHUB_RUN_ATTEMPT}"
+          echo "workflow_ref=${GITHUB_WORKFLOW_REF}"
+          echo "sha=${GITHUB_SHA}"
+
       - name: Check out repository
         uses: actions/checkout@v4
 
@@ -66,22 +88,29 @@ jobs:
           set -euo pipefail
 
           if [[ "${GITHUB_EVENT_NAME}" == "schedule" ]]; then
-            case "${GITHUB_EVENT_SCHEDULE}" in
-              "0 0 * * *")
+            matched_schedule="${JALAPENO_EVENT_SCHEDULE:-}"
+            case "${matched_schedule}" in
+              "7 0 * * *")
                 post_type="video"
                 run_label="video_daily_run"
                 mode="production"
+                expected_schedule="7 0 * * *"
                 ;;
-              "0 20 * * *")
+              "7 20 * * *")
                 post_type="buffago"
                 run_label="buffago_three_day_run"
                 mode="production"
+                expected_schedule="7 20 * * *"
                 ;;
               *)
-                echo "Unsupported schedule trigger: ${GITHUB_EVENT_SCHEDULE}" >&2
+                echo "Unsupported schedule trigger: ${matched_schedule}" >&2
                 exit 1
                 ;;
             esac
+            echo "matched_schedule=${matched_schedule}"
+            echo "expected_schedule=${expected_schedule}"
+            echo "resolved_content_type=${post_type}"
+            echo "resolved_mode=${mode}"
           elif [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
             post_type="${{ inputs.post_type }}"
             case "${post_type}" in

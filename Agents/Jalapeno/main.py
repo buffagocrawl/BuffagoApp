@@ -188,9 +188,14 @@ def _github_run_source() -> str:
 
 def _github_run_metadata() -> dict[str, str]:
     metadata: dict[str, str] = {}
+    event_schedule = (
+        os.getenv("JALAPENO_EVENT_SCHEDULE", "").strip()
+        or os.getenv("GITHUB_EVENT_SCHEDULE", "").strip()
+    )
+    if event_schedule:
+        metadata["github_event_schedule"] = event_schedule
     for env_name, field_name in (
         ("GITHUB_EVENT_NAME", "github_event_name"),
-        ("GITHUB_EVENT_SCHEDULE", "github_event_schedule"),
         ("GITHUB_RUN_ID", "github_run_id"),
         ("GITHUB_RUN_ATTEMPT", "github_run_attempt"),
         ("GITHUB_WORKFLOW", "github_workflow"),
