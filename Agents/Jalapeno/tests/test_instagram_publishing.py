@@ -73,6 +73,8 @@ def test_instagram_publishing_config_sections_load() -> None:
     assert config.instagram.dry_run is True
     assert config.instagram.api_version == "v23.0"
     assert config.instagram.quality_threshold == 85
+    assert config.instagram.validated_image_quality_threshold == 80
+    assert config.instagram.validated_image_prompt_quality_threshold == 90
     assert config.publishing.container_poll_max_attempts == 10
     assert config.notifications.enabled is True
     assert config.notifications.channels.console is True
@@ -121,6 +123,66 @@ def test_precheck_blocks_dry_run() -> None:
 
     assert result.passed is False
     assert result.reason == "dry_run enabled"
+
+
+def test_image_precheck_allows_validated_real_ai_score_82(tmp_path: Path) -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    config = replace(config, instagram=replace(config.instagram, enabled=True, dry_run=False))
+    post = replace(_sample_post(), quality_score=82, image_validation_status="passed", image_source="real_ai", prompt_quality=100)
+    stream = StringIO()
+    logger = initialize_logging(replace(config, log_directory=tmp_path / "logs"), stream=stream)
+
+    result = precheck_approved_post(config, post, dry_run=False, test_mode=False, logger=logger)
+
+    assert result.passed is True
+    log_output = stream.getvalue()
+    assert "minimum_quality_score=80" in log_output
+    assert "quality_gate_override_applied=true" in log_output
+    assert "quality_gate_policy=validated_real_ai_image_quality_gate" in log_output
+
+
+def test_image_precheck_blocks_quality_score_79() -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    config = replace(config, instagram=replace(config.instagram, enabled=True, dry_run=False))
+    post = replace(_sample_post(), quality_score=79, image_validation_status="passed", image_source="real_ai", prompt_quality=100)
+
+    result = precheck_approved_post(config, post, dry_run=False, test_mode=False)
+
+    assert result.passed is False
+    assert result.reason == "quality score below validated image threshold: 79 < 80"
+
+
+def test_image_precheck_blocks_failed_validation() -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    config = replace(config, instagram=replace(config.instagram, enabled=True, dry_run=False))
+    post = replace(_sample_post(), quality_score=95, image_validation_status="failed", image_validation_reason="detected text artifacts")
+
+    result = precheck_approved_post(config, post, dry_run=False, test_mode=False)
+
+    assert result.passed is False
+    assert result.reason == "detected text artifacts"
+
+
+def test_image_precheck_blocks_fallback_or_placeholder_source() -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    config = replace(config, instagram=replace(config.instagram, enabled=True, dry_run=False))
+    post = replace(_sample_post(), quality_score=95, image_source="fallback", image_validation_status="passed", prompt_quality=100)
+
+    result = precheck_approved_post(config, post, dry_run=False, test_mode=False)
+
+    assert result.passed is False
+    assert result.reason == "image source must be real_ai, received fallback"
+
+
+def test_image_precheck_blocks_missing_image_url() -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    config = replace(config, instagram=replace(config.instagram, enabled=True, dry_run=False))
+    post = replace(_sample_post(), quality_score=95, public_image_url="")
+
+    result = precheck_approved_post(config, post, dry_run=False, test_mode=False)
+
+    assert result.passed is False
+    assert result.reason == "missing public_image_url"
 
 
 def test_reel_container_payload_uses_video_url_and_redacts_token() -> None:

@@ -125,6 +125,8 @@ class InstagramConfig:
     access_token_secret_name: str
     api_version: str
     quality_threshold: int
+    validated_image_quality_threshold: int
+    validated_image_prompt_quality_threshold: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -432,6 +434,8 @@ def load_configuration(
         access_token_secret_name=_require_string(instagram_section, "access_token_secret_name"),
         api_version=_require_string(instagram_section, "api_version"),
         quality_threshold=_require_int(instagram_section, "quality_threshold"),
+        validated_image_quality_threshold=_optional_int(instagram_section, "validated_image_quality_threshold", 80),
+        validated_image_prompt_quality_threshold=_optional_int(instagram_section, "validated_image_prompt_quality_threshold", 90),
     )
     retryable_error_codes = _require_string_list(publishing_section, "retryable_error_codes")
     channels_section = notifications_section.get("channels")
@@ -460,6 +464,10 @@ def load_configuration(
         raise ConfigError(f"logging.level must be one of: {', '.join(VALID_LOG_LEVELS)}")
     if instagram_config.quality_threshold < 0 or instagram_config.quality_threshold > 100:
         raise ConfigError("instagram.quality_threshold must be between 0 and 100")
+    if instagram_config.validated_image_quality_threshold < 0 or instagram_config.validated_image_quality_threshold > 100:
+        raise ConfigError("instagram.validated_image_quality_threshold must be between 0 and 100")
+    if instagram_config.validated_image_prompt_quality_threshold < 0 or instagram_config.validated_image_prompt_quality_threshold > 100:
+        raise ConfigError("instagram.validated_image_prompt_quality_threshold must be between 0 and 100")
     if publishing_section.get("container_poll_timeout_seconds") is None:
         container_poll_timeout_seconds = _require_int(publishing_section, "container_poll_max_attempts") * _require_int(
             publishing_section, "container_poll_wait_seconds"

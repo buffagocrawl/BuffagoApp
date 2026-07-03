@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from logging_utils import log_event
+from image_pipeline.meme_text_renderer import MemeTextStyle, SafeArea, render_meme_text, sanitize_meme_text
 from supabase_client import SupabaseClient
 from video_assets import VideoAsset
 
@@ -72,7 +73,7 @@ def _strip_emoji(text: str) -> str:
 
 
 def _clean_overlay_text(text: str) -> str:
-    cleaned = _strip_emoji(_strip_hashtags(text))
+    cleaned = sanitize_meme_text(_strip_emoji(_strip_hashtags(text)), uppercase=False)
     cleaned = re.sub(r"https?://\S+", "", cleaned)
     cleaned = re.sub(r"[@*`_~]", "", cleaned)
     cleaned = re.sub(r"\s+", " ", cleaned).strip(" -:,.!?")
@@ -116,59 +117,48 @@ def select_overlay_text(caption: str) -> str:
     return text
 
 
-def _wrap_two_lines(text: str, *, max_chars: int = 18) -> str:
-    words = text.split()
-    if len(words) <= 2 or len(text) <= max_chars:
-        return text
-    best_index = min(range(1, len(words)), key=lambda index: abs(len(" ".join(words[:index])) - len(" ".join(words[index:]))))
-    first = " ".join(words[:best_index])
-    second = " ".join(words[best_index:])
-    if len(first) > max_chars + 8 or len(second) > max_chars + 8:
-        midpoint = max(1, len(words) // 2)
-        first = " ".join(words[:midpoint])
-        second = " ".join(words[midpoint:])
-    return f"{first}\n{second}"
-
-
-def _escape_drawtext(value: str) -> str:
-    return (
-        value.replace("\\", "\\\\")
-        .replace(":", "\\:")
-        .replace("'", "\\'")
-        .replace("%", "\\%")
-        .replace("\n", r"\n")
-    )
-
-
-def _font_file() -> str | None:
-    candidates = [
-        Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"),
-        Path("/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf"),
-        Path("C:/Windows/Fonts/arialbd.ttf"),
-        Path("C:/Windows/Fonts/Arialbd.ttf"),
+def _video_dimensions(input_path: Path, *, timeout_seconds: int = 30) -> tuple[int, int]:
+    command = [
+        "ffprobe",
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_entries",
+        "stream=width,height",
+        "-of",
+        "csv=s=x:p=0",
+        str(input_path),
     ]
-    for candidate in candidates:
-        if candidate.exists():
-            return candidate.as_posix().replace(":", "\\:")
-    return None
+    completed = subprocess.run(command, capture_output=True, text=True, timeout=timeout_seconds, check=False)
+    if completed.returncode != 0:
+        message = completed.stderr.strip() or completed.stdout.strip() or f"ffprobe exited with {completed.returncode}"
+        raise RuntimeError(message)
+    raw = completed.stdout.strip()
+    match = re.match(r"^(\d+)x(\d+)$", raw)
+    if not match:
+        raise RuntimeError(f"Unable to read video dimensions from ffprobe output: {raw!r}")
+    return int(match.group(1)), int(match.group(2))
 
 
-def _drawtext_filter(overlay_text: str) -> str:
-    wrapped = _wrap_two_lines(overlay_text)
-    font = _font_file()
-    font_arg = f"fontfile='{font}':" if font else ""
-    return (
-        "drawtext="
-        f"{font_arg}"
-        f"text='{_escape_drawtext(wrapped)}':"
-        "fontcolor=white:"
-        "fontsize=h*0.072:"
-        "bordercolor=black:"
-        "borderw=6:"
-        "line_spacing=10:"
-        "x=(w-text_w)/2:"
-        "y=h*0.16"
+def _render_overlay_png(path: Path, overlay_text: str, *, size: tuple[int, int]) -> None:
+    from PIL import Image
+
+    height = size[1]
+    canvas = Image.new("RGBA", size, (0, 0, 0, 0))
+    max_font = max(42, round(height * 0.072))
+    min_font = max(24, round(height * 0.034))
+    rendered = render_meme_text(
+        canvas,
+        overlay_text,
+        position="top",
+        safe_area=SafeArea(top=80, side=60, bottom=max(80, round(height * 0.48))),
+        auto_wrap=True,
+        auto_scale=True,
+        emphasis=True,
+        style=MemeTextStyle(max_font_size=max_font, min_font_size=min_font),
     )
+    rendered.save(path, format="PNG", optimize=True)
 
 
 def render_overlay_file(
@@ -180,34 +170,41 @@ def render_overlay_file(
 ) -> None:
     if not ffmpeg_available():
         raise RuntimeError("ffmpeg is not available")
-    command = [
-        "ffmpeg",
-        "-hide_banner",
-        "-loglevel",
-        "error",
-        "-y",
-        "-i",
-        str(input_path),
-        "-vf",
-        _drawtext_filter(overlay_text),
-        "-c:v",
-        "libx264",
-        "-preset",
-        "veryfast",
-        "-crf",
-        "20",
-        "-c:a",
-        "aac",
-        "-b:a",
-        "128k",
-        "-movflags",
-        "+faststart",
-        str(output_path),
-    ]
-    completed = subprocess.run(command, capture_output=True, text=True, timeout=timeout_seconds, check=False)
-    if completed.returncode != 0:
-        message = completed.stderr.strip() or completed.stdout.strip() or f"ffmpeg exited with {completed.returncode}"
-        raise RuntimeError(message)
+    with tempfile.TemporaryDirectory(prefix="jalapeno-video-text-") as overlay_dir_raw:
+        overlay_path = Path(overlay_dir_raw) / "text-overlay.png"
+        dimensions = _video_dimensions(input_path)
+        _render_overlay_png(overlay_path, sanitize_meme_text(overlay_text, uppercase=True), size=dimensions)
+        command = [
+            "ffmpeg",
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-y",
+            "-i",
+            str(input_path),
+            "-i",
+            str(overlay_path),
+            "-filter_complex",
+            "[0:v][1:v]overlay=0:0:format=auto",
+            "-c:v",
+            "libx264",
+            "-preset",
+            "veryfast",
+            "-crf",
+            "20",
+            "-c:a",
+            "aac",
+            "-b:a",
+            "128k",
+            "-movflags",
+            "+faststart",
+            str(output_path),
+        ]
+        completed = subprocess.run(command, capture_output=True, text=True, timeout=timeout_seconds, check=False)
+        if completed.returncode != 0:
+            message = completed.stderr.strip() or completed.stdout.strip() or f"ffmpeg exited with {completed.returncode}"
+            raise RuntimeError(message)
+        return
 
 
 def create_text_overlay_video(

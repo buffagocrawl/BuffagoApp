@@ -219,6 +219,8 @@ def validate_instagram_publishing_environment(
             and config.instagram.access_token_secret_name
             and config.instagram.api_version
             and isinstance(config.instagram.quality_threshold, int)
+            and isinstance(config.instagram.validated_image_quality_threshold, int)
+            and isinstance(config.instagram.validated_image_prompt_quality_threshold, int)
             and isinstance(config.publishing.container_poll_max_attempts, int)
             and isinstance(config.publishing.container_poll_wait_seconds, int)
             and isinstance(config.publishing.container_poll_timeout_seconds, int)

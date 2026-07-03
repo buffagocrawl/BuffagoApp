@@ -40,6 +40,16 @@ class PublishPrecheckResult:
     duration_ms: int
 
 
+@dataclass(frozen=True, slots=True)
+class QualityGateDecision:
+    passed: bool
+    reason: str | None
+    minimum_quality_score: int
+    standard_quality_score: int
+    override_applied: bool
+    policy: str
+
+
 @dataclass(slots=True)
 class PublishPipelineState:
     post: ApprovedInstagramPost
@@ -78,6 +88,53 @@ def _quality_threshold(config: JalapenoConfig) -> int:
     return int(config.instagram.quality_threshold)
 
 
+def _validated_image_quality_threshold(config: JalapenoConfig) -> int:
+    return int(config.instagram.validated_image_quality_threshold)
+
+
+def _validated_image_prompt_quality_threshold(config: JalapenoConfig) -> int:
+    return int(config.instagram.validated_image_prompt_quality_threshold)
+
+
+def _quality_gate_decision(config: JalapenoConfig, post: ApprovedInstagramPost) -> QualityGateDecision:
+    standard_threshold = _quality_threshold(config)
+    if post.media_kind != "image":
+        passed = post.quality_score >= standard_threshold
+        return QualityGateDecision(
+            passed=passed,
+            reason=None if passed else f"quality score below threshold: {post.quality_score} < {standard_threshold}",
+            minimum_quality_score=standard_threshold,
+            standard_quality_score=standard_threshold,
+            override_applied=False,
+            policy="standard_media_quality_gate",
+        )
+
+    image_threshold = _validated_image_quality_threshold(config)
+    prompt_threshold = _validated_image_prompt_quality_threshold(config)
+    image_is_validated = (
+        post.image_validation_status == "passed"
+        and post.image_source == "real_ai"
+        and post.prompt_quality >= prompt_threshold
+    )
+    effective_threshold = image_threshold if image_is_validated else standard_threshold
+    passed = post.quality_score >= effective_threshold
+    override_applied = image_is_validated and post.quality_score < standard_threshold and passed
+    if passed:
+        reason = None
+    elif image_is_validated:
+        reason = f"quality score below validated image threshold: {post.quality_score} < {effective_threshold}"
+    else:
+        reason = f"quality score below threshold: {post.quality_score} < {effective_threshold}"
+    return QualityGateDecision(
+        passed=passed,
+        reason=reason,
+        minimum_quality_score=effective_threshold,
+        standard_quality_score=standard_threshold,
+        override_applied=override_applied,
+        policy="validated_real_ai_image_quality_gate" if image_is_validated else "standard_image_quality_gate",
+    )
+
+
 def precheck_approved_post(
     config: JalapenoConfig,
     post: ApprovedInstagramPost,
@@ -92,6 +149,7 @@ def precheck_approved_post(
     started_at = time.perf_counter()
     posting_allowed = not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode
     meta_api_allowed = not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode
+    quality_gate = _quality_gate_decision(config, post)
     log_event(
         logger,
         "publish_precheck_started",
@@ -109,11 +167,16 @@ def precheck_approved_post(
         instagram_enabled_source=instagram_enabled_source,
         test_mode=test_mode,
         quality_score=post.quality_score,
-        minimum_quality_score=_quality_threshold(config),
+        minimum_quality_score=quality_gate.minimum_quality_score,
+        standard_quality_score=quality_gate.standard_quality_score,
+        quality_gate_policy=quality_gate.policy,
+        quality_gate_override_applied=quality_gate.override_applied,
+        quality_gate_reason=quality_gate.reason,
         image_source=post.image_source,
         image_validation_status=post.image_validation_status,
         validation_reason=post.image_validation_reason,
         prompt_quality=post.prompt_quality,
+        minimum_prompt_quality=_validated_image_prompt_quality_threshold(config) if post.media_kind == "image" else None,
         media_kind=post.media_kind,
         video_url=post.public_video_url,
         media_source=post.media_source,
@@ -123,9 +186,6 @@ def precheck_approved_post(
     if not post.approved:
         passed = False
         reason = "approved is false"
-    elif post.quality_score < _quality_threshold(config):
-        passed = False
-        reason = "quality score below threshold"
     elif post.media_kind == "image" and post.image_validation_status != "passed":
         passed = False
         reason = post.image_validation_reason or "image validation failed"
@@ -135,9 +195,15 @@ def precheck_approved_post(
     elif post.media_kind == "image" and not post.public_image_url:
         passed = False
         reason = "missing public_image_url"
+    elif post.media_kind == "image" and post.prompt_quality < _validated_image_prompt_quality_threshold(config):
+        passed = False
+        reason = f"prompt quality below threshold: {post.prompt_quality} < {_validated_image_prompt_quality_threshold(config)}"
     elif post.media_kind == "reel" and not post.public_video_url:
         passed = False
         reason = "missing public_video_url"
+    elif not quality_gate.passed:
+        passed = False
+        reason = quality_gate.reason
     elif not post.caption:
         passed = False
         reason = "missing caption"
@@ -170,11 +236,17 @@ def precheck_approved_post(
             instagram_enabled=config.instagram.enabled,
             instagram_enabled_source=instagram_enabled_source,
             quality_score=post.quality_score,
-            minimum_quality_score=_quality_threshold(config),
+            minimum_quality_score=quality_gate.minimum_quality_score,
+            standard_quality_score=quality_gate.standard_quality_score,
+            quality_gate_policy=quality_gate.policy,
+            quality_gate_override_applied=quality_gate.override_applied,
+            quality_gate_reason=quality_gate.reason,
+            block_reason=None,
             image_source=post.image_source,
             image_validation_status=post.image_validation_status,
             validation_reason=post.image_validation_reason,
             prompt_quality=post.prompt_quality,
+            minimum_prompt_quality=_validated_image_prompt_quality_threshold(config) if post.media_kind == "image" else None,
             media_kind=post.media_kind,
             video_url=post.public_video_url,
             media_source=post.media_source,
@@ -199,11 +271,17 @@ def precheck_approved_post(
             instagram_enabled=config.instagram.enabled,
             instagram_enabled_source=instagram_enabled_source,
             quality_score=post.quality_score,
-            minimum_quality_score=_quality_threshold(config),
+            minimum_quality_score=quality_gate.minimum_quality_score,
+            standard_quality_score=quality_gate.standard_quality_score,
+            quality_gate_policy=quality_gate.policy,
+            quality_gate_override_applied=quality_gate.override_applied,
+            quality_gate_reason=quality_gate.reason,
+            block_reason=reason,
             image_source=post.image_source,
             image_validation_status=post.image_validation_status,
             validation_reason=post.image_validation_reason,
             prompt_quality=post.prompt_quality,
+            minimum_prompt_quality=_validated_image_prompt_quality_threshold(config) if post.media_kind == "image" else None,
             media_kind=post.media_kind,
             video_url=post.public_video_url,
             media_source=post.media_source,

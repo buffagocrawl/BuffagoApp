@@ -61,6 +61,8 @@ instagram:
   access_token_secret_name: "meta_long_lived_access_token"
   api_version: "v23.0"
   quality_threshold: 85
+  validated_image_quality_threshold: 80
+  validated_image_prompt_quality_threshold: 90
 
 publishing:
   container_poll_max_attempts: 10

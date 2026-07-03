@@ -1,0 +1,86 @@
+from __future__ import annotations
+
+from pathlib import Path
+import sys
+
+PROJECT_DIR = Path(__file__).resolve().parents[1]
+if str(PROJECT_DIR) not in sys.path:
+    sys.path.insert(0, str(PROJECT_DIR))
+
+from PIL import Image
+
+from image_pipeline.meme_formatter import format_meme_image
+from image_pipeline.meme_text_renderer import SafeArea, layout_meme_text, render_meme_text, sanitize_meme_text
+
+
+def test_sanitize_meme_text_normalizes_hidden_characters_and_carriage_returns() -> None:
+    text = sanitize_meme_text(" \ufeffif this wing\r\nhad\u200b a voicemail\x00: bring napkins. ")
+
+    assert text == "IF THIS WING\nHAD A VOICEMAIL: BRING NAPKINS."
+    assert "\r" not in text
+    assert "\ufeff" not in text
+    assert "\u200b" not in text
+    assert "\x00" not in text
+
+
+def test_layout_wraps_and_scales_inside_safe_area() -> None:
+    image = Image.new("RGBA", (1080, 1350), (20, 20, 24, 255))
+    safe = SafeArea(top=80, side=60, bottom=80)
+
+    layout = layout_meme_text(
+        image,
+        "IF THIS WING HAD A VOICEMAIL, IT WOULD JUST SAY: BRING NAPKINS.",
+        position="top",
+        safe_area=safe,
+        emphasis=True,
+    )
+
+    assert layout.valid
+    assert len(layout.lines) > 1
+    assert layout.bbox[0] >= layout.safe_bbox[0]
+    assert layout.bbox[1] >= layout.safe_bbox[1]
+    assert layout.bbox[2] <= layout.safe_bbox[2]
+    assert layout.bbox[3] <= layout.safe_bbox[3]
+    for line in layout.lines:
+        assert line.width <= layout.safe_bbox[2] - layout.safe_bbox[0]
+
+
+def test_render_meme_text_highlights_final_punchline() -> None:
+    image = Image.new("RGBA", (1080, 1350), (20, 20, 24, 255))
+    layout = layout_meme_text(
+        image,
+        "IF THIS WING HAD A VOICEMAIL, IT WOULD JUST SAY: BRING NAPKINS.",
+        position="top",
+        emphasis=True,
+    )
+
+    assert layout.lines[-1].fill != layout.lines[0].fill
+
+
+def test_format_meme_image_handles_long_caption_without_clipping() -> None:
+    source = Image.new("RGBA", (1024, 1024), (210, 82, 24, 255))
+
+    result = format_meme_image(
+        source,
+        top_text="IF THIS WING HAD A VOICEMAIL, IT WOULD JUST SAY: BRING NAPKINS.",
+        bottom_text="WHEN THE SAUCE HITS, THE GROUP CHAT GETS QUIET.",
+    )
+
+    assert result.applied
+    assert result.image.size == (1080, 1350)
+
+
+def test_render_meme_text_rejects_unfittable_safe_area() -> None:
+    image = Image.new("RGBA", (320, 320), (20, 20, 24, 255))
+
+    try:
+        render_meme_text(
+            image,
+            "THIS IS A VERY LONG CAPTION THAT CANNOT FIT",
+            safe_area=SafeArea(top=150, side=150, bottom=150),
+        )
+    except ValueError as exc:
+        assert "safe area" in str(exc)
+    else:
+        raise AssertionError("Expected render_meme_text to reject an impossible safe area")
+
