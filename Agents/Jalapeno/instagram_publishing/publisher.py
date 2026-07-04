@@ -48,6 +48,8 @@ class QualityGateDecision:
     standard_quality_score: int
     override_applied: bool
     policy: str
+    score_used: int
+    score_source: str
 
 
 @dataclass(slots=True)
@@ -98,15 +100,19 @@ def _validated_image_prompt_quality_threshold(config: JalapenoConfig) -> int:
 
 def _quality_gate_decision(config: JalapenoConfig, post: ApprovedInstagramPost) -> QualityGateDecision:
     standard_threshold = _quality_threshold(config)
+    score_used = post.publish_gate_score_used if post.publish_gate_score_used is not None else post.quality_score
+    score_source = post.publish_gate_score_source or "quality_score"
     if post.media_kind != "image":
-        passed = post.quality_score >= standard_threshold
+        passed = score_used >= standard_threshold
         return QualityGateDecision(
             passed=passed,
-            reason=None if passed else f"quality score below threshold: {post.quality_score} < {standard_threshold}",
+            reason=None if passed else f"quality score below threshold: {score_used} < {standard_threshold}",
             minimum_quality_score=standard_threshold,
             standard_quality_score=standard_threshold,
             override_applied=False,
             policy="standard_media_quality_gate",
+            score_used=score_used,
+            score_source=score_source,
         )
 
     image_threshold = _validated_image_quality_threshold(config)
@@ -117,14 +123,14 @@ def _quality_gate_decision(config: JalapenoConfig, post: ApprovedInstagramPost) 
         and post.prompt_quality >= prompt_threshold
     )
     effective_threshold = image_threshold if image_is_validated else standard_threshold
-    passed = post.quality_score >= effective_threshold
-    override_applied = image_is_validated and post.quality_score < standard_threshold and passed
+    passed = score_used >= effective_threshold
+    override_applied = image_is_validated and score_used < standard_threshold and passed
     if passed:
         reason = None
     elif image_is_validated:
-        reason = f"quality score below validated image threshold: {post.quality_score} < {effective_threshold}"
+        reason = f"quality score below validated image threshold: {score_used} < {effective_threshold}"
     else:
-        reason = f"quality score below threshold: {post.quality_score} < {effective_threshold}"
+        reason = f"quality score below threshold: {score_used} < {effective_threshold}"
     return QualityGateDecision(
         passed=passed,
         reason=reason,
@@ -132,6 +138,8 @@ def _quality_gate_decision(config: JalapenoConfig, post: ApprovedInstagramPost) 
         standard_quality_score=standard_threshold,
         override_applied=override_applied,
         policy="validated_real_ai_image_quality_gate" if image_is_validated else "standard_image_quality_gate",
+        score_used=score_used,
+        score_source=score_source,
     )
 
 
@@ -167,6 +175,11 @@ def precheck_approved_post(
         instagram_enabled_source=instagram_enabled_source,
         test_mode=test_mode,
         quality_score=post.quality_score,
+        candidate_score=post.candidate_score,
+        caption_score=post.caption_score,
+        image_quality_score=post.image_quality_score,
+        publish_gate_score_used=quality_gate.score_used,
+        publish_gate_score_source=quality_gate.score_source,
         minimum_quality_score=quality_gate.minimum_quality_score,
         standard_quality_score=quality_gate.standard_quality_score,
         quality_gate_policy=quality_gate.policy,
@@ -236,6 +249,11 @@ def precheck_approved_post(
             instagram_enabled=config.instagram.enabled,
             instagram_enabled_source=instagram_enabled_source,
             quality_score=post.quality_score,
+            candidate_score=post.candidate_score,
+            caption_score=post.caption_score,
+            image_quality_score=post.image_quality_score,
+            publish_gate_score_used=quality_gate.score_used,
+            publish_gate_score_source=quality_gate.score_source,
             minimum_quality_score=quality_gate.minimum_quality_score,
             standard_quality_score=quality_gate.standard_quality_score,
             quality_gate_policy=quality_gate.policy,
@@ -271,6 +289,11 @@ def precheck_approved_post(
             instagram_enabled=config.instagram.enabled,
             instagram_enabled_source=instagram_enabled_source,
             quality_score=post.quality_score,
+            candidate_score=post.candidate_score,
+            caption_score=post.caption_score,
+            image_quality_score=post.image_quality_score,
+            publish_gate_score_used=quality_gate.score_used,
+            publish_gate_score_source=quality_gate.score_source,
             minimum_quality_score=quality_gate.minimum_quality_score,
             standard_quality_score=quality_gate.standard_quality_score,
             quality_gate_policy=quality_gate.policy,

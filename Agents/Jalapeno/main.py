@@ -9,6 +9,7 @@ from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from uuid import UUID, uuid4
+from zoneinfo import ZoneInfo
 
 from config import (
     CONFIG_FILE,
@@ -56,6 +57,12 @@ PRODUCTION_POST_TYPE_MAP = {
     "video": "daily_wing_reel",
 }
 BUFFAGO_POST_CADENCE = timedelta(days=3)
+SCHEDULE_TIMEZONE = "America/New_York"
+SCHEDULE_WINDOW_TOLERANCE = timedelta(minutes=90)
+SCHEDULE_TARGET_HOURS = {
+    "buffago": 20,
+    "video": 18,
+}
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -106,6 +113,50 @@ def _normalize_optional_post_type(raw_value: str | None) -> str | None:
 
 def _production_scheduled_post_type(post_type: str) -> str:
     return PRODUCTION_POST_TYPE_MAP[post_type]
+
+
+def _scheduled_post_type_for_cron(cron: str) -> str | None:
+    normalized = " ".join(cron.split())
+    if normalized == "0 22 * * *":
+        return "video"
+    if normalized == "0 0 */3 * *":
+        return "buffago"
+    return None
+
+
+def _schedule_window_status(
+    post_type: str,
+    *,
+    now: datetime | None = None,
+    timezone_name: str = SCHEDULE_TIMEZONE,
+    tolerance: timedelta = SCHEDULE_WINDOW_TOLERANCE,
+) -> dict[str, object]:
+    if post_type not in SCHEDULE_TARGET_HOURS:
+        raise ConfigError(f"Invalid POST_TYPE '{post_type}'. Valid values: buffago, video")
+    current_utc = now or datetime.now(timezone.utc)
+    if current_utc.tzinfo is None:
+        current_utc = current_utc.replace(tzinfo=timezone.utc)
+    current_utc = current_utc.astimezone(timezone.utc)
+    local_zone = ZoneInfo(timezone_name)
+    local_time = current_utc.astimezone(local_zone)
+    target_local = local_time.replace(
+        hour=SCHEDULE_TARGET_HOURS[post_type],
+        minute=0,
+        second=0,
+        microsecond=0,
+    )
+    elapsed = local_time - target_local
+    allowed = timedelta(0) <= elapsed <= tolerance
+    return {
+        "allowed": allowed,
+        "utc_time": current_utc.isoformat(),
+        "local_time": local_time.isoformat(),
+        "timezone": timezone_name,
+        "target_local_time": target_local.isoformat(),
+        "target_hour": SCHEDULE_TARGET_HOURS[post_type],
+        "elapsed_minutes": round(elapsed.total_seconds() / 60, 3),
+        "tolerance_minutes": int(tolerance.total_seconds() / 60),
+    }
 
 
 def _is_video_post(scheduled_post_type: str) -> bool:
@@ -625,13 +676,13 @@ def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = Fals
             print(f"Warning: video asset availability check failed: {exc}")
         print(f"Active video assets available: {active_count}")
         if active_count == 0:
-            print("Warning: no active video assets are available for the 8pm Reel")
+            print("Warning: no active video assets are available for the 6pm Reel")
     elif client is None:
         print("Warning: jalapeno_video_assets and video bucket not inspected because Supabase is unavailable")
-    print(f"Configured 4pm Buffago cadence post: {config.buffago_post_time} {config.timezone}")
-    print(f"Configured 8pm video Reel post: {config.video.post_time} {config.timezone}")
-    if config.buffago_post_time != "16:00" or config.video.post_time != "20:00":
-        print("Warning: scheduler config does not match expected 16:00 Buffago and 20:00 video times")
+    print(f"Configured 8pm Buffago cadence post: {config.buffago_post_time} {config.timezone}")
+    print(f"Configured 6pm video Reel post: {config.video.post_time} {config.timezone}")
+    if config.buffago_post_time != "20:00" or config.video.post_time != "18:00":
+        print("Warning: scheduler config does not match expected 20:00 Buffago and 18:00 video times")
     print(f"OpenAI key available: {bool(os.getenv('OPENAI_API_KEY', '').strip() or os.getenv('JALAPENO_AI_FUNCTION_URL', '').strip())}")
     print(f"Meta credentials available: {bool(os.getenv(config.instagram.access_token_secret_name, '').strip() and os.getenv(config.instagram.ig_user_id_secret_name, '').strip())}")
     print(f"Instagram business account id present: {bool(config.instagram_business_account_id)}")
@@ -1035,6 +1086,53 @@ def run_production(content_type: str | None = None) -> int:
         run_source=run_source,
         **github_metadata,
     )
+
+    matched_cron = github_metadata.get("github_event_schedule")
+    if run_source == "github_actions_scheduler":
+        cron_post_type = _scheduled_post_type_for_cron(matched_cron or "")
+        window_status = _schedule_window_status(post_type)
+        log_event(
+            logger,
+            "schedule_window_checked",
+            mode="production",
+            post_type=post_type,
+            scheduled_post_type=scheduled_post_type,
+            run_source=run_source,
+            matched_cron=matched_cron,
+            resolved_post_type=post_type,
+            cron_resolved_post_type=cron_post_type,
+            schedule_window_allowed=window_status["allowed"],
+            utc_time=window_status["utc_time"],
+            america_new_york_time=window_status["local_time"],
+            schedule_target_local_time=window_status["target_local_time"],
+            schedule_elapsed_minutes=window_status["elapsed_minutes"],
+            schedule_tolerance_minutes=window_status["tolerance_minutes"],
+        )
+        if cron_post_type is not None and cron_post_type != post_type:
+            raise ConfigError(f"Scheduled cron '{matched_cron}' resolved to {cron_post_type}, not {post_type}")
+        if not window_status["allowed"]:
+            log_event(
+                logger,
+                "schedule_window_skipped",
+                mode="production",
+                post_type=post_type,
+                scheduled_post_type=scheduled_post_type,
+                run_source=run_source,
+                matched_cron=matched_cron,
+                resolved_post_type=post_type,
+                utc_time=window_status["utc_time"],
+                america_new_york_time=window_status["local_time"],
+                schedule_target_local_time=window_status["target_local_time"],
+                schedule_elapsed_minutes=window_status["elapsed_minutes"],
+                schedule_tolerance_minutes=window_status["tolerance_minutes"],
+                status="skipped",
+            )
+            print("Scheduled run skipped: outside America/New_York publish window")
+            print(f"UTC time: {window_status['utc_time']}")
+            print(f"America/New_York time: {window_status['local_time']}")
+            print(f"Matched cron: {matched_cron or 'unknown'}")
+            print(f"Resolved post type: {post_type}")
+            return 0
 
     has_url = bool(os.getenv("SUPABASE_URL", "").strip())
     has_service_role_key = bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip())

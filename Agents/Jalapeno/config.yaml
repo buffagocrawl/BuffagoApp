@@ -6,9 +6,9 @@ agent:
 timezone: America/New_York
 
 posting:
-  buffago_post_time: "16:00"
+  buffago_post_time: "20:00"
   meme_post_time: "20:00"
-  video_post_time: "20:00"
+  video_post_time: "18:00"
   video_recent_reuse_days: 7
 
 runtime:

@@ -20,14 +20,15 @@ on:
     # GitHub Actions cron uses UTC in this workflow format.
     # GitHub documents higher delay/drop risk at the start of every hour:
     # https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule
-    # These values intentionally run shortly after the hour during Eastern Daylight Time:
-    # - 8:07 PM ET video daily run      -> 00:07 UTC next day
-    # - 4:07 PM ET Buffago cadence run -> 20:07 UTC
+    # These values target Eastern Daylight Time. The Python entrypoint also
+    # enforces a 0-90 minute America/New_York local-time publish window.
+    # - 6:00 PM ET video daily run       -> 22:00 UTC
+    # - 8:00 PM ET Buffago cadence run  -> 00:00 UTC next day
     # When Eastern Standard Time resumes, update to:
-    # - 8:07 PM ET video daily run      -> 01:07 UTC next day
-    # - 4:07 PM ET Buffago cadence run -> 21:07 UTC
-    - cron: "7 0 * * *"
-    - cron: "7 20 * * *"
+    # - 6:00 PM ET video daily run       -> 23:00 UTC
+    # - 8:00 PM ET Buffago cadence run  -> 01:00 UTC next day
+    - cron: "0 22 * * *"
+    - cron: "0 0 */3 * *"
 
 jobs:
   jalapeno-instagram:
@@ -90,25 +91,29 @@ jobs:
           if [[ "${GITHUB_EVENT_NAME}" == "schedule" ]]; then
             matched_schedule="${JALAPENO_EVENT_SCHEDULE:-}"
             case "${matched_schedule}" in
-              "7 0 * * *")
+              "0 22 * * *")
                 post_type="video"
                 run_label="video_daily_run"
                 mode="production"
-                expected_schedule="7 0 * * *"
+                expected_schedule="0 22 * * *"
                 ;;
-              "7 20 * * *")
+              "0 0 */3 * *")
                 post_type="buffago"
                 run_label="buffago_three_day_run"
                 mode="production"
-                expected_schedule="7 20 * * *"
+                expected_schedule="0 0 */3 * *"
                 ;;
               *)
                 echo "Unsupported schedule trigger: ${matched_schedule}" >&2
                 exit 1
                 ;;
             esac
+            echo "utc_time=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+            echo "america_new_york_time=$(TZ=America/New_York date +"%Y-%m-%dT%H:%M:%S%z")"
+            echo "matched_cron=${matched_schedule}"
             echo "matched_schedule=${matched_schedule}"
             echo "expected_schedule=${expected_schedule}"
+            echo "resolved_post_type=${post_type}"
             echo "resolved_content_type=${post_type}"
             echo "resolved_mode=${mode}"
           elif [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then

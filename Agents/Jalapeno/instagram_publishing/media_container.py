@@ -89,6 +89,44 @@ def _resolve_quality_score(
     raise ValueError("Approved post is missing quality_score")
 
 
+def _resolve_candidate_score(winner: dict[str, Any]) -> int | None:
+    for key in ("candidate_score", "quality_score", "overall_score", "final_score", "score"):
+        value = _number_or_none(winner.get(key))
+        if value is not None:
+            return int(round(value))
+    return None
+
+
+def _resolve_caption_score(winner: dict[str, Any]) -> int | None:
+    for key in ("caption_score", "caption_quality_score"):
+        value = _number_or_none(winner.get(key))
+        if value is not None:
+            return int(round(value))
+    return None
+
+
+def _resolve_image_quality_score(image_result: dict[str, Any], *, logger=None) -> int | None:
+    image_score = _number_or_none(image_result.get("quality_score"))
+    if image_score is not None:
+        return int(round(image_score))
+
+    validation_payload = image_result.get("validation") if isinstance(image_result.get("validation"), dict) else {}
+    validation_score = _number_or_none(validation_payload.get("quality_score"))
+    if validation_score is None:
+        validation_score = _number_or_none(validation_payload.get("prompt_quality"))
+    if validation_score is None:
+        validation_score = _number_or_none(image_result.get("prompt_quality"))
+    if validation_score is not None:
+        log_event(
+            logger,
+            "image_quality_score_missing_using_validation_score",
+            level="warning",
+            image_quality_score=int(round(validation_score)),
+        )
+        return int(round(validation_score))
+    return None
+
+
 @dataclass(frozen=True, slots=True)
 class ApprovedInstagramPost:
     run_id: str
@@ -136,6 +174,11 @@ class ApprovedInstagramPost:
     error_message: str | None = None
     request_payload_safe: dict[str, Any] | None = None
     response_payload: dict[str, Any] | None = None
+    candidate_score: int | None = None
+    caption_score: int | None = None
+    image_quality_score: int | None = None
+    publish_gate_score_used: int | None = None
+    publish_gate_score_source: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -178,9 +221,24 @@ def load_approved_post_from_artifacts(
     if media_kind == "reel":
         prompt_quality = int(_number_or_none(winner.get("prompt_quality")) or 100)
         quality_score = int(_number_or_none(winner.get("quality_score")) or 90)
+        candidate_score = _resolve_candidate_score(winner)
+        caption_score = _resolve_caption_score(winner)
+        image_quality_score = None
+        publish_gate_score_used = quality_score
+        publish_gate_score_source = "reel_quality_score"
     else:
         prompt_quality = _resolve_prompt_quality(image_result)
-        quality_score = _resolve_quality_score(winner, image_result, logger=logger)
+        candidate_score = _resolve_candidate_score(winner)
+        caption_score = _resolve_caption_score(winner)
+        image_quality_score = _resolve_image_quality_score(image_result, logger=logger)
+        if image_quality_score is not None:
+            quality_score = image_quality_score
+            publish_gate_score_used = image_quality_score
+            publish_gate_score_source = "image_quality_score"
+        else:
+            quality_score = _resolve_quality_score(winner, image_result, logger=logger)
+            publish_gate_score_used = quality_score
+            publish_gate_score_source = "candidate_score" if candidate_score is not None else "quality_score_fallback"
     approved_value = winner.get("approved")
     if approved_value is None:
         approved_value = decision_summary.get("approved")
@@ -245,6 +303,11 @@ def load_approved_post_from_artifacts(
         error_message=_string_or_none(content_decision.get("error_message")),
         request_payload_safe=None,
         response_payload=None,
+        candidate_score=candidate_score,
+        caption_score=caption_score,
+        image_quality_score=image_quality_score,
+        publish_gate_score_used=publish_gate_score_used,
+        publish_gate_score_source=publish_gate_score_source,
         metadata=content_decision.get("metadata") if isinstance(content_decision.get("metadata"), dict) else {},
     )
 
@@ -329,6 +392,11 @@ def serialize_container_record(record: ApprovedInstagramPost) -> dict[str, Any]:
         "error_message": record.error_message,
         "request_payload_safe": record.request_payload_safe or {},
         "response_payload": record.response_payload or {},
+        "candidate_score": record.candidate_score,
+        "caption_score": record.caption_score,
+        "image_quality_score": record.image_quality_score,
+        "publish_gate_score_used": record.publish_gate_score_used,
+        "publish_gate_score_source": record.publish_gate_score_source,
         "metadata": record.metadata,
     }
     return payload

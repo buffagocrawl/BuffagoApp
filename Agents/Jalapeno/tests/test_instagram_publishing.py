@@ -163,6 +163,91 @@ def test_image_precheck_blocks_failed_validation() -> None:
     assert result.reason == "detected text artifacts"
 
 
+def test_buffago_validated_image_quality_overrides_candidate_score_78(tmp_path: Path) -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    config = replace(config, instagram=replace(config.instagram, enabled=True, dry_run=False))
+    stream = StringIO()
+    logger = initialize_logging(replace(config, log_directory=tmp_path / "logs"), stream=stream)
+    content_decision = {
+        "run_id": "11111111-1111-1111-1111-111111111111",
+        "scheduled_post_type": "buffago_post",
+        "winner": {
+            "candidate_id": "22222222-2222-2222-2222-222222222222",
+            "content_type": "restaurant_spotlight",
+            "caption": "Buffago test caption",
+            "hashtags": ["buffago", "wingnight"],
+            "image_prompt": "A hero plate of wings",
+            "approved": True,
+            "quality_score": 78,
+            "caption_score": 92,
+        },
+        "decision_summary": {"approved": True},
+    }
+    image_pipeline = {
+        "result": {
+            "public_url": "https://example.com/public-image.jpg",
+            "image_source": "real_ai",
+            "image_validation_status": "passed",
+            "image_validation_reason": "passed",
+            "quality_score": 100,
+            "prompt_quality": 100,
+        }
+    }
+
+    post = load_approved_post_from_artifacts(content_decision, image_pipeline=image_pipeline, logger=logger)
+    result = precheck_approved_post(config, post, dry_run=False, test_mode=False, logger=logger)
+
+    assert post.candidate_score == 78
+    assert post.caption_score == 92
+    assert post.image_quality_score == 100
+    assert post.publish_gate_score_used == 100
+    assert post.publish_gate_score_source == "image_quality_score"
+    assert post.quality_score == 100
+    assert result.passed is True
+    log_output = stream.getvalue()
+    assert "candidate_score=78" in log_output
+    assert "caption_score=92" in log_output
+    assert "image_quality_score=100" in log_output
+    assert "publish_gate_score_used=100" in log_output
+    assert "publish_gate_score_source=image_quality_score" in log_output
+
+
+def test_buffago_failed_image_validation_blocks_even_with_quality_100() -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    config = replace(config, instagram=replace(config.instagram, enabled=True, dry_run=False))
+    content_decision = {
+        "run_id": "11111111-1111-1111-1111-111111111111",
+        "scheduled_post_type": "buffago_post",
+        "winner": {
+            "candidate_id": "22222222-2222-2222-2222-222222222222",
+            "content_type": "restaurant_spotlight",
+            "caption": "Buffago test caption",
+            "hashtags": ["buffago", "wingnight"],
+            "image_prompt": "A hero plate of wings",
+            "approved": True,
+            "quality_score": 78,
+        },
+        "decision_summary": {"approved": True},
+    }
+    image_pipeline = {
+        "result": {
+            "public_url": "https://example.com/public-image.jpg",
+            "image_source": "real_ai",
+            "image_validation_status": "failed",
+            "image_validation_reason": "detected artifacts",
+            "quality_score": 100,
+            "prompt_quality": 100,
+        }
+    }
+
+    post = load_approved_post_from_artifacts(content_decision, image_pipeline=image_pipeline)
+    result = precheck_approved_post(config, post, dry_run=False, test_mode=False)
+
+    assert post.image_quality_score == 100
+    assert result.passed is False
+    assert result.reason == "detected artifacts"
+
+
 def test_image_precheck_blocks_fallback_or_placeholder_source() -> None:
     config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
     config = replace(config, instagram=replace(config.instagram, enabled=True, dry_run=False))
@@ -792,5 +877,5 @@ def test_publish_precheck_receives_image_validation_quality_score_when_winner_sc
     assert persisted_publish["quality_score"] == quality_score
     assert persisted_publish["prompt_quality"] == quality_score
     log_output = stream.getvalue()
-    assert "quality_score missing from publish state" in log_output
-    assert f"quality_score={quality_score}" in log_output
+    assert "image_quality_score_missing_using_validation_score" in log_output
+    assert f"image_quality_score={quality_score}" in log_output

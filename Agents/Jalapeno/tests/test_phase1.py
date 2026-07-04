@@ -39,6 +39,8 @@ from validation import validate_image_pipeline_environment, validate_phase5_envi
 from main import (  # noqa: E402
     PRODUCTION_POST_TYPE_MAP,
     _is_backup_worthy_video_publish_failure,
+    _schedule_window_status,
+    _scheduled_post_type_for_cron,
     _should_skip_buffago_three_day_run,
     _normalize_optional_post_type,
     _normalize_production_post_type,
@@ -77,9 +79,9 @@ def test_config_yaml_loads() -> None:
     assert config.channel == "instagram"
     assert config.brand == "Buffago"
     assert config.timezone == "America/New_York"
-    assert config.buffago_post_time == "16:00"
+    assert config.buffago_post_time == "20:00"
     assert config.meme_post_time == "20:00"
-    assert config.video_post_time == "20:00"
+    assert config.video_post_time == "18:00"
     assert config.video.bucket == "jalapeno-wing-videos"
     assert config.video.recent_reuse_days == 7
     assert config.test_mode_never_posts is True
@@ -239,6 +241,46 @@ def test_production_post_type_map_is_stable() -> None:
         "buffago": "buffago_post",
         "video": "daily_wing_reel",
     }
+
+
+def test_scheduled_video_cron_resolves_to_video_post() -> None:
+    assert _scheduled_post_type_for_cron("0 22 * * *") == "video"
+
+
+def test_scheduled_buffago_cron_resolves_to_buffago_post() -> None:
+    assert _scheduled_post_type_for_cron("0 0 */3 * *") == "buffago"
+
+
+def test_video_schedule_window_allows_six_pm_new_york_delay() -> None:
+    status = _schedule_window_status(
+        "video",
+        now=datetime(2026, 7, 1, 22, 45, tzinfo=timezone.utc),
+    )
+
+    assert status["allowed"] is True
+    assert status["target_hour"] == 18
+    assert status["elapsed_minutes"] == 45
+
+
+def test_buffago_schedule_window_allows_eight_pm_new_york_delay() -> None:
+    status = _schedule_window_status(
+        "buffago",
+        now=datetime(2026, 7, 2, 0, 30, tzinfo=timezone.utc),
+    )
+
+    assert status["allowed"] is True
+    assert status["target_hour"] == 20
+    assert status["elapsed_minutes"] == 30
+
+
+def test_wrong_local_time_window_skips_successfully() -> None:
+    status = _schedule_window_status(
+        "buffago",
+        now=datetime(2026, 7, 1, 20, 7, tzinfo=timezone.utc),
+    )
+
+    assert status["allowed"] is False
+    assert status["elapsed_minutes"] == -233
 
 
 def test_production_requires_post_type() -> None:
