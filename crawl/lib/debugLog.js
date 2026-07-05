@@ -3,13 +3,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DEVICE_KEY = 'buffago:debug_device_id';
 const SENSITIVE_KEY = /^(access_?token|refresh_?token|token|code|secret|client_?secret|password|authorization|apikey|anon_?key|state)$/i;
-const URL_LIKE_KEY = /url|uri|redirect/i;
 
 function sanitizeUrl(raw) {
   try {
     const parsed = new URL(String(raw));
     for (const key of [...parsed.searchParams.keys()]) {
-      if (SENSITIVE_KEY.test(key)) parsed.searchParams.set(key, '[redacted]');
+      const value = parsed.searchParams.get(key);
+      if (SENSITIVE_KEY.test(key)) {
+        parsed.searchParams.set(key, '[redacted]');
+      } else if (typeof value === 'string' && /^[a-z][a-z0-9+.-]*:\/\//i.test(value)) {
+        parsed.searchParams.set(key, sanitizeUrl(value));
+      }
     }
     if (parsed.hash) {
       const fragment = new URLSearchParams(parsed.hash.replace(/^#/, ''));
@@ -28,7 +32,7 @@ function sanitizeDetail(value, key = '', depth = 0) {
   if (depth > 6) return '[max-depth]';
   if (SENSITIVE_KEY.test(key)) return '[redacted]';
   if (typeof value === 'string') {
-    if (URL_LIKE_KEY.test(key) || /^[a-z][a-z0-9+.-]*:\/\//i.test(value)) return sanitizeUrl(value);
+    if (/^[a-z][a-z0-9+.-]*:\/\//i.test(value)) return sanitizeUrl(value);
     return value.length > 1000 ? `${value.slice(0, 1000)}…` : value;
   }
   if (Array.isArray(value)) return value.slice(0, 50).map((item) => sanitizeDetail(item, key, depth + 1));
@@ -41,6 +45,10 @@ function sanitizeDetail(value, key = '', depth = 0) {
     );
   }
   return value;
+}
+
+export function sanitizeForLogging(detail = {}) {
+  return sanitizeDetail(detail ?? {});
 }
 
 async function getDeviceId() {
@@ -58,7 +66,7 @@ export async function dbg(event, detail = {}, scope = 'auth') {
     const { data: u } = await supabase.auth.getUser();
     const user_id = u?.user?.id || null;
 
-    const safeDetail = sanitizeDetail(detail ?? {});
+    const safeDetail = sanitizeForLogging(detail ?? {});
 
     await supabase.from('debug_logs').insert({
       device_id,

@@ -53,6 +53,19 @@ function safeParseUrl(url) {
   return out;
 }
 
+function secretSummary(value) {
+  if (typeof value !== 'string' || value.length === 0) {
+    return { present: false, length: 0 };
+  }
+
+  return {
+    present: true,
+    length: value.length,
+    prefix: value.slice(0, 4),
+    suffix: value.slice(-4),
+  };
+}
+
 // Same helper Ratings screen uses
 const deriveStateCode = (address) => {
   if (!address || typeof address !== 'string') return null;
@@ -400,6 +413,19 @@ export default function AuthCallback() {
           typeof parsed.fragment?.refresh_token === 'string' ? parsed.fragment.refresh_token : null;
 
         await dbg(
+          'oauth_callback_secret_summary',
+          {
+            flowId,
+            mode: flowMode,
+            authCode: secretSummary(code),
+            accessCredential: secretSummary(accessToken),
+            refreshCredential: secretSummary(refreshToken),
+            elapsedMs: Date.now() - flowStartedAt,
+          },
+          flowMode ? 'facebook' : 'auth'
+        );
+
+        await dbg(
           'oauth_callback_params_inspected',
           {
             flowId,
@@ -419,9 +445,30 @@ export default function AuthCallback() {
         }
 
         if (code) {
-          await dbg('oauth_code_exchange_started', { flowId, mode: flowMode }, flowMode ? 'facebook' : 'auth');
+          await dbg(
+            'oauth_code_reached_supabase_exchange',
+            {
+              flowId,
+              mode: flowMode,
+              authCode: secretSummary(code),
+              elapsedMs: Date.now() - flowStartedAt,
+            },
+            flowMode ? 'facebook' : 'auth'
+          );
           const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-          if (error) throw error;
+          if (error) {
+            await dbg(
+              'oauth_code_exchange_failed',
+              {
+                flowId,
+                mode: flowMode,
+                ...sanitizeAuthError(error),
+                elapsedMs: Date.now() - flowStartedAt,
+              },
+              flowMode ? 'facebook' : 'auth'
+            );
+            throw error;
+          }
 
           const userId = data?.session?.user?.id;
           if (!userId) throw new Error('No session user after code exchange');
@@ -431,12 +478,34 @@ export default function AuthCallback() {
             flowMode ? 'facebook' : 'auth'
           );
         } else if (accessToken && refreshToken) {
-          await dbg('oauth_set_session_started', { flowId, mode: flowMode }, flowMode ? 'facebook' : 'auth');
+          await dbg(
+            'oauth_fragment_tokens_reached_supabase_set_session',
+            {
+              flowId,
+              mode: flowMode,
+              accessCredential: secretSummary(accessToken),
+              refreshCredential: secretSummary(refreshToken),
+              elapsedMs: Date.now() - flowStartedAt,
+            },
+            flowMode ? 'facebook' : 'auth'
+          );
           const { data, error } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken,
           });
-          if (error) throw error;
+          if (error) {
+            await dbg(
+              'oauth_set_session_failed',
+              {
+                flowId,
+                mode: flowMode,
+                ...sanitizeAuthError(error),
+                elapsedMs: Date.now() - flowStartedAt,
+              },
+              flowMode ? 'facebook' : 'auth'
+            );
+            throw error;
+          }
 
           const userId = data?.session?.user?.id;
           if (!userId) throw new Error('No session user after setSession');
@@ -475,6 +544,23 @@ export default function AuthCallback() {
           },
           flowMode ? 'facebook' : 'auth'
         );
+        if (flowMode) {
+          await dbg(
+            'facebook_session_final_state',
+            {
+              flowId,
+              mode: flowMode,
+              phase: 'session_persisted',
+              hasSession: true,
+              hasUserId: true,
+              matchesExpectedLinkUser: expectedLinkUserId
+                ? s2.session.user.id === expectedLinkUserId
+                : null,
+              elapsedMs: Date.now() - flowStartedAt,
+            },
+            'facebook'
+          );
+        }
 
         if (expectedLinkUserId && s2.session.user.id !== expectedLinkUserId) {
           await dbg(
@@ -627,6 +713,8 @@ export default function AuthCallback() {
             mode: flowMode,
             outcome: 'success',
             hasUserId: Boolean(user?.id),
+            hasSession: true,
+            hasFacebookIdentity: Boolean(getFacebookIdentity(user)),
             elapsedMs: Date.now() - flowStartedAt,
             callbackProcessingMs: Date.now() - callbackStartedAt,
           },

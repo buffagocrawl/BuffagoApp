@@ -1,9 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { makeRedirectUri } from 'expo-auth-session';
 import Constants from 'expo-constants';
 import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
-import { dbg } from './debugLog';
+import { dbg, sanitizeForLogging } from './debugLog';
 import { trackEvent } from './analytics';
 import { supabase } from './supabase';
 
@@ -15,25 +16,15 @@ export const OAUTH_FLOW_MODE_KEY = 'buffago:oauth:flow_mode';
 export const OAUTH_FLOW_STARTED_AT_KEY = 'buffago:oauth:started_at';
 
 const ANDROID_REDIRECT_GRACE_MS = 1800;
-const NATIVE_FACEBOOK_GRACE_MS = 2400;
 
 const elapsedMs = (startedAt) => Math.max(0, Date.now() - startedAt);
 
-function facebookNativeUrl(authUrl) {
-  if (!authUrl) return null;
-  try {
-    return `fb://facewebmodal/f?href=${encodeURIComponent(String(authUrl))}`;
-  } catch {
-    return null;
-  }
-}
-
 async function emitFacebookLog(eventName, detail = {}, screen = null) {
-  const payload = {
+  const payload = sanitizeForLogging({
     provider: 'facebook',
     device_platform: Platform.OS,
     ...detail,
-  };
+  });
 
   try {
     console.info(`[facebook] ${eventName}`, payload);
@@ -46,8 +37,23 @@ async function emitFacebookLog(eventName, detail = {}, screen = null) {
 }
 
 export function getFacebookRedirectUrl() {
-  const created = Linking.createURL('auth/callback');
-  return Constants.appOwnership === 'expo' ? created : 'buffago://auth/callback';
+  if (Constants.appOwnership === 'expo') {
+    return makeRedirectUri({ path: 'auth/callback' });
+  }
+
+  return makeRedirectUri({
+    scheme: 'buffago',
+    path: 'auth/callback',
+  });
+}
+
+export function getFacebookRedirectDiagnostics() {
+  return {
+    makeRedirectUri: getFacebookRedirectUrl(),
+    linkingCreateUrl: Linking.createURL('auth/callback'),
+    appOwnership: Constants.appOwnership || null,
+    executionEnvironment: Constants.executionEnvironment || null,
+  };
 }
 
 export function describeUrl(rawUrl) {
@@ -117,6 +123,7 @@ export function facebookConfigChecklist(redirectUrl) {
     androidPackage: 'com.buffago.app',
     appScheme: 'buffago',
     redirectUrl: describeUrl(redirectUrl),
+    redirectDiagnostics: getFacebookRedirectDiagnostics(),
     requiredAndroidIntent: 'buffago://auth/callback',
     requiredSupabaseRedirectAllowListEntry: 'buffago://auth/callback',
     requiredSupabaseProvider: 'Facebook provider enabled with App ID and App Secret',
@@ -175,6 +182,7 @@ export async function runFacebookOAuth({
       ...common,
       target_url: null,
       redirect_url: redirectUrl,
+      redirect_diagnostics: getFacebookRedirectDiagnostics(),
       app_info: facebookAppInfo(),
     },
     screen
@@ -184,6 +192,7 @@ export async function runFacebookOAuth({
     ...facebookAppInfo(),
     hasSession: Boolean(currentUserId),
     redirect: describeUrl(redirectUrl),
+    redirectDiagnostics: getFacebookRedirectDiagnostics(),
     elapsedMs: elapsedMs(startedAt),
   }, 'facebook');
 
@@ -199,6 +208,7 @@ export async function runFacebookOAuth({
   await dbg('facebook_oauth_request_started', {
     ...common,
     redirect: describeUrl(redirectUrl),
+    redirectDiagnostics: getFacebookRedirectDiagnostics(),
     app: facebookAppInfo(),
     customTabs: customTabsInfo
       ? {
@@ -272,6 +282,8 @@ export async function runFacebookOAuth({
     ...common,
     hasProviderUrl: Boolean(authUrl),
     providerUrl: authUrl ? describeUrl(authUrl) : null,
+    authorizeUrl: authUrl,
+    redirectDiagnostics: getFacebookRedirectDiagnostics(),
     elapsedMs: elapsedMs(startedAt),
   }, 'facebook');
   if (!authUrl) {
@@ -319,6 +331,13 @@ export async function runFacebookOAuth({
     resolveRedirect = resolve;
   });
   const redirectSub = Linking.addEventListener('url', ({ url }) => {
+    dbg('facebook_linking_event_observed', {
+      ...common,
+      url: url || null,
+      parsed: url ? describeUrl(url) : null,
+      matchesRedirect: Boolean(url && String(url).startsWith(redirectUrl)),
+      elapsedMs: elapsedMs(startedAt),
+    }, 'facebook');
     if (!url || !String(url).startsWith(redirectUrl)) return;
     observedRedirectUrl = url;
     AsyncStorage.setItem(OAUTH_RETURN_URL_KEY, url).catch(() => {});
@@ -349,71 +368,26 @@ export async function runFacebookOAuth({
 
   let result;
   try {
-    const nativeUrl = facebookNativeUrl(authUrl);
     await emitFacebookLog(
-      'facebook_link_native_attempt',
+      'facebook_browser_session_selected',
       {
         ...common,
-        native_url: nativeUrl,
+        target_url: authUrl,
+        redirect_url: redirectUrl,
+        surface: Platform.OS === 'android' ? 'chrome_custom_tabs' : 'auth_session',
+      },
+      screen
+    );
+
+    await emitFacebookLog(
+      'facebook_link_browser_opened',
+      {
+        ...common,
         target_url: authUrl,
         redirect_url: redirectUrl,
       },
       screen
     );
-
-    if (nativeUrl) {
-      try {
-        await Linking.openURL(nativeUrl);
-        await Promise.race([redirectPromise, wait(NATIVE_FACEBOOK_GRACE_MS)]);
-        if (!observedRedirectUrl) {
-          await emitFacebookLog(
-            'facebook_link_timeout',
-            {
-              ...common,
-              phase: 'native_wait',
-              target_url: authUrl,
-              redirect_url: redirectUrl,
-            },
-            screen
-          );
-        }
-      } catch (error) {
-        await emitFacebookLog(
-          'facebook_link_failure',
-          {
-            ...common,
-            phase: 'native_open',
-            error: error?.message || 'Native Facebook app open failed',
-            stack: sanitizeAuthError(error).stack,
-            target_url: authUrl,
-            redirect_url: redirectUrl,
-          },
-          screen
-        );
-      }
-    }
-
-    if (observedRedirectUrl) {
-      await AsyncStorage.setItem(OAUTH_RETURN_URL_KEY, observedRedirectUrl);
-      await dbg('facebook_callback_handoff_ready', {
-        ...common,
-        callback: describeUrl(observedRedirectUrl),
-        elapsedMs: elapsedMs(startedAt),
-      }, 'facebook');
-      return { outcome: 'callback', callbackUrl: observedRedirectUrl, flowId, startedAt };
-    }
-
-    if (!observedRedirectUrl) {
-      await emitFacebookLog(
-        'facebook_link_browser_opened',
-        {
-          ...common,
-          target_url: authUrl,
-          redirect_url: redirectUrl,
-        },
-        screen
-      );
-    }
 
     result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
     await dbg('facebook_browser_session_result', {

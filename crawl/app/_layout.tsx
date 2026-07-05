@@ -2,7 +2,7 @@
 import * as WebBrowser from 'expo-web-browser';
 import 'react-native-reanimated';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Platform, View } from 'react-native';
+import { AppState, Platform, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Linking from 'expo-linking';
 import { Stack, usePathname } from 'expo-router'; 
@@ -350,7 +350,30 @@ function AppShell() {
  */
 export default function RootLayout() {
   useEffect(() => {
+    const logLinkingEvent = async (url: string | null, source: string) => {
+      const [flowId, mode, startedAtRaw] = await AsyncStorage.multiGet([
+        OAUTH_FLOW_ID_KEY,
+        OAUTH_FLOW_MODE_KEY,
+        OAUTH_FLOW_STARTED_AT_KEY,
+      ]);
+      const startedAt = Number(startedAtRaw?.[1]);
+      await dbg(
+        'linking_event_observed',
+        {
+          flowId: flowId?.[1] || null,
+          mode: mode?.[1] || null,
+          source,
+          url: url || null,
+          parsed: url ? describeUrl(url) : null,
+          isAuthCallback: Boolean(url && String(url).includes('auth/callback')),
+          elapsedMs: Number.isFinite(startedAt) && startedAt > 0 ? Date.now() - startedAt : null,
+        },
+        mode?.[1] ? 'facebook' : 'auth'
+      );
+    };
+
     const cacheOAuthCallback = async (url: string | null) => {
+      await logLinkingEvent(url, 'root');
       if (!url || !String(url).includes('auth/callback')) return;
       await AsyncStorage.setItem(OAUTH_RETURN_URL_KEY, url);
       const [flowId, mode, startedAtRaw] = await AsyncStorage.multiGet([
@@ -375,6 +398,32 @@ export default function RootLayout() {
       cacheOAuthCallback(url).catch(() => {});
     });
     Linking.getInitialURL().then(cacheOAuthCallback).catch(() => {});
+
+    return () => subscription.remove();
+  }, []);
+
+  useEffect(() => {
+    let previousState = AppState.currentState;
+    const subscription = AppState.addEventListener('change', async (nextState) => {
+      const [flowId, mode, startedAtRaw] = await AsyncStorage.multiGet([
+        OAUTH_FLOW_ID_KEY,
+        OAUTH_FLOW_MODE_KEY,
+        OAUTH_FLOW_STARTED_AT_KEY,
+      ]);
+      const startedAt = Number(startedAtRaw?.[1]);
+      await dbg(
+        'app_state_transition',
+        {
+          flowId: flowId?.[1] || null,
+          mode: mode?.[1] || null,
+          previousState,
+          nextState,
+          elapsedMs: Number.isFinite(startedAt) && startedAt > 0 ? Date.now() - startedAt : null,
+        },
+        mode?.[1] ? 'facebook' : 'app'
+      );
+      previousState = nextState;
+    });
 
     return () => subscription.remove();
   }, []);
