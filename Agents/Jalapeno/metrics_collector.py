@@ -65,6 +65,8 @@ class MetricsCollectionResult:
     snapshots_persisted: int
     failures: int
     action_required: bool
+    skipped_duplicates: int = 0
+    dry_run: bool = False
 
 
 def _extract_metadata(post: dict[str, Any]) -> dict[str, Any]:
@@ -99,16 +101,29 @@ def _extract_metadata(post: dict[str, Any]) -> dict[str, Any]:
     return creative
 
 
-def _should_collect(post: dict[str, Any], now: datetime) -> bool:
+def _post_age_hours(post: dict[str, Any], now: datetime) -> float | None:
     published_at = _parse_dt(post.get("published_at"))
     if published_at is None:
-        return False
-    age_hours = (now - published_at).total_seconds() / 3600.0
+        return None
+    return (now - published_at).total_seconds() / 3600.0
+
+
+def _collection_window(age_hours: float, *, backfill: bool = False) -> str | None:
     if 23 <= age_hours <= 30:
-        return True
+        return "24h"
     if 71 <= age_hours <= 80:
-        return True
-    return age_hours <= 30 * 24
+        return "72h"
+    if 164 <= age_hours <= 180:
+        return "7d"
+    if not backfill:
+        return None
+    if 24 <= age_hours < 72:
+        return "24h"
+    if 72 <= age_hours < 168:
+        return "72h"
+    if 168 <= age_hours <= 30 * 24:
+        return "7d"
+    return None
 
 
 def _engagement_rate(metrics: dict[str, Any]) -> float | None:
@@ -119,7 +134,7 @@ def _engagement_rate(metrics: dict[str, Any]) -> float | None:
     return round(engagement / reach, 4)
 
 
-def _fetch_published_posts(client: SupabaseClient, now: datetime) -> list[dict[str, Any]]:
+def _fetch_published_posts(client: SupabaseClient, now: datetime, *, backfill: bool = False) -> list[dict[str, Any]]:
     cutoff = now - timedelta(days=30)
     posts = client.fetch_rows(
         "jalapeno_posts",
@@ -131,32 +146,88 @@ def _fetch_published_posts(client: SupabaseClient, now: datetime) -> list[dict[s
             "limit": 200,
         },
     )
-    if not posts:
-        instagram_rows = client.fetch_rows(
-            "jalapeno_instagram_posts",
-            select="*",
-            filters={
-                "published_at": f"gte.{cutoff.isoformat()}",
-                "status": "in.(published,published_with_permalink_pending)",
-                "order": "published_at.desc",
-                "limit": 200,
-            },
-        )
-        posts = [
-            {
-                "id": row.get("post_id"),
-                "run_id": row.get("run_id"),
-                "generated_caption": row.get("caption"),
-                "hashtags": row.get("hashtags"),
-                "post_type": row.get("scheduled_post_type") or row.get("content_type"),
-                "instagram_media_id": row.get("published_media_id"),
-                "published_at": row.get("published_at"),
-                "metadata": row.get("metadata") if isinstance(row.get("metadata"), dict) else {},
-            }
-            for row in instagram_rows
-            if row.get("post_id") and row.get("published_media_id")
-        ]
-    return [post for post in posts if post.get("instagram_media_id") and post.get("id") and _should_collect(post, now)]
+    instagram_rows = client.fetch_rows(
+        "jalapeno_instagram_posts",
+        select="*",
+        filters={
+            "published_at": f"gte.{cutoff.isoformat()}",
+            "status": "in.(published,published_with_permalink_pending)",
+            "order": "published_at.desc",
+            "limit": 200,
+        },
+    )
+    instagram_by_post_id = {
+        str(row.get("post_id")): row
+        for row in instagram_rows
+        if row.get("post_id") and row.get("published_media_id")
+    }
+    for post in posts:
+        instagram_row = instagram_by_post_id.get(str(post.get("id")))
+        if instagram_row and not post.get("instagram_media_id"):
+            post["instagram_media_id"] = instagram_row.get("published_media_id")
+        if instagram_row and not post.get("published_at"):
+            post["published_at"] = instagram_row.get("published_at")
+    known_post_ids = {str(post.get("id")) for post in posts if post.get("id")}
+    posts.extend(
+        {
+            "id": row.get("post_id"),
+            "run_id": row.get("run_id"),
+            "generated_caption": row.get("caption"),
+            "hashtags": row.get("hashtags"),
+            "post_type": row.get("scheduled_post_type") or row.get("content_type"),
+            "instagram_media_id": row.get("published_media_id"),
+            "published_at": row.get("published_at"),
+            "metadata": row.get("metadata") if isinstance(row.get("metadata"), dict) else {},
+        }
+        for row in instagram_rows
+        if row.get("post_id") and row.get("published_media_id") and str(row.get("post_id")) not in known_post_ids
+    )
+    candidates: list[dict[str, Any]] = []
+    for post in posts:
+        if not post.get("instagram_media_id") or not post.get("id"):
+            continue
+        age_hours = _post_age_hours(post, now)
+        if age_hours is None:
+            continue
+        window = _collection_window(age_hours, backfill=backfill)
+        if window is None:
+            continue
+        enriched = dict(post)
+        enriched["metrics_collection_window"] = window
+        enriched["metrics_exact_window"] = 23 <= age_hours <= 30 or 71 <= age_hours <= 80 or 164 <= age_hours <= 180
+        candidates.append(enriched)
+    return candidates
+
+
+def _existing_metric_windows(client: SupabaseClient, posts: list[dict[str, Any]]) -> set[tuple[str, str]]:
+    post_ids = sorted({str(post.get("id")) for post in posts if post.get("id")})
+    if not post_ids:
+        return set()
+    rows = client.fetch_rows(
+        "jalapeno_post_metrics",
+        select="post_id,post_age_hours,metadata",
+        filters={
+            "post_id": f"in.({','.join(post_ids)})",
+            "limit": 1000,
+        },
+    )
+    windows: set[tuple[str, str]] = set()
+    for row in rows:
+        post_id = str(row.get("post_id") or "")
+        metadata = row.get("metadata") if isinstance(row.get("metadata"), dict) else {}
+        window = metadata.get("collection_window")
+        if not window:
+            age_hours = row.get("post_age_hours")
+            if isinstance(age_hours, str):
+                try:
+                    age_hours = float(age_hours)
+                except ValueError:
+                    age_hours = None
+            if isinstance(age_hours, (int, float)):
+                window = _collection_window(float(age_hours), backfill=True)
+        if post_id and isinstance(window, str) and window:
+            windows.add((post_id, window))
+    return windows
 
 
 def collect_instagram_metrics(
@@ -166,6 +237,8 @@ def collect_instagram_metrics(
     logger=None,
     run_id: str | None = None,
     now: datetime | None = None,
+    backfill: bool = False,
+    dry_run: bool = False,
 ) -> MetricsCollectionResult:
     started = time.perf_counter()
     now = now or _utcnow()
@@ -173,23 +246,93 @@ def collect_instagram_metrics(
     persisted = 0
     failures = 0
     action_required = False
-    log_event(logger, "metrics_collection_started", run_id=active_run_id, stage="metrics", status="started")
-    access_token = _read_secret(config.instagram.access_token_secret_name)
-    ig_user_id = _read_secret(config.instagram.ig_user_id_secret_name)
-    graph = InstagramGraphClient(
-        ig_user_id=ig_user_id,
-        access_token=access_token,
-        api_version=config.instagram.api_version,
-        simulate=False,
-        timeout_seconds=30,
-    )
-    posts = _fetch_published_posts(client, now)
+    log_event(logger, "metrics_collection_started", run_id=active_run_id, stage="metrics", status="started", backfill=backfill, dry_run=dry_run)
+    graph: InstagramGraphClient | None = None
+    if not dry_run:
+        access_token = _read_secret(config.instagram.access_token_secret_name)
+        ig_user_id = _read_secret(config.instagram.ig_user_id_secret_name)
+        graph = InstagramGraphClient(
+            ig_user_id=ig_user_id,
+            access_token=access_token,
+            api_version=config.instagram.api_version,
+            simulate=False,
+            timeout_seconds=30,
+        )
+    posts = _fetch_published_posts(client, now, backfill=backfill)
+    log_event(logger, "published_posts_loaded", run_id=active_run_id, stage="metrics", status="completed", candidate_count=len(posts), backfill=backfill)
+    existing_windows = _existing_metric_windows(client, posts)
+    deduped_posts: list[dict[str, Any]] = []
+    skipped_duplicates = 0
+    for post in posts:
+        post_id = str(post.get("id"))
+        window = str(post.get("metrics_collection_window"))
+        if (post_id, window) in existing_windows:
+            skipped_duplicates += 1
+            log_event(
+                logger,
+                "metrics_candidate_skipped_duplicate",
+                run_id=active_run_id,
+                post_id=post_id,
+                instagram_media_id=post.get("instagram_media_id"),
+                collection_window=window,
+                stage="metrics",
+                status="skipped",
+            )
+            continue
+        deduped_posts.append(post)
+    posts = deduped_posts
     for post in posts:
         post_started = time.perf_counter()
         post_id = str(post.get("id"))
         media_id = str(post.get("instagram_media_id"))
+        window = str(post.get("metrics_collection_window"))
+        log_event(
+            logger,
+            "metrics_candidate_selected",
+            run_id=active_run_id,
+            post_id=post_id,
+            instagram_media_id=media_id,
+            collection_window=window,
+            exact_window=bool(post.get("metrics_exact_window")),
+            stage="metrics",
+            status="selected",
+        )
+        if dry_run:
+            continue
+        failure_stage = "insights"
         try:
+            if graph is None:
+                raise ConfigError("Instagram Graph client was not initialized")
+            log_event(
+                logger,
+                "instagram_insights_fetch_started",
+                run_id=active_run_id,
+                post_id=post_id,
+                instagram_media_id=media_id,
+                collection_window=window,
+                stage="metrics",
+                status="started",
+            )
             raw_metrics = graph.get_media_metrics(media_id)
+            insight_errors = raw_metrics.get("insight_errors") if isinstance(raw_metrics.get("insight_errors"), dict) else {}
+            returned_metrics = raw_metrics.get("returned_insight_metrics") if isinstance(raw_metrics.get("returned_insight_metrics"), list) else []
+            if insight_errors and not returned_metrics:
+                combined_error = " ".join(str(value) for value in insight_errors.values())
+                if _is_token_error(SupabaseError(combined_error)) or _is_rate_limit(SupabaseError(combined_error)):
+                    raise SupabaseError(combined_error)
+            log_event(
+                logger,
+                "instagram_insights_fetch_succeeded",
+                run_id=active_run_id,
+                post_id=post_id,
+                instagram_media_id=media_id,
+                collection_window=window,
+                requested_metrics=raw_metrics.get("requested_insight_metrics"),
+                returned_metrics=raw_metrics.get("returned_insight_metrics"),
+                missing_metrics=raw_metrics.get("missing_insight_metrics"),
+                stage="metrics",
+                status="completed",
+            )
             metrics = {
                 "likes": _safe_int(raw_metrics.get("likes") or raw_metrics.get("like_count")),
                 "comments": _safe_int(raw_metrics.get("comments") or raw_metrics.get("comments_count")),
@@ -203,6 +346,17 @@ def collect_instagram_metrics(
             age_hours = round((now - published_at).total_seconds() / 3600.0, 2) if published_at else None
             age_days = round(age_hours / 24.0, 2) if age_hours is not None else None
             creative = _extract_metadata(post)
+            failure_stage = "insert"
+            log_event(
+                logger,
+                "post_metrics_insert_started",
+                run_id=active_run_id,
+                post_id=post_id,
+                instagram_media_id=media_id,
+                collection_window=window,
+                stage="metrics",
+                status="started",
+            )
             insert_metrics_snapshot(
                 client,
                 post_id=UUID(post_id),
@@ -212,17 +366,26 @@ def collect_instagram_metrics(
                 post_age_hours=age_hours,
                 post_age_days=age_days,
                 raw_metrics=raw_metrics,
-                metadata={"source": "instagram_graph_api", "run_id": active_run_id, **creative},
+                metadata={
+                    "source": "instagram_graph_api",
+                    "run_id": active_run_id,
+                    "collection_window": window,
+                    "exact_collection_window": bool(post.get("metrics_exact_window")),
+                    "backfill": backfill,
+                    **creative,
+                },
                 **metrics,
                 **creative,
             )
+            failure_stage = "completed"
             persisted += 1
             log_event(
                 logger,
-                "metrics_snapshot_persisted",
+                "post_metrics_insert_succeeded",
                 run_id=active_run_id,
                 post_id=post_id,
                 instagram_media_id=media_id,
+                collection_window=window,
                 stage="metrics",
                 status="completed",
                 duration_ms=int((time.perf_counter() - post_started) * 1000),
@@ -233,11 +396,14 @@ def collect_instagram_metrics(
             error_type = "meta_token_expired" if _is_token_error(exc) else "rate_limit" if _is_rate_limit(exc) else type(exc).__name__
             if error_type == "meta_token_expired":
                 action_required = True
+                log_event(logger, "instagram_insights_fetch_failed" if failure_stage == "insights" else "post_metrics_insert_failed", level="error", run_id=active_run_id, post_id=post_id, instagram_media_id=media_id, collection_window=window, stage="metrics", status="failed_action_required", error=str(exc))
                 log_event(logger, "token_expired_detected", level="error", run_id=active_run_id, post_id=post_id, instagram_media_id=media_id, stage="metrics", status="failed_action_required", error=str(exc))
                 log_event(logger, "failure_alert_required", level="error", run_id=active_run_id, post_id=post_id, instagram_media_id=media_id, stage="metrics", status="failed_action_required", error_type=error_type, error=str(exc))
             elif error_type == "rate_limit":
+                log_event(logger, "instagram_insights_fetch_failed" if failure_stage == "insights" else "post_metrics_insert_failed", level="warning", run_id=active_run_id, post_id=post_id, instagram_media_id=media_id, collection_window=window, stage="metrics", status="retry_deferred", error=str(exc))
                 log_event(logger, "rate_limit_retry", level="warning", run_id=active_run_id, post_id=post_id, instagram_media_id=media_id, stage="metrics", status="retry_deferred", retry_count=0, error=str(exc))
             else:
+                log_event(logger, "instagram_insights_fetch_failed" if failure_stage == "insights" else "post_metrics_insert_failed", level="error", run_id=active_run_id, post_id=post_id, instagram_media_id=media_id, collection_window=window, stage="metrics", status="failed", error_type=error_type, error=str(exc))
                 log_event(logger, "metrics_collection_failed", level="error", run_id=active_run_id, post_id=post_id, instagram_media_id=media_id, stage="metrics", status="failed", error_type=error_type, error=str(exc))
             try:
                 insert_error_row(
@@ -258,7 +424,7 @@ def collect_instagram_metrics(
     log_event(
         logger,
         "metrics_collection_completed" if not failures else "metrics_collection_failed",
-        level="error" if action_required else "info",
+        level="error" if failures else "info",
         run_id=active_run_id,
         stage="metrics",
         status="failed_action_required" if action_required else "completed",
@@ -266,6 +432,9 @@ def collect_instagram_metrics(
         checked_posts=len(posts),
         snapshots_persisted=persisted,
         failures=failures,
+        skipped_duplicates=skipped_duplicates,
+        backfill=backfill,
+        dry_run=dry_run,
     )
     return MetricsCollectionResult(
         run_id=active_run_id,
@@ -273,4 +442,6 @@ def collect_instagram_metrics(
         snapshots_persisted=persisted,
         failures=failures,
         action_required=action_required,
+        skipped_duplicates=skipped_duplicates,
+        dry_run=dry_run,
     )

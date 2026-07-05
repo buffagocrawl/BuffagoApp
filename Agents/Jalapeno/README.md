@@ -536,16 +536,31 @@ The engine uses configurable weights in `content_engine/decision_config.json`, s
 Run metrics collection:
 
 ```powershell
-python main.py --metrics
+python main.py --collect-metrics
+```
+
+Dry-run candidate selection without Meta calls or inserts:
+
+```powershell
+python main.py --collect-metrics --metrics-dry-run
+```
+
+Backfill missing windows for published posts from the last 30 days:
+
+```powershell
+python main.py --collect-metrics --metrics-backfill
 ```
 
 Metrics behavior:
 
 - collects snapshots for posts published around 24 hours old
 - collects snapshots again around 72 hours old
-- refreshes all published posts from the last 30 days
+- collects a 7 day snapshot when available
+- backfills missing 24h, 72h, and 7d windows for recent published posts
+- skips duplicate rows for the same post and collection window
 - stores historical snapshots in `jalapeno_post_metrics`
 - computes engagement rate from likes, comments, saves, shares, and reach/impressions
+- logs requested, returned, and missing Instagram insight metrics
 - detects token/auth failures and returns an action-required status instead of retrying forever
 - logs rate limit events and defers safely
 
@@ -726,7 +741,7 @@ python main.py --instagram-publish-live
 Collect metrics for recent published posts:
 
 ```powershell
-python main.py --metrics
+python main.py --collect-metrics
 ```
 
 Generate reports:

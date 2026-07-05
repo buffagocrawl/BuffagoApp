@@ -221,6 +221,9 @@ class InstagramGraphClient:
                 "shares": 1,
                 "reach": 250,
                 "impressions": 310,
+                "requested_insight_metrics": ["reach", "impressions", "saved", "shares"],
+                "returned_insight_metrics": ["reach", "impressions", "saved", "shares"],
+                "missing_insight_metrics": [],
                 "source": "simulated",
             }
         details_response = self.transport.request(
@@ -235,26 +238,47 @@ class InstagramGraphClient:
         if details_response.status_code >= 400:
             raise SupabaseError(f"Instagram Graph API media details failed ({details_response.status_code}): {self._redact_access_token(details_response.text)}")
         details = details_response.json() if details_response.content else {}
-        insights_response = self.transport.request(
-            method="GET",
-            url=self._endpoint(f"{media_id}/insights"),
-            params={
-                "access_token": self.access_token,
-                "metric": "reach,impressions,saved,shares",
-            },
-            timeout=self.timeout_seconds,
-        )
-        if insights_response.status_code >= 400:
-            raise SupabaseError(f"Instagram Graph API media insights failed ({insights_response.status_code}): {self._redact_access_token(insights_response.text)}")
-        insights_payload = insights_response.json() if insights_response.content else {}
         metrics = dict(details)
-        for item in insights_payload.get("data", []) if isinstance(insights_payload, dict) else []:
-            if not isinstance(item, dict):
+        media_type = str(details.get("media_type") or "").upper()
+        if media_type in {"REELS", "VIDEO"}:
+            requested_metrics = ["reach", "plays", "saved", "shares", "total_interactions"]
+        else:
+            requested_metrics = ["reach", "impressions", "saved", "shares"]
+        returned_metrics: list[str] = []
+        missing_metrics: list[str] = []
+        insight_errors: dict[str, str] = {}
+        for metric_name in requested_metrics:
+            insights_response = self.transport.request(
+                method="GET",
+                url=self._endpoint(f"{media_id}/insights"),
+                params={
+                    "access_token": self.access_token,
+                    "metric": metric_name,
+                },
+                timeout=self.timeout_seconds,
+            )
+            if insights_response.status_code >= 400:
+                missing_metrics.append(metric_name)
+                insight_errors[metric_name] = self._redact_access_token(insights_response.text)
                 continue
-            name = item.get("name")
-            values = item.get("values")
-            if not isinstance(name, str) or not isinstance(values, list) or not values:
-                continue
-            first_value = values[0] if isinstance(values[0], dict) else {}
-            metrics[name] = first_value.get("value")
+            insights_payload = insights_response.json() if insights_response.content else {}
+            metric_returned = False
+            for item in insights_payload.get("data", []) if isinstance(insights_payload, dict) else []:
+                if not isinstance(item, dict):
+                    continue
+                name = item.get("name")
+                values = item.get("values")
+                if not isinstance(name, str) or not isinstance(values, list) or not values:
+                    continue
+                first_value = values[0] if isinstance(values[0], dict) else {}
+                metrics[name] = first_value.get("value")
+                returned_metrics.append(name)
+                metric_returned = True
+            if not metric_returned:
+                missing_metrics.append(metric_name)
+        metrics["requested_insight_metrics"] = requested_metrics
+        metrics["returned_insight_metrics"] = sorted(set(returned_metrics))
+        metrics["missing_insight_metrics"] = sorted(set(missing_metrics))
+        if insight_errors:
+            metrics["insight_errors"] = insight_errors
         return metrics

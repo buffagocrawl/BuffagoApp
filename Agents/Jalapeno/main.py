@@ -74,7 +74,7 @@ def build_parser() -> argparse.ArgumentParser:
     mode_group.add_argument("--image-pipeline-live", action="store_true", help="Run only the live image pipeline upload and persistence flow")
     mode_group.add_argument("--instagram-publish-live", action="store_true", help="Run only the live Instagram publishing flow")
     mode_group.add_argument("--production", action="store_true", help="Run the live production publishing pipeline")
-    mode_group.add_argument("--metrics", action="store_true", help="Collect Instagram metrics for recent published posts")
+    mode_group.add_argument("--metrics", "--collect-metrics", action="store_true", help="Collect Instagram metrics for recent published posts")
     mode_group.add_argument("--daily-report", action="store_true", help="Generate and optionally email the Jalapeno daily report")
     mode_group.add_argument("--weekly-report", action="store_true", help="Generate and optionally email the Jalapeno weekly report")
     parser.add_argument(
@@ -91,6 +91,16 @@ def build_parser() -> argparse.ArgumentParser:
         "--content-type",
         choices=sorted(PRODUCTION_POST_TYPE_MAP),
         help="Select the production content path. Equivalent to POST_TYPE for GitHub Actions.",
+    )
+    parser.add_argument(
+        "--metrics-backfill",
+        action="store_true",
+        help="Collect missing metrics windows for published posts from the last 30 days.",
+    )
+    parser.add_argument(
+        "--metrics-dry-run",
+        action="store_true",
+        help="Load and log metrics candidates without calling Meta or inserting rows.",
     )
     return parser
 
@@ -806,14 +816,19 @@ def _load_live_client_and_config(mode_name: str):
     return config, logger, client
 
 
-def run_metrics() -> int:
+def run_metrics(*, backfill: bool = False, dry_run: bool = False) -> int:
     config, logger, client = _load_live_client_and_config("metrics")
-    result = collect_instagram_metrics(config, client, logger=logger)
+    result = collect_instagram_metrics(config, client, logger=logger, backfill=backfill, dry_run=dry_run)
     print(f"Metrics checked posts: {result.checked_posts}")
     print(f"Metrics snapshots persisted: {result.snapshots_persisted}")
+    print(f"Metrics skipped duplicates: {result.skipped_duplicates}")
     print(f"Metrics failures: {result.failures}")
+    print(f"Metrics dry run: {result.dry_run}")
     if result.action_required:
         print("Metrics action required: Meta token/auth issue detected")
+        return 2
+    if result.failures:
+        print("Metrics collection failed for one or more posts")
         return 2
     return 0
 
@@ -1682,7 +1697,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.production:
             return run_production(content_type=args.content_type)
         if args.metrics:
-            return run_metrics()
+            return run_metrics(backfill=args.metrics_backfill, dry_run=args.metrics_dry_run)
         if args.daily_report:
             return run_admin_report("daily")
         if args.weekly_report:

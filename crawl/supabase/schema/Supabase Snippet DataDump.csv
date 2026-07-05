@@ -1,0 +1,1212 @@
+table_schema,table_name,ordinal_position,column_name,data_type,is_nullable,column_default
+auth,audit_log_entries,1,instance_id,uuid,YES,null
+auth,audit_log_entries,2,id,uuid,NO,null
+auth,audit_log_entries,3,payload,json,YES,null
+auth,audit_log_entries,4,created_at,timestamp with time zone,YES,null
+auth,audit_log_entries,5,ip_address,character varying,NO,''::character varying
+auth,custom_oauth_providers,1,id,uuid,NO,gen_random_uuid()
+auth,custom_oauth_providers,2,provider_type,text,NO,null
+auth,custom_oauth_providers,3,identifier,text,NO,null
+auth,custom_oauth_providers,4,name,text,NO,null
+auth,custom_oauth_providers,5,client_id,text,NO,null
+auth,custom_oauth_providers,6,client_secret,text,NO,null
+auth,custom_oauth_providers,7,acceptable_client_ids,ARRAY,NO,'{}'::text[]
+auth,custom_oauth_providers,8,scopes,ARRAY,NO,'{}'::text[]
+auth,custom_oauth_providers,9,pkce_enabled,boolean,NO,true
+auth,custom_oauth_providers,10,attribute_mapping,jsonb,NO,'{}'::jsonb
+auth,custom_oauth_providers,11,authorization_params,jsonb,NO,'{}'::jsonb
+auth,custom_oauth_providers,12,enabled,boolean,NO,true
+auth,custom_oauth_providers,13,email_optional,boolean,NO,false
+auth,custom_oauth_providers,14,issuer,text,YES,null
+auth,custom_oauth_providers,15,discovery_url,text,YES,null
+auth,custom_oauth_providers,16,skip_nonce_check,boolean,NO,false
+auth,custom_oauth_providers,17,cached_discovery,jsonb,YES,null
+auth,custom_oauth_providers,18,discovery_cached_at,timestamp with time zone,YES,null
+auth,custom_oauth_providers,19,authorization_url,text,YES,null
+auth,custom_oauth_providers,20,token_url,text,YES,null
+auth,custom_oauth_providers,21,userinfo_url,text,YES,null
+auth,custom_oauth_providers,22,jwks_uri,text,YES,null
+auth,custom_oauth_providers,23,created_at,timestamp with time zone,NO,now()
+auth,custom_oauth_providers,24,updated_at,timestamp with time zone,NO,now()
+auth,custom_oauth_providers,25,custom_claims_allowlist,ARRAY,NO,'{}'::text[]
+auth,flow_state,1,id,uuid,NO,null
+auth,flow_state,2,user_id,uuid,YES,null
+auth,flow_state,3,auth_code,text,YES,null
+auth,flow_state,4,code_challenge_method,USER-DEFINED,YES,null
+auth,flow_state,5,code_challenge,text,YES,null
+auth,flow_state,6,provider_type,text,NO,null
+auth,flow_state,7,provider_access_token,text,YES,null
+auth,flow_state,8,provider_refresh_token,text,YES,null
+auth,flow_state,9,created_at,timestamp with time zone,YES,null
+auth,flow_state,10,updated_at,timestamp with time zone,YES,null
+auth,flow_state,11,authentication_method,text,NO,null
+auth,flow_state,12,auth_code_issued_at,timestamp with time zone,YES,null
+auth,flow_state,13,invite_token,text,YES,null
+auth,flow_state,14,referrer,text,YES,null
+auth,flow_state,15,oauth_client_state_id,uuid,YES,null
+auth,flow_state,16,linking_target_id,uuid,YES,null
+auth,flow_state,17,email_optional,boolean,NO,false
+auth,identities,1,provider_id,text,NO,null
+auth,identities,2,user_id,uuid,NO,null
+auth,identities,3,identity_data,jsonb,NO,null
+auth,identities,4,provider,text,NO,null
+auth,identities,5,last_sign_in_at,timestamp with time zone,YES,null
+auth,identities,6,created_at,timestamp with time zone,YES,null
+auth,identities,7,updated_at,timestamp with time zone,YES,null
+auth,identities,8,email,text,YES,null
+auth,identities,9,id,uuid,NO,gen_random_uuid()
+auth,instances,1,id,uuid,NO,null
+auth,instances,2,uuid,uuid,YES,null
+auth,instances,3,raw_base_config,text,YES,null
+auth,instances,4,created_at,timestamp with time zone,YES,null
+auth,instances,5,updated_at,timestamp with time zone,YES,null
+auth,mfa_amr_claims,1,session_id,uuid,NO,null
+auth,mfa_amr_claims,2,created_at,timestamp with time zone,NO,null
+auth,mfa_amr_claims,3,updated_at,timestamp with time zone,NO,null
+auth,mfa_amr_claims,4,authentication_method,text,NO,null
+auth,mfa_amr_claims,5,id,uuid,NO,null
+auth,mfa_challenges,1,id,uuid,NO,null
+auth,mfa_challenges,2,factor_id,uuid,NO,null
+auth,mfa_challenges,3,created_at,timestamp with time zone,NO,null
+auth,mfa_challenges,4,verified_at,timestamp with time zone,YES,null
+auth,mfa_challenges,5,ip_address,inet,NO,null
+auth,mfa_challenges,6,otp_code,text,YES,null
+auth,mfa_challenges,7,web_authn_session_data,jsonb,YES,null
+auth,mfa_factors,1,id,uuid,NO,null
+auth,mfa_factors,2,user_id,uuid,NO,null
+auth,mfa_factors,3,friendly_name,text,YES,null
+auth,mfa_factors,4,factor_type,USER-DEFINED,NO,null
+auth,mfa_factors,5,status,USER-DEFINED,NO,null
+auth,mfa_factors,6,created_at,timestamp with time zone,NO,null
+auth,mfa_factors,7,updated_at,timestamp with time zone,NO,null
+auth,mfa_factors,8,secret,text,YES,null
+auth,mfa_factors,9,phone,text,YES,null
+auth,mfa_factors,10,last_challenged_at,timestamp with time zone,YES,null
+auth,mfa_factors,11,web_authn_credential,jsonb,YES,null
+auth,mfa_factors,12,web_authn_aaguid,uuid,YES,null
+auth,mfa_factors,13,last_webauthn_challenge_data,jsonb,YES,null
+auth,oauth_authorizations,1,id,uuid,NO,null
+auth,oauth_authorizations,2,authorization_id,text,NO,null
+auth,oauth_authorizations,3,client_id,uuid,NO,null
+auth,oauth_authorizations,4,user_id,uuid,YES,null
+auth,oauth_authorizations,5,redirect_uri,text,NO,null
+auth,oauth_authorizations,6,scope,text,NO,null
+auth,oauth_authorizations,7,state,text,YES,null
+auth,oauth_authorizations,8,resource,text,YES,null
+auth,oauth_authorizations,9,code_challenge,text,YES,null
+auth,oauth_authorizations,10,code_challenge_method,USER-DEFINED,YES,null
+auth,oauth_authorizations,11,response_type,USER-DEFINED,NO,'code'::auth.oauth_response_type
+auth,oauth_authorizations,12,status,USER-DEFINED,NO,'pending'::auth.oauth_authorization_status
+auth,oauth_authorizations,13,authorization_code,text,YES,null
+auth,oauth_authorizations,14,created_at,timestamp with time zone,NO,now()
+auth,oauth_authorizations,15,expires_at,timestamp with time zone,NO,(now() + '00:03:00'::interval)
+auth,oauth_authorizations,16,approved_at,timestamp with time zone,YES,null
+auth,oauth_authorizations,17,nonce,text,YES,null
+auth,oauth_client_states,1,id,uuid,NO,null
+auth,oauth_client_states,2,provider_type,text,NO,null
+auth,oauth_client_states,3,code_verifier,text,YES,null
+auth,oauth_client_states,4,created_at,timestamp with time zone,NO,null
+auth,oauth_clients,1,id,uuid,NO,null
+auth,oauth_clients,3,client_secret_hash,text,YES,null
+auth,oauth_clients,4,registration_type,USER-DEFINED,NO,null
+auth,oauth_clients,5,redirect_uris,text,NO,null
+auth,oauth_clients,6,grant_types,text,NO,null
+auth,oauth_clients,7,client_name,text,YES,null
+auth,oauth_clients,8,client_uri,text,YES,null
+auth,oauth_clients,9,logo_uri,text,YES,null
+auth,oauth_clients,10,created_at,timestamp with time zone,NO,now()
+auth,oauth_clients,11,updated_at,timestamp with time zone,NO,now()
+auth,oauth_clients,12,deleted_at,timestamp with time zone,YES,null
+auth,oauth_clients,13,client_type,USER-DEFINED,NO,'confidential'::auth.oauth_client_type
+auth,oauth_clients,14,token_endpoint_auth_method,text,NO,null
+auth,oauth_consents,1,id,uuid,NO,null
+auth,oauth_consents,2,user_id,uuid,NO,null
+auth,oauth_consents,3,client_id,uuid,NO,null
+auth,oauth_consents,4,scopes,text,NO,null
+auth,oauth_consents,5,granted_at,timestamp with time zone,NO,now()
+auth,oauth_consents,6,revoked_at,timestamp with time zone,YES,null
+auth,one_time_tokens,1,id,uuid,NO,null
+auth,one_time_tokens,2,user_id,uuid,NO,null
+auth,one_time_tokens,3,token_type,USER-DEFINED,NO,null
+auth,one_time_tokens,4,token_hash,text,NO,null
+auth,one_time_tokens,5,relates_to,text,NO,null
+auth,one_time_tokens,6,created_at,timestamp without time zone,NO,now()
+auth,one_time_tokens,7,updated_at,timestamp without time zone,NO,now()
+auth,refresh_tokens,1,instance_id,uuid,YES,null
+auth,refresh_tokens,2,id,bigint,NO,nextval('auth.refresh_tokens_id_seq'::regclass)
+auth,refresh_tokens,3,token,character varying,YES,null
+auth,refresh_tokens,4,user_id,character varying,YES,null
+auth,refresh_tokens,5,revoked,boolean,YES,null
+auth,refresh_tokens,6,created_at,timestamp with time zone,YES,null
+auth,refresh_tokens,7,updated_at,timestamp with time zone,YES,null
+auth,refresh_tokens,8,parent,character varying,YES,null
+auth,refresh_tokens,9,session_id,uuid,YES,null
+auth,saml_providers,1,id,uuid,NO,null
+auth,saml_providers,2,sso_provider_id,uuid,NO,null
+auth,saml_providers,3,entity_id,text,NO,null
+auth,saml_providers,4,metadata_xml,text,NO,null
+auth,saml_providers,5,metadata_url,text,YES,null
+auth,saml_providers,6,attribute_mapping,jsonb,YES,null
+auth,saml_providers,7,created_at,timestamp with time zone,YES,null
+auth,saml_providers,8,updated_at,timestamp with time zone,YES,null
+auth,saml_providers,9,name_id_format,text,YES,null
+auth,saml_relay_states,1,id,uuid,NO,null
+auth,saml_relay_states,2,sso_provider_id,uuid,NO,null
+auth,saml_relay_states,3,request_id,text,NO,null
+auth,saml_relay_states,4,for_email,text,YES,null
+auth,saml_relay_states,5,redirect_to,text,YES,null
+auth,saml_relay_states,7,created_at,timestamp with time zone,YES,null
+auth,saml_relay_states,8,updated_at,timestamp with time zone,YES,null
+auth,saml_relay_states,9,flow_state_id,uuid,YES,null
+auth,schema_migrations,1,version,character varying,NO,null
+auth,sessions,1,id,uuid,NO,null
+auth,sessions,2,user_id,uuid,NO,null
+auth,sessions,3,created_at,timestamp with time zone,YES,null
+auth,sessions,4,updated_at,timestamp with time zone,YES,null
+auth,sessions,5,factor_id,uuid,YES,null
+auth,sessions,6,aal,USER-DEFINED,YES,null
+auth,sessions,7,not_after,timestamp with time zone,YES,null
+auth,sessions,8,refreshed_at,timestamp without time zone,YES,null
+auth,sessions,9,user_agent,text,YES,null
+auth,sessions,10,ip,inet,YES,null
+auth,sessions,11,tag,text,YES,null
+auth,sessions,12,oauth_client_id,uuid,YES,null
+auth,sessions,13,refresh_token_hmac_key,text,YES,null
+auth,sessions,14,refresh_token_counter,bigint,YES,null
+auth,sessions,15,scopes,text,YES,null
+auth,sso_domains,1,id,uuid,NO,null
+auth,sso_domains,2,sso_provider_id,uuid,NO,null
+auth,sso_domains,3,domain,text,NO,null
+auth,sso_domains,4,created_at,timestamp with time zone,YES,null
+auth,sso_domains,5,updated_at,timestamp with time zone,YES,null
+auth,sso_providers,1,id,uuid,NO,null
+auth,sso_providers,2,resource_id,text,YES,null
+auth,sso_providers,3,created_at,timestamp with time zone,YES,null
+auth,sso_providers,4,updated_at,timestamp with time zone,YES,null
+auth,sso_providers,5,disabled,boolean,YES,null
+auth,users,1,instance_id,uuid,YES,null
+auth,users,2,id,uuid,NO,null
+auth,users,3,aud,character varying,YES,null
+auth,users,4,role,character varying,YES,null
+auth,users,5,email,character varying,YES,null
+auth,users,6,encrypted_password,character varying,YES,null
+auth,users,7,email_confirmed_at,timestamp with time zone,YES,null
+auth,users,8,invited_at,timestamp with time zone,YES,null
+auth,users,9,confirmation_token,character varying,YES,null
+auth,users,10,confirmation_sent_at,timestamp with time zone,YES,null
+auth,users,11,recovery_token,character varying,YES,null
+auth,users,12,recovery_sent_at,timestamp with time zone,YES,null
+auth,users,13,email_change_token_new,character varying,YES,null
+auth,users,14,email_change,character varying,YES,null
+auth,users,15,email_change_sent_at,timestamp with time zone,YES,null
+auth,users,16,last_sign_in_at,timestamp with time zone,YES,null
+auth,users,17,raw_app_meta_data,jsonb,YES,null
+auth,users,18,raw_user_meta_data,jsonb,YES,null
+auth,users,19,is_super_admin,boolean,YES,null
+auth,users,20,created_at,timestamp with time zone,YES,null
+auth,users,21,updated_at,timestamp with time zone,YES,null
+auth,users,22,phone,text,YES,NULL::character varying
+auth,users,23,phone_confirmed_at,timestamp with time zone,YES,null
+auth,users,24,phone_change,text,YES,''::character varying
+auth,users,25,phone_change_token,character varying,YES,''::character varying
+auth,users,26,phone_change_sent_at,timestamp with time zone,YES,null
+auth,users,27,confirmed_at,timestamp with time zone,YES,null
+auth,users,28,email_change_token_current,character varying,YES,''::character varying
+auth,users,29,email_change_confirm_status,smallint,YES,0
+auth,users,30,banned_until,timestamp with time zone,YES,null
+auth,users,31,reauthentication_token,character varying,YES,''::character varying
+auth,users,32,reauthentication_sent_at,timestamp with time zone,YES,null
+auth,users,33,is_sso_user,boolean,NO,false
+auth,users,34,deleted_at,timestamp with time zone,YES,null
+auth,users,35,is_anonymous,boolean,NO,false
+auth,webauthn_challenges,1,id,uuid,NO,gen_random_uuid()
+auth,webauthn_challenges,2,user_id,uuid,YES,null
+auth,webauthn_challenges,3,challenge_type,text,NO,null
+auth,webauthn_challenges,4,session_data,jsonb,NO,null
+auth,webauthn_challenges,5,created_at,timestamp with time zone,NO,now()
+auth,webauthn_challenges,6,expires_at,timestamp with time zone,NO,null
+auth,webauthn_credentials,1,id,uuid,NO,gen_random_uuid()
+auth,webauthn_credentials,2,user_id,uuid,NO,null
+auth,webauthn_credentials,3,credential_id,bytea,NO,null
+auth,webauthn_credentials,4,public_key,bytea,NO,null
+auth,webauthn_credentials,5,attestation_type,text,NO,''::text
+auth,webauthn_credentials,6,aaguid,uuid,YES,null
+auth,webauthn_credentials,7,sign_count,bigint,NO,0
+auth,webauthn_credentials,8,transports,jsonb,NO,'[]'::jsonb
+auth,webauthn_credentials,9,backup_eligible,boolean,NO,false
+auth,webauthn_credentials,10,backed_up,boolean,NO,false
+auth,webauthn_credentials,11,friendly_name,text,NO,''::text
+auth,webauthn_credentials,12,created_at,timestamp with time zone,NO,now()
+auth,webauthn_credentials,13,updated_at,timestamp with time zone,NO,now()
+auth,webauthn_credentials,14,last_used_at,timestamp with time zone,YES,null
+extensions,pg_stat_statements,1,userid,oid,YES,null
+extensions,pg_stat_statements,2,dbid,oid,YES,null
+extensions,pg_stat_statements,3,toplevel,boolean,YES,null
+extensions,pg_stat_statements,4,queryid,bigint,YES,null
+extensions,pg_stat_statements,5,query,text,YES,null
+extensions,pg_stat_statements,6,plans,bigint,YES,null
+extensions,pg_stat_statements,7,total_plan_time,double precision,YES,null
+extensions,pg_stat_statements,8,min_plan_time,double precision,YES,null
+extensions,pg_stat_statements,9,max_plan_time,double precision,YES,null
+extensions,pg_stat_statements,10,mean_plan_time,double precision,YES,null
+extensions,pg_stat_statements,11,stddev_plan_time,double precision,YES,null
+extensions,pg_stat_statements,12,calls,bigint,YES,null
+extensions,pg_stat_statements,13,total_exec_time,double precision,YES,null
+extensions,pg_stat_statements,14,min_exec_time,double precision,YES,null
+extensions,pg_stat_statements,15,max_exec_time,double precision,YES,null
+extensions,pg_stat_statements,16,mean_exec_time,double precision,YES,null
+extensions,pg_stat_statements,17,stddev_exec_time,double precision,YES,null
+extensions,pg_stat_statements,18,rows,bigint,YES,null
+extensions,pg_stat_statements,19,shared_blks_hit,bigint,YES,null
+extensions,pg_stat_statements,20,shared_blks_read,bigint,YES,null
+extensions,pg_stat_statements,21,shared_blks_dirtied,bigint,YES,null
+extensions,pg_stat_statements,22,shared_blks_written,bigint,YES,null
+extensions,pg_stat_statements,23,local_blks_hit,bigint,YES,null
+extensions,pg_stat_statements,24,local_blks_read,bigint,YES,null
+extensions,pg_stat_statements,25,local_blks_dirtied,bigint,YES,null
+extensions,pg_stat_statements,26,local_blks_written,bigint,YES,null
+extensions,pg_stat_statements,27,temp_blks_read,bigint,YES,null
+extensions,pg_stat_statements,28,temp_blks_written,bigint,YES,null
+extensions,pg_stat_statements,29,shared_blk_read_time,double precision,YES,null
+extensions,pg_stat_statements,30,shared_blk_write_time,double precision,YES,null
+extensions,pg_stat_statements,31,local_blk_read_time,double precision,YES,null
+extensions,pg_stat_statements,32,local_blk_write_time,double precision,YES,null
+extensions,pg_stat_statements,33,temp_blk_read_time,double precision,YES,null
+extensions,pg_stat_statements,34,temp_blk_write_time,double precision,YES,null
+extensions,pg_stat_statements,35,wal_records,bigint,YES,null
+extensions,pg_stat_statements,36,wal_fpi,bigint,YES,null
+extensions,pg_stat_statements,37,wal_bytes,numeric,YES,null
+extensions,pg_stat_statements,38,jit_functions,bigint,YES,null
+extensions,pg_stat_statements,39,jit_generation_time,double precision,YES,null
+extensions,pg_stat_statements,40,jit_inlining_count,bigint,YES,null
+extensions,pg_stat_statements,41,jit_inlining_time,double precision,YES,null
+extensions,pg_stat_statements,42,jit_optimization_count,bigint,YES,null
+extensions,pg_stat_statements,43,jit_optimization_time,double precision,YES,null
+extensions,pg_stat_statements,44,jit_emission_count,bigint,YES,null
+extensions,pg_stat_statements,45,jit_emission_time,double precision,YES,null
+extensions,pg_stat_statements,46,jit_deform_count,bigint,YES,null
+extensions,pg_stat_statements,47,jit_deform_time,double precision,YES,null
+extensions,pg_stat_statements,48,stats_since,timestamp with time zone,YES,null
+extensions,pg_stat_statements,49,minmax_stats_since,timestamp with time zone,YES,null
+extensions,pg_stat_statements_info,1,dealloc,bigint,YES,null
+extensions,pg_stat_statements_info,2,stats_reset,timestamp with time zone,YES,null
+public,00_Open_Work,1,source,text,YES,null
+public,00_Open_Work,2,status,text,YES,null
+public,00_Open_Work,3,item_count,integer,YES,null
+public,analytics_agent_growth_opportunities,1,opportunity_type,text,YES,null
+public,analytics_agent_growth_opportunities,2,destination_id,uuid,YES,null
+public,analytics_agent_growth_opportunities,3,route_id,uuid,YES,null
+public,analytics_agent_growth_opportunities,4,state_id,integer,YES,null
+public,analytics_agent_growth_opportunities,5,event_date,date,YES,null
+public,analytics_agent_growth_opportunities,6,signal_count,bigint,YES,null
+public,analytics_agent_growth_opportunities,7,context,jsonb,YES,null
+public,analytics_agent_restaurant_summary,1,destination_id,uuid,YES,null
+public,analytics_agent_restaurant_summary,2,destination_name,text,YES,null
+public,analytics_agent_restaurant_summary,3,city,text,YES,null
+public,analytics_agent_restaurant_summary,4,state_id,integer,YES,null
+public,analytics_agent_restaurant_summary,5,rating_count,bigint,YES,null
+public,analytics_agent_restaurant_summary,6,avg_weight_score,numeric,YES,null
+public,analytics_agent_restaurant_summary,7,avg_overall,numeric,YES,null
+public,analytics_agent_restaurant_summary,8,last_rated_at,timestamp with time zone,YES,null
+public,analytics_agent_restaurant_summary,9,profile_views_30d,bigint,YES,null
+public,analytics_agent_restaurant_summary,10,directions_taps_30d,bigint,YES,null
+public,analytics_agent_restaurant_summary,11,rating_starts_30d,bigint,YES,null
+public,analytics_agent_restaurant_summary,12,event_rating_completions_30d,bigint,YES,null
+public,analytics_agent_restaurant_summary,13,shares_30d,bigint,YES,null
+public,analytics_agent_route_summary,1,route_id,uuid,YES,null
+public,analytics_agent_route_summary,2,title,text,YES,null
+public,analytics_agent_route_summary,3,city,text,YES,null
+public,analytics_agent_route_summary,4,is_public,boolean,YES,null
+public,analytics_agent_route_summary,5,is_token_route,boolean,YES,null
+public,analytics_agent_route_summary,6,all_crawls,bigint,YES,null
+public,analytics_agent_route_summary,7,completed_crawls,bigint,YES,null
+public,analytics_agent_route_summary,8,last_crawl_at,timestamp with time zone,YES,null
+public,analytics_agent_route_summary,9,unique_identities_30d,bigint,YES,null
+public,analytics_agent_route_summary,10,crawl_views_30d,bigint,YES,null
+public,analytics_agent_route_summary,11,crawl_starts_30d,bigint,YES,null
+public,analytics_agent_route_summary,12,crawl_completions_30d,bigint,YES,null
+public,analytics_agent_route_summary,13,ratings_completed_30d,bigint,YES,null
+public,analytics_crawl_funnel_daily,1,event_date,date,YES,null
+public,analytics_crawl_funnel_daily,2,crawl_started,bigint,YES,null
+public,analytics_crawl_funnel_daily,3,crawl_viewed,bigint,YES,null
+public,analytics_crawl_funnel_daily,4,crawl_resumed,bigint,YES,null
+public,analytics_crawl_funnel_daily,5,crawl_saved,bigint,YES,null
+public,analytics_crawl_funnel_daily,6,crawl_completed,bigint,YES,null
+public,analytics_crawl_funnel_daily,7,crawl_abandoned,bigint,YES,null
+public,analytics_crawl_funnel_daily,8,crawl_ratings_completed,bigint,YES,null
+public,analytics_crawl_funnel_daily,9,rough_completion_rate,numeric,YES,null
+public,analytics_daily_active_users,1,event_date,date,YES,null
+public,analytics_daily_active_users,2,signed_in_users,bigint,YES,null
+public,analytics_daily_active_users,3,anonymous_users,bigint,YES,null
+public,analytics_daily_active_users,4,active_identities,bigint,YES,null
+public,analytics_daily_active_users,5,sessions,bigint,YES,null
+public,analytics_daily_active_users,6,total_events,bigint,YES,null
+public,analytics_daily_active_users,7,app_opens,bigint,YES,null
+public,analytics_daily_active_users,8,screen_views,bigint,YES,null
+public,analytics_destination_performance_daily,1,event_date,date,YES,null
+public,analytics_destination_performance_daily,2,destination_id,uuid,YES,null
+public,analytics_destination_performance_daily,3,unique_identities,bigint,YES,null
+public,analytics_destination_performance_daily,4,profile_views,bigint,YES,null
+public,analytics_destination_performance_daily,5,directions_taps,bigint,YES,null
+public,analytics_destination_performance_daily,6,rating_starts,bigint,YES,null
+public,analytics_destination_performance_daily,7,rating_completions,bigint,YES,null
+public,analytics_destination_performance_daily,8,shares,bigint,YES,null
+public,analytics_discovery_daily,1,event_date,date,YES,null
+public,analytics_discovery_daily,2,restaurant_searches_with_results,bigint,YES,null
+public,analytics_discovery_daily,3,restaurant_search_empty,bigint,YES,null
+public,analytics_discovery_daily,4,restaurant_search_failed,bigint,YES,null
+public,analytics_discovery_daily,5,restaurant_search_result_selected,bigint,YES,null
+public,analytics_discovery_daily,6,restaurant_profile_views,bigint,YES,null
+public,analytics_discovery_daily,7,directions_taps,bigint,YES,null
+public,analytics_discovery_daily,8,map_opens,bigint,YES,null
+public,analytics_discovery_daily,9,failures,bigint,YES,null
+public,analytics_discovery_daily,10,slow_screens,bigint,YES,null
+public,analytics_rating_funnel_daily,1,event_date,date,YES,null
+public,analytics_rating_funnel_daily,2,rating_started,bigint,YES,null
+public,analytics_rating_funnel_daily,3,rating_completed,bigint,YES,null
+public,analytics_rating_funnel_daily,4,rating_not_completed,bigint,YES,null
+public,analytics_rating_funnel_daily,5,rating_abandoned,bigint,YES,null
+public,analytics_rating_funnel_daily,6,rating_failed,bigint,YES,null
+public,analytics_rating_funnel_daily,7,rating_validation_failed,bigint,YES,null
+public,analytics_rating_funnel_daily,8,completion_rate,numeric,YES,null
+public,analytics_route_performance_daily,1,event_date,date,YES,null
+public,analytics_route_performance_daily,2,route_id,uuid,YES,null
+public,analytics_route_performance_daily,3,unique_identities,bigint,YES,null
+public,analytics_route_performance_daily,4,crawl_views,bigint,YES,null
+public,analytics_route_performance_daily,5,crawl_starts,bigint,YES,null
+public,analytics_route_performance_daily,6,crawl_saves,bigint,YES,null
+public,analytics_route_performance_daily,7,crawl_completions,bigint,YES,null
+public,analytics_route_performance_daily,8,ratings_completed,bigint,YES,null
+public,analytics_route_performance_daily,9,leaderboard_views,bigint,YES,null
+public,analytics_social_opt_out_by_account_age,1,account_age_bucket,text,YES,null
+public,analytics_social_opt_out_by_account_age,2,total_users,bigint,YES,null
+public,analytics_social_opt_out_by_account_age,3,total_users_opted_out,bigint,YES,null
+public,analytics_social_opt_out_by_account_age,4,opt_out_rate,numeric,YES,null
+public,analytics_social_opt_out_by_facebook_link,1,facebook_connected,boolean,YES,null
+public,analytics_social_opt_out_by_facebook_link,2,total_users,bigint,YES,null
+public,analytics_social_opt_out_by_facebook_link,3,total_users_opted_out,bigint,YES,null
+public,analytics_social_opt_out_by_facebook_link,4,opt_out_rate,numeric,YES,null
+public,analytics_social_opt_out_summary,1,total_users,bigint,YES,null
+public,analytics_social_opt_out_summary,2,total_users_opted_out,bigint,YES,null
+public,analytics_social_opt_out_summary,3,opt_out_rate,numeric,YES,null
+public,badge_catalog,1,id,bigint,NO,nextval('badge_catalog_id_seq'::regclass)
+public,badge_catalog,2,code,text,NO,null
+public,badge_catalog,3,name,text,NO,null
+public,badge_catalog,4,description,text,YES,null
+public,badge_catalog,5,icon,text,YES,null
+public,badge_catalog,6,xp_reward,integer,NO,0
+public,badge_catalog,7,category,text,YES,null
+public,badge_catalog,8,tier,integer,YES,1
+public,badge_catalog,9,is_active,boolean,NO,true
+public,buffacoin_ledger,1,id,uuid,NO,gen_random_uuid()
+public,buffacoin_ledger,2,user_id,uuid,NO,null
+public,buffacoin_ledger,3,delta,integer,NO,null
+public,buffacoin_ledger,4,reason,text,NO,null
+public,buffacoin_ledger,5,crawl_id,uuid,YES,null
+public,buffacoin_ledger,6,state_id,integer,YES,null
+public,buffacoin_ledger,7,destination_id,uuid,YES,null
+public,buffacoin_ledger,8,created_at,timestamp with time zone,NO,now()
+public,buffacoin_wallets,1,user_id,uuid,NO,null
+public,buffacoin_wallets,2,balance,integer,NO,0
+public,buffacoin_wallets,3,updated_at,timestamp with time zone,NO,now()
+public,buffacoin_wallets,4,created_at,timestamp with time zone,NO,now()
+public,crawl_coverage_public,1,crawl_id,uuid,YES,null
+public,crawl_coverage_public,2,user_id,uuid,YES,null
+public,crawl_coverage_public,3,route_id,uuid,YES,null
+public,crawl_coverage_public,4,status,text,YES,null
+public,crawl_coverage_public,5,start_time,timestamp with time zone,YES,null
+public,crawl_coverage_public,6,end_time,timestamp with time zone,YES,null
+public,crawl_coverage_public,7,stop_count,integer,YES,null
+public,crawl_coverage_public,8,rated_count,bigint,YES,null
+public,crawl_coverage_public,9,pct_rated,numeric,YES,null
+public,crawl_public,1,crawl_id,uuid,YES,null
+public,crawl_public,2,user_id,uuid,YES,null
+public,crawl_public,3,route_id,uuid,YES,null
+public,crawl_public,4,status,text,YES,null
+public,crawl_public,5,start_time,timestamp with time zone,YES,null
+public,crawl_public,6,end_time,timestamp with time zone,YES,null
+public,crawl_weekly_streak,1,user_id,uuid,YES,null
+public,crawl_weekly_streak,2,current_streak_weeks,bigint,YES,null
+public,crawls,1,crawl_id,uuid,NO,gen_random_uuid()
+public,crawls,2,route_id,uuid,YES,null
+public,crawls,3,user_id,uuid,YES,null
+public,crawls,4,status,text,NO,'created'::text
+public,crawls,6,start_time,timestamp with time zone,YES,null
+public,crawls,7,end_time,timestamp with time zone,YES,null
+public,crawls,10,crawl_type,text,NO,'route'::text
+public,crawls,11,is_solo,boolean,NO,false
+public,custom_restaurant_sourcing,1,id,uuid,NO,gen_random_uuid()
+public,custom_restaurant_sourcing,2,state_id,integer,NO,null
+public,custom_restaurant_sourcing,3,restaurant_name,text,NO,null
+public,custom_restaurant_sourcing,4,ratings,jsonb,NO,null
+public,custom_restaurant_sourcing,5,prefs_snapshot,jsonb,YES,null
+public,custom_restaurant_sourcing,6,created_at,timestamp with time zone,NO,now()
+public,custom_restaurant_sourcing,7,user_id,uuid,YES,null
+public,daily_xp_claims,1,id,bigint,NO,null
+public,daily_xp_claims,2,user_id,uuid,NO,null
+public,daily_xp_claims,3,claimed_at,timestamp with time zone,NO,now()
+public,daily_xp_claims,4,claim_date,date,YES,null
+public,debug_logs,1,id,uuid,NO,gen_random_uuid()
+public,debug_logs,2,created_at,timestamp with time zone,NO,now()
+public,debug_logs,3,device_id,text,YES,null
+public,debug_logs,4,user_id,uuid,YES,null
+public,debug_logs,5,scope,text,NO,'auth'::text
+public,debug_logs,6,event,text,NO,null
+public,debug_logs,7,detail,jsonb,NO,'{}'::jsonb
+public,destination_ratings,1,id,uuid,NO,gen_random_uuid()
+public,destination_ratings,2,destination_id,uuid,NO,null
+public,destination_ratings,3,crawl_id,uuid,NO,null
+public,destination_ratings,4,user_id,uuid,YES,null
+public,destination_ratings,5,crispiness,smallint,YES,null
+public,destination_ratings,6,sauce,smallint,YES,null
+public,destination_ratings,7,meat,smallint,YES,null
+public,destination_ratings,8,overall,smallint,YES,null
+public,destination_ratings,9,weight_score,numeric,YES,null
+public,destination_ratings,10,created_at,timestamp with time zone,NO,now()
+public,destination_ratings,11,tag_id,bigint,YES,null
+public,destination_ratings,12,wings_eaten,smallint,YES,0
+public,destination_ratings,13,sauce_style,smallint,YES,null
+public,destination_ratings,14,flavor_vibe,ARRAY,YES,null
+public,destination_ratings,15,spice_level,smallint,YES,null
+public,destination_ratings,16,would_order_again,boolean,YES,null
+public,destination_ratings,17,is_buffacoin,boolean,NO,false
+public,destination_suggestions,1,id,uuid,NO,gen_random_uuid()
+public,destination_suggestions,2,user_id,uuid,NO,null
+public,destination_suggestions,3,state_id,integer,YES,null
+public,destination_suggestions,4,restaurant_name,text,NO,null
+public,destination_suggestions,5,address,text,YES,null
+public,destination_suggestions,6,created_at,timestamp with time zone,NO,now()
+public,destination_tags,1,id,bigint,NO,null
+public,destination_tags,2,tag,text,NO,null
+public,destination_tags,3,created_at,timestamp with time zone,NO,now()
+public,destinations,1,id,uuid,NO,gen_random_uuid()
+public,destinations,2,name,text,NO,null
+public,destinations,3,address,text,YES,null
+public,destinations,4,lat,numeric,YES,null
+public,destinations,5,lng,numeric,YES,null
+public,destinations,6,city,text,YES,null
+public,destinations,7,created_by,uuid,YES,null
+public,destinations,8,created_at,timestamp with time zone,NO,now()
+public,destinations,10,state_id,integer,YES,null
+public,friend_invite_codes,1,user_id,uuid,NO,null
+public,friend_invite_codes,2,code,uuid,NO,gen_random_uuid()
+public,friend_invite_codes,3,created_at,timestamp with time zone,NO,now()
+public,friend_invite_codes,4,rotated_at,timestamp with time zone,NO,now()
+public,friendships,1,id,uuid,NO,gen_random_uuid()
+public,friendships,2,requester_id,uuid,NO,null
+public,friendships,3,addressee_id,uuid,NO,null
+public,friendships,4,status,text,NO,'pending'::text
+public,friendships,5,created_at,timestamp with time zone,NO,now()
+public,friendships,6,responded_at,timestamp with time zone,YES,null
+public,friendships,7,updated_at,timestamp with time zone,NO,now()
+public,fun_facts,1,id,uuid,NO,gen_random_uuid()
+public,fun_facts,2,text,text,NO,null
+public,fun_facts,3,source,text,YES,null
+public,fun_facts,4,is_active,boolean,NO,true
+public,fun_facts,5,created_at,timestamp with time zone,NO,now()
+public,jalapeno_content_candidates,1,id,uuid,NO,gen_random_uuid()
+public,jalapeno_content_candidates,2,run_id,uuid,NO,null
+public,jalapeno_content_candidates,3,candidate_id,text,NO,null
+public,jalapeno_content_candidates,4,content_type,text,NO,null
+public,jalapeno_content_candidates,5,reason_chosen,text,YES,null
+public,jalapeno_content_candidates,6,working_title,text,YES,null
+public,jalapeno_content_candidates,7,short_summary,text,YES,null
+public,jalapeno_content_candidates,8,target_emotion,text,YES,null
+public,jalapeno_content_candidates,9,suggested_cta,text,YES,null
+public,jalapeno_content_candidates,10,suggested_image_concept,text,YES,null
+public,jalapeno_content_candidates,11,suggested_caption_angle,text,YES,null
+public,jalapeno_content_candidates,12,primary_theme,text,YES,null
+public,jalapeno_content_candidates,13,secondary_theme,text,YES,null
+public,jalapeno_content_candidates,14,mood,text,YES,null
+public,jalapeno_content_candidates,15,hook_style,text,YES,null
+public,jalapeno_content_candidates,16,cta_category,text,YES,null
+public,jalapeno_content_candidates,17,restaurants_mentioned,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_content_candidates,18,cities_mentioned,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_content_candidates,19,states_mentioned,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_content_candidates,20,food_categories,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_content_candidates,21,holiday_references,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_content_candidates,22,sports_references,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_content_candidates,23,current_event_references,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_content_candidates,24,source_signals,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_content_candidates,25,visual_style,text,YES,null
+public,jalapeno_content_candidates,26,image_composition,text,YES,null
+public,jalapeno_content_candidates,27,duplicate_score,numeric,YES,null
+public,jalapeno_content_candidates,28,overall_score,numeric,YES,null
+public,jalapeno_content_candidates,29,rejected,boolean,NO,false
+public,jalapeno_content_candidates,30,rejection_reason,text,YES,null
+public,jalapeno_content_candidates,31,score_breakdown,jsonb,NO,'{}'::jsonb
+public,jalapeno_content_candidates,32,metadata,jsonb,NO,'{}'::jsonb
+public,jalapeno_content_candidates,33,created_at,timestamp with time zone,NO,now()
+public,jalapeno_content_candidates,34,updated_at,timestamp with time zone,NO,now()
+public,jalapeno_content_decisions,1,id,uuid,NO,gen_random_uuid()
+public,jalapeno_content_decisions,2,run_id,uuid,NO,null
+public,jalapeno_content_decisions,3,winner_candidate_id,text,YES,null
+public,jalapeno_content_decisions,4,runner_up_candidate_id,text,YES,null
+public,jalapeno_content_decisions,5,decision_summary,jsonb,NO,'{}'::jsonb
+public,jalapeno_content_decisions,6,winner_reasoning,jsonb,NO,'[]'::jsonb
+public,jalapeno_content_decisions,7,model_name,text,YES,null
+public,jalapeno_content_decisions,8,token_usage,jsonb,NO,'{}'::jsonb
+public,jalapeno_content_decisions,9,cost_estimate,numeric,YES,null
+public,jalapeno_content_decisions,10,platform,text,NO,'instagram'::text
+public,jalapeno_content_decisions,11,created_at,timestamp with time zone,NO,now()
+public,jalapeno_content_decisions,12,updated_at,timestamp with time zone,NO,now()
+public,jalapeno_content_decisions,13,image_asset_id,uuid,YES,null
+public,jalapeno_content_decisions,14,image_public_url,text,YES,null
+public,jalapeno_content_decisions,15,image_storage_path,text,YES,null
+public,jalapeno_content_decisions,16,image_uploaded_at,timestamp with time zone,YES,null
+public,jalapeno_content_memory,1,id,uuid,NO,gen_random_uuid()
+public,jalapeno_content_memory,2,post_id,text,NO,null
+public,jalapeno_content_memory,3,run_id,uuid,YES,null
+public,jalapeno_content_memory,4,timestamp,timestamp with time zone,NO,now()
+public,jalapeno_content_memory,5,platform,text,NO,'instagram'::text
+public,jalapeno_content_memory,6,post_type,text,YES,null
+public,jalapeno_content_memory,7,primary_theme,text,YES,null
+public,jalapeno_content_memory,8,secondary_theme,text,YES,null
+public,jalapeno_content_memory,9,mood,text,YES,null
+public,jalapeno_content_memory,10,target_emotion,text,YES,null
+public,jalapeno_content_memory,11,restaurants_mentioned,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_content_memory,12,cities_mentioned,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_content_memory,13,states_mentioned,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_content_memory,14,food_categories,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_content_memory,15,holiday_references,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_content_memory,16,sports_references,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_content_memory,17,current_event_references,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_content_memory,18,hook_style,text,YES,null
+public,jalapeno_content_memory,19,cta_category,text,YES,null
+public,jalapeno_content_memory,20,specific_cta,text,YES,null
+public,jalapeno_content_memory,21,hashtags,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_content_memory,22,dominant_image_colors,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_content_memory,23,image_style,text,YES,null
+public,jalapeno_content_memory,24,image_composition,text,YES,null
+public,jalapeno_content_memory,25,caption_length,integer,YES,null
+public,jalapeno_content_memory,26,emoji_count,integer,YES,null
+public,jalapeno_content_memory,27,question_included,boolean,YES,null
+public,jalapeno_content_memory,28,carousel,boolean,YES,null
+public,jalapeno_content_memory,29,publishing_time,text,YES,null
+public,jalapeno_content_memory,30,likes,integer,YES,null
+public,jalapeno_content_memory,31,comments,integer,YES,null
+public,jalapeno_content_memory,32,shares,integer,YES,null
+public,jalapeno_content_memory,33,saves,integer,YES,null
+public,jalapeno_content_memory,34,reach,integer,YES,null
+public,jalapeno_content_memory,35,impressions,integer,YES,null
+public,jalapeno_content_memory,36,engagement_rate,numeric,YES,null
+public,jalapeno_content_memory,37,follower_growth,integer,YES,null
+public,jalapeno_content_memory,38,metadata,jsonb,NO,'{}'::jsonb
+public,jalapeno_content_memory,39,created_at,timestamp with time zone,NO,now()
+public,jalapeno_content_memory,40,updated_at,timestamp with time zone,NO,now()
+public,jalapeno_content_performance,1,id,uuid,NO,gen_random_uuid()
+public,jalapeno_content_performance,2,post_id,text,NO,null
+public,jalapeno_content_performance,3,run_id,uuid,YES,null
+public,jalapeno_content_performance,4,platform,text,NO,'instagram'::text
+public,jalapeno_content_performance,5,likes,integer,YES,null
+public,jalapeno_content_performance,6,comments,integer,YES,null
+public,jalapeno_content_performance,7,shares,integer,YES,null
+public,jalapeno_content_performance,8,saves,integer,YES,null
+public,jalapeno_content_performance,9,reach,integer,YES,null
+public,jalapeno_content_performance,10,impressions,integer,YES,null
+public,jalapeno_content_performance,11,engagement_rate,numeric,YES,null
+public,jalapeno_content_performance,12,follower_growth,integer,YES,null
+public,jalapeno_content_performance,13,raw_metrics,jsonb,NO,'{}'::jsonb
+public,jalapeno_content_performance,14,captured_at,timestamp with time zone,NO,now()
+public,jalapeno_content_performance,15,created_at,timestamp with time zone,NO,now()
+public,jalapeno_errors,1,id,uuid,NO,gen_random_uuid()
+public,jalapeno_errors,2,run_id,uuid,YES,null
+public,jalapeno_errors,3,post_id,uuid,YES,null
+public,jalapeno_errors,4,candidate_id,uuid,YES,null
+public,jalapeno_errors,5,stage,text,NO,null
+public,jalapeno_errors,6,error_type,text,YES,null
+public,jalapeno_errors,7,message,text,NO,null
+public,jalapeno_errors,8,stack_trace,text,YES,null
+public,jalapeno_errors,9,raw_payload,jsonb,NO,'{}'::jsonb
+public,jalapeno_errors,10,is_retryable,boolean,NO,false
+public,jalapeno_errors,11,retry_count,integer,NO,0
+public,jalapeno_errors,12,resolved,boolean,NO,false
+public,jalapeno_errors,13,resolved_at,timestamp with time zone,YES,null
+public,jalapeno_errors,14,created_at,timestamp with time zone,NO,now()
+public,jalapeno_image_assets,1,id,uuid,NO,gen_random_uuid()
+public,jalapeno_image_assets,2,run_id,uuid,NO,null
+public,jalapeno_image_assets,3,candidate_id,text,NO,null
+public,jalapeno_image_assets,4,post_id,uuid,YES,null
+public,jalapeno_image_assets,5,local_temp_path,text,NO,null
+public,jalapeno_image_assets,6,storage_bucket,text,YES,null
+public,jalapeno_image_assets,7,storage_path,text,YES,null
+public,jalapeno_image_assets,8,public_url,text,YES,null
+public,jalapeno_image_assets,9,image_type,text,NO,null
+public,jalapeno_image_assets,10,content_type,text,NO,null
+public,jalapeno_image_assets,11,width,integer,NO,null
+public,jalapeno_image_assets,12,height,integer,NO,null
+public,jalapeno_image_assets,13,aspect_ratio,numeric,NO,null
+public,jalapeno_image_assets,14,file_size_bytes,bigint,NO,null
+public,jalapeno_image_assets,15,format,text,NO,null
+public,jalapeno_image_assets,16,branding_applied,boolean,NO,false
+public,jalapeno_image_assets,17,meme_format_applied,boolean,NO,false
+public,jalapeno_image_assets,18,validation_status,text,NO,null
+public,jalapeno_image_assets,19,uploaded_at,timestamp with time zone,YES,null
+public,jalapeno_image_assets,20,cleanup_status,text,NO,'pending'::text
+public,jalapeno_image_assets,21,created_at,timestamp with time zone,NO,now()
+public,jalapeno_image_assets,22,updated_at,timestamp with time zone,NO,now()
+public,jalapeno_image_assets,23,image_prompt,text,YES,null
+public,jalapeno_image_assets,24,image_source,text,NO,'unknown'::text
+public,jalapeno_image_assets,25,prompt_quality,integer,NO,0
+public,jalapeno_image_assets,26,validation_reason,text,YES,null
+public,jalapeno_image_assets,27,prompt_version,text,YES,null
+public,jalapeno_image_assets,28,generation_time_ms,integer,YES,null
+public,jalapeno_image_assets,29,image_model,text,YES,null
+public,jalapeno_image_assets,30,metadata,jsonb,YES,null
+public,jalapeno_image_assets,31,quality_score,integer,YES,null
+public,jalapeno_instagram_posts,1,id,uuid,NO,gen_random_uuid()
+public,jalapeno_instagram_posts,2,run_id,uuid,NO,null
+public,jalapeno_instagram_posts,3,candidate_id,text,NO,null
+public,jalapeno_instagram_posts,4,post_id,uuid,YES,null
+public,jalapeno_instagram_posts,5,image_asset_id,uuid,YES,null
+public,jalapeno_instagram_posts,6,container_id,text,YES,null
+public,jalapeno_instagram_posts,7,container_status,text,YES,null
+public,jalapeno_instagram_posts,8,container_created_at,timestamp with time zone,YES,null
+public,jalapeno_instagram_posts,9,request_payload_safe,jsonb,NO,'{}'::jsonb
+public,jalapeno_instagram_posts,10,response_payload,jsonb,NO,'{}'::jsonb
+public,jalapeno_instagram_posts,11,published_media_id,text,YES,null
+public,jalapeno_instagram_posts,12,permalink,text,YES,null
+public,jalapeno_instagram_posts,13,caption,text,YES,null
+public,jalapeno_instagram_posts,14,hashtags,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_instagram_posts,15,alt_text,text,YES,null
+public,jalapeno_instagram_posts,16,image_url,text,YES,null
+public,jalapeno_instagram_posts,17,content_type,text,NO,null
+public,jalapeno_instagram_posts,18,scheduled_post_type,text,YES,null
+public,jalapeno_instagram_posts,19,scheduled_for,timestamp with time zone,YES,null
+public,jalapeno_instagram_posts,20,published_at,timestamp with time zone,YES,null
+public,jalapeno_instagram_posts,21,status,text,NO,'pending'::text
+public,jalapeno_instagram_posts,22,failure_stage,text,YES,null
+public,jalapeno_instagram_posts,23,failure_reason,text,YES,null
+public,jalapeno_instagram_posts,24,error_code,text,YES,null
+public,jalapeno_instagram_posts,25,error_message,text,YES,null
+public,jalapeno_instagram_posts,26,retry_count,integer,NO,0
+public,jalapeno_instagram_posts,27,last_attempt_at,timestamp with time zone,YES,null
+public,jalapeno_instagram_posts,28,cost_estimate,numeric,YES,null
+public,jalapeno_instagram_posts,29,metadata,jsonb,NO,'{}'::jsonb
+public,jalapeno_instagram_posts,30,created_at,timestamp with time zone,NO,now()
+public,jalapeno_instagram_posts,31,updated_at,timestamp with time zone,NO,now()
+public,jalapeno_instagram_posts,32,video_asset_id,uuid,YES,null
+public,jalapeno_instagram_posts,33,video_url,text,YES,null
+public,jalapeno_instagram_posts,34,media_kind,text,YES,null
+public,jalapeno_instagram_posts,35,media_source,text,YES,null
+public,jalapeno_instagram_posts,36,storage_path,text,YES,null
+public,jalapeno_instagram_posts,37,quality_score,integer,YES,null
+public,jalapeno_instagram_posts,38,image_source,text,YES,null
+public,jalapeno_instagram_posts,39,image_validation_status,text,YES,null
+public,jalapeno_instagram_posts,40,image_validation_reason,text,YES,null
+public,jalapeno_instagram_posts,41,prompt_quality,integer,YES,null
+public,jalapeno_instagram_posts,42,original_video_url,text,YES,null
+public,jalapeno_instagram_posts,43,processed_video_url,text,YES,null
+public,jalapeno_instagram_posts,44,original_storage_path,text,YES,null
+public,jalapeno_instagram_posts,45,processed_storage_path,text,YES,null
+public,jalapeno_instagram_posts,46,overlay_text,text,YES,null
+public,jalapeno_instagram_posts,47,overlay_status,text,YES,null
+public,jalapeno_instagram_posts,48,overlay_error,text,YES,null
+public,jalapeno_performance_summaries,1,id,uuid,NO,gen_random_uuid()
+public,jalapeno_performance_summaries,2,generated_by_run_id,uuid,YES,null
+public,jalapeno_performance_summaries,3,summary_type,text,NO,null
+public,jalapeno_performance_summaries,4,period_start,timestamp with time zone,NO,null
+public,jalapeno_performance_summaries,5,period_end,timestamp with time zone,NO,null
+public,jalapeno_performance_summaries,6,summary,jsonb,NO,'{}'::jsonb
+public,jalapeno_performance_summaries,7,created_at,timestamp with time zone,NO,now()
+public,jalapeno_post_candidates,1,id,uuid,NO,gen_random_uuid()
+public,jalapeno_post_candidates,2,run_id,uuid,NO,null
+public,jalapeno_post_candidates,3,candidate_number,integer,YES,null
+public,jalapeno_post_candidates,4,post_type,text,YES,null
+public,jalapeno_post_candidates,5,idea,text,YES,null
+public,jalapeno_post_candidates,6,reasoning,text,YES,null
+public,jalapeno_post_candidates,7,caption,text,YES,null
+public,jalapeno_post_candidates,8,hashtags,ARRAY,YES,null
+public,jalapeno_post_candidates,9,image_prompt,text,YES,null
+public,jalapeno_post_candidates,10,image_storage_path,text,YES,null
+public,jalapeno_post_candidates,11,image_url,text,YES,null
+public,jalapeno_post_candidates,12,raw_text_prompt,jsonb,NO,'{}'::jsonb
+public,jalapeno_post_candidates,13,raw_image_prompt,jsonb,NO,'{}'::jsonb
+public,jalapeno_post_candidates,14,raw_ai_response,jsonb,NO,'{}'::jsonb
+public,jalapeno_post_candidates,15,engagement_prediction,numeric,YES,null
+public,jalapeno_post_candidates,16,uniqueness_score,numeric,YES,null
+public,jalapeno_post_candidates,17,brand_alignment_score,numeric,YES,null
+public,jalapeno_post_candidates,18,humor_score,numeric,YES,null
+public,jalapeno_post_candidates,19,quality_score,numeric,YES,null
+public,jalapeno_post_candidates,20,duplicate_score,numeric,YES,null
+public,jalapeno_post_candidates,21,overall_score,numeric,YES,null
+public,jalapeno_post_candidates,22,selected,boolean,NO,false
+public,jalapeno_post_candidates,23,rejection_reason,text,YES,null
+public,jalapeno_post_candidates,24,created_at,timestamp with time zone,NO,now()
+public,jalapeno_post_candidates,25,updated_at,timestamp with time zone,NO,now()
+public,jalapeno_post_metrics,1,id,uuid,NO,gen_random_uuid()
+public,jalapeno_post_metrics,2,post_id,uuid,NO,null
+public,jalapeno_post_metrics,3,instagram_media_id,text,YES,null
+public,jalapeno_post_metrics,4,likes,integer,YES,null
+public,jalapeno_post_metrics,5,comments,integer,YES,null
+public,jalapeno_post_metrics,6,shares,integer,YES,null
+public,jalapeno_post_metrics,7,saves,integer,YES,null
+public,jalapeno_post_metrics,8,reach,integer,YES,null
+public,jalapeno_post_metrics,9,impressions,integer,YES,null
+public,jalapeno_post_metrics,10,profile_visits,integer,YES,null
+public,jalapeno_post_metrics,11,follows,integer,YES,null
+public,jalapeno_post_metrics,12,engagement_rate,numeric,YES,null
+public,jalapeno_post_metrics,13,raw_metrics,jsonb,NO,'{}'::jsonb
+public,jalapeno_post_metrics,14,captured_at,timestamp with time zone,NO,now()
+public,jalapeno_post_metrics,15,created_at,timestamp with time zone,NO,now()
+public,jalapeno_post_metrics,16,collected_at,timestamp with time zone,YES,now()
+public,jalapeno_post_metrics,17,post_age_hours,numeric,YES,null
+public,jalapeno_post_metrics,18,post_age_days,numeric,YES,null
+public,jalapeno_post_metrics,19,caption,text,YES,null
+public,jalapeno_post_metrics,20,category,text,YES,null
+public,jalapeno_post_metrics,21,prompt_template,text,YES,null
+public,jalapeno_post_metrics,22,prompt_reason,text,YES,null
+public,jalapeno_post_metrics,23,image_prompt,text,YES,null
+public,jalapeno_post_metrics,24,image_style,text,YES,null
+public,jalapeno_post_metrics,25,hashtags,ARRAY,NO,ARRAY[]::text[]
+public,jalapeno_post_metrics,26,cta_type,text,YES,null
+public,jalapeno_post_metrics,27,generation_model,text,YES,null
+public,jalapeno_post_metrics,28,image_model,text,YES,null
+public,jalapeno_post_metrics,29,cost_metadata,jsonb,NO,'{}'::jsonb
+public,jalapeno_post_metrics,30,published_at,timestamp with time zone,YES,null
+public,jalapeno_post_metrics,31,state,jsonb,YES,null
+public,jalapeno_post_metrics,32,restaurant,jsonb,YES,null
+public,jalapeno_post_metrics,33,topic,text,YES,null
+public,jalapeno_post_metrics,34,metadata,jsonb,NO,'{}'::jsonb
+public,jalapeno_post_metrics,35,video_asset_id,uuid,YES,null
+public,jalapeno_post_metrics,36,caption_type,text,YES,null
+public,jalapeno_post_metrics,37,video_style,text,YES,null
+public,jalapeno_post_metrics,38,media_source,text,YES,null
+public,jalapeno_post_metrics,39,storage_path,text,YES,null
+public,jalapeno_posts,1,id,uuid,NO,gen_random_uuid()
+public,jalapeno_posts,2,run_id,uuid,NO,null
+public,jalapeno_posts,3,candidate_id,uuid,YES,null
+public,jalapeno_posts,4,post_type,text,YES,null
+public,jalapeno_posts,5,chosen_idea,text,YES,null
+public,jalapeno_posts,6,generated_caption,text,YES,null
+public,jalapeno_posts,7,hashtags,ARRAY,YES,null
+public,jalapeno_posts,8,image_prompt,text,YES,null
+public,jalapeno_posts,9,image_storage_path,text,YES,null
+public,jalapeno_posts,10,image_url,text,YES,null
+public,jalapeno_posts,11,scheduled_for,timestamp with time zone,YES,null
+public,jalapeno_posts,12,published_at,timestamp with time zone,YES,null
+public,jalapeno_posts,13,publish_status,text,NO,'drafted'::text
+public,jalapeno_posts,14,instagram_media_id,text,YES,null
+public,jalapeno_posts,15,instagram_permalink,text,YES,null
+public,jalapeno_posts,16,retry_count,integer,NO,0
+public,jalapeno_posts,17,last_publish_attempt_at,timestamp with time zone,YES,null
+public,jalapeno_posts,18,publish_response,jsonb,NO,'{}'::jsonb
+public,jalapeno_posts,19,metadata,jsonb,NO,'{}'::jsonb
+public,jalapeno_posts,20,created_at,timestamp with time zone,NO,now()
+public,jalapeno_posts,21,updated_at,timestamp with time zone,NO,now()
+public,jalapeno_posts,22,media_source,text,YES,null
+public,jalapeno_posts,23,video_asset_id,uuid,YES,null
+public,jalapeno_posts,24,storage_path,text,YES,null
+public,jalapeno_posts,25,video_url,text,YES,null
+public,jalapeno_posts,26,original_video_url,text,YES,null
+public,jalapeno_posts,27,processed_video_url,text,YES,null
+public,jalapeno_posts,28,original_storage_path,text,YES,null
+public,jalapeno_posts,29,processed_storage_path,text,YES,null
+public,jalapeno_posts,30,overlay_text,text,YES,null
+public,jalapeno_posts,31,overlay_status,text,YES,null
+public,jalapeno_posts,32,overlay_error,text,YES,null
+public,jalapeno_report_logs,1,id,uuid,NO,gen_random_uuid()
+public,jalapeno_report_logs,2,run_id,uuid,YES,null
+public,jalapeno_report_logs,3,report_type,text,NO,null
+public,jalapeno_report_logs,4,subject,text,NO,null
+public,jalapeno_report_logs,5,body,text,NO,null
+public,jalapeno_report_logs,6,period_start,timestamp with time zone,NO,null
+public,jalapeno_report_logs,7,period_end,timestamp with time zone,NO,null
+public,jalapeno_report_logs,8,delivery_status,text,NO,null
+public,jalapeno_report_logs,9,recipient,text,YES,null
+public,jalapeno_report_logs,10,metadata,jsonb,NO,'{}'::jsonb
+public,jalapeno_report_logs,11,created_at,timestamp with time zone,NO,now()
+public,jalapeno_runs,1,id,uuid,NO,gen_random_uuid()
+public,jalapeno_runs,2,run_id,uuid,NO,null
+public,jalapeno_runs,3,agent_name,text,NO,'jalapeno'::text
+public,jalapeno_runs,4,agent_version,text,YES,null
+public,jalapeno_runs,5,workflow_version,text,YES,null
+public,jalapeno_runs,6,prompt_version,text,YES,null
+public,jalapeno_runs,7,git_commit,text,YES,null
+public,jalapeno_runs,8,environment,text,YES,null
+public,jalapeno_runs,9,trigger_source,text,YES,null
+public,jalapeno_runs,10,post_type,text,YES,null
+public,jalapeno_runs,11,status,text,NO,null
+public,jalapeno_runs,12,dry_run,boolean,NO,true
+public,jalapeno_runs,13,started_at,timestamp with time zone,NO,now()
+public,jalapeno_runs,14,completed_at,timestamp with time zone,YES,null
+public,jalapeno_runs,15,duration_ms,integer,YES,null
+public,jalapeno_runs,16,total_candidates,integer,NO,0
+public,jalapeno_runs,17,selected_candidate_id,uuid,YES,null
+public,jalapeno_runs,18,model_name,text,YES,null
+public,jalapeno_runs,19,image_model_name,text,YES,null
+public,jalapeno_runs,20,prompt_tokens,integer,YES,null
+public,jalapeno_runs,21,completion_tokens,integer,YES,null
+public,jalapeno_runs,22,total_tokens,integer,YES,null
+public,jalapeno_runs,23,estimated_cost,numeric,YES,null
+public,jalapeno_runs,24,metadata,jsonb,NO,'{}'::jsonb
+public,jalapeno_runs,25,created_at,timestamp with time zone,NO,now()
+public,jalapeno_runs,26,updated_at,timestamp with time zone,NO,now()
+public,jalapeno_runs,27,publish_status,text,NO,'pending'::text
+public,jalapeno_runs,28,publish_failure_stage,text,YES,null
+public,jalapeno_runs,29,publish_failure_reason,text,YES,null
+public,jalapeno_runs,30,publish_error_code,text,YES,null
+public,jalapeno_runs,31,publish_error_message,text,YES,null
+public,jalapeno_runs,32,publish_retry_count,integer,NO,0
+public,jalapeno_runs,33,last_publish_attempt_at,timestamp with time zone,YES,null
+public,jalapeno_runs,34,published_media_id,text,YES,null
+public,jalapeno_runs,35,published_permalink,text,YES,null
+public,jalapeno_settings,1,id,uuid,NO,gen_random_uuid()
+public,jalapeno_settings,2,setting_key,text,NO,null
+public,jalapeno_settings,3,setting_value,jsonb,NO,null
+public,jalapeno_settings,4,description,text,YES,null
+public,jalapeno_settings,5,is_secret,boolean,NO,false
+public,jalapeno_settings,6,is_enabled,boolean,NO,true
+public,jalapeno_settings,7,created_at,timestamp with time zone,NO,now()
+public,jalapeno_settings,8,updated_at,timestamp with time zone,NO,now()
+public,jalapeno_video_assets,1,id,uuid,NO,gen_random_uuid()
+public,jalapeno_video_assets,2,storage_bucket,text,NO,'jalapeno-wing-videos'::text
+public,jalapeno_video_assets,3,storage_path,text,NO,null
+public,jalapeno_video_assets,4,public_url,text,YES,null
+public,jalapeno_video_assets,5,style,text,YES,null
+public,jalapeno_video_assets,6,caption_type,text,YES,null
+public,jalapeno_video_assets,7,active,boolean,NO,true
+public,jalapeno_video_assets,8,used_count,integer,NO,0
+public,jalapeno_video_assets,9,last_used_at,timestamp with time zone,YES,null
+public,jalapeno_video_assets,10,performance_score,numeric,YES,null
+public,jalapeno_video_assets,11,notes,text,YES,null
+public,jalapeno_video_assets,12,created_at,timestamp with time zone,NO,now()
+public,jalapeno_video_assets,13,updated_at,timestamp with time zone,NO,now()
+public,lb_total_destinations,1,total_destinations,integer,YES,null
+public,lb_total_routes,1,total_routes,integer,YES,null
+public,lb_user_badges_counts,1,user_id,uuid,NO,null
+public,lb_user_badges_counts,2,badges_count,integer,NO,0
+public,lb_user_destinations_rated,1,user_id,uuid,YES,null
+public,lb_user_destinations_rated,2,distinct_destinations,bigint,YES,null
+public,lb_user_routes_completed,1,user_id,uuid,YES,null
+public,lb_user_routes_completed,2,completed_routes,bigint,YES,null
+public,level_thresholds,1,level,integer,NO,null
+public,level_thresholds,2,xp_required,integer,NO,null
+public,level_thresholds,3,level_title,text,YES,null
+public,onboarding_analytics,1,id,uuid,NO,gen_random_uuid()
+public,onboarding_analytics,2,session_id,uuid,NO,null
+public,onboarding_analytics,3,user_id,uuid,YES,null
+public,onboarding_analytics,4,step,text,NO,null
+public,onboarding_analytics,5,started_at,timestamp with time zone,NO,now()
+public,onboarding_analytics,6,finished_at,timestamp with time zone,YES,null
+public,onboarding_analytics,7,duration_ms,integer,YES,null
+public,onboarding_analytics,8,state_id,integer,YES,null
+public,onboarding_analytics,9,picked_destination_id,uuid,YES,null
+public,onboarding_analytics,10,created_custom,boolean,NO,false
+public,onboarding_analytics,11,created_account,boolean,NO,false
+public,onboarding_analytics,12,skipped,boolean,NO,false
+public,ratings_per_crawl_user,1,crawl_id,uuid,YES,null
+public,ratings_per_crawl_user,2,user_id,uuid,YES,null
+public,ratings_per_crawl_user,3,rated_count,bigint,YES,null
+public,route_ordered_destinations,1,route_id,uuid,YES,null
+public,route_ordered_destinations,2,destination_id,uuid,YES,null
+public,route_ordered_destinations,3,stop_order,integer,YES,null
+public,route_stop_counts,1,route_id,uuid,YES,null
+public,route_stop_counts,2,stop_count,integer,YES,null
+public,route_submissions,1,id,uuid,NO,gen_random_uuid()
+public,route_submissions,2,user_id,uuid,NO,null
+public,route_submissions,3,stop1,text,YES,null
+public,route_submissions,4,stop2,text,YES,null
+public,route_submissions,5,stop3,text,YES,null
+public,route_submissions,6,stop4,text,YES,null
+public,route_submissions,7,stop5,text,YES,null
+public,route_submissions,8,created_at,timestamp with time zone,NO,now()
+public,route_submissions,9,status,text,NO,'new'::text
+public,route_travel_tag,1,id,smallint,NO,null
+public,route_travel_tag,2,travel,text,NO,null
+public,routes,1,id,uuid,NO,gen_random_uuid()
+public,routes,2,title,text,NO,null
+public,routes,3,city,text,NO,null
+public,routes,4,created_by,uuid,YES,null
+public,routes,5,is_public,boolean,NO,true
+public,routes,6,stop1_id,uuid,YES,null
+public,routes,7,stop2_id,uuid,YES,null
+public,routes,8,stop3_id,uuid,YES,null
+public,routes,9,stop4_id,uuid,YES,null
+public,routes,10,stop5_id,uuid,YES,null
+public,routes,11,created_at,timestamp with time zone,NO,now()
+public,routes,12,travel_tag_id,smallint,YES,null
+public,routes,13,is_token_route,boolean,NO,false
+public,social_activity_reads,1,user_id,uuid,NO,null
+public,social_activity_reads,2,friend_requests_seen_at,timestamp with time zone,NO,'1970-01-01 00:00:00+00'::timestamp with time zone
+public,social_activity_reads,3,friend_activity_seen_at,timestamp with time zone,NO,'1970-01-01 00:00:00+00'::timestamp with time zone
+public,social_activity_reads,4,updated_at,timestamp with time zone,NO,now()
+public,socially_visible_crawls,1,crawl_id,uuid,YES,null
+public,socially_visible_crawls,2,route_id,uuid,YES,null
+public,socially_visible_crawls,3,user_id,uuid,YES,null
+public,socially_visible_crawls,4,status,text,YES,null
+public,socially_visible_crawls,5,start_time,timestamp with time zone,YES,null
+public,socially_visible_crawls,6,end_time,timestamp with time zone,YES,null
+public,socially_visible_crawls,7,crawl_type,text,YES,null
+public,socially_visible_crawls,8,is_solo,boolean,YES,null
+public,socially_visible_destination_ratings,1,id,uuid,YES,null
+public,socially_visible_destination_ratings,2,destination_id,uuid,YES,null
+public,socially_visible_destination_ratings,3,crawl_id,uuid,YES,null
+public,socially_visible_destination_ratings,4,user_id,uuid,YES,null
+public,socially_visible_destination_ratings,5,crispiness,smallint,YES,null
+public,socially_visible_destination_ratings,6,sauce,smallint,YES,null
+public,socially_visible_destination_ratings,7,meat,smallint,YES,null
+public,socially_visible_destination_ratings,8,overall,smallint,YES,null
+public,socially_visible_destination_ratings,9,weight_score,numeric,YES,null
+public,socially_visible_destination_ratings,10,created_at,timestamp with time zone,YES,null
+public,socially_visible_destination_ratings,11,tag_id,bigint,YES,null
+public,socially_visible_destination_ratings,12,wings_eaten,smallint,YES,null
+public,socially_visible_destination_ratings,13,sauce_style,smallint,YES,null
+public,socially_visible_destination_ratings,14,flavor_vibe,ARRAY,YES,null
+public,socially_visible_destination_ratings,15,spice_level,smallint,YES,null
+public,socially_visible_destination_ratings,16,would_order_again,boolean,YES,null
+public,socially_visible_destination_ratings,17,is_buffacoin,boolean,YES,null
+public,socially_visible_users,1,user_id,uuid,YES,null
+public,socially_visible_users,2,username,text,YES,null
+public,socially_visible_users,3,avatar_url,text,YES,null
+public,socially_visible_users,4,created_at,timestamp with time zone,YES,null
+public,socially_visible_users,5,xp,integer,YES,null
+public,socially_visible_users,6,facebook_connected,boolean,YES,null
+public,socially_visible_users,7,facebook_connected_at,timestamp with time zone,YES,null
+public,states,1,state_id,integer,NO,nextval('states_state_id_seq'::regclass)
+public,states,2,state_code,character,NO,null
+public,states,3,state_name,text,NO,null
+public,user_badges,1,user_id,uuid,NO,null
+public,user_badges,2,badge_id,bigint,NO,null
+public,user_badges,3,earned_at,timestamp with time zone,NO,now()
+public,user_blocks,1,blocker_id,uuid,NO,null
+public,user_blocks,2,blocked_id,uuid,NO,null
+public,user_blocks,3,created_at,timestamp with time zone,NO,now()
+public,user_contactus,1,id,uuid,NO,gen_random_uuid()
+public,user_contactus,2,user_id,uuid,YES,null
+public,user_contactus,3,note,text,NO,null
+public,user_contactus,4,created_at,timestamp with time zone,NO,now()
+public,user_contactus,5,status,text,NO,'new'::text
+public,user_events,1,id,uuid,NO,gen_random_uuid()
+public,user_events,2,occurred_at,timestamp with time zone,NO,now()
+public,user_events,3,received_at,timestamp with time zone,NO,now()
+public,user_events,4,user_id,uuid,YES,null
+public,user_events,5,anonymous_id,text,YES,null
+public,user_events,6,session_id,uuid,NO,null
+public,user_events,7,event_name,text,NO,null
+public,user_events,8,screen,text,YES,null
+public,user_events,9,platform,text,YES,null
+public,user_events,10,app_version,text,YES,null
+public,user_events,11,state_id,integer,YES,null
+public,user_events,12,route_id,uuid,YES,null
+public,user_events,13,crawl_id,uuid,YES,null
+public,user_events,14,destination_id,uuid,YES,null
+public,user_events,15,metadata,jsonb,NO,'{}'::jsonb
+public,user_feedback,1,id,uuid,NO,gen_random_uuid()
+public,user_feedback,2,user_id,uuid,YES,null
+public,user_feedback,3,note,text,NO,null
+public,user_feedback,4,created_at,timestamp with time zone,NO,now()
+public,user_feedback,5,status,text,NO,'new'::text
+public,user_meta,1,user_id,uuid,NO,null
+public,user_meta,2,daily_claim_streak,integer,NO,0
+public,user_meta,3,last_daily_claim_at,timestamp with time zone,YES,null
+public,user_meta,4,created_at,timestamp with time zone,NO,now()
+public,user_meta,5,updated_at,timestamp with time zone,NO,now()
+public,user_preferences,1,user_id,uuid,NO,null
+public,user_preferences,2,wing_piece,smallint,YES,null
+public,user_preferences,3,sauce_pref,smallint,YES,null
+public,user_preferences,4,spicy_pref,smallint,YES,null
+public,user_preferences,5,prep_pref,smallint,YES,null
+public,user_preferences,6,created_at,timestamp with time zone,NO,now()
+public,user_preferences,7,updated_at,timestamp with time zone,NO,now()
+public,user_wing_battle_votes,1,user_id,uuid,NO,null
+public,user_wing_battle_votes,2,battle_id,bigint,NO,null
+public,user_wing_battle_votes,3,choice,smallint,NO,null
+public,user_wing_battle_votes,4,created_at,timestamp with time zone,NO,now()
+public,user_wing_battle_votes,5,updated_at,timestamp with time zone,NO,now()
+public,user_with_level,1,user_id,uuid,YES,null
+public,user_with_level,2,xp,integer,YES,null
+public,user_with_level,3,level,integer,YES,null
+public,users,1,user_id,uuid,NO,null
+public,users,3,avatar_url,text,YES,null
+public,users,4,created_at,timestamp with time zone,NO,now()
+public,users,5,username,text,YES,null
+public,users,6,xp,integer,NO,0
+public,users,7,taste_persona,text,YES,null
+public,users,8,facebook_connected,boolean,NO,false
+public,users,9,facebook_provider_id,text,YES,null
+public,users,10,facebook_connected_at,timestamp with time zone,YES,null
+public,users,11,social_opt_out,boolean,NO,false
+public,users_check_profile,1,user_id,uuid,NO,null
+public,users_check_profile,2,seen_at,timestamp with time zone,NO,now()
+public,users_check_route,1,user_id,uuid,NO,null
+public,users_check_route,2,seen_at,timestamp with time zone,NO,now()
+public,v_badges_for_user,1,user_id,uuid,YES,null
+public,v_badges_for_user,2,badge_id,bigint,YES,null
+public,v_badges_for_user,3,code,text,YES,null
+public,v_badges_for_user,4,name,text,YES,null
+public,v_badges_for_user,5,description,text,YES,null
+public,v_badges_for_user,6,icon,text,YES,null
+public,v_badges_for_user,7,xp_reward,integer,YES,null
+public,v_badges_for_user,8,earned_at,timestamp with time zone,YES,null
+public,v_badges_for_user,9,earned,boolean,YES,null
+public,v_social_feed,1,user_id,uuid,YES,null
+public,v_social_feed,2,weight_score,numeric,YES,null
+public,v_social_feed,3,created_at,timestamp with time zone,YES,null
+public,v_social_feed,4,destination_id,uuid,YES,null
+public,v_social_feed,5,destination_name,text,YES,null
+public,v_social_feed,6,destination_city,text,YES,null
+public,v_social_feed,7,destination_state_id,integer,YES,null
+public,v_social_feed,8,username,text,YES,null
+public,wing_battle_options,1,id,bigint,NO,nextval('wing_battle_options_id_seq'::regclass)
+public,wing_battle_options,2,label,text,YES,null
+public,wing_battle_options,3,left_option,text,NO,null
+public,wing_battle_options,4,right_option,text,NO,null
+public,wing_battle_options,5,is_active,boolean,NO,true
+public,wing_battle_options,6,sort_order,integer,YES,null
+public,wing_battle_options,7,created_at,timestamp with time zone,NO,now()
+public,wing_battle_options_active,1,id,bigint,YES,null
+public,wing_battle_options_active,2,label,text,YES,null
+public,wing_battle_options_active,3,left_option,text,YES,null
+public,wing_battle_options_active,4,right_option,text,YES,null
+public,wingman_intake_logs,1,id,uuid,NO,gen_random_uuid()
+public,wingman_intake_logs,2,user_id,uuid,YES,null
+public,wingman_intake_logs,3,raw_input,text,NO,null
+public,wingman_intake_logs,4,state_id,integer,YES,null
+public,wingman_intake_logs,5,ai_name,text,YES,null
+public,wingman_intake_logs,6,ai_city,text,YES,null
+public,wingman_intake_logs,7,ai_state,text,YES,null
+public,wingman_intake_logs,8,ai_confidence,numeric,YES,null
+public,wingman_intake_logs,9,place_found,boolean,YES,null
+public,wingman_intake_logs,10,place_name,text,YES,null
+public,wingman_intake_logs,11,place_address,text,YES,null
+public,wingman_intake_logs,12,place_lat,numeric,YES,null
+public,wingman_intake_logs,13,place_lng,numeric,YES,null
+public,wingman_intake_logs,14,wings_probability,numeric,YES,null
+public,wingman_intake_logs,15,wings_confidence,text,YES,null
+public,wingman_intake_logs,16,decision,text,NO,null
+public,wingman_intake_logs,17,decision_reason,text,YES,null
+public,wingman_intake_logs,18,destination_id,uuid,YES,null
+public,wingman_intake_logs,19,suggestion_id,uuid,YES,null
+public,wingman_intake_logs,20,ai_raw_response,jsonb,YES,null
+public,wingman_intake_logs,21,place_raw_response,jsonb,YES,null
+public,wingman_intake_logs,22,created_at,timestamp with time zone,NO,now()
+public,wingman_intake_logs,23,restaurant_name,text,YES,null
+public,wingman_intake_logs,24,city_input,text,YES,null
+public,wingman_intake_logs,25,extra_info,text,YES,null
+public,xp_ledger,1,id,uuid,NO,gen_random_uuid()
+public,xp_ledger,2,user_id,uuid,NO,null
+public,xp_ledger,3,amount,integer,NO,null
+public,xp_ledger,4,source,text,NO,null
+public,xp_ledger,5,reason,text,YES,null
+public,xp_ledger,6,idempotency_key,text,NO,null
+public,xp_ledger,7,destination_id,uuid,YES,null
+public,xp_ledger,8,crawl_id,uuid,YES,null
+public,xp_ledger,9,route_id,uuid,YES,null
+public,xp_ledger,10,badge_id,bigint,YES,null
+public,xp_ledger,11,battle_id,bigint,YES,null
+public,xp_ledger,12,challenge_id,uuid,YES,null
+public,xp_ledger,13,referral_id,uuid,YES,null
+public,xp_ledger,14,level_before,integer,YES,null
+public,xp_ledger,15,level_after,integer,YES,null
+public,xp_ledger,16,xp_before,integer,NO,null
+public,xp_ledger,17,xp_after,integer,NO,null
+public,xp_ledger,18,metadata,jsonb,NO,'{}'::jsonb
+public,xp_ledger,19,created_at,timestamp with time zone,NO,now()
+realtime,messages,3,topic,text,NO,null
+realtime,messages,4,extension,text,NO,null
+realtime,messages,5,payload,jsonb,YES,null
+realtime,messages,6,event,text,YES,null
+realtime,messages,7,private,boolean,YES,false
+realtime,messages,8,updated_at,timestamp without time zone,NO,now()
+realtime,messages,9,inserted_at,timestamp without time zone,NO,now()
+realtime,messages,10,id,uuid,NO,gen_random_uuid()
+realtime,messages,11,binary_payload,bytea,YES,null
+realtime,schema_migrations,1,version,bigint,NO,null
+realtime,schema_migrations,2,inserted_at,timestamp without time zone,YES,null
+realtime,subscription,1,id,bigint,NO,null
+realtime,subscription,2,subscription_id,uuid,NO,null
+realtime,subscription,4,entity,regclass,NO,null
+realtime,subscription,5,filters,ARRAY,NO,'{}'::realtime.user_defined_filter[]
+realtime,subscription,7,claims,jsonb,NO,null
+realtime,subscription,8,claims_role,regrole,NO,null
+realtime,subscription,9,created_at,timestamp without time zone,NO,"timezone('utc'::text, now())"
+realtime,subscription,10,action_filter,text,YES,'*'::text
+realtime,subscription,11,selected_columns,ARRAY,YES,null
+storage,buckets,1,id,text,NO,null
+storage,buckets,2,name,text,NO,null
+storage,buckets,3,owner,uuid,YES,null
+storage,buckets,4,created_at,timestamp with time zone,YES,now()
+storage,buckets,5,updated_at,timestamp with time zone,YES,now()
+storage,buckets,6,public,boolean,YES,false
+storage,buckets,7,avif_autodetection,boolean,YES,false
+storage,buckets,8,file_size_limit,bigint,YES,null
+storage,buckets,9,allowed_mime_types,ARRAY,YES,null
+storage,buckets,10,owner_id,text,YES,null
+storage,buckets,11,type,USER-DEFINED,NO,'STANDARD'::storage.buckettype
+storage,buckets_analytics,1,name,text,NO,null
+storage,buckets_analytics,2,type,USER-DEFINED,NO,'ANALYTICS'::storage.buckettype
+storage,buckets_analytics,3,format,text,NO,'ICEBERG'::text
+storage,buckets_analytics,4,created_at,timestamp with time zone,NO,now()
+storage,buckets_analytics,5,updated_at,timestamp with time zone,NO,now()
+storage,buckets_analytics,6,id,uuid,NO,gen_random_uuid()
+storage,buckets_analytics,7,deleted_at,timestamp with time zone,YES,null
+storage,buckets_vectors,1,id,text,NO,null
+storage,buckets_vectors,2,type,USER-DEFINED,NO,'VECTOR'::storage.buckettype
+storage,buckets_vectors,3,created_at,timestamp with time zone,NO,now()
+storage,buckets_vectors,4,updated_at,timestamp with time zone,NO,now()
+storage,migrations,1,id,integer,NO,null
+storage,migrations,2,name,character varying,NO,null
+storage,migrations,3,hash,character varying,NO,null
+storage,migrations,4,executed_at,timestamp without time zone,YES,CURRENT_TIMESTAMP
+storage,objects,1,id,uuid,NO,gen_random_uuid()
+storage,objects,2,bucket_id,text,YES,null
+storage,objects,3,name,text,YES,null
+storage,objects,4,owner,uuid,YES,null
+storage,objects,5,created_at,timestamp with time zone,YES,now()
+storage,objects,6,updated_at,timestamp with time zone,YES,now()
+storage,objects,7,last_accessed_at,timestamp with time zone,YES,now()
+storage,objects,8,metadata,jsonb,YES,null
+storage,objects,9,path_tokens,ARRAY,YES,null
+storage,objects,10,version,text,YES,null
+storage,objects,11,owner_id,text,YES,null
+storage,objects,12,user_metadata,jsonb,YES,null
+storage,s3_multipart_uploads,1,id,text,NO,null
+storage,s3_multipart_uploads,2,in_progress_size,bigint,NO,0
+storage,s3_multipart_uploads,3,upload_signature,text,NO,null
+storage,s3_multipart_uploads,4,bucket_id,text,NO,null
+storage,s3_multipart_uploads,5,key,text,NO,null
+storage,s3_multipart_uploads,6,version,text,NO,null
+storage,s3_multipart_uploads,7,owner_id,text,YES,null
+storage,s3_multipart_uploads,8,created_at,timestamp with time zone,NO,now()
+storage,s3_multipart_uploads,9,user_metadata,jsonb,YES,null
+storage,s3_multipart_uploads,10,metadata,jsonb,YES,null
+storage,s3_multipart_uploads_parts,1,id,uuid,NO,gen_random_uuid()
+storage,s3_multipart_uploads_parts,2,upload_id,text,NO,null
+storage,s3_multipart_uploads_parts,3,size,bigint,NO,0
+storage,s3_multipart_uploads_parts,4,part_number,integer,NO,null
+storage,s3_multipart_uploads_parts,5,bucket_id,text,NO,null
+storage,s3_multipart_uploads_parts,6,key,text,NO,null
+storage,s3_multipart_uploads_parts,7,etag,text,NO,null
+storage,s3_multipart_uploads_parts,8,owner_id,text,YES,null
+storage,s3_multipart_uploads_parts,9,version,text,NO,null
+storage,s3_multipart_uploads_parts,10,created_at,timestamp with time zone,NO,now()
+storage,vector_indexes,1,id,text,NO,gen_random_uuid()
+storage,vector_indexes,2,name,text,NO,null
+storage,vector_indexes,3,bucket_id,text,NO,null
+storage,vector_indexes,4,data_type,text,NO,null
+storage,vector_indexes,5,dimension,integer,NO,null
+storage,vector_indexes,6,distance_metric,text,NO,null
+storage,vector_indexes,7,metadata_configuration,jsonb,YES,null
+storage,vector_indexes,8,created_at,timestamp with time zone,NO,now()
+storage,vector_indexes,9,updated_at,timestamp with time zone,NO,now()
+supabase_migrations,schema_migrations,1,version,text,NO,null
+supabase_migrations,schema_migrations,2,statements,ARRAY,YES,null
+supabase_migrations,schema_migrations,3,name,text,YES,null
+vault,decrypted_secrets,1,id,uuid,YES,null
+vault,decrypted_secrets,2,name,text,YES,null
+vault,decrypted_secrets,3,description,text,YES,null
+vault,decrypted_secrets,4,secret,text,YES,null
+vault,decrypted_secrets,5,decrypted_secret,text,YES,null
+vault,decrypted_secrets,6,key_id,uuid,YES,null
+vault,decrypted_secrets,7,nonce,bytea,YES,null
+vault,decrypted_secrets,8,created_at,timestamp with time zone,YES,null
+vault,decrypted_secrets,9,updated_at,timestamp with time zone,YES,null
+vault,secrets,1,id,uuid,NO,gen_random_uuid()
+vault,secrets,2,name,text,YES,null
+vault,secrets,3,description,text,NO,''::text
+vault,secrets,4,secret,text,NO,null
+vault,secrets,5,key_id,uuid,YES,null
+vault,secrets,6,nonce,bytea,YES,vault._crypto_aead_det_noncegen()
+vault,secrets,7,created_at,timestamp with time zone,NO,CURRENT_TIMESTAMP
+vault,secrets,8,updated_at,timestamp with time zone,NO,CURRENT_TIMESTAMP

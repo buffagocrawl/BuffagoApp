@@ -1,0 +1,98 @@
+name: Jalapeno Instagram Metrics
+
+on:
+  workflow_dispatch:
+    inputs:
+      backfill:
+        description: Backfill missing 24h, 72h, and 7d metric windows
+        required: true
+        type: boolean
+        default: false
+      dry_run:
+        description: Load candidates without Meta calls or Supabase inserts
+        required: true
+        type: boolean
+        default: false
+  schedule:
+    - cron: "17 3 * * *"
+
+jobs:
+  jalapeno-metrics:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: Agents/Jalapeno
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      META_APP_SECRET: ${{ secrets.META_APP_SECRET }}
+      META_LONG_LIVED_ACCESS_TOKEN: ${{ secrets.META_LONG_LIVED_ACCESS_TOKEN }}
+      FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
+      INSTAGRAM_BUSINESS_ACCOUNT_ID: ${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}
+      GITHUB_WORKFLOW_RUN_ID: ${{ github.run_id }}
+
+    steps:
+      - name: Log GitHub trigger context
+        working-directory: .
+        run: |
+          set -euo pipefail
+
+          echo "github_event=${GITHUB_EVENT_NAME}"
+          echo "github_schedule=${GITHUB_EVENT_SCHEDULE:-}"
+          echo "current_utc=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          echo "workflow_name=${GITHUB_WORKFLOW}"
+          echo "branch=${GITHUB_REF_NAME}"
+          echo "run_id=${GITHUB_RUN_ID}"
+          echo "sha=${GITHUB_SHA}"
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Jalapeno dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Validate required secrets
+        run: |
+          set -euo pipefail
+
+          required_vars=(
+            SUPABASE_URL
+            SUPABASE_SERVICE_ROLE_KEY
+            META_APP_SECRET
+            META_LONG_LIVED_ACCESS_TOKEN
+            FACEBOOK_PAGE_ID
+            INSTAGRAM_BUSINESS_ACCOUNT_ID
+          )
+
+          missing=()
+          for var_name in "${required_vars[@]}"; do
+            if [[ -z "${!var_name:-}" ]]; then
+              missing+=("${var_name}")
+            fi
+          done
+
+          if (( ${#missing[@]} > 0 )); then
+            printf 'Missing required GitHub secrets/env values for metrics: %s\n' "${missing[*]}" >&2
+            exit 1
+          fi
+
+      - name: Run Jalapeno metrics
+        run: |
+          set -euo pipefail
+
+          command=(python main.py --collect-metrics)
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && "${{ inputs.backfill }}" == "true" ]]; then
+            command+=(--metrics-backfill)
+          fi
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && "${{ inputs.dry_run }}" == "true" ]]; then
+            command+=(--metrics-dry-run)
+          fi
+
+          echo "command=${command[*]}"
+          "${command[@]}"
