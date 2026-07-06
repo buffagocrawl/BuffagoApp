@@ -15,6 +15,9 @@ from logging_utils import log_event
 from supabase_client import SupabaseClient, SupabaseError
 
 
+_RESERVED_LOG_EVENT_KEYS = frozenset({"run_id", "stage", "status", "event", "level"})
+
+
 def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
@@ -295,6 +298,14 @@ def _timestamp_close(left: datetime | None, right: datetime | None, *, threshold
     return abs((left - right).total_seconds()) <= threshold_seconds
 
 
+def _sanitize_log_fields(fields: dict[str, Any], *, prefix: str) -> dict[str, Any]:
+    sanitized: dict[str, Any] = {}
+    for key, value in fields.items():
+        sanitized_key = f"{prefix}{key}" if key in _RESERVED_LOG_EVENT_KEYS else key
+        sanitized[sanitized_key] = value
+    return sanitized
+
+
 def _build_graph_client(config: JalapenoConfig) -> InstagramGraphClient:
     access_token = _read_secret(config.instagram.access_token_secret_name)
     ig_user_id = _read_secret(config.instagram.ig_user_id_secret_name)
@@ -407,7 +418,14 @@ def run_metrics_diagnostics(
             "proposed_timestamp": analysis["candidate"].get("timestamp") if isinstance(analysis["candidate"], dict) else None,
         }
         mismatches.append(mismatch)
-        log_event(logger, "metrics_recent_media_mismatch", run_id=active_run_id, stage="metrics", status="mismatch", **mismatch)
+        log_event(
+            logger,
+            "metrics_recent_media_mismatch",
+            run_id=active_run_id,
+            stage="metrics",
+            status="mismatch",
+            **_sanitize_log_fields(mismatch, prefix="mismatch_"),
+        )
         if mismatch["proposed_instagram_media_id"]:
             repair_candidates.append(mismatch)
 
@@ -466,7 +484,14 @@ def repair_metrics_media_ids(
             "proposed_permalink": candidate.get("proposed_permalink"),
         }
         proposed_updates.append(proposed)
-        log_event(logger, "metrics_media_id_repair_candidate", run_id=active_run_id, stage="metrics", dry_run=dry_run, **proposed)
+        log_event(
+            logger,
+            "metrics_media_id_repair_candidate",
+            run_id=active_run_id,
+            stage="metrics",
+            dry_run=dry_run,
+            **_sanitize_log_fields(proposed, prefix="repair_"),
+        )
         if dry_run:
             continue
         update_publish_status(
@@ -476,7 +501,13 @@ def repair_metrics_media_ids(
             instagram_media_id=str(candidate["proposed_instagram_media_id"]),
             instagram_permalink=str(candidate.get("proposed_permalink") or ""),
         )
-        log_event(logger, "metrics_media_id_repair_applied", run_id=active_run_id, stage="metrics", **proposed)
+        log_event(
+            logger,
+            "metrics_media_id_repair_applied",
+            run_id=active_run_id,
+            stage="metrics",
+            **_sanitize_log_fields(proposed, prefix="repair_"),
+        )
     return proposed_updates
 
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 from datetime import datetime, timezone
+from io import StringIO
 from pathlib import Path
 import sys
 
@@ -11,6 +12,7 @@ if str(PROJECT_DIR) not in sys.path:
 
 import metrics_collector as metrics_module  # noqa: E402
 from config import load_configuration  # noqa: E402
+from config import initialize_logging  # noqa: E402
 
 
 POST_ID = "11111111-1111-1111-1111-111111111111"
@@ -201,6 +203,34 @@ def test_diagnostics_detects_recent_media_mismatch(monkeypatch) -> None:
     assert diagnostics.configured_ig_account_found is True
     assert diagnostics.mismatch_count == 1
     assert diagnostics.repair_candidates[0]["proposed_instagram_media_id"] == "18142131364537604"
+
+
+def test_diagnostics_sanitizes_reserved_log_keys_in_mismatch(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setenv("META_LONG_LIVED_ACCESS_TOKEN", "test-token")
+    monkeypatch.setenv("INSTAGRAM_BUSINESS_ACCOUNT_ID", "instagram-business-account-id")
+    monkeypatch.setenv("FACEBOOK_PAGE_ID", "facebook-page-id")
+    monkeypatch.setattr(metrics_module, "InstagramGraphClient", _FakeGraphClient)
+
+    class _MismatchClient(_FakeSupabaseClient):
+        def fetch_rows(self, table_name: str, *, filters: dict | None = None, select: str = "*") -> list[dict]:
+            rows = super().fetch_rows(table_name, filters=filters, select=select)
+            if table_name == "jalapeno_posts":
+                rows[0]["instagram_media_id"] = "18019561010853949"
+                rows[0]["instagram_permalink"] = "https://instagram.com/p/correct/"
+            return rows
+
+    stream = StringIO()
+    logger = initialize_logging(replace(_config(), log_directory=tmp_path / "logs"), stream=stream)
+
+    diagnostics = metrics_module.run_metrics_diagnostics(_config(), _MismatchClient(), logger=logger)
+
+    assert diagnostics.mismatch_count == 1
+    log_output = stream.getvalue()
+    assert "metrics_recent_media_mismatch" in log_output
+    assert f"run_id={RUN_ID}" not in log_output
+    assert f"mismatch_run_id={RUN_ID}" in log_output
+    assert "stored_instagram_media_id=18019561010853949" in log_output
+    assert "proposed_instagram_media_id=18142131364537604" in log_output
 
 
 def test_unreadable_media_failure_does_not_set_action_required(monkeypatch) -> None:
