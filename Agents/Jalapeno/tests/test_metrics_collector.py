@@ -82,6 +82,31 @@ class _FakeGraphClient:
             "missing_insight_metrics": ["plays", "total_interactions"],
         }
 
+    def get_me(self, *, fields: str = "id,name") -> dict:
+        return {"id": "me-1", "name": "Buffago"}
+
+    def get_me_accounts(self, *, fields: str = "id,name,instagram_business_account{id,username}", limit: int = 100) -> dict:
+        return {
+            "data": [
+                {
+                    "id": "facebook-page-id",
+                    "name": "Buffago",
+                    "instagram_business_account": {"id": "instagram-business-account-id", "username": "buffago"},
+                }
+            ]
+        }
+
+    def get_recent_media(self, *, limit: int = 25) -> list[dict]:
+        return [
+            {
+                "id": "18142131364537604",
+                "caption": "caption",
+                "permalink": "https://instagram.com/p/correct/",
+                "timestamp": "2026-07-01T03:17:00+00:00",
+                "media_type": "REELS",
+            }
+        ]
+
 
 def _config():
     config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
@@ -145,3 +170,59 @@ def test_metrics_dry_run_does_not_require_meta_token(monkeypatch) -> None:
     assert result.dry_run is True
     assert result.snapshots_persisted == 0
     assert client.inserted_metrics == []
+
+
+def test_classify_code_100_subcode_33_is_not_token_expired() -> None:
+    error = metrics_module.SupabaseError(
+        'Instagram Graph API media details failed (400): {"error":{"message":"Unsupported get request","type":"GraphMethodException","code":100,"error_subcode":33}}'
+    )
+
+    assert metrics_module.classify_meta_error(error) == "meta_media_unreadable_or_missing_permission"
+
+
+def test_diagnostics_detects_recent_media_mismatch(monkeypatch) -> None:
+    monkeypatch.setenv("META_LONG_LIVED_ACCESS_TOKEN", "test-token")
+    monkeypatch.setenv("INSTAGRAM_BUSINESS_ACCOUNT_ID", "instagram-business-account-id")
+    monkeypatch.setenv("FACEBOOK_PAGE_ID", "facebook-page-id")
+    monkeypatch.setattr(metrics_module, "InstagramGraphClient", _FakeGraphClient)
+
+    class _MismatchClient(_FakeSupabaseClient):
+        def fetch_rows(self, table_name: str, *, filters: dict | None = None, select: str = "*") -> list[dict]:
+            rows = super().fetch_rows(table_name, filters=filters, select=select)
+            if table_name == "jalapeno_posts":
+                rows[0]["instagram_media_id"] = "18019561010853949"
+                rows[0]["instagram_permalink"] = "https://instagram.com/p/correct/"
+            return rows
+
+    diagnostics = metrics_module.run_metrics_diagnostics(_config(), _MismatchClient())
+
+    assert diagnostics.me_ok is True
+    assert diagnostics.configured_page_found is True
+    assert diagnostics.configured_ig_account_found is True
+    assert diagnostics.mismatch_count == 1
+    assert diagnostics.repair_candidates[0]["proposed_instagram_media_id"] == "18142131364537604"
+
+
+def test_unreadable_media_failure_does_not_set_action_required(monkeypatch) -> None:
+    monkeypatch.setenv("META_LONG_LIVED_ACCESS_TOKEN", "test-token")
+    monkeypatch.setenv("INSTAGRAM_BUSINESS_ACCOUNT_ID", "test-ig-user")
+
+    class _UnreadableGraphClient(_FakeGraphClient):
+        def get_media_metrics(self, media_id: str) -> dict:
+            raise metrics_module.SupabaseError(
+                'Instagram Graph API media details failed (400): {"error":{"message":"Unsupported get request","type":"GraphMethodException","code":100,"error_subcode":33}}'
+            )
+
+    monkeypatch.setattr(metrics_module, "InstagramGraphClient", _UnreadableGraphClient)
+    client = _FakeSupabaseClient()
+
+    result = metrics_module.collect_instagram_metrics(
+        _config(),
+        client,
+        now=datetime(2026, 7, 5, 3, 17, tzinfo=timezone.utc),
+        backfill=True,
+    )
+
+    assert result.failures == 1
+    assert result.action_required is False
+    assert client.inserted_errors[0]["error_type"] == "meta_media_unreadable_or_missing_permission"

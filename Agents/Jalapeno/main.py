@@ -31,7 +31,7 @@ from data_snapshot import generate_latest_snapshot
 from external_context import generate_external_context
 from jalapeno_db import JalapenoRunContext, complete_run, create_run, ensure_selected_post_candidate, fail_run, insert_error_row, insert_final_post
 from logging_utils import log_event
-from metrics_collector import collect_instagram_metrics
+from metrics_collector import collect_instagram_metrics, repair_metrics_media_ids, run_metrics_diagnostics
 from performance_context import build_performance_context
 from reporting import generate_admin_report
 from supabase_client import SupabaseClient, SupabaseError
@@ -101,6 +101,16 @@ def build_parser() -> argparse.ArgumentParser:
         "--metrics-dry-run",
         action="store_true",
         help="Load and log metrics candidates without calling Meta or inserting rows.",
+    )
+    parser.add_argument(
+        "--metrics-diagnostics",
+        action="store_true",
+        help="Check Meta account connectivity and compare stored Instagram media ids against recent IG media.",
+    )
+    parser.add_argument(
+        "--metrics-repair-media-ids",
+        action="store_true",
+        help="Propose or apply repairs for bad stored Instagram media ids by matching recent IG media.",
     )
     return parser
 
@@ -816,19 +826,44 @@ def _load_live_client_and_config(mode_name: str):
     return config, logger, client
 
 
-def run_metrics(*, backfill: bool = False, dry_run: bool = False) -> int:
+def run_metrics(*, backfill: bool = False, dry_run: bool = False, diagnostics: bool = False, repair_media_ids: bool = False) -> int:
     config, logger, client = _load_live_client_and_config("metrics")
-    result = collect_instagram_metrics(config, client, logger=logger, backfill=backfill, dry_run=dry_run)
+    diagnostics_result = None
+    repair_result = None
+    if diagnostics:
+        diagnostics_result = run_metrics_diagnostics(config, client, logger=logger)
+        print(f"Metrics diagnostics me ok: {diagnostics_result.me_ok}")
+        print(f"Metrics diagnostics accounts ok: {diagnostics_result.accounts_ok}")
+        print(f"Metrics diagnostics configured page found: {diagnostics_result.configured_page_found}")
+        print(f"Metrics diagnostics configured IG account found: {diagnostics_result.configured_ig_account_found}")
+        print(f"Metrics diagnostics recent media ok: {diagnostics_result.recent_media_ok}")
+        print(f"Metrics diagnostics recent media count: {diagnostics_result.recent_media_count}")
+        print(f"Metrics diagnostics stored ids checked: {diagnostics_result.stored_ids_checked}")
+        print(f"Metrics diagnostics stored ids found in recent media: {diagnostics_result.stored_ids_found_in_recent_media}")
+        print(f"Metrics diagnostics mismatches: {diagnostics_result.mismatch_count}")
+    if repair_media_ids:
+        repair_result = repair_metrics_media_ids(config, client, logger=logger, dry_run=dry_run)
+        print(f"Metrics repair candidates: {len(repair_result)}")
+    result = collect_instagram_metrics(
+        config,
+        client,
+        logger=logger,
+        backfill=backfill,
+        dry_run=dry_run,
+        diagnostics=False,
+        repair_media_ids=False,
+    )
     print(f"Metrics checked posts: {result.checked_posts}")
     print(f"Metrics snapshots persisted: {result.snapshots_persisted}")
     print(f"Metrics skipped duplicates: {result.skipped_duplicates}")
     print(f"Metrics failures: {result.failures}")
     print(f"Metrics dry run: {result.dry_run}")
+    print(f"Metrics repair candidates seen: {result.repair_candidates}")
     if result.action_required:
         print("Metrics action required: Meta token/auth issue detected")
         return 2
-    if result.failures:
-        print("Metrics collection failed for one or more posts")
+    if diagnostics_result is not None and not diagnostics_result.me_ok:
+        print("Metrics diagnostics failed: /me did not return a valid account")
         return 2
     return 0
 
@@ -1697,7 +1732,12 @@ def main(argv: list[str] | None = None) -> int:
         if args.production:
             return run_production(content_type=args.content_type)
         if args.metrics:
-            return run_metrics(backfill=args.metrics_backfill, dry_run=args.metrics_dry_run)
+            return run_metrics(
+                backfill=args.metrics_backfill,
+                dry_run=args.metrics_dry_run,
+                diagnostics=args.metrics_diagnostics,
+                repair_media_ids=args.metrics_repair_media_ids,
+            )
         if args.daily_report:
             return run_admin_report("daily")
         if args.weekly_report:

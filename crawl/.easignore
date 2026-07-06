@@ -24,3 +24,7 @@ node_modules/
 # Env files
 .env
 .env.*
+
+../.pytest_cache/
+
+.pytest_cache/

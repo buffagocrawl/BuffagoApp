@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+import json
 from typing import Any
 from uuid import uuid4
 
@@ -92,6 +93,34 @@ class InstagramGraphClient:
         )
         if response.status_code >= 400:
             raise SupabaseError(f"Instagram Graph API request failed ({response.status_code}): {self._redact_access_token(response.text)}")
+        if not response.content:
+            return {}
+        return response.json()
+
+    def _request_raw(
+        self,
+        method: str,
+        path: str,
+        *,
+        data: dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None,
+    ) -> requests.Response:
+        if self.simulate:
+            raise SupabaseError("Live Graph API requests are disabled in simulation mode")
+        request_params = dict(params or {})
+        if method.upper() == "GET":
+            request_params["access_token"] = self.access_token
+        return self.transport.request(
+            method=method.upper(),
+            url=self._endpoint(path),
+            data=data,
+            params=request_params or None,
+            timeout=self.timeout_seconds,
+        )
+
+    def _json_or_error(self, response: requests.Response, context: str) -> dict[str, Any]:
+        if response.status_code >= 400:
+            raise SupabaseError(f"{context} ({response.status_code}): {self._redact_access_token(response.text)}")
         if not response.content:
             return {}
         return response.json()
@@ -226,18 +255,12 @@ class InstagramGraphClient:
                 "missing_insight_metrics": [],
                 "source": "simulated",
             }
-        details_response = self.transport.request(
-            method="GET",
-            url=self._endpoint(media_id),
-            params={
-                "access_token": self.access_token,
-                "fields": "id,caption,like_count,comments_count,permalink,timestamp,media_type",
-            },
-            timeout=self.timeout_seconds,
+        details_response = self._request_raw(
+            "GET",
+            media_id,
+            params={"fields": "id,caption,like_count,comments_count,permalink,timestamp,media_type"},
         )
-        if details_response.status_code >= 400:
-            raise SupabaseError(f"Instagram Graph API media details failed ({details_response.status_code}): {self._redact_access_token(details_response.text)}")
-        details = details_response.json() if details_response.content else {}
+        details = self._json_or_error(details_response, "Instagram Graph API media details failed")
         metrics = dict(details)
         media_type = str(details.get("media_type") or "").upper()
         if media_type in {"REELS", "VIDEO"}:
@@ -248,14 +271,10 @@ class InstagramGraphClient:
         missing_metrics: list[str] = []
         insight_errors: dict[str, str] = {}
         for metric_name in requested_metrics:
-            insights_response = self.transport.request(
-                method="GET",
-                url=self._endpoint(f"{media_id}/insights"),
-                params={
-                    "access_token": self.access_token,
-                    "metric": metric_name,
-                },
-                timeout=self.timeout_seconds,
+            insights_response = self._request_raw(
+                "GET",
+                f"{media_id}/insights",
+                params={"metric": metric_name},
             )
             if insights_response.status_code >= 400:
                 missing_metrics.append(metric_name)
@@ -282,3 +301,45 @@ class InstagramGraphClient:
         if insight_errors:
             metrics["insight_errors"] = insight_errors
         return metrics
+
+    def get_me(self, *, fields: str = "id,name") -> dict[str, Any]:
+        if self.simulate:
+            return {"id": "sim-user", "name": "Simulated User"}
+        return self._request("GET", "me", params={"fields": fields})
+
+    def get_me_accounts(self, *, fields: str = "id,name,instagram_business_account{id,username}", limit: int = 100) -> dict[str, Any]:
+        if self.simulate:
+            return {"data": []}
+        return self._request("GET", "me/accounts", params={"fields": fields, "limit": limit})
+
+    def get_recent_media(self, *, limit: int = 25) -> list[dict[str, Any]]:
+        if self.simulate:
+            return list(self._simulated_media.values())[:limit]
+        response = self._request(
+            "GET",
+            f"{self.ig_user_id}/media",
+            params={"fields": "id,caption,permalink,timestamp,media_type", "limit": limit},
+        )
+        data = response.get("data")
+        return list(data) if isinstance(data, list) else []
+
+    def get_media_details_safe(self, media_id: str) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
+        if self.simulate:
+            return self.get_media_details(media_id), None
+        response = self._request_raw(
+            "GET",
+            media_id,
+            params={"fields": "id,permalink,timestamp,media_type,media_url,caption"},
+        )
+        if response.status_code >= 400:
+            error_payload = None
+            if response.content:
+                try:
+                    error_payload = response.json()
+                except json.JSONDecodeError:
+                    error_payload = {"raw_text": self._redact_access_token(response.text)}
+            return None, {
+                "status_code": response.status_code,
+                "error": error_payload if error_payload is not None else {"raw_text": self._redact_access_token(response.text)},
+            }
+        return response.json() if response.content else {}, None

@@ -1005,6 +1005,17 @@ def _finalize_success(
         state.post.metadata.clear()
         state.post.metadata.update(post_metadata)
     _persist_publish_state(client, state)
+    log_event(
+        logger,
+        "publish_state_persisted",
+        run_id=post.run_id,
+        candidate_id=post.candidate_id,
+        post_id=post_id,
+        instagram_container_id=state.container_id,
+        instagram_published_media_id=state.published_media_id,
+        persisted_instagram_media_id=state.published_media_id,
+        status=state.status,
+    )
     if client is not None and post_id:
         update_publish_status(
             client,
@@ -1020,6 +1031,17 @@ def _finalize_success(
             container_id=state.container_id,
             publish_response=state.response_payload or {},
             metadata=post_metadata,
+        )
+        log_event(
+            logger,
+            "publish_post_record_updated",
+            run_id=post.run_id,
+            candidate_id=post.candidate_id,
+            post_id=post_id,
+            instagram_container_id=state.container_id,
+            instagram_published_media_id=state.published_media_id,
+            persisted_instagram_media_id=state.published_media_id,
+            status=state.status,
         )
     report = create_publish_report(
         run_id=post.run_id,

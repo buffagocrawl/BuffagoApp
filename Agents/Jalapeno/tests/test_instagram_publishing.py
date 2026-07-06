@@ -769,6 +769,8 @@ def test_successful_publish_marks_approval_status_published(tmp_path: Path) -> N
         publishing=replace(config.publishing, publish_max_retries=1, retry_backoff_seconds=0),
     )
     client = _PublishFlowSupabaseClient()
+    stream = StringIO()
+    logger = initialize_logging(replace(config, log_directory=tmp_path / "logs"), stream=stream)
     client.post_rows.append(
         {
             "id": "33333333-3333-3333-3333-333333333333",
@@ -791,6 +793,7 @@ def test_successful_publish_marks_approval_status_published(tmp_path: Path) -> N
         post,
         access_token="test-access-token",
         ig_user_id="test-ig-user-id",
+        logger=logger,
         client=client,
         simulate=True,
         dry_run=False,
@@ -803,6 +806,10 @@ def test_successful_publish_marks_approval_status_published(tmp_path: Path) -> N
     assert client.post_rows[0]["metadata"]["approval_status"] == "published"
     assert client.post_rows[0]["metadata"]["approval_required"] is False
     assert client.instagram_post_rows["11111111-1111-1111-1111-111111111111"]["metadata"]["approval_status"] == "published"
+    log_output = stream.getvalue()
+    assert "publish_state_persisted" in log_output
+    assert "instagram_container_id=sim-container" in log_output
+    assert "persisted_instagram_media_id=sim-media" in log_output
 
 
 def test_publish_precheck_receives_image_validation_quality_score_when_winner_score_missing(
