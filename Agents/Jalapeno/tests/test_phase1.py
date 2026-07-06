@@ -83,7 +83,7 @@ def test_config_yaml_loads() -> None:
     assert config.meme_post_time == "20:00"
     assert config.video_post_time == "18:00"
     assert config.video.bucket == "jalapeno-wing-videos"
-    assert config.video.recent_reuse_days == 7
+    assert config.video.reuse_cooldown_days == 30
     assert config.test_mode_never_posts is True
 
 

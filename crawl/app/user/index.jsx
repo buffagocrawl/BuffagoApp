@@ -20,6 +20,7 @@ import {
   clearFacebookFlowState,
   facebookConfigChecklist,
   getFacebookRedirectUrl,
+  isOAuthFlowInProgress,
   runFacebookOAuth,
   sanitizeAuthError,
 } from '../../lib/facebookOAuth';
@@ -160,6 +161,7 @@ export default function UserSettings() {
 
   // prevent duplicate badge/XP awards
   const awardedRef = useRef(false);
+  const oauthFlowActiveRef = useRef(false);
 
   const email = session?.user?.email ?? '';
   const rawAvatarUrl = session?.user?.user_metadata?.avatar_url ?? null;
@@ -455,9 +457,29 @@ export default function UserSettings() {
     })();
 
     const { data: sub } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      const flowActive = await isOAuthFlowInProgress({ mode: 'link_identity' });
+      oauthFlowActiveRef.current = flowActive;
+      await dbg(
+        'facebook_auth_event_observed',
+        {
+          event,
+          flowActive,
+          hasSession: Boolean(newSession),
+          sessionUserId: newSession?.user?.id || null,
+        },
+        'facebook'
+      );
       setSession(newSession ?? null);
 
       if (event === 'SIGNED_OUT') {
+        if (flowActive) {
+          await dbg(
+            'facebook_signed_out_ignored_during_link',
+            { event, sessionUserId: newSession?.user?.id || null },
+            'facebook'
+          );
+          return;
+        }
         try {
           if (router.canGoBack?.()) router.dismissAll?.();
         } catch {}
@@ -500,12 +522,31 @@ export default function UserSettings() {
 
   // If user not logged in once initialized, bounce to home
   useEffect(() => {
-    if (initialized && !session) {
+    let cancelled = false;
+
+    (async () => {
+      if (!initialized || session) return;
+      const flowActive = await isOAuthFlowInProgress({ mode: 'link_identity' });
+      oauthFlowActiveRef.current = flowActive;
+      if (cancelled || flowActive) {
+        if (flowActive) {
+          await dbg(
+            'facebook_session_guard_deferred_during_link',
+            { route: '/user' },
+            'facebook'
+          );
+        }
+        return;
+      }
       try {
         if (router.canGoBack?.()) router.dismissAll?.();
       } catch {}
       setTimeout(() => router.replace('/home'), 0);
-    }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [initialized, session, router]);
 
   // Load preferences and user row when logged in
@@ -524,6 +565,18 @@ export default function UserSettings() {
       const { data: sessionData } = await supabase.auth.getSession();
       const hasSession = Boolean(sessionData?.session?.user?.id);
       const currentUserId = sessionData?.session?.user?.id || null;
+      oauthFlowActiveRef.current = hasSession;
+      await dbg(
+        'facebook_link_preflight',
+        {
+          currentUserId,
+          hasSession,
+          method: hasSession ? 'linkIdentity' : 'signInWithOAuth',
+          redirectUrl: getFacebookRedirectUrl(),
+          returnPath: hasSession ? '/user' : '/(tabs)/home',
+        },
+        'facebook'
+      );
       trackEvent({
         eventName: 'facebook_connect_button_tapped',
         screen: 'settings',
@@ -543,6 +596,15 @@ export default function UserSettings() {
       });
 
       if (result.outcome === 'callback') {
+        await dbg(
+          'facebook_callback_navigation_requested',
+          {
+            currentUserId,
+            method: mode === 'link_identity' ? 'linkIdentity' : 'signInWithOAuth',
+            finalRoute: '/auth/callback',
+          },
+          'facebook'
+        );
         trackEvent({
           eventName: 'facebook_oauth_redirect_received',
           screen: 'settings',
@@ -567,6 +629,7 @@ export default function UserSettings() {
       throw new Error(`Unexpected Facebook auth result: ${result.resultType || result.outcome}`);
     } catch (e) {
       console.log('[FB OAuth error]', e);
+      oauthFlowActiveRef.current = false;
       await clearFacebookFlowState();
       await dbg(
         'facebook_oauth_failed',

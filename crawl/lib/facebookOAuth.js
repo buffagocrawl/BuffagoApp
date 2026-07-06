@@ -14,6 +14,7 @@ export const OAUTH_LINK_USER_ID_KEY = 'buffago:oauth:link_user_id';
 export const OAUTH_FLOW_ID_KEY = 'buffago:oauth:flow_id';
 export const OAUTH_FLOW_MODE_KEY = 'buffago:oauth:flow_mode';
 export const OAUTH_FLOW_STARTED_AT_KEY = 'buffago:oauth:started_at';
+export const OAUTH_LINK_SESSION_KEY = 'buffago:oauth:link_session';
 
 const ANDROID_REDIRECT_GRACE_MS = 1800;
 
@@ -145,6 +146,67 @@ async function storeFlowState({ flowId, mode, returnPath, currentUserId, started
   }
 }
 
+export async function readOAuthFlowState() {
+  const entries = await AsyncStorage.multiGet([
+    OAUTH_FLOW_ID_KEY,
+    OAUTH_FLOW_MODE_KEY,
+    OAUTH_FLOW_STARTED_AT_KEY,
+    OAUTH_RETURN_PATH_KEY,
+    OAUTH_LINK_USER_ID_KEY,
+  ]);
+
+  const map = Object.fromEntries(entries);
+  return {
+    flowId: map[OAUTH_FLOW_ID_KEY] || null,
+    mode: map[OAUTH_FLOW_MODE_KEY] || null,
+    startedAt: Number(map[OAUTH_FLOW_STARTED_AT_KEY]) || null,
+    returnPath: map[OAUTH_RETURN_PATH_KEY] || null,
+    expectedUserId: map[OAUTH_LINK_USER_ID_KEY] || null,
+  };
+}
+
+export async function isOAuthFlowInProgress({ mode = null } = {}) {
+  const flowState = await readOAuthFlowState();
+  if (!flowState.mode) return false;
+  if (!mode) return true;
+  return flowState.mode === mode;
+}
+
+async function storeLinkSessionSnapshot(session, { flowId, screen } = {}) {
+  if (!session?.user?.id || !session?.access_token || !session?.refresh_token) {
+    await AsyncStorage.removeItem(OAUTH_LINK_SESSION_KEY);
+    return;
+  }
+
+  const snapshot = {
+    flowId: flowId || null,
+    screen: screen || null,
+    userId: session.user.id,
+    accessToken: session.access_token,
+    refreshToken: session.refresh_token,
+    capturedAt: new Date().toISOString(),
+  };
+
+  await AsyncStorage.setItem(OAUTH_LINK_SESSION_KEY, JSON.stringify(snapshot));
+}
+
+export async function getStoredLinkSessionSnapshot() {
+  const raw = await AsyncStorage.getItem(OAUTH_LINK_SESSION_KEY);
+  if (!raw) return null;
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed?.userId || !parsed?.accessToken || !parsed?.refreshToken) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+export async function clearStoredLinkSessionSnapshot() {
+  await AsyncStorage.removeItem(OAUTH_LINK_SESSION_KEY);
+}
+
 export async function clearFacebookFlowState() {
   try {
     await AsyncStorage.multiRemove([
@@ -155,6 +217,7 @@ export async function clearFacebookFlowState() {
       OAUTH_FLOW_MODE_KEY,
       OAUTH_FLOW_STARTED_AT_KEY,
     ]);
+    await clearStoredLinkSessionSnapshot();
   } catch {
     // Cleanup must never replace the original auth result.
   }
@@ -176,6 +239,12 @@ export async function runFacebookOAuth({
   const common = { flowId, mode, screen };
 
   await storeFlowState({ flowId, mode, returnPath, currentUserId, startedAt });
+  if (mode === 'link_identity') {
+    const { data: sessionData } = await supabase.auth.getSession();
+    await storeLinkSessionSnapshot(sessionData?.session ?? null, { flowId, screen });
+  } else {
+    await clearStoredLinkSessionSnapshot();
+  }
   await emitFacebookLog(
     'facebook_link_start',
     {
@@ -227,6 +296,18 @@ export async function runFacebookOAuth({
     scopes: 'public_profile,email',
     skipBrowserRedirect: true,
   };
+
+  await dbg(
+    'facebook_oauth_method_selected',
+    {
+      ...common,
+      method: mode === 'link_identity' ? 'linkIdentity' : 'signInWithOAuth',
+      currentUserId,
+      redirect: describeUrl(redirectUrl),
+      elapsedMs: elapsedMs(startedAt),
+    },
+    'facebook'
+  );
 
   const response =
     mode === 'link_identity'

@@ -107,7 +107,7 @@ class StorageConfig:
 class VideoConfig:
     bucket: str
     post_time: str
-    recent_reuse_days: int
+    reuse_cooldown_days: int
     backup_attempts: int
 
 
@@ -411,16 +411,23 @@ def load_configuration(
         bucket=_require_string(storage_section, "bucket"),
         public=_require_bool(storage_section, "public"),
     )
-    recent_reuse_days_raw = os.getenv("JALAPENO_VIDEO_RECENT_REUSE_DAYS", "").strip()
+    recent_reuse_days_raw = (
+        os.getenv("JALAPENO_VIDEO_REUSE_COOLDOWN_DAYS", "").strip()
+        or os.getenv("JALAPENO_VIDEO_RECENT_REUSE_DAYS", "").strip()
+    )
     try:
-        recent_reuse_days = int(recent_reuse_days_raw) if recent_reuse_days_raw else _optional_int(posting, "video_recent_reuse_days", 7)
+        recent_reuse_days = (
+            int(recent_reuse_days_raw)
+            if recent_reuse_days_raw
+            else _optional_int(posting, "video_reuse_cooldown_days", _optional_int(posting, "video_recent_reuse_days", 30))
+        )
     except ValueError as exc:
-        raise ConfigError("JALAPENO_VIDEO_RECENT_REUSE_DAYS must be an integer") from exc
+        raise ConfigError("JALAPENO_VIDEO_REUSE_COOLDOWN_DAYS must be an integer") from exc
     video_config = VideoConfig(
         bucket=os.getenv("JALAPENO_VIDEO_BUCKET", "").strip()
         or _optional_string(storage_section, "video_bucket", "jalapeno-wing-videos"),
         post_time=video_post_time,
-        recent_reuse_days=recent_reuse_days,
+        reuse_cooldown_days=recent_reuse_days,
         backup_attempts=1,
     )
     cleanup_config = CleanupConfig(

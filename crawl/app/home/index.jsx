@@ -24,6 +24,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { supabase } from '../../lib/supabase.js';
+import { isOAuthFlowInProgress } from '../../lib/facebookOAuth';
 import WelcomeWizard from '../../components/WelcomeWizard';
 import LocationGate from '../../components/LocationGate';
 import { useLocationCtx } from '../../providers/LocationProvider';
@@ -376,6 +377,12 @@ export default function Home() {
     gateRanRef.current = true;
 
     (async () => {
+      const oauthFlowActive = await isOAuthFlowInProgress({ mode: 'link_identity' });
+      if (oauthFlowActive) {
+        setGateChecked(true);
+        return;
+      }
+
       try {
         const done = await AsyncStorage.getItem('buffago:onboarding:complete');
         if (done !== 'true') {

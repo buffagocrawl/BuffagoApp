@@ -8,8 +8,11 @@ import { supabase } from '../../lib/supabase';
 import { dbg } from '../../lib/debugLog';
 import { trackEvent } from '../../lib/analytics';
 import {
+  clearStoredLinkSessionSnapshot,
   clearFacebookFlowState,
   describeUrl,
+  getStoredLinkSessionSnapshot,
+  isOAuthFlowInProgress,
   OAUTH_FLOW_ID_KEY,
   OAUTH_FLOW_MODE_KEY,
   OAUTH_FLOW_STARTED_AT_KEY,
@@ -30,6 +33,42 @@ const ONBOARDING_SEED_RATING_KEY = 'buffago:onboarding:seed_rating';
 const ONBOARDING_DEST_SUGGESTION_KEY = 'buffago:onboarding:dest_suggestion';
 
 const USERNAME_REGEX = /^[a-zA-Z0-9_]{3,20}$/;
+
+async function restoreLinkSessionSnapshot(snapshot, flowId) {
+  if (!snapshot?.accessToken || !snapshot?.refreshToken) {
+    throw new Error('Missing saved link session snapshot');
+  }
+
+  const { data, error } = await supabase.auth.setSession({
+    access_token: snapshot.accessToken,
+    refresh_token: snapshot.refreshToken,
+  });
+
+  if (error) {
+    await dbg(
+      'facebook_link_session_restore_failed',
+      {
+        flowId,
+        snapshotUserId: snapshot?.userId || null,
+        ...sanitizeAuthError(error),
+      },
+      'facebook'
+    );
+    throw error;
+  }
+
+  await dbg(
+    'facebook_link_session_restore_succeeded',
+    {
+      flowId,
+      snapshotUserId: snapshot?.userId || null,
+      restoredUserId: data?.session?.user?.id || null,
+    },
+    'facebook'
+  );
+
+  return data?.session ?? null;
+}
 
 function safeParseUrl(url) {
   if (!url || typeof url !== 'string') return { query: {}, fragment: {}, hasFragment: false };
@@ -392,6 +431,21 @@ export default function AuthCallback() {
 
         const returnPath = (await AsyncStorage.getItem(OAUTH_RETURN_PATH_KEY)) || null;
         const expectedLinkUserId = (await AsyncStorage.getItem(OAUTH_LINK_USER_ID_KEY)) || null;
+        const linkSessionSnapshot = await getStoredLinkSessionSnapshot();
+
+        await dbg(
+          'facebook_redirect_url_received',
+          {
+            flowId,
+            mode: flowMode,
+            redirectUrl: url,
+            callback: describeUrl(url),
+            expectedLinkUserId,
+            snapshotUserId: linkSessionSnapshot?.userId || null,
+            elapsedMs: Date.now() - flowStartedAt,
+          },
+          flowMode ? 'facebook' : 'auth'
+        );
 
         const parsed = safeParseUrl(url);
         const callbackError =
@@ -528,7 +582,21 @@ export default function AuthCallback() {
 
         const { data: s2, error: sErr } = await supabase.auth.getSession();
         if (sErr) throw sErr;
-        if (!s2?.session?.user?.id) throw new Error('Session not persisted after callback');
+        let resolvedSession = s2?.session ?? null;
+        if (!resolvedSession?.user?.id && flowMode === 'link_identity' && linkSessionSnapshot) {
+          await dbg(
+            'facebook_link_session_missing_after_callback',
+            {
+              flowId,
+              expectedLinkUserId,
+              snapshotUserId: linkSessionSnapshot.userId,
+              elapsedMs: Date.now() - flowStartedAt,
+            },
+            'facebook'
+          );
+          resolvedSession = await restoreLinkSessionSnapshot(linkSessionSnapshot, flowId);
+        }
+        if (!resolvedSession?.user?.id) throw new Error('Session not persisted after callback');
         await dbg(
           'oauth_session_persisted',
           {
@@ -536,9 +604,9 @@ export default function AuthCallback() {
             mode: flowMode,
             hasSession: true,
             hasUserId: true,
-            userId: s2.session.user.id,
+            userId: resolvedSession.user.id,
             matchesExpectedLinkUser: expectedLinkUserId
-              ? s2.session.user.id === expectedLinkUserId
+              ? resolvedSession.user.id === expectedLinkUserId
               : null,
             elapsedMs: Date.now() - flowStartedAt,
           },
@@ -554,7 +622,7 @@ export default function AuthCallback() {
               hasSession: true,
               hasUserId: true,
               matchesExpectedLinkUser: expectedLinkUserId
-                ? s2.session.user.id === expectedLinkUserId
+                ? resolvedSession.user.id === expectedLinkUserId
                 : null,
               elapsedMs: Date.now() - flowStartedAt,
             },
@@ -562,17 +630,20 @@ export default function AuthCallback() {
           );
         }
 
-        if (expectedLinkUserId && s2.session.user.id !== expectedLinkUserId) {
+        if (expectedLinkUserId && resolvedSession.user.id !== expectedLinkUserId) {
           await dbg(
             'facebook_link_user_mismatch',
             {
               expectedUserId: expectedLinkUserId,
-              actualUserId: s2.session.user.id,
+              actualUserId: resolvedSession.user.id,
+              snapshotUserId: linkSessionSnapshot?.userId || null,
             },
             'facebook'
           );
-          await supabase.auth.signOut();
-          throw new Error('Facebook returned a different BuffaGo account. Please sign in again and retry from Settings.');
+          if (flowMode === 'link_identity' && linkSessionSnapshot) {
+            resolvedSession = await restoreLinkSessionSnapshot(linkSessionSnapshot, flowId);
+          }
+          throw new Error('Facebook returned a different BuffaGo account. Original session was restored.');
         }
 
         // Apply onboarding payloads, and profile upsert
@@ -591,6 +662,8 @@ export default function AuthCallback() {
             mode: flowMode,
             hasUserId: Boolean(user?.id),
             hasFacebookIdentity: Boolean(getFacebookIdentity(user)),
+            userId: user?.id || null,
+            providers: (user?.identities || []).map((identity) => identity?.provider).filter(Boolean),
             elapsedMs: Date.now() - flowStartedAt,
           },
           flowMode ? 'facebook' : 'auth'
@@ -604,6 +677,7 @@ export default function AuthCallback() {
           }
 
           if (getFacebookIdentity(user)) {
+            const providerList = (user.identities || []).map((identity) => identity?.provider).filter(Boolean);
             await dbg(
               'facebook_profile_social_link_update_started',
               { flowId, mode: flowMode, userId: user.id, elapsedMs: Date.now() - flowStartedAt },
@@ -631,6 +705,8 @@ export default function AuthCallback() {
               'facebook_oauth_success',
               {
                 userId: user.id,
+                expectedUserId: expectedLinkUserId,
+                providerList,
                 persistedConnected: savedFacebook.connected,
                 newlyConnected: savedFacebook.newlyConnected,
                 flowId,
@@ -654,6 +730,8 @@ export default function AuthCallback() {
                 flowId,
                 mode: flowMode,
                 userId: user.id,
+                expectedUserId: expectedLinkUserId,
+                providerList,
                 persistedConnected: savedFacebook.connected,
                 newlyConnected: savedFacebook.newlyConnected,
                 device_platform: Platform.OS,
@@ -695,6 +773,40 @@ export default function AuthCallback() {
           await applyOnboardingSeedRatingIfAny(user.id);
         }
 
+        if (flowMode === 'link_identity') {
+          const { data: verifyUserData, error: verifyUserError } = await supabase.auth.getUser();
+          if (verifyUserError) throw verifyUserError;
+
+          const verifiedUser = verifyUserData?.user || null;
+          const verifiedUserId = verifiedUser?.id || null;
+          const verifiedProviders = (verifiedUser?.identities || [])
+            .map((identity) => identity?.provider)
+            .filter(Boolean);
+          const hasFacebookIdentity = Boolean(getFacebookIdentity(verifiedUser));
+
+          await dbg(
+            'facebook_link_post_verification',
+            {
+              flowId,
+              expectedUserId: expectedLinkUserId,
+              verifiedUserId,
+              sameUserId: expectedLinkUserId ? verifiedUserId === expectedLinkUserId : null,
+              hasFacebookIdentity,
+              providers: verifiedProviders,
+              finalRoute: returnPath || '/user',
+              elapsedMs: Date.now() - flowStartedAt,
+            },
+            'facebook'
+          );
+
+          if (expectedLinkUserId && verifiedUserId !== expectedLinkUserId) {
+            throw new Error('Facebook link verification failed: Supabase user id changed.');
+          }
+          if (!hasFacebookIdentity) {
+            throw new Error('Facebook link verification failed: Facebook identity missing after callback.');
+          }
+        }
+
         await new Promise((r) => setTimeout(r, 50));
 
         await AsyncStorage.multiRemove([
@@ -705,6 +817,7 @@ export default function AuthCallback() {
           OAUTH_FLOW_MODE_KEY,
           OAUTH_FLOW_STARTED_AT_KEY,
         ]);
+        await clearStoredLinkSessionSnapshot();
 
         await dbg(
           flowMode ? 'facebook_flow_finished' : 'oauth_flow_finished',
@@ -721,7 +834,20 @@ export default function AuthCallback() {
           flowMode ? 'facebook' : 'auth'
         );
 
-        if (!cancelled) router.replace(returnPath || '/(tabs)/home');
+        const finalRoute = returnPath || '/(tabs)/home';
+        await dbg(
+          'facebook_final_navigation_route',
+          {
+            flowId,
+            mode: flowMode,
+            finalRoute,
+            finalUserId: user?.id || null,
+            elapsedMs: Date.now() - flowStartedAt,
+          },
+          flowMode ? 'facebook' : 'auth'
+        );
+
+        if (!cancelled) router.replace(finalRoute);
       } catch (e) {
         const msg = String(e?.message || e);
         console.warn('OAuth callback failed', msg);
@@ -763,12 +889,21 @@ export default function AuthCallback() {
           },
           flowMode ? 'facebook' : 'auth'
         );
-        if (flowMode) await clearFacebookFlowState();
+        if (flowMode) {
+          const flowStillActive = await isOAuthFlowInProgress({ mode: 'link_identity' });
+          const snapshot = await getStoredLinkSessionSnapshot();
+          if (flowStillActive && snapshot) {
+            try {
+              await restoreLinkSessionSnapshot(snapshot, flowId);
+            } catch {}
+          }
+          await clearFacebookFlowState();
+        }
 
         if (!cancelled) {
           setErrMsg(msg);
           setTimeout(() => {
-            if (!cancelled) router.replace('/auth/login');
+            if (!cancelled) router.replace(flowMode === 'link_identity' ? '/user' : '/auth/login');
           }, 600);
         }
       }

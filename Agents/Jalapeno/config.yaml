@@ -9,7 +9,7 @@ posting:
   buffago_post_time: "20:00"
   meme_post_time: "20:00"
   video_post_time: "18:00"
-  video_recent_reuse_days: 7
+  video_reuse_cooldown_days: 30
 
 runtime:
   default_mode: dry-run
