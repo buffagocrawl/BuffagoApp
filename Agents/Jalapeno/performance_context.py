@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 from statistics import mean
 from typing import Any
 
+from growth_loop import load_active_strategy
 from logging_utils import log_event
 from supabase_client import SupabaseClient
 
@@ -53,8 +54,10 @@ class PerformanceContext:
     duplicate_topics_to_avoid: list[str]
     strong_patterns: list[str]
     weak_patterns: list[str]
+    recommended_adjustments: list[str]
     prompt_guidance: str
     source_counts: dict[str, int]
+    active_strategy: dict[str, Any]
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -73,8 +76,10 @@ class PerformanceContext:
             "duplicate_topics_to_avoid": self.duplicate_topics_to_avoid,
             "strong_patterns": self.strong_patterns,
             "weak_patterns": self.weak_patterns,
+            "recommended_adjustments": self.recommended_adjustments,
             "prompt_guidance": self.prompt_guidance,
             "source_counts": self.source_counts,
+            "active_strategy": self.active_strategy,
         }
 
 
@@ -204,9 +209,21 @@ def build_performance_context(
     now = now or started
     log_event(logger, "performance_context_built", run_id=run_id, stage="learning_context", status="started")
     rows: list[dict[str, Any]] = []
+    active_strategy: dict[str, Any] = {}
     if client is not None:
         try:
             rows = _merged_rows(client, since=now - timedelta(days=90))
+            loaded_strategy = load_active_strategy(client)
+            if isinstance(loaded_strategy, dict):
+                active_strategy = loaded_strategy
+                log_event(
+                    logger,
+                    "strategy_loaded",
+                    run_id=run_id,
+                    stage="learning_context",
+                    status="completed",
+                    strategy_id=loaded_strategy.get("id"),
+                )
         except Exception as exc:
             log_event(
                 logger,
@@ -263,10 +280,20 @@ def build_performance_context(
         "If prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.",
         "Avoid visible text inside generated images unless explicitly required.",
     ]
+    strategy = active_strategy.get("strategy") if isinstance(active_strategy.get("strategy"), dict) else {}
+    recommended_adjustments = []
+    if strategy.get("use_more_creative_styles"):
+        recommended_adjustments.extend(f"Use more {style}" for style in strategy["use_more_creative_styles"][:3])
+    if strategy.get("reduce_creative_styles"):
+        recommended_adjustments.extend(f"Reduce {style}" for style in strategy["reduce_creative_styles"][:3])
+    if strategy.get("best_posting_windows"):
+        recommended_adjustments.append("Prefer posting around " + ", ".join(strategy["best_posting_windows"][:2]))
     if strong_patterns:
         guidance_parts.append("Working patterns: " + "; ".join(strong_patterns[:5]))
     if weak_patterns:
         guidance_parts.append("Weak patterns: " + "; ".join(weak_patterns[:5]))
+    if recommended_adjustments:
+        guidance_parts.append("Active strategy: " + "; ".join(recommended_adjustments[:5]))
     context = PerformanceContext(
         generated_at=started.isoformat(),
         best_posts=best_posts,
@@ -283,8 +310,10 @@ def build_performance_context(
         duplicate_topics_to_avoid=duplicate_topics[:12],
         strong_patterns=strong_patterns[:8],
         weak_patterns=weak_patterns[:8],
+        recommended_adjustments=recommended_adjustments[:8],
         prompt_guidance="\n".join(guidance_parts),
         source_counts={"rows": len(rows)},
+        active_strategy=active_strategy,
     )
     log_event(
         logger,

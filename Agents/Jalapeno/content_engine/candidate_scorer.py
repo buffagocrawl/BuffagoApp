@@ -104,6 +104,12 @@ class CandidateScorer:
             adjustments["performance_category_bonus"] = 4.0
         if candidate.cta_category.lower() in best_ctas:
             adjustments["performance_cta_bonus"] = 2.0
+        if candidate.metadata.get("strategy_preferred_style"):
+            adjustments["strategy_preferred_style_bonus"] = 2.5
+        if candidate.metadata.get("strategy_preferred_hook"):
+            adjustments["strategy_preferred_hook_bonus"] = 1.5
+        if candidate.metadata.get("strategy_preferred_caption_style"):
+            adjustments["strategy_preferred_caption_style_bonus"] = 1.0
 
         if candidate.primary_theme.lower() in {theme.lower() for theme in recent_themes[:5]}:
             adjustments["recently_used_theme_penalty"] = -self.settings.memory_adjustments.recently_used_theme_penalty
@@ -117,6 +123,8 @@ class CandidateScorer:
             adjustments["recently_used_visual_style_penalty"] = -self.settings.memory_adjustments.recently_used_visual_style_penalty
         if candidate.visual_style.lower() in weak_styles or candidate.metadata.get("poor_image_style_risk"):
             adjustments["poor_image_style_penalty"] = -4.0
+        if candidate.metadata.get("strategy_reduce_style"):
+            adjustments["strategy_reduce_style_penalty"] = -2.5
 
         if duplicate_score > 0.0:
             adjustments["duplicate_penalty"] = -duplicate_score * self.settings.memory_adjustments.duplicate_penalty

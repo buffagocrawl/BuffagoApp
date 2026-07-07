@@ -27,6 +27,7 @@ import {
   persistFacebookConnection,
   readFacebookConnection,
 } from '../../lib/socialAccounts';
+import { Button } from 'react-native-paper';
 
 // Onboarding keys (match OnboardingFlow)
 const ONBOARDING_SEED_RATING_KEY = 'buffago:onboarding:seed_rating';
@@ -322,7 +323,14 @@ export default function AuthCallback() {
   const liveUrl = Linking.useURL();
 
   const [errMsg, setErrMsg] = useState('');
+  const [attempt, setAttempt] = useState(0);
+  const [processing, setProcessing] = useState(true);
+  const [fallbackRoute, setFallbackRoute] = useState('/auth/login');
   const ranRef = useRef(false);
+
+  useEffect(() => {
+    ranRef.current = false;
+  }, [attempt]);
 
   useEffect(() => {
     if (ranRef.current) return;
@@ -335,7 +343,10 @@ export default function AuthCallback() {
       let flowId = null;
       let flowMode = null;
       let flowStartedAt = callbackStartedAt;
+      setProcessing(true);
+      setErrMsg('');
       try {
+        console.info('[auth/callback] processing started');
         flowId = await AsyncStorage.getItem(OAUTH_FLOW_ID_KEY);
         flowMode = await AsyncStorage.getItem(OAUTH_FLOW_MODE_KEY);
         const storedStartedAt = Number(await AsyncStorage.getItem(OAUTH_FLOW_STARTED_AT_KEY));
@@ -432,6 +443,10 @@ export default function AuthCallback() {
         const returnPath = (await AsyncStorage.getItem(OAUTH_RETURN_PATH_KEY)) || null;
         const expectedLinkUserId = (await AsyncStorage.getItem(OAUTH_LINK_USER_ID_KEY)) || null;
         const linkSessionSnapshot = await getStoredLinkSessionSnapshot();
+        const safeFallbackRoute =
+          returnPath ||
+          (flowMode === 'link_identity' ? '/user' : '/auth/login');
+        setFallbackRoute(safeFallbackRoute);
 
         await dbg(
           'facebook_redirect_url_received',
@@ -465,6 +480,25 @@ export default function AuthCallback() {
           typeof parsed.fragment?.access_token === 'string' ? parsed.fragment.access_token : null;
         const refreshToken =
           typeof parsed.fragment?.refresh_token === 'string' ? parsed.fragment.refresh_token : null;
+
+        const hasAnyCallbackCredential =
+          Boolean(code) || Boolean(accessToken && refreshToken) || Boolean(callbackError);
+        const flowActive = await isOAuthFlowInProgress();
+
+        if (!hasAnyCallbackCredential && !flowActive) {
+          await dbg(
+            'oauth_callback_ignored_without_active_flow',
+            {
+              flowId,
+              mode: flowMode,
+              callback: describeUrl(url),
+              elapsedMs: Date.now() - flowStartedAt,
+            },
+            flowMode ? 'facebook' : 'auth'
+          );
+          if (!cancelled) router.replace(safeFallbackRoute);
+          return;
+        }
 
         await dbg(
           'oauth_callback_secret_summary',
@@ -655,6 +689,7 @@ export default function AuthCallback() {
         const { data: userData, error: userError } = await supabase.auth.getUser();
         if (userError) throw userError;
         const user = userData?.user || null;
+        console.info('[auth/callback] current user resolved', { userId: user?.id || null });
         await dbg(
           'oauth_user_refresh_finished',
           {
@@ -835,6 +870,10 @@ export default function AuthCallback() {
         );
 
         const finalRoute = returnPath || '/(tabs)/home';
+        console.info('[auth/callback] final route decision', {
+          finalRoute,
+          userId: user?.id || null,
+        });
         await dbg(
           'facebook_final_navigation_route',
           {
@@ -902,10 +941,9 @@ export default function AuthCallback() {
 
         if (!cancelled) {
           setErrMsg(msg);
-          setTimeout(() => {
-            if (!cancelled) router.replace(flowMode === 'link_identity' ? '/user' : '/auth/login');
-          }, 600);
         }
+      } finally {
+        if (!cancelled) setProcessing(false);
       }
     };
 
@@ -914,13 +952,38 @@ export default function AuthCallback() {
     return () => {
       cancelled = true;
     };
-  }, [params?.code, params?.returnUrl, liveUrl, router]);
+  }, [attempt, params?.code, params?.returnUrl, liveUrl, router]);
+
+  const retry = () => {
+    setAttempt((value) => value + 1);
+  };
+
+  const signOutAndRecover = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch {}
+    router.replace('/auth/login');
+  };
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16 }}>
-      <ActivityIndicator size="large" />
-      {errMsg ? (
-        <Text style={{ marginTop: 12, opacity: 0.7, textAlign: 'center' }}>{errMsg}</Text>
+      {processing ? <ActivityIndicator size="large" /> : null}
+      <Text style={{ marginTop: 12, opacity: 0.8, textAlign: 'center' }}>
+        {processing ? 'Finishing sign-in…' : 'OAuth callback needs attention'}
+      </Text>
+      {errMsg ? <Text style={{ marginTop: 12, opacity: 0.7, textAlign: 'center' }}>{errMsg}</Text> : null}
+      {!processing && errMsg ? (
+        <View style={{ width: '100%', marginTop: 18, gap: 10 }}>
+          <Button mode="contained" onPress={retry}>
+            Retry callback
+          </Button>
+          <Button mode="outlined" onPress={() => router.replace(fallbackRoute)}>
+            Continue safely
+          </Button>
+          <Button mode="text" onPress={signOutAndRecover}>
+            Log out
+          </Button>
+        </View>
       ) : null}
     </View>
   );

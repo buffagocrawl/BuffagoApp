@@ -55,6 +55,14 @@ Phases 12-14 turn Jalapeno into a fuller Instagram content operator:
 - persists failure context and action-required states
 - generates daily and weekly admin reports and emails them through Resend when configured
 
+The growth loop extends that operator model:
+
+- normalizes creative-pattern metadata for every generated or published post
+- scores posts with follow/share/save-weighted growth signals instead of overvaluing likes
+- stores weekly Instagram growth reports in Supabase
+- recommends a conservative next-week strategy from rolling performance windows
+- persists an optional active strategy that future content decisions can use as a bias, not a hard override
+
 ## Prompt Library
 
 Buffago brand, voice, and reusable prompt instructions live in standalone markdown files at the repository root:
@@ -225,6 +233,55 @@ Stores:
 - delivery status
 - optional recipient
 - metadata such as duration and email status
+
+### `jalapeno_post_patterns`
+
+Stores normalized creative metadata for each Jalapeno post.
+
+Stores:
+
+- content type and content-mix bucket
+- creative style
+- hook text and overlay text
+- caption style
+- hashtags
+- asset path
+- prompt template name and generated prompt
+- scheduled and published timestamps
+
+### `jalapeno_post_scores`
+
+Stores the derived growth score for each Jalapeno post.
+
+Stores:
+
+- current weighted growth score
+- scoring version
+- metric snapshot timestamp and collection window
+- score breakdown with raw metrics and normalized components
+
+### `jalapeno_growth_reports`
+
+Stores the weekly Jalapeno Instagram growth report.
+
+Stores:
+
+- report week start/end
+- rollup summary
+- embedded strategy recommendations
+
+### `jalapeno_content_strategy`
+
+Stores draft or applied Jalapeno strategy snapshots.
+
+Stores:
+
+- linked growth report
+- draft/applied status
+- active flag
+- effective date range
+- strategy payload
+- rationale payload
 
 ### `jalapeno_content_candidates`
 
@@ -551,6 +608,18 @@ Backfill missing windows for published posts from the last 30 days:
 python main.py --collect-metrics --metrics-backfill
 ```
 
+Run connectivity and stored-ID diagnostics:
+
+```powershell
+python main.py --collect-metrics --metrics-diagnostics
+```
+
+Attempt media ID repair before collecting metrics:
+
+```powershell
+python main.py --collect-metrics --repair-media-ids
+```
+
 Metrics behavior:
 
 - collects snapshots for posts published around 24 hours old
@@ -560,6 +629,9 @@ Metrics behavior:
 - skips duplicate rows for the same post and collection window
 - stores historical snapshots in `jalapeno_post_metrics`
 - computes engagement rate from likes, comments, saves, shares, and reach/impressions
+- validates each stored Instagram media ID before fetching insights
+- classifies unreadable media IDs as `meta_media_unreadable_or_missing_permission`
+- can diagnose and repair bad stored media IDs by matching recent IG media
 - logs requested, returned, and missing Instagram insight metrics
 - detects token/auth failures and returns an action-required status instead of retrying forever
 - logs rate limit events and defers safely
@@ -572,8 +644,56 @@ Before each content decision, Jalapeno builds a learning context from recent sna
 - best CTA types and hashtag patterns
 - duplicate topics to avoid
 - strong and weak creative patterns
+- active strategy adjustments, when one has been applied
 
 That context is stored in the decision summary and used by local scoring so future posts can favor working patterns, avoid recent duplicates, avoid poor image styles, and explain the content direction.
+
+## Growth Loop
+
+Run the weekly Instagram growth report:
+
+```powershell
+python main.py --growth-report
+```
+
+Preview the next-week strategy recommendation:
+
+```powershell
+python main.py --recommend-strategy
+```
+
+Preview or apply the active strategy:
+
+```powershell
+python main.py --apply-strategy
+```
+
+Strategy safety:
+
+- one post does not dominate the strategy because rankings use a rolling window plus shrinkage toward the overall average
+- style, hook, caption, and posting-time adjustments require minimum samples
+- content-mix adjustments are capped and fall back to the baseline mix until enough data exists
+- `python main.py --apply-strategy` only mutates the active strategy when `JALAPENO_DRY_RUN=false`
+- with the default dry-run posture, `--apply-strategy` prints a preview and does not change the active strategy
+
+Current baseline mix:
+
+- 40% mouthwatering food
+- 30% funny wing memes
+- 20% polls and questions
+- 10% Buffago app feature content
+
+Weekly growth reports include:
+
+- total posts published
+- total views, reach, and impressions
+- follower change and profile views when available
+- top and worst posts
+- best-performing content types, styles, hooks, overlays, captions, hashtags, and posting times
+- per-post engagement and rate summaries
+- next-week strategy adjustments
+- profile optimization recommendations
+- posting frequency recommendation of 2 reels/day and 1 image or carousel every 2 to 3 days
 
 ## Admin Reports
 
@@ -749,6 +869,9 @@ Generate reports:
 ```powershell
 python main.py --daily-report
 python main.py --weekly-report
+python main.py --growth-report
+python main.py --recommend-strategy
+python main.py --apply-strategy
 ```
 
 Run the test suite on Windows:
@@ -826,6 +949,14 @@ Required GitHub secrets:
 - `META_LONG_LIVED_ACCESS_TOKEN`
 - `OPENAI_API_KEY`
 - optional report secrets: `REPORT_EMAIL_TO`, `REPORT_EMAIL_FROM`, `RESEND_API_KEY`
+
+The weekly growth loop workflow lives at `.github/workflows/jalapeno-growth-loop.yml`.
+
+Workflow behavior:
+
+- scheduled runs generate the weekly growth report only
+- manual dispatch can generate the report, recommend strategy, or apply strategy
+- manual strategy application stays dry-run unless `apply_strategy=true`, which sets `JALAPENO_DRY_RUN=false` for that run
 
 Notes on secret mapping:
 

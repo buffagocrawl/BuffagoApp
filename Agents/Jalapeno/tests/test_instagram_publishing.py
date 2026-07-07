@@ -418,7 +418,7 @@ def test_graph_status_and_media_details_request_explicit_fields() -> None:
 
     assert transport.calls[0]["params"] == {"fields": "status_code", "access_token": "secret-token"}
     assert transport.calls[1]["params"] == {
-        "fields": "id,permalink,timestamp,media_type,media_url,caption",
+        "fields": client.media_details_fields(),
         "access_token": "secret-token",
     }
 

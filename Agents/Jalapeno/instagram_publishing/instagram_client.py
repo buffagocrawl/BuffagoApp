@@ -64,6 +64,18 @@ class InstagramGraphClient:
         self._simulated_containers: dict[str, _SimulatedContainerState] = {}
         self._simulated_media: dict[str, dict[str, Any]] = {}
 
+    @staticmethod
+    def media_details_fields() -> str:
+        return "id,caption,media_type,media_product_type,permalink,timestamp,media_url,thumbnail_url,like_count,comments_count"
+
+    def describe_media_details_endpoint(self, media_id: str) -> str:
+        return f"/{media_id}?fields={self.media_details_fields()}"
+
+    def describe_media_insights_endpoint(self, media_id: str, metric_name: str | None = None) -> str:
+        if metric_name:
+            return f"/{media_id}/insights?metric={metric_name}"
+        return f"/{media_id}/insights"
+
     def _endpoint(self, path: str) -> str:
         base = f"https://graph.facebook.com/{self.api_version.strip('/')}"
         return f"{base}/{path.lstrip('/')}"
@@ -236,7 +248,7 @@ class InstagramGraphClient:
         response = self._request(
             "GET",
             media_id,
-            params={"fields": "id,permalink,timestamp,media_type,media_url,caption"},
+            params={"fields": self.media_details_fields()},
         )
         return response
 
@@ -258,7 +270,7 @@ class InstagramGraphClient:
         details_response = self._request_raw(
             "GET",
             media_id,
-            params={"fields": "id,caption,like_count,comments_count,permalink,timestamp,media_type"},
+            params={"fields": self.media_details_fields()},
         )
         details = self._json_or_error(details_response, "Instagram Graph API media details failed")
         metrics = dict(details)
@@ -298,6 +310,8 @@ class InstagramGraphClient:
         metrics["requested_insight_metrics"] = requested_metrics
         metrics["returned_insight_metrics"] = sorted(set(returned_metrics))
         metrics["missing_insight_metrics"] = sorted(set(missing_metrics))
+        metrics["media_details_endpoint"] = self.describe_media_details_endpoint(media_id)
+        metrics["insights_endpoint"] = self.describe_media_insights_endpoint(media_id)
         if insight_errors:
             metrics["insight_errors"] = insight_errors
         return metrics
@@ -318,7 +332,7 @@ class InstagramGraphClient:
         response = self._request(
             "GET",
             f"{self.ig_user_id}/media",
-            params={"fields": "id,caption,permalink,timestamp,media_type", "limit": limit},
+            params={"fields": "id,caption,permalink,timestamp,media_type,media_product_type,media_url,thumbnail_url", "limit": limit},
         )
         data = response.get("data")
         return list(data) if isinstance(data, list) else []
@@ -329,7 +343,7 @@ class InstagramGraphClient:
         response = self._request_raw(
             "GET",
             media_id,
-            params={"fields": "id,permalink,timestamp,media_type,media_url,caption"},
+            params={"fields": self.media_details_fields()},
         )
         if response.status_code >= 400:
             error_payload = None

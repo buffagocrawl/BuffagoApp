@@ -453,6 +453,16 @@ def update_instagram_post(
     return rows[0] if rows else payload
 
 
+def update_instagram_post_by_post_id(
+    client: SupabaseClient,
+    *,
+    post_id: UUID,
+    payload: dict[str, Any],
+) -> dict[str, Any]:
+    rows = client.update_rows("jalapeno_instagram_posts", {"post_id": f"eq.{post_id}"}, payload)
+    return rows[0] if rows else payload
+
+
 def mark_run_publish_failed(
     client: SupabaseClient,
     *,

@@ -1,0 +1,114 @@
+name: Jalapeno Growth Loop
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Select which Jalapeno growth-loop action to run
+        required: true
+        type: choice
+        default: growth-report
+        options:
+          - growth-report
+          - recommend-strategy
+          - apply-strategy
+      apply_strategy:
+        description: Allow active-strategy mutation for apply-strategy runs
+        required: true
+        type: boolean
+        default: false
+  schedule:
+    - cron: "0 15 * * 1"
+
+jobs:
+  jalapeno-growth-loop:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: Agents/Jalapeno
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
+      INSTAGRAM_BUSINESS_ACCOUNT_ID: ${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Jalapeno dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Resolve growth-loop command
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_EVENT_NAME}" == "schedule" ]]; then
+            action="growth-report"
+          else
+            action="${{ inputs.action }}"
+          fi
+
+          case "${action}" in
+            growth-report)
+              command="python main.py --growth-report"
+              dry_run="true"
+              ;;
+            recommend-strategy)
+              command="python main.py --recommend-strategy"
+              dry_run="true"
+              ;;
+            apply-strategy)
+              command="python main.py --apply-strategy"
+              if [[ "${{ inputs.apply_strategy }}" == "true" ]]; then
+                dry_run="false"
+              else
+                dry_run="true"
+              fi
+              ;;
+            *)
+              echo "Unsupported action: ${action}" >&2
+              exit 1
+              ;;
+          esac
+
+          {
+            echo "JALAPENO_GROWTH_COMMAND=${command}"
+            echo "JALAPENO_DRY_RUN=${dry_run}"
+          } >> "${GITHUB_ENV}"
+
+      - name: Validate required secrets
+        run: |
+          set -euo pipefail
+
+          required_vars=(
+            SUPABASE_URL
+            SUPABASE_SERVICE_ROLE_KEY
+            FACEBOOK_PAGE_ID
+            INSTAGRAM_BUSINESS_ACCOUNT_ID
+          )
+
+          missing=()
+          for var_name in "${required_vars[@]}"; do
+            if [[ -z "${!var_name:-}" ]]; then
+              missing+=("${var_name}")
+            fi
+          done
+
+          if (( ${#missing[@]} > 0 )); then
+            printf 'Missing required GitHub secrets/env values for growth loop: %s\n' "${missing[*]}" >&2
+            exit 1
+          fi
+
+      - name: Run Jalapeno growth loop
+        run: |
+          set -euo pipefail
+          echo "command=${JALAPENO_GROWTH_COMMAND}"
+          echo "JALAPENO_DRY_RUN=${JALAPENO_DRY_RUN}"
+          ${JALAPENO_GROWTH_COMMAND}

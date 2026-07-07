@@ -29,9 +29,10 @@ from config import (
 from content_engine.content_engine import run_content_decision_engine
 from data_snapshot import generate_latest_snapshot
 from external_context import generate_external_context
+from growth_loop import apply_strategy_recommendation, generate_growth_report, persist_post_pattern, recommend_strategy_from_rows, score_posts
 from jalapeno_db import JalapenoRunContext, complete_run, create_run, ensure_selected_post_candidate, fail_run, insert_error_row, insert_final_post
 from logging_utils import log_event
-from metrics_collector import collect_instagram_metrics, repair_metrics_media_ids, run_metrics_diagnostics
+from metrics_collector import collect_instagram_metrics, run_metrics_diagnostics
 from performance_context import build_performance_context
 from reporting import generate_admin_report
 from supabase_client import SupabaseClient, SupabaseError
@@ -77,6 +78,9 @@ def build_parser() -> argparse.ArgumentParser:
     mode_group.add_argument("--metrics", "--collect-metrics", action="store_true", help="Collect Instagram metrics for recent published posts")
     mode_group.add_argument("--daily-report", action="store_true", help="Generate and optionally email the Jalapeno daily report")
     mode_group.add_argument("--weekly-report", action="store_true", help="Generate and optionally email the Jalapeno weekly report")
+    mode_group.add_argument("--growth-report", action="store_true", help="Generate the Jalapeno weekly Instagram growth report and store it in Supabase")
+    mode_group.add_argument("--recommend-strategy", action="store_true", help="Preview the next Jalapeno Instagram growth strategy without mutating the active strategy")
+    mode_group.add_argument("--apply-strategy", action="store_true", help="Apply the latest recommended Jalapeno Instagram growth strategy when JALAPENO_DRY_RUN=false")
     parser.add_argument(
         "--refresh-external-context",
         action="store_true",
@@ -109,6 +113,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--metrics-repair-media-ids",
+        "--repair-media-ids",
         action="store_true",
         help="Propose or apply repairs for bad stored Instagram media ids by matching recent IG media.",
     )
@@ -828,8 +833,15 @@ def _load_live_client_and_config(mode_name: str):
 
 def run_metrics(*, backfill: bool = False, dry_run: bool = False, diagnostics: bool = False, repair_media_ids: bool = False) -> int:
     config, logger, client = _load_live_client_and_config("metrics")
-    diagnostics_result = None
-    repair_result = None
+    result = collect_instagram_metrics(
+        config,
+        client,
+        logger=logger,
+        backfill=backfill,
+        dry_run=dry_run,
+        diagnostics=diagnostics,
+        repair_media_ids=repair_media_ids,
+    )
     if diagnostics:
         diagnostics_result = run_metrics_diagnostics(config, client, logger=logger)
         print(f"Metrics diagnostics me ok: {diagnostics_result.me_ok}")
@@ -839,30 +851,28 @@ def run_metrics(*, backfill: bool = False, dry_run: bool = False, diagnostics: b
         print(f"Metrics diagnostics recent media ok: {diagnostics_result.recent_media_ok}")
         print(f"Metrics diagnostics recent media count: {diagnostics_result.recent_media_count}")
         print(f"Metrics diagnostics stored ids checked: {diagnostics_result.stored_ids_checked}")
+        print(f"Metrics diagnostics stored ids readable: {diagnostics_result.stored_ids_readable}")
+        print(f"Metrics diagnostics stored ids unreadable: {diagnostics_result.stored_ids_unreadable}")
         print(f"Metrics diagnostics stored ids found in recent media: {diagnostics_result.stored_ids_found_in_recent_media}")
         print(f"Metrics diagnostics mismatches: {diagnostics_result.mismatch_count}")
     if repair_media_ids:
-        repair_result = repair_metrics_media_ids(config, client, logger=logger, dry_run=dry_run)
-        print(f"Metrics repair candidates: {len(repair_result)}")
-    result = collect_instagram_metrics(
-        config,
-        client,
-        logger=logger,
-        backfill=backfill,
-        dry_run=dry_run,
-        diagnostics=False,
-        repair_media_ids=False,
-    )
+        print(f"Metrics repair candidates: {result.repair_candidates}")
+        print(f"Metrics repaired media ids: {result.repaired_media_ids}")
+    print(f"Metrics candidate count: {result.candidate_count}")
     print(f"Metrics checked posts: {result.checked_posts}")
     print(f"Metrics snapshots persisted: {result.snapshots_persisted}")
     print(f"Metrics skipped duplicates: {result.skipped_duplicates}")
     print(f"Metrics failures: {result.failures}")
+    print(f"Metrics unreadable media ids: {result.unreadable_media_ids}")
     print(f"Metrics dry run: {result.dry_run}")
     print(f"Metrics repair candidates seen: {result.repair_candidates}")
     if result.action_required:
         print("Metrics action required: Meta token/auth issue detected")
         return 2
-    if diagnostics_result is not None and not diagnostics_result.me_ok:
+    if result.failures > 0 and result.snapshots_persisted == 0:
+        print("Metrics failed: zero snapshots persisted and at least one metrics fetch failed")
+        return 2
+    if diagnostics and not diagnostics_result.me_ok:
         print("Metrics diagnostics failed: /me did not return a valid account")
         return 2
     return 0
@@ -876,6 +886,70 @@ def run_admin_report(report_type: str) -> int:
     print(f"Report stored: {result.stored}")
     print(f"Email status: {result.email_status}")
     return 0 if result.email_status != "failed" else 2
+
+
+def _strategy_write_enabled() -> bool:
+    raw = os.getenv("JALAPENO_DRY_RUN", "").strip().lower()
+    if not raw:
+        return False
+    return raw in {"0", "false", "no", "off"}
+
+
+def run_growth_report() -> int:
+    config, logger, client = _load_live_client_and_config("growth-report")
+    result = generate_growth_report(client, logger=logger)
+    print("Jalapeno Weekly Growth Report")
+    print(f"Period start: {result.period_start}")
+    print(f"Period end: {result.period_end}")
+    print(f"Posts published: {result.summary['total_posts_published']}")
+    print(f"Total views: {result.summary['total_views']}")
+    print(f"Total reach: {result.summary['total_reach']}")
+    print(f"Total impressions: {result.summary['total_impressions']}")
+    print(f"Report stored: {result.stored}")
+    print("Recommended mix:")
+    for bucket, share in result.recommendations.get("content_mix_targets", {}).items():
+        print(f"  {bucket}: {round(float(share) * 100, 1)}%")
+    print("Recommended creative styles to use more:")
+    for item in result.recommendations.get("use_more_creative_styles", []):
+        print(f"  {item}")
+    return 0
+
+
+def run_recommend_strategy() -> int:
+    config, logger, client = _load_live_client_and_config("recommend-strategy")
+    rows = score_posts(client, logger=logger)
+    recommendation = recommend_strategy_from_rows(rows, logger=logger)
+    print("Jalapeno Strategy Recommendation")
+    print(f"Generated at: {recommendation.generated_at}")
+    print(f"Insufficient data: {recommendation.insufficient_data}")
+    print("Recommended adjustments:")
+    for item in recommendation.rationale.get("recommended_adjustments", []):
+        print(f"  {item}")
+    print("Content mix targets:")
+    for bucket, share in recommendation.strategy.get("content_mix_targets", {}).items():
+        print(f"  {bucket}: {round(float(share) * 100, 1)}%")
+    return 0
+
+
+def run_apply_strategy() -> int:
+    config, logger, client = _load_live_client_and_config("apply-strategy")
+    rows = score_posts(client, logger=logger)
+    recommendation = recommend_strategy_from_rows(rows, logger=logger)
+    write = _strategy_write_enabled()
+    latest_report = generate_growth_report(client, logger=logger)
+    result = apply_strategy_recommendation(
+        client,
+        recommendation,
+        logger=logger,
+        report_id=latest_report.report_id,
+        write=write,
+    )
+    print(f"Strategy write enabled: {write}")
+    if write:
+        print(f"Applied strategy id: {result.get('id')}")
+    else:
+        print("Strategy preview generated only. Set JALAPENO_DRY_RUN=false to apply.")
+    return 0
 
 
 def run_dry_run() -> int:
@@ -957,7 +1031,7 @@ def run_dry_run() -> int:
                     decision_summary={"winner_reasoning": ["Dry-run selected a Supabase video asset."]},
                     logger=logger,
                 )
-                insert_final_post(
+                dry_run_post = insert_final_post(
                     client,
                     run_id=run_uuid,
                     candidate_id=UUID(content.candidate_id),
@@ -981,15 +1055,23 @@ def run_dry_run() -> int:
                     publish_status="dry_run",
                     metadata={
                         "dry_run": True,
+                        "content_type": scheduled_post_type,
+                        "creative_style": content.video_asset.style or "realistic_food",
+                        "hook_text": str(overlay_fields["overlay_text"]),
+                        "caption_style": content.caption_type,
+                        "prompt_template_name": "daily_wing_reel",
+                        "generated_prompt": "Preloaded Supabase Storage wing video asset; no AI image generation.",
                         "media_source": "supabase_video_asset",
                         "video_asset_id": content.video_asset.id,
                         "storage_path": overlay_fields["storage_path"],
+                        "asset_path": overlay_fields["storage_path"],
                         "caption_type": content.caption_type,
                         "style": content.video_asset.style,
                         "no_publish": True,
                         **overlay_fields,
                     },
                 )
+                persist_post_pattern(client, dry_run_post)
                 log_event(
                     logger,
                     "dry_run_video_reel_selected",
@@ -1353,10 +1435,17 @@ def run_production(content_type: str | None = None) -> int:
                 overlay_error=overlay_fields["overlay_error"] if isinstance(overlay_fields["overlay_error"], str) else None,
                 publish_status="drafted" if runtime_settings.dry_run else "publishing",
                 metadata={
+                    "content_type": scheduled_post_type,
+                    "creative_style": content.video_asset.style or "realistic_food",
+                    "hook_text": str(overlay_fields["overlay_text"]),
+                    "caption_style": content.caption_type,
+                    "prompt_template_name": "daily_wing_reel",
+                    "generated_prompt": "Preloaded Supabase Storage wing video asset; no AI image generation.",
                     "media_source": "supabase_video_asset",
                     "video_asset_id": content.video_asset.id,
                     "storage_bucket": content.video_asset.storage_bucket,
                     "storage_path": overlay_fields["storage_path"],
+                    "asset_path": overlay_fields["storage_path"],
                     "caption_type": content.caption_type,
                     "style": content.video_asset.style,
                     "post_type": scheduled_post_type,
@@ -1364,6 +1453,7 @@ def run_production(content_type: str | None = None) -> int:
                     **overlay_fields,
                 },
             )
+            persist_post_pattern(client, inserted_post)
             content_decision["post_id"] = inserted_post.get("id")
             content_decision["metadata"] = {
                 "media_source": "supabase_video_asset",
@@ -1495,10 +1585,17 @@ def run_production(content_type: str | None = None) -> int:
                     overlay_error=backup_overlay_fields["overlay_error"] if isinstance(backup_overlay_fields["overlay_error"], str) else None,
                     publish_status="drafted" if runtime_settings.dry_run else "publishing",
                     metadata={
+                        "content_type": scheduled_post_type,
+                        "creative_style": backup_content.video_asset.style or "realistic_food",
+                        "hook_text": str(backup_overlay_fields["overlay_text"]),
+                        "caption_style": backup_content.caption_type,
+                        "prompt_template_name": "daily_wing_reel",
+                        "generated_prompt": "Preloaded Supabase Storage wing video asset backup; no AI image generation.",
                         "media_source": "supabase_video_asset",
                         "video_asset_id": backup_content.video_asset.id,
                         "storage_bucket": backup_content.video_asset.storage_bucket,
                         "storage_path": backup_overlay_fields["storage_path"],
+                        "asset_path": backup_overlay_fields["storage_path"],
                         "caption_type": backup_content.caption_type,
                         "style": backup_content.video_asset.style,
                         "backup_for_video_asset_id": content.video_asset.id,
@@ -1506,6 +1603,7 @@ def run_production(content_type: str | None = None) -> int:
                         **backup_overlay_fields,
                     },
                 )
+                persist_post_pattern(client, backup_post)
                 backup_decision["post_id"] = backup_post.get("id")
                 backup_decision["metadata"] = {
                     "media_source": "supabase_video_asset",
@@ -1742,6 +1840,12 @@ def main(argv: list[str] | None = None) -> int:
             return run_admin_report("daily")
         if args.weekly_report:
             return run_admin_report("weekly")
+        if args.growth_report:
+            return run_growth_report()
+        if args.recommend_strategy:
+            return run_recommend_strategy()
+        if args.apply_strategy:
+            return run_apply_strategy()
         parser.error("one mode must be selected")
     except ConfigError as exc:
         print(f"Validation failed: {exc}")

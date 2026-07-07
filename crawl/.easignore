@@ -17,6 +17,12 @@ dist/
 build/
 android/
 ios/
+.tmp/
+.tmp/**
+.pytest_cache/
+.pytest_cache/**
+__pycache__/
+**/__pycache__/
 
 # Node
 node_modules/
@@ -24,7 +30,11 @@ node_modules/
 # Env files
 .env
 .env.*
-
-../.pytest_cache/
-
-.pytest_cache/
+../Agents
+../Agents/**
+../.tmp
+../.tmp/**
+**/.pytest_cache
+**/__pycache__
+Agents/
+Agents/**

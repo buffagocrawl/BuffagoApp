@@ -25,6 +25,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { supabase } from '../../lib/supabase.js';
 import { isOAuthFlowInProgress } from '../../lib/facebookOAuth';
+import { hasCompletedOnboarding } from '../../hooks/useOnboardingGate';
 import WelcomeWizard from '../../components/WelcomeWizard';
 import LocationGate from '../../components/LocationGate';
 import { useLocationCtx } from '../../providers/LocationProvider';
@@ -377,19 +378,23 @@ export default function Home() {
     gateRanRef.current = true;
 
     (async () => {
-      const oauthFlowActive = await isOAuthFlowInProgress({ mode: 'link_identity' });
-      if (oauthFlowActive) {
-        setGateChecked(true);
-        return;
-      }
-
       try {
-        const done = await AsyncStorage.getItem('buffago:onboarding:complete');
-        if (done !== 'true') {
+        const [oauthFlowActive, onboardingDone] = await Promise.all([
+          isOAuthFlowInProgress({ mode: 'link_identity' }),
+          hasCompletedOnboarding(),
+        ]);
+
+        if (oauthFlowActive) {
+          setGateChecked(true);
+          return;
+        }
+
+        if (!onboardingDone) {
           router.replace('/onboarding');
           return;
         }
-      } catch {
+      } catch (error) {
+        console.warn('home gate check failed', error?.message || error);
         router.replace('/onboarding');
         return;
       }
@@ -1233,7 +1238,12 @@ export default function Home() {
   // Prevent Home from flashing while we decide whether to gate
   if (!gateChecked) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} />
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }}
+      >
+        <ActivityIndicator />
+        <Text style={{ marginTop: 12, opacity: 0.75 }}>Loading BuffaGo…</Text>
+      </SafeAreaView>
     );
   }
 

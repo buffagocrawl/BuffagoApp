@@ -9,6 +9,7 @@ from typing import Any
 from uuid import UUID
 
 from config import JalapenoConfig, ConfigError, RuntimePublishSettings
+from growth_loop import persist_post_pattern
 from instagram_publishing.media_container import ApprovedInstagramPost, load_approved_post_from_artifacts as _load_approved_post_from_artifacts
 from instagram_publishing.publisher import (
     DEFAULT_PUBLISH_REPORT_PATH,
@@ -57,13 +58,25 @@ def _creative_metadata(content_decision: dict[str, Any], image_pipeline: dict[st
     decision_summary = content_decision.get("decision_summary") if isinstance(content_decision.get("decision_summary"), dict) else {}
     image_payload = image_pipeline or {}
     image_result = image_payload.get("result") if isinstance(image_payload.get("result"), dict) else image_payload
+    asset_path = None
+    if isinstance(image_result, dict):
+        asset_path = image_result.get("storage_path") or image_result.get("public_url")
+    if asset_path is None:
+        asset_path = winner.get("storage_path") or winner.get("image_storage_path")
+    overlay_text = winner.get("overlay_text") or winner.get("hook_text") or winner.get("working_title")
     metadata = {
         "category": winner.get("content_type") or winner.get("post_type"),
         "content_type": winner.get("content_type") or winner.get("post_type"),
+        "creative_style": winner.get("creative_style") or winner.get("visual_style") or winner.get("image_style"),
+        "hook_text": winner.get("hook_text") or winner.get("working_title"),
+        "overlay_text": overlay_text,
+        "caption_style": winner.get("caption_style") or winner.get("cta_category"),
         "prompt_template": decision_summary.get("prompt_version") or decision_summary.get("model_name"),
+        "prompt_template_name": winner.get("prompt_template_name") or decision_summary.get("prompt_version") or decision_summary.get("model_name"),
         "prompt_reason": winner.get("reason_chosen") or decision_summary.get("content_direction_reason"),
         "reason_chosen": winner.get("reason_chosen"),
         "image_prompt": winner.get("image_prompt"),
+        "generated_prompt": winner.get("image_prompt"),
         "image_style": winner.get("visual_style") or winner.get("image_style"),
         "visual_style": winner.get("visual_style"),
         "cta_type": winner.get("cta_category"),
@@ -77,7 +90,7 @@ def _creative_metadata(content_decision: dict[str, Any], image_pipeline: dict[st
         "processed_video_url": winner.get("processed_video_url"),
         "original_storage_path": winner.get("original_storage_path"),
         "processed_storage_path": winner.get("processed_storage_path"),
-        "overlay_text": winner.get("overlay_text"),
+        "overlay_text": overlay_text,
         "overlay_status": winner.get("overlay_status"),
         "overlay_error": winner.get("overlay_error"),
         "caption_type": winner.get("caption_type"),
@@ -97,6 +110,7 @@ def _creative_metadata(content_decision: dict[str, Any], image_pipeline: dict[st
         "hashtags": winner.get("hashtags") or [],
         "chosen_idea": winner.get("working_title") or winner.get("short_summary"),
         "working_title": winner.get("working_title"),
+        "asset_path": asset_path,
         "performance_context_used": bool(decision_summary.get("performance_context")),
         "content_direction_reason": decision_summary.get("content_direction_reason"),
     }
@@ -488,6 +502,20 @@ def run_instagram_publishing_live_environment(
         )
         if existing_rows:
             post_id = str(existing_rows[0].get("id"))
+            try:
+                full_rows = client.fetch_rows("jalapeno_posts", select="*", filters={"id": f"eq.{post_id}", "limit": 1})
+                if full_rows:
+                    persist_post_pattern(client, full_rows[0])
+            except Exception as exc:  # pragma: no cover - additive analytics should not break publish flow
+                log_event(
+                    logger,
+                    "post_pattern_persist_failed",
+                    level="warning",
+                    run_id=approved_post.run_id,
+                    candidate_id=approved_post.candidate_id,
+                    post_id=post_id,
+                    error=str(exc),
+                )
         else:
             candidate_uuid = None
             try:
@@ -519,6 +547,18 @@ def run_instagram_publishing_live_environment(
                 metadata={**_creative_metadata(content_decision, image_pipeline), **approved_post.metadata},
             )
             post_id = str(inserted.get("id")) if inserted.get("id") else None
+            try:
+                persist_post_pattern(client, inserted)
+            except Exception as exc:  # pragma: no cover - additive analytics should not break publish flow
+                log_event(
+                    logger,
+                    "post_pattern_persist_failed",
+                    level="warning",
+                    run_id=approved_post.run_id,
+                    candidate_id=approved_post.candidate_id,
+                    post_id=post_id,
+                    error=str(exc),
+                )
 
     access_token = _read_secret(effective_config.instagram.access_token_secret_name)
     ig_user_id = _read_secret(effective_config.instagram.ig_user_id_secret_name)

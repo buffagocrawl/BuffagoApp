@@ -25,6 +25,11 @@ class ContentCandidate:
     mood: str
     hook_style: str
     cta_category: str
+    creative_style: str = ""
+    hook_text: str = ""
+    overlay_text: str = ""
+    caption_style: str = ""
+    prompt_template_name: str = ""
     restaurants_mentioned: list[str] = field(default_factory=list)
     cities_mentioned: list[str] = field(default_factory=list)
     states_mentioned: list[str] = field(default_factory=list)
@@ -116,13 +121,18 @@ class CandidateGenerator:
             ContentCandidate(
                 candidate_id=str(uuid4()),
                 content_type="restaurant_spotlight",
+                creative_style="realistic_food",
                 reason_chosen="Top restaurant signal plus recent ratings make this the safest food-first anchor.",
                 working_title=f"Why {primary_restaurant[0]} keeps showing up",
                 short_summary=f"Spotlight {primary_restaurant[0]} in {primary_restaurant[1] or 'Buffalo'} as a high-signal favorite from recent Buffago activity.",
+                hook_text=f"Why {primary_restaurant[0]} keeps showing up",
+                overlay_text=primary_restaurant[0],
                 target_emotion="Curious",
                 suggested_cta="Drop your go-to wing spot in the comments.",
                 suggested_image_concept=f"Close-up wing tray at {primary_restaurant[0]} with crisp texture and warm restaurant lighting.",
                 suggested_caption_angle="Lead with the restaurant name, then a quick local opinion that invites replies.",
+                caption_style="food-first-local-opinion",
+                prompt_template_name="buffago_post",
                 primary_theme="restaurant focus",
                 secondary_theme="recent ratings",
                 mood="Friendly",
@@ -140,13 +150,18 @@ class CandidateGenerator:
             ContentCandidate(
                 candidate_id=str(uuid4()),
                 content_type="hidden_gem",
+                creative_style="realistic_food",
                 reason_chosen="A second restaurant lets the feed feel curated instead of repetitive.",
                 working_title=f"Hidden gem: {secondary_restaurant[0]}",
                 short_summary=f"Frame {secondary_restaurant[0]} as the quieter pick worth saving for later.",
+                hook_text=f"Hidden gem: {secondary_restaurant[0]}",
+                overlay_text=f"Hidden gem: {secondary_restaurant[0]}",
                 target_emotion="Encouraged",
                 suggested_cta="Save this for your next crawl.",
                 suggested_image_concept=f"Moody but bright table shot of {secondary_restaurant[0]} with wings, celery, and sauce cups.",
                 suggested_caption_angle="Make the post feel like a friendly local tip instead of an ad.",
+                caption_style="save-worthy-local-tip",
+                prompt_template_name="buffago_post",
                 primary_theme="hidden gem",
                 secondary_theme="restaurant discovery",
                 mood="Friendly",
@@ -164,13 +179,18 @@ class CandidateGenerator:
             ContentCandidate(
                 candidate_id=str(uuid4()),
                 content_type="funny_observation",
+                creative_style="funny_meme",
                 reason_chosen="Humor keeps the brand human and is less likely to feel overproduced.",
                 working_title="The wing napkin math problem",
                 short_summary="A playful observation about how wings quietly multiply napkins, opinions, and group chat energy.",
+                hook_text="The wing napkin math problem",
+                overlay_text="Wing napkin math",
                 target_emotion="Amused",
                 suggested_cta="Tell us your most chaotic wing order.",
                 suggested_image_concept="Meme-style table scene with wings, napkins, and a mildly dramatic reaction shot.",
                 suggested_caption_angle="Use observational humor with a Buffago-local twist.",
+                caption_style="observational-joke",
+                prompt_template_name="meme",
                 primary_theme="humor",
                 secondary_theme="wing culture",
                 mood="Funny",
@@ -185,13 +205,18 @@ class CandidateGenerator:
             ContentCandidate(
                 candidate_id=str(uuid4()),
                 content_type="wing_fact",
+                creative_style="app_feature_graphic",
                 reason_chosen="Educational posts diversify the feed and give people a reason to save or share.",
                 working_title="Wing fact worth knowing",
                 short_summary="A clean, snackable fact about wings, sauce, or ordering behavior that feels useful without sounding preachy.",
+                hook_text="Wing fact worth knowing",
+                overlay_text="Wing fact",
                 target_emotion="Informed",
                 suggested_cta="Save this for the next debate.",
                 suggested_image_concept="Graphic-led food fact card with wings and a minimal Buffago color palette.",
                 suggested_caption_angle="Keep the wording short and give the post one clear takeaway.",
+                caption_style="educational-saveable",
+                prompt_template_name="buffago_post",
                 primary_theme="education",
                 secondary_theme="wing trivia",
                 mood="Educational",
@@ -206,13 +231,18 @@ class CandidateGenerator:
             ContentCandidate(
                 candidate_id=str(uuid4()),
                 content_type="community_highlight",
+                creative_style="sports_map_graphic",
                 reason_chosen="Community content broadens the account beyond restaurants and signals real local activity.",
                 working_title=f"Buffago in {active_states[0] if active_states else 'New York'}",
                 short_summary="Highlight the people, states, or local energy behind the Buffago ecosystem without over-explaining it.",
+                hook_text=f"Buffago in {active_states[0] if active_states else 'New York'}",
+                overlay_text=f"Buffago in {active_states[0] if active_states else 'New York'}",
                 target_emotion="Connected",
                 suggested_cta="Which city should get the next spotlight?",
                 suggested_image_concept="Community map graphic with local pins and wing markers across active states.",
                 suggested_caption_angle="Focus on the map, the community, and the playful competition between cities.",
+                caption_style="question-led-community",
+                prompt_template_name="buffago_post",
                 primary_theme="community",
                 secondary_theme="local activity",
                 mood="Friendly",
@@ -228,13 +258,18 @@ class CandidateGenerator:
             ContentCandidate(
                 candidate_id=str(uuid4()),
                 content_type="xp_milestone",
+                creative_style="app_demo",
                 reason_chosen="Gamified content helps the feed feel like it belongs to the product, not just the marketing team.",
                 working_title="Someone just crossed a big XP line",
                 short_summary="Use the XP and streak context to frame a milestone post that rewards participation.",
+                hook_text="Someone just crossed a big XP line",
+                overlay_text="XP milestone",
                 target_emotion="Motivated",
                 suggested_cta="Who is closest to the next level?",
                 suggested_image_concept="Badge-style XP milestone graphic with a wing reward and bold level callout.",
                 suggested_caption_angle="Make it feel like a celebration, not a stat dump.",
+                caption_style="app-feature-celebration",
+                prompt_template_name="buffago_post",
                 primary_theme="gamification",
                 secondary_theme="XP",
                 mood="Exciting",
@@ -249,13 +284,18 @@ class CandidateGenerator:
             ContentCandidate(
                 candidate_id=str(uuid4()),
                 content_type="leaderboard",
+                creative_style="app_demo",
                 reason_chosen="Leaderboards create natural comparison and comments without needing a hard sell.",
                 working_title="The current wing leaderboard mood",
                 short_summary="Turn ratings or crawl activity into a playful comparison format that invites debate.",
+                hook_text="The current wing leaderboard mood",
+                overlay_text="Wing leaderboard",
                 target_emotion="Competitive",
                 suggested_cta="Who would you move up the board?",
                 suggested_image_concept="Leaderboard graphic with wing spots and local city cues.",
                 suggested_caption_angle="Frame it as a friendly debate rather than a rigid ranking claim.",
+                caption_style="debate-starter",
+                prompt_template_name="buffago_post",
                 primary_theme="competition",
                 secondary_theme="local ranking",
                 mood="Competitive",
@@ -272,13 +312,18 @@ class CandidateGenerator:
             ContentCandidate(
                 candidate_id=str(uuid4()),
                 content_type="challenge",
+                creative_style="poll_question",
                 reason_chosen="Challenges are a good bridge between product, humor, and comments.",
                 working_title="One more wing stop challenge",
                 short_summary="Challenge the audience to build the most disciplined or least disciplined crawl route possible.",
+                hook_text="One more wing stop challenge",
+                overlay_text="Wing stop challenge",
                 target_emotion="Playful",
                 suggested_cta="Drop your crawl version in the comments.",
                 suggested_image_concept="Challenge card with route lines, wings, and a playful scorecard.",
                 suggested_caption_angle="Use a light dare that sounds like Buffago, not a brand slogan.",
+                caption_style="question-led-challenge",
+                prompt_template_name="buffago_post",
                 primary_theme="challenge",
                 secondary_theme="crawl planning",
                 mood="Exciting",
@@ -294,13 +339,18 @@ class CandidateGenerator:
             ContentCandidate(
                 candidate_id=str(uuid4()),
                 content_type="sports_tie_in",
+                creative_style="sports",
                 reason_chosen="Sports make sense today and give the post a timely, communal rhythm.",
                 working_title="Game day wings, no complicated analysis",
                 short_summary="Tie wing energy to the current sports mood without pretending to know specific scores.",
+                hook_text="Game day wings, no complicated analysis",
+                overlay_text="Game day wings",
                 target_emotion="Ready",
                 suggested_cta="Game day order: what are you picking?",
                 suggested_image_concept="Game-day wings on a table with jersey colors and a cozy watch-party setup.",
                 suggested_caption_angle="Keep the sports mention broad and the food focus obvious.",
+                caption_style="game-day-question",
+                prompt_template_name="buffago_post",
                 primary_theme="sports",
                 secondary_theme="watch party",
                 mood="Exciting",
@@ -316,13 +366,18 @@ class CandidateGenerator:
             ContentCandidate(
                 candidate_id=str(uuid4()),
                 content_type="food_holiday",
+                creative_style="realistic_food",
                 reason_chosen="Food holiday posts are reliable, relevant, and easy to keep visually sharp.",
                 working_title="If today is a food holiday, wings are answering the call",
                 short_summary="Lean into the food holiday frame while keeping the tone playful and direct.",
+                hook_text="If today is a food holiday, wings are answering the call",
+                overlay_text="Wings understood the assignment",
                 target_emotion="Hungry",
                 suggested_cta="Which sauce would you pair with it?",
                 suggested_image_concept="Celebratory wing platter with festive accents and bright color contrast.",
                 suggested_caption_angle="Make the holiday feel like an obvious excuse to post wings.",
+                caption_style="seasonal-question",
+                prompt_template_name="buffago_post",
                 primary_theme="holiday",
                 secondary_theme="food celebration",
                 mood="Curious",
@@ -337,13 +392,18 @@ class CandidateGenerator:
             ContentCandidate(
                 candidate_id=str(uuid4()),
                 content_type="meme",
+                creative_style="funny_meme",
                 reason_chosen="A meme is the best counterweight if the feed has recently leaned too promotional.",
                 working_title="When the wing debate gets out of hand",
                 short_summary="Use a playful meme structure to keep the feed unexpected and comment-friendly.",
+                hook_text="When the wing debate gets out of hand",
+                overlay_text="Wing debate mode",
                 target_emotion="Amused",
                 suggested_cta="What side are you on?",
                 suggested_image_concept="High-contrast meme with a dramatic wing moment and a clear joke setup.",
                 suggested_caption_angle="Light sarcasm, short text, and one obvious punchline.",
+                caption_style="meme-debate",
+                prompt_template_name="meme",
                 primary_theme="humor",
                 secondary_theme="debate",
                 mood="Funny",
@@ -384,6 +444,16 @@ class CandidateGenerator:
                 candidate.metadata["performance_pattern_match"] = True
             if performance_context.get("prompt_guidance"):
                 candidate.metadata["learning_prompt_guidance"] = performance_context["prompt_guidance"]
+            active_strategy = performance_context.get("active_strategy") if isinstance(performance_context.get("active_strategy"), dict) else {}
+            strategy_config = active_strategy.get("strategy") if isinstance(active_strategy.get("strategy"), dict) else {}
+            if candidate.creative_style in strategy_config.get("use_more_creative_styles", []):
+                candidate.metadata["strategy_preferred_style"] = True
+            if candidate.creative_style in strategy_config.get("reduce_creative_styles", []):
+                candidate.metadata["strategy_reduce_style"] = True
+            if candidate.hook_text in strategy_config.get("preferred_hook_patterns", []):
+                candidate.metadata["strategy_preferred_hook"] = True
+            if candidate.caption_style in strategy_config.get("preferred_caption_styles", []):
+                candidate.metadata["strategy_preferred_caption_style"] = True
 
         return candidates
 

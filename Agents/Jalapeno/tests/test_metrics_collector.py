@@ -11,6 +11,7 @@ if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
 import metrics_collector as metrics_module  # noqa: E402
+import main as main_module  # noqa: E402
 from config import load_configuration  # noqa: E402
 from config import initialize_logging  # noqa: E402
 
@@ -22,38 +23,47 @@ RUN_ID = "22222222-2222-2222-2222-222222222222"
 class _FakeSupabaseClient:
     def __init__(self, *, metric_rows: list[dict] | None = None) -> None:
         self.metric_rows = metric_rows or []
+        self.post_rows = [
+            {
+                "id": POST_ID,
+                "run_id": RUN_ID,
+                "generated_caption": "caption",
+                "hashtags": ["buffago"],
+                "post_type": "daily_wing_reel",
+                "instagram_media_id": None,
+                "published_at": "2026-07-01T03:17:00+00:00",
+                "publish_status": "published",
+                "image_url": "https://cdn.example.com/uploads/wing.jpg",
+                "video_url": "https://cdn.example.com/uploads/wing.mp4",
+                "storage_path": "posts/wing.mp4",
+                "metadata": {"caption_type": "short", "video_style": "wing_closeup"},
+            }
+        ]
+        self.instagram_post_rows = [
+            {
+                "post_id": POST_ID,
+                "run_id": RUN_ID,
+                "caption": "caption",
+                "hashtags": ["buffago"],
+                "scheduled_post_type": "daily_wing_reel",
+                "published_media_id": "18142131364537604",
+                "published_at": "2026-07-01T03:17:00+00:00",
+                "status": "published",
+                "permalink": "https://instagram.com/p/correct/",
+                "image_url": "https://cdn.example.com/uploads/wing.jpg",
+                "video_url": "https://cdn.example.com/uploads/wing.mp4",
+                "storage_path": "posts/wing.mp4",
+                "metadata": {},
+            }
+        ]
         self.inserted_metrics: list[dict] = []
         self.inserted_errors: list[dict] = []
 
     def fetch_rows(self, table_name: str, *, filters: dict | None = None, select: str = "*") -> list[dict]:
         if table_name == "jalapeno_posts":
-            return [
-                {
-                    "id": POST_ID,
-                    "run_id": RUN_ID,
-                    "generated_caption": "caption",
-                    "hashtags": ["buffago"],
-                    "post_type": "daily_wing_reel",
-                    "instagram_media_id": None,
-                    "published_at": "2026-07-01T03:17:00+00:00",
-                    "publish_status": "published",
-                    "metadata": {"caption_type": "short", "video_style": "wing_closeup"},
-                }
-            ]
+            return [dict(row) for row in self.post_rows]
         if table_name == "jalapeno_instagram_posts":
-            return [
-                {
-                    "post_id": POST_ID,
-                    "run_id": RUN_ID,
-                    "caption": "caption",
-                    "hashtags": ["buffago"],
-                    "scheduled_post_type": "daily_wing_reel",
-                    "published_media_id": "18142131364537604",
-                    "published_at": "2026-07-01T03:17:00+00:00",
-                    "status": "published",
-                    "metadata": {},
-                }
-            ]
+            return [dict(row) for row in self.instagram_post_rows]
         if table_name == "jalapeno_post_metrics":
             return list(self.metric_rows)
         return []
@@ -63,6 +73,25 @@ class _FakeSupabaseClient:
             self.inserted_metrics.append(payload)
         if table_name == "jalapeno_errors":
             self.inserted_errors.append(payload)
+        return [payload]
+
+    def update_rows(self, table_name: str, filters: dict, payload: dict) -> list[dict]:
+        if table_name == "jalapeno_posts":
+            post_id = str(filters.get("id", "")).removeprefix("eq.")
+            for index, row in enumerate(self.post_rows):
+                if str(row.get("id")) == post_id:
+                    updated = dict(row)
+                    updated.update(payload)
+                    self.post_rows[index] = updated
+                    return [updated]
+        if table_name == "jalapeno_instagram_posts":
+            post_id = str(filters.get("post_id", "")).removeprefix("eq.")
+            for index, row in enumerate(self.instagram_post_rows):
+                if str(row.get("post_id")) == post_id:
+                    updated = dict(row)
+                    updated.update(payload)
+                    self.instagram_post_rows[index] = updated
+                    return [updated]
         return [payload]
 
 
@@ -82,7 +111,28 @@ class _FakeGraphClient:
             "requested_insight_metrics": ["reach", "plays", "saved", "shares", "total_interactions"],
             "returned_insight_metrics": ["reach", "saved", "shares"],
             "missing_insight_metrics": ["plays", "total_interactions"],
+            "media_details_endpoint": f"/{media_id}?fields=id,caption,media_type,media_product_type,permalink,timestamp,media_url,thumbnail_url,like_count,comments_count",
+            "insights_endpoint": f"/{media_id}/insights",
         }
+
+    def get_media_details_safe(self, media_id: str):
+        return (
+            {
+                "id": media_id,
+                "caption": "caption",
+                "permalink": "https://instagram.com/p/correct/",
+                "timestamp": "2026-07-01T03:17:00+00:00",
+                "media_type": "REELS",
+                "media_product_type": "REELS",
+            },
+            None,
+        )
+
+    def describe_media_details_endpoint(self, media_id: str) -> str:
+        return f"/{media_id}?fields=id,caption,media_type,media_product_type,permalink,timestamp,media_url,thumbnail_url,like_count,comments_count"
+
+    def describe_media_insights_endpoint(self, media_id: str, metric_name: str | None = None) -> str:
+        return f"/{media_id}/insights?metric={metric_name}" if metric_name else f"/{media_id}/insights"
 
     def get_me(self, *, fields: str = "id,name") -> dict:
         return {"id": "me-1", "name": "Buffago"}
@@ -106,6 +156,8 @@ class _FakeGraphClient:
                 "permalink": "https://instagram.com/p/correct/",
                 "timestamp": "2026-07-01T03:17:00+00:00",
                 "media_type": "REELS",
+                "media_product_type": "REELS",
+                "media_url": "https://cdn.example.com/uploads/wing.mp4",
             }
         ]
 
@@ -129,6 +181,7 @@ def test_backfill_uses_instagram_post_published_media_id_and_labels_window(monke
     )
 
     assert result.checked_posts == 1
+    assert result.candidate_count == 1
     assert result.snapshots_persisted == 1
     inserted = client.inserted_metrics[0]
     assert inserted["instagram_media_id"] == "18142131364537604"
@@ -186,7 +239,22 @@ def test_diagnostics_detects_recent_media_mismatch(monkeypatch) -> None:
     monkeypatch.setenv("META_LONG_LIVED_ACCESS_TOKEN", "test-token")
     monkeypatch.setenv("INSTAGRAM_BUSINESS_ACCOUNT_ID", "instagram-business-account-id")
     monkeypatch.setenv("FACEBOOK_PAGE_ID", "facebook-page-id")
-    monkeypatch.setattr(metrics_module, "InstagramGraphClient", _FakeGraphClient)
+
+    class _MismatchGraphClient(_FakeGraphClient):
+        def get_media_details_safe(self, media_id: str):
+            if media_id == "18019561010853949":
+                return None, {
+                    "status_code": 400,
+                    "error": {
+                        "message": "Unsupported get request",
+                        "type": "GraphMethodException",
+                        "code": 100,
+                        "error_subcode": 33,
+                    },
+                }
+            return super().get_media_details_safe(media_id)
+
+    monkeypatch.setattr(metrics_module, "InstagramGraphClient", _MismatchGraphClient)
 
     class _MismatchClient(_FakeSupabaseClient):
         def fetch_rows(self, table_name: str, *, filters: dict | None = None, select: str = "*") -> list[dict]:
@@ -201,6 +269,7 @@ def test_diagnostics_detects_recent_media_mismatch(monkeypatch) -> None:
     assert diagnostics.me_ok is True
     assert diagnostics.configured_page_found is True
     assert diagnostics.configured_ig_account_found is True
+    assert diagnostics.stored_ids_unreadable == 1
     assert diagnostics.mismatch_count == 1
     assert diagnostics.repair_candidates[0]["proposed_instagram_media_id"] == "18142131364537604"
 
@@ -209,7 +278,22 @@ def test_diagnostics_sanitizes_reserved_log_keys_in_mismatch(monkeypatch, tmp_pa
     monkeypatch.setenv("META_LONG_LIVED_ACCESS_TOKEN", "test-token")
     monkeypatch.setenv("INSTAGRAM_BUSINESS_ACCOUNT_ID", "instagram-business-account-id")
     monkeypatch.setenv("FACEBOOK_PAGE_ID", "facebook-page-id")
-    monkeypatch.setattr(metrics_module, "InstagramGraphClient", _FakeGraphClient)
+
+    class _MismatchGraphClient(_FakeGraphClient):
+        def get_media_details_safe(self, media_id: str):
+            if media_id == "18019561010853949":
+                return None, {
+                    "status_code": 400,
+                    "error": {
+                        "message": "Unsupported get request",
+                        "type": "GraphMethodException",
+                        "code": 100,
+                        "error_subcode": 33,
+                    },
+                }
+            return super().get_media_details_safe(media_id)
+
+    monkeypatch.setattr(metrics_module, "InstagramGraphClient", _MismatchGraphClient)
 
     class _MismatchClient(_FakeSupabaseClient):
         def fetch_rows(self, table_name: str, *, filters: dict | None = None, select: str = "*") -> list[dict]:
@@ -238,10 +322,16 @@ def test_unreadable_media_failure_does_not_set_action_required(monkeypatch) -> N
     monkeypatch.setenv("INSTAGRAM_BUSINESS_ACCOUNT_ID", "test-ig-user")
 
     class _UnreadableGraphClient(_FakeGraphClient):
-        def get_media_metrics(self, media_id: str) -> dict:
-            raise metrics_module.SupabaseError(
-                'Instagram Graph API media details failed (400): {"error":{"message":"Unsupported get request","type":"GraphMethodException","code":100,"error_subcode":33}}'
-            )
+        def get_media_details_safe(self, media_id: str):
+            return None, {
+                "status_code": 400,
+                "error": {
+                    "message": "Unsupported get request",
+                    "type": "GraphMethodException",
+                    "code": 100,
+                    "error_subcode": 33,
+                },
+            }
 
     monkeypatch.setattr(metrics_module, "InstagramGraphClient", _UnreadableGraphClient)
     client = _FakeSupabaseClient()
@@ -255,4 +345,73 @@ def test_unreadable_media_failure_does_not_set_action_required(monkeypatch) -> N
 
     assert result.failures == 1
     assert result.action_required is False
+    assert result.unreadable_media_ids == 1
     assert client.inserted_errors[0]["error_type"] == "meta_media_unreadable_or_missing_permission"
+    assert client.inserted_errors[0]["raw_payload"]["meta_endpoint"].endswith("/18142131364537604?fields=id,caption,media_type,media_product_type,permalink,timestamp,media_url,thumbnail_url,like_count,comments_count")
+    assert client.inserted_metrics == []
+
+
+def test_repair_mode_updates_stored_media_id_when_match_found(monkeypatch) -> None:
+    monkeypatch.setenv("META_LONG_LIVED_ACCESS_TOKEN", "test-token")
+    monkeypatch.setenv("INSTAGRAM_BUSINESS_ACCOUNT_ID", "instagram-business-account-id")
+    monkeypatch.setenv("FACEBOOK_PAGE_ID", "facebook-page-id")
+
+    class _RepairGraphClient(_FakeGraphClient):
+        def get_media_details_safe(self, media_id: str):
+            if media_id == "18019561010853949":
+                return None, {
+                    "status_code": 400,
+                    "error": {
+                        "message": "Unsupported get request",
+                        "type": "GraphMethodException",
+                        "code": 100,
+                        "error_subcode": 33,
+                    },
+                }
+            return super().get_media_details_safe(media_id)
+
+    monkeypatch.setattr(metrics_module, "InstagramGraphClient", _RepairGraphClient)
+
+    class _RepairClient(_FakeSupabaseClient):
+        def __init__(self) -> None:
+            super().__init__()
+            self.post_rows[0]["instagram_media_id"] = "18019561010853949"
+            self.post_rows[0]["instagram_permalink"] = "https://instagram.com/p/correct/"
+            self.instagram_post_rows[0]["published_media_id"] = "18019561010853949"
+
+    client = _RepairClient()
+
+    result = metrics_module.collect_instagram_metrics(
+        _config(),
+        client,
+        now=datetime(2026, 7, 5, 3, 17, tzinfo=timezone.utc),
+        backfill=True,
+        repair_media_ids=True,
+    )
+
+    assert result.repair_candidates == 1
+    assert result.repaired_media_ids == 1
+    assert client.post_rows[0]["instagram_media_id"] == "18142131364537604"
+    assert client.instagram_post_rows[0]["published_media_id"] == "18142131364537604"
+    assert client.inserted_metrics[0]["instagram_media_id"] == "18142131364537604"
+
+
+def test_run_metrics_returns_nonzero_when_failures_persist_zero_snapshots(monkeypatch) -> None:
+    class _Result:
+        candidate_count = 1
+        checked_posts = 1
+        snapshots_persisted = 0
+        skipped_duplicates = 0
+        failures = 1
+        unreadable_media_ids = 1
+        dry_run = False
+        repair_candidates = 0
+        repaired_media_ids = 0
+        action_required = False
+
+    monkeypatch.setattr(main_module, "_load_live_client_and_config", lambda mode: (_config(), object(), object()))
+    monkeypatch.setattr(main_module, "collect_instagram_metrics", lambda *args, **kwargs: _Result())
+
+    exit_code = main_module.run_metrics()
+
+    assert exit_code == 2

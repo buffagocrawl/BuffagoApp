@@ -27,7 +27,6 @@ import { AuthProvider, useAuth } from '../providers/AuthProvider';
 import LocationProvider from '../providers/LocationProvider';
 import XpToastProvider from '../providers/XpToastProvider';
 
-import { supabase } from '../lib/supabase';
 import { dbg } from '../lib/debugLog';
 import {
   describeUrl,
@@ -45,6 +44,7 @@ WebBrowser.maybeCompleteAuthSession();
 const ANDROID_SYSTEM_BAR_BACKGROUND = '#050607';
 const APP_STARTUP_STARTED_AT = Date.now();
 const IOS_SPLASH_ASSET = 'assets/images/BuffaGo-splash.png';
+const STARTUP_FAILSAFE_MS = 8000;
 
 /**
  * Fun-fact boot splash (JS-only).
@@ -132,6 +132,76 @@ function AppBootSplash() {
   );
 }
 
+function AppStatusScreen({
+  title,
+  message,
+}: {
+  title: string;
+  message: string;
+}) {
+  const paperTheme = usePaperTheme();
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: paperTheme.colors.background,
+        padding: 24,
+      }}
+    >
+      <Text style={{ fontSize: 22, fontWeight: '900', marginBottom: 10, textAlign: 'center' }}>
+        {title}
+      </Text>
+      <Text style={{ opacity: 0.8, textAlign: 'center', lineHeight: 21 }}>{message}</Text>
+    </View>
+  );
+}
+
+class RootErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  componentDidCatch(error: Error) {
+    console.error('[startup] Root error boundary caught render error', error);
+    dbg(
+      'root_error_boundary_caught',
+      {
+        message: error?.message || 'unknown',
+        stack: typeof error?.stack === 'string' ? error.stack.slice(0, 1000) : null,
+      },
+      'app'
+    );
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <ThemeProvider>
+          <PaperProvider>
+            <AppStatusScreen
+              title="BuffaGo hit a startup error"
+              message="Restart the app or sign out after the next launch. The error was logged."
+            />
+          </PaperProvider>
+        </ThemeProvider>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 /**
  * Inner app stack that receives all providers.
  *
@@ -140,7 +210,7 @@ function AppBootSplash() {
 function AppShell() {
   const paperTheme = usePaperTheme();
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { user, initializing } = useAuth();
   const lastTrackedPathRef = useRef<string | null>(null);
   const appOpenTrackedRef = useRef(false);
   const initialPathRef = useRef<string | null>(pathname || null);
@@ -152,6 +222,7 @@ function AppShell() {
   const [bootDone, setBootDone] = useState(false);
   const [minTimeDone, setMinTimeDone] = useState(false);
   const [appReady, setAppReady] = useState(false);
+  const [startupTimedOut, setStartupTimedOut] = useState(false);
   const startupLoggedRef = useRef(false);
 
   // Onboarding gate
@@ -175,22 +246,47 @@ function AppShell() {
   }, []);
 
   useEffect(() => {
-    let alive = true;
+    if (initializing) return;
+    setBootDone(true);
+    console.info('[startup] initial session hydration completed', {
+      userId: user?.id ?? null,
+    });
+    dbg(
+      'initial_session_hydration_completed',
+      { userId: user?.id ?? null },
+      'app'
+    );
+  }, [initializing, user?.id]);
 
-    (async () => {
-      try {
-        await supabase.auth.getSession();
-      } catch {
-        // ignore
-      } finally {
-        if (alive) setBootDone(true);
-      }
-    })();
+  useEffect(() => {
+    console.info('[startup] app mounted', { pathname: pathname || null });
+    dbg('app_mounted', { pathname: pathname || null }, 'app');
+  }, [pathname]);
+
+  useEffect(() => {
+    let alive = true;
+    const timeout = setTimeout(() => {
+      if (!alive || appReady) return;
+      setStartupTimedOut(true);
+      console.warn('[startup] failsafe timeout reached before app became ready');
+      dbg(
+        'startup_failsafe_timeout_reached',
+        {
+          bootDone,
+          minTimeDone,
+          authInitializing: initializing,
+          pathname: pathname || null,
+          userId: user?.id ?? null,
+        },
+        'app'
+      );
+    }, STARTUP_FAILSAFE_MS);
 
     return () => {
       alive = false;
+      clearTimeout(timeout);
     };
-  }, []);
+  }, [appReady, bootDone, initializing, minTimeDone, pathname, user?.id]);
 
   useEffect(() => {
     let alive = true;
@@ -271,6 +367,15 @@ function AppShell() {
       });
     });
   }, []);
+
+  if (!appReady && startupTimedOut) {
+    return (
+      <AppStatusScreen
+        title="BuffaGo is still loading"
+        message="Startup took longer than expected. The app stayed visible instead of falling back to a blank screen."
+      />
+    );
+  }
 
   if (!appReady) return <AppBootSplash />;
 
@@ -429,12 +534,14 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <QueryProvider>
-          <AppShell />
-        </QueryProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <RootErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <QueryProvider>
+            <AppShell />
+          </QueryProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </RootErrorBoundary>
   );
 }

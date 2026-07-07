@@ -99,7 +99,7 @@ def generate_caption_package(
     alt_text = generate_alt_text(candidate, image_prompt="", snapshot=snapshot, external_context=external_context)
     image_prompt = generate_image_prompt(candidate, snapshot=snapshot, external_context=external_context)
 
-    hook = f"{candidate.working_title}."
+    hook = f"{candidate.hook_text or candidate.working_title}."
     if candidate.content_type in {"meme", "funny_observation"}:
         body = f"{candidate.short_summary} The joke lands because it still feels like Buffago, not an ad."
     elif candidate.content_type in {"challenge", "leaderboard", "xp_milestone"}:
@@ -130,4 +130,3 @@ def generate_caption_package(
         alt_text=alt_text,
         image_prompt=image_prompt,
     )
-

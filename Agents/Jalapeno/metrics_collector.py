@@ -9,8 +9,9 @@ from typing import Any
 from uuid import UUID, uuid4
 
 from config import JalapenoConfig, ConfigError
+from growth_loop import persist_post_pattern, score_posts
 from instagram_publishing.instagram_client import InstagramGraphClient
-from jalapeno_db import insert_error_row, insert_metrics_snapshot, update_publish_status
+from jalapeno_db import insert_error_row, insert_metrics_snapshot, update_instagram_post_by_post_id, update_publish_status
 from logging_utils import log_event
 from supabase_client import SupabaseClient, SupabaseError
 
@@ -54,8 +55,8 @@ def _read_secret(secret_name: str) -> str:
 
 def _extract_graph_error_fields(message: str) -> dict[str, int | str]:
     lowered = message.lower()
-    code_match = re.search(r'"code"\s*:\s*(\d+)', message)
-    subcode_match = re.search(r'"error_subcode"\s*:\s*(\d+)', message)
+    code_match = re.search(r'["\']code["\']\s*:\s*(\d+)', message)
+    subcode_match = re.search(r'["\']error_subcode["\']\s*:\s*(\d+)', message)
     status_match = re.search(r"\((\d{3})\)", message)
     if not code_match:
         code_match = re.search(r"\bcode[= :]+(\d+)", lowered)
@@ -92,6 +93,7 @@ def classify_meta_error(error: Exception) -> str:
 @dataclass(frozen=True, slots=True)
 class MetricsCollectionResult:
     run_id: str
+    candidate_count: int
     checked_posts: int
     snapshots_persisted: int
     failures: int
@@ -100,6 +102,8 @@ class MetricsCollectionResult:
     dry_run: bool = False
     diagnostics_ran: bool = False
     repair_candidates: int = 0
+    repaired_media_ids: int = 0
+    unreadable_media_ids: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -111,6 +115,8 @@ class MetricsDiagnosticsResult:
     recent_media_ok: bool
     recent_media_count: int
     stored_ids_checked: int
+    stored_ids_readable: int
+    stored_ids_unreadable: int
     stored_ids_found_in_recent_media: int
     mismatch_count: int
     repair_candidates: list[dict[str, Any]]
@@ -226,6 +232,9 @@ def _fetch_published_posts(client: SupabaseClient, now: datetime, *, backfill: b
             "instagram_media_id": row.get("published_media_id"),
             "instagram_permalink": row.get("permalink"),
             "published_at": row.get("published_at"),
+            "image_url": row.get("image_url"),
+            "video_url": row.get("video_url"),
+            "storage_path": row.get("storage_path"),
             "metadata": row.get("metadata") if isinstance(row.get("metadata"), dict) else {},
         }
         for row in instagram_rows
@@ -292,6 +301,19 @@ def _normalize_permalink(value: Any) -> str:
     return normalized.lower()
 
 
+def _normalized_text_prefix(value: Any, *, limit: int = 80) -> str:
+    return _normalize_caption(value)[:limit]
+
+
+def _media_reference_fingerprint(value: Any) -> str:
+    if not isinstance(value, str):
+        return ""
+    normalized = value.strip().lower().rstrip("/")
+    if not normalized:
+        return ""
+    return normalized.rsplit("/", 1)[-1]
+
+
 def _timestamp_close(left: datetime | None, right: datetime | None, *, threshold_seconds: int = 7200) -> bool:
     if left is None or right is None:
         return False
@@ -321,8 +343,14 @@ def _build_graph_client(config: JalapenoConfig) -> InstagramGraphClient:
 def _analyze_post_media_against_recent_media(post: dict[str, Any], recent_media: list[dict[str, Any]]) -> dict[str, Any]:
     stored_id = str(post.get("instagram_media_id") or "")
     post_caption = _normalize_caption(post.get("generated_caption") or post.get("caption"))
+    post_caption_prefix = _normalized_text_prefix(post.get("generated_caption") or post.get("caption"))
     post_permalink = _normalize_permalink(post.get("instagram_permalink"))
     post_published_at = _parse_dt(post.get("published_at"))
+    post_media_fingerprint = (
+        _media_reference_fingerprint(post.get("video_url"))
+        or _media_reference_fingerprint(post.get("image_url"))
+        or _media_reference_fingerprint(post.get("storage_path"))
+    )
     exact_id_match = any(str(item.get("id") or "") == stored_id for item in recent_media)
     if exact_id_match:
         return {"post_id": str(post.get("id")), "stored_id": stored_id, "match_type": "exact_id", "candidate": None}
@@ -333,9 +361,28 @@ def _analyze_post_media_against_recent_media(post: dict[str, Any], recent_media:
         if post_caption and _normalize_caption(item.get("caption")) == post_caption:
             return {"post_id": str(post.get("id")), "stored_id": stored_id, "match_type": "caption", "candidate": item}
     for item in recent_media:
+        if post_caption_prefix and _normalized_text_prefix(item.get("caption")) == post_caption_prefix:
+            return {"post_id": str(post.get("id")), "stored_id": stored_id, "match_type": "caption_prefix", "candidate": item}
+    for item in recent_media:
+        recent_media_fingerprint = _media_reference_fingerprint(item.get("media_url")) or _media_reference_fingerprint(item.get("thumbnail_url"))
+        if post_media_fingerprint and recent_media_fingerprint and post_media_fingerprint == recent_media_fingerprint:
+            return {"post_id": str(post.get("id")), "stored_id": stored_id, "match_type": "media_url", "candidate": item}
+    for item in recent_media:
         if _timestamp_close(post_published_at, _parse_dt(item.get("timestamp"))):
             return {"post_id": str(post.get("id")), "stored_id": stored_id, "match_type": "timestamp", "candidate": item}
     return {"post_id": str(post.get("id")), "stored_id": stored_id, "match_type": "none", "candidate": None}
+
+
+def _meta_error_payload(error: dict[str, Any] | None) -> dict[str, Any]:
+    if not isinstance(error, dict):
+        return {}
+    nested = error.get("error") if isinstance(error.get("error"), dict) else error
+    payload: dict[str, Any] = {}
+    for key in ("message", "type", "code", "error_subcode"):
+        value = nested.get(key)
+        if value is not None:
+            payload[key] = value
+    return payload
 
 
 def run_metrics_diagnostics(
@@ -357,6 +404,8 @@ def run_metrics_diagnostics(
     recent_media_ok = False
     mismatches: list[dict[str, Any]] = []
     repair_candidates: list[dict[str, Any]] = []
+    stored_ids_readable = 0
+    stored_ids_unreadable = 0
 
     log_event(logger, "metrics_diagnostics_started", run_id=active_run_id, stage="metrics", status="started")
 
@@ -401,8 +450,31 @@ def run_metrics_diagnostics(
     found_in_recent = 0
     for post in posts:
         stored_id = str(post.get("instagram_media_id") or "")
+        details, read_error = graph.get_media_details_safe(stored_id)
+        endpoint = graph.describe_media_details_endpoint(stored_id)
+        if read_error is None and isinstance(details, dict) and details.get("id"):
+            stored_ids_readable += 1
+        else:
+            stored_ids_unreadable += 1
+            error_payload = _meta_error_payload(read_error)
+            log_event(
+                logger,
+                "metrics_media_id_unreadable",
+                level="warning",
+                run_id=active_run_id,
+                post_id=str(post.get("id") or ""),
+                instagram_media_id=stored_id,
+                meta_endpoint=endpoint,
+                stage="metrics",
+                status="unreadable",
+                error_type="meta_media_unreadable_or_missing_permission",
+                meta_error_code=error_payload.get("code"),
+                meta_error_subcode=error_payload.get("error_subcode"),
+                error=error_payload.get("message") or read_error,
+            )
         if stored_id in recent_media_ids:
             found_in_recent += 1
+        if read_error is None and isinstance(details, dict) and details.get("id"):
             continue
         analysis = _analyze_post_media_against_recent_media(post, recent_media)
         mismatch = {
@@ -412,6 +484,8 @@ def run_metrics_diagnostics(
             "instagram_permalink": post.get("instagram_permalink"),
             "published_at": post.get("published_at"),
             "caption_preview": (post.get("generated_caption") or "")[:120],
+            "meta_endpoint": endpoint,
+            "read_error": read_error,
             "match_type": analysis["match_type"],
             "proposed_instagram_media_id": analysis["candidate"].get("id") if isinstance(analysis["candidate"], dict) else None,
             "proposed_permalink": analysis["candidate"].get("permalink") if isinstance(analysis["candidate"], dict) else None,
@@ -442,6 +516,8 @@ def run_metrics_diagnostics(
         recent_media_ok=recent_media_ok,
         recent_media_count=len(recent_media),
         stored_ids_checked=len(posts),
+        stored_ids_readable=stored_ids_readable,
+        stored_ids_unreadable=stored_ids_unreadable,
         stored_ids_found_in_recent_media=found_in_recent,
         mismatch_count=len(mismatches),
         repair_candidate_count=len(repair_candidates),
@@ -454,6 +530,8 @@ def run_metrics_diagnostics(
         recent_media_ok=recent_media_ok,
         recent_media_count=len(recent_media),
         stored_ids_checked=len(posts),
+        stored_ids_readable=stored_ids_readable,
+        stored_ids_unreadable=stored_ids_unreadable,
         stored_ids_found_in_recent_media=found_in_recent,
         mismatch_count=len(mismatches),
         repair_candidates=repair_candidates,
@@ -469,9 +547,10 @@ def repair_metrics_media_ids(
     dry_run: bool = True,
     run_id: str | None = None,
     now: datetime | None = None,
+    diagnostics_result: MetricsDiagnosticsResult | None = None,
 ) -> list[dict[str, Any]]:
     active_run_id = run_id or str(uuid4())
-    diagnostics = run_metrics_diagnostics(config, client, logger=logger, run_id=active_run_id, now=now)
+    diagnostics = diagnostics_result or run_metrics_diagnostics(config, client, logger=logger, run_id=active_run_id, now=now)
     proposed_updates: list[dict[str, Any]] = []
     for candidate in diagnostics.repair_candidates:
         if not candidate.get("proposed_instagram_media_id"):
@@ -482,6 +561,7 @@ def repair_metrics_media_ids(
             "new_instagram_media_id": candidate["proposed_instagram_media_id"],
             "match_type": candidate["match_type"],
             "proposed_permalink": candidate.get("proposed_permalink"),
+            "applied": False,
         }
         proposed_updates.append(proposed)
         log_event(
@@ -501,6 +581,16 @@ def repair_metrics_media_ids(
             instagram_media_id=str(candidate["proposed_instagram_media_id"]),
             instagram_permalink=str(candidate.get("proposed_permalink") or ""),
         )
+        update_instagram_post_by_post_id(
+            client,
+            post_id=UUID(candidate["post_id"]),
+            payload={
+                "published_media_id": str(candidate["proposed_instagram_media_id"]),
+                "permalink": str(candidate.get("proposed_permalink") or ""),
+                "updated_at": _utcnow().isoformat(),
+            },
+        )
+        proposed["applied"] = True
         log_event(
             logger,
             "metrics_media_id_repair_applied",
@@ -531,6 +621,8 @@ def collect_instagram_metrics(
     action_required = False
     skipped_duplicates = 0
     repair_candidates = 0
+    repaired_media_ids = 0
+    unreadable_media_ids = 0
 
     log_event(
         logger,
@@ -548,15 +640,26 @@ def collect_instagram_metrics(
     if diagnostics or repair_media_ids:
         diagnostics_result = run_metrics_diagnostics(config, client, logger=logger, run_id=active_run_id, now=now)
         repair_candidates = len(diagnostics_result.repair_candidates)
+        unreadable_media_ids = diagnostics_result.stored_ids_unreadable
     if repair_media_ids:
-        repair_metrics_media_ids(config, client, logger=logger, dry_run=dry_run, run_id=active_run_id, now=now)
+        repair_updates = repair_metrics_media_ids(
+            config,
+            client,
+            logger=logger,
+            dry_run=dry_run,
+            run_id=active_run_id,
+            now=now,
+            diagnostics_result=diagnostics_result,
+        )
+        repaired_media_ids = sum(1 for item in repair_updates if item.get("applied"))
 
     graph: InstagramGraphClient | None = None
     if not dry_run:
         graph = _build_graph_client(config)
 
     posts = _fetch_published_posts(client, now, backfill=backfill)
-    log_event(logger, "published_posts_loaded", run_id=active_run_id, stage="metrics", status="completed", candidate_count=len(posts), backfill=backfill)
+    candidate_count = len(posts)
+    log_event(logger, "published_posts_loaded", run_id=active_run_id, stage="metrics", status="completed", candidate_count=candidate_count, backfill=backfill)
     existing_windows = _existing_metric_windows(client, posts)
     deduped_posts: list[dict[str, Any]] = []
     for post in posts:
@@ -577,6 +680,18 @@ def collect_instagram_metrics(
             continue
         deduped_posts.append(post)
     posts = deduped_posts
+    if candidate_count == 0:
+        log_event(logger, "metrics_no_eligible_posts", run_id=active_run_id, stage="metrics", status="completed", candidate_count=0, backfill=backfill)
+    elif not posts and skipped_duplicates:
+        log_event(
+            logger,
+            "metrics_all_candidates_skipped_duplicate",
+            run_id=active_run_id,
+            stage="metrics",
+            status="completed",
+            candidate_count=candidate_count,
+            skipped_duplicates=skipped_duplicates,
+        )
 
     for post in posts:
         post_started = time.perf_counter()
@@ -600,6 +715,54 @@ def collect_instagram_metrics(
         try:
             if graph is None:
                 raise ConfigError("Instagram Graph client was not initialized")
+            media_details_endpoint = graph.describe_media_details_endpoint(media_id)
+            log_event(
+                logger,
+                "instagram_media_id_validation_started",
+                run_id=active_run_id,
+                post_id=post_id,
+                instagram_media_id=media_id,
+                meta_endpoint=media_details_endpoint,
+                stage="metrics",
+                status="started",
+            )
+            media_details, read_error = graph.get_media_details_safe(media_id)
+            if read_error is not None:
+                unreadable_media_ids += 1
+                error_payload = _meta_error_payload(read_error)
+                error_message = error_payload.get("message") or str(read_error)
+                log_event(
+                    logger,
+                    "instagram_media_id_validation_failed",
+                    level="error",
+                    run_id=active_run_id,
+                    post_id=post_id,
+                    instagram_media_id=media_id,
+                    meta_endpoint=media_details_endpoint,
+                    stage="metrics",
+                    status="failed",
+                    error_type="meta_media_unreadable_or_missing_permission",
+                    meta_error_code=error_payload.get("code"),
+                    meta_error_subcode=error_payload.get("error_subcode"),
+                    error=error_message,
+                )
+                raise SupabaseError(
+                    f"Instagram Graph API media details failed ({read_error.get('status_code')}): "
+                    f"{error_payload or read_error}"
+                )
+            log_event(
+                logger,
+                "instagram_media_id_validation_succeeded",
+                run_id=active_run_id,
+                post_id=post_id,
+                instagram_media_id=media_id,
+                meta_endpoint=media_details_endpoint,
+                stage="metrics",
+                status="completed",
+                media_type=media_details.get("media_type") if isinstance(media_details, dict) else None,
+                media_product_type=media_details.get("media_product_type") if isinstance(media_details, dict) else None,
+                permalink=media_details.get("permalink") if isinstance(media_details, dict) else None,
+            )
             log_event(
                 logger,
                 "instagram_insights_fetch_started",
@@ -607,6 +770,7 @@ def collect_instagram_metrics(
                 post_id=post_id,
                 instagram_media_id=media_id,
                 collection_window=window,
+                meta_endpoint=graph.describe_media_insights_endpoint(media_id),
                 stage="metrics",
                 status="started",
             )
@@ -628,6 +792,8 @@ def collect_instagram_metrics(
                 requested_metrics=raw_metrics.get("requested_insight_metrics"),
                 returned_metrics=raw_metrics.get("returned_insight_metrics"),
                 missing_metrics=raw_metrics.get("missing_insight_metrics"),
+                meta_endpoint=raw_metrics.get("insights_endpoint"),
+                media_details_endpoint=raw_metrics.get("media_details_endpoint"),
                 stage="metrics",
                 status="completed",
             )
@@ -644,6 +810,10 @@ def collect_instagram_metrics(
             age_hours = round((now - published_at).total_seconds() / 3600.0, 2) if published_at else None
             age_days = round(age_hours / 24.0, 2) if age_hours is not None else None
             creative = _extract_metadata(post)
+            try:
+                persist_post_pattern(client, post)
+            except Exception:
+                pass
             failure_stage = "insert"
             log_event(
                 logger,
@@ -705,6 +875,7 @@ def collect_instagram_metrics(
                     status="failed_action_required",
                     error_type=error_type,
                     error=str(exc),
+                    meta_endpoint=graph.describe_media_insights_endpoint(media_id) if graph is not None and failure_stage == "insights" else None,
                 )
                 log_event(
                     logger,
@@ -730,6 +901,7 @@ def collect_instagram_metrics(
                     status="retry_deferred",
                     error_type=error_type,
                     error=str(exc),
+                    meta_endpoint=graph.describe_media_insights_endpoint(media_id) if graph is not None and failure_stage == "insights" else None,
                 )
             else:
                 log_event(
@@ -744,6 +916,7 @@ def collect_instagram_metrics(
                     status="failed",
                     error_type=error_type,
                     error=str(exc),
+                    meta_endpoint=graph.describe_media_details_endpoint(media_id) if graph is not None and error_type == "meta_media_unreadable_or_missing_permission" else (graph.describe_media_insights_endpoint(media_id) if graph is not None and failure_stage == "insights" else None),
                 )
             try:
                 insert_error_row(
@@ -753,13 +926,31 @@ def collect_instagram_metrics(
                     stage="metrics",
                     error_type=error_type,
                     message=str(exc),
-                    raw_payload={"instagram_media_id": media_id, "collection_window": window},
+                    raw_payload={
+                        "instagram_media_id": media_id,
+                        "collection_window": window,
+                        "meta_endpoint": graph.describe_media_details_endpoint(media_id) if graph is not None and error_type == "meta_media_unreadable_or_missing_permission" else (graph.describe_media_insights_endpoint(media_id) if graph is not None and failure_stage == "insights" else None),
+                    },
                     is_retryable=error_type == "rate_limit",
                     retry_count=0,
                 )
             except Exception:
                 pass
             continue
+
+    if not dry_run and (persisted or posts):
+        try:
+            score_posts(client, logger=logger, now=now)
+        except Exception as exc:
+            log_event(
+                logger,
+                "post_scoring_failed",
+                level="warning",
+                run_id=active_run_id,
+                stage="metrics",
+                status="failed",
+                error=str(exc),
+            )
 
     log_event(
         logger,
@@ -770,9 +961,12 @@ def collect_instagram_metrics(
         status="failed_action_required" if action_required else "completed",
         duration_ms=int((time.perf_counter() - started) * 1000),
         checked_posts=len(posts),
+        candidate_count=candidate_count,
         snapshots_persisted=persisted,
         failures=failures,
         skipped_duplicates=skipped_duplicates,
+        repaired_media_ids=repaired_media_ids,
+        unreadable_media_ids=unreadable_media_ids,
         backfill=backfill,
         dry_run=dry_run,
         diagnostics=diagnostics,
@@ -782,6 +976,7 @@ def collect_instagram_metrics(
     )
     return MetricsCollectionResult(
         run_id=active_run_id,
+        candidate_count=candidate_count,
         checked_posts=len(posts),
         snapshots_persisted=persisted,
         failures=failures,
@@ -790,4 +985,6 @@ def collect_instagram_metrics(
         dry_run=dry_run,
         diagnostics_ran=bool(diagnostics or repair_media_ids),
         repair_candidates=repair_candidates,
+        repaired_media_ids=repaired_media_ids,
+        unreadable_media_ids=unreadable_media_ids,
     )

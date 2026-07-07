@@ -2652,7 +2652,18 @@ export default function Home() {
     },
     [closeRestaurantSearch, coords?.latitude, coords?.longitude, session?.user?.id]
   );
-  if (onboardingLoading) return null;
+  if (onboardingLoading) {
+    return (
+      <LocationGate>
+        <SafeAreaView
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}
+        >
+          <ActivityIndicator />
+          <Text style={{ marginTop: 12, opacity: 0.75 }}>Loading BuffaGo…</Text>
+        </SafeAreaView>
+      </LocationGate>
+    );
+  }
 
   if (shouldShowIntro) {
     return (

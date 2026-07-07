@@ -151,6 +151,9 @@ def test_required_cli_modes_exist() -> None:
     assert parser.parse_args(["--test"]).test is True
     assert parser.parse_args(["--production"]).production is True
     assert parser.parse_args(["--production", "--content-type", "video"]).content_type == "video"
+    assert parser.parse_args(["--growth-report"]).growth_report is True
+    assert parser.parse_args(["--recommend-strategy"]).recommend_strategy is True
+    assert parser.parse_args(["--apply-strategy"]).apply_strategy is True
 
 
 def test_prompt_library_validation_reports_manifest(tmp_path: Path) -> None:
