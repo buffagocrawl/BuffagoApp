@@ -324,7 +324,18 @@ class ContentDecisionEngine:
             snapshot=snapshot,
             external_context=external_context,
         )
-        log_event(logger, "caption_generated", run_id=active_run_id, candidate_id=selection.winner.candidate.candidate_id, score=winner_caption.quality_review.get("score"), approved=winner_caption.quality_review.get("approved"))
+        log_event(
+            logger,
+            "caption_generated",
+            run_id=active_run_id,
+            candidate_id=selection.winner.candidate.candidate_id,
+            score=winner_caption.quality_review.get("score"),
+            approved=winner_caption.quality_review.get("approved"),
+            selected_caption_style=winner_caption.selected_caption_style,
+            caption_length=winner_caption.caption_length,
+            validation_passed=winner_caption.validation_passed,
+            fallback_used=winner_caption.fallback_used,
+        )
         log_event(logger, "hashtags_generated", run_id=active_run_id, candidate_id=selection.winner.candidate.candidate_id, hashtag_count=len(winner_caption.hashtags))
         log_event(logger, "alt_text_generated", run_id=active_run_id, candidate_id=selection.winner.candidate.candidate_id)
         log_event(logger, "image_prompt_generated", run_id=active_run_id, candidate_id=selection.winner.candidate.candidate_id)
@@ -338,6 +349,8 @@ class ContentDecisionEngine:
             {
                 "caption_package": asdict(winner_caption),
                 "caption": winner_caption.caption,
+                "caption_style": winner_caption.caption_style,
+                "caption_type": winner_caption.caption_type,
                 "hashtags": winner_caption.hashtags,
                 "alt_text": winner_caption.alt_text,
                 "image_prompt": winner_caption.image_prompt,
@@ -348,6 +361,8 @@ class ContentDecisionEngine:
         if selection.runner_up is not None:
             runner_up_caption = generate_caption_package(selection.runner_up.candidate, snapshot=snapshot, external_context=external_context)
             runner_up_payload = _serialize_candidate(selection.runner_up.candidate, score=selection.runner_up, caption=runner_up_caption)
+            runner_up_payload["caption_style"] = runner_up_caption.caption_style
+            runner_up_payload["caption_type"] = runner_up_caption.caption_type
             runner_up_payload["scheduled_post_type"] = scheduled_post_type
 
         decision_summary = {

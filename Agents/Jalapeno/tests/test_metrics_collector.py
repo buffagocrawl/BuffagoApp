@@ -53,6 +53,9 @@ class _FakeSupabaseClient:
                 "image_url": "https://cdn.example.com/uploads/wing.jpg",
                 "video_url": "https://cdn.example.com/uploads/wing.mp4",
                 "storage_path": "posts/wing.mp4",
+                "metrics_status": None,
+                "metrics_error_type": None,
+                "metrics_disabled_at": None,
                 "metadata": {},
             }
         ]
@@ -227,12 +230,58 @@ def test_metrics_dry_run_does_not_require_meta_token(monkeypatch) -> None:
     assert client.inserted_metrics == []
 
 
+def test_metrics_disabled_at_row_is_excluded_from_candidate_selection(monkeypatch) -> None:
+    monkeypatch.setenv("META_LONG_LIVED_ACCESS_TOKEN", "test-token")
+    monkeypatch.setenv("INSTAGRAM_BUSINESS_ACCOUNT_ID", "test-ig-user")
+    monkeypatch.setattr(metrics_module, "InstagramGraphClient", _FakeGraphClient)
+    client = _FakeSupabaseClient()
+    client.instagram_post_rows[0]["metrics_disabled_at"] = "2026-07-04T00:00:00+00:00"
+
+    result = metrics_module.collect_instagram_metrics(
+        _config(),
+        client,
+        now=datetime(2026, 7, 5, 3, 17, tzinfo=timezone.utc),
+        backfill=True,
+    )
+
+    assert result.candidate_count == 0
+    assert result.checked_posts == 0
+    assert client.inserted_metrics == []
+
+
+def test_media_unreadable_status_row_is_excluded_from_candidate_selection(monkeypatch) -> None:
+    monkeypatch.setenv("META_LONG_LIVED_ACCESS_TOKEN", "test-token")
+    monkeypatch.setenv("INSTAGRAM_BUSINESS_ACCOUNT_ID", "test-ig-user")
+    monkeypatch.setattr(metrics_module, "InstagramGraphClient", _FakeGraphClient)
+    client = _FakeSupabaseClient()
+    client.instagram_post_rows[0]["metrics_status"] = "media_unreadable"
+
+    result = metrics_module.collect_instagram_metrics(
+        _config(),
+        client,
+        now=datetime(2026, 7, 5, 3, 17, tzinfo=timezone.utc),
+        backfill=True,
+    )
+
+    assert result.candidate_count == 0
+    assert result.checked_posts == 0
+    assert client.inserted_metrics == []
+
+
 def test_classify_code_100_subcode_33_is_not_token_expired() -> None:
     error = metrics_module.SupabaseError(
         'Instagram Graph API media details failed (400): {"error":{"message":"Unsupported get request","type":"GraphMethodException","code":100,"error_subcode":33}}'
     )
 
     assert metrics_module.classify_meta_error(error) == "meta_media_unreadable_or_missing_permission"
+
+
+def test_classify_code_10_permission_denied_is_not_token_expired() -> None:
+    error = metrics_module.SupabaseError(
+        'Instagram Graph API insights failed (400): {"error":{"message":"Application does not have permission for this action","type":"OAuthException","code":10}}'
+    )
+
+    assert metrics_module.classify_meta_error(error) == "meta_missing_insights_permission"
 
 
 def test_diagnostics_detects_recent_media_mismatch(monkeypatch) -> None:
@@ -348,6 +397,9 @@ def test_unreadable_media_failure_does_not_set_action_required(monkeypatch) -> N
     assert result.unreadable_media_ids == 1
     assert client.inserted_errors[0]["error_type"] == "meta_media_unreadable_or_missing_permission"
     assert client.inserted_errors[0]["raw_payload"]["meta_endpoint"].endswith("/18142131364537604?fields=id,caption,media_type,media_product_type,permalink,timestamp,media_url,thumbnail_url,like_count,comments_count")
+    assert client.instagram_post_rows[0]["metrics_status"] == "media_unreadable"
+    assert client.instagram_post_rows[0]["metrics_error_type"] == "meta_media_unreadable_or_missing_permission"
+    assert client.instagram_post_rows[0]["metrics_disabled_at"] == "2026-07-05T03:17:00+00:00"
     assert client.inserted_metrics == []
 
 
@@ -378,6 +430,8 @@ def test_repair_mode_updates_stored_media_id_when_match_found(monkeypatch) -> No
             self.post_rows[0]["instagram_media_id"] = "18019561010853949"
             self.post_rows[0]["instagram_permalink"] = "https://instagram.com/p/correct/"
             self.instagram_post_rows[0]["published_media_id"] = "18019561010853949"
+            self.instagram_post_rows[0]["metrics_status"] = "media_unreadable"
+            self.instagram_post_rows[0]["metrics_disabled_at"] = "2026-07-04T00:00:00+00:00"
 
     client = _RepairClient()
 
@@ -391,6 +445,7 @@ def test_repair_mode_updates_stored_media_id_when_match_found(monkeypatch) -> No
 
     assert result.repair_candidates == 1
     assert result.repaired_media_ids == 1
+    assert result.candidate_count == 1
     assert client.post_rows[0]["instagram_media_id"] == "18142131364537604"
     assert client.instagram_post_rows[0]["published_media_id"] == "18142131364537604"
     assert client.inserted_metrics[0]["instagram_media_id"] == "18142131364537604"

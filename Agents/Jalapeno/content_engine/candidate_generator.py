@@ -371,7 +371,7 @@ class CandidateGenerator:
                 working_title="If today is a food holiday, wings are answering the call",
                 short_summary="Lean into the food holiday frame while keeping the tone playful and direct.",
                 hook_text="If today is a food holiday, wings are answering the call",
-                overlay_text="Wings understood the assignment",
+                overlay_text="Wing night is calling",
                 target_emotion="Hungry",
                 suggested_cta="Which sauce would you pair with it?",
                 suggested_image_concept="Celebratory wing platter with festive accents and bright color contrast.",

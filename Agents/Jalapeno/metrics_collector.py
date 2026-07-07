@@ -83,6 +83,8 @@ def classify_meta_error(error: Exception) -> str:
         return "token_expired"
     if code == 100 and subcode == 33:
         return "meta_media_unreadable_or_missing_permission"
+    if code == 10 and "permission" in lowered:
+        return "meta_missing_insights_permission"
     if code == 613 or http_status == 429 or "rate limit" in lowered or "too many" in lowered or "throttle" in lowered:
         return "rate_limit"
     if http_status == 401:
@@ -104,6 +106,13 @@ class MetricsCollectionResult:
     repair_candidates: int = 0
     repaired_media_ids: int = 0
     unreadable_media_ids: int = 0
+
+
+@dataclass(frozen=True, slots=True)
+class MetricsCandidateLoadResult:
+    posts: list[dict[str, Any]]
+    published_posts_found: int
+    metrics_excluded_count: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -188,7 +197,27 @@ def _engagement_rate(metrics: dict[str, Any]) -> float | None:
     return round(engagement / reach, 4)
 
 
-def _fetch_published_posts(client: SupabaseClient, now: datetime, *, backfill: bool = False) -> list[dict[str, Any]]:
+_METRICS_DISABLED_STATUSES = frozenset(
+    {"media_unreadable", "metrics_disabled", "deleted", "do_not_collect"}
+)
+
+
+def _metrics_collection_disabled(instagram_row: dict[str, Any] | None) -> bool:
+    if not isinstance(instagram_row, dict):
+        return False
+    if instagram_row.get("metrics_disabled_at") is not None:
+        return True
+    status = str(instagram_row.get("metrics_status") or "").strip().lower()
+    return status in _METRICS_DISABLED_STATUSES
+
+
+def _fetch_published_posts(
+    client: SupabaseClient,
+    now: datetime,
+    *,
+    backfill: bool = False,
+    include_disabled: bool = False,
+) -> MetricsCandidateLoadResult:
     cutoff = now - timedelta(days=30)
     posts = client.fetch_rows(
         "jalapeno_posts",
@@ -240,7 +269,7 @@ def _fetch_published_posts(client: SupabaseClient, now: datetime, *, backfill: b
         for row in instagram_rows
         if row.get("post_id") and row.get("published_media_id") and str(row.get("post_id")) not in known_post_ids
     )
-    candidates: list[dict[str, Any]] = []
+    eligible_posts: list[dict[str, Any]] = []
     for post in posts:
         if not post.get("instagram_media_id") or not post.get("id"):
             continue
@@ -251,10 +280,38 @@ def _fetch_published_posts(client: SupabaseClient, now: datetime, *, backfill: b
         if window is None:
             continue
         enriched = dict(post)
+        instagram_row = instagram_by_post_id.get(str(post.get("id")))
+        if instagram_row:
+            enriched["instagram_post"] = instagram_row
         enriched["metrics_collection_window"] = window
         enriched["metrics_exact_window"] = 23 <= age_hours <= 30 or 71 <= age_hours <= 80 or 164 <= age_hours <= 180
-        candidates.append(enriched)
-    return candidates
+        eligible_posts.append(enriched)
+    published_posts_found = len(eligible_posts)
+    if include_disabled:
+        return MetricsCandidateLoadResult(
+            posts=eligible_posts,
+            published_posts_found=published_posts_found,
+            metrics_excluded_count=0,
+        )
+    candidates = [post for post in eligible_posts if not _metrics_collection_disabled(post.get("instagram_post"))]
+    return MetricsCandidateLoadResult(
+        posts=candidates,
+        published_posts_found=published_posts_found,
+        metrics_excluded_count=published_posts_found - len(candidates),
+    )
+
+
+def _mark_metrics_media_unreadable(client: SupabaseClient, *, post_id: str, now: datetime) -> None:
+    update_instagram_post_by_post_id(
+        client,
+        post_id=UUID(post_id),
+        payload={
+            "metrics_status": "media_unreadable",
+            "metrics_error_type": "meta_media_unreadable_or_missing_permission",
+            "metrics_disabled_at": now.isoformat(),
+            "updated_at": now.isoformat(),
+        },
+    )
 
 
 def _existing_metric_windows(client: SupabaseClient, posts: list[dict[str, Any]]) -> set[tuple[str, str]]:
@@ -446,7 +503,7 @@ def run_metrics_diagnostics(
         recent_media_ids=sorted(id_ for id_ in recent_media_ids if id_),
     )
 
-    posts = _fetch_published_posts(client, current_now, backfill=True)
+    posts = _fetch_published_posts(client, current_now, backfill=True, include_disabled=True).posts
     found_in_recent = 0
     for post in posts:
         stored_id = str(post.get("instagram_media_id") or "")
@@ -657,9 +714,26 @@ def collect_instagram_metrics(
     if not dry_run:
         graph = _build_graph_client(config)
 
-    posts = _fetch_published_posts(client, now, backfill=backfill)
+    candidate_load = _fetch_published_posts(
+        client,
+        now,
+        backfill=backfill,
+        include_disabled=repair_media_ids,
+    )
+    posts = candidate_load.posts
     candidate_count = len(posts)
-    log_event(logger, "published_posts_loaded", run_id=active_run_id, stage="metrics", status="completed", candidate_count=candidate_count, backfill=backfill)
+    log_event(
+        logger,
+        "published_posts_loaded",
+        run_id=active_run_id,
+        stage="metrics",
+        status="completed",
+        backfill=backfill,
+        repair_media_ids=repair_media_ids,
+        published_posts_found=candidate_load.published_posts_found,
+        metrics_excluded_count=candidate_load.metrics_excluded_count,
+        candidate_count=candidate_count,
+    )
     existing_windows = _existing_metric_windows(client, posts)
     deduped_posts: list[dict[str, Any]] = []
     for post in posts:
@@ -731,6 +805,21 @@ def collect_instagram_metrics(
                 unreadable_media_ids += 1
                 error_payload = _meta_error_payload(read_error)
                 error_message = error_payload.get("message") or str(read_error)
+                if error_payload.get("code") == 100 and error_payload.get("error_subcode") == 33:
+                    try:
+                        _mark_metrics_media_unreadable(client, post_id=post_id, now=now)
+                    except Exception as mark_exc:
+                        log_event(
+                            logger,
+                            "instagram_media_id_disable_failed",
+                            level="warning",
+                            run_id=active_run_id,
+                            post_id=post_id,
+                            instagram_media_id=media_id,
+                            stage="metrics",
+                            status="failed",
+                            error=str(mark_exc),
+                        )
                 log_event(
                     logger,
                     "instagram_media_id_validation_failed",

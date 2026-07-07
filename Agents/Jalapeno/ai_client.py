@@ -7,6 +7,7 @@ from typing import Any
 
 import requests
 
+from caption_rules import validate_caption
 from ai_config import AIConfig, load_ai_config
 from ai_prompts import DEFAULT_BRAND_RULES, PROMPT_LIBRARY_VERSION, load_prompt_bundle
 from ai_schemas import (
@@ -392,6 +393,12 @@ class JalapenoAIClient:
             output = self._response_output(response)
             if request_type == "text_content":
                 output = normalize_text_output(output)
+                caption_validation = validate_caption(output["caption"])
+                if not caption_validation["passed"]:
+                    raise SchemaValidationError(
+                        "Caption validation failed: " + ", ".join(caption_validation["issues"])
+                    )
+                output["caption"] = caption_validation["normalized_caption"]
             elif request_type == "image_prompt":
                 output = normalize_image_output(output)
             else:

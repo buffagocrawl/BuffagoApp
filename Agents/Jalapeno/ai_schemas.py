@@ -4,6 +4,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any
 
+from caption_rules import pick_fallback_caption
 from content_engine.visual_prompt_style import (
     apply_prompt_metadata,
     build_buffago_image_direction,
@@ -263,8 +264,8 @@ def _signals_used_from_context(external_context: dict[str, Any]) -> list[str]:
 
 def _base_caption(content_slot: str) -> str:
     if content_slot == "meme_post":
-        return "When the wings hit the table and suddenly everyone develops strong opinions."
-    return "Buffago said wings first, and honestly, that was the correct decision."
+        return "The group chat needs a wing night."
+    return "Send this to someone who owes you wings."
 
 
 def _fallback_scene_prompt(content_slot: str, post_type: str) -> tuple[str, dict[str, str]]:
@@ -297,33 +298,35 @@ def fallback_text_output(
     external_context: dict[str, Any],
 ) -> dict[str, Any]:
     signals = _signals_used_from_context(external_context)
+    style_seed = f"{content_slot}:{':'.join(signals)}"
+    fallback_style, fallback_caption = pick_fallback_caption(seed=style_seed)
     if content_slot == "meme_post" or "sports_events" in signals:
         post_type = "meme"
-        caption = "Hot take: if wings aren't involved, is it even worth the napkins?"
+        caption = fallback_caption
         image_prompt, _metadata = _fallback_scene_prompt(content_slot, post_type)
-        content_angle = "Buffago meme energy"
-        why_this_post = "A safe meme-style post keeps the brand playful without inventing facts."
+        content_angle = f"Buffago {fallback_style} caption"
+        why_this_post = "A safe wing-specific fallback caption keeps the brand playful without inventing facts."
         hashtags = ["#Buffago", "#WingHumor", "#BuffaloWings", "#LocalFood"]
         confidence = 0.78
     elif any("holiday" in signal for signal in signals):
         post_type = "food_holiday"
-        caption = "A food holiday is basically a public service announcement for wings."
+        caption = fallback_caption
         image_prompt, _metadata = _fallback_scene_prompt(content_slot, post_type)
-        content_angle = "Food holiday wing feature"
-        why_this_post = "Food holidays are safe, relevant, and easy to keep brand-first."
+        content_angle = f"Food holiday {fallback_style} caption"
+        why_this_post = "Food holidays are safe, relevant, and easier to keep wing-first with a curated fallback caption."
         hashtags = ["#Buffago", "#FoodHoliday", "#Wings", "#WingWednesday"]
         confidence = 0.76
     elif content_slot == "buffago_post":
         post_type = "restaurant_spotlight"
-        caption = _base_caption(content_slot)
+        caption = fallback_caption
         image_prompt, _metadata = _fallback_scene_prompt(content_slot, post_type)
-        content_angle = "Restaurant spotlight"
-        why_this_post = "Restaurant spotlight keeps the post food-first and tied to the Buffago lane."
+        content_angle = f"Restaurant spotlight {fallback_style} caption"
+        why_this_post = "Restaurant spotlight stays food-first and tied to the Buffago lane with a curated caption fallback."
         hashtags = ["#Buffago", "#BuffaloWings", "#WingStop", "#LocalEats"]
         confidence = 0.84
     else:
         post_type = "community_update"
-        caption = "Buffago is here for the wings, the neighborhood, and the people who know a good plate when they see one."
+        caption = _base_caption(content_slot)
         image_prompt, _metadata = _fallback_scene_prompt(content_slot, post_type)
         content_angle = "Community update"
         why_this_post = "Community updates keep the account local and positive without leaning on risky claims."
