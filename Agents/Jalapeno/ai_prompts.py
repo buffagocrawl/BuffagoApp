@@ -3,6 +3,7 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Any
 
+from caption_rules import CAPTION_STYLE_ORDER, style_guidance
 from prompt_library_loader import PROMPT_LIBRARY_VERSION, load_prompt_library, load_prompt_text
 
 
@@ -60,6 +61,11 @@ def _slot_prompt(content_slot: str) -> str:
     return load_prompt_text("buffago_post")
 
 
+def _caption_style_system_text() -> str:
+    lines = [f"- {style}: {style_guidance(style)}" for style in CAPTION_STYLE_ORDER]
+    return "\n".join(lines)
+
+
 def build_brand_validation_prompt(
     *,
     request_type: str,
@@ -115,15 +121,27 @@ def build_text_generation_prompt(
         "Use only the provided context. Do not invent metrics, endorsements, or private user details. "
         "Write a strong caption, a focused image prompt, and concise helper metadata.\n\n"
         "Caption rules:\n"
-        "- Caption must be about wings, sauce, crispiness, cravings, wing night, friends, or the group chat\n"
+        "- Caption must stay in Buffago's lane: wings, wing night, sauce, crispiness, cravings, ordering wings, friends, crew, or the group chat\n"
         "- Usually 1 sentence, max 2 short sentences\n"
         "- Keep the caption under 160 characters unless the context absolutely requires more\n"
         "- Make it sound naturally shareable with prompts like Send this to..., Tag..., Share this with..., Comment..., or Save this for wing night\n"
-        "- Captions should fit styles like send_to_friend, tag_someone, wing_debt, craving_prompt, group_chat, sauce_debate, weekend_wings, or simple_hype\n"
+        "- Use exactly one of these caption styles as the lane for the caption:\n"
+        f"{_caption_style_system_text()}\n"
+        "- Do not be clever\n"
+        "- Do not use internet slang\n"
+        "- Do not personify wings, plates, photos, or posts\n"
+        "- Do not use metaphor joke formats\n"
+        "- Write one simple shareable wing caption\n"
+        "- Prefer tag/send/comment/share prompts\n"
+        "- Keep under 120 characters when possible\n"
+        "- Mention or clearly imply wings, wing night, sauce, flats/drums, cravings, friends, group chat, or someone owing wings\n"
         "- Hashtags must stay separate from the caption field\n"
         "- Do not include literal \\n in the caption\n"
         "- Do not use understood the assignment, main character energy, vibes are immaculate, POV unless it literally makes sense, or random slang that could fit any food post\n"
-        "- Do not write captions that are generic, overly clever, corporate, or unrelated to wings"
+        "- Do not write captions that are generic, overly clever, corporate, or unrelated to wings\n"
+        "- Do not sound like a random meme account, a chain restaurant ad, or a generic foodie page\n"
+        "- Avoid captions that could work for pizza, burgers, tacos, or any plate with no changes\n"
+        "- Prefer direct, plain wording over clever nonsense"
     )
 
 

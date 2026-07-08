@@ -27,6 +27,7 @@ from config import (
     warn_missing_future_secrets,
 )
 from content_engine.content_engine import run_content_decision_engine
+from caption_rules import generate_caption_samples
 from data_snapshot import generate_latest_snapshot
 from external_context import generate_external_context
 from growth_loop import apply_strategy_recommendation, generate_growth_report, persist_post_pattern, recommend_strategy_from_rows, score_posts
@@ -81,6 +82,7 @@ def build_parser() -> argparse.ArgumentParser:
     mode_group.add_argument("--growth-report", action="store_true", help="Generate the Jalapeno weekly Instagram growth report and store it in Supabase")
     mode_group.add_argument("--recommend-strategy", action="store_true", help="Preview the next Jalapeno Instagram growth strategy without mutating the active strategy")
     mode_group.add_argument("--apply-strategy", action="store_true", help="Apply the latest recommended Jalapeno Instagram growth strategy when JALAPENO_DRY_RUN=false")
+    mode_group.add_argument("--caption-samples", action="store_true", help="Print 20 curated caption samples without posting anything")
     parser.add_argument(
         "--refresh-external-context",
         action="store_true",
@@ -723,6 +725,12 @@ def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = Fals
     print(f"Weekly report dry run generated: {bool(weekly_report.body)}")
     print("Validation succeeded")
     print(f"Mode: {config.default_mode}")
+    return 0
+
+
+def run_caption_samples(count: int = 20) -> int:
+    samples = generate_caption_samples(count=count)
+    print(json.dumps(samples, indent=2, sort_keys=True))
     return 0
 
 
@@ -1846,6 +1854,8 @@ def main(argv: list[str] | None = None) -> int:
             return run_recommend_strategy()
         if args.apply_strategy:
             return run_apply_strategy()
+        if args.caption_samples:
+            return run_caption_samples()
         parser.error("one mode must be selected")
     except ConfigError as exc:
         print(f"Validation failed: {exc}")

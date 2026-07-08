@@ -466,6 +466,8 @@ The image pipeline also reads these config sections from `config.yaml`:
 1. It applies memory-based diversity bonuses and repetition penalties.
 1. It chooses a winner and runner-up.
 1. It generates the final caption package, hashtags, alt text, and image prompt.
+1. Caption generation stays inside the wing-specific style system: `send_to_friend`, `tag_someone`, `wing_debt`, `group_chat`, `craving_prompt`, `sauce_debate`, `wing_night`, `simple_hype`, or `comment_prompt`.
+1. Caption validation rejects generic meme slang, captions over 160 characters, literal `\n`, inline hashtags, and captions that drift away from Buffago's wing lane.
 1. It stores every candidate and the final decision record.
 1. Published winners later feed the long-term memory store.
 
@@ -1005,6 +1007,7 @@ Structured log events are emitted for:
 - candidate rejected as duplicate
 - candidate selected
 - caption generated
+  includes `selected_caption_style`, `caption_length`, `validation_passed`, and `fallback_used`
 - hashtags generated
 - alt text generated
 - image prompt generated

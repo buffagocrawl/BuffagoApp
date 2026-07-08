@@ -7,7 +7,7 @@ from typing import Any
 
 import requests
 
-from caption_rules import validate_caption
+from caption_rules import CAPTION_STYLE_ORDER, choose_caption_style, finalize_caption, style_guidance, validate_caption
 from ai_config import AIConfig, load_ai_config
 from ai_prompts import DEFAULT_BRAND_RULES, PROMPT_LIBRARY_VERSION, load_prompt_bundle
 from ai_schemas import (
@@ -166,6 +166,7 @@ class JalapenoAIClient:
         content_slot: str,
         output_schema_version: str,
         brand_rules: dict[str, Any] | None = None,
+        selected_caption_style: str | None = None,
     ) -> dict[str, Any]:
         prompt_name = "buffago_post"
         if request_type == "image_prompt":
@@ -175,7 +176,7 @@ class JalapenoAIClient:
         elif content_slot == "meme_post":
             prompt_name = "meme"
 
-        return {
+        payload = {
             "request_type": request_type,
             "agent_name": agent_name,
             "run_id": run_id,
@@ -192,6 +193,23 @@ class JalapenoAIClient:
             "routing_reason": routing_reason,
             "run_context": run_context.to_payload(),
         }
+        if request_type == "text_content" and selected_caption_style:
+            payload["caption_style_system"] = {
+                "selected_caption_style": selected_caption_style,
+                "selected_caption_style_guidance": style_guidance(selected_caption_style),
+                "allowed_caption_styles": list(CAPTION_STYLE_ORDER),
+                "caption_rules_summary": [
+                    "Do not be clever.",
+                    "Do not use internet slang.",
+                    "Do not personify wings, plates, photos, or posts.",
+                    "Do not use metaphor joke formats.",
+                    "Write one simple shareable wing caption.",
+                    "Prefer tag, send, comment, or share prompts.",
+                    "Keep under 120 characters when possible.",
+                    "Mention or clearly imply wings, wing night, sauce, flats/drums, cravings, friends, group chat, or someone owing wings.",
+                ],
+            }
+        return payload
 
     def _response_usage(self, response: dict[str, Any]) -> dict[str, Any]:
         usage = response.get("usage")
@@ -269,6 +287,7 @@ class JalapenoAIClient:
         external_context: dict[str, Any],
         errors: list[str],
         run_id: str | None = None,
+        selected_caption_style: str | None = None,
     ) -> AIRequestResult:
         if request_type == "image_prompt":
             output = fallback_image_output(
@@ -286,6 +305,7 @@ class JalapenoAIClient:
                 content_slot=content_slot,
                 internal_snapshot=internal_snapshot,
                 external_context=external_context,
+                forced_style=selected_caption_style,
             )
 
         usage = {
@@ -334,6 +354,12 @@ class JalapenoAIClient:
         brand_rules: dict[str, Any] | None = None,
     ) -> AIRequestResult:
         try:
+            selected_caption_style = None
+            if request_type == "text_content":
+                source_summary = external_context.get("source_summary") if isinstance(external_context.get("source_summary"), dict) else {}
+                raw_signals = source_summary.get("signals_used") if isinstance(source_summary, dict) else []
+                signals = [str(signal).strip() for signal in raw_signals] if isinstance(raw_signals, list) else []
+                selected_caption_style = choose_caption_style(seed=f"{run_id}:{content_slot}:{':'.join(signals) or 'fallback_context'}")
             payload = self._build_payload(
                 request_type=request_type,
                 selected_text_model=routing_decision.text_model,
@@ -347,6 +373,7 @@ class JalapenoAIClient:
                 content_slot=content_slot,
                 output_schema_version=output_schema_version,
                 brand_rules=brand_rules,
+                selected_caption_style=selected_caption_style,
             )
         except PromptLibraryError as exc:
             return self._fallback_result(
@@ -358,6 +385,7 @@ class JalapenoAIClient:
                 external_context=external_context,
                 errors=[str(exc)],
                 run_id=run_id,
+                selected_caption_style=selected_caption_style,
             )
         input_size_chars = len(json.dumps(payload, default=str))
         prompt_name = str(payload.get("prompt_name") or request_type)
@@ -393,12 +421,20 @@ class JalapenoAIClient:
             output = self._response_output(response)
             if request_type == "text_content":
                 output = normalize_text_output(output)
-                caption_validation = validate_caption(output["caption"])
-                if not caption_validation["passed"]:
-                    raise SchemaValidationError(
-                        "Caption validation failed: " + ", ".join(caption_validation["issues"])
-                    )
-                output["caption"] = caption_validation["normalized_caption"]
+                caption_plan = finalize_caption(
+                    seed=f"{run_id}:{content_slot}:{selected_caption_style or 'caption'}",
+                    style=selected_caption_style,
+                    raw_caption=output["caption"],
+                    allowed_styles=[selected_caption_style] if selected_caption_style else None,
+                    allow_openai_caption=True,
+                )
+                output["caption"] = caption_plan["caption"]
+                output["selected_caption_style"] = caption_plan["selected_caption_style"]
+                output["caption_source"] = caption_plan["caption_source"]
+                output["caption_length"] = caption_plan["validation"]["caption_length"]
+                output["validation_passed"] = caption_plan["validation_passed"]
+                output["validation_failure_reason"] = caption_plan["validation_failure_reason"]
+                output["fallback_used"] = caption_plan["fallback_used"]
             elif request_type == "image_prompt":
                 output = normalize_image_output(output)
             else:
@@ -411,6 +447,13 @@ class JalapenoAIClient:
             chosen_cta = output.get("cta") if isinstance(output.get("cta"), str) else None
             image_generation_prompt = output.get("image_prompt") if isinstance(output.get("image_prompt"), str) else None
             content_category = output.get("post_type") if isinstance(output.get("post_type"), str) else content_slot
+            caption_length = output.get("caption_length") if isinstance(output.get("caption_length"), int) else None
+            validation_passed = output.get("validation_passed") if isinstance(output.get("validation_passed"), bool) else None
+            logged_caption_style = output.get("selected_caption_style") if isinstance(output.get("selected_caption_style"), str) else selected_caption_style
+            caption_source = output.get("caption_source") if isinstance(output.get("caption_source"), str) else None
+            validation_failure_reason = output.get("validation_failure_reason") if isinstance(output.get("validation_failure_reason"), str) else None
+            generated_caption = output.get("caption") if isinstance(output.get("caption"), str) else None
+            fallback_used = bool(output.get("fallback_used")) if "fallback_used" in output else False
             review_score = 100.0 if safety.get("passed", False) else 0.0
             rejected_reason = None if safety.get("passed", False) else "; ".join(safety.get("reasons", []) or [])
             log_event(
@@ -432,8 +475,28 @@ class JalapenoAIClient:
                 chosen_cta=chosen_cta,
                 chosen_hashtags=chosen_hashtags,
                 image_generation_prompt=image_generation_prompt,
+                generated_caption=generated_caption,
+                selected_caption_style=logged_caption_style,
+                caption_source=caption_source,
+                caption_length=caption_length,
+                validation_passed=validation_passed,
+                validation_failure_reason=validation_failure_reason,
+                fallback_used=fallback_used,
             )
-            log_event(self.logger, f"ai_{request_type}_success", model=response_model, run_id=run_id, content_slot=content_slot)
+            log_event(
+                self.logger,
+                f"ai_{request_type}_success",
+                model=response_model,
+                run_id=run_id,
+                content_slot=content_slot,
+                selected_caption_style=logged_caption_style,
+                caption_source=caption_source,
+                generated_caption=generated_caption,
+                caption_length=caption_length,
+                validation_passed=validation_passed,
+                validation_failure_reason=validation_failure_reason,
+                fallback_used=fallback_used,
+            )
             return self._wrap_result(
                 request_type=request_type,
                 schema_version=output_schema_version,
@@ -457,9 +520,27 @@ class JalapenoAIClient:
                 external_context=external_context,
                 errors=errors,
                 run_id=run_id,
+                selected_caption_style=selected_caption_style,
             )
             generation_time_ms = int((time.perf_counter() - started_at) * 1000)
             fallback_output = fallback_result.output
+            fallback_caption_validation = (
+                validate_caption(fallback_output.get("caption", ""))
+                if request_type == "text_content" and isinstance(fallback_output.get("caption"), str)
+                else None
+            )
+            if fallback_caption_validation is not None:
+                fallback_output["caption"] = fallback_caption_validation["normalized_caption"]
+                fallback_output["caption_length"] = fallback_caption_validation["caption_length"]
+                fallback_output["validation_passed"] = fallback_caption_validation["passed"]
+                fallback_output["selected_caption_style"] = (
+                    fallback_output.get("selected_caption_style")
+                    if isinstance(fallback_output.get("selected_caption_style"), str)
+                    else selected_caption_style
+                )
+                fallback_output["caption_source"] = "fallback"
+                fallback_output["validation_failure_reason"] = ", ".join(fallback_caption_validation["reasons"]) if not fallback_caption_validation["passed"] else None
+                fallback_output["fallback_used"] = True
             log_event(
                 self.logger,
                 "ai_prompt_execution_completed",
@@ -479,6 +560,13 @@ class JalapenoAIClient:
                 chosen_cta=fallback_output.get("cta") if isinstance(fallback_output.get("cta"), str) else None,
                 chosen_hashtags=fallback_output.get("hashtags") if isinstance(fallback_output.get("hashtags"), list) else None,
                 image_generation_prompt=fallback_output.get("image_prompt") if isinstance(fallback_output.get("image_prompt"), str) else None,
+                generated_caption=fallback_output.get("caption") if isinstance(fallback_output.get("caption"), str) else None,
+                selected_caption_style=fallback_output.get("selected_caption_style") if isinstance(fallback_output.get("selected_caption_style"), str) else selected_caption_style,
+                caption_source=fallback_output.get("caption_source") if isinstance(fallback_output.get("caption_source"), str) else "fallback",
+                caption_length=fallback_output.get("caption_length") if isinstance(fallback_output.get("caption_length"), int) else None,
+                validation_passed=fallback_output.get("validation_passed") if isinstance(fallback_output.get("validation_passed"), bool) else None,
+                validation_failure_reason=fallback_output.get("validation_failure_reason") if isinstance(fallback_output.get("validation_failure_reason"), str) else None,
+                fallback_used=True,
             )
             return fallback_result
 

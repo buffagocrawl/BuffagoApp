@@ -4,7 +4,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any
 
-from caption_rules import pick_fallback_caption
+from caption_rules import choose_caption_style, finalize_caption
 from content_engine.visual_prompt_style import (
     apply_prompt_metadata,
     build_buffago_image_direction,
@@ -296,10 +296,19 @@ def fallback_text_output(
     content_slot: str,
     internal_snapshot: dict[str, Any],
     external_context: dict[str, Any],
+    forced_style: str | None = None,
 ) -> dict[str, Any]:
     signals = _signals_used_from_context(external_context)
     style_seed = f"{content_slot}:{':'.join(signals)}"
-    fallback_style, fallback_caption = pick_fallback_caption(seed=style_seed)
+    fallback_style = forced_style or choose_caption_style(seed=style_seed)
+    caption_plan = finalize_caption(
+        seed=style_seed,
+        style=fallback_style,
+        allowed_styles=[forced_style] if forced_style else None,
+        allow_openai_caption=False,
+    )
+    fallback_style = caption_plan["selected_caption_style"]
+    fallback_caption = caption_plan["caption"]
     if content_slot == "meme_post" or "sports_events" in signals:
         post_type = "meme"
         caption = fallback_caption
@@ -337,6 +346,11 @@ def fallback_text_output(
         "content_slot": content_slot,
         "post_type": post_type,
         "caption": caption,
+        "selected_caption_style": fallback_style,
+        "caption_source": "fallback",
+        "validation_passed": caption_plan["validation_passed"],
+        "validation_failure_reason": caption_plan["validation_failure_reason"],
+        "fallback_used": True,
         "hashtags": hashtags,
         "image_prompt": image_prompt,
         "alt_text": "A Buffago-style wing post with a local, food-first tone.",

@@ -5,10 +5,8 @@ from typing import Any
 
 from caption_rules import (
     CAPTION_STYLE_ORDER,
-    normalize_caption_text,
-    pick_fallback_caption,
-    pick_caption_for_style,
-    validate_caption,
+    choose_caption_style,
+    finalize_caption,
 )
 from content_engine.alt_text_generator import generate_alt_text
 from content_engine.candidate_generator import ContentCandidate
@@ -36,6 +34,8 @@ class CaptionPackage:
     validation_passed: bool = False
     fallback_used: bool = False
     caption_length: int = 0
+    caption_source: str = ""
+    validation_failure_reason: str | None = None
 
 
 def _style_pool(candidate: ContentCandidate, external_context: dict[str, Any]) -> list[str]:
@@ -45,9 +45,9 @@ def _style_pool(candidate: ContentCandidate, external_context: dict[str, Any]) -
     sports_events = list(external_context.get("sports_events", []) or [])
 
     if candidate.cta_category in {"comment", "question"}:
-        styles.extend(["tag_someone", "sauce_debate"])
+        styles.extend(["tag_someone", "sauce_debate", "comment_prompt"])
     if candidate.cta_category == "save":
-        styles.extend(["craving_prompt", "weekend_wings"])
+        styles.extend(["craving_prompt", "wing_night"])
     if content_type in {"meme", "funny_observation", "challenge", "leaderboard"}:
         styles.extend(["group_chat", "wing_debt", "tag_someone"])
     if "sauce" in " ".join(candidate.food_categories).lower():
@@ -55,7 +55,7 @@ def _style_pool(candidate: ContentCandidate, external_context: dict[str, Any]) -
     if content_type in {"restaurant_spotlight", "hidden_gem", "sports_tie_in", "food_holiday"}:
         styles.extend(["send_to_friend", "craving_prompt"])
     if day_of_week in {"friday", "saturday", "sunday"} or sports_events:
-        styles.append("weekend_wings")
+        styles.append("wing_night")
 
     unique: list[str] = []
     for style in styles + list(CAPTION_STYLE_ORDER):
@@ -67,8 +67,9 @@ def _style_pool(candidate: ContentCandidate, external_context: dict[str, Any]) -
 def _pick_caption(candidate: ContentCandidate, external_context: dict[str, Any]) -> tuple[str, str]:
     style_pool = _style_pool(candidate, external_context)
     style_seed = f"{candidate.candidate_id}:{candidate.content_type}:style"
-    style, caption = pick_fallback_caption(seed=style_seed, allowed_styles=style_pool)
-    return style, caption
+    style = choose_caption_style(seed=style_seed, allowed_styles=style_pool)
+    caption_plan = finalize_caption(seed=style_seed, style=style, allowed_styles=[style], allow_openai_caption=False)
+    return caption_plan["selected_caption_style"], caption_plan["caption"]
 
 
 def _quality_review(
@@ -101,6 +102,7 @@ def _quality_review(
         "prompt_version": PROMPT_LIBRARY_VERSION,
         "fallback_used": fallback_used,
         "caption_length": validation["caption_length"],
+        "validation_passed": validation["passed"],
     }
 
 
@@ -117,23 +119,23 @@ def generate_caption_package(
     image_prompt = generate_image_prompt(candidate, snapshot=snapshot, external_context=external_context)
 
     selected_caption_style, draft_caption = _pick_caption(candidate, external_context)
-    cleaned_caption = normalize_caption_text(draft_caption)
-    validation = validate_caption(cleaned_caption)
+    caption_plan = finalize_caption(
+        seed=f"{candidate.candidate_id}:{candidate.content_type}:caption",
+        style=selected_caption_style,
+        raw_caption=draft_caption,
+        allowed_styles=[selected_caption_style],
+        allow_openai_caption=False,
+    )
+    cleaned_caption = caption_plan["caption"]
+    validation = caption_plan["validation"]
     cleanup_notes = [
         "Caption generator uses short Buffago wing templates with strict validation.",
         f"Selected caption style: {selected_caption_style}.",
+        f"Caption source: {caption_plan['caption_source']}.",
     ]
-    fallback_used = False
+    fallback_used = bool(caption_plan["fallback_used"])
 
-    if not validation["passed"]:
-        fallback_used = True
-        fallback_style, fallback_caption = pick_fallback_caption(
-            seed=f"{candidate.candidate_id}:{candidate.content_type}:fallback",
-            allowed_styles=_style_pool(candidate, external_context),
-        )
-        selected_caption_style = fallback_style
-        cleaned_caption = normalize_caption_text(fallback_caption)
-        validation = validate_caption(cleaned_caption)
+    if fallback_used:
         cleanup_notes.append("Primary caption failed validation and was replaced with a curated fallback.")
 
     cleanup_notes.append("caption_cleanup prompt reviewed against local caption rules.")
@@ -169,4 +171,6 @@ def generate_caption_package(
         validation_passed=validation["passed"],
         fallback_used=fallback_used,
         caption_length=validation["caption_length"],
+        caption_source=caption_plan["caption_source"],
+        validation_failure_reason=caption_plan["validation_failure_reason"],
     )

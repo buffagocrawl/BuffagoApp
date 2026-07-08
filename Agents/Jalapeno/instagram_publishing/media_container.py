@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from caption_rules import finalize_caption, validate_caption
 from logging_utils import log_event
 
 
@@ -257,6 +258,33 @@ def load_approved_post_from_artifacts(
     if media_kind == "reel" and not public_video_url:
         raise ValueError("Approved Reel is missing public_video_url")
 
+    caption_validation = validate_caption(caption)
+    caption_source = "template"
+    fallback_used = False
+    validation_failure_reason = None
+    if not caption_validation["passed"]:
+        caption_plan = finalize_caption(
+            seed=f"{run_id}:{candidate_id}:{content_type}",
+            style=_string_or_none(winner.get("selected_caption_style")) or _string_or_none(winner.get("caption_style")),
+            raw_caption=caption,
+            allow_openai_caption=False,
+        )
+        caption = caption_plan["caption"]
+        caption_validation = caption_plan["validation"]
+        caption_source = caption_plan["caption_source"]
+        fallback_used = caption_plan["fallback_used"]
+        validation_failure_reason = caption_plan["validation_failure_reason"]
+
+    metadata = dict(content_decision.get("metadata") or {}) if isinstance(content_decision.get("metadata"), dict) else {}
+    metadata.update(
+        {
+            "caption_source": caption_source,
+            "caption_validation_passed": caption_validation["passed"],
+            "caption_validation_failure_reason": validation_failure_reason,
+            "caption_fallback_used": fallback_used,
+        }
+    )
+
     return ApprovedInstagramPost(
         run_id=run_id,
         candidate_id=candidate_id,
@@ -308,7 +336,7 @@ def load_approved_post_from_artifacts(
         image_quality_score=image_quality_score,
         publish_gate_score_used=publish_gate_score_used,
         publish_gate_score_source=publish_gate_score_source,
-        metadata=content_decision.get("metadata") if isinstance(content_decision.get("metadata"), dict) else {},
+        metadata=metadata if metadata else (content_decision.get("metadata") if isinstance(content_decision.get("metadata"), dict) else {}),
     )
 
 

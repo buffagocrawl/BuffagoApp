@@ -11,7 +11,7 @@ PROJECT_DIR = Path(__file__).resolve().parents[1]
 if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
-from caption_rules import CAPTION_STYLE_ORDER, validate_caption  # noqa: E402
+from caption_rules import CAPTION_STYLE_ORDER, generate_caption_samples, validate_caption  # noqa: E402
 from ai_client import JalapenoAIClient  # noqa: E402
 from config import initialize_logging, load_configuration  # noqa: E402
 from content_engine.candidate_generator import ContentCandidate  # noqa: E402
@@ -59,14 +59,54 @@ def _candidate() -> ContentCandidate:
     )
 
 
-def test_validate_caption_rejects_generic_phrase_and_literal_newline() -> None:
-    result = validate_caption("POV\\nmain character energy at dinner.")
+@pytest.mark.parametrize(
+    "caption",
+    [
+        "this wing post understood the assignment better than a group chat",
+        "If this wing had a voicemail, it would just say bring napkins.",
+        "POV: sauce chose violence",
+        "main character energy on a plate",
+        "It's giving crispy chaos.",
+    ],
+)
+def test_validate_caption_rejects_banned_examples(caption: str) -> None:
+    result = validate_caption(caption)
 
     assert result["passed"] is False
-    assert "literal_newline_escape_present" in result["issues"]
-    assert "banned_phrase:pov" in result["issues"]
-    assert "banned_phrase:main character energy" in result["issues"]
-    assert "missing_wing_signal" in result["issues"]
+    assert result["valid"] is False
+    assert result["issues"]
+
+
+@pytest.mark.parametrize(
+    "caption",
+    [
+        "Send this to someone who owes you wings.",
+        "Tag the friend who would destroy this plate.",
+        "If they don't answer in 10 minutes, they owe you wings.",
+        "Comment flats or drums.",
+        "Send this to the group chat and see who folds first.",
+    ],
+)
+def test_validate_caption_accepts_good_examples(caption: str) -> None:
+    result = validate_caption(caption)
+
+    assert result["passed"] is True
+    assert result["valid"] is True
+    assert result["issues"] == []
+
+
+def test_validate_caption_rejects_generic_food_copy_without_wing_specificity() -> None:
+    result = validate_caption("If this made you hungry, you know what to do.")
+
+    assert result["passed"] is False
+    assert "missing_wing_specificity" in result["issues"]
+
+
+def test_validate_caption_rejects_hashtags_inside_caption() -> None:
+    result = validate_caption("Send this to someone who owes you wings. #Buffago")
+
+    assert result["passed"] is False
+    assert "hashtags_belong_outside_caption" in result["issues"]
 
 
 def test_generate_caption_package_uses_allowed_styles_and_short_caption() -> None:
@@ -80,9 +120,11 @@ def test_generate_caption_package_uses_allowed_styles_and_short_caption() -> Non
     assert package.caption_type == package.caption_style
     assert package.validation_passed is True
     assert package.fallback_used is False
+    assert package.caption_source == "template"
     assert package.caption_length <= 160
     assert "\\n" not in package.caption
     assert "\n" not in package.caption
+    assert package.selected_caption_style
 
 
 def test_generate_caption_package_falls_back_when_primary_caption_is_invalid(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -99,9 +141,20 @@ def test_generate_caption_package_falls_back_when_primary_caption_is_invalid(mon
 
     assert package.fallback_used is True
     assert package.validation_passed is True
+    assert package.caption_source == "fallback"
     assert package.caption_style in CAPTION_STYLE_ORDER
     assert "main character energy" not in package.caption.lower()
     assert "\\n" not in package.caption
+
+
+def test_generate_caption_samples_returns_20_valid_records() -> None:
+    samples = generate_caption_samples()
+
+    assert len(samples) == 20
+    assert {sample["source"] for sample in samples} <= {"template"}
+    assert all(sample["validation"]["valid"] is True for sample in samples)
+    assert all(sample["caption"] for sample in samples)
+    assert all(sample["style"] in CAPTION_STYLE_ORDER for sample in samples)
 
 
 def test_content_engine_logs_caption_style_validation_and_fallback_fields(tmp_path: Path) -> None:
@@ -177,3 +230,6 @@ def test_ai_text_generation_uses_curated_fallback_when_caption_validation_fails(
     assert result.output["caption"]
     assert "main character energy" not in result.output["caption"].lower()
     assert "\\n" not in result.output["caption"]
+    assert result.output["validation_passed"] is True
+    assert result.output["caption_length"] <= 160
+    assert result.output["selected_caption_style"] in CAPTION_STYLE_ORDER

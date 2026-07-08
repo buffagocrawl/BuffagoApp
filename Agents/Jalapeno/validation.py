@@ -327,6 +327,13 @@ def validate_phase5_environment(
         run_id=active_run_id,
         content_slot="buffago_post",
         used_fallback=text_result.used_fallback,
+        caption_source=text_result.output.get("caption_source"),
+        generated_caption=text_result.output.get("caption"),
+        selected_caption_style=text_result.output.get("selected_caption_style"),
+        caption_length=text_result.output.get("caption_length"),
+        validation_passed=text_result.output.get("validation_passed"),
+        validation_failure_reason=text_result.output.get("validation_failure_reason"),
+        fallback_used=text_result.output.get("fallback_used"),
     )
 
     log_event(

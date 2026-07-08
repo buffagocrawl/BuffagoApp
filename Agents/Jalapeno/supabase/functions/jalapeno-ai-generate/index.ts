@@ -26,6 +26,13 @@ interface JalapenoAIRequest {
   selected_image_model?: string;
   routing_reason?: string;
   run_context?: Record<string, unknown>;
+  caption_style_system?: {
+    selected_caption_style?: string;
+    selected_caption_style_guidance?: string;
+    allowed_caption_styles?: string[];
+    caption_rules_summary?: string[];
+  };
+  selected_caption_style?: string;
 }
 
 interface UsagePayload {
@@ -154,6 +161,379 @@ const BRAND_VALIDATION_SCHEMA = {
     notes: { type: "array", items: { type: "string" } },
   },
 };
+
+const CAPTION_STYLE_ORDER = [
+  "send_to_friend",
+  "tag_someone",
+  "wing_debt",
+  "group_chat",
+  "craving_prompt",
+  "sauce_debate",
+  "wing_night",
+  "simple_hype",
+  "comment_prompt",
+];
+
+const CAPTION_STYLE_TEMPLATES: Record<string, string[]> = {
+  send_to_friend: [
+    "Send this to someone who owes you wings.",
+    "Share this with someone who needs a wing night.",
+    "Send this to your wing night crew.",
+    "Send this to someone who would say yes immediately.",
+    "Share this with the friend who never says no to wings.",
+  ],
+  tag_someone: [
+    "Tag the friend who would destroy this plate.",
+    "Tag the friend who says they're only having one wing.",
+    "Tag the person who always orders extra ranch.",
+    "Tag the blue cheese defender.",
+    "Tag your wing night MVP.",
+  ],
+  wing_debt: [
+    "If they don't answer in 10 minutes, they owe you wings.",
+    "If they ignore this, they're buying wings.",
+    "Someone in your group chat owes you a wing night.",
+    "If they flake on wing night again, they owe the whole table wings.",
+    "You can settle a lot with one properly funded wing night.",
+  ],
+  group_chat: [
+    "Send this to the group chat and see who folds first.",
+    "Someone in your group chat needs wings.",
+    "The only group chat decision that matters: wings.",
+    "Your group chat needs this kind of pressure.",
+    "This plate needs a wing crew.",
+  ],
+  craving_prompt: [
+    "If this made you hungry, send it to the person you're blaming.",
+    "This is your sign to order wings.",
+    "Share this with someone who needs a wing night.",
+    "Save this for your next wing run.",
+    "This is your sign to plan wings.",
+  ],
+  sauce_debate: [
+    "Tag someone who takes sauce choice way too seriously.",
+    "Comment your sauce pick.",
+    "Comment your go-to wing order.",
+    "Comment the sauce order you would not let your friends mess up.",
+    "The answer is wings. The only question is sauce.",
+  ],
+  wing_night: [
+    "Wing night is calling.",
+    "Save this for wing night.",
+    "Send this to your wing night crew.",
+    "This is your sign to plan wings.",
+    "Crispy wings deserve witnesses.",
+  ],
+  simple_hype: [
+    "Crispy wings deserve witnesses.",
+    "Someone you know needs these wings.",
+    "Hot wings, no small talk.",
+    "The answer is wings.",
+    "These wings are not here to be ignored.",
+  ],
+  comment_prompt: [
+    "Comment flats or drums.",
+    "Comment your go-to wing order.",
+    "Comment your sauce pick.",
+    "Comment the sauce order you would not let your friends mess up.",
+    "Comment if you're team flats or team drums.",
+  ],
+};
+
+const CURATED_CAPTIONS = new Set<string>([
+  "Send this to someone who owes you wings.",
+  "Tag the friend who would destroy this plate.",
+  "If they don't answer in 10 minutes, they owe you wings.",
+  "Share this with someone who needs a wing night.",
+  "This is your sign to order wings.",
+  "Tag someone who takes sauce choice way too seriously.",
+  "Send this to the group chat and see who folds first.",
+  "Wing night is calling.",
+  "Save this for your next wing run.",
+  "Someone you know needs these wings.",
+  "Comment your go-to wing order.",
+  "Tag the person who always says they're only having one.",
+  "Send this to your wing night crew.",
+  "Crispy, saucy, dangerous.",
+  "The group chat needs a wing night.",
+  ...Object.values(CAPTION_STYLE_TEMPLATES).flat(),
+]);
+
+const BANNED_GENERIC_PHRASES = [
+  "understood the assignment",
+  "main character energy",
+  "vibes are immaculate",
+  "pov",
+  "it's giving",
+  "it’s giving",
+  "its giving",
+  "no crumbs",
+  "rent free",
+  "core memory",
+  "era",
+  "lowkey",
+  "highkey",
+  "chose violence",
+  "if this wing had",
+  "if this plate had",
+  "if this post had",
+  "had a voicemail",
+  "left a voicemail",
+  "called and said",
+  "texted and said",
+  "this wing called",
+  "this plate called",
+  "this post called",
+  "bring napkins",
+  "game changer",
+  "foodie fam",
+  "must try",
+  "you need this",
+  "epic",
+  "literally",
+  "obsessed",
+  "chef's kiss",
+  "this slaps",
+  "craving unlocked",
+  "internet is broken",
+  "living rent free",
+  "sheesh",
+  "no notes",
+  "elite",
+  "midweek mood",
+];
+
+const PRIMARY_WING_SIGNAL_PATTERNS = [
+  /\bwing\b/i,
+  /\bwings\b/i,
+  /\bwing night\b/i,
+  /\bwing run\b/i,
+  /\bsauce\b/i,
+  /\bsaucy\b/i,
+  /\bflats\b/i,
+  /\bdrums\b/i,
+  /\branch\b/i,
+  /\bblue cheese\b/i,
+  /\bbuffalo\b/i,
+];
+
+const SUPPORTING_SIGNAL_PATTERNS = [
+  /\bcraving\b/i,
+  /\bhungry\b/i,
+  /\bgroup chat\b/i,
+  /\bfriend\b/i,
+  /\bcrew\b/i,
+  /\bplate\b/i,
+  /\border\b/i,
+  /\bsplit\b/i,
+  /\bowe\b/i,
+  /\bowes\b/i,
+  /\btag\b/i,
+  /\bsend\b/i,
+  /\bshare\b/i,
+  /\bcomment\b/i,
+  /\bsave\b/i,
+  /\bdebate\b/i,
+];
+
+const PERSONIFICATION_PATTERNS = [
+  /\bif this (?:wing|plate|post|photo) had\b/i,
+  /\bhad a voicemail\b/i,
+  /\bleft a voicemail\b/i,
+  /\bcalled and said\b/i,
+  /\btexted and said\b/i,
+  /\bthis (?:wing|plate|post|photo) called\b/i,
+];
+
+function normalizeCaptionText(text: string): string {
+  return text.replace(/\\n/g, " ").replace(/\r/g, " ").replace(/\n/g, " ").replace(/\s+/g, " ").replace(/\s+([?.!,])/g, "$1").replace(/([?.!,])([A-Za-z])/g, "$1 $2").trim();
+}
+
+function hashSeed(seed: string): number {
+  let hash = 2166136261;
+  for (let index = 0; index < seed.length; index += 1) {
+    hash ^= seed.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function pickFrom(values: string[], seed: string): string {
+  return values[hashSeed(seed) % values.length];
+}
+
+function chooseCaptionStyle(seed: string, allowedStyles?: string[]): string {
+  const styles = (allowedStyles?.length ? allowedStyles : CAPTION_STYLE_ORDER).filter((style) => Object.prototype.hasOwnProperty.call(CAPTION_STYLE_TEMPLATES, style));
+  const pool = styles.length > 0 ? styles : CAPTION_STYLE_ORDER;
+  return pickFrom(pool, `${seed}:style`);
+}
+
+function pickCaptionForStyle(style: string, seed: string): string {
+  const pool = CAPTION_STYLE_TEMPLATES[style] ?? CAPTION_STYLE_TEMPLATES.simple_hype;
+  return pickFrom(pool, `${seed}:caption`);
+}
+
+function countEmoji(text: string): number {
+  return Array.from(text).filter((char) => char.codePointAt(0) !== undefined && char.codePointAt(0)! >= 0x1f300).length;
+}
+
+function validateCaption(caption: string): { valid: boolean; reasons: string[]; normalized_caption: string; caption_length: number } {
+  const normalized = normalizeCaptionText(caption);
+  const lowered = normalized.toLowerCase();
+  const reasons: string[] = [];
+  const isCurated = CURATED_CAPTIONS.has(normalized);
+
+  if (!normalized) {
+    reasons.push("empty_caption");
+  }
+  if (normalized.length > 160) {
+    reasons.push(`caption_too_long:${normalized.length}`);
+  }
+  if (caption.includes("\\n")) {
+    reasons.push("literal_newline_escape_present");
+  }
+  if (normalized !== caption && (caption.includes("\n") || caption.includes("\r")) && !caption.includes("\\n")) {
+    reasons.push("contains_actual_newlines");
+  }
+  for (const phrase of BANNED_GENERIC_PHRASES) {
+    if (phrase === "pov") {
+      if (/\bpov\b/i.test(lowered)) {
+        reasons.push("banned_phrase:pov");
+      }
+    } else if (lowered.includes(phrase)) {
+      reasons.push(`banned_phrase:${phrase}`);
+    }
+  }
+  for (const pattern of PERSONIFICATION_PATTERNS) {
+    if (pattern.test(lowered)) {
+      reasons.push("personifies_wing_or_plate");
+      break;
+    }
+  }
+  const hasPrimarySignal = PRIMARY_WING_SIGNAL_PATTERNS.some((pattern) => pattern.test(lowered));
+  const hasSupportingSignal = SUPPORTING_SIGNAL_PATTERNS.some((pattern) => pattern.test(lowered));
+  const hasFriendOrGroupCta = [/\bgroup chat\b/i, /\bfriend\b/i, /\bcrew\b/i, /\bplate\b/i, /\border\b/i, /\bowe\b/i, /\bowes\b/i].some((pattern) => pattern.test(lowered));
+  if (!isCurated && !hasPrimarySignal && !hasSupportingSignal) {
+    reasons.push("missing_buffago_signal");
+  }
+  if (!isCurated && !hasPrimarySignal && !hasFriendOrGroupCta) {
+    reasons.push("missing_wing_specificity");
+  }
+  if (!isCurated && !hasPrimarySignal && !hasSupportingSignal) {
+    reasons.push("too_abstract_or_generic");
+  }
+  if ((normalized.match(/[.!?]/g) ?? []).length > 2) {
+    reasons.push("too_many_sentences");
+  }
+  if (normalized.includes("#")) {
+    reasons.push("hashtags_belong_outside_caption");
+  }
+  if (countEmoji(normalized) > 2) {
+    reasons.push("too_many_emojis");
+  }
+
+  return {
+    valid: reasons.length === 0,
+    reasons,
+    normalized_caption: normalized,
+    caption_length: normalized.length,
+  };
+}
+
+function finalizeCaption(seed: string, style?: string, rawCaption?: string, allowedStyles?: string[]): {
+  caption: string;
+  caption_source: "template" | "openai" | "fallback";
+  selected_caption_style: string;
+  validation_passed: boolean;
+  validation_failure_reason: string | null;
+  fallback_used: boolean;
+  validation: { valid: boolean; reasons: string[]; normalized_caption: string; caption_length: number };
+} {
+  const selectedStyle = style && Object.prototype.hasOwnProperty.call(CAPTION_STYLE_TEMPLATES, style)
+    ? style
+    : chooseCaptionStyle(seed, allowedStyles);
+  const curatedCaption = pickCaptionForStyle(selectedStyle, seed);
+  const curatedValidation = validateCaption(curatedCaption);
+  const rawValidation = rawCaption && rawCaption.trim() ? validateCaption(rawCaption) : null;
+  if (rawValidation?.valid && CURATED_CAPTIONS.has(rawValidation.normalized_caption)) {
+    return {
+      caption: rawValidation.normalized_caption,
+      caption_source: "openai",
+      selected_caption_style: selectedStyle,
+      validation_passed: true,
+      validation_failure_reason: null,
+      fallback_used: false,
+      validation: rawValidation,
+    };
+  }
+  const fallback = Boolean(rawCaption && rawValidation && !rawValidation.valid);
+  return {
+    caption: curatedValidation.normalized_caption,
+    caption_source: fallback ? "fallback" : "template",
+    selected_caption_style: selectedStyle,
+    validation_passed: curatedValidation.valid,
+    validation_failure_reason: curatedValidation.valid ? null : curatedValidation.reasons.join(", "),
+    fallback_used: fallback,
+    validation: curatedValidation,
+  };
+}
+
+function requireString(value: unknown, fieldName: string): string {
+  if (typeof value !== "string" || !value.trim()) {
+    throw new Error(`Missing or invalid string field: ${fieldName}`);
+  }
+  return value.trim();
+}
+
+function requireStringList(value: unknown, fieldName: string): string[] {
+  if (!Array.isArray(value)) {
+    throw new Error(`Missing or invalid list field: ${fieldName}`);
+  }
+  return value.map((item) => {
+    if (typeof item !== "string" || !item.trim()) {
+      throw new Error(`Missing or invalid string item in field: ${fieldName}`);
+    }
+    return item.trim();
+  });
+}
+
+function normalizeTextOutput(payload: Record<string, unknown>): Record<string, unknown> {
+  return {
+    content_slot: requireString(payload.content_slot, "content_slot"),
+    post_type: requireString(payload.post_type, "post_type"),
+    caption: requireString(payload.caption, "caption"),
+    hashtags: requireStringList(payload.hashtags, "hashtags"),
+    image_prompt: requireString(payload.image_prompt, "image_prompt"),
+    alt_text: requireString(payload.alt_text, "alt_text"),
+    content_angle: requireString(payload.content_angle, "content_angle"),
+    source_signals_used: requireStringList(payload.source_signals_used, "source_signals_used"),
+    why_this_post: requireString(payload.why_this_post, "why_this_post"),
+    brand_safety_notes: requireStringList(payload.brand_safety_notes, "brand_safety_notes"),
+    confidence_score: Number(payload.confidence_score),
+  };
+}
+
+function normalizeImageOutput(payload: Record<string, unknown>): Record<string, unknown> {
+  return {
+    content_slot: requireString(payload.content_slot, "content_slot"),
+    image_prompt: requireString(payload.image_prompt, "image_prompt"),
+    style: requireString(payload.style, "style"),
+    needs_text_overlay: Boolean(payload.needs_text_overlay),
+    text_overlay: typeof payload.text_overlay === "string" ? payload.text_overlay.trim() : null,
+    composition_notes: requireString(payload.composition_notes, "composition_notes"),
+    negative_prompt_guidance: requireString(payload.negative_prompt_guidance, "negative_prompt_guidance"),
+    brand_safety_notes: requireStringList(payload.brand_safety_notes, "brand_safety_notes"),
+  };
+}
+
+function normalizeBrandValidationOutput(payload: Record<string, unknown>): Record<string, unknown> {
+  return {
+    passed: Boolean(payload.passed),
+    risk_level: requireString(payload.risk_level, "risk_level"),
+    reasons: requireStringList(payload.reasons, "reasons"),
+    notes: requireStringList(payload.notes, "notes"),
+  };
+}
 
 function jsonResponse(body: Envelope, status = 200): Response {
   return new Response(JSON.stringify(body, null, 2), {
@@ -610,7 +990,7 @@ async function handleTextOrImageRequest(
 
     const systemPrompt = request.request_type === "image_prompt"
       ? "Generate a production-ready Buffago image prompt as cinematic comedy scene direction. Include supported visual metadata. Return only the structured JSON requested."
-      : "Generate a ready-to-post Buffago caption package. Return only the structured JSON requested.";
+      : "Generate a ready-to-post Buffago caption package. Use template-first captions, do not be clever, do not use internet slang, do not personify wings or plates, and keep captions short and shareable. Return only the structured JSON requested.";
     const promptLibrary = normalizePromptLibrary(request.prompt_library);
     const promptLibraryVersion = request.prompt_library_version ?? "prompt-library-v1";
     const input = [
@@ -639,11 +1019,35 @@ async function handleTextOrImageRequest(
     );
 
     const outputText = extractOutputText(response);
-    const output = parseJsonObject(outputText);
-    const textValues = collectFields(output, ["caption", "image_prompt", "alt_text", "content_angle", "why_this_post", "text_overlay"]);
-    const safety = scanSafety(textValues);
     const usage = extractUsage(response);
     usage.estimated_cost_usd = estimatedCost(usage, "text_model");
+
+    let output = parseJsonObject(outputText);
+    if (request.request_type === "text_content") {
+      const normalized = normalizeTextOutput(output);
+      const requestedStyle = request.caption_style_system?.selected_caption_style ?? request.selected_caption_style ?? undefined;
+      const captionPlan = finalizeCaption(
+        `${request.run_id}:${request.content_slot}:${requestedStyle ?? "caption"}`,
+        requestedStyle,
+        typeof normalized.caption === "string" ? normalized.caption : undefined,
+        request.caption_style_system?.allowed_caption_styles,
+      );
+      output = {
+        ...normalized,
+        caption: captionPlan.caption,
+        selected_caption_style: captionPlan.selected_caption_style,
+        caption_source: captionPlan.caption_source,
+        caption_length: captionPlan.validation.caption_length,
+        validation_passed: captionPlan.validation_passed,
+        validation_failure_reason: captionPlan.validation_failure_reason,
+        fallback_used: captionPlan.fallback_used,
+      };
+    } else if (request.request_type === "image_prompt") {
+      output = normalizeImageOutput(output);
+    }
+
+    const textValues = collectFields(output, ["caption", "image_prompt", "alt_text", "content_angle", "why_this_post", "text_overlay"]);
+    const safety = scanSafety(textValues);
 
     if (!safety.passed) {
       return {

@@ -332,8 +332,11 @@ class ContentDecisionEngine:
             score=winner_caption.quality_review.get("score"),
             approved=winner_caption.quality_review.get("approved"),
             selected_caption_style=winner_caption.selected_caption_style,
+            caption_source=winner_caption.caption_source,
+            generated_caption=winner_caption.caption,
             caption_length=winner_caption.caption_length,
             validation_passed=winner_caption.validation_passed,
+            validation_failure_reason=winner_caption.validation_failure_reason,
             fallback_used=winner_caption.fallback_used,
         )
         log_event(logger, "hashtags_generated", run_id=active_run_id, candidate_id=selection.winner.candidate.candidate_id, hashtag_count=len(winner_caption.hashtags))
