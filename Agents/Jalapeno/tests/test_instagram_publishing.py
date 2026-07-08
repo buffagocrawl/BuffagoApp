@@ -25,7 +25,7 @@ def _sample_post() -> ApprovedInstagramPost:
     return ApprovedInstagramPost(
         run_id="11111111-1111-1111-1111-111111111111",
         candidate_id="22222222-2222-2222-2222-222222222222",
-        caption="Buffago test caption",
+        caption="Send this to someone who owes you wings.",
         hashtags=["buffago", "wingnight"],
         alt_text="A test alt text",
         image_prompt="A test prompt",
@@ -38,6 +38,7 @@ def _sample_post() -> ApprovedInstagramPost:
         prompt_quality=100,
         approved=True,
         scheduled_post_type="buffago_post",
+        overlay_text="SEND THIS TO\nYOUR WING CREW",
     )
 
 
@@ -45,7 +46,7 @@ def _sample_reel() -> ApprovedInstagramPost:
     return ApprovedInstagramPost(
         run_id="11111111-1111-1111-1111-111111111111",
         candidate_id="22222222-2222-2222-2222-222222222222",
-        caption="8pm wing check.",
+        caption="Send this to the group chat and start the debate.",
         hashtags=["buffago", "wingnight"],
         alt_text=None,
         image_prompt="Preloaded Supabase Storage wing video asset; no AI image or video generated.",
@@ -174,7 +175,7 @@ def test_buffago_validated_image_quality_overrides_candidate_score_78(tmp_path: 
         "winner": {
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "restaurant_spotlight",
-            "caption": "Buffago test caption",
+            "caption": "Send this to someone who owes you wings.",
             "hashtags": ["buffago", "wingnight"],
             "image_prompt": "A hero plate of wings",
             "approved": True,
@@ -221,7 +222,7 @@ def test_buffago_failed_image_validation_blocks_even_with_quality_100() -> None:
         "winner": {
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "restaurant_spotlight",
-            "caption": "Buffago test caption",
+            "caption": "Send this to someone who owes you wings.",
             "hashtags": ["buffago", "wingnight"],
             "image_prompt": "A hero plate of wings",
             "approved": True,
@@ -270,12 +271,27 @@ def test_image_precheck_blocks_missing_image_url() -> None:
     assert result.reason == "missing public_image_url"
 
 
+def test_image_precheck_blocks_mismatched_overlay_and_caption() -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    config = replace(config, instagram=replace(config.instagram, enabled=True, dry_run=False))
+    post = replace(
+        _sample_post(),
+        caption="Send this to the group chat and start the timer.",
+        overlay_text="FLATS OR DRUMS?\nPICK A SIDE.",
+    )
+
+    result = precheck_approved_post(config, post, dry_run=False, test_mode=False)
+
+    assert result.passed is False
+    assert result.reason == "creative validation failed: caption_overlay_mismatch"
+
+
 def test_reel_container_payload_uses_video_url_and_redacts_token() -> None:
     payload, safe_payload = safe_container_request_payload(
         image_url="https://example.com/image.jpg",
         video_url="https://example.com/video.mp4",
         media_kind="reel",
-        caption="Test Reel",
+        caption="Send this to your wing crew.",
         access_token="secret-token",
     )
 
@@ -294,6 +310,38 @@ def test_reel_precheck_allows_supabase_video_without_image_validation() -> None:
     assert result.passed is True
 
 
+def test_load_approved_post_regenerates_bad_overlay_text() -> None:
+    content_decision = {
+        "run_id": "11111111-1111-1111-1111-111111111111",
+        "scheduled_post_type": "buffago_post",
+        "winner": {
+            "candidate_id": "22222222-2222-2222-2222-222222222222",
+            "content_type": "restaurant_spotlight",
+            "caption": "Send this and start the timer.",
+            "hashtags": ["buffago", "wingnight"],
+            "image_prompt": "A hero plate of wings",
+            "approved": True,
+            "overlay_text": "IF THIS WING HAD A VOICEMAIL",
+        },
+        "decision_summary": {"approved": True},
+    }
+    image_pipeline = {
+        "result": {
+            "public_url": "https://example.com/public-image.jpg",
+            "image_source": "real_ai",
+            "image_validation_status": "passed",
+            "prompt_quality": 100,
+        }
+    }
+
+    post = load_approved_post_from_artifacts(content_decision, image_pipeline=image_pipeline)
+
+    assert post.overlay_text != "IF THIS WING HAD A VOICEMAIL"
+    assert "voicemail" not in (post.overlay_text or "").lower()
+    assert post.metadata["overlay_fallback_used"] is True
+    assert post.metadata["post_pair_validation_passed"] is True
+
+
 def test_reel_artifact_uses_processed_video_when_overlay_completed() -> None:
     content_decision = {
         "run_id": "11111111-1111-1111-1111-111111111111",
@@ -301,7 +349,7 @@ def test_reel_artifact_uses_processed_video_when_overlay_completed() -> None:
         "winner": {
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "daily_wing_reel",
-            "caption": "Daily wing reel because the scroll deserved sauce.",
+            "caption": "Settle it in the comments.",
             "hashtags": ["buffago"],
             "image_prompt": "Preloaded Supabase Storage wing video asset; no AI image or video generated.",
             "approved": True,
@@ -312,7 +360,7 @@ def test_reel_artifact_uses_processed_video_when_overlay_completed() -> None:
             "storage_path": "processed/original_texted.mp4",
             "original_storage_path": "original.mp4",
             "processed_storage_path": "processed/original_texted.mp4",
-            "overlay_text": "THE SCROLL DESERVED SAUCE",
+            "overlay_text": "FLATS OR DRUMS?\nPICK A SIDE.",
             "overlay_status": "completed",
             "media_source": "supabase_video_asset",
         },
@@ -333,7 +381,7 @@ def test_reel_artifact_falls_back_to_original_when_overlay_failed() -> None:
         "winner": {
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "daily_wing_reel",
-            "caption": "Daily wing reel because the scroll deserved sauce.",
+            "caption": "Settle it in the comments.",
             "hashtags": ["buffago"],
             "image_prompt": "Preloaded Supabase Storage wing video asset; no AI image or video generated.",
             "approved": True,
@@ -343,7 +391,7 @@ def test_reel_artifact_falls_back_to_original_when_overlay_failed() -> None:
             "original_video_url": "https://example.com/original.mp4",
             "original_storage_path": "original.mp4",
             "processed_storage_path": "processed/original_texted.mp4",
-            "overlay_text": "THE SCROLL DESERVED SAUCE",
+            "overlay_text": "FLATS OR DRUMS?\nPICK A SIDE.",
             "overlay_status": "failed",
             "overlay_error": "ffmpeg is not available",
             "media_source": "supabase_video_asset",
@@ -573,7 +621,7 @@ def test_live_publish_persists_missing_candidate_before_final_post_insert(
         "winner": {
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "restaurant_spotlight",
-            "caption": "Buffago test caption",
+            "caption": "Send this to someone who owes you wings.",
             "hashtags": ["buffago", "wingnight"],
             "image_prompt": "A hero plate of wings",
             "working_title": "Wing night pick",
@@ -632,10 +680,11 @@ def test_live_publish_auto_approves_when_content_decision_is_not_manually_approv
         "winner": {
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "meme",
-            "caption": "Buffago meme caption",
+            "caption": "Settle it in the comments.",
             "hashtags": ["buffago", "meme"],
             "image_prompt": "A buffalo wing meme",
             "approved": False,
+            "overlay_text": "FLATS OR DRUMS?\nPICK A SIDE.",
         },
         "decision_summary": {
             "approved": False,
@@ -673,11 +722,10 @@ def test_live_publish_auto_approves_when_content_decision_is_not_manually_approv
 
     assert result.result["status"] == "published"
     assert seen["approved"] is True
-    assert seen["metadata"] == {
-        "approval_bypass_enabled": True,
-        "approval_required": False,
-        "approval_status": "auto_approved",
-    }
+    assert isinstance(seen["metadata"], dict)
+    assert seen["metadata"]["approval_bypass_enabled"] is True
+    assert seen["metadata"]["approval_required"] is False
+    assert seen["metadata"]["approval_status"] == "auto_approved"
     log_output = stream.getvalue()
     assert "publish_continuing_without_manual_approval" in log_output
     assert "approval_bypass_enabled=true" in log_output
@@ -709,7 +757,7 @@ def test_live_publish_uses_resolved_runtime_dry_run_false(
         "winner": {
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "daily_wing_reel",
-            "caption": "8pm wing check.",
+            "caption": "Send this to the group chat and start the debate.",
             "hashtags": ["buffago", "wingnight"],
             "image_prompt": "Preloaded Supabase Storage wing video asset; no AI image or video generated.",
             "approved": True,
@@ -832,7 +880,7 @@ def test_publish_precheck_receives_image_validation_quality_score_when_winner_sc
         "winner": {
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "restaurant_spotlight",
-            "caption": "Buffago test caption",
+            "caption": "Send this to someone who owes you wings.",
             "hashtags": ["buffago", "wingnight"],
             "image_prompt": "A hero plate of wings",
             "approved": True,

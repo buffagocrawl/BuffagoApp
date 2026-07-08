@@ -4,7 +4,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any
 
-from caption_rules import choose_caption_style, finalize_caption
+from caption_rules import choose_caption_style, finalize_caption, finalize_overlay_text, validate_overlay_text
 from content_engine.visual_prompt_style import (
     apply_prompt_metadata,
     build_buffago_image_direction,
@@ -215,6 +215,10 @@ def normalize_image_output(payload: dict[str, Any]) -> dict[str, Any]:
     text_overlay = payload.get("text_overlay")
     if text_overlay is not None and (not isinstance(text_overlay, str) or not text_overlay.strip()):
         raise SchemaValidationError("text_overlay must be a string or null")
+    if isinstance(text_overlay, str):
+        overlay_validation = validate_overlay_text(text_overlay.strip())
+        if not overlay_validation["passed"]:
+            raise SchemaValidationError(f"text_overlay failed validation: {', '.join(overlay_validation['reasons'])}")
 
     normalized = {
         "content_slot": content_slot,
@@ -264,7 +268,7 @@ def _signals_used_from_context(external_context: dict[str, Any]) -> list[str]:
 
 def _base_caption(content_slot: str) -> str:
     if content_slot == "meme_post":
-        return "The group chat needs a wing night."
+        return "Send this to the group chat and start the debate."
     return "Send this to someone who owes you wings."
 
 
@@ -275,17 +279,17 @@ def _fallback_scene_prompt(content_slot: str, post_type: str) -> tuple[str, dict
     if content_slot == "meme_post" or post_type == "meme":
         prompt = build_scene_direction_prompt(
             setting="packed sports bar at peak wing-night noise",
-            characters="two lifelong friends, a facepalming bartender, nearby diners, and someone recording on a phone crowd around a basket of wings",
-            conflict="one friend stands on a booth pointing a saucy wing like courtroom evidence while the other clutches the basket like treasure",
-            mood="absurd, scroll-stopping, mock-serious, and instantly readable without a caption",
+            characters="friends, nearby diners, and one person holding up a phone all crowd around a basket of wings",
+            conflict="the table is split over flats versus drums and everyone reacts like the answer matters right now",
+            mood="social, scroll-stopping, hungry, and instantly readable",
             direction=direction,
         )
     else:
         prompt = build_scene_direction_prompt(
             setting="warm neighborhood wing restaurant with a busy counter and full booths",
             characters="regulars and servers react as a steaming platter of wings lands in the foreground",
-            conflict="everyone reaches for the crispiest glossy buffalo wing at the same time and freezes in comedic disbelief",
-            mood="hungry, cinematic, lively, and local",
+            conflict="everyone pauses because the platter clearly just changed the plan for the night",
+            mood="hungry, cinematic, lively, and social",
             direction=direction,
         )
     return prompt, metadata
@@ -373,14 +377,19 @@ def fallback_image_output(
     external_context: dict[str, Any],
 ) -> dict[str, Any]:
     signals = _signals_used_from_context(external_context)
+    overlay_plan = finalize_overlay_text(
+        seed=f"{content_slot}:{':'.join(signals)}:overlay",
+        style=choose_caption_style(seed=f"{content_slot}:{':'.join(signals)}"),
+        caption=_base_caption(content_slot),
+    )
     if content_slot == "meme_post":
         image_prompt, metadata = _fallback_scene_prompt(content_slot, "meme")
         return {
             "content_slot": content_slot,
             "image_prompt": image_prompt,
             "style": "meme",
-            "needs_text_overlay": False,
-            "text_overlay": None,
+            "needs_text_overlay": True,
+            "text_overlay": overlay_plan["overlay_text"],
             "composition_notes": "Keep the wings in the foreground or sharp focal plane, make the argument readable through action and reactions, and avoid static table conversation.",
             "negative_prompt_guidance": "Avoid politics, people-facing tragedy jokes, brand logos, alcohol focus, cluttered backgrounds, text inside the generated image, and stock-photo staging.",
             "brand_safety_notes": [
@@ -395,8 +404,8 @@ def fallback_image_output(
         "content_slot": content_slot,
         "image_prompt": image_prompt,
         "style": "realistic",
-        "needs_text_overlay": False,
-        "text_overlay": None,
+        "needs_text_overlay": True,
+        "text_overlay": overlay_plan["overlay_text"],
         "composition_notes": "Frame the wings as the hero, use shallow depth of field, visible steam, expressive background reactions, and clear motion.",
         "negative_prompt_guidance": "No politics, no tragedy jokes, no alcohol emphasis, no fake endorsements, no private people data, no text inside the generated image, and no overdesigned stock-photo energy.",
         "brand_safety_notes": [

@@ -1,5 +1,5 @@
 # Buffago Required CTAs
-Prompt Version: prompt-library-v1
+Prompt Version: prompt-library-v2
 
 ## Discovery
 - Rate your next wings
@@ -10,8 +10,12 @@ Prompt Version: prompt-library-v1
 
 ## Community
 - Invite a friend
+- Tag a friend
+- Send this to someone
 - Compare your rankings
 - Challenge someone
+- Debate flats vs drums
+- Debate sauce or heat level
 - Drop your spot in the comments
 - Tell your crew where to go next
 
@@ -40,4 +44,3 @@ Prompt Version: prompt-library-v1
 - Invite a friend, compare rankings, and turn dinner into a crawl.
 - Keep your streak alive and earn the next badge.
 - Download Buffago and start building your wing journey today.
-

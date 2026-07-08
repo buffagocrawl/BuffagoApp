@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from caption_rules import finalize_caption, validate_caption
+from caption_rules import finalize_caption, finalize_overlay_text, validate_caption, validate_post_pair
 from logging_utils import log_event
 
 
@@ -275,6 +275,16 @@ def load_approved_post_from_artifacts(
         fallback_used = caption_plan["fallback_used"]
         validation_failure_reason = caption_plan["validation_failure_reason"]
 
+    overlay_text = _string_or_none(winner.get("overlay_text"))
+    overlay_plan = finalize_overlay_text(
+        seed=f"{run_id}:{candidate_id}:{content_type}:overlay",
+        style=_string_or_none(winner.get("selected_caption_style")) or _string_or_none(winner.get("caption_style")),
+        caption=caption,
+        raw_overlay=overlay_text,
+    )
+    overlay_text = overlay_plan["overlay_text"]
+    post_pair_validation = validate_post_pair(caption, overlay_text)
+
     metadata = dict(content_decision.get("metadata") or {}) if isinstance(content_decision.get("metadata"), dict) else {}
     metadata.update(
         {
@@ -282,6 +292,12 @@ def load_approved_post_from_artifacts(
             "caption_validation_passed": caption_validation["passed"],
             "caption_validation_failure_reason": validation_failure_reason,
             "caption_fallback_used": fallback_used,
+            "overlay_source": overlay_plan["overlay_source"],
+            "overlay_validation_passed": overlay_plan["validation_passed"],
+            "overlay_validation_failure_reason": overlay_plan["validation_failure_reason"],
+            "overlay_fallback_used": overlay_plan["fallback_used"],
+            "post_pair_validation_passed": post_pair_validation["passed"],
+            "post_pair_validation_failure_reason": None if post_pair_validation["passed"] else ", ".join(post_pair_validation["reasons"]),
         }
     )
 
@@ -313,7 +329,7 @@ def load_approved_post_from_artifacts(
         processed_video_url=_string_or_none(winner.get("processed_video_url")),
         original_storage_path=_string_or_none(winner.get("original_storage_path")),
         processed_storage_path=_string_or_none(winner.get("processed_storage_path")),
-        overlay_text=_string_or_none(winner.get("overlay_text")),
+        overlay_text=overlay_text,
         overlay_status=_string_or_none(winner.get("overlay_status")),
         overlay_error=_string_or_none(winner.get("overlay_error")),
         media_source=_string_or_none(winner.get("media_source")),

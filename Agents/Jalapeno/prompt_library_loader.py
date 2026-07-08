@@ -7,7 +7,7 @@ from typing import Any, Final
 
 BASE_DIR: Final[Path] = Path(__file__).resolve().parents[2]
 PROMPT_LIBRARY_DIR: Final[Path] = BASE_DIR / "prompt_library"
-PROMPT_LIBRARY_VERSION: Final[str] = "prompt-library-v1"
+PROMPT_LIBRARY_VERSION: Final[str] = "prompt-library-v2"
 
 # Future agents should load these markdown files instead of embedding prompt text in code.
 PROMPT_LIBRARY_FILES: Final[dict[str, str]] = {
@@ -16,6 +16,7 @@ PROMPT_LIBRARY_FILES: Final[dict[str, str]] = {
     "content_rules": "content_rules.md",
     "banned_phrases": "banned_phrases.md",
     "required_ctas": "required_ctas.md",
+    "shareable_food_post_rules": "shareable_food_post_rules.md",
     "buffago_post": "prompts/buffago_post.md",
     "meme": "prompts/meme.md",
     "image_generation": "prompts/image_generation.md",

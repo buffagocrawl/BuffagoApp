@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 from uuid import UUID
 
+from caption_rules import validate_post_pair
 from config import JalapenoConfig
 from instagram_publishing.container_status import ContainerStatusResult, wait_for_container_ready
 from instagram_publishing.instagram_client import (
@@ -220,13 +221,18 @@ def precheck_approved_post(
     elif not post.caption:
         passed = False
         reason = "missing caption"
-    elif dry_run or config.instagram.dry_run:
+    else:
+        pair_validation = validate_post_pair(post.caption, post.overlay_text)
+        if not pair_validation["passed"]:
+            passed = False
+            reason = f"creative validation failed: {', '.join(pair_validation['reasons'])}"
+    if passed and (dry_run or config.instagram.dry_run):
         passed = False
         reason = "dry_run enabled"
-    elif test_mode:
+    elif passed and test_mode:
         passed = False
         reason = "test_mode enabled"
-    elif not config.instagram.enabled:
+    elif passed and not config.instagram.enabled:
         passed = False
         reason = "instagram publishing disabled"
 

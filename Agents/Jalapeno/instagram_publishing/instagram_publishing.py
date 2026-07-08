@@ -265,7 +265,7 @@ def validate_instagram_publishing_environment(
     fake_post = ApprovedInstagramPost(
         run_id="11111111-1111-1111-1111-111111111111",
         candidate_id="22222222-2222-2222-2222-222222222222",
-        caption="Buffago test caption",
+        caption="Send this to someone who owes you wings.",
         hashtags=["buffago", "wingnight"],
         alt_text="A test alt text for validation",
         image_prompt="A test prompt",
@@ -278,6 +278,7 @@ def validate_instagram_publishing_environment(
         prompt_quality=100,
         approved=True,
         scheduled_post_type="buffago_post",
+        overlay_text="SEND THIS TO\nYOUR WING CREW",
     )
 
     dry_run_precheck = precheck_approved_post(

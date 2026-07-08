@@ -7,6 +7,7 @@ from caption_rules import (
     CAPTION_STYLE_ORDER,
     choose_caption_style,
     finalize_caption,
+    finalize_overlay_text,
 )
 from content_engine.alt_text_generator import generate_alt_text
 from content_engine.candidate_generator import ContentCandidate
@@ -36,6 +37,10 @@ class CaptionPackage:
     caption_length: int = 0
     caption_source: str = ""
     validation_failure_reason: str | None = None
+    overlay_text: str = ""
+    overlay_source: str = ""
+    overlay_validation_passed: bool = False
+    overlay_validation_failure_reason: str | None = None
 
 
 def _style_pool(candidate: ContentCandidate, external_context: dict[str, Any]) -> list[str]:
@@ -127,11 +132,18 @@ def generate_caption_package(
         allow_openai_caption=False,
     )
     cleaned_caption = caption_plan["caption"]
+    overlay_plan = finalize_overlay_text(
+        seed=f"{candidate.candidate_id}:{candidate.content_type}:overlay",
+        style=selected_caption_style,
+        caption=cleaned_caption,
+        raw_overlay=candidate.overlay_text,
+    )
     validation = caption_plan["validation"]
     cleanup_notes = [
         "Caption generator uses short Buffago wing templates with strict validation.",
         f"Selected caption style: {selected_caption_style}.",
         f"Caption source: {caption_plan['caption_source']}.",
+        f"Overlay source: {overlay_plan['overlay_source']}.",
     ]
     fallback_used = bool(caption_plan["fallback_used"])
 
@@ -173,4 +185,8 @@ def generate_caption_package(
         caption_length=validation["caption_length"],
         caption_source=caption_plan["caption_source"],
         validation_failure_reason=caption_plan["validation_failure_reason"],
+        overlay_text=overlay_plan["overlay_text"],
+        overlay_source=overlay_plan["overlay_source"],
+        overlay_validation_passed=overlay_plan["validation_passed"],
+        overlay_validation_failure_reason=overlay_plan["validation_failure_reason"],
     )

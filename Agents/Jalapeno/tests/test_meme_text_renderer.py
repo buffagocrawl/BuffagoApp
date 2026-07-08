@@ -14,9 +14,9 @@ from image_pipeline.meme_text_renderer import SafeArea, layout_meme_text, render
 
 
 def test_sanitize_meme_text_normalizes_hidden_characters_and_carriage_returns() -> None:
-    text = sanitize_meme_text(" \ufeffif this wing\r\nhad\u200b a voicemail\x00: bring napkins. ")
+    text = sanitize_meme_text(" \ufeffsend this to\r\nyour\u200b wing crew\x00 ")
 
-    assert text == "IF THIS WING\nHAD A VOICEMAIL: BRING NAPKINS."
+    assert text == "SEND THIS TO\nYOUR WING CREW"
     assert "\r" not in text
     assert "\ufeff" not in text
     assert "\u200b" not in text
@@ -29,7 +29,7 @@ def test_layout_wraps_and_scales_inside_safe_area() -> None:
 
     layout = layout_meme_text(
         image,
-        "IF THIS WING HAD A VOICEMAIL, IT WOULD JUST SAY: BRING NAPKINS.",
+        "IF THEY DON'T REPLY\nTHEY OWE WINGS",
         position="top",
         safe_area=safe,
         emphasis=True,
@@ -49,7 +49,7 @@ def test_render_meme_text_highlights_final_punchline() -> None:
     image = Image.new("RGBA", (1080, 1350), (20, 20, 24, 255))
     layout = layout_meme_text(
         image,
-        "IF THIS WING HAD A VOICEMAIL, IT WOULD JUST SAY: BRING NAPKINS.",
+        "FLATS OR DRUMS?\nPICK A SIDE.",
         position="top",
         emphasis=True,
     )
@@ -62,8 +62,8 @@ def test_format_meme_image_handles_long_caption_without_clipping() -> None:
 
     result = format_meme_image(
         source,
-        top_text="IF THIS WING HAD A VOICEMAIL, IT WOULD JUST SAY: BRING NAPKINS.",
-        bottom_text="WHEN THE SAUCE HITS, THE GROUP CHAT GETS QUIET.",
+        top_text="SEND THIS TO\nYOUR WING CREW",
+        bottom_text="FLATS OR DRUMS?\nPICK A SIDE.",
     )
 
     assert result.applied
@@ -83,4 +83,3 @@ def test_render_meme_text_rejects_unfittable_safe_area() -> None:
         assert "safe area" in str(exc)
     else:
         raise AssertionError("Expected render_meme_text to reject an impossible safe area")
-

@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from caption_rules import finalize_overlay_text, validate_overlay_text
 from logging_utils import log_event
 from image_pipeline.meme_text_renderer import MemeTextStyle, SafeArea, render_meme_text, sanitize_meme_text
 from supabase_client import SupabaseClient
@@ -16,8 +17,7 @@ from video_assets import VideoAsset
 
 
 PROCESSED_PREFIX = "processed"
-FALLBACK_OVERLAYS = ("SAUCY WING NIGHT", "THE SCROLL DESERVED SAUCE")
-STRONG_WORDS = ("SAUCE", "WINGS", "WING", "CRISPY", "BUFFALO", "SAUCY")
+FALLBACK_OVERLAYS = ("SEND THIS TO\nYOUR WING CREW", "FLATS OR DRUMS?\nPICK A SIDE.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -98,23 +98,21 @@ def _first_caption_hook(caption: str) -> str:
 
 def select_overlay_text(caption: str) -> str:
     hook = _clean_overlay_text(_first_caption_hook(caption))
-    words = hook.split()
-    generic_phrases = {
-        "daily wing reel",
-        "buffago test caption",
-        "8pm wing check",
-        "wing night",
-    }
-    if len(words) < 4 or hook.lower() in generic_phrases:
-        return FALLBACK_OVERLAYS[0]
-    if len(words) > 12:
-        words = words[:12]
-    text = " ".join(words).upper()
-    if not any(word in text for word in STRONG_WORDS):
-        if "SCROLL" in text:
-            return "THE SCROLL DESERVED SAUCE"
-        return FALLBACK_OVERLAYS[0]
-    return text
+    overlay_plan = finalize_overlay_text(
+        seed=f"video-overlay:{normalize_seed_text(caption)}",
+        caption=caption,
+        raw_overlay=hook if hook else None,
+    )
+    selected = overlay_plan["overlay_text"]
+    validation = validate_overlay_text(selected)
+    if validation["passed"]:
+        return selected.upper()
+    return FALLBACK_OVERLAYS[0]
+
+
+def normalize_seed_text(text: str) -> str:
+    cleaned = re.sub(r"\s+", " ", text.strip().lower())
+    return cleaned[:120]
 
 
 def _video_dimensions(input_path: Path, *, timeout_seconds: int = 30) -> tuple[int, int]:

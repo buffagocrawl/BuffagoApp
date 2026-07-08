@@ -11,7 +11,7 @@ PROJECT_DIR = Path(__file__).resolve().parents[1]
 if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
-from caption_rules import CAPTION_STYLE_ORDER, generate_caption_samples, validate_caption  # noqa: E402
+from caption_rules import CAPTION_STYLE_ORDER, generate_caption_samples, validate_caption, validate_overlay_text, validate_post_pair  # noqa: E402
 from ai_client import JalapenoAIClient  # noqa: E402
 from config import initialize_logging, load_configuration  # noqa: E402
 from content_engine.candidate_generator import ContentCandidate  # noqa: E402
@@ -67,6 +67,7 @@ def _candidate() -> ContentCandidate:
         "POV: sauce chose violence",
         "main character energy on a plate",
         "It's giving crispy chaos.",
+        "This wing paid rent.",
     ],
 )
 def test_validate_caption_rejects_banned_examples(caption: str) -> None:
@@ -109,6 +110,58 @@ def test_validate_caption_rejects_hashtags_inside_caption() -> None:
     assert "hashtags_belong_outside_caption" in result["issues"]
 
 
+@pytest.mark.parametrize(
+    "overlay",
+    [
+        "SEND THIS TO\nYOUR WING CREW",
+        "IF THEY DON'T REPLY\nTHEY OWE WINGS",
+        "WHO'S EATING\nTHIS WITH YOU?",
+        "FLATS OR DRUMS?\nPICK A SIDE.",
+        "CANCEL YOUR PLANS.\nGET WINGS.",
+    ],
+)
+def test_validate_overlay_text_accepts_share_trigger_examples(overlay: str) -> None:
+    result = validate_overlay_text(overlay)
+
+    assert result["passed"] is True
+    assert result["issues"] == []
+
+
+@pytest.mark.parametrize(
+    "overlay",
+    [
+        "IF THIS WING HAD A VOICEMAIL",
+        "THIS WING UNDERSTOOD THE ASSIGNMENT",
+        "A TOTALLY UNRELATED CLEVER THOUGHT",
+        "WINGS PAYING RENT AGAIN",
+    ],
+)
+def test_validate_overlay_text_rejects_banned_or_generic_ai_overlay(overlay: str) -> None:
+    result = validate_overlay_text(overlay)
+
+    assert result["passed"] is False
+    assert result["issues"]
+
+
+def test_validate_post_pair_rejects_mismatched_overlay_and_caption() -> None:
+    result = validate_post_pair(
+        "Send this to the group chat and start the timer.",
+        "FLATS OR DRUMS?\nPICK A SIDE.",
+    )
+
+    assert result["passed"] is False
+    assert "caption_overlay_mismatch" in result["issues"]
+
+
+def test_validate_post_pair_accepts_matched_overlay_and_caption() -> None:
+    result = validate_post_pair(
+        "Settle it in the comments.",
+        "FLATS OR DRUMS?\nPICK A SIDE.",
+    )
+
+    assert result["passed"] is True
+
+
 def test_generate_caption_package_uses_allowed_styles_and_short_caption() -> None:
     package = generate_caption_package(
         _candidate(),
@@ -125,6 +178,9 @@ def test_generate_caption_package_uses_allowed_styles_and_short_caption() -> Non
     assert "\\n" not in package.caption
     assert "\n" not in package.caption
     assert package.selected_caption_style
+    assert package.overlay_text
+    assert package.overlay_validation_passed is True
+    assert validate_post_pair(package.caption, package.overlay_text)["passed"] is True
 
 
 def test_generate_caption_package_falls_back_when_primary_caption_is_invalid(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -145,6 +201,7 @@ def test_generate_caption_package_falls_back_when_primary_caption_is_invalid(mon
     assert package.caption_style in CAPTION_STYLE_ORDER
     assert "main character energy" not in package.caption.lower()
     assert "\\n" not in package.caption
+    assert package.overlay_validation_passed is True
 
 
 def test_generate_caption_samples_returns_20_valid_records() -> None:
@@ -154,6 +211,7 @@ def test_generate_caption_samples_returns_20_valid_records() -> None:
     assert {sample["source"] for sample in samples} <= {"template"}
     assert all(sample["validation"]["valid"] is True for sample in samples)
     assert all(sample["caption"] for sample in samples)
+    assert all(sample["overlay_text"] for sample in samples)
     assert all(sample["style"] in CAPTION_STYLE_ORDER for sample in samples)
 
 

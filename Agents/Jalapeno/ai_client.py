@@ -202,11 +202,12 @@ class JalapenoAIClient:
                     "Do not be clever.",
                     "Do not use internet slang.",
                     "Do not personify wings, plates, photos, or posts.",
-                    "Do not use metaphor joke formats.",
+                    "Do not use metaphor joke formats or surreal AI jokes.",
                     "Write one simple shareable wing caption.",
-                    "Prefer tag, send, comment, or share prompts.",
+                    "Prefer tag, send, comment, debate, challenge, or plan-making prompts.",
                     "Keep under 120 characters when possible.",
                     "Mention or clearly imply wings, wing night, sauce, flats/drums, cravings, friends, group chat, or someone owing wings.",
+                    "Caption and image text must feel like one post.",
                 ],
             }
         return payload
@@ -506,7 +507,7 @@ class JalapenoAIClient:
                 safety=safety,
                 errors=[],
                 backend_available=True,
-                used_fallback=False,
+                used_fallback=fallback_used,
                 raw_response=response,
             )
         except (SchemaValidationError, AIBackendError, ValueError, TypeError) as exc:
