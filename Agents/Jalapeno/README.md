@@ -337,12 +337,13 @@ Stores:
 
 - storage bucket and storage path
 - optional public URL override
+- reusable flag for permanent reuse exclusion
 - style and caption type hints
 - active flag
 - used count and last used timestamp
 - optional performance score and notes
 
-The `20260701000400_jalapeno_video_assets.sql` migration creates the `jalapeno-wing-videos` public bucket, creates this table, and adds video linkage columns to post, Instagram publish, and metrics tables.
+The `20260701000400_jalapeno_video_assets.sql` migration creates the `jalapeno-wing-videos` public bucket, creates this table, and adds video linkage columns to post, Instagram publish, and metrics tables. The `20260709000300_jalapeno_video_asset_reuse_enabled.sql` migration adds `reuse_enabled boolean not null default true` and disables known-bad assets by `storage_path`.
 
 ### `jalapeno_instagram_posts`
 
@@ -780,10 +781,13 @@ Supabase Storage setup:
 Supabase video Reel setup:
 
 - Apply `supabase/migrations/20260701000400_jalapeno_video_assets.sql`.
+- Apply `supabase/migrations/20260709000300_jalapeno_video_asset_reuse_enabled.sql`.
 - Upload Reel-ready video files to the `jalapeno-wing-videos` bucket, or set `JALAPENO_VIDEO_BUCKET` to the bucket you want to use.
-- Add rows to `public.jalapeno_video_assets` with `storage_bucket`, `storage_path`, `active=true`, and optional `style` / `caption_type` hints.
+- Add rows to `public.jalapeno_video_assets` with `storage_bucket`, `storage_path`, `active=true`, optional `style` / `caption_type` hints, and `reuse_enabled=true` unless you want the asset permanently excluded.
 - If the table is empty, validation and dry-run will warn clearly; the agent can auto-register root-level video files from the configured bucket.
 - Reuse is avoided for `JALAPENO_VIDEO_RECENT_REUSE_DAYS` when enough active inventory exists.
+- Permanently disable specific videos with:
+  `update public.jalapeno_video_assets set reuse_enabled = false where storage_path in ('1593.mp4', '1594.mp4');`
 
 ## Content Memory
 

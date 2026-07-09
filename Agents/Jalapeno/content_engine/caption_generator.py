@@ -212,7 +212,10 @@ def _openai_variant_plan(
             "caption_rules": [
                 "Natural and punchy",
                 "Exactly one clear engagement CTA",
+                "Lean into tag, comment, share, question, pick-a-side, or send-this prompts",
+                "Always produce exactly 5 hashtags",
                 "No stale joke templates",
+                "Avoid voicemail, understood the assignment, or bring napkins unless the context genuinely fits",
                 "No fake metrics or surreal food-personification",
                 "Do not include hashtags in the caption body",
             ],
@@ -226,7 +229,9 @@ def _openai_variant_plan(
     system_prompt = (
         "You write Buffago Instagram caption ideas for Jalapeno. "
         "Keep the language direct, local, wing-obsessed, and engagement-first. "
-        "Avoid stale meme templates, voicemail jokes, and generic food-influencer filler. "
+        "Always return captions that push sharing, tagging, comments, questions, or picking a side. "
+        "Always produce exactly 5 hashtags. "
+        "Avoid stale meme templates, voicemail jokes, understood the assignment, bring napkins, and generic food-influencer filler. "
         "Return valid JSON only."
     )
     user_prompt = json.dumps(prompt_payload, ensure_ascii=True, indent=2, sort_keys=True)

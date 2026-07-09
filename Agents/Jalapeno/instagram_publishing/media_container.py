@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from caption_rules import compose_caption_with_hashtags, finalize_caption_overlay_pair, validate_caption, validate_post_pair
+from caption_rules import compose_caption_with_hashtags, finalize_caption_overlay_pair, repair_hashtag_list, validate_caption, validate_post_pair
 from logging_utils import log_event
 
 
@@ -33,6 +33,32 @@ def _list_of_strings(value: Any) -> list[str]:
 
 def _compose_publish_caption(caption: str, hashtags: list[str]) -> str:
     return compose_caption_with_hashtags(caption, hashtags)
+
+
+def _hashtag_context(content_decision: dict[str, Any], winner: dict[str, Any]) -> dict[str, Any]:
+    metadata = content_decision.get("metadata") if isinstance(content_decision.get("metadata"), dict) else {}
+    context: dict[str, Any] = {}
+    for source in (metadata, winner):
+        if not isinstance(source, dict):
+            continue
+        for key in (
+            "state",
+            "state_name",
+            "states_mentioned",
+            "town",
+            "city",
+            "cities_mentioned",
+            "restaurant",
+            "restaurant_name",
+            "restaurants_mentioned",
+            "crawl_context",
+            "crawl_name",
+            "crawl_title",
+        ):
+            value = source.get(key)
+            if value:
+                context[key] = value
+    return context
 
 
 def _number_or_none(value: Any) -> float | None:
@@ -271,7 +297,10 @@ def load_approved_post_from_artifacts(
         raw_overlay=_string_or_none(winner.get("overlay_text")),
         allow_openai_caption=False,
     )
-    caption = _compose_publish_caption(caption_plan["caption"], hashtags)
+    hashtag_context = _hashtag_context(content_decision, winner)
+    hashtag_repair = repair_hashtag_list(hashtags, expected_count=5, caption=caption, context=hashtag_context)
+    hashtags = hashtag_repair.hashtags
+    caption = compose_caption_with_hashtags(caption_plan["caption"], hashtags, context=hashtag_context)
     overlay_text = caption_plan["overlay_text"]
     caption_validation = validate_caption(caption, require_hashtags=True)
     overlay_plan = caption_plan
@@ -283,6 +312,12 @@ def load_approved_post_from_artifacts(
     metadata = dict(content_decision.get("metadata") or {}) if isinstance(content_decision.get("metadata"), dict) else {}
     metadata.update(
         {
+            "hashtag_repair_applied": hashtag_repair.changed,
+            "hashtag_repair_original_count": hashtag_repair.original_count,
+            "hashtag_repair_repaired_count": hashtag_repair.repaired_count,
+            "hashtag_repair_added_hashtags": hashtag_repair.added_hashtags,
+            "hashtag_repair_removed_hashtags": hashtag_repair.removed_hashtags,
+            "final_hashtags": hashtags,
             "caption_source": caption_source,
             "caption_validation_passed": caption_validation["passed"],
             "caption_validation_failure_reason": validation_failure_reason,
@@ -308,6 +343,18 @@ def load_approved_post_from_artifacts(
             "feedback_summary": winner.get("feedback_summary") if isinstance(winner.get("feedback_summary"), dict) else decision_summary.get("feedback_summary") if isinstance(decision_summary.get("feedback_summary"), dict) else {},
         }
     )
+    if hashtag_repair.changed:
+        log_event(
+            logger,
+            "publish_hashtags_repaired",
+            run_id=run_id,
+            candidate_id=candidate_id,
+            original_count=hashtag_repair.original_count,
+            repaired_count=hashtag_repair.repaired_count,
+            added_hashtags=hashtag_repair.added_hashtags,
+            removed_hashtags=hashtag_repair.removed_hashtags,
+            final_hashtags=hashtags,
+        )
 
     return ApprovedInstagramPost(
         run_id=run_id,

@@ -1,11 +1,25 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 import random
 import re
 from typing import Any
 
 
 HASHTAG_PATTERN = re.compile(r"(?<!\w)#([A-Za-z0-9_]+)")
+
+DEFAULT_PUBLISH_HASHTAG_POOL = (
+    "#Buffago",
+    "#BuffaloWings",
+    "#WingNight",
+    "#ChickenWings",
+    "#Foodie",
+    "#Wings",
+    "#ConnecticutFood",
+    "#CTEats",
+    "#FoodTok",
+    "#WingLovers",
+)
 
 SHAREABLE_FOOD_POST_RULES = (
     "Every Buffago post should feel like something a user would send, tag, comment on, debate, or use to make wing plans.",
@@ -355,13 +369,150 @@ def normalize_hashtag_list(hashtags: list[str], *, expected_count: int | None = 
     return normalized
 
 
-def compose_caption_with_hashtags(caption: str, hashtags: list[str]) -> str:
-    normalized_caption = normalize_caption_text(caption)
-    body = re.sub(r"(?:\s*#\w+)+\s*$", "", normalized_caption).strip()
+@dataclass(frozen=True, slots=True)
+class HashtagRepairResult:
+    hashtags: list[str]
+    original_count: int
+    repaired_count: int
+    added_hashtags: list[str]
+    removed_hashtags: list[str]
+    location_hashtag: str | None = None
+
+    @property
+    def changed(self) -> bool:
+        return bool(self.added_hashtags or self.removed_hashtags or self.original_count != self.repaired_count)
+
+
+def split_caption_and_hashtags(caption: str) -> tuple[str, list[str]]:
+    normalized = normalize_caption_text(caption)
+    hashtags = [f"#{match.group(1)}" for match in HASHTAG_PATTERN.finditer(normalized)]
+    body = HASHTAG_PATTERN.sub("", normalized) if hashtags else normalized
+    body = re.sub(r"\s+", " ", body).strip(" ,")
+    return body, hashtags
+
+
+def _title_hashtag(value: str) -> str:
+    parts = re.findall(r"[A-Za-z0-9]+", value)
+    return f"#{''.join(part[:1].upper() + part[1:] for part in parts)}" if parts else ""
+
+
+def _context_string_values(context: Any, keys: tuple[str, ...]) -> list[str]:
+    if not isinstance(context, dict):
+        return []
+    values: list[str] = []
+    for key in keys:
+        value = context.get(key)
+        if isinstance(value, str) and value.strip():
+            values.append(value.strip())
+        elif isinstance(value, list):
+            for item in value:
+                if isinstance(item, str) and item.strip():
+                    values.append(item.strip())
+        elif isinstance(value, dict):
+            for nested in _context_string_values(value, keys):
+                values.append(nested)
+    return values
+
+
+def _location_hashtag_candidates(context: dict[str, Any] | None = None) -> list[str]:
+    if not isinstance(context, dict):
+        return []
+
+    city_values = _context_string_values(context, ("town", "city", "cities_mentioned"))
+    state_values = _context_string_values(context, ("state", "state_name", "states_mentioned"))
+    restaurant_values = _context_string_values(context, ("restaurant", "restaurant_name", "restaurants_mentioned"))
+    crawl_values = _context_string_values(context, ("crawl_context", "crawl_name", "crawl_title"))
+
+    candidates: list[str] = []
+    for city in city_values:
+        candidates.append(_title_hashtag(f"{city} Eats"))
+    for state in state_values:
+        normalized = state.strip().lower()
+        if normalized in {"ct", "connecticut"}:
+            candidates.extend(["#ConnecticutFood", "#CTEats"])
+        else:
+            candidates.append(_title_hashtag(f"{state} Eats"))
+    for restaurant in restaurant_values:
+        candidates.append(_title_hashtag(restaurant))
+    for crawl in crawl_values:
+        candidates.append(_title_hashtag(crawl))
+    return normalize_hashtag_list(candidates)
+
+
+def repair_hashtag_list(
+    hashtags: list[str],
+    *,
+    expected_count: int = 5,
+    caption: str | None = None,
+    context: dict[str, Any] | None = None,
+) -> HashtagRepairResult:
+    merged = list(hashtags)
+    if caption:
+        _body, caption_hashtags = split_caption_and_hashtags(caption)
+        merged.extend(caption_hashtags)
+
+    original = normalize_hashtag_list(merged)
+    location_candidates = _location_hashtag_candidates(context)
+    location_set = {tag.lower() for tag in location_candidates}
+    location_hashtag = next((tag for tag in location_candidates if tag.lower() not in {item.lower() for item in original}), None)
+
+    repaired = list(original)
+    if len(repaired) < expected_count:
+        fill_pool = list(location_candidates) + list(DEFAULT_PUBLISH_HASHTAG_POOL)
+        seen = {tag.lower() for tag in repaired}
+        for tag in normalize_hashtag_list(fill_pool):
+            lowered = tag.lower()
+            if lowered in seen:
+                continue
+            repaired.append(tag)
+            seen.add(lowered)
+            if len(repaired) == expected_count:
+                break
+
+    repaired = repaired[:expected_count]
+    if location_candidates and not any(tag.lower() in location_set for tag in repaired):
+        location_from_original = next((tag for tag in original if tag.lower() in location_set), None)
+        forced_location = location_from_original or location_hashtag or location_candidates[0]
+        if repaired:
+            repaired[-1] = forced_location
+        else:
+            repaired = [forced_location]
+
+    if len(repaired) < expected_count:
+        seen = {tag.lower() for tag in repaired}
+        for tag in normalize_hashtag_list(list(DEFAULT_PUBLISH_HASHTAG_POOL)):
+            lowered = tag.lower()
+            if lowered in seen:
+                continue
+            repaired.append(tag)
+            seen.add(lowered)
+            if len(repaired) == expected_count:
+                break
+
+    repaired = normalize_hashtag_list(repaired)[:expected_count]
+    added = [tag for tag in repaired if tag.lower() not in {item.lower() for item in original}]
+    removed = [tag for tag in original if tag.lower() not in {item.lower() for item in repaired}]
+    return HashtagRepairResult(
+        hashtags=repaired,
+        original_count=len(original),
+        repaired_count=len(repaired),
+        added_hashtags=added,
+        removed_hashtags=removed,
+        location_hashtag=next((tag for tag in repaired if tag.lower() in location_set), None),
+    )
+
+
+def compose_caption_with_hashtags(
+    caption: str,
+    hashtags: list[str],
+    *,
+    context: dict[str, Any] | None = None,
+) -> str:
+    body, _caption_hashtags = split_caption_and_hashtags(caption)
     if not body:
         raise ValueError("Caption body cannot be empty")
-    normalized_hashtags = normalize_hashtag_list(hashtags, expected_count=5)
-    return f"{body} {' '.join(normalized_hashtags)}"
+    repaired = repair_hashtag_list(hashtags, expected_count=5, caption=caption, context=context)
+    return f"{body} {' '.join(repaired.hashtags)}"
 
 
 def style_templates(style: str) -> tuple[str, ...]:

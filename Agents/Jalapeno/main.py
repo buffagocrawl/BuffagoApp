@@ -715,6 +715,7 @@ def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = Fals
             "storage_bucket",
             "storage_path",
             "public_url",
+            "reuse_enabled",
             "style",
             "caption_type",
             "active",

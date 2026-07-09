@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import time
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from uuid import UUID
 
-from caption_rules import validate_post_pair
+from caption_rules import compose_caption_with_hashtags, repair_hashtag_list, validate_post_pair
 from config import JalapenoConfig
 from instagram_publishing.container_status import ContainerStatusResult, wait_for_container_ready
 from instagram_publishing.instagram_client import (
@@ -81,6 +81,37 @@ class PublishError(RuntimeError):
         super().__init__(message)
         self.stage = stage
         self.error_code = error_code
+
+
+def _repair_post_hashtags(post: ApprovedInstagramPost, *, logger=None) -> ApprovedInstagramPost:
+    repair = repair_hashtag_list(post.hashtags, expected_count=5, caption=post.caption, context=post.metadata)
+    if not repair.changed:
+        return post
+
+    repaired_caption = compose_caption_with_hashtags(post.caption, repair.hashtags, context=post.metadata)
+    metadata = dict(post.metadata) if isinstance(post.metadata, dict) else {}
+    metadata.update(
+        {
+            "hashtag_repair_applied": True,
+            "hashtag_repair_original_count": repair.original_count,
+            "hashtag_repair_repaired_count": repair.repaired_count,
+            "hashtag_repair_added_hashtags": repair.added_hashtags,
+            "hashtag_repair_removed_hashtags": repair.removed_hashtags,
+            "final_hashtags": repair.hashtags,
+        }
+    )
+    log_event(
+        logger,
+        "publish_hashtags_repaired",
+        run_id=post.run_id,
+        candidate_id=post.candidate_id,
+        original_count=repair.original_count,
+        repaired_count=repair.repaired_count,
+        added_hashtags=repair.added_hashtags,
+        removed_hashtags=repair.removed_hashtags,
+        final_hashtags=repair.hashtags,
+    )
+    return replace(post, caption=repaired_caption, hashtags=repair.hashtags, metadata=metadata)
 
 
 class RetryablePublishError(PublishError):
@@ -477,6 +508,7 @@ def publish_instagram_post(
     report_path: Path = DEFAULT_PUBLISH_REPORT_PATH,
 ) -> dict[str, Any]:
     started_at = time.perf_counter()
+    post = _repair_post_hashtags(post, logger=logger)
     posting_allowed = not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode
     meta_api_allowed = not dry_run and not config.instagram.dry_run and config.instagram.enabled and not test_mode
     state = PublishPipelineState(

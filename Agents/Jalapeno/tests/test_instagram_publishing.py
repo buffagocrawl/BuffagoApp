@@ -314,6 +314,19 @@ def test_safe_container_request_payload_appends_hashtags_to_caption() -> None:
     assert payload["caption"].endswith("#Foodie")
 
 
+def test_safe_container_request_payload_repairs_short_hashtag_list() -> None:
+    payload, _ = safe_container_request_payload(
+        image_url="https://example.com/image.jpg",
+        media_kind="image",
+        caption="Tag the friend who would try this basket.",
+        hashtags=["#Buffago", "#BuffaloWings", "#WingNight", "#ChickenWings"],
+        access_token="secret-token",
+    )
+
+    assert payload["caption"].count("#") == 5
+    assert payload["caption"].endswith("#Foodie")
+
+
 def test_reel_precheck_allows_supabase_video_without_image_validation() -> None:
     config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
     config = replace(config, instagram=replace(config.instagram, enabled=True, dry_run=False))
@@ -353,6 +366,47 @@ def test_load_approved_post_regenerates_bad_overlay_text() -> None:
     assert "voicemail" not in (post.overlay_text or "").lower()
     assert post.metadata["overlay_fallback_used"] is True
     assert post.metadata["post_pair_validation_passed"] is True
+
+
+def test_load_approved_post_repairs_hashtags_and_logs(tmp_path: Path) -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    stream = StringIO()
+    logger = initialize_logging(replace(config, log_directory=tmp_path / "logs"), stream=stream)
+    content_decision = {
+        "run_id": "11111111-1111-1111-1111-111111111111",
+        "scheduled_post_type": "buffago_post",
+        "winner": {
+            "candidate_id": "22222222-2222-2222-2222-222222222222",
+            "content_type": "restaurant_spotlight",
+            "caption": "Tag the friend who would try this basket. #Buffago #WingNight",
+            "hashtags": ["#BuffaloWings", "#BuffaloWings", "#Foodie!!"],
+            "cities_mentioned": ["Hartford"],
+            "states_mentioned": ["CT"],
+            "image_prompt": "A hero plate of wings",
+            "approved": True,
+            "overlay_text": "TAG YOUR\nWING FRIEND",
+        },
+        "decision_summary": {"approved": True},
+    }
+    image_pipeline = {
+        "result": {
+            "public_url": "https://example.com/public-image.jpg",
+            "image_source": "real_ai",
+            "image_validation_status": "passed",
+            "prompt_quality": 100,
+        }
+    }
+
+    post = load_approved_post_from_artifacts(content_decision, image_pipeline=image_pipeline, logger=logger)
+
+    assert len(post.hashtags) == 5
+    assert "#HartfordEats" in post.hashtags
+    assert post.metadata["hashtag_repair_applied"] is True
+    assert post.metadata["hashtag_repair_original_count"] == 4
+    log_output = stream.getvalue()
+    assert "publish_hashtags_repaired" in log_output
+    assert 'original_count=4' in log_output
+    assert 'repaired_count=5' in log_output
 
 
 def test_reel_artifact_uses_processed_video_when_overlay_completed() -> None:
@@ -543,6 +597,38 @@ def test_simulated_publish_reuses_existing_media_id(tmp_path: Path, monkeypatch:
 
     assert first["published_media_id"] == second["published_media_id"]
     assert second["status"] in {"published", "published_with_permalink_pending"}
+
+
+def test_publish_instagram_post_repairs_hashtag_count_before_precheck(tmp_path: Path) -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    config = replace(
+        config,
+        instagram=replace(config.instagram, enabled=True, dry_run=False),
+        publishing=replace(config.publishing, publish_max_retries=1, retry_backoff_seconds=0),
+    )
+    post = replace(
+        _sample_post(),
+        caption="Tag the friend who would try this basket. #Buffago",
+        hashtags=["#BuffaloWings", "#WingNight", "#ChickenWings"],
+        metadata={"state": "CT"},
+    )
+
+    result = publish_instagram_post(
+        config,
+        post,
+        access_token="test-access-token",
+        ig_user_id="test-ig-user-id",
+        client=None,
+        simulate=True,
+        dry_run=False,
+        test_mode=False,
+        post_id="33333333-3333-3333-3333-333333333333",
+        report_path=tmp_path / "report.json",
+    )
+
+    assert result["status"] in {"published", "published_with_permalink_pending"}
+    assert result["report"]["caption_preview"].count("#") == 5
+    assert len(result["report"]["hashtags"]) == 5
 
 
 class _PublishFlowSupabaseClient:

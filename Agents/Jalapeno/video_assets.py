@@ -23,6 +23,7 @@ class VideoAsset:
     storage_bucket: str
     storage_path: str
     public_url: str
+    reuse_enabled: bool
     style: str | None
     caption_type: str | None
     used_count: int
@@ -35,6 +36,7 @@ class VideoAsset:
 class VideoAssetSelection:
     asset: VideoAsset
     total_videos_found: int
+    reuse_disabled_count: int
     blocked_recent_use: int
     eligible_videos: int
     used_fallback_reuse: bool
@@ -99,7 +101,18 @@ class VideoAssetRepository:
                 "limit": 500,
             },
         )
-        return [self._from_row(row) for row in rows if isinstance(row.get("storage_path"), str)]
+        assets = [self._from_row(row) for row in rows if isinstance(row.get("storage_path"), str)]
+        reuse_disabled_count = sum(1 for asset in assets if not asset.reuse_enabled)
+        eligible_reuse_enabled_count = len(assets) - reuse_disabled_count
+        log_event(
+            self.logger,
+            "video_assets_loaded",
+            storage_bucket=self.bucket,
+            total_videos_found=len(assets),
+            reuse_disabled_count=reuse_disabled_count,
+            eligible_reuse_enabled_count=eligible_reuse_enabled_count,
+        )
+        return assets
 
     def ensure_assets_available(self) -> list[VideoAsset]:
         assets = self.list_active_assets()
@@ -114,23 +127,33 @@ class VideoAssetRepository:
 
     def select_asset_with_history(self, *, excluded_ids: set[str] | None = None) -> VideoAssetSelection:
         excluded_ids = excluded_ids or set()
-        assets = [asset for asset in self.ensure_assets_available() if asset.id not in excluded_ids]
-        if not assets:
+        all_assets = [asset for asset in self.ensure_assets_available() if asset.id not in excluded_ids]
+        if not all_assets:
             raise VideoAssetError("no_video_assets: no active Supabase video assets are available")
+        assets = [asset for asset in all_assets if asset.reuse_enabled]
+        reuse_disabled_assets = [asset for asset in all_assets if not asset.reuse_enabled]
+        if not assets:
+            raise VideoAssetError(
+                "no_reusable_video_assets: all active Supabase video assets have reuse_enabled=false; "
+                "enable at least one jalapeno_video_assets row before running video selection"
+            )
 
         recently_used = self._recently_used_identifiers(assets)
         eligible_assets = [asset for asset in assets if not self._asset_recently_used(asset, recently_used)]
         pool = eligible_assets if eligible_assets else assets
         used_fallback_reuse = not eligible_assets
-        selected = sorted(
-            pool,
-            key=lambda asset: (
-                asset.last_used_at is not None,
-                _parse_dt(asset.last_used_at) or datetime.min.replace(tzinfo=timezone.utc),
-                asset.used_count,
-                -(asset.performance_score or 0.0),
-            ),
-        )[0]
+        overall_selected = self._select_best_asset(all_assets)
+        if overall_selected is not None and not overall_selected.reuse_enabled:
+            log_event(
+                self.logger,
+                "video_asset_excluded_reuse_disabled",
+                level="warning",
+                video_asset_id=overall_selected.id,
+                storage_bucket=overall_selected.storage_bucket,
+                storage_path=overall_selected.storage_path,
+            )
+        selected = self._select_best_asset(pool)
+        assert selected is not None
         event_name = "video_reuse_cooldown_exhausted" if used_fallback_reuse else "video_asset_selected"
         log_event(
             self.logger,
@@ -143,15 +166,24 @@ class VideoAssetRepository:
             used_count=selected.used_count,
             last_used_at=selected.last_used_at,
             total_videos_found=len(assets),
+            reuse_disabled_count=len(reuse_disabled_assets),
             blocked_recent_use=len(assets) - len(eligible_assets),
             videos_excluded_recently_used=len(assets) - len(eligible_assets),
+            eligible_reuse_enabled_count=len(assets),
             eligible_count=len(eligible_assets),
             eligible_videos=len(eligible_assets),
             cooldown_days=self.config.video.reuse_cooldown_days,
+            fallback_reuse_scope="reuse_enabled_only" if used_fallback_reuse else None,
+            fallback_reuse_message=(
+                "Cooldown exhausted; fallback reuse is limited to reuse_enabled=true videos."
+                if used_fallback_reuse
+                else None
+            ),
         )
         return VideoAssetSelection(
             asset=selected,
             total_videos_found=len(assets),
+            reuse_disabled_count=len(reuse_disabled_assets),
             blocked_recent_use=len(assets) - len(eligible_assets),
             eligible_videos=len(eligible_assets),
             used_fallback_reuse=used_fallback_reuse,
@@ -196,6 +228,7 @@ class VideoAssetRepository:
             storage_bucket=bucket,
             storage_path=path,
             public_url=_storage_public_url(self.client, bucket, path, row.get("public_url")),
+            reuse_enabled=bool(row.get("reuse_enabled", True)),
             style=str(row.get("style")).strip() if row.get("style") else None,
             caption_type=str(row.get("caption_type")).strip() if row.get("caption_type") else None,
             used_count=int(row.get("used_count") or 0),
@@ -203,6 +236,19 @@ class VideoAssetRepository:
             performance_score=float(row["performance_score"]) if isinstance(row.get("performance_score"), (int, float)) else None,
             metadata=row,
         )
+
+    def _select_best_asset(self, assets: list[VideoAsset]) -> VideoAsset | None:
+        if not assets:
+            return None
+        return sorted(
+            assets,
+            key=lambda asset: (
+                asset.last_used_at is not None,
+                _parse_dt(asset.last_used_at) or datetime.min.replace(tzinfo=timezone.utc),
+                asset.used_count,
+                -(asset.performance_score or 0.0),
+            ),
+        )[0]
 
     def _recently_used_identifiers(self, assets: list[VideoAsset]) -> set[str]:
         cutoff = _utcnow() - timedelta(days=self.config.video.reuse_cooldown_days)

@@ -3,13 +3,14 @@ from __future__ import annotations
 from pathlib import Path
 import sys
 from datetime import datetime, timedelta, timezone
+from uuid import uuid4
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
 from config import load_configuration  # noqa: E402
-from video_assets import VideoAssetRepository  # noqa: E402
+from video_assets import VideoAssetError, VideoAssetRepository  # noqa: E402
 from video_overlay import processed_storage_path, select_overlay_text  # noqa: E402
 
 
@@ -45,7 +46,26 @@ class _VideoAssetClient:
             ]
         assert table_name == "jalapeno_posts"
         self.post_filters = dict(filters or {})
-        return list(self.post_rows)
+        rows = list(self.post_rows)
+        filters = self.post_filters
+        publish_status_filter = filters.get("publish_status")
+        if isinstance(publish_status_filter, str) and publish_status_filter.startswith("in.(") and publish_status_filter.endswith(")"):
+            allowed_statuses = {
+                status.strip()
+                for status in publish_status_filter[len("in.(") : -1].split(",")
+                if status.strip()
+            }
+            rows = [row for row in rows if str(row.get("publish_status")) in allowed_statuses]
+        published_after_filter = filters.get("published_at")
+        if isinstance(published_after_filter, str) and published_after_filter.startswith("gte."):
+            cutoff = datetime.fromisoformat(published_after_filter[4:])
+            rows = [
+                row
+                for row in rows
+                if isinstance(row.get("published_at"), str)
+                and datetime.fromisoformat(str(row["published_at"])) >= cutoff
+            ]
+        return rows
 
     def storage_public_url(self, bucket: str, storage_path: str) -> str:
         return f"https://example.com/{bucket}/{storage_path}"
@@ -79,6 +99,7 @@ def _asset_row(
     storage_path: str,
     *,
     public_url: str | None = None,
+    reuse_enabled: bool = True,
     used_count: int = 0,
     last_used_at: str | None = None,
     performance_score: float | None = None,
@@ -88,6 +109,7 @@ def _asset_row(
         "storage_bucket": "jalapeno-wing-videos",
         "storage_path": storage_path,
         "public_url": public_url or f"https://example.com/{storage_path}",
+        "reuse_enabled": reuse_enabled,
         "active": True,
         "used_count": used_count,
         "last_used_at": last_used_at,
@@ -134,6 +156,7 @@ def test_video_asset_repository_filters_to_configured_bucket() -> None:
     assert client.filters is not None
     assert client.filters["storage_bucket"] == "eq.jalapeno-wing-videos"
     assert assets[0].storage_bucket == "jalapeno-wing-videos"
+    assert assets[0].reuse_enabled is True
     assert config.video.reuse_cooldown_days == 30
 
 
@@ -234,6 +257,7 @@ def test_fallback_reuse_happens_only_when_every_video_is_blocked() -> None:
     selection = VideoAssetRepository(client, config, logger=logger).select_asset_with_history()  # type: ignore[arg-type]
 
     assert selection.used_fallback_reuse is True
+    assert selection.reuse_disabled_count == 0
     assert selection.blocked_recent_use == 2
     assert selection.eligible_videos == 0
     assert selection.asset.storage_path == "used-a.mp4"
@@ -256,6 +280,102 @@ def test_dry_run_and_failed_posts_do_not_block_reuse() -> None:
 
     assert selection.asset.storage_path == "available.mp4"
     assert selection.blocked_recent_use == 0
+
+
+def test_reuse_enabled_defaults_true_when_column_missing() -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    client = _SelectionClient(
+        [
+            {
+                "id": str(uuid4()),
+                "storage_bucket": "jalapeno-wing-videos",
+                "storage_path": "default-true.mp4",
+                "public_url": "https://example.com/default-true.mp4",
+                "active": True,
+                "used_count": 0,
+                "last_used_at": None,
+            }
+        ]
+    )
+
+    asset = VideoAssetRepository(client, config).list_active_assets()[0]  # type: ignore[arg-type]
+
+    assert asset.reuse_enabled is True
+
+
+def test_reuse_disabled_video_is_excluded_from_normal_selection() -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    recent = (datetime.now(timezone.utc) - timedelta(days=1)).isoformat()
+    assets = [
+        _asset_row("11111111-1111-1111-1111-111111111111", "1593.mp4", reuse_enabled=False, used_count=0),
+        _asset_row("22222222-2222-2222-2222-222222222222", "fresh.mp4", reuse_enabled=True, used_count=3),
+    ]
+    client = _SelectionClient(
+        assets,
+        post_rows=[_post_row(published_at=recent, storage_path="something-else.mp4")],
+    )
+    logger = _Logger()
+
+    selection = VideoAssetRepository(client, config, logger=logger).select_asset_with_history()  # type: ignore[arg-type]
+
+    assert selection.asset.storage_path == "fresh.mp4"
+    assert selection.reuse_disabled_count == 1
+    assert any("video_asset_excluded_reuse_disabled" in message for _, message in logger.records)
+
+
+def test_reuse_disabled_video_is_excluded_when_cooldown_is_exhausted() -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    recent = (datetime.now(timezone.utc) - timedelta(days=1)).isoformat()
+    assets = [
+        _asset_row("11111111-1111-1111-1111-111111111111", "1594.mp4", reuse_enabled=False, used_count=0),
+        _asset_row("22222222-2222-2222-2222-222222222222", "eligible-a.mp4", reuse_enabled=True, used_count=1),
+        _asset_row("33333333-3333-3333-3333-333333333333", "eligible-b.mp4", reuse_enabled=True, used_count=2),
+    ]
+    client = _SelectionClient(
+        assets,
+        post_rows=[
+            _post_row(published_at=recent, video_asset_id="22222222-2222-2222-2222-222222222222", storage_path="eligible-a.mp4"),
+            _post_row(published_at=recent, video_asset_id="33333333-3333-3333-3333-333333333333", storage_path="eligible-b.mp4"),
+        ],
+    )
+    logger = _Logger()
+
+    selection = VideoAssetRepository(client, config, logger=logger).select_asset_with_history()  # type: ignore[arg-type]
+
+    assert selection.used_fallback_reuse is True
+    assert selection.asset.storage_path == "eligible-a.mp4"
+    assert selection.reuse_disabled_count == 1
+    assert all(selection.asset.storage_path != blocked for blocked in ("1593.mp4", "1594.mp4"))
+    assert any("video_reuse_cooldown_exhausted" in message for _, message in logger.records)
+
+
+def test_all_reuse_disabled_videos_fail_clearly() -> None:
+    config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
+    client = _SelectionClient(
+        [
+            _asset_row("11111111-1111-1111-1111-111111111111", "1593.mp4", reuse_enabled=False),
+            _asset_row("22222222-2222-2222-2222-222222222222", "1594.mp4", reuse_enabled=False),
+        ]
+    )
+
+    try:
+        VideoAssetRepository(client, config).select_asset_with_history()  # type: ignore[arg-type]
+        assert False, "expected VideoAssetError"
+    except VideoAssetError as exc:
+        assert "no_reusable_video_assets" in str(exc)
+        assert "reuse_enabled=false" in str(exc)
+
+
+def test_reuse_enabled_migration_disables_1593_and_1594_by_storage_path() -> None:
+    migration = (
+        PROJECT_DIR
+        / "supabase"
+        / "migrations"
+        / "20260709000300_jalapeno_video_asset_reuse_enabled.sql"
+    ).read_text(encoding="utf-8")
+
+    assert "ADD COLUMN IF NOT EXISTS reuse_enabled boolean NOT NULL DEFAULT true" in migration
+    assert "WHERE storage_path IN ('1593.mp4', '1594.mp4')" in migration
 
 
 def test_overlay_text_uses_caption_hook_without_hashtags() -> None:

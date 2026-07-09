@@ -11,7 +11,7 @@ PROJECT_DIR = Path(__file__).resolve().parents[1]
 if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
-from caption_rules import CAPTION_STYLE_ORDER, CURATED_FALLBACK_CAPTIONS, generate_caption_samples, validate_caption, validate_overlay_text, validate_post_pair  # noqa: E402
+from caption_rules import CAPTION_STYLE_ORDER, CURATED_FALLBACK_CAPTIONS, compose_caption_with_hashtags, generate_caption_samples, repair_hashtag_list, validate_caption, validate_overlay_text, validate_post_pair  # noqa: E402
 from ai_client import JalapenoAIClient  # noqa: E402
 from config import initialize_logging, load_configuration  # noqa: E402
 from content_engine.candidate_generator import ContentCandidate  # noqa: E402
@@ -127,6 +127,67 @@ def test_validate_caption_accepts_exactly_five_hashtags_when_required() -> None:
 
     assert result["passed"] is True
     assert result["hashtag_count"] == 5
+
+
+def test_repair_hashtag_list_fills_zero_hashtags_to_exactly_five() -> None:
+    repaired = repair_hashtag_list([], expected_count=5)
+
+    assert repaired.original_count == 0
+    assert repaired.repaired_count == 5
+    assert repaired.hashtags == ["#Buffago", "#BuffaloWings", "#WingNight", "#ChickenWings", "#Foodie"]
+
+
+def test_repair_hashtag_list_fills_four_hashtags_to_exactly_five() -> None:
+    repaired = repair_hashtag_list(
+        ["#Buffago", "#BuffaloWings", "#WingNight", "#ChickenWings"],
+        expected_count=5,
+    )
+
+    assert repaired.original_count == 4
+    assert repaired.hashtags == ["#Buffago", "#BuffaloWings", "#WingNight", "#ChickenWings", "#Foodie"]
+
+
+def test_repair_hashtag_list_keeps_five_hashtags_except_normalization() -> None:
+    repaired = repair_hashtag_list(
+        ["buffago", "#Buffalo-Wings", "WingNight!!", "Chicken Wings", "#Foodie"],
+        expected_count=5,
+    )
+
+    assert repaired.original_count == 5
+    assert repaired.hashtags == ["#buffago", "#BuffaloWings", "#WingNight", "#ChickenWings", "#Foodie"]
+
+
+def test_repair_hashtag_list_trims_seven_hashtags_to_exactly_five() -> None:
+    repaired = repair_hashtag_list(
+        ["#Buffago", "#BuffaloWings", "#WingNight", "#ChickenWings", "#Foodie", "#Wings", "#FoodTok"],
+        expected_count=5,
+    )
+
+    assert repaired.original_count == 7
+    assert repaired.hashtags == ["#Buffago", "#BuffaloWings", "#WingNight", "#ChickenWings", "#Foodie"]
+
+
+def test_repair_hashtag_list_dedupes_and_refills_to_exactly_five() -> None:
+    repaired = repair_hashtag_list(
+        ["#Buffago", "buffago", "#WingNight", "#WingNight", "#Foodie"],
+        expected_count=5,
+    )
+
+    assert repaired.original_count == 3
+    assert repaired.repaired_count == 5
+    assert repaired.hashtags == ["#Buffago", "#WingNight", "#Foodie", "#BuffaloWings", "#ChickenWings"]
+
+
+def test_compose_caption_with_hashtags_repairs_embedded_caption_hashtags() -> None:
+    caption = compose_caption_with_hashtags(
+        "Tag the friend who would try this #Buffago tonight. #WingNight",
+        ["#BuffaloWings", "#Foodie"],
+        context={"state": "CT"},
+    )
+
+    assert caption.endswith("#BuffaloWings #Foodie #Buffago #WingNight #ConnecticutFood")
+    assert " #Buffago tonight" not in caption
+    assert validate_caption(caption, require_hashtags=True)["passed"] is True
 
 
 @pytest.mark.parametrize(
