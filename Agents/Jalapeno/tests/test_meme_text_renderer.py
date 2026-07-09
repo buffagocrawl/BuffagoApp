@@ -49,7 +49,7 @@ def test_render_meme_text_highlights_final_punchline() -> None:
     image = Image.new("RGBA", (1080, 1350), (20, 20, 24, 255))
     layout = layout_meme_text(
         image,
-        "FLATS OR DRUMS?\nPICK A SIDE.",
+        "WHO GETS THE LAST WING?\n\nVOTE NOW.",
         position="top",
         emphasis=True,
     )
@@ -63,7 +63,7 @@ def test_format_meme_image_handles_long_caption_without_clipping() -> None:
     result = format_meme_image(
         source,
         top_text="SEND THIS TO\nYOUR WING CREW",
-        bottom_text="FLATS OR DRUMS?\nPICK A SIDE.",
+        bottom_text="WHO GETS THE\nLAST WING? VOTE.",
     )
 
     assert result.applied

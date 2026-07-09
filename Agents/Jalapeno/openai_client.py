@@ -88,7 +88,7 @@ class OpenAIContentClient:
         started_at = time.perf_counter()
         log_event(
             self.logger,
-            "openai_generation_started",
+            "openai_request_started",
             stage=stage,
             model=self.model,
             options_count=options_count,
@@ -134,7 +134,7 @@ class OpenAIContentClient:
             duration_ms = int((time.perf_counter() - started_at) * 1000)
             log_event(
                 self.logger,
-                "openai_generation_completed",
+                "openai_request_succeeded",
                 stage=stage,
                 model=self.model,
                 options_count=options_count,
@@ -154,7 +154,7 @@ class OpenAIContentClient:
             duration_ms = int((time.perf_counter() - started_at) * 1000)
             log_event(
                 self.logger,
-                "openai_generation_failed",
+                "openai_request_failed",
                 level="warning",
                 stage=stage,
                 model=self.model,

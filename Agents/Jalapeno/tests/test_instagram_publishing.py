@@ -277,7 +277,7 @@ def test_image_precheck_blocks_mismatched_overlay_and_caption() -> None:
     post = replace(
         _sample_post(),
         caption="Send this to the group chat and start the timer.",
-        overlay_text="FLATS OR DRUMS?\nPICK A SIDE.",
+        overlay_text="WHO GETS THE\nLAST WING? VOTE.",
     )
 
     result = precheck_approved_post(config, post, dry_run=False, test_mode=False)
@@ -427,7 +427,7 @@ def test_reel_artifact_uses_processed_video_when_overlay_completed() -> None:
             "storage_path": "processed/original_texted.mp4",
             "original_storage_path": "original.mp4",
             "processed_storage_path": "processed/original_texted.mp4",
-            "overlay_text": "FLATS OR DRUMS?\nPICK A SIDE.",
+            "overlay_text": "WHO GETS THE\nLAST WING? VOTE.",
             "overlay_status": "completed",
             "media_source": "supabase_video_asset",
         },
@@ -458,7 +458,7 @@ def test_reel_artifact_falls_back_to_original_when_overlay_failed() -> None:
             "original_video_url": "https://example.com/original.mp4",
             "original_storage_path": "original.mp4",
             "processed_storage_path": "processed/original_texted.mp4",
-            "overlay_text": "FLATS OR DRUMS?\nPICK A SIDE.",
+            "overlay_text": "WHO GETS THE\nLAST WING? VOTE.",
             "overlay_status": "failed",
             "overlay_error": "ffmpeg is not available",
             "media_source": "supabase_video_asset",
@@ -783,7 +783,7 @@ def test_live_publish_auto_approves_when_content_decision_is_not_manually_approv
             "hashtags": ["#Buffago", "#WingLovers", "#CTFood", "#BuffaloWings", "#Foodie"],
             "image_prompt": "A buffalo wing meme",
             "approved": False,
-            "overlay_text": "FLATS OR DRUMS?\nPICK A SIDE.",
+            "overlay_text": "WHO GETS THE\nLAST WING? VOTE.",
         },
         "decision_summary": {
             "approved": False,

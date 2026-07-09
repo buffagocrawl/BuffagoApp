@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import replace
 from io import StringIO
+import json
+import logging
 from pathlib import Path
 import sys
 
@@ -15,7 +17,7 @@ from caption_rules import CAPTION_STYLE_ORDER, CURATED_FALLBACK_CAPTIONS, compos
 from ai_client import JalapenoAIClient  # noqa: E402
 from config import initialize_logging, load_configuration  # noqa: E402
 from content_engine.candidate_generator import ContentCandidate  # noqa: E402
-from content_engine.caption_generator import generate_caption_package  # noqa: E402
+from content_engine.caption_generator import AICopyRequiredError, generate_caption_package  # noqa: E402
 from content_engine.content_ranking import score_caption_overlay_variant  # noqa: E402
 from data_snapshot import generate_latest_snapshot  # noqa: E402
 from validation import validate_content_engine_environment  # noqa: E402
@@ -196,7 +198,7 @@ def test_compose_caption_with_hashtags_repairs_embedded_caption_hashtags() -> No
         "SEND THIS TO\nYOUR WING CREW",
         "IF THEY DON'T REPLY\nTHEY OWE WINGS",
         "WHO'S EATING\nTHIS WITH YOU?",
-        "FLATS OR DRUMS?\nPICK A SIDE.",
+        "WHO GETS THE\nLAST WING? VOTE.",
         "CANCEL YOUR PLANS.\nGET WINGS.",
     ],
 )
@@ -240,7 +242,7 @@ def test_validate_overlay_text_rejects_overlay_without_cta() -> None:
 def test_validate_post_pair_rejects_mismatched_overlay_and_caption() -> None:
     result = validate_post_pair(
         "Send this to the group chat and start the timer.",
-        "FLATS OR DRUMS?\nPICK A SIDE.",
+        "WHO GETS THE\nLAST WING? VOTE.",
     )
 
     assert result["passed"] is False
@@ -342,6 +344,122 @@ def test_generate_caption_package_falls_back_when_primary_caption_is_invalid(mon
     assert validate_caption(package.caption, require_hashtags=True)["passed"] is True
     assert package.openai_used is False
     assert package.fallback_used is True
+
+
+def test_generate_caption_package_requires_openai_when_enforced(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("USE_OPENAI", raising=False)
+    monkeypatch.delenv("AI_ENABLED", raising=False)
+    monkeypatch.delenv("ENABLE_AI_COPY", raising=False)
+    monkeypatch.delenv("JALAPENO_EMERGENCY_TEMPLATE_FALLBACK", raising=False)
+
+    with pytest.raises(AICopyRequiredError, match="OPENAI_API_KEY missing"):
+        generate_caption_package(
+            _candidate(),
+            snapshot={},
+            external_context={},
+            require_ai_copy=True,
+        )
+
+
+def test_generate_caption_package_logs_openai_request_and_blocks_recent_reuse(
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    class _FakeResponse:
+        status_code = 200
+        reason = "OK"
+
+        def json(self) -> dict[str, object]:
+            return {
+                "choices": [
+                    {
+                        "message": {
+                            "content": json.dumps(
+                                {
+                                    "caption_options": [
+                                        {
+                                            "caption_body": "Send this to someone who owes you wings.",
+                                            "caption_style": "send_to_friend",
+                                            "overlay_text": "SEND THIS TO\nYOUR WING CREW",
+                                        },
+                                        {
+                                            "caption_body": "Tag the friend who is always first to call wing night.",
+                                            "caption_style": "tag_someone",
+                                            "overlay_text": "TAG YOUR\nWING NIGHT MVP",
+                                        },
+                                    ],
+                                    "overlay_options": [
+                                        {"overlay_text": "SEND THIS TO\nYOUR WING CREW"},
+                                        {"overlay_text": "TAG YOUR\nWING NIGHT MVP"},
+                                    ],
+                                }
+                            )
+                        }
+                    }
+                ],
+                "usage": {
+                    "prompt_tokens": 120,
+                    "completion_tokens": 80,
+                    "total_tokens": 200,
+                },
+            }
+
+        @property
+        def text(self) -> str:
+            return ""
+
+    class _FakeSession:
+        def post(self, *args, **kwargs) -> _FakeResponse:
+            return _FakeResponse()
+
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("OPENAI_MODEL", "gpt-4.1-mini")
+    monkeypatch.setenv("USE_OPENAI", "true")
+    monkeypatch.setenv("AI_ENABLED", "true")
+    monkeypatch.setenv("ENABLE_AI_COPY", "true")
+    monkeypatch.delenv("JALAPENO_EMERGENCY_TEMPLATE_FALLBACK", raising=False)
+    monkeypatch.setattr("content_engine.caption_generator._local_variant_plan", lambda *args, **kwargs: [])
+
+    logger = logging.getLogger("jalapeno-caption-test")
+    caplog.set_level(logging.INFO, logger="jalapeno-caption-test")
+    monkeypatch.setattr(
+        "content_engine.caption_generator.OpenAIContentClient.from_env",
+        classmethod(
+            lambda cls, **kwargs: cls(
+                "test-key",
+                model="gpt-4.1-mini",
+                logger=kwargs.get("logger"),
+                session=_FakeSession(),
+            )
+        ),
+    )
+
+    package = generate_caption_package(
+        _candidate(),
+        snapshot={},
+        external_context={},
+        recent_posts=[
+            {
+                "selected_caption": "Send this to someone who owes you wings. #Buffago #BuffaloWings #WingNight #ChickenWings #Foodie",
+                "selected_overlay": "SEND THIS TO\nYOUR WING CREW",
+                "published_at": "2026-07-08T12:00:00+00:00",
+            }
+        ],
+        logger=logger,
+        require_ai_copy=True,
+    )
+
+    messages = [record.getMessage() for record in caplog.records]
+    assert any("openai_request_started" in message for message in messages)
+    assert any("openai_request_succeeded" in message for message in messages)
+    assert any("ai_caption_selected" in message for message in messages)
+    assert any("ai_overlay_selected" in message for message in messages)
+    assert package.copy_source == "openai"
+    assert package.openai_used is True
+    assert package.caption != "Send this to someone who owes you wings. #Buffago #BuffaloWings #WingNight #ChickenWings #Foodie"
+    assert package.overlay_text != "SEND THIS TO\nYOUR WING CREW"
+    assert package.reuse_blocked_reason is None
 
 
 def test_generate_caption_samples_returns_20_valid_records() -> None:

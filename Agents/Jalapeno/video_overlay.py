@@ -17,7 +17,7 @@ from video_assets import VideoAsset
 
 
 PROCESSED_PREFIX = "processed"
-FALLBACK_OVERLAYS = ("SEND THIS TO\nYOUR WING CREW", "FLATS OR DRUMS?\nPICK A SIDE.")
+FALLBACK_OVERLAYS = ("SEND THIS TO\nYOUR WING CREW", "WHO GETS THE\nLAST WING? VOTE.")
 
 
 @dataclass(frozen=True, slots=True)

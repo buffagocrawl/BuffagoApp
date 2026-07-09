@@ -90,7 +90,7 @@ SHARE_OVERLAY_TEMPLATES = (
 )
 
 OPINION_OVERLAY_TEMPLATES = (
-    "FLATS OR DRUMS?",
+    "WHO GETS THE LAST WING?",
     "RANCH OR BLUE CHEESE?",
     "CRISPY OR SAUCY?",
 )
@@ -333,7 +333,7 @@ class CandidateGenerator:
                 reason_chosen="Educational posts diversify the feed and give people a reason to save or share.",
                 working_title="Wing fact worth knowing",
                 short_summary="A clean, snackable fact about wings, sauce, or ordering behavior that feels useful without sounding preachy.",
-                hook_text="FLATS OR DRUMS?",
+                hook_text="WHO GETS THE LAST WING?",
                 overlay_text="",
                 target_emotion="Informed",
                 suggested_cta="Save this for the next debate.",
@@ -412,7 +412,7 @@ class CandidateGenerator:
                 reason_chosen="Leaderboards create natural comparison and comments without needing a hard sell.",
                 working_title="The current wing leaderboard mood",
                 short_summary="Turn ratings or crawl activity into a playful comparison format that invites debate.",
-                hook_text="FLATS OR DRUMS?",
+                hook_text="WHO GETS THE LAST WING?",
                 overlay_text="",
                 target_emotion="Competitive",
                 suggested_cta="Who would you move up the board?",
@@ -520,7 +520,7 @@ class CandidateGenerator:
                 reason_chosen="A meme is the best counterweight if the feed has recently leaned too promotional.",
                 working_title="When the wing debate gets out of hand",
                 short_summary="Use a playful meme structure to keep the feed unexpected and comment-friendly.",
-                hook_text="FLATS OR DRUMS? PICK A SIDE.",
+                hook_text="WHO GETS THE LAST WING?",
                 overlay_text="",
                 target_emotion="Amused",
                 suggested_cta="What side are you on?",

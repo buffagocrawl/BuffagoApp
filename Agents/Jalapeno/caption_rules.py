@@ -150,7 +150,7 @@ OVERLAY_STYLE_TEMPLATES: dict[str, tuple[str, ...]] = {
         "MAKE THE PLANS.\nGET WINGS.",
     ),
     "sauce_debate": (
-        "FLATS OR DRUMS?\nPICK A SIDE.",
+        "WHO GETS THE\nLAST WING? VOTE.",
         "VOTE RANCH OR\nBLUE CHEESE",
         "COMMENT YOUR\nSAUCE PICK",
     ),
@@ -166,7 +166,7 @@ OVERLAY_STYLE_TEMPLATES: dict[str, tuple[str, ...]] = {
         "DROP YOUR\nORDER BELOW",
     ),
     "comment_prompt": (
-        "FLATS OR DRUMS?\nPICK A SIDE.",
+        "WHO GETS THE\nLAST WING? VOTE.",
         "DROP YOUR\nSAUCE ORDER",
         "SETTLE IT IN\nTHE COMMENTS",
     ),
@@ -191,7 +191,7 @@ CURATED_FALLBACK_OVERLAYS = (
     "SEND THIS TO\nYOUR WING CREW",
     "WHO'S EATING\nTHIS WITH YOU?",
     "IF THEY DON'T REPLY\nTHEY OWE WINGS",
-    "FLATS OR DRUMS?\nPICK A SIDE.",
+    "WHO GETS THE\nLAST WING? VOTE.",
     "CANCEL YOUR PLANS.\nGET WINGS.",
     "FIRST REPLY\nBUYS THE WINGS",
 )

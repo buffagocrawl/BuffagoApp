@@ -386,7 +386,7 @@ def test_overlay_text_uses_caption_hook_without_hashtags() -> None:
 
 
 def test_overlay_text_falls_back_for_generic_caption() -> None:
-    assert select_overlay_text("8pm wing check.") == "FLATS OR DRUMS?\nPICK A SIDE."
+    assert select_overlay_text("8pm wing check.") == "WHO GETS THE\nLAST WING? VOTE."
 
 
 def test_processed_storage_path_uses_processed_folder_and_texted_suffix() -> None:

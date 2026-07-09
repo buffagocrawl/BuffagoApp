@@ -1130,6 +1130,7 @@ def run_dry_run() -> int:
             run_id=str(uuid4()),
             dry_run=True,
             scheduled_post_type=content_engine_post_type,
+            require_ai_copy=True,
         )
         print(f"Dry-run content decision written: {content_result.output_path}")
         print(f"Dry-run candidate count: {len(content_result.all_candidates)}")
@@ -1150,8 +1151,9 @@ def run_dry_run() -> int:
             candidate_count=len(content_result.all_candidates),
         )
     except Exception as exc:
-        log_event(logger, "dry_run_content_decision_failed", level="warning", error=str(exc))
-        print(f"Warning: dry-run content decision failed: {exc}")
+        log_event(logger, "dry_run_content_decision_failed", level="error", error=str(exc))
+        print(f"Dry-run content decision failed: {exc}")
+        return 1
     if scheduled_post_type and _is_video_post(scheduled_post_type):
         has_url = bool(os.getenv("SUPABASE_URL", "").strip())
         has_service_role_key = bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip())
@@ -1214,6 +1216,11 @@ def run_dry_run() -> int:
                     overlay_text=str(overlay_fields["overlay_text"]),
                     overlay_status=str(overlay_fields["overlay_status"]),
                     overlay_error=overlay_fields["overlay_error"] if isinstance(overlay_fields["overlay_error"], str) else None,
+                    selected_caption=content.caption,
+                    selected_overlay=str(overlay_fields["overlay_text"]),
+                    caption_text=content.caption,
+                    copy_source="template",
+                    generated_at=datetime.now(timezone.utc).isoformat(),
                     publish_status="dry_run",
                     metadata={
                         "dry_run": True,
@@ -1595,6 +1602,11 @@ def run_production(content_type: str | None = None) -> int:
                 overlay_text=str(overlay_fields["overlay_text"]),
                 overlay_status=str(overlay_fields["overlay_status"]),
                 overlay_error=overlay_fields["overlay_error"] if isinstance(overlay_fields["overlay_error"], str) else None,
+                selected_caption=content.caption,
+                selected_overlay=str(overlay_fields["overlay_text"]),
+                caption_text=content.caption,
+                copy_source="template",
+                generated_at=datetime.now(timezone.utc).isoformat(),
                 publish_status="drafted" if runtime_settings.dry_run else "publishing",
                 metadata={
                     "content_type": scheduled_post_type,
@@ -1745,6 +1757,11 @@ def run_production(content_type: str | None = None) -> int:
                     overlay_text=str(backup_overlay_fields["overlay_text"]),
                     overlay_status=str(backup_overlay_fields["overlay_status"]),
                     overlay_error=backup_overlay_fields["overlay_error"] if isinstance(backup_overlay_fields["overlay_error"], str) else None,
+                    selected_caption=backup_content.caption,
+                    selected_overlay=str(backup_overlay_fields["overlay_text"]),
+                    caption_text=backup_content.caption,
+                    copy_source="template",
+                    generated_at=datetime.now(timezone.utc).isoformat(),
                     publish_status="drafted" if runtime_settings.dry_run else "publishing",
                     metadata={
                         "content_type": scheduled_post_type,
@@ -1847,6 +1864,7 @@ def run_production(content_type: str | None = None) -> int:
             run_id=run_id,
             dry_run=runtime_settings.dry_run,
             scheduled_post_type=scheduled_post_type,
+            require_ai_copy=True,
         )
         content_decision = {
             "run_id": content_result.run_id,

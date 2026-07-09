@@ -110,6 +110,10 @@ def _persist_candidate_row(client: SupabaseClient, run_id: str, candidate_payloa
         "overlay_options": candidate_payload.get("caption_package", {}).get("overlay_options", []),
         "selected_caption": candidate_payload.get("caption_package", {}).get("caption"),
         "selected_overlay": candidate_payload.get("caption_package", {}).get("overlay_text"),
+        "caption_text": candidate_payload.get("caption_package", {}).get("caption"),
+        "copy_source": candidate_payload.get("caption_package", {}).get("copy_source"),
+        "generated_at": candidate_payload.get("caption_package", {}).get("generated_at"),
+        "reuse_blocked_reason": candidate_payload.get("caption_package", {}).get("reuse_blocked_reason"),
         "ranking_reason": candidate_payload.get("caption_package", {}).get("ranking_reason"),
         "ranking_score": candidate_payload.get("caption_package", {}).get("ranking_score"),
         "ranking_breakdown": candidate_payload.get("caption_package", {}).get("ranking_breakdown", {}),
@@ -147,6 +151,10 @@ def _persist_decision_row(client: SupabaseClient, run_id: str, result: ContentDe
         "ranking_reason": result.winner.get("ranking_reason"),
         "selected_caption": result.winner.get("caption"),
         "selected_overlay": result.winner.get("overlay_text"),
+        "caption_text": result.winner.get("caption"),
+        "copy_source": result.decision_summary.get("copy_source"),
+        "generated_at": result.decision_summary.get("generated_at"),
+        "reuse_blocked_reason": result.decision_summary.get("reuse_blocked_reason"),
         "caption_options": result.winner.get("caption_options", []),
         "overlay_options": result.winner.get("overlay_options", []),
     }
@@ -229,6 +237,7 @@ class ContentDecisionEngine:
         dry_run: bool = True,
         output_path: Path = DEFAULT_DECISION_OUTPUT_PATH,
         scheduled_post_type: str | None = None,
+        require_ai_copy: bool = False,
     ) -> ContentDecisionResult:
         active_run_id = run_id or str(uuid4())
         started_at = _utcnow()
@@ -264,7 +273,7 @@ class ContentDecisionEngine:
             scheduled_post_type=scheduled_post_type,
         )
 
-        recent_posts = load_recent_published_posts(client, limit=30) if client is not None else []
+        recent_posts = load_recent_published_posts(client, limit=100) if client is not None else []
         scored_candidates: list[ScoredCandidate] = []
         persisted_candidates: list[dict[str, Any]] = []
         for candidate in candidates:
@@ -351,6 +360,7 @@ class ContentDecisionEngine:
             performance_context=performance_context,
             recent_posts=recent_posts,
             logger=logger,
+            require_ai_copy=require_ai_copy,
         )
         banned_phrase_detected = any(
             issue.startswith("banned_phrase:") for issue in winner_caption.quality_review.get("issues", [])
@@ -415,6 +425,7 @@ class ContentDecisionEngine:
                 performance_context=performance_context,
                 recent_posts=recent_posts,
                 logger=logger,
+                require_ai_copy=False,
             )
             runner_up_payload = _serialize_candidate(selection.runner_up.candidate, score=selection.runner_up, caption=runner_up_caption)
             runner_up_payload["overlay_text"] = runner_up_caption.overlay_text
@@ -438,7 +449,11 @@ class ContentDecisionEngine:
             "feedback_summary_version": feedback_summary.version,
             "feedback_summary": feedback_summary.to_dict(),
             "openai_used": winner_caption.openai_used,
+            "openai_model": winner_caption.openai_model,
             "fallback_reason": winner_caption.fallback_reason,
+            "copy_source": winner_caption.copy_source,
+            "generated_at": winner_caption.generated_at,
+            "reuse_blocked_reason": winner_caption.reuse_blocked_reason,
             "selected_caption": winner_caption.caption,
             "selected_overlay": winner_caption.overlay_text,
             "caption_options": winner_caption.caption_options,
@@ -607,6 +622,7 @@ def run_content_decision_engine(
     dry_run: bool = True,
     output_path: Path = DEFAULT_DECISION_OUTPUT_PATH,
     scheduled_post_type: str | None = None,
+    require_ai_copy: bool = False,
 ) -> ContentDecisionResult:
     engine = ContentDecisionEngine()
     return engine.run(
@@ -618,4 +634,5 @@ def run_content_decision_engine(
         dry_run=dry_run,
         output_path=output_path,
         scheduled_post_type=scheduled_post_type,
+        require_ai_copy=require_ai_copy,
     )

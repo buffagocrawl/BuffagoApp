@@ -155,10 +155,8 @@ def _truncate_prompt(prompt: str, *, limit: int = 240) -> str:
 
 
 def _format_meme_text(winner: dict[str, Any]) -> tuple[str, str]:
-    top_text = _resolve_text(winner, "working_title", fallback="BUFFAGO WING ENERGY")
-    bottom_text = _resolve_text(winner, "suggested_cta", fallback=_resolve_text(winner, "short_summary", fallback=""))
-    if not bottom_text:
-        bottom_text = "When the wings hit the table, everyone has thoughts."
+    top_text = _resolve_text(winner, "overlay_text", fallback=_resolve_text(winner, "working_title", fallback="BUFFAGO WING ENERGY"))
+    bottom_text = ""
     return top_text, bottom_text
 
 

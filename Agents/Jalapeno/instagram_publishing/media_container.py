@@ -341,6 +341,9 @@ def load_approved_post_from_artifacts(
             "fallback_reason": winner.get("fallback_reason"),
             "feedback_summary_version": winner.get("feedback_summary_version") or decision_summary.get("feedback_summary_version"),
             "feedback_summary": winner.get("feedback_summary") if isinstance(winner.get("feedback_summary"), dict) else decision_summary.get("feedback_summary") if isinstance(decision_summary.get("feedback_summary"), dict) else {},
+            "copy_source": winner.get("copy_source") or decision_summary.get("copy_source") or ("openai" if winner.get("openai_used") else "template"),
+            "generated_at": winner.get("generated_at") or decision_summary.get("generated_at"),
+            "reuse_blocked_reason": winner.get("reuse_blocked_reason") or decision_summary.get("reuse_blocked_reason"),
         }
     )
     if hashtag_repair.changed:
@@ -475,6 +478,10 @@ def serialize_container_record(record: ApprovedInstagramPost) -> dict[str, Any]:
         "original_storage_path": record.original_storage_path,
         "processed_storage_path": record.processed_storage_path,
         "overlay_text": record.overlay_text,
+        "caption_text": record.caption,
+        "copy_source": record.metadata.get("copy_source") if isinstance(record.metadata, dict) else None,
+        "generated_at": record.metadata.get("generated_at") if isinstance(record.metadata, dict) else None,
+        "reuse_blocked_reason": record.metadata.get("reuse_blocked_reason") if isinstance(record.metadata, dict) else None,
         "overlay_status": record.overlay_status,
         "overlay_error": record.overlay_error,
         "media_source": record.media_source,
