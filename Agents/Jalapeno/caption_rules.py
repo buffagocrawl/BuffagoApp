@@ -5,6 +5,8 @@ import re
 from typing import Any
 
 
+HASHTAG_PATTERN = re.compile(r"(?<!\w)#([A-Za-z0-9_]+)")
+
 SHAREABLE_FOOD_POST_RULES = (
     "Every Buffago post should feel like something a user would send, tag, comment on, debate, or use to make wing plans.",
     "Use direct social triggers: send this, tag a friend, settle flats versus drums, debate sauce or heat, make wing plans, or challenge someone.",
@@ -331,6 +333,37 @@ def normalize_caption_text(text: str) -> str:
     return cleaned.strip()
 
 
+def normalize_hashtag_text(tag: str) -> str:
+    cleaned = re.sub(r"[^A-Za-z0-9_]+", "", tag.strip().lstrip("#"))
+    return f"#{cleaned}" if cleaned else ""
+
+
+def normalize_hashtag_list(hashtags: list[str], *, expected_count: int | None = None) -> list[str]:
+    normalized: list[str] = []
+    seen: set[str] = set()
+    for tag in hashtags:
+        cleaned = normalize_hashtag_text(tag)
+        if not cleaned:
+            continue
+        lowered = cleaned.lower()
+        if lowered in seen:
+            continue
+        seen.add(lowered)
+        normalized.append(cleaned)
+    if expected_count is not None and len(normalized) != expected_count:
+        raise ValueError(f"Expected exactly {expected_count} hashtags, received {len(normalized)}")
+    return normalized
+
+
+def compose_caption_with_hashtags(caption: str, hashtags: list[str]) -> str:
+    normalized_caption = normalize_caption_text(caption)
+    body = re.sub(r"(?:\s*#\w+)+\s*$", "", normalized_caption).strip()
+    if not body:
+        raise ValueError("Caption body cannot be empty")
+    normalized_hashtags = normalize_hashtag_list(hashtags, expected_count=5)
+    return f"{body} {' '.join(normalized_hashtags)}"
+
+
 def style_templates(style: str) -> tuple[str, ...]:
     return CAPTION_STYLE_TEMPLATES.get(style, CAPTION_STYLE_TEMPLATES["simple_hype"])
 
@@ -478,13 +511,16 @@ def validate_caption(
     *,
     max_length: int = 160,
     allow_longer: bool = False,
+    require_hashtags: bool = False,
 ) -> dict[str, Any]:
     issues: list[str] = []
     normalized = normalize_caption_text(caption)
-    lowered = normalized.lower()
+    hashtags = [f"#{match.group(1)}" for match in HASHTAG_PATTERN.finditer(normalized)]
+    body = re.sub(r"(?:\s*#\w+)+\s*$", "", normalized).strip() if hashtags else normalized
+    lowered = body.lower()
     is_curated = lowered in CURATED_CAPTION_LOOKUP
 
-    if not normalized:
+    if not body:
         issues.append("empty_caption")
     if not allow_longer and len(normalized) > max_length:
         issues.append(f"caption_too_long:{len(normalized)}")
@@ -507,8 +543,8 @@ def validate_caption(
 
     has_primary_signal = any(re.search(pattern, lowered) for pattern in PRIMARY_WING_SIGNAL_PATTERNS)
     has_supporting_signal = any(re.search(pattern, lowered) for pattern in SUPPORTING_SIGNAL_PATTERNS)
-    engagement_actions = _detect_engagement_actions(normalized)
-    social_angles = _detect_social_angles(normalized)
+    engagement_actions = _detect_engagement_actions(body)
+    social_angles = _detect_social_angles(body)
     has_friend_or_group_cta = any(
         re.search(pattern, lowered)
         for pattern in (r"\bgroup chat\b", r"\bfriend\b", r"\bcrew\b", r"\bplate\b", r"\border\b", r"\bowe\b", r"\bowes\b")
@@ -528,7 +564,16 @@ def validate_caption(
         issues.append("caption_not_direct_enough")
     if normalized.count(".") + normalized.count("!") + normalized.count("?") > 2:
         issues.append("too_many_sentences")
-    if "#" in normalized:
+    if require_hashtags:
+        if not hashtags:
+            issues.append("missing_hashtags")
+        elif len(hashtags) != 5:
+            issues.append(f"hashtag_count_not_equal_5:{len(hashtags)}")
+        elif len(normalize_hashtag_list(hashtags)) != 5:
+            issues.append("hashtag_count_not_equal_5")
+        if HASHTAG_PATTERN.search(body):
+            issues.append("hashtags_must_be_at_end")
+    elif hashtags:
         issues.append("hashtags_belong_outside_caption")
     if _emoji_count(normalized) > 2:
         issues.append("too_many_emojis")
@@ -544,10 +589,17 @@ def validate_caption(
         "caption_source": "template" if is_curated else "openai",
         "social_angles": sorted(social_angles),
         "engagement_actions": sorted(engagement_actions),
+        "hashtag_count": len(hashtags),
     }
 
 
-def validate_overlay_text(text: str, *, max_words: int = 8, preferred_min_words: int = 3) -> dict[str, Any]:
+def validate_overlay_text(
+    text: str,
+    *,
+    max_words: int = 8,
+    preferred_min_words: int = 3,
+    max_chars: int = 42,
+) -> dict[str, Any]:
     issues: list[str] = []
     normalized = text.replace("\r", "\n").strip()
     normalized = re.sub(r"\n{3,}", "\n\n", normalized)
@@ -559,12 +611,16 @@ def validate_overlay_text(text: str, *, max_words: int = 8, preferred_min_words:
 
     if not normalized:
         issues.append("empty_overlay_text")
+    if "\\n" in text:
+        issues.append("literal_newline_escape_present")
     if len(lines) > 2:
         issues.append("overlay_too_many_lines")
     if word_count > max_words:
         issues.append(f"overlay_too_long:{word_count}")
     if 0 < word_count < preferred_min_words:
         issues.append(f"overlay_too_short:{word_count}")
+    if len(normalized) > max_chars:
+        issues.append(f"overlay_text_too_long:{len(normalized)}")
     if any(count > 8 for count in _line_word_counts(normalized)):
         issues.append("overlay_line_too_long")
 
@@ -606,7 +662,8 @@ def validate_overlay_text(text: str, *, max_words: int = 8, preferred_min_words:
 
 def validate_post_pair(caption: str, overlay_text: str | None) -> dict[str, Any]:
     issues: list[str] = []
-    caption_validation = validate_caption(caption)
+    caption_hashtags = HASHTAG_PATTERN.findall(normalize_caption_text(caption))
+    caption_validation = validate_caption(caption, require_hashtags=bool(caption_hashtags))
     overlay_validation = validate_overlay_text(overlay_text) if isinstance(overlay_text, str) and overlay_text.strip() else None
     caption_angles = set(caption_validation["social_angles"])
     overlay_angles = set(overlay_validation["social_angles"]) if overlay_validation is not None else set()
@@ -622,7 +679,7 @@ def validate_post_pair(caption: str, overlay_text: str | None) -> dict[str, Any]
             issues.extend(f"overlay:{issue}" for issue in overlay_validation["issues"])
     if overlay_validation is not None and caption_angles and overlay_angles and not (caption_angles & overlay_angles) and not overlay_reinforces_caption:
         issues.append("caption_overlay_mismatch")
-    if overlay_validation is not None and not overlay_reinforces_caption and not (caption_angles & overlay_angles):
+    elif overlay_validation is not None and not overlay_reinforces_caption and not (caption_angles & overlay_angles):
         issues.append("caption_overlay_concept_unrelated")
 
     passed = not issues

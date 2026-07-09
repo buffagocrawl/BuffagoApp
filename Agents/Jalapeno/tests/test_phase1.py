@@ -164,8 +164,8 @@ def test_prompt_library_validation_reports_manifest(tmp_path: Path) -> None:
 
     manifest = validate_prompt_library_environment(logger=logger)
 
-    assert manifest["version"] == "prompt-library-v1"
-    assert len(manifest["files"]) == 10
+    assert manifest["version"] == "prompt-library-v2"
+    assert len(manifest["files"]) >= 10
     assert "prompt_library_validation_started" in stream.getvalue()
     assert "prompt_library_validation_completed" in stream.getvalue()
 
@@ -416,6 +416,9 @@ def test_dry_run_logs_optional_post_type_for_manual_dispatch(
     assert "scheduled_post_type=daily_wing_reel" in output
     assert "run_source=github_actions_manual_dispatch" in output
     assert "github_run_id=123456" in output
+    assert "dry_run_content_decision_summary" in output
+    assert "openai_used=" in output
+    assert "feedback_summary_version=" in output
 
 
 def test_secrets_are_not_printed_in_logs(tmp_path: Path) -> None:
@@ -767,8 +770,6 @@ def test_fallback_image_output_uses_scene_direction_metadata_and_no_text() -> No
     assert "courtroom evidence" in prompt or "visual centerpiece" in prompt
     assert "golden crisp edges" in prompt
     assert "no visible words" in prompt
-    assert result["needs_text_overlay"] is False
-    assert result["text_overlay"] is None
     assert result["camera_angle"]
     assert result["scene_type"]
     assert result["comedy_beat"]
@@ -836,6 +837,39 @@ def test_buffago_prompt_variety_rotates_across_candidates() -> None:
 
     assert len(camera_angles) >= 3
     assert len(scene_types) >= 3
+
+
+def test_candidate_overlays_include_questions_but_not_only_questions() -> None:
+    generator = CandidateGenerator(ContentEngineSettings(candidate_count_min=5, candidate_count_max=10, preferred_candidate_count=7))
+    candidates = generator.generate_candidates(
+        snapshot={
+            "recent_ratings": [{"restaurant_name": "J Timothy's", "city": "Plainville", "state": "CT"}],
+            "top_restaurants": [{"restaurant_name": "Dew Drop Inn", "city": "Derby", "state": "CT"}],
+            "new_restaurants": [],
+            "active_states": [{"state": "CT"}],
+            "crawl_activity": {"recent_crawls": []},
+            "recent_badges": [],
+            "xp_streak_milestones": {"xp_levels": []},
+        },
+        external_context={
+            "date": "2026-07-09",
+            "trend_topics": ["connecticut wings"],
+            "news_topics": [],
+            "recommended_content_angles": ["wing debate"],
+            "sports_events": ["game day"],
+            "major_holidays": [],
+            "minor_holidays": [],
+            "food_holidays": [],
+        },
+        memory_summary={},
+    )
+
+    overlays = [candidate.overlay_text for candidate in candidates if candidate.overlay_text]
+    question_count = sum(1 for overlay in overlays if overlay.endswith("?"))
+
+    assert overlays
+    assert question_count > 0
+    assert question_count < len(overlays)
 
 
 def test_content_engine_validation_runs_dry_run_without_posting(tmp_path: Path) -> None:

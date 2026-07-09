@@ -418,6 +418,10 @@ def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = Fals
     required_tables = [
         "jalapeno_runs",
         "jalapeno_posts",
+        "jalapeno_content_candidates",
+        "jalapeno_content_decisions",
+        "jalapeno_content_memory",
+        "jalapeno_content_performance",
         "jalapeno_image_assets",
         "jalapeno_post_metrics",
         "jalapeno_instagram_posts",
@@ -485,6 +489,18 @@ def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = Fals
             "duplicate_score",
             "selected",
             "rejection_reason",
+            "caption_options",
+            "overlay_options",
+            "selected_caption",
+            "selected_overlay",
+            "ranking_reason",
+            "ranking_score",
+            "ranking_breakdown",
+            "openai_used",
+            "openai_model",
+            "fallback_reason",
+            "feedback_summary_version",
+            "feedback_summary",
             "updated_at",
         },
         "jalapeno_posts": {
@@ -512,6 +528,18 @@ def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = Fals
             "overlay_text",
             "overlay_status",
             "overlay_error",
+            "caption_options",
+            "overlay_options",
+            "selected_caption",
+            "selected_overlay",
+            "ranking_reason",
+            "ranking_score",
+            "ranking_breakdown",
+            "openai_used",
+            "openai_model",
+            "fallback_reason",
+            "feedback_summary_version",
+            "feedback_summary",
             "retry_count",
             "last_publish_attempt_at",
             "published_at",
@@ -564,6 +592,90 @@ def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = Fals
             "overlay_status",
             "overlay_error",
             "created_at",
+            "caption_options",
+            "overlay_options",
+            "selected_caption",
+            "selected_overlay",
+            "ranking_reason",
+            "ranking_score",
+            "ranking_breakdown",
+            "openai_used",
+            "openai_model",
+            "fallback_reason",
+            "feedback_summary_version",
+            "feedback_summary",
+        },
+        "jalapeno_content_candidates": {
+            "id",
+            "run_id",
+            "candidate_id",
+            "content_type",
+            "reason_chosen",
+            "working_title",
+            "short_summary",
+            "target_emotion",
+            "suggested_cta",
+            "suggested_image_concept",
+            "suggested_caption_angle",
+            "primary_theme",
+            "secondary_theme",
+            "mood",
+            "hook_style",
+            "cta_category",
+            "restaurants_mentioned",
+            "cities_mentioned",
+            "states_mentioned",
+            "food_categories",
+            "holiday_references",
+            "sports_references",
+            "current_event_references",
+            "source_signals",
+            "visual_style",
+            "image_composition",
+            "duplicate_score",
+            "overall_score",
+            "rejected",
+            "rejection_reason",
+            "caption_options",
+            "overlay_options",
+            "selected_caption",
+            "selected_overlay",
+            "ranking_reason",
+            "ranking_score",
+            "ranking_breakdown",
+            "openai_used",
+            "openai_model",
+            "fallback_reason",
+            "feedback_summary_version",
+            "feedback_summary",
+            "score_breakdown",
+            "metadata",
+        },
+        "jalapeno_content_decisions": {
+            "id",
+            "run_id",
+            "winner_candidate_id",
+            "runner_up_candidate_id",
+            "decision_summary",
+            "winner_reasoning",
+            "model_name",
+            "token_usage",
+            "cost_estimate",
+            "platform",
+            "caption_options",
+            "overlay_options",
+            "selected_caption",
+            "selected_overlay",
+            "ranking_reason",
+            "ranking_score",
+            "ranking_breakdown",
+            "openai_used",
+            "openai_model",
+            "fallback_reason",
+            "feedback_summary_version",
+            "feedback_summary",
+            "created_at",
+            "updated_at",
         },
         "jalapeno_image_assets": {
             "id",
@@ -710,7 +822,8 @@ def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = Fals
     print(f"Configured 6pm video Reel post: {config.video.post_time} {config.timezone}")
     if config.buffago_post_time != "20:00" or config.video.post_time != "18:00":
         print("Warning: scheduler config does not match expected 20:00 Buffago and 18:00 video times")
-    print(f"OpenAI key available: {bool(os.getenv('OPENAI_API_KEY', '').strip() or os.getenv('JALAPENO_AI_FUNCTION_URL', '').strip())}")
+    print(f"OpenAI direct configured: {bool(os.getenv('OPENAI_API_KEY', '').strip())} (model={os.getenv('OPENAI_MODEL', '').strip() or 'gpt-4.1-mini'})")
+    print(f"Jalapeno AI function configured: {bool(os.getenv('JALAPENO_AI_FUNCTION_URL', '').strip() or os.getenv('SUPABASE_URL', '').strip())}")
     print(f"Meta credentials available: {bool(os.getenv(config.instagram.access_token_secret_name, '').strip() and os.getenv(config.instagram.ig_user_id_secret_name, '').strip())}")
     print(f"Instagram business account id present: {bool(config.instagram_business_account_id)}")
     print(f"Facebook page id present: {bool(config.facebook_page_id)}")
@@ -1002,6 +1115,42 @@ def run_dry_run() -> int:
         run_source=run_source,
         **github_metadata,
     )
+    snapshot_result = None
+    external_result = None
+    try:
+        snapshot_result = generate_latest_snapshot(logger=logger, client=None)
+        external_result = generate_external_context(config, logger=logger)
+        content_engine_post_type = scheduled_post_type if scheduled_post_type in {"buffago_post", "meme_post"} else None
+        content_result = run_content_decision_engine(
+            snapshot=snapshot_result.snapshot,
+            external_context=external_result.context,
+            client=None,
+            logger=logger,
+            run_id=str(uuid4()),
+            dry_run=True,
+            scheduled_post_type=content_engine_post_type,
+        )
+        print(f"Dry-run content decision written: {content_result.output_path}")
+        print(f"Dry-run candidate count: {len(content_result.all_candidates)}")
+        print(f"Dry-run winner type: {content_result.winner.get('content_type')}")
+        print(f"Dry-run OpenAI used: {content_result.decision_summary.get('openai_used', False)}")
+        print(f"Dry-run OpenAI model: {content_result.decision_summary.get('model_name', 'local-rules')}")
+        print(f"Dry-run feedback summary version: {content_result.decision_summary.get('feedback_summary_version', 'unknown')}")
+        if content_result.decision_summary.get("fallback_reason"):
+            print(f"Dry-run fallback reason: {content_result.decision_summary.get('fallback_reason')}")
+        log_event(
+            logger,
+            "dry_run_content_decision_summary",
+            run_id=content_result.run_id,
+            openai_used=content_result.decision_summary.get("openai_used", False),
+            openai_model=content_result.decision_summary.get("model_name", "local-rules"),
+            feedback_summary_version=content_result.decision_summary.get("feedback_summary_version", "unknown"),
+            fallback_reason=content_result.decision_summary.get("fallback_reason"),
+            candidate_count=len(content_result.all_candidates),
+        )
+    except Exception as exc:
+        log_event(logger, "dry_run_content_decision_failed", level="warning", error=str(exc))
+        print(f"Warning: dry-run content decision failed: {exc}")
     if scheduled_post_type and _is_video_post(scheduled_post_type):
         has_url = bool(os.getenv("SUPABASE_URL", "").strip())
         has_service_role_key = bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip())

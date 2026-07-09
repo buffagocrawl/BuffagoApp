@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime
+import random
 from typing import Any
 from uuid import uuid4
 
@@ -74,6 +75,129 @@ def _normalize_location(item: Any) -> tuple[str | None, str | None]:
     return city, state
 
 
+QUESTION_OVERLAY_TEMPLATES = (
+    "BEST WINGS IN {location}?",
+    "WHO HAS THE BEST WINGS IN {state}?",
+    "WHERE ARE {state}'S BEST WINGS?",
+    "BEST WINGS IN {city}?",
+    "WHO HAS THE BEST WINGS HERE?",
+)
+
+SHARE_OVERLAY_TEMPLATES = (
+    "SEND THIS TO YOUR WING BUDDY",
+    "TAG YOUR WING CREW",
+    "WHO ARE YOU BRINGING HERE?",
+)
+
+OPINION_OVERLAY_TEMPLATES = (
+    "FLATS OR DRUMS?",
+    "RANCH OR BLUE CHEESE?",
+    "CRISPY OR SAUCY?",
+)
+
+RESTAURANT_OVERLAY_TEMPLATES = (
+    "{restaurant} WORTH THE HYPE?",
+    "HIDDEN GEM?",
+    "WOULD YOU STOP HERE?",
+)
+
+
+def _state_label(state: str | None) -> str:
+    if not state:
+        return "CT"
+    normalized = state.strip().upper()
+    if normalized == "CT":
+        return "CONNECTICUT"
+    if normalized == "NY":
+        return "NEW YORK"
+    return state.strip()
+
+
+def _overlay_family_seed(candidate: ContentCandidate, external_context: dict[str, Any], suffix: str) -> str:
+    return f"{candidate.candidate_id}:{candidate.content_type}:{external_context.get('date') or external_context.get('day_of_week') or 'no-date'}:{suffix}"
+
+
+def _overlay_text_for_parts(
+    *,
+    content_type: str,
+    cta_category: str,
+    restaurant: str | None,
+    city: str | None,
+    state: str | None,
+    external_context: dict[str, Any],
+) -> str:
+    candidate = ContentCandidate(
+        candidate_id=f"{content_type}:{cta_category}:{restaurant or city or state or 'local'}",
+        content_type=content_type,
+        reason_chosen="overlay rotation",
+        working_title=restaurant or city or state or "local wing post",
+        short_summary="overlay rotation helper",
+        target_emotion="Curious",
+        suggested_cta="Send this to your wing crew.",
+        suggested_image_concept="Wings and sauce.",
+        suggested_caption_angle="Keep it social and local.",
+        primary_theme="restaurant focus" if restaurant else "local food",
+        secondary_theme="wing culture",
+        mood="Friendly",
+        hook_style="direct local hook",
+        cta_category=cta_category,
+        restaurants_mentioned=[restaurant] if restaurant else [],
+        cities_mentioned=[city] if city else [],
+        states_mentioned=[state] if state else [],
+        food_categories=["wings", "sauce"],
+    )
+    return _overlay_text_for_candidate(candidate, external_context)
+
+
+def _overlay_text_for_candidate(candidate: ContentCandidate, external_context: dict[str, Any]) -> str:
+    city = candidate.cities_mentioned[0] if candidate.cities_mentioned else None
+    state = candidate.states_mentioned[0] if candidate.states_mentioned else None
+    restaurant = candidate.restaurants_mentioned[0] if candidate.restaurants_mentioned else None
+    available_families = ["question", "share", "opinion", "restaurant"]
+    family_weights = [40, 30, 20, 10]
+    if candidate.content_type in {"restaurant_spotlight", "hidden_gem"}:
+        family_weights = [45, 20, 15, 20]
+    elif candidate.content_type in {"meme", "funny_observation", "challenge"}:
+        family_weights = [20, 35, 30, 15]
+    elif candidate.cta_category == "question":
+        family_weights = [55, 20, 15, 10]
+    family = random.Random(_overlay_family_seed(candidate, external_context, "family")).choices(available_families, weights=family_weights, k=1)[0]
+
+    if family == "question":
+        location = city or _state_label(state)
+        templates = []
+        if city and state:
+            templates.extend(
+                [
+                    f"BEST WINGS IN {city}?",
+                    f"WHO HAS THE BEST WINGS IN {_state_label(state)}?",
+                    f"WHERE ARE {_state_label(state)}'S BEST WINGS?",
+                    f"BEST WINGS IN {city}?",
+                ]
+            )
+        elif city:
+            templates.extend([f"BEST WINGS IN {city}?", f"WHO HAS THE BEST WINGS IN {city}?"])
+        elif state:
+            templates.extend([f"BEST WINGS IN {_state_label(state)}?", f"WHO HAS THE BEST WINGS IN {_state_label(state)}?"])
+        else:
+            templates.extend(["BEST WINGS IN TOWN?", "WHO HAS THE BEST WINGS HERE?"])
+        templates.extend(
+            template.format(location=location or "TOWN", state=_state_label(state), city=city or "TOWN")
+            for template in QUESTION_OVERLAY_TEMPLATES
+        )
+        return random.Random(_overlay_family_seed(candidate, external_context, "question")).choice(_unique(templates))
+
+    if family == "share":
+        return random.Random(_overlay_family_seed(candidate, external_context, "share")).choice(list(SHARE_OVERLAY_TEMPLATES))
+    if family == "opinion":
+        return random.Random(_overlay_family_seed(candidate, external_context, "opinion")).choice(list(OPINION_OVERLAY_TEMPLATES))
+
+    templates = list(RESTAURANT_OVERLAY_TEMPLATES)
+    if restaurant:
+        templates.insert(0, f"{restaurant} WORTH THE HYPE?")
+    return random.Random(_overlay_family_seed(candidate, external_context, "restaurant")).choice(_unique(templates))
+
+
 class CandidateGenerator:
     def __init__(self, settings: ContentEngineSettings) -> None:
         self.settings = settings
@@ -126,7 +250,7 @@ class CandidateGenerator:
                 working_title=f"Why {primary_restaurant[0]} keeps showing up",
                 short_summary=f"Spotlight {primary_restaurant[0]} in {primary_restaurant[1] or 'Buffalo'} as a high-signal favorite from recent Buffago activity.",
                 hook_text="WHO'S EATING THIS WITH YOU?",
-                overlay_text="WHO'S EATING\nTHIS WITH YOU?",
+                overlay_text="",
                 target_emotion="Curious",
                 suggested_cta="Drop your go-to wing spot in the comments.",
                 suggested_image_concept=f"Close-up wing tray at {primary_restaurant[0]} with crisp texture and warm restaurant lighting.",
@@ -155,7 +279,7 @@ class CandidateGenerator:
                 working_title=f"Hidden gem: {secondary_restaurant[0]}",
                 short_summary=f"Frame {secondary_restaurant[0]} as the quieter pick worth saving for later.",
                 hook_text="SEND THIS TO YOUR WING CREW",
-                overlay_text="SEND THIS TO\nYOUR WING CREW",
+                overlay_text="",
                 target_emotion="Encouraged",
                 suggested_cta="Save this for your next crawl.",
                 suggested_image_concept=f"Moody but bright table shot of {secondary_restaurant[0]} with wings, celery, and sauce cups.",
@@ -184,7 +308,7 @@ class CandidateGenerator:
                 working_title="The wing napkin math problem",
                 short_summary="A playful observation about how wings quietly multiply napkins, opinions, and group chat energy.",
                 hook_text="FIRST REPLY BUYS THE WINGS",
-                overlay_text="FIRST REPLY\nBUYS THE WINGS",
+                overlay_text="",
                 target_emotion="Amused",
                 suggested_cta="Tell us your most chaotic wing order.",
                 suggested_image_concept="Meme-style table scene with wings, napkins, and a mildly dramatic reaction shot.",
@@ -210,7 +334,7 @@ class CandidateGenerator:
                 working_title="Wing fact worth knowing",
                 short_summary="A clean, snackable fact about wings, sauce, or ordering behavior that feels useful without sounding preachy.",
                 hook_text="FLATS OR DRUMS?",
-                overlay_text="FLATS OR DRUMS?\nPICK A SIDE.",
+                overlay_text="",
                 target_emotion="Informed",
                 suggested_cta="Save this for the next debate.",
                 suggested_image_concept="Graphic-led food fact card with wings and a minimal Buffago color palette.",
@@ -236,7 +360,7 @@ class CandidateGenerator:
                 working_title=f"Buffago in {active_states[0] if active_states else 'New York'}",
                 short_summary="Highlight the people, states, or local energy behind the Buffago ecosystem without over-explaining it.",
                 hook_text="WHO'S DOWN FOR WING NIGHT?",
-                overlay_text="WHO'S DOWN FOR\nWING NIGHT?",
+                overlay_text="",
                 target_emotion="Connected",
                 suggested_cta="Which city should get the next spotlight?",
                 suggested_image_concept="Community map graphic with local pins and wing markers across active states.",
@@ -263,7 +387,7 @@ class CandidateGenerator:
                 working_title="Someone just crossed a big XP line",
                 short_summary="Use the XP and streak context to frame a milestone post that rewards participation.",
                 hook_text="TAG YOUR WING MVP",
-                overlay_text="TAG YOUR\nWING MVP",
+                overlay_text="",
                 target_emotion="Motivated",
                 suggested_cta="Who is closest to the next level?",
                 suggested_image_concept="Badge-style XP milestone graphic with a wing reward and bold level callout.",
@@ -289,7 +413,7 @@ class CandidateGenerator:
                 working_title="The current wing leaderboard mood",
                 short_summary="Turn ratings or crawl activity into a playful comparison format that invites debate.",
                 hook_text="FLATS OR DRUMS?",
-                overlay_text="FLATS OR DRUMS?\nPICK A SIDE.",
+                overlay_text="",
                 target_emotion="Competitive",
                 suggested_cta="Who would you move up the board?",
                 suggested_image_concept="Leaderboard graphic with wing spots and local city cues.",
@@ -317,7 +441,7 @@ class CandidateGenerator:
                 working_title="One more wing stop challenge",
                 short_summary="Challenge the audience to build the most disciplined or least disciplined crawl route possible.",
                 hook_text="START THE TIMER",
-                overlay_text="START THE TIMER.\nWINGS ARE ON THEM.",
+                overlay_text="",
                 target_emotion="Playful",
                 suggested_cta="Drop your crawl version in the comments.",
                 suggested_image_concept="Challenge card with route lines, wings, and a playful scorecard.",
@@ -344,7 +468,7 @@ class CandidateGenerator:
                 working_title="Game day wings, no complicated analysis",
                 short_summary="Tie wing energy to the current sports mood without pretending to know specific scores.",
                 hook_text="SEND THIS TO THE GROUP CHAT",
-                overlay_text="SEND THIS TO\nTHE GROUP CHAT",
+                overlay_text="",
                 target_emotion="Ready",
                 suggested_cta="Game day order: what are you picking?",
                 suggested_image_concept="Game-day wings on a table with jersey colors and a cozy watch-party setup.",
@@ -371,7 +495,7 @@ class CandidateGenerator:
                 working_title="If today is a food holiday, wings are answering the call",
                 short_summary="Lean into the food holiday frame while keeping the tone playful and direct.",
                 hook_text="CANCEL YOUR PLANS. GET WINGS.",
-                overlay_text="CANCEL YOUR PLANS.\nGET WINGS.",
+                overlay_text="",
                 target_emotion="Hungry",
                 suggested_cta="Which sauce would you pair with it?",
                 suggested_image_concept="Celebratory wing platter with festive accents and bright color contrast.",
@@ -397,7 +521,7 @@ class CandidateGenerator:
                 working_title="When the wing debate gets out of hand",
                 short_summary="Use a playful meme structure to keep the feed unexpected and comment-friendly.",
                 hook_text="FLATS OR DRUMS? PICK A SIDE.",
-                overlay_text="FLATS OR DRUMS?\nPICK A SIDE.",
+                overlay_text="",
                 target_emotion="Amused",
                 suggested_cta="What side are you on?",
                 suggested_image_concept="High-contrast meme with a dramatic wing moment and a clear joke setup.",
@@ -455,6 +579,7 @@ class CandidateGenerator:
             if candidate.caption_style in strategy_config.get("preferred_caption_styles", []):
                 candidate.metadata["strategy_preferred_caption_style"] = True
 
+        candidates = [replace(candidate, overlay_text=_overlay_text_for_candidate(candidate, external_context)) for candidate in candidates]
         return candidates
 
     def generate_candidates(

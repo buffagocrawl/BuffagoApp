@@ -741,7 +741,7 @@ def validate_video_overlay_environment(
         log_event(logger, "video_overlay_validation_failed", level="error", error=message)
         raise ConfigError(message)
 
-    overlay_text = select_overlay_text("Daily wing reel because the scroll deserved sauce.\n\n#Buffago #WingNight")
+    overlay_text = select_overlay_text("Daily wing reel because the scroll deserved sauce.")
     processed_storage_path = "processed/validation_probe_texted.mp4"
     processed_storage_writable = False
     with tempfile.TemporaryDirectory(prefix="jalapeno-overlay-validation-") as temp_dir_raw:

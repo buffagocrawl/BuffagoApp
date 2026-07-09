@@ -136,7 +136,7 @@ def build_text_generation_prompt(
         "- Prefer tag, send, share, comment, like, reply, vote, choose, debate, challenge, or plan-making prompts\n"
         "- Keep under 120 characters when possible\n"
         "- Mention or clearly imply wings, wing night, sauce, flats/drums, cravings, friends, group chat, or someone owing wings\n"
-        "- Hashtags must stay separate from the caption field\n"
+        "- Hashtags must stay separate from the caption field and total exactly 5 tags\n"
         "- Do not include literal \\n in the caption\n"
         "- Do not use understood the assignment, main character, had a job, paid rent, brought receipts, illegal levels, POV unless it literally makes sense, or random slang that could fit any food post\n"
         "- Do not write captions that are generic, overly clever, surreal, corporate, or unrelated to the image text angle\n"

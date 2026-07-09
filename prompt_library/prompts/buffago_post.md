@@ -16,6 +16,7 @@ Analyze recent Buffago activity, top restaurants, new restaurants, achievements,
 - Prefer share-trigger concepts over generic humor.
 - Good angles: tag a friend, send this to someone, make wing plans, debate flats versus drums, debate sauce or heat, challenge someone, like, reply, or vote.
 - Ban wing personification, surreal AI jokes, captions that do not match the image-text idea, and captions that do not ask for an action.
+- Return exactly 5 hashtags and keep them relevant to the post.
 - Return JSON only.
 
 ## Output Shape

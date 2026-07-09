@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from caption_rules import finalize_caption_overlay_pair, validate_caption, validate_post_pair
+from caption_rules import compose_caption_with_hashtags, finalize_caption_overlay_pair, validate_caption, validate_post_pair
 from logging_utils import log_event
 
 
@@ -28,6 +29,10 @@ def _list_of_strings(value: Any) -> list[str]:
         if isinstance(item, str) and item.strip():
             items.append(item.strip())
     return items
+
+
+def _compose_publish_caption(caption: str, hashtags: list[str]) -> str:
+    return compose_caption_with_hashtags(caption, hashtags)
 
 
 def _number_or_none(value: Any) -> float | None:
@@ -258,21 +263,22 @@ def load_approved_post_from_artifacts(
     if media_kind == "reel" and not public_video_url:
         raise ValueError("Approved Reel is missing public_video_url")
 
+    caption_body = re.sub(r"(?:\s*#\w+)+\s*$", "", caption).strip()
     caption_plan = finalize_caption_overlay_pair(
         seed=f"{run_id}:{candidate_id}:{content_type}",
         caption_style=_string_or_none(winner.get("selected_caption_style")) or _string_or_none(winner.get("caption_style")),
-        raw_caption=caption,
+        raw_caption=caption_body,
         raw_overlay=_string_or_none(winner.get("overlay_text")),
         allow_openai_caption=False,
     )
-    caption = caption_plan["caption"]
+    caption = _compose_publish_caption(caption_plan["caption"], hashtags)
     overlay_text = caption_plan["overlay_text"]
-    caption_validation = caption_plan["caption_validation"]
+    caption_validation = validate_caption(caption, require_hashtags=True)
     overlay_plan = caption_plan
     caption_source = caption_plan["caption_source"]
     fallback_used = caption_plan["fallback_used"]
-    validation_failure_reason = caption_plan["validation_failure_reason"]
-    post_pair_validation = caption_plan["pair_validation"]
+    post_pair_validation = validate_post_pair(caption, overlay_text)
+    validation_failure_reason = None if caption_validation["passed"] else ", ".join(caption_validation["reasons"])
 
     metadata = dict(content_decision.get("metadata") or {}) if isinstance(content_decision.get("metadata"), dict) else {}
     metadata.update(
@@ -288,6 +294,18 @@ def load_approved_post_from_artifacts(
             "post_pair_validation_passed": post_pair_validation["passed"],
             "post_pair_validation_failure_reason": None if post_pair_validation["passed"] else ", ".join(post_pair_validation["reasons"]),
             "caption_overlay_concept": caption_plan["caption_overlay_concept"],
+            "selected_caption": caption,
+            "selected_overlay": overlay_text,
+            "caption_options": winner.get("caption_options") if isinstance(winner.get("caption_options"), list) else [],
+            "overlay_options": winner.get("overlay_options") if isinstance(winner.get("overlay_options"), list) else [],
+            "ranking_reason": winner.get("ranking_reason"),
+            "ranking_score": winner.get("ranking_score"),
+            "ranking_breakdown": winner.get("ranking_breakdown") if isinstance(winner.get("ranking_breakdown"), dict) else {},
+            "openai_used": bool(winner.get("openai_used")),
+            "openai_model": winner.get("openai_model"),
+            "fallback_reason": winner.get("fallback_reason"),
+            "feedback_summary_version": winner.get("feedback_summary_version") or decision_summary.get("feedback_summary_version"),
+            "feedback_summary": winner.get("feedback_summary") if isinstance(winner.get("feedback_summary"), dict) else decision_summary.get("feedback_summary") if isinstance(decision_summary.get("feedback_summary"), dict) else {},
         }
     )
 
@@ -352,6 +370,7 @@ def safe_container_request_payload(
     video_url: str | None = None,
     media_kind: str = "image",
     caption: str,
+    hashtags: list[str] | None = None,
     access_token: str,
     user_tags: list[dict[str, Any]] | None = None,
     location_id: str | None = None,
@@ -359,7 +378,7 @@ def safe_container_request_payload(
     include_accessibility_caption: bool = False,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     request_payload: dict[str, Any] = {
-        "caption": caption,
+        "caption": _compose_publish_caption(caption, hashtags or []) if hashtags else caption,
         "access_token": access_token,
     }
     if media_kind == "reel":

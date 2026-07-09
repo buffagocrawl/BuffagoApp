@@ -43,6 +43,7 @@ jobs:
       META_APP_SECRET: ${{ secrets.META_APP_SECRET }}
       META_LONG_LIVED_ACCESS_TOKEN: ${{ secrets.META_LONG_LIVED_ACCESS_TOKEN }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-4.1-mini' }}
       FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
       INSTAGRAM_BUSINESS_ACCOUNT_ID: ${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}
       GITHUB_WORKFLOW_RUN_ID: ${{ github.run_id }}

@@ -28,7 +28,7 @@ Expo / React Native app
   -> Supabase Edge Functions for privileged workflows
        -> Wingman restaurant intake
        -> account deletion
-  -> OpenAI and Google Places used server-side in Edge Functions
+  -> OpenAI and Google Places used server-side in Edge Functions, with Jalapeno also able to call OpenAI directly when configured
   -> Jalapeno content decision engine and long-term content memory
 ```
 
@@ -38,7 +38,7 @@ Jalapeno now keeps its Buffago brand and prompt guidance in standalone markdown 
 
 The library is versioned and loaded dynamically at runtime by the Jalapeno agent and its validation flow.
 
-Jalapeno's content decision engine also reuses that library for candidate generation, caption cleanup, quality review, and image prompt guidance.
+Jalapeno's content decision engine also reuses that library for candidate generation, caption cleanup, quality review, image prompt guidance, and OpenAI-backed caption/overlay variant generation when configured.
 
 ## AI And Data Quality
 

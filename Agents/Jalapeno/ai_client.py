@@ -1,13 +1,21 @@
 from __future__ import annotations
 
 import json
+import re
 import time
 from dataclasses import asdict, dataclass
 from typing import Any
 
 import requests
 
-from caption_rules import CAPTION_STYLE_ORDER, choose_caption_style, finalize_caption, style_guidance, validate_caption
+from caption_rules import (
+    CAPTION_STYLE_ORDER,
+    choose_caption_style,
+    compose_caption_with_hashtags,
+    finalize_caption,
+    style_guidance,
+    validate_caption,
+)
 from ai_config import AIConfig, load_ai_config
 from ai_prompts import DEFAULT_BRAND_RULES, PROMPT_LIBRARY_VERSION, load_prompt_bundle
 from ai_schemas import (
@@ -422,23 +430,23 @@ class JalapenoAIClient:
             output = self._response_output(response)
             if request_type == "text_content":
                 output = normalize_text_output(output)
+                caption_body = re.sub(r"(?:\s*#\w+)+\s*$", "", output["caption"]).strip()
                 caption_plan = finalize_caption(
                     seed=f"{run_id}:{content_slot}:{selected_caption_style or 'caption'}",
                     style=selected_caption_style,
-                    raw_caption=output["caption"],
+                    raw_caption=caption_body,
                     allowed_styles=[selected_caption_style] if selected_caption_style else None,
                     allow_openai_caption=True,
                 )
-                output["caption"] = caption_plan["caption"]
+                output["caption"] = compose_caption_with_hashtags(caption_plan["caption"], output["hashtags"])
                 output["selected_caption_style"] = caption_plan["selected_caption_style"]
                 output["caption_source"] = caption_plan["caption_source"]
-                output["caption_length"] = caption_plan["validation"]["caption_length"]
-                output["validation_passed"] = caption_plan["validation_passed"]
-                output["validation_failure_reason"] = caption_plan["validation_failure_reason"]
+                caption_validation = validate_caption(output["caption"], require_hashtags=True)
+                output["caption_length"] = caption_validation["caption_length"]
+                output["validation_passed"] = caption_validation["passed"]
+                output["validation_failure_reason"] = None if caption_validation["passed"] else ", ".join(caption_validation["reasons"])
                 output["fallback_used"] = caption_plan["fallback_used"]
-                output["banned_phrase_detected"] = any(
-                    issue.startswith("banned_phrase:") for issue in caption_plan["validation"].get("issues", [])
-                )
+                output["banned_phrase_detected"] = any(issue.startswith("banned_phrase:") for issue in caption_validation.get("issues", []))
             elif request_type == "image_prompt":
                 output = normalize_image_output(output)
             else:
@@ -532,7 +540,7 @@ class JalapenoAIClient:
             generation_time_ms = int((time.perf_counter() - started_at) * 1000)
             fallback_output = fallback_result.output
             fallback_caption_validation = (
-                validate_caption(fallback_output.get("caption", ""))
+                validate_caption(fallback_output.get("caption", ""), require_hashtags=True)
                 if request_type == "text_content" and isinstance(fallback_output.get("caption"), str)
                 else None
             )

@@ -221,6 +221,9 @@ def precheck_approved_post(
     elif not post.caption:
         passed = False
         reason = "missing caption"
+    elif len([tag for tag in post.hashtags if isinstance(tag, str) and tag.strip()]) != 5:
+        passed = False
+        reason = "hashtag count must be exactly 5"
     else:
         pair_validation = validate_post_pair(post.caption, post.overlay_text)
         if not pair_validation["passed"]:
@@ -345,6 +348,7 @@ def _build_request_payload(
         video_url=post.public_video_url,
         media_kind=post.media_kind,
         caption=post.caption,
+        hashtags=post.hashtags,
         access_token=access_token,
         user_tags=post.user_tags,
         location_id=post.location_id,

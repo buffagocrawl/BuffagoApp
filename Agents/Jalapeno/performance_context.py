@@ -50,6 +50,7 @@ class PerformanceContext:
     best_video_assets: list[dict[str, Any]]
     worst_video_assets: list[dict[str, Any]]
     best_caption_types: list[dict[str, Any]]
+    best_overlay_patterns: list[dict[str, Any]]
     best_hashtag_patterns: list[dict[str, Any]]
     duplicate_topics_to_avoid: list[str]
     strong_patterns: list[str]
@@ -72,6 +73,7 @@ class PerformanceContext:
             "best_video_assets": self.best_video_assets,
             "worst_video_assets": self.worst_video_assets,
             "best_caption_types": self.best_caption_types,
+            "best_overlay_patterns": self.best_overlay_patterns,
             "best_hashtag_patterns": self.best_hashtag_patterns,
             "duplicate_topics_to_avoid": self.duplicate_topics_to_avoid,
             "strong_patterns": self.strong_patterns,
@@ -254,6 +256,7 @@ def build_performance_context(
     best_video_assets = _aggregate(rows, "video_asset_id", reverse=True)
     worst_video_assets = _aggregate(rows, "video_asset_id", reverse=False)
     best_caption_types = _aggregate(rows, "caption_type", reverse=True)
+    best_overlay_patterns = _aggregate(rows, "overlay_text", reverse=True)
     best_hashtags = _hashtags(rows)
     duplicate_topics = []
     for row in rows[:25]:
@@ -306,6 +309,7 @@ def build_performance_context(
         best_video_assets=best_video_assets,
         worst_video_assets=worst_video_assets,
         best_caption_types=best_caption_types,
+        best_overlay_patterns=best_overlay_patterns,
         best_hashtag_patterns=best_hashtags,
         duplicate_topics_to_avoid=duplicate_topics[:12],
         strong_patterns=strong_patterns[:8],

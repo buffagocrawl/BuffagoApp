@@ -14,7 +14,7 @@ Phase 2 adds the database and logging foundation:
 - cost and metrics scaffolding
 - conservative RLS posture
 
-Phase 5 adds the AI generation bridge through Supabase Edge Functions. Jalapeno never reads an OpenAI key locally; Supabase owns that secret server-side.
+Phase 5 adds the AI generation bridge through Supabase Edge Functions, and the content engine can also use direct OpenAI calls when `OPENAI_API_KEY` is available. When OpenAI is missing, Jalapeno falls back to local deterministic templates instead of crashing.
 
 The new Content Decision Engine sits on top of that foundation and behaves like a human social media manager:
 
@@ -119,6 +119,8 @@ Optional AI backend overrides:
 
 - `JALAPENO_AI_FUNCTION_URL`
 - `JALAPENO_AI_FUNCTION_TOKEN`
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL`
 
 Meta integration secrets remain separate:
 
@@ -550,7 +552,7 @@ Validation checks:
 - retry logic does not create duplicate publishes
 - report generation works
 - required Jalapeno tables exist or are reported as missing
-- OpenAI or Jalapeno AI backend availability is reported
+- OpenAI direct availability or Jalapeno AI backend availability is reported
 - Meta credentials and Instagram/Facebook IDs are reported
 - report email config is reported as configured or disabled
 - metrics collector dependencies are importable
@@ -749,7 +751,7 @@ Jalapeno keeps model selection centralized in `config.yaml` under `ai.models`.
 
 - Production image generation defaults to `gpt-image-2` for the OpenAI Image API.
 - Development, validation, and dry-run image generation also use `gpt-image-2`.
-- Text generation keeps separate production and development routes.
+- Text generation keeps separate production and development routes, and Jalapeno content generation can use direct OpenAI when configured.
 - Image pipeline logs include the configured `image_model`.
 
 ## Image Asset Pipeline Workflow
@@ -965,6 +967,7 @@ Notes on secret mapping:
 - `INSTAGRAM_BUSINESS_ACCOUNT_ID` is both a Jalapeno-required environment variable and the value used for the Instagram publishing target
 - Scheduled production and manual live publishing set `JALAPENO_DRY_RUN=false` in the workflow; no separate `JALAPENO_INSTAGRAM_ENABLED` secret is required.
 - `SUPABASE_SERVICE_ROLE_KEY` is also reused as the default Jalapeno AI function token when `JALAPENO_AI_FUNCTION_TOKEN` is not separately set
+- `OPENAI_API_KEY` and `OPENAI_MODEL` enable direct OpenAI-backed caption and overlay generation
 - No real secret values should be committed to the repository
 
 ## Inspecting Data

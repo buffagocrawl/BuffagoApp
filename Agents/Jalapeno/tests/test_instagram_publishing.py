@@ -26,7 +26,7 @@ def _sample_post() -> ApprovedInstagramPost:
         run_id="11111111-1111-1111-1111-111111111111",
         candidate_id="22222222-2222-2222-2222-222222222222",
         caption="Send this to someone who owes you wings.",
-        hashtags=["buffago", "wingnight"],
+        hashtags=["#Buffago", "#WingLovers", "#CTFood", "#BuffaloWings", "#Foodie"],
         alt_text="A test alt text",
         image_prompt="A test prompt",
         public_image_url="https://example.com/public-image.jpg",
@@ -47,7 +47,7 @@ def _sample_reel() -> ApprovedInstagramPost:
         run_id="11111111-1111-1111-1111-111111111111",
         candidate_id="22222222-2222-2222-2222-222222222222",
         caption="Send this to the group chat and start the debate.",
-        hashtags=["buffago", "wingnight"],
+        hashtags=["#Buffago", "#WingLovers", "#CTFood", "#BuffaloWings", "#Foodie"],
         alt_text=None,
         image_prompt="Preloaded Supabase Storage wing video asset; no AI image or video generated.",
         public_image_url="https://example.com/video.mp4",
@@ -176,7 +176,7 @@ def test_buffago_validated_image_quality_overrides_candidate_score_78(tmp_path: 
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "restaurant_spotlight",
             "caption": "Send this to someone who owes you wings.",
-            "hashtags": ["buffago", "wingnight"],
+            "hashtags": ["#Buffago", "#WingLovers", "#CTFood", "#BuffaloWings", "#Foodie"],
             "image_prompt": "A hero plate of wings",
             "approved": True,
             "quality_score": 78,
@@ -223,7 +223,7 @@ def test_buffago_failed_image_validation_blocks_even_with_quality_100() -> None:
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "restaurant_spotlight",
             "caption": "Send this to someone who owes you wings.",
-            "hashtags": ["buffago", "wingnight"],
+            "hashtags": ["#Buffago", "#WingLovers", "#CTFood", "#BuffaloWings", "#Foodie"],
             "image_prompt": "A hero plate of wings",
             "approved": True,
             "quality_score": 78,
@@ -301,6 +301,19 @@ def test_reel_container_payload_uses_video_url_and_redacts_token() -> None:
     assert safe_payload["access_token"] == "[redacted]"
 
 
+def test_safe_container_request_payload_appends_hashtags_to_caption() -> None:
+    payload, _ = safe_container_request_payload(
+        image_url="https://example.com/image.jpg",
+        media_kind="image",
+        caption="Send this to someone who owes you wings.",
+        hashtags=["#Buffago", "#WingLovers", "#CTFood", "#BuffaloWings", "#Foodie"],
+        access_token="secret-token",
+    )
+
+    assert payload["caption"].count("#") == 5
+    assert payload["caption"].endswith("#Foodie")
+
+
 def test_reel_precheck_allows_supabase_video_without_image_validation() -> None:
     config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
     config = replace(config, instagram=replace(config.instagram, enabled=True, dry_run=False))
@@ -318,7 +331,7 @@ def test_load_approved_post_regenerates_bad_overlay_text() -> None:
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "restaurant_spotlight",
             "caption": "Send this and start the timer.",
-            "hashtags": ["buffago", "wingnight"],
+            "hashtags": ["#Buffago", "#WingLovers", "#CTFood", "#BuffaloWings", "#Foodie"],
             "image_prompt": "A hero plate of wings",
             "approved": True,
             "overlay_text": "IF THIS WING HAD A VOICEMAIL",
@@ -350,7 +363,7 @@ def test_reel_artifact_uses_processed_video_when_overlay_completed() -> None:
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "daily_wing_reel",
             "caption": "Settle it in the comments.",
-            "hashtags": ["buffago"],
+            "hashtags": ["#Buffago", "#WingLovers", "#CTFood", "#BuffaloWings", "#Foodie"],
             "image_prompt": "Preloaded Supabase Storage wing video asset; no AI image or video generated.",
             "approved": True,
             "public_video_url": "https://example.com/original.mp4",
@@ -382,7 +395,7 @@ def test_reel_artifact_falls_back_to_original_when_overlay_failed() -> None:
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "daily_wing_reel",
             "caption": "Settle it in the comments.",
-            "hashtags": ["buffago"],
+            "hashtags": ["#Buffago", "#WingLovers", "#CTFood", "#BuffaloWings", "#Foodie"],
             "image_prompt": "Preloaded Supabase Storage wing video asset; no AI image or video generated.",
             "approved": True,
             "public_video_url": "https://example.com/original.mp4",
@@ -622,7 +635,7 @@ def test_live_publish_persists_missing_candidate_before_final_post_insert(
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "restaurant_spotlight",
             "caption": "Send this to someone who owes you wings.",
-            "hashtags": ["buffago", "wingnight"],
+            "hashtags": ["#Buffago", "#WingLovers", "#CTFood", "#BuffaloWings", "#Foodie"],
             "image_prompt": "A hero plate of wings",
             "working_title": "Wing night pick",
         },
@@ -681,7 +694,7 @@ def test_live_publish_auto_approves_when_content_decision_is_not_manually_approv
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "meme",
             "caption": "Settle it in the comments.",
-            "hashtags": ["buffago", "meme"],
+            "hashtags": ["#Buffago", "#WingLovers", "#CTFood", "#BuffaloWings", "#Foodie"],
             "image_prompt": "A buffalo wing meme",
             "approved": False,
             "overlay_text": "FLATS OR DRUMS?\nPICK A SIDE.",
@@ -758,7 +771,7 @@ def test_live_publish_uses_resolved_runtime_dry_run_false(
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "daily_wing_reel",
             "caption": "Send this to the group chat and start the debate.",
-            "hashtags": ["buffago", "wingnight"],
+            "hashtags": ["#Buffago", "#WingLovers", "#CTFood", "#BuffaloWings", "#Foodie"],
             "image_prompt": "Preloaded Supabase Storage wing video asset; no AI image or video generated.",
             "approved": True,
             "public_video_url": "https://example.com/video.mp4",
@@ -881,7 +894,7 @@ def test_publish_precheck_receives_image_validation_quality_score_when_winner_sc
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "restaurant_spotlight",
             "caption": "Send this to someone who owes you wings.",
-            "hashtags": ["buffago", "wingnight"],
+            "hashtags": ["#Buffago", "#WingLovers", "#CTFood", "#BuffaloWings", "#Foodie"],
             "image_prompt": "A hero plate of wings",
             "approved": True,
         },

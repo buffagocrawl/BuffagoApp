@@ -19,6 +19,7 @@ from content_engine.caption_generator import CaptionPackage, generate_caption_pa
 from content_engine.duplicate_checker import DuplicateChecker
 from content_engine.hashtag_generator import generate_hashtags
 from content_engine.image_prompt_generator import generate_image_prompt
+from content_engine.feedback_summary import build_feedback_summary
 from content_engine.settings import ContentEngineSettings, load_content_engine_settings
 from content_engine.winner_selector import WinnerSelectionResult, WinnerSelector
 from content_memory import analyze_content_memory, infer_memory_entry_from_post, load_content_memory, load_recent_published_posts, persist_memory_entry
@@ -105,6 +106,18 @@ def _persist_candidate_row(client: SupabaseClient, run_id: str, candidate_payloa
         "overall_score": candidate_payload.get("final_score"),
         "rejected": candidate_payload.get("rejected_duplicate", False),
         "rejection_reason": candidate_payload.get("duplicate_reason"),
+        "caption_options": candidate_payload.get("caption_package", {}).get("caption_options", []),
+        "overlay_options": candidate_payload.get("caption_package", {}).get("overlay_options", []),
+        "selected_caption": candidate_payload.get("caption_package", {}).get("caption"),
+        "selected_overlay": candidate_payload.get("caption_package", {}).get("overlay_text"),
+        "ranking_reason": candidate_payload.get("caption_package", {}).get("ranking_reason"),
+        "ranking_score": candidate_payload.get("caption_package", {}).get("ranking_score"),
+        "ranking_breakdown": candidate_payload.get("caption_package", {}).get("ranking_breakdown", {}),
+        "openai_used": candidate_payload.get("caption_package", {}).get("openai_used", False),
+        "openai_model": candidate_payload.get("caption_package", {}).get("openai_model"),
+        "fallback_reason": candidate_payload.get("caption_package", {}).get("fallback_reason"),
+        "feedback_summary_version": candidate_payload.get("caption_package", {}).get("feedback_summary_version"),
+        "feedback_summary": candidate_payload.get("caption_package", {}).get("feedback_summary", {}),
         "score_breakdown": {
             "category_scores": candidate_payload.get("category_scores", {}),
             "adjustments": candidate_payload.get("adjustments", {}),
@@ -127,6 +140,15 @@ def _persist_decision_row(client: SupabaseClient, run_id: str, result: ContentDe
         "token_usage": result.decision_summary.get("token_usage", {}),
         "cost_estimate": result.decision_summary.get("cost_estimate"),
         "platform": result.decision_summary.get("platform", "instagram"),
+        "feedback_summary_version": result.decision_summary.get("feedback_summary_version"),
+        "feedback_summary": result.decision_summary.get("feedback_summary", {}),
+        "openai_used": result.decision_summary.get("openai_used", False),
+        "fallback_reason": result.decision_summary.get("fallback_reason"),
+        "ranking_reason": result.winner.get("ranking_reason"),
+        "selected_caption": result.winner.get("caption"),
+        "selected_overlay": result.winner.get("overlay_text"),
+        "caption_options": result.winner.get("caption_options", []),
+        "overlay_options": result.winner.get("overlay_options", []),
     }
     rows = client.insert_row("jalapeno_content_decisions", payload)
     return rows[0] if rows else payload
@@ -213,6 +235,9 @@ class ContentDecisionEngine:
         log_event(logger, "candidate_generation_started", run_id=active_run_id, dry_run=dry_run, stage="content_engine", model="local-rules")
         memory_entries, memory_summary, memory_rows = load_content_memory(client, logger=logger, run_id=active_run_id, limit=30)
         performance_context = build_performance_context(client, logger=logger, run_id=active_run_id).to_dict()
+        feedback_summary = build_feedback_summary(performance_context, {
+            "theme_rotation_needed": memory_summary.theme_rotation_needed,
+        })
         if memory_summary.reasoning:
             log_event(logger, "content_memory_analyzed", run_id=active_run_id, reasoning=memory_summary.reasoning, community_activity_score=memory_summary.community_activity_score)
         if memory_summary.theme_rotation_needed:
@@ -323,6 +348,9 @@ class ContentDecisionEngine:
             selection.winner.candidate,
             snapshot=snapshot,
             external_context=external_context,
+            performance_context=performance_context,
+            recent_posts=recent_posts,
+            logger=logger,
         )
         banned_phrase_detected = any(
             issue.startswith("banned_phrase:") for issue in winner_caption.quality_review.get("issues", [])
@@ -380,7 +408,14 @@ class ContentDecisionEngine:
         )
         runner_up_payload = None
         if selection.runner_up is not None:
-            runner_up_caption = generate_caption_package(selection.runner_up.candidate, snapshot=snapshot, external_context=external_context)
+            runner_up_caption = generate_caption_package(
+                selection.runner_up.candidate,
+                snapshot=snapshot,
+                external_context=external_context,
+                performance_context=performance_context,
+                recent_posts=recent_posts,
+                logger=logger,
+            )
             runner_up_payload = _serialize_candidate(selection.runner_up.candidate, score=selection.runner_up, caption=runner_up_caption)
             runner_up_payload["overlay_text"] = runner_up_caption.overlay_text
             runner_up_payload["caption_style"] = runner_up_caption.caption_style
@@ -400,6 +435,14 @@ class ContentDecisionEngine:
             "winner_reasoning": selection.reasoning,
             "memory_reasoning": memory_summary.reasoning,
             "performance_context": performance_context,
+            "feedback_summary_version": feedback_summary.version,
+            "feedback_summary": feedback_summary.to_dict(),
+            "openai_used": winner_caption.openai_used,
+            "fallback_reason": winner_caption.fallback_reason,
+            "selected_caption": winner_caption.caption,
+            "selected_overlay": winner_caption.overlay_text,
+            "caption_options": winner_caption.caption_options,
+            "overlay_options": winner_caption.overlay_options,
             "content_direction_reason": (
                 performance_context.get("strong_patterns", ["No strong historic pattern yet"])[0]
                 if isinstance(performance_context.get("strong_patterns"), list) and performance_context.get("strong_patterns")

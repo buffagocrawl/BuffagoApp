@@ -16,6 +16,7 @@ from ai_client import JalapenoAIClient  # noqa: E402
 from config import initialize_logging, load_configuration  # noqa: E402
 from content_engine.candidate_generator import ContentCandidate  # noqa: E402
 from content_engine.caption_generator import generate_caption_package  # noqa: E402
+from content_engine.content_ranking import score_caption_overlay_variant  # noqa: E402
 from data_snapshot import generate_latest_snapshot  # noqa: E402
 from validation import validate_content_engine_environment  # noqa: E402
 
@@ -118,6 +119,16 @@ def test_validate_caption_rejects_hashtags_inside_caption() -> None:
     assert "hashtags_belong_outside_caption" in result["issues"]
 
 
+def test_validate_caption_accepts_exactly_five_hashtags_when_required() -> None:
+    result = validate_caption(
+        "Send this to someone who owes you wings. #Buffago #WingLovers #CTFood #BuffaloWings #Foodie",
+        require_hashtags=True,
+    )
+
+    assert result["passed"] is True
+    assert result["hashtag_count"] == 5
+
+
 @pytest.mark.parametrize(
     "overlay",
     [
@@ -149,6 +160,13 @@ def test_validate_overlay_text_rejects_banned_or_generic_ai_overlay(overlay: str
 
     assert result["passed"] is False
     assert result["issues"]
+
+
+def test_validate_overlay_text_rejects_literal_newline_escape() -> None:
+    result = validate_overlay_text("SEND THIS TO\\nYOUR WING CREW")
+
+    assert result["passed"] is False
+    assert "literal_newline_escape_present" in result["issues"]
 
 
 def test_validate_overlay_text_rejects_overlay_without_cta() -> None:
@@ -198,18 +216,48 @@ def test_generate_caption_package_uses_allowed_styles_and_short_caption() -> Non
     assert package.caption_style in CAPTION_STYLE_ORDER
     assert package.caption_type == package.caption_style
     assert package.validation_passed is True
-    assert package.fallback_used is False
+    assert package.fallback_used is True
     assert package.caption_source == "template"
     assert package.caption_length <= 160
     assert "\\n" not in package.caption
     assert "\n" not in package.caption
+    assert len(package.hashtags) == 5
+    assert package.caption.count("#") == 5
+    assert validate_caption(package.caption, require_hashtags=True)["passed"] is True
     assert package.selected_caption_style
     assert package.overlay_text
     assert package.overlay_validation_passed is True
     assert validate_post_pair(package.caption, package.overlay_text)["passed"] is True
+    assert package.openai_used is False
+    assert package.openai_model is None
+    assert package.feedback_summary_version == "feedback-v1"
+    assert package.ranking_score >= 0
+    assert package.caption_options
+    assert package.overlay_options
+    assert package.caption_options[0]["caption"]
 
 
 def test_generate_caption_package_falls_back_when_primary_caption_is_invalid(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "content_engine.caption_generator._local_variant_plan",
+        lambda candidate, snapshot, external_context, feedback_summary: [
+            {
+                "source": "template",
+                "caption": "Main character energy for dinner.",
+                "overlay_text": "WINGS FOR THE WIN",
+                "caption_style": "simple_hype",
+                "caption_source": "template",
+                "overlay_source": "template",
+                "validation": {"passed": False, "issues": ["missing_engagement_action"]},
+                "hashtags": ["#Buffago", "#WingLovers", "#CTFood", "#BuffaloWings", "#LocalEats"],
+                "feedback_summary_version": feedback_summary.version,
+            }
+        ],
+    )
+    monkeypatch.setattr(
+        "content_engine.caption_generator._openai_variant_plan",
+        lambda *args, **kwargs: ([], None, "OpenAI is not configured"),
+    )
     monkeypatch.setattr(
         "content_engine.caption_generator._pick_caption",
         lambda candidate, external_context: ("simple_hype", "Main character energy\\nfor dinner."),
@@ -228,6 +276,11 @@ def test_generate_caption_package_falls_back_when_primary_caption_is_invalid(mon
     assert "main character energy" not in package.caption.lower()
     assert "\\n" not in package.caption
     assert package.overlay_validation_passed is True
+    assert len(package.hashtags) == 5
+    assert package.caption.count("#") == 5
+    assert validate_caption(package.caption, require_hashtags=True)["passed"] is True
+    assert package.openai_used is False
+    assert package.fallback_used is True
 
 
 def test_generate_caption_samples_returns_20_valid_records() -> None:
@@ -295,7 +348,7 @@ def test_ai_text_generation_uses_curated_fallback_when_caption_validation_fails(
             "content_slot": "buffago_post",
             "post_type": "restaurant_spotlight",
             "caption": "POV main character energy for dinner.",
-            "hashtags": ["#Buffago", "#Wings"],
+            "hashtags": ["#Buffago", "#WingLovers", "#CTFood", "#BuffaloWings", "#Foodie"],
             "image_prompt": "Hero plate of wings.",
             "alt_text": "Wings on a plate.",
             "content_angle": "test",
@@ -324,3 +377,38 @@ def test_ai_text_generation_uses_curated_fallback_when_caption_validation_fails(
     assert result.output["validation_passed"] is True
     assert result.output["caption_length"] <= 160
     assert result.output["selected_caption_style"] in CAPTION_STYLE_ORDER
+
+
+def test_ranking_penalizes_recent_repetition() -> None:
+    candidate = _candidate().to_dict()
+    feedback_summary = {
+        "best_cta_types": [{"name": "comment"}],
+        "best_caption_types": [{"name": "tag_someone"}],
+        "best_overlay_patterns": [{"name": "SEND THIS TO YOUR WING CREW"}],
+        "preferred_posting_windows": ["18:00"],
+        "recommended_adjustments": [],
+    }
+    repeated = score_caption_overlay_variant(
+        "Send this to someone who owes you wings.",
+        "SEND THIS TO\nYOUR WING CREW",
+        ["#Buffago", "#BuffaloWings", "#WingCrawl", "#LocalEats", "#WingSpot"],
+        candidate=candidate,
+        feedback_summary=feedback_summary,
+        recent_captions=["Send this to someone who owes you wings."],
+        recent_overlays=["SEND THIS TO\nYOUR WING CREW"],
+        recent_hashtag_sets=[["#Buffago", "#BuffaloWings", "#WingCrawl", "#LocalEats", "#WingSpot"]],
+    )
+    fresh = score_caption_overlay_variant(
+        "Tag the friend who would demolish this plate.",
+        "WHO'S EATING\nTHIS WITH YOU?",
+        ["#Buffago", "#BuffaloWings", "#WingCrawl", "#CTFood", "#ConnecticutEats"],
+        candidate=candidate,
+        feedback_summary=feedback_summary,
+        recent_captions=["Send this to someone who owes you wings."],
+        recent_overlays=["SEND THIS TO\nYOUR WING CREW"],
+        recent_hashtag_sets=[["#Buffago", "#BuffaloWings", "#WingCrawl", "#LocalEats", "#WingSpot"]],
+    )
+
+    assert fresh.score > repeated.score
+    assert repeated.rejected is False
+    assert fresh.rejected is False

@@ -4,7 +4,16 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any
 
-from caption_rules import choose_caption_style, finalize_caption, finalize_caption_overlay_pair, finalize_overlay_text, validate_overlay_text
+from caption_rules import (
+    choose_caption_style,
+    compose_caption_with_hashtags,
+    finalize_caption,
+    finalize_caption_overlay_pair,
+    finalize_overlay_text,
+    normalize_hashtag_list,
+    validate_overlay_text,
+)
+from content_engine.hashtag_generator import generate_fallback_hashtags
 from content_engine.visual_prompt_style import (
     apply_prompt_metadata,
     build_buffago_image_direction,
@@ -188,11 +197,13 @@ def normalize_text_output(payload: dict[str, Any]) -> dict[str, Any]:
     if confidence_score < 0.0 or confidence_score > 1.0:
         raise SchemaValidationError("confidence_score must be between 0 and 1")
 
+    hashtags = normalize_hashtag_list(_require_string_list(payload.get("hashtags"), "hashtags"), expected_count=5)
+
     return {
         "content_slot": content_slot,
         "post_type": post_type,
         "caption": _require_string(payload.get("caption"), "caption"),
-        "hashtags": _require_string_list(payload.get("hashtags"), "hashtags"),
+        "hashtags": hashtags,
         "image_prompt": _require_string(payload.get("image_prompt"), "image_prompt"),
         "alt_text": _require_string(payload.get("alt_text"), "alt_text"),
         "content_angle": _require_string(payload.get("content_angle"), "content_angle"),
@@ -322,35 +333,35 @@ def fallback_text_output(
     )
     if content_slot == "meme_post" or "sports_events" in signals:
         post_type = "meme"
-        caption = pair_plan["caption"]
+        hashtags = generate_fallback_hashtags(content_slot=content_slot, signals=signals, seed=style_seed)
+        caption = compose_caption_with_hashtags(pair_plan["caption"], hashtags)
         image_prompt, _metadata = _fallback_scene_prompt(content_slot, post_type)
         content_angle = f"Buffago {fallback_style} caption"
         why_this_post = "A safe wing-specific fallback caption keeps the brand playful without inventing facts."
-        hashtags = ["#Buffago", "#WingHumor", "#BuffaloWings", "#LocalFood"]
         confidence = 0.78
     elif any("holiday" in signal for signal in signals):
         post_type = "food_holiday"
-        caption = pair_plan["caption"]
+        hashtags = generate_fallback_hashtags(content_slot=content_slot, signals=signals, seed=style_seed)
+        caption = compose_caption_with_hashtags(pair_plan["caption"], hashtags)
         image_prompt, _metadata = _fallback_scene_prompt(content_slot, post_type)
         content_angle = f"Food holiday {fallback_style} caption"
         why_this_post = "Food holidays are safe, relevant, and easier to keep wing-first with a curated fallback caption."
-        hashtags = ["#Buffago", "#FoodHoliday", "#Wings", "#WingWednesday"]
         confidence = 0.76
     elif content_slot == "buffago_post":
         post_type = "restaurant_spotlight"
-        caption = pair_plan["caption"]
+        hashtags = generate_fallback_hashtags(content_slot=content_slot, signals=signals, seed=style_seed)
+        caption = compose_caption_with_hashtags(pair_plan["caption"], hashtags)
         image_prompt, _metadata = _fallback_scene_prompt(content_slot, post_type)
         content_angle = f"Restaurant spotlight {fallback_style} caption"
         why_this_post = "Restaurant spotlight stays food-first and tied to the Buffago lane with a curated caption fallback."
-        hashtags = ["#Buffago", "#BuffaloWings", "#WingStop", "#LocalEats"]
         confidence = 0.84
     else:
         post_type = "community_update"
-        caption = pair_plan["caption"]
+        hashtags = generate_fallback_hashtags(content_slot=content_slot, signals=signals, seed=style_seed)
+        caption = compose_caption_with_hashtags(pair_plan["caption"], hashtags)
         image_prompt, _metadata = _fallback_scene_prompt(content_slot, post_type)
         content_angle = "Community update"
         why_this_post = "Community updates keep the account local and positive without leaning on risky claims."
-        hashtags = ["#Buffago", "#LocalFood", "#Wings", "#CommunityEats"]
         confidence = 0.8
 
     return {

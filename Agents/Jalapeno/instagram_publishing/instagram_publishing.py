@@ -266,7 +266,7 @@ def validate_instagram_publishing_environment(
         run_id="11111111-1111-1111-1111-111111111111",
         candidate_id="22222222-2222-2222-2222-222222222222",
         caption="Send this to someone who owes you wings.",
-        hashtags=["buffago", "wingnight"],
+        hashtags=["#Buffago", "#WingLovers", "#CTFood", "#BuffaloWings", "#Foodie"],
         alt_text="A test alt text for validation",
         image_prompt="A test prompt",
         public_image_url="https://example.com/public-image.jpg",
