@@ -12,10 +12,11 @@ Create share-trigger wing content that feels local, social, and easy to send, ta
 - Keep the social hook grounded in real wing culture.
 - The post should feel like Buffago, not like generic internet noise.
 - Can reference sports, current events, the weekend, Monday, food, restaurants, friends, heat levels, sauce, and wing lovers.
-- Prefer share triggers over punchlines: tag a friend, send this to someone, start a flats-versus-drums debate, make plans, challenge someone, or call out a wing-loving friend.
+- Prefer share triggers over punchlines: tag a friend, send this to someone, start a flats-versus-drums debate, make plans, challenge someone, call out a wing-loving friend, or ask for likes, replies, votes, or picks.
 - Ban AI joke formats like "If this wing had a voicemail...", "understood the assignment", wings acting human, surreal one-liners, and unrelated captions.
 - `meme_text` should usually be 3 to 8 words and no more than two short lines.
 - `caption` must directly support the same idea as `meme_text`.
+- `caption` must still ask the viewer to do something.
 - `image_prompt` must describe only the visual scene.
 - Do not ask the image model to render meme captions or text.
 - The image prompt should explicitly forbid visible words, captions, UI, prompt text, fake app screens, and abstract placeholder shapes.

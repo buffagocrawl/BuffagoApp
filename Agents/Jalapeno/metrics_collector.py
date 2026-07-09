@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import re
 import time
+from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Any
@@ -11,7 +12,7 @@ from uuid import UUID, uuid4
 from config import JalapenoConfig, ConfigError
 from growth_loop import persist_post_pattern, score_posts
 from instagram_publishing.instagram_client import InstagramGraphClient
-from jalapeno_db import insert_error_row, insert_metrics_snapshot, update_instagram_post_by_post_id, update_publish_status
+from jalapeno_db import insert_error_row, insert_metrics_snapshot, update_jalapeno_post_by_id, update_publish_status
 from logging_utils import log_event
 from supabase_client import SupabaseClient, SupabaseError
 
@@ -72,6 +73,13 @@ def _extract_graph_error_fields(message: str) -> dict[str, int | str]:
     return fields
 
 
+def _extract_graph_error_type(message: str) -> str | None:
+    type_match = re.search(r'["\']type["\']\s*:\s*["\']([^"\']+)["\']', message)
+    if type_match:
+        return type_match.group(1)
+    return None
+
+
 def classify_meta_error(error: Exception) -> str:
     message = str(error)
     lowered = message.lower()
@@ -79,16 +87,18 @@ def classify_meta_error(error: Exception) -> str:
     code = details.get("code")
     subcode = details.get("subcode")
     http_status = details.get("http_status")
-    if code == 190 or "oauthexception" in lowered:
-        return "token_expired"
     if code == 100 and subcode == 33:
         return "meta_media_unreadable_or_missing_permission"
-    if code == 10 and "permission" in lowered:
-        return "meta_missing_insights_permission"
+    if code == 10 and ("permission" in lowered or "oauth" in lowered):
+        return "meta_permission_denied"
+    if code == 190:
+        return "token_expired"
     if code == 613 or http_status == 429 or "rate limit" in lowered or "too many" in lowered or "throttle" in lowered:
         return "rate_limit"
-    if http_status == 401:
+    if http_status == 401 and ("token" in lowered or "expired" in lowered or "oauth" in lowered):
         return "token_expired"
+    if "object does not exist" in lowered or "missing permissions" in lowered or "unsupported operation" in lowered:
+        return "meta_media_unreadable_or_missing_permission"
     return type(error).__name__
 
 
@@ -103,9 +113,13 @@ class MetricsCollectionResult:
     skipped_duplicates: int = 0
     dry_run: bool = False
     diagnostics_ran: bool = False
+    diagnostics_result: MetricsDiagnosticsResult | None = None
     repair_candidates: int = 0
     repaired_media_ids: int = 0
     unreadable_media_ids: int = 0
+    media_ids_marked_unreadable: int = 0
+    meta_permission_failures: int = 0
+    token_expired_failures: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -113,6 +127,7 @@ class MetricsCandidateLoadResult:
     posts: list[dict[str, Any]]
     published_posts_found: int
     metrics_excluded_count: int
+    excluded_counts: dict[str, int]
 
 
 @dataclass(frozen=True, slots=True)
@@ -198,17 +213,32 @@ def _engagement_rate(metrics: dict[str, Any]) -> float | None:
 
 
 _METRICS_DISABLED_STATUSES = frozenset(
-    {"media_unreadable", "metrics_disabled", "deleted", "do_not_collect"}
+    {"media_unreadable", "metrics_disabled", "instagram_media_deleted_or_inaccessible"}
 )
 
 
-def _metrics_collection_disabled(instagram_row: dict[str, Any] | None) -> bool:
-    if not isinstance(instagram_row, dict):
-        return False
-    if instagram_row.get("metrics_disabled_at") is not None:
-        return True
-    status = str(instagram_row.get("metrics_status") or "").strip().lower()
-    return status in _METRICS_DISABLED_STATUSES
+def _table_columns(client: SupabaseClient, table_name: str) -> set[str]:
+    table_columns = getattr(client, "table_columns", None)
+    if not callable(table_columns):
+        return set()
+    try:
+        columns = table_columns(table_name)
+    except Exception:
+        return set()
+    return set(columns) if isinstance(columns, set) else set(columns or [])
+
+
+def _is_unreadable_media_error(message: str, payload: dict[str, Any]) -> bool:
+    lowered = message.lower()
+    code = payload.get("code")
+    subcode = payload.get("error_subcode")
+    return (
+        (code == 100 and subcode == 33)
+        or "object does not exist" in lowered
+        or "cannot be loaded due to missing permissions" in lowered
+        or "missing permissions" in lowered
+        or "unsupported operation" in lowered
+    )
 
 
 def _fetch_published_posts(
@@ -217,6 +247,8 @@ def _fetch_published_posts(
     *,
     backfill: bool = False,
     include_disabled: bool = False,
+    logger=None,
+    run_id: str | None = None,
 ) -> MetricsCandidateLoadResult:
     cutoff = now - timedelta(days=30)
     posts = client.fetch_rows(
@@ -224,93 +256,112 @@ def _fetch_published_posts(
         select="*",
         filters={
             "published_at": f"gte.{cutoff.isoformat()}",
-            "publish_status": "in.(published,published_with_permalink_pending)",
             "order": "published_at.desc",
             "limit": 200,
         },
     )
-    instagram_rows = client.fetch_rows(
-        "jalapeno_instagram_posts",
-        select="*",
-        filters={
-            "published_at": f"gte.{cutoff.isoformat()}",
-            "status": "in.(published,published_with_permalink_pending)",
-            "order": "published_at.desc",
-            "limit": 200,
-        },
-    )
-    instagram_by_post_id = {
-        str(row.get("post_id")): row
-        for row in instagram_rows
-        if row.get("post_id") and row.get("published_media_id")
-    }
-    for post in posts:
-        instagram_row = instagram_by_post_id.get(str(post.get("id")))
-        if instagram_row and not post.get("instagram_media_id"):
-            post["instagram_media_id"] = instagram_row.get("published_media_id")
-        if instagram_row and not post.get("published_at"):
-            post["published_at"] = instagram_row.get("published_at")
-    known_post_ids = {str(post.get("id")) for post in posts if post.get("id")}
-    posts.extend(
-        {
-            "id": row.get("post_id"),
-            "run_id": row.get("run_id"),
-            "generated_caption": row.get("caption"),
-            "hashtags": row.get("hashtags"),
-            "post_type": row.get("scheduled_post_type") or row.get("content_type"),
-            "instagram_media_id": row.get("published_media_id"),
-            "instagram_permalink": row.get("permalink"),
-            "published_at": row.get("published_at"),
-            "image_url": row.get("image_url"),
-            "video_url": row.get("video_url"),
-            "storage_path": row.get("storage_path"),
-            "metadata": row.get("metadata") if isinstance(row.get("metadata"), dict) else {},
-        }
-        for row in instagram_rows
-        if row.get("post_id") and row.get("published_media_id") and str(row.get("post_id")) not in known_post_ids
-    )
+    excluded_counts: Counter[str] = Counter()
     eligible_posts: list[dict[str, Any]] = []
     for post in posts:
-        if not post.get("instagram_media_id") or not post.get("id"):
-            continue
-        age_hours = _post_age_hours(post, now)
-        if age_hours is None:
-            continue
-        window = _collection_window(age_hours, backfill=backfill)
-        if window is None:
+        post_id = str(post.get("id") or "")
+        media_id = str(post.get("instagram_media_id") or "")
+        publish_status = str(post.get("publish_status") or "").strip().lower()
+        metrics_status = str(post.get("metrics_status") or "").strip().lower()
+        metrics_disabled_at = post.get("metrics_disabled_at")
+        published_at = _parse_dt(post.get("published_at"))
+        exclusion_reason: str | None = None
+        if not post_id:
+            exclusion_reason = "missing_post_id"
+        elif not media_id:
+            exclusion_reason = "missing_instagram_media_id"
+        elif publish_status != "published":
+            exclusion_reason = "non_published_publish_status"
+        elif not include_disabled and metrics_disabled_at is not None:
+            exclusion_reason = "metrics_disabled_at_not_null"
+        elif not include_disabled and metrics_status in _METRICS_DISABLED_STATUSES:
+            exclusion_reason = f"metrics_status_{metrics_status or 'missing'}"
+        elif published_at is None:
+            exclusion_reason = "missing_published_at"
+        else:
+            age_hours = (now - published_at).total_seconds() / 3600.0
+            window = _collection_window(age_hours, backfill=backfill)
+            if window is None:
+                exclusion_reason = "outside_collection_window"
+        if exclusion_reason is not None:
+            excluded_counts[exclusion_reason] += 1
+            log_event(
+                logger,
+                "metrics_candidate_excluded",
+                run_id=run_id,
+                post_id=post_id,
+                instagram_media_id=media_id,
+                publish_status=post.get("publish_status"),
+                published_at=post.get("published_at"),
+                metrics_status=post.get("metrics_status"),
+                metrics_disabled_at=post.get("metrics_disabled_at"),
+                exclusion_reason=exclusion_reason,
+                collection_window=None,
+                stage="metrics",
+                status="excluded",
+            )
             continue
         enriched = dict(post)
-        instagram_row = instagram_by_post_id.get(str(post.get("id")))
-        if instagram_row:
-            enriched["instagram_post"] = instagram_row
+        age_hours = (now - published_at).total_seconds() / 3600.0 if published_at else 0.0
+        window = _collection_window(age_hours, backfill=backfill)
         enriched["metrics_collection_window"] = window
         enriched["metrics_exact_window"] = 23 <= age_hours <= 30 or 71 <= age_hours <= 80 or 164 <= age_hours <= 180
         eligible_posts.append(enriched)
+        log_event(
+            logger,
+            "metrics_candidate_selected",
+            run_id=run_id,
+            post_id=post_id,
+            instagram_media_id=media_id,
+            publish_status=post.get("publish_status"),
+            published_at=post.get("published_at"),
+            collection_window=window,
+            metrics_status=post.get("metrics_status"),
+            metrics_disabled_at=post.get("metrics_disabled_at"),
+            stage="metrics",
+            status="selected",
+        )
     published_posts_found = len(eligible_posts)
     if include_disabled:
         return MetricsCandidateLoadResult(
             posts=eligible_posts,
             published_posts_found=published_posts_found,
-            metrics_excluded_count=0,
+            metrics_excluded_count=sum(excluded_counts.values()),
+            excluded_counts=dict(excluded_counts),
         )
-    candidates = [post for post in eligible_posts if not _metrics_collection_disabled(post.get("instagram_post"))]
     return MetricsCandidateLoadResult(
-        posts=candidates,
+        posts=eligible_posts,
         published_posts_found=published_posts_found,
-        metrics_excluded_count=published_posts_found - len(candidates),
+        metrics_excluded_count=sum(excluded_counts.values()),
+        excluded_counts=dict(excluded_counts),
     )
 
 
-def _mark_metrics_media_unreadable(client: SupabaseClient, *, post_id: str, now: datetime) -> None:
-    update_instagram_post_by_post_id(
+def _mark_metrics_media_unreadable(
+    client: SupabaseClient,
+    *,
+    post_id: str,
+    now: datetime,
+    error_payload: dict[str, Any],
+) -> None:
+    payload: dict[str, Any] = {
+        "metrics_status": "media_unreadable",
+        "metrics_error_type": "instagram_media_deleted_or_inaccessible",
+        "metrics_disabled_at": now.isoformat(),
+    }
+    columns = _table_columns(client, "jalapeno_posts")
+    if not columns or "metrics_last_error" in columns:
+        payload["metrics_last_error"] = error_payload
+    if not columns or "updated_at" in columns:
+        payload["updated_at"] = now.isoformat()
+    update_jalapeno_post_by_id(
         client,
         post_id=UUID(post_id),
-        payload={
-            "metrics_status": "media_unreadable",
-            "metrics_error_type": "meta_media_unreadable_or_missing_permission",
-            "metrics_disabled_at": now.isoformat(),
-            "updated_at": now.isoformat(),
-        },
+        payload=payload,
     )
 
 
@@ -503,7 +554,14 @@ def run_metrics_diagnostics(
         recent_media_ids=sorted(id_ for id_ in recent_media_ids if id_),
     )
 
-    posts = _fetch_published_posts(client, current_now, backfill=True, include_disabled=True).posts
+    posts = _fetch_published_posts(
+        client,
+        current_now,
+        backfill=True,
+        include_disabled=True,
+        logger=logger,
+        run_id=active_run_id,
+    ).posts
     found_in_recent = 0
     for post in posts:
         stored_id = str(post.get("instagram_media_id") or "")
@@ -638,12 +696,12 @@ def repair_metrics_media_ids(
             instagram_media_id=str(candidate["proposed_instagram_media_id"]),
             instagram_permalink=str(candidate.get("proposed_permalink") or ""),
         )
-        update_instagram_post_by_post_id(
+        update_jalapeno_post_by_id(
             client,
             post_id=UUID(candidate["post_id"]),
             payload={
-                "published_media_id": str(candidate["proposed_instagram_media_id"]),
-                "permalink": str(candidate.get("proposed_permalink") or ""),
+                "instagram_media_id": str(candidate["proposed_instagram_media_id"]),
+                "instagram_permalink": str(candidate.get("proposed_permalink") or ""),
                 "updated_at": _utcnow().isoformat(),
             },
         )
@@ -680,6 +738,9 @@ def collect_instagram_metrics(
     repair_candidates = 0
     repaired_media_ids = 0
     unreadable_media_ids = 0
+    media_ids_marked_unreadable = 0
+    meta_permission_failures = 0
+    token_expired_failures = 0
 
     log_event(
         logger,
@@ -719,6 +780,8 @@ def collect_instagram_metrics(
         now,
         backfill=backfill,
         include_disabled=repair_media_ids,
+        logger=logger,
+        run_id=active_run_id,
     )
     posts = candidate_load.posts
     candidate_count = len(posts)
@@ -732,6 +795,7 @@ def collect_instagram_metrics(
         repair_media_ids=repair_media_ids,
         published_posts_found=candidate_load.published_posts_found,
         metrics_excluded_count=candidate_load.metrics_excluded_count,
+        excluded_counts=candidate_load.excluded_counts,
         candidate_count=candidate_count,
     )
     existing_windows = _existing_metric_windows(client, posts)
@@ -772,17 +836,6 @@ def collect_instagram_metrics(
         post_id = str(post.get("id"))
         media_id = str(post.get("instagram_media_id"))
         window = str(post.get("metrics_collection_window"))
-        log_event(
-            logger,
-            "metrics_candidate_selected",
-            run_id=active_run_id,
-            post_id=post_id,
-            instagram_media_id=media_id,
-            collection_window=window,
-            exact_window=bool(post.get("metrics_exact_window")),
-            stage="metrics",
-            status="selected",
-        )
         if dry_run:
             continue
         failure_stage = "insights"
@@ -802,13 +855,40 @@ def collect_instagram_metrics(
             )
             media_details, read_error = graph.get_media_details_safe(media_id)
             if read_error is not None:
-                unreadable_media_ids += 1
                 error_payload = _meta_error_payload(read_error)
                 error_message = error_payload.get("message") or str(read_error)
-                if error_payload.get("code") == 100 and error_payload.get("error_subcode") == 33:
+                if _is_unreadable_media_error(error_message, error_payload):
                     try:
-                        _mark_metrics_media_unreadable(client, post_id=post_id, now=now)
+                        _mark_metrics_media_unreadable(client, post_id=post_id, now=now, error_payload={
+                            "internal_error_type": "instagram_media_deleted_or_inaccessible",
+                            "meta_endpoint": media_details_endpoint,
+                            "meta_error_code": error_payload.get("code"),
+                            "meta_error_subcode": error_payload.get("error_subcode"),
+                            "meta_error_type": error_payload.get("type"),
+                            "message": error_message,
+                            "action_taken": "marked_media_unreadable",
+                        })
+                        unreadable_media_ids += 1
+                        media_ids_marked_unreadable += 1
+                        log_event(
+                            logger,
+                            "instagram_media_id_marked_unreadable",
+                            level="warning",
+                            run_id=active_run_id,
+                            post_id=post_id,
+                            instagram_media_id=media_id,
+                            meta_endpoint=media_details_endpoint,
+                            meta_error_code=error_payload.get("code"),
+                            meta_error_subcode=error_payload.get("error_subcode"),
+                            meta_error_type=error_payload.get("type"),
+                            internal_error_type="instagram_media_deleted_or_inaccessible",
+                            action_taken="marked_media_unreadable",
+                            stage="metrics",
+                            status="completed",
+                        )
+                        continue
                     except Exception as mark_exc:
+                        failures += 1
                         log_event(
                             logger,
                             "instagram_media_id_disable_failed",
@@ -820,6 +900,7 @@ def collect_instagram_metrics(
                             status="failed",
                             error=str(mark_exc),
                         )
+                    unreadable_media_ids += 1
                 log_event(
                     logger,
                     "instagram_media_id_validation_failed",
@@ -833,12 +914,12 @@ def collect_instagram_metrics(
                     error_type="meta_media_unreadable_or_missing_permission",
                     meta_error_code=error_payload.get("code"),
                     meta_error_subcode=error_payload.get("error_subcode"),
+                    meta_error_type=error_payload.get("type"),
+                    internal_error_type="meta_media_unreadable_or_missing_permission",
+                    action_taken="recorded_failure",
                     error=error_message,
                 )
-                raise SupabaseError(
-                    f"Instagram Graph API media details failed ({read_error.get('status_code')}): "
-                    f"{error_payload or read_error}"
-                )
+                continue
             log_event(
                 logger,
                 "instagram_media_id_validation_succeeded",
@@ -869,7 +950,7 @@ def collect_instagram_metrics(
             if insight_errors and not returned_metrics:
                 combined_error = " ".join(str(value) for value in insight_errors.values())
                 classification = classify_meta_error(SupabaseError(combined_error))
-                if classification in {"token_expired", "rate_limit", "meta_media_unreadable_or_missing_permission"}:
+                if classification in {"token_expired", "rate_limit", "meta_media_unreadable_or_missing_permission", "meta_permission_denied"}:
                     raise SupabaseError(combined_error)
             log_event(
                 logger,
@@ -950,7 +1031,14 @@ def collect_instagram_metrics(
         except Exception as exc:
             failures += 1
             error_type = classify_meta_error(exc)
+            error_message = str(exc)
+            error_fields = _extract_graph_error_fields(error_message)
+            meta_error_type = _extract_graph_error_type(error_message)
+            endpoint = None
+            if graph is not None:
+                endpoint = graph.describe_media_insights_endpoint(media_id) if failure_stage == "insights" else graph.describe_media_details_endpoint(media_id)
             if error_type == "token_expired":
+                token_expired_failures += 1
                 action_required = True
                 log_event(
                     logger,
@@ -963,8 +1051,13 @@ def collect_instagram_metrics(
                     stage="metrics",
                     status="failed_action_required",
                     error_type=error_type,
-                    error=str(exc),
-                    meta_endpoint=graph.describe_media_insights_endpoint(media_id) if graph is not None and failure_stage == "insights" else None,
+                    internal_error_type=error_type,
+                    action_taken="action_required",
+                    meta_error_code=error_fields.get("code"),
+                    meta_error_subcode=error_fields.get("subcode"),
+                    meta_error_type=meta_error_type,
+                    error=error_message,
+                    meta_endpoint=endpoint,
                 )
                 log_event(
                     logger,
@@ -977,6 +1070,44 @@ def collect_instagram_metrics(
                     status="failed_action_required",
                     error=str(exc),
                 )
+            elif error_type == "meta_permission_denied":
+                meta_permission_failures += 1
+                action_required = True
+                log_event(
+                    logger,
+                    "instagram_insights_fetch_failed" if failure_stage == "insights" else "post_metrics_insert_failed",
+                    level="error",
+                    run_id=active_run_id,
+                    post_id=post_id,
+                    instagram_media_id=media_id,
+                    collection_window=window,
+                    stage="metrics",
+                    status="failed_action_required",
+                    error_type=error_type,
+                    internal_error_type="meta_permission_denied",
+                    action_taken="action_required",
+                    meta_error_code=error_fields.get("code"),
+                    meta_error_subcode=error_fields.get("subcode"),
+                    meta_error_type=meta_error_type,
+                    error=error_message,
+                    meta_endpoint=endpoint,
+                )
+                if failure_stage == "insights":
+                    log_event(
+                        logger,
+                        "instagram_insights_permission_denied",
+                        level="error",
+                        run_id=active_run_id,
+                        post_id=post_id,
+                        instagram_media_id=media_id,
+                        meta_endpoint=endpoint,
+                        meta_error_code=error_fields.get("code"),
+                        meta_error_subcode=error_fields.get("subcode"),
+                        meta_error_type=meta_error_type,
+                        internal_error_type="meta_permission_denied",
+                        action_taken="action_required",
+                        message="Meta token can read media details but cannot read insights. Check app permissions, scopes, page access, Instagram Business account access, and app review.",
+                    )
             elif error_type == "rate_limit":
                 log_event(
                     logger,
@@ -989,8 +1120,13 @@ def collect_instagram_metrics(
                     stage="metrics",
                     status="retry_deferred",
                     error_type=error_type,
-                    error=str(exc),
-                    meta_endpoint=graph.describe_media_insights_endpoint(media_id) if graph is not None and failure_stage == "insights" else None,
+                    internal_error_type=error_type,
+                    action_taken="retry_deferred",
+                    meta_error_code=error_fields.get("code"),
+                    meta_error_subcode=error_fields.get("subcode"),
+                    meta_error_type=meta_error_type,
+                    error=error_message,
+                    meta_endpoint=endpoint,
                 )
             else:
                 log_event(
@@ -1004,8 +1140,13 @@ def collect_instagram_metrics(
                     stage="metrics",
                     status="failed",
                     error_type=error_type,
-                    error=str(exc),
-                    meta_endpoint=graph.describe_media_details_endpoint(media_id) if graph is not None and error_type == "meta_media_unreadable_or_missing_permission" else (graph.describe_media_insights_endpoint(media_id) if graph is not None and failure_stage == "insights" else None),
+                    internal_error_type=error_type,
+                    action_taken="recorded_failure",
+                    meta_error_code=error_fields.get("code"),
+                    meta_error_subcode=error_fields.get("subcode"),
+                    meta_error_type=meta_error_type,
+                    error=error_message,
+                    meta_endpoint=endpoint,
                 )
             try:
                 insert_error_row(
@@ -1014,11 +1155,16 @@ def collect_instagram_metrics(
                     post_id=UUID(post_id),
                     stage="metrics",
                     error_type=error_type,
-                    message=str(exc),
+                    message=error_message,
                     raw_payload={
                         "instagram_media_id": media_id,
                         "collection_window": window,
-                        "meta_endpoint": graph.describe_media_details_endpoint(media_id) if graph is not None and error_type == "meta_media_unreadable_or_missing_permission" else (graph.describe_media_insights_endpoint(media_id) if graph is not None and failure_stage == "insights" else None),
+                        "meta_endpoint": endpoint,
+                        "internal_error_type": error_type,
+                        "meta_error_code": error_fields.get("code"),
+                        "meta_error_subcode": error_fields.get("subcode"),
+                        "meta_error_type": meta_error_type,
+                        "action_taken": "action_required" if error_type in {"token_expired", "meta_permission_denied"} else ("retry_deferred" if error_type == "rate_limit" else "recorded_failure"),
                     },
                     is_retryable=error_type == "rate_limit",
                     retry_count=0,
@@ -1044,7 +1190,7 @@ def collect_instagram_metrics(
     log_event(
         logger,
         "metrics_collection_completed" if not failures else "metrics_collection_completed_with_failures",
-        level="error" if action_required else "info",
+        level="error" if action_required or failures else "info",
         run_id=active_run_id,
         stage="metrics",
         status="failed_action_required" if action_required else "completed",
@@ -1056,10 +1202,14 @@ def collect_instagram_metrics(
         skipped_duplicates=skipped_duplicates,
         repaired_media_ids=repaired_media_ids,
         unreadable_media_ids=unreadable_media_ids,
+        media_ids_marked_unreadable=media_ids_marked_unreadable,
+        meta_permission_failures=meta_permission_failures,
+        token_expired_failures=token_expired_failures,
         backfill=backfill,
         dry_run=dry_run,
         diagnostics=diagnostics,
         repair_media_ids=repair_media_ids,
+        action_required=action_required,
         diagnostics_mismatch_count=(diagnostics_result.mismatch_count if diagnostics_result else 0),
         repair_candidate_count=repair_candidates,
     )
@@ -1073,7 +1223,11 @@ def collect_instagram_metrics(
         skipped_duplicates=skipped_duplicates,
         dry_run=dry_run,
         diagnostics_ran=bool(diagnostics or repair_media_ids),
+        diagnostics_result=diagnostics_result,
         repair_candidates=repair_candidates,
         repaired_media_ids=repaired_media_ids,
         unreadable_media_ids=unreadable_media_ids,
+        media_ids_marked_unreadable=media_ids_marked_unreadable,
+        meta_permission_failures=meta_permission_failures,
+        token_expired_failures=token_expired_failures,
     )

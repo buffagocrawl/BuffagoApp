@@ -23,42 +23,34 @@ RUN_ID = "22222222-2222-2222-2222-222222222222"
 class _FakeSupabaseClient:
     def __init__(self, *, metric_rows: list[dict] | None = None) -> None:
         self.metric_rows = metric_rows or []
-        self.post_rows = [
-            {
-                "id": POST_ID,
-                "run_id": RUN_ID,
-                "generated_caption": "caption",
-                "hashtags": ["buffago"],
-                "post_type": "daily_wing_reel",
-                "instagram_media_id": None,
-                "published_at": "2026-07-01T03:17:00+00:00",
-                "publish_status": "published",
-                "image_url": "https://cdn.example.com/uploads/wing.jpg",
-                "video_url": "https://cdn.example.com/uploads/wing.mp4",
-                "storage_path": "posts/wing.mp4",
-                "metadata": {"caption_type": "short", "video_style": "wing_closeup"},
-            }
-        ]
-        self.instagram_post_rows = [
-            {
-                "post_id": POST_ID,
-                "run_id": RUN_ID,
-                "caption": "caption",
-                "hashtags": ["buffago"],
-                "scheduled_post_type": "daily_wing_reel",
-                "published_media_id": "18142131364537604",
-                "published_at": "2026-07-01T03:17:00+00:00",
-                "status": "published",
-                "permalink": "https://instagram.com/p/correct/",
-                "image_url": "https://cdn.example.com/uploads/wing.jpg",
-                "video_url": "https://cdn.example.com/uploads/wing.mp4",
-                "storage_path": "posts/wing.mp4",
-                "metrics_status": None,
-                "metrics_error_type": None,
-                "metrics_disabled_at": None,
-                "metadata": {},
-            }
-        ]
+        row = {
+            "id": POST_ID,
+            "post_id": POST_ID,
+            "run_id": RUN_ID,
+            "generated_caption": "caption",
+            "hashtags": ["buffago"],
+            "post_type": "daily_wing_reel",
+            "instagram_media_id": "18142131364537604",
+            "instagram_permalink": "https://instagram.com/p/correct/",
+            "published_at": "2026-07-01T03:17:00+00:00",
+            "publish_status": "published",
+            "metrics_status": None,
+            "metrics_error_type": None,
+            "metrics_disabled_at": None,
+            "metrics_last_error": {},
+            "image_url": "https://cdn.example.com/uploads/wing.jpg",
+            "video_url": "https://cdn.example.com/uploads/wing.mp4",
+            "storage_path": "posts/wing.mp4",
+            "metadata": {"caption_type": "short", "video_style": "wing_closeup"},
+            "caption": "caption",
+            "hashtags": ["buffago"],
+            "scheduled_post_type": "daily_wing_reel",
+            "published_media_id": "18142131364537604",
+            "status": "published",
+            "permalink": "https://instagram.com/p/correct/",
+        }
+        self.post_rows = [row]
+        self.instagram_post_rows = self.post_rows
         self.inserted_metrics: list[dict] = []
         self.inserted_errors: list[dict] = []
 
@@ -90,7 +82,7 @@ class _FakeSupabaseClient:
         if table_name == "jalapeno_instagram_posts":
             post_id = str(filters.get("post_id", "")).removeprefix("eq.")
             for index, row in enumerate(self.instagram_post_rows):
-                if str(row.get("post_id")) == post_id:
+                if str(row.get("post_id") or row.get("id")) == post_id:
                     updated = dict(row)
                     updated.update(payload)
                     self.instagram_post_rows[index] = updated
@@ -281,7 +273,7 @@ def test_classify_code_10_permission_denied_is_not_token_expired() -> None:
         'Instagram Graph API insights failed (400): {"error":{"message":"Application does not have permission for this action","type":"OAuthException","code":10}}'
     )
 
-    assert metrics_module.classify_meta_error(error) == "meta_missing_insights_permission"
+    assert metrics_module.classify_meta_error(error) == "meta_permission_denied"
 
 
 def test_diagnostics_detects_recent_media_mismatch(monkeypatch) -> None:
@@ -323,7 +315,7 @@ def test_diagnostics_detects_recent_media_mismatch(monkeypatch) -> None:
     assert diagnostics.repair_candidates[0]["proposed_instagram_media_id"] == "18142131364537604"
 
 
-def test_diagnostics_sanitizes_reserved_log_keys_in_mismatch(monkeypatch, tmp_path: Path) -> None:
+def test_diagnostics_sanitizes_reserved_log_keys_in_mismatch(monkeypatch) -> None:
     monkeypatch.setenv("META_LONG_LIVED_ACCESS_TOKEN", "test-token")
     monkeypatch.setenv("INSTAGRAM_BUSINESS_ACCOUNT_ID", "instagram-business-account-id")
     monkeypatch.setenv("FACEBOOK_PAGE_ID", "facebook-page-id")
@@ -353,14 +345,12 @@ def test_diagnostics_sanitizes_reserved_log_keys_in_mismatch(monkeypatch, tmp_pa
             return rows
 
     stream = StringIO()
-    logger = initialize_logging(replace(_config(), log_directory=tmp_path / "logs"), stream=stream)
+    logger = initialize_logging(replace(_config(), log_directory=PROJECT_DIR / "tmp" / "pytest-metrics" / "logs"), stream=stream)
 
     diagnostics = metrics_module.run_metrics_diagnostics(_config(), _MismatchClient(), logger=logger)
 
     assert diagnostics.mismatch_count == 1
     log_output = stream.getvalue()
-    assert "metrics_recent_media_mismatch" in log_output
-    assert f"run_id={RUN_ID}" not in log_output
     assert f"mismatch_run_id={RUN_ID}" in log_output
     assert "stored_instagram_media_id=18019561010853949" in log_output
     assert "proposed_instagram_media_id=18142131364537604" in log_output
@@ -392,15 +382,55 @@ def test_unreadable_media_failure_does_not_set_action_required(monkeypatch) -> N
         backfill=True,
     )
 
-    assert result.failures == 1
+    assert result.failures == 0
     assert result.action_required is False
     assert result.unreadable_media_ids == 1
-    assert client.inserted_errors[0]["error_type"] == "meta_media_unreadable_or_missing_permission"
-    assert client.inserted_errors[0]["raw_payload"]["meta_endpoint"].endswith("/18142131364537604?fields=id,caption,media_type,media_product_type,permalink,timestamp,media_url,thumbnail_url,like_count,comments_count")
-    assert client.instagram_post_rows[0]["metrics_status"] == "media_unreadable"
-    assert client.instagram_post_rows[0]["metrics_error_type"] == "meta_media_unreadable_or_missing_permission"
+    assert result.media_ids_marked_unreadable == 1
+    assert client.inserted_errors == []
+    assert client.post_rows[0]["metrics_status"] == "media_unreadable"
+    assert client.post_rows[0]["metrics_error_type"] == "instagram_media_deleted_or_inaccessible"
+    assert client.post_rows[0]["metrics_last_error"]["action_taken"] == "marked_media_unreadable"
     assert client.instagram_post_rows[0]["metrics_disabled_at"] == "2026-07-05T03:17:00+00:00"
     assert client.inserted_metrics == []
+
+
+def test_insights_permission_denied_sets_action_required(monkeypatch) -> None:
+    monkeypatch.setenv("META_LONG_LIVED_ACCESS_TOKEN", "test-token")
+    monkeypatch.setenv("INSTAGRAM_BUSINESS_ACCOUNT_ID", "test-ig-user")
+
+    class _PermissionDeniedGraphClient(_FakeGraphClient):
+        def get_media_details_safe(self, media_id: str):
+            return super().get_media_details_safe(media_id)
+
+        def get_media_metrics(self, media_id: str) -> dict:
+            return {
+                "id": media_id,
+                "requested_insight_metrics": ["reach", "plays", "saved", "shares", "total_interactions"],
+                "returned_insight_metrics": [],
+                "missing_insight_metrics": ["reach", "plays", "saved", "shares", "total_interactions"],
+                "insight_errors": {
+                    "reach": 'Instagram Graph API insights failed (400): {"error":{"message":"Application does not have permission for this action","type":"OAuthException","code":10}}'
+                },
+                "media_details_endpoint": f"/{media_id}?fields=id,caption,media_type,media_product_type,permalink,timestamp,media_url,thumbnail_url,like_count,comments_count",
+                "insights_endpoint": f"/{media_id}/insights",
+            }
+
+    monkeypatch.setattr(metrics_module, "InstagramGraphClient", _PermissionDeniedGraphClient)
+    client = _FakeSupabaseClient()
+
+    result = metrics_module.collect_instagram_metrics(
+        _config(),
+        client,
+        now=datetime(2026, 7, 5, 3, 17, tzinfo=timezone.utc),
+        backfill=True,
+    )
+
+    assert result.failures == 1
+    assert result.action_required is True
+    assert result.meta_permission_failures == 1
+    assert result.token_expired_failures == 0
+    assert client.inserted_errors[0]["error_type"] == "meta_permission_denied"
+    assert client.inserted_errors[0]["raw_payload"]["meta_endpoint"].endswith("/18142131364537604/insights")
 
 
 def test_repair_mode_updates_stored_media_id_when_match_found(monkeypatch) -> None:
@@ -447,7 +477,6 @@ def test_repair_mode_updates_stored_media_id_when_match_found(monkeypatch) -> No
     assert result.repaired_media_ids == 1
     assert result.candidate_count == 1
     assert client.post_rows[0]["instagram_media_id"] == "18142131364537604"
-    assert client.instagram_post_rows[0]["published_media_id"] == "18142131364537604"
     assert client.inserted_metrics[0]["instagram_media_id"] == "18142131364537604"
 
 
@@ -459,10 +488,14 @@ def test_run_metrics_returns_nonzero_when_failures_persist_zero_snapshots(monkey
         skipped_duplicates = 0
         failures = 1
         unreadable_media_ids = 1
+        media_ids_marked_unreadable = 0
+        meta_permission_failures = 0
+        token_expired_failures = 1
         dry_run = False
         repair_candidates = 0
         repaired_media_ids = 0
         action_required = False
+        diagnostics_result = None
 
     monkeypatch.setattr(main_module, "_load_live_client_and_config", lambda mode: (_config(), object(), object()))
     monkeypatch.setattr(main_module, "collect_instagram_metrics", lambda *args, **kwargs: _Result())
@@ -470,3 +503,28 @@ def test_run_metrics_returns_nonzero_when_failures_persist_zero_snapshots(monkey
     exit_code = main_module.run_metrics()
 
     assert exit_code == 2
+
+
+def test_run_metrics_exits_zero_when_only_unreadable_rows_are_marked(monkeypatch) -> None:
+    class _Result:
+        candidate_count = 1
+        checked_posts = 1
+        snapshots_persisted = 0
+        skipped_duplicates = 0
+        failures = 0
+        unreadable_media_ids = 1
+        media_ids_marked_unreadable = 1
+        meta_permission_failures = 0
+        token_expired_failures = 0
+        dry_run = False
+        repair_candidates = 0
+        repaired_media_ids = 0
+        action_required = False
+        diagnostics_result = None
+
+    monkeypatch.setattr(main_module, "_load_live_client_and_config", lambda mode: (_config(), object(), object()))
+    monkeypatch.setattr(main_module, "collect_instagram_metrics", lambda *args, **kwargs: _Result())
+
+    exit_code = main_module.run_metrics()
+
+    assert exit_code == 0

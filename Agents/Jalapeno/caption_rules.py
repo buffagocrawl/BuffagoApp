@@ -13,6 +13,22 @@ SHAREABLE_FOOD_POST_RULES = (
     "Caption and image text must work together as one post and point at the same social action or debate.",
 )
 
+ENGAGEMENT_ACTION_PATTERNS = (
+    r"\bsend\b",
+    r"\bshare\b",
+    r"\btag\b",
+    r"\bcomment\b",
+    r"\blike\b",
+    r"\breply\b",
+    r"\bgroup chat\b",
+    r"\bowe\b",
+    r"\bowes\b",
+    r"\bvote\b",
+    r"\bpick\b",
+    r"\bchoose\b",
+    r"\bwho(?:'s| is)\b",
+)
+
 CAPTION_STYLE_ORDER = (
     "send_to_friend",
     "tag_someone",
@@ -42,7 +58,7 @@ CAPTION_STYLE_TEMPLATES: dict[str, tuple[str, ...]] = {
     ),
     "wing_debt": (
         "If they don't answer in 10 minutes, they owe you wings.",
-        "If they ignore this, they're buying wings.",
+        "Reply in 10 minutes or you owe wings.",
         "First reply buys the wings.",
         "Send this and start the timer.",
         "If they flake again, they owe the whole table wings.",
@@ -50,42 +66,42 @@ CAPTION_STYLE_TEMPLATES: dict[str, tuple[str, ...]] = {
     "group_chat": (
         "Send this to the group chat and see who folds first.",
         "Send this to the group chat right now.",
-        "Send this to the group chat right now.",
         "Send this to the group chat and start the timer.",
         "Drop this in the group chat and wait.",
+        "Drop this in the group chat and make the call.",
     ),
     "craving_prompt": (
-        "This is your sign to get wings.",
-        "Cancel your plans. Get wings.",
-        "This is your sign to plan wing night.",
-        "Save this for the next wing run.",
         "Send this to the person you're getting wings with.",
+        "Tag the friend who needs a wing run.",
+        "Share this with the friend who owes you wings.",
+        "Send this to your wing crew.",
+        "Comment if wing night is happening.",
     ),
     "sauce_debate": (
-        "Flats or drums. Pick a side.",
+        "Comment flats or drums.",
         "Comment your sauce pick.",
-        "Settle the sauce debate in the comments.",
+        "Vote flats or drums.",
         "Tag someone who takes sauce choice way too seriously.",
-        "How hot is too hot? Comment your answer.",
+        "Like if ranch wins.",
     ),
     "wing_night": (
         "Who's down for wing night?",
         "Send this to whoever is down for wing night.",
-        "Make the plans. Get wings.",
         "Send this to your wing crew.",
-        "Who is pulling up for wings?",
+        "Comment if wing night is happening.",
+        "Tag the friend who needs wing night.",
     ),
     "simple_hype": (
         "Who is eating this with you?",
         "Send this to your wing crew.",
         "Who is pulling up for wings?",
-        "Make the plans. Get wings.",
-        "Drop your order in the comments.",
+        "Like if this counts as dinner.",
+        "Comment your wing order.",
     ),
     "comment_prompt": (
         "Comment flats or drums.",
         "Drop your go-to sauce order.",
-        "Settle it in the comments.",
+        "Vote for flats or drums.",
         "Comment your heat level.",
         "Who gets the last wing? Comment below.",
     ),
@@ -95,22 +111,22 @@ OVERLAY_STYLE_TEMPLATES: dict[str, tuple[str, ...]] = {
     "send_to_friend": (
         "SEND THIS TO\nYOUR WING CREW",
         "SEND THIS TO\nTHE GROUP CHAT",
-        "SEND THIS TO\nYOUR WING FRIEND",
+        "SEND THIS TO\nSOMEONE WHO OWES WINGS",
     ),
     "tag_someone": (
-        "WHO'S EATING\nTHIS WITH YOU?",
+        "TAG YOUR\nWING NIGHT FRIEND",
         "TAG YOUR\nWING MVP",
-        "CALL OUT YOUR\nWING FRIEND",
+        "TAG YOUR\nWING FRIEND",
     ),
     "wing_debt": (
         "IF THEY DON'T REPLY\nTHEY OWE WINGS",
         "FIRST REPLY\nBUYS THE WINGS",
-        "START THE TIMER.\nWINGS ARE ON THEM.",
+        "NO REPLY IN 10 MIN\n= THEY OWE WINGS",
     ),
     "group_chat": (
         "GROUP CHAT\nWING CHECK",
         "SEND THIS TO\nTHE GROUP CHAT",
-        "WHO'S DOWN FOR\nWING NIGHT?",
+        "DROP THIS IN\nTHE GROUP CHAT",
     ),
     "craving_prompt": (
         "CANCEL YOUR PLANS.\nGET WINGS.",
@@ -119,8 +135,8 @@ OVERLAY_STYLE_TEMPLATES: dict[str, tuple[str, ...]] = {
     ),
     "sauce_debate": (
         "FLATS OR DRUMS?\nPICK A SIDE.",
-        "RANCH OR\nBLUE CHEESE?",
-        "HOW HOT IS\nTOO HOT?",
+        "VOTE RANCH OR\nBLUE CHEESE",
+        "COMMENT YOUR\nSAUCE PICK",
     ),
     "wing_night": (
         "WHO'S DOWN FOR\nWING NIGHT?",
@@ -134,7 +150,7 @@ OVERLAY_STYLE_TEMPLATES: dict[str, tuple[str, ...]] = {
         "DROP YOUR\nORDER BELOW",
     ),
     "comment_prompt": (
-        "FLATS OR DRUMS?",
+        "FLATS OR DRUMS?\nPICK A SIDE.",
         "DROP YOUR\nSAUCE ORDER",
         "SETTLE IT IN\nTHE COMMENTS",
     ),
@@ -145,11 +161,11 @@ CURATED_FALLBACK_CAPTIONS = (
     "Tag the friend who would destroy this plate.",
     "If they don't answer in 10 minutes, they owe you wings.",
     "Share this with someone who needs a wing night.",
-    "This is your sign to get wings.",
+    "Send this to the friend who needs wings.",
     "Tag someone who takes sauce choice way too seriously.",
     "Send this to the group chat and see who folds first.",
     "Who's down for wing night?",
-    "Save this for the next wing run.",
+    "Send this to the friend who needs a wing run.",
     "Comment flats or drums.",
     "Send this to your wing night crew.",
     "Send this to the group chat right now.",
@@ -275,7 +291,7 @@ SOCIAL_ANGLE_PATTERNS: dict[str, tuple[str, ...]] = {
     "debate": (r"\bflats\b", r"\bdrums\b", r"\bsauce\b", r"\bheat\b", r"\branch\b", r"\bblue cheese\b", r"\bpick a side\b", r"\bsettle it\b"),
     "plans": (r"\bwing night\b", r"\bget wings\b", r"\border wings\b", r"\bmake the plans\b", r"\bdown for wings\b", r"\bpulling up\b", r"\byour sign\b", r"\bsave\b"),
     "challenge": (r"\bowe\b", r"\bowes\b", r"\btimer\b", r"\breply\b", r"\b10 minutes\b", r"\bbuys the wings\b", r"\bbuying wings\b", r"\bchallenge\b", r"\bignore this\b"),
-    "comment": (r"\bcomment\b", r"\bcomments\b", r"\bdrop your\b", r"\bpick a side\b"),
+    "comment": (r"\bcomment\b", r"\bcomments\b", r"\bdrop your\b", r"\bpick a side\b", r"\bvote\b", r"\bchoose\b", r"\bpick\b"),
 }
 
 DIRECT_CTA_PATTERNS = (
@@ -283,6 +299,8 @@ DIRECT_CTA_PATTERNS = (
     r"\bshare\b",
     r"\btag\b",
     r"\bcomment\b",
+    r"\blike\b",
+    r"\breply\b",
     r"\bsave\b",
     r"\bdrop your\b",
     r"\bdrop this\b",
@@ -297,6 +315,11 @@ DIRECT_CTA_PATTERNS = (
     r"\bbuys the wings\b",
     r"\bowe\b",
     r"\bignore this\b",
+    r"\bvote\b",
+    r"\bvotes?\b",
+    r"\bvoting\b",
+    r"\bpick\b",
+    r"\bchoose\b",
 )
 
 
@@ -318,6 +341,80 @@ def style_overlay_templates(style: str) -> tuple[str, ...]:
 
 def style_guidance(style: str) -> str:
     return CAPTION_STYLE_GUIDANCE.get(style, CAPTION_STYLE_GUIDANCE["simple_hype"])
+
+
+def _engagement_action_patterns() -> tuple[str, ...]:
+    return ENGAGEMENT_ACTION_PATTERNS
+
+
+def _detect_engagement_actions(text: str) -> set[str]:
+    lowered = normalize_caption_text(text).lower()
+    matches: set[str] = set()
+    for pattern in _engagement_action_patterns():
+        if re.search(pattern, lowered):
+            matches.add(pattern)
+    return matches
+
+
+def _style_for_caption(caption: str, *, seed: str, allowed_styles: list[str] | None = None) -> str:
+    lowered = normalize_caption_text(caption).lower()
+    matching_styles: list[str] = []
+    for style, patterns in SOCIAL_ANGLE_PATTERNS.items():
+        if any(re.search(pattern, lowered) for pattern in patterns):
+            if style == "send_share":
+                matching_styles.extend(["send_to_friend", "group_chat"])
+            elif style == "tag_callout":
+                matching_styles.append("tag_someone")
+            elif style == "debate":
+                matching_styles.extend(["sauce_debate", "comment_prompt"])
+            elif style == "plans":
+                matching_styles.extend(["wing_night", "craving_prompt", "simple_hype"])
+            elif style == "challenge":
+                matching_styles.append("wing_debt")
+            elif style == "comment":
+                matching_styles.append("comment_prompt")
+    if not matching_styles:
+        matching_styles = list(allowed_styles or CAPTION_STYLE_ORDER)
+    filtered = [style for style in matching_styles if style in CAPTION_STYLE_TEMPLATES and (allowed_styles is None or style in allowed_styles)]
+    return choose_caption_style(seed=seed, allowed_styles=filtered or allowed_styles)
+
+
+def _caption_overlay_concept(caption: str, overlay_text: str | None = None) -> str | None:
+    caption_angles = _detect_social_angles(caption)
+    overlay_angles = _detect_social_angles(overlay_text or "") if overlay_text else set()
+    shared = sorted(caption_angles & overlay_angles)
+    if shared:
+        return shared[0]
+    if caption_angles:
+        return sorted(caption_angles)[0]
+    if overlay_angles:
+        return sorted(overlay_angles)[0]
+    return None
+
+
+def _overlay_reinforces_caption(caption: str, overlay_text: str) -> bool:
+    caption_lower = normalize_caption_text(caption).lower()
+    overlay_lower = normalize_caption_text(overlay_text).lower()
+    caption_angles = _detect_social_angles(caption)
+    overlay_angles = _detect_social_angles(overlay_text)
+    if caption_angles & overlay_angles:
+        return True
+    if "send_share" in caption_angles and any(
+        term in overlay_lower
+        for term in ("send", "share", "group chat", "wing crew", "crew", "friend", "who's", "who is")
+    ):
+        return True
+    if "tag_callout" in caption_angles and any(term in overlay_lower for term in ("tag", "friend", "crew", "wing night friend", "mvp")):
+        return True
+    if "debate" in caption_angles and any(term in overlay_lower for term in ("flats", "drums", "sauce", "heat", "ranch", "blue cheese")):
+        return True
+    if "plans" in caption_angles and any(term in overlay_lower for term in ("wing night", "plans", "get wings", "pulling up", "crew", "wing night crew")):
+        return True
+    if "challenge" in caption_angles and any(term in overlay_lower for term in ("owe", "reply", "timer", "ignore this", "buys the wings")):
+        return True
+    if "comment" in caption_angles and any(term in overlay_lower for term in ("comment", "drop", "pick a side", "flats or drums")):
+        return True
+    return False
 
 
 def pick_caption_for_style(style: str, *, seed: str) -> str:
@@ -410,19 +507,22 @@ def validate_caption(
 
     has_primary_signal = any(re.search(pattern, lowered) for pattern in PRIMARY_WING_SIGNAL_PATTERNS)
     has_supporting_signal = any(re.search(pattern, lowered) for pattern in SUPPORTING_SIGNAL_PATTERNS)
+    engagement_actions = _detect_engagement_actions(normalized)
     social_angles = _detect_social_angles(normalized)
     has_friend_or_group_cta = any(
         re.search(pattern, lowered)
         for pattern in (r"\bgroup chat\b", r"\bfriend\b", r"\bcrew\b", r"\bplate\b", r"\border\b", r"\bowe\b", r"\bowes\b")
     )
 
-    if not is_curated and not has_primary_signal and not has_supporting_signal:
+    if not is_curated and not has_primary_signal and not has_supporting_signal and not engagement_actions:
         issues.append("missing_buffago_signal")
-    if not is_curated and not has_primary_signal and not has_friend_or_group_cta:
+    if not is_curated and not has_primary_signal and not has_friend_or_group_cta and not engagement_actions:
         issues.append("missing_wing_specificity")
-    if not is_curated and not has_primary_signal and not has_supporting_signal:
+    if not is_curated and not has_primary_signal and not has_supporting_signal and not engagement_actions:
         issues.append("too_abstract_or_generic")
-    if not social_angles:
+    if not engagement_actions:
+        issues.append("missing_engagement_action")
+    if not social_angles and not engagement_actions:
         issues.append("missing_social_share_angle")
     if not _has_direct_social_cta(normalized):
         issues.append("caption_not_direct_enough")
@@ -443,6 +543,7 @@ def validate_caption(
         "caption_length": len(normalized),
         "caption_source": "template" if is_curated else "openai",
         "social_angles": sorted(social_angles),
+        "engagement_actions": sorted(engagement_actions),
     }
 
 
@@ -464,7 +565,7 @@ def validate_overlay_text(text: str, *, max_words: int = 8, preferred_min_words:
         issues.append(f"overlay_too_long:{word_count}")
     if 0 < word_count < preferred_min_words:
         issues.append(f"overlay_too_short:{word_count}")
-    if any(count > 5 for count in _line_word_counts(normalized)):
+    if any(count > 8 for count in _line_word_counts(normalized)):
         issues.append("overlay_line_too_long")
 
     for phrase in BANNED_GENERIC_PHRASES:
@@ -479,12 +580,13 @@ def validate_overlay_text(text: str, *, max_words: int = 8, preferred_min_words:
             issues.append("personifies_wing_or_plate")
             break
 
+    engagement_actions = _detect_engagement_actions(normalized)
     angles = _detect_social_angles(normalized)
-    if not angles:
+    if not angles and not engagement_actions:
         issues.append("overlay_missing_share_trigger")
-    if not _has_direct_social_cta(normalized):
+    if not engagement_actions and not _has_direct_social_cta(normalized):
         issues.append("overlay_not_direct_enough")
-    if not is_curated and not any(re.search(pattern, lowered) for pattern in PRIMARY_WING_SIGNAL_PATTERNS + SUPPORTING_SIGNAL_PATTERNS):
+    if not is_curated and not any(re.search(pattern, lowered) for pattern in PRIMARY_WING_SIGNAL_PATTERNS + SUPPORTING_SIGNAL_PATTERNS) and not engagement_actions:
         issues.append("overlay_missing_food_or_social_signal")
 
     passed = not issues
@@ -497,6 +599,7 @@ def validate_overlay_text(text: str, *, max_words: int = 8, preferred_min_words:
         "word_count": word_count,
         "line_count": len(lines),
         "social_angles": sorted(angles),
+        "engagement_actions": sorted(engagement_actions),
         "overlay_source": "template" if is_curated else "openai",
     }
 
@@ -507,13 +610,20 @@ def validate_post_pair(caption: str, overlay_text: str | None) -> dict[str, Any]
     overlay_validation = validate_overlay_text(overlay_text) if isinstance(overlay_text, str) and overlay_text.strip() else None
     caption_angles = set(caption_validation["social_angles"])
     overlay_angles = set(overlay_validation["social_angles"]) if overlay_validation is not None else set()
+    caption_overlay_concept = _caption_overlay_concept(caption, overlay_text if isinstance(overlay_text, str) else None)
+    overlay_reinforces_caption = bool(overlay_text and _overlay_reinforces_caption(caption, overlay_text))
 
     if not caption_validation["passed"]:
         issues.extend(f"caption:{issue}" for issue in caption_validation["issues"])
     if overlay_validation is not None and not overlay_validation["passed"]:
-        issues.extend(f"overlay:{issue}" for issue in overlay_validation["issues"])
-    if overlay_validation is not None and caption_angles and overlay_angles and not (caption_angles & overlay_angles):
+        if overlay_reinforces_caption and set(overlay_validation["issues"]).issubset({"overlay_not_direct_enough", "overlay_missing_share_trigger"}):
+            pass
+        else:
+            issues.extend(f"overlay:{issue}" for issue in overlay_validation["issues"])
+    if overlay_validation is not None and caption_angles and overlay_angles and not (caption_angles & overlay_angles) and not overlay_reinforces_caption:
         issues.append("caption_overlay_mismatch")
+    if overlay_validation is not None and not overlay_reinforces_caption and not (caption_angles & overlay_angles):
+        issues.append("caption_overlay_concept_unrelated")
 
     passed = not issues
     return {
@@ -525,6 +635,8 @@ def validate_post_pair(caption: str, overlay_text: str | None) -> dict[str, Any]
         "overlay_validation": overlay_validation,
         "caption_angles": sorted(caption_angles),
         "overlay_angles": sorted(overlay_angles),
+        "caption_overlay_concept": caption_overlay_concept,
+        "overlay_reinforces_caption": overlay_reinforces_caption,
     }
 
 
@@ -575,7 +687,7 @@ def finalize_overlay_text(
     caption: str,
     raw_overlay: str | None = None,
 ) -> dict[str, Any]:
-    selected_style = style or choose_caption_style(seed=seed)
+    selected_style = style or _style_for_caption(caption, seed=seed)
     raw_pair_validation = validate_post_pair(caption, raw_overlay) if isinstance(raw_overlay, str) and raw_overlay.strip() else None
 
     if raw_pair_validation and raw_pair_validation["passed"]:
@@ -584,22 +696,34 @@ def finalize_overlay_text(
             "overlay_text": overlay_validation["normalized_overlay"],
             "overlay_source": "openai",
             "selected_caption_style": selected_style,
+            "caption_overlay_concept": raw_pair_validation["caption_overlay_concept"],
             "validation_passed": True,
             "validation_failure_reason": None,
             "fallback_used": False,
             "validation": raw_pair_validation,
         }
 
-    curated_options = list(style_overlay_templates(selected_style))
-    random.Random(f"{seed}:overlay-order").shuffle(curated_options)
-    curated_overlay = curated_options[0]
-    curated_pair_validation = validate_post_pair(caption, curated_overlay)
-    for option in curated_options:
-        candidate_validation = validate_post_pair(caption, option)
-        if candidate_validation["passed"]:
-            curated_overlay = option
-            curated_pair_validation = candidate_validation
+    candidate_styles = [selected_style] if selected_style in CAPTION_STYLE_TEMPLATES else []
+    for candidate_style in CAPTION_STYLE_ORDER:
+        if candidate_style not in candidate_styles:
+            candidate_styles.append(candidate_style)
+    curated_overlay = None
+    curated_pair_validation = None
+    for candidate_style in candidate_styles:
+        curated_options = list(style_overlay_templates(candidate_style))
+        random.Random(f"{seed}:{candidate_style}:overlay-order").shuffle(curated_options)
+        for option in curated_options:
+            candidate_validation = validate_post_pair(caption, option)
+            if candidate_validation["passed"]:
+                curated_overlay = option
+                curated_pair_validation = candidate_validation
+                selected_style = candidate_style
+                break
+        if curated_overlay is not None:
             break
+    if curated_overlay is None:
+        curated_overlay = CURATED_FALLBACK_OVERLAYS[0]
+        curated_pair_validation = validate_post_pair(caption, curated_overlay)
 
     overlay_validation = validate_overlay_text(curated_overlay)
     source = "fallback" if raw_overlay and raw_pair_validation and not raw_pair_validation["passed"] else "template"
@@ -607,10 +731,77 @@ def finalize_overlay_text(
         "overlay_text": overlay_validation["normalized_overlay"],
         "overlay_source": source,
         "selected_caption_style": selected_style,
+        "caption_overlay_concept": curated_pair_validation["caption_overlay_concept"] if curated_pair_validation else None,
         "validation_passed": curated_pair_validation["passed"],
         "validation_failure_reason": None if curated_pair_validation["passed"] else ", ".join(curated_pair_validation["reasons"]),
         "fallback_used": source == "fallback",
         "validation": curated_pair_validation,
+    }
+
+
+def finalize_caption_overlay_pair(
+    *,
+    seed: str,
+    caption_style: str | None = None,
+    raw_caption: str | None = None,
+    raw_overlay: str | None = None,
+    allowed_styles: list[str] | None = None,
+    allow_openai_caption: bool = False,
+) -> dict[str, Any]:
+    attempts = 3
+    last_caption_plan: dict[str, Any] | None = None
+    last_overlay_plan: dict[str, Any] | None = None
+    for attempt in range(attempts):
+        attempt_seed = f"{seed}:attempt:{attempt}"
+        selected_style = caption_style
+        if selected_style is None:
+            selected_style = choose_caption_style(seed=attempt_seed, allowed_styles=allowed_styles)
+        caption_plan = finalize_caption(
+            seed=attempt_seed,
+            style=selected_style,
+            raw_caption=raw_caption if attempt == 0 else None,
+            allowed_styles=[selected_style] if selected_style else allowed_styles,
+            allow_openai_caption=allow_openai_caption if attempt == 0 else False,
+        )
+        overlay_plan = finalize_overlay_text(
+            seed=f"{attempt_seed}:overlay",
+            style=caption_plan["selected_caption_style"],
+            caption=caption_plan["caption"],
+            raw_overlay=raw_overlay if attempt == 0 else None,
+        )
+        pair_validation = validate_post_pair(caption_plan["caption"], overlay_plan["overlay_text"])
+        last_caption_plan = caption_plan
+        last_overlay_plan = overlay_plan
+        if pair_validation["passed"]:
+            return {
+                "caption": caption_plan["caption"],
+                "overlay_text": overlay_plan["overlay_text"],
+                "selected_caption_style": caption_plan["selected_caption_style"],
+                "caption_source": caption_plan["caption_source"],
+                "overlay_source": overlay_plan["overlay_source"],
+                "caption_overlay_concept": pair_validation["caption_overlay_concept"],
+                "validation_passed": True,
+                "validation_failure_reason": None,
+                "fallback_used": bool(caption_plan["fallback_used"] or overlay_plan["fallback_used"]),
+                "caption_validation": caption_plan["validation"],
+                "overlay_validation": overlay_plan["validation"],
+                "pair_validation": pair_validation,
+            }
+    assert last_caption_plan is not None and last_overlay_plan is not None
+    pair_validation = validate_post_pair(last_caption_plan["caption"], last_overlay_plan["overlay_text"])
+    return {
+        "caption": last_caption_plan["caption"],
+        "overlay_text": last_overlay_plan["overlay_text"],
+        "selected_caption_style": last_caption_plan["selected_caption_style"],
+        "caption_source": last_caption_plan["caption_source"],
+        "overlay_source": last_overlay_plan["overlay_source"],
+        "caption_overlay_concept": pair_validation["caption_overlay_concept"],
+        "validation_passed": pair_validation["passed"],
+        "validation_failure_reason": None if pair_validation["passed"] else ", ".join(pair_validation["reasons"]),
+        "fallback_used": bool(last_caption_plan["fallback_used"] or last_overlay_plan["fallback_used"]),
+        "caption_validation": last_caption_plan["validation"],
+        "overlay_validation": last_overlay_plan["validation"],
+        "pair_validation": pair_validation,
     }
 
 

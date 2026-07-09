@@ -33,7 +33,7 @@ from external_context import generate_external_context
 from growth_loop import apply_strategy_recommendation, generate_growth_report, persist_post_pattern, recommend_strategy_from_rows, score_posts
 from jalapeno_db import JalapenoRunContext, complete_run, create_run, ensure_selected_post_candidate, fail_run, insert_error_row, insert_final_post
 from logging_utils import log_event
-from metrics_collector import collect_instagram_metrics, run_metrics_diagnostics
+from metrics_collector import collect_instagram_metrics
 from performance_context import build_performance_context
 from reporting import generate_admin_report
 from supabase_client import SupabaseClient, SupabaseError
@@ -850,8 +850,8 @@ def run_metrics(*, backfill: bool = False, dry_run: bool = False, diagnostics: b
         diagnostics=diagnostics,
         repair_media_ids=repair_media_ids,
     )
-    if diagnostics:
-        diagnostics_result = run_metrics_diagnostics(config, client, logger=logger)
+    diagnostics_result = result.diagnostics_result if diagnostics else None
+    if diagnostics_result is not None:
         print(f"Metrics diagnostics me ok: {diagnostics_result.me_ok}")
         print(f"Metrics diagnostics accounts ok: {diagnostics_result.accounts_ok}")
         print(f"Metrics diagnostics configured page found: {diagnostics_result.configured_page_found}")
@@ -872,15 +872,19 @@ def run_metrics(*, backfill: bool = False, dry_run: bool = False, diagnostics: b
     print(f"Metrics skipped duplicates: {result.skipped_duplicates}")
     print(f"Metrics failures: {result.failures}")
     print(f"Metrics unreadable media ids: {result.unreadable_media_ids}")
+    print(f"Metrics media ids marked unreadable: {result.media_ids_marked_unreadable}")
+    print(f"Metrics meta permission failures: {result.meta_permission_failures}")
+    print(f"Metrics token expired failures: {result.token_expired_failures}")
+    print(f"Metrics action required: {result.action_required}")
     print(f"Metrics dry run: {result.dry_run}")
     print(f"Metrics repair candidates seen: {result.repair_candidates}")
     if result.action_required:
-        print("Metrics action required: Meta token/auth issue detected")
+        print("Metrics action required: Meta insights permissions or token/auth issue detected")
         return 2
-    if result.failures > 0 and result.snapshots_persisted == 0:
-        print("Metrics failed: zero snapshots persisted and at least one metrics fetch failed")
+    if result.failures > 0:
+        print("Metrics failed: one or more non-recoverable metrics errors occurred")
         return 2
-    if diagnostics and not diagnostics_result.me_ok:
+    if diagnostics_result is not None and not diagnostics_result.me_ok:
         print("Metrics diagnostics failed: /me did not return a valid account")
         return 2
     return 0

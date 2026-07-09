@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from caption_rules import finalize_overlay_text, validate_overlay_text
+from caption_rules import finalize_overlay_text, validate_overlay_text, validate_post_pair
 from logging_utils import log_event
 from image_pipeline.meme_text_renderer import MemeTextStyle, SafeArea, render_meme_text, sanitize_meme_text
 from supabase_client import SupabaseClient
@@ -105,9 +105,12 @@ def select_overlay_text(caption: str) -> str:
     )
     selected = overlay_plan["overlay_text"]
     validation = validate_overlay_text(selected)
-    if validation["passed"]:
+    if validation["passed"] and validate_post_pair(caption, selected)["passed"]:
         return selected.upper()
-    return FALLBACK_OVERLAYS[0]
+    pair_validation = validate_post_pair(caption, FALLBACK_OVERLAYS[0])
+    if pair_validation["passed"]:
+        return FALLBACK_OVERLAYS[0]
+    return FALLBACK_OVERLAYS[1]
 
 
 def normalize_seed_text(text: str) -> str:
@@ -226,7 +229,14 @@ def create_text_overlay_video(
         "overlay_text": overlay_text,
     }
     log_event(logger, "video_overlay_started", **base_fields)
-    log_event(logger, "video_overlay_text_selected", **base_fields)
+    log_event(
+        logger,
+        "overlay_text_selected",
+        caption_overlay_concept=validate_post_pair(caption, overlay_text)["caption_overlay_concept"],
+        validation_passed=validate_post_pair(caption, overlay_text)["passed"],
+        banned_phrase_detected=any(issue.startswith("banned_phrase:") for issue in validate_overlay_text(overlay_text)["issues"]),
+        **base_fields,
+    )
     try:
         if not ffmpeg_available():
             raise RuntimeError("ffmpeg is not available")

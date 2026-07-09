@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from caption_rules import finalize_caption, finalize_overlay_text, validate_caption, validate_post_pair
+from caption_rules import finalize_caption_overlay_pair, validate_caption, validate_post_pair
 from logging_utils import log_event
 
 
@@ -258,32 +258,21 @@ def load_approved_post_from_artifacts(
     if media_kind == "reel" and not public_video_url:
         raise ValueError("Approved Reel is missing public_video_url")
 
-    caption_validation = validate_caption(caption)
-    caption_source = "template"
-    fallback_used = False
-    validation_failure_reason = None
-    if not caption_validation["passed"]:
-        caption_plan = finalize_caption(
-            seed=f"{run_id}:{candidate_id}:{content_type}",
-            style=_string_or_none(winner.get("selected_caption_style")) or _string_or_none(winner.get("caption_style")),
-            raw_caption=caption,
-            allow_openai_caption=False,
-        )
-        caption = caption_plan["caption"]
-        caption_validation = caption_plan["validation"]
-        caption_source = caption_plan["caption_source"]
-        fallback_used = caption_plan["fallback_used"]
-        validation_failure_reason = caption_plan["validation_failure_reason"]
-
-    overlay_text = _string_or_none(winner.get("overlay_text"))
-    overlay_plan = finalize_overlay_text(
-        seed=f"{run_id}:{candidate_id}:{content_type}:overlay",
-        style=_string_or_none(winner.get("selected_caption_style")) or _string_or_none(winner.get("caption_style")),
-        caption=caption,
-        raw_overlay=overlay_text,
+    caption_plan = finalize_caption_overlay_pair(
+        seed=f"{run_id}:{candidate_id}:{content_type}",
+        caption_style=_string_or_none(winner.get("selected_caption_style")) or _string_or_none(winner.get("caption_style")),
+        raw_caption=caption,
+        raw_overlay=_string_or_none(winner.get("overlay_text")),
+        allow_openai_caption=False,
     )
-    overlay_text = overlay_plan["overlay_text"]
-    post_pair_validation = validate_post_pair(caption, overlay_text)
+    caption = caption_plan["caption"]
+    overlay_text = caption_plan["overlay_text"]
+    caption_validation = caption_plan["caption_validation"]
+    overlay_plan = caption_plan
+    caption_source = caption_plan["caption_source"]
+    fallback_used = caption_plan["fallback_used"]
+    validation_failure_reason = caption_plan["validation_failure_reason"]
+    post_pair_validation = caption_plan["pair_validation"]
 
     metadata = dict(content_decision.get("metadata") or {}) if isinstance(content_decision.get("metadata"), dict) else {}
     metadata.update(
@@ -293,11 +282,12 @@ def load_approved_post_from_artifacts(
             "caption_validation_failure_reason": validation_failure_reason,
             "caption_fallback_used": fallback_used,
             "overlay_source": overlay_plan["overlay_source"],
-            "overlay_validation_passed": overlay_plan["validation_passed"],
+            "overlay_validation_passed": overlay_plan["overlay_validation"]["passed"],
             "overlay_validation_failure_reason": overlay_plan["validation_failure_reason"],
             "overlay_fallback_used": overlay_plan["fallback_used"],
             "post_pair_validation_passed": post_pair_validation["passed"],
             "post_pair_validation_failure_reason": None if post_pair_validation["passed"] else ", ".join(post_pair_validation["reasons"]),
+            "caption_overlay_concept": caption_plan["caption_overlay_concept"],
         }
     )
 

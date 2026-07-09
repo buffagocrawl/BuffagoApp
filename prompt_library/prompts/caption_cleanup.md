@@ -17,4 +17,4 @@ Use this prompt to clean up raw captions before publishing.
 - Do not add fake facts.
 - Do not over-polish the caption until it loses personality.
 - Keep the caption friendly, social, and easy to scan.
-
+- Keep or add a clear CTA if the caption does not already ask the viewer to do something.

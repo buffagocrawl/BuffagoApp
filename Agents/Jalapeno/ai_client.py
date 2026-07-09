@@ -436,6 +436,9 @@ class JalapenoAIClient:
                 output["validation_passed"] = caption_plan["validation_passed"]
                 output["validation_failure_reason"] = caption_plan["validation_failure_reason"]
                 output["fallback_used"] = caption_plan["fallback_used"]
+                output["banned_phrase_detected"] = any(
+                    issue.startswith("banned_phrase:") for issue in caption_plan["validation"].get("issues", [])
+                )
             elif request_type == "image_prompt":
                 output = normalize_image_output(output)
             else:
@@ -450,6 +453,7 @@ class JalapenoAIClient:
             content_category = output.get("post_type") if isinstance(output.get("post_type"), str) else content_slot
             caption_length = output.get("caption_length") if isinstance(output.get("caption_length"), int) else None
             validation_passed = output.get("validation_passed") if isinstance(output.get("validation_passed"), bool) else None
+            banned_phrase_detected = output.get("banned_phrase_detected") if isinstance(output.get("banned_phrase_detected"), bool) else None
             logged_caption_style = output.get("selected_caption_style") if isinstance(output.get("selected_caption_style"), str) else selected_caption_style
             caption_source = output.get("caption_source") if isinstance(output.get("caption_source"), str) else None
             validation_failure_reason = output.get("validation_failure_reason") if isinstance(output.get("validation_failure_reason"), str) else None
@@ -483,6 +487,7 @@ class JalapenoAIClient:
                 validation_passed=validation_passed,
                 validation_failure_reason=validation_failure_reason,
                 fallback_used=fallback_used,
+                banned_phrase_detected=banned_phrase_detected,
             )
             log_event(
                 self.logger,
@@ -497,6 +502,7 @@ class JalapenoAIClient:
                 validation_passed=validation_passed,
                 validation_failure_reason=validation_failure_reason,
                 fallback_used=fallback_used,
+                banned_phrase_detected=banned_phrase_detected,
             )
             return self._wrap_result(
                 request_type=request_type,

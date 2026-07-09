@@ -14,8 +14,8 @@ Analyze recent Buffago activity, top restaurants, new restaurants, achievements,
 - Do not attack restaurants.
 - Keep the post social first.
 - Prefer share-trigger concepts over generic humor.
-- Good angles: tag a friend, send this to someone, make wing plans, debate flats versus drums, debate sauce or heat, or challenge someone.
-- Ban wing personification, surreal AI jokes, and captions that do not match the image-text idea.
+- Good angles: tag a friend, send this to someone, make wing plans, debate flats versus drums, debate sauce or heat, challenge someone, like, reply, or vote.
+- Ban wing personification, surreal AI jokes, captions that do not match the image-text idea, and captions that do not ask for an action.
 - Return JSON only.
 
 ## Output Shape

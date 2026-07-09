@@ -324,9 +324,12 @@ class ContentDecisionEngine:
             snapshot=snapshot,
             external_context=external_context,
         )
+        banned_phrase_detected = any(
+            issue.startswith("banned_phrase:") for issue in winner_caption.quality_review.get("issues", [])
+        )
         log_event(
             logger,
-            "caption_generated",
+            "caption_selected",
             run_id=active_run_id,
             candidate_id=selection.winner.candidate.candidate_id,
             score=winner_caption.quality_review.get("score"),
@@ -337,6 +340,20 @@ class ContentDecisionEngine:
             caption_length=winner_caption.caption_length,
             validation_passed=winner_caption.validation_passed,
             validation_failure_reason=winner_caption.validation_failure_reason,
+            fallback_used=winner_caption.fallback_used,
+            caption_overlay_concept=winner_caption.caption_overlay_concept,
+            banned_phrase_detected=banned_phrase_detected,
+            overlay_text_selected=winner_caption.overlay_text,
+        )
+        log_event(
+            logger,
+            "caption_generated",
+            run_id=active_run_id,
+            candidate_id=selection.winner.candidate.candidate_id,
+            selected_caption_style=winner_caption.selected_caption_style,
+            caption_source=winner_caption.caption_source,
+            generated_caption=winner_caption.caption,
+            validation_passed=winner_caption.validation_passed,
             fallback_used=winner_caption.fallback_used,
         )
         log_event(logger, "hashtags_generated", run_id=active_run_id, candidate_id=selection.winner.candidate.candidate_id, hashtag_count=len(winner_caption.hashtags))

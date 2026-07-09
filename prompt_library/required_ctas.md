@@ -18,6 +18,10 @@ Prompt Version: prompt-library-v2
 - Debate sauce or heat level
 - Drop your spot in the comments
 - Tell your crew where to go next
+- Like if you agree
+- Reply with your order
+- Vote for flats or drums
+- Choose a side
 
 ## Gamification
 - Keep your streak alive

@@ -11,7 +11,7 @@ PROJECT_DIR = Path(__file__).resolve().parents[1]
 if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
-from caption_rules import CAPTION_STYLE_ORDER, generate_caption_samples, validate_caption, validate_overlay_text, validate_post_pair  # noqa: E402
+from caption_rules import CAPTION_STYLE_ORDER, CURATED_FALLBACK_CAPTIONS, generate_caption_samples, validate_caption, validate_overlay_text, validate_post_pair  # noqa: E402
 from ai_client import JalapenoAIClient  # noqa: E402
 from config import initialize_logging, load_configuration  # noqa: E402
 from content_engine.candidate_generator import ContentCandidate  # noqa: E402
@@ -68,6 +68,7 @@ def _candidate() -> ContentCandidate:
         "main character energy on a plate",
         "It's giving crispy chaos.",
         "This wing paid rent.",
+        "bring napkins for this wing plate",
     ],
 )
 def test_validate_caption_rejects_banned_examples(caption: str) -> None:
@@ -101,6 +102,13 @@ def test_validate_caption_rejects_generic_food_copy_without_wing_specificity() -
 
     assert result["passed"] is False
     assert "missing_wing_specificity" in result["issues"]
+
+
+def test_validate_caption_rejects_caption_without_cta() -> None:
+    result = validate_caption("These wings are the whole mood.")
+
+    assert result["passed"] is False
+    assert "missing_engagement_action" in result["issues"]
 
 
 def test_validate_caption_rejects_hashtags_inside_caption() -> None:
@@ -143,6 +151,13 @@ def test_validate_overlay_text_rejects_banned_or_generic_ai_overlay(overlay: str
     assert result["issues"]
 
 
+def test_validate_overlay_text_rejects_overlay_without_cta() -> None:
+    result = validate_overlay_text("YOUR WING CREW")
+
+    assert result["passed"] is False
+    assert "overlay_not_direct_enough" in result["issues"]
+
+
 def test_validate_post_pair_rejects_mismatched_overlay_and_caption() -> None:
     result = validate_post_pair(
         "Send this to the group chat and start the timer.",
@@ -155,11 +170,22 @@ def test_validate_post_pair_rejects_mismatched_overlay_and_caption() -> None:
 
 def test_validate_post_pair_accepts_matched_overlay_and_caption() -> None:
     result = validate_post_pair(
-        "Settle it in the comments.",
-        "FLATS OR DRUMS?\nPICK A SIDE.",
+        "Send this to someone who owes you wings.",
+        "SEND THIS TO\nYOUR WING CREW",
     )
 
     assert result["passed"] is True
+    assert result["caption_overlay_concept"] is not None
+
+
+def test_validate_post_pair_allows_overlay_without_cta_when_it_reinforces_caption() -> None:
+    result = validate_post_pair(
+        "Send this to someone who owes you wings.",
+        "YOUR WING CREW",
+    )
+
+    assert result["passed"] is True
+    assert result["overlay_reinforces_caption"] is True
 
 
 def test_generate_caption_package_uses_allowed_styles_and_short_caption() -> None:
@@ -213,6 +239,13 @@ def test_generate_caption_samples_returns_20_valid_records() -> None:
     assert all(sample["caption"] for sample in samples)
     assert all(sample["overlay_text"] for sample in samples)
     assert all(sample["style"] in CAPTION_STYLE_ORDER for sample in samples)
+
+
+def test_curated_fallback_captions_are_all_cta_based() -> None:
+    for caption in CURATED_FALLBACK_CAPTIONS:
+        validation = validate_caption(caption)
+        assert validation["passed"] is True
+        assert validation["engagement_actions"], caption
 
 
 def test_content_engine_logs_caption_style_validation_and_fallback_fields(tmp_path: Path) -> None:

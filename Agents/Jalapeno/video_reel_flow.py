@@ -39,33 +39,31 @@ def _caption_type(asset: VideoAsset) -> str:
 def generate_reel_caption(asset: VideoAsset, *, now: datetime | None = None) -> tuple[str, list[str], str]:
     now = now or _utcnow()
     caption_type = _caption_type(asset)
-    style = (asset.style or "").replace("_", " ").strip()
-    style_hint = f" {style}" if style else ""
     templates = {
         "funny": [
-            f"This wing{style_hint} understood the assignment better than most group chats.",
-            f"If this wing had a voicemail, it would just say: bring napkins.",
-            f"Some wings enter the room. This one made eye contact.",
+            "Send this to the friend who thinks they can out-eat this plate.",
+            "Tag the friend who would try to finish this basket.",
+            "Like this if wing night is non-negotiable.",
         ],
         "hype": [
-            f"8pm wing check: crispy, saucy, emotionally persuasive.",
-            f"Daily wing reel because the scroll deserved sauce.",
-            f"Tonight's forecast: high chance of ordering wings.",
+            "Send this to the group chat and make wing night happen.",
+            "Comment your sauce pick before someone else chooses for you.",
+            "Like if this counts as dinner.",
         ],
         "poll": [
-            f"Be honest: flats, drums, or whichever one is closest?",
-            f"Would you share the last one, or is that between you and your conscience?",
-            f"Rate the sauce shine from 1 to emergency napkin run.",
+            "Vote now: flats or drums?",
+            "Comment your go-to wing order.",
+            "Pick a side and send this to the friend who disagrees.",
         ],
         "local": [
-            f"Buffago energy: never casual about wings.",
-            f"Western New York raised the bar and the napkin count.",
-            f"Wing opinions are welcome. Weak takes may be sauced.",
+            "Share this with someone who owes you a wing stop.",
+            "Tag your wing-night person and make the plan.",
+            "Send this if your city takes wing night seriously.",
         ],
         "app_cta": [
-            f"Find your next wing stop in Buffago, then argue about it like family.",
-            f"Save this energy for your next Buffago wing crawl.",
-            f"Buffago exists for moments like this: wings first, plans second.",
+            "Download Buffago and start your next wing crawl.",
+            "Share this with the friend who always wants the next spot.",
+            "Tag someone and build your next wing plan in Buffago.",
         ],
     }
     options = templates.get(caption_type, templates["funny"])

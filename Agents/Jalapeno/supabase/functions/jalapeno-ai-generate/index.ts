@@ -191,51 +191,51 @@ const CAPTION_STYLE_TEMPLATES: Record<string, string[]> = {
   ],
   wing_debt: [
     "If they don't answer in 10 minutes, they owe you wings.",
-    "If they ignore this, they're buying wings.",
-    "Someone in your group chat owes you a wing night.",
+    "Reply in 10 minutes or you owe wings.",
+    "First reply buys the wings.",
     "If they flake on wing night again, they owe the whole table wings.",
-    "You can settle a lot with one properly funded wing night.",
+    "Send this and start the timer.",
   ],
   group_chat: [
     "Send this to the group chat and see who folds first.",
-    "Someone in your group chat needs wings.",
-    "The only group chat decision that matters: wings.",
-    "Your group chat needs this kind of pressure.",
-    "This plate needs a wing crew.",
+    "Send this to the group chat and start the timer.",
+    "Drop this in the group chat and wait.",
+    "Drop this in the group chat and make the call.",
+    "Send this to the group chat right now.",
   ],
   craving_prompt: [
-    "If this made you hungry, send it to the person you're blaming.",
-    "This is your sign to order wings.",
-    "Share this with someone who needs a wing night.",
-    "Save this for your next wing run.",
-    "This is your sign to plan wings.",
+    "Send this to the person you're getting wings with.",
+    "Tag the friend who needs a wing run.",
+    "Share this with the friend who owes you wings.",
+    "Send this to your wing crew.",
+    "Comment if wing night is happening.",
   ],
   sauce_debate: [
-    "Tag someone who takes sauce choice way too seriously.",
+    "Comment flats or drums.",
     "Comment your sauce pick.",
-    "Comment your go-to wing order.",
-    "Comment the sauce order you would not let your friends mess up.",
-    "The answer is wings. The only question is sauce.",
+    "Vote flats or drums.",
+    "Tag someone who takes sauce choice way too seriously.",
+    "Like if ranch wins.",
   ],
   wing_night: [
-    "Wing night is calling.",
-    "Save this for wing night.",
+    "Who's down for wing night?",
     "Send this to your wing night crew.",
-    "This is your sign to plan wings.",
-    "Crispy wings deserve witnesses.",
+    "Send this to your wing crew.",
+    "Comment if wing night is happening.",
+    "Tag the friend who needs wing night.",
   ],
   simple_hype: [
-    "Crispy wings deserve witnesses.",
-    "Someone you know needs these wings.",
-    "Hot wings, no small talk.",
-    "The answer is wings.",
-    "These wings are not here to be ignored.",
+    "Who is eating this with you?",
+    "Send this to your wing crew.",
+    "Who is pulling up for wings?",
+    "Like if this counts as dinner.",
+    "Comment your wing order.",
   ],
   comment_prompt: [
     "Comment flats or drums.",
     "Comment your go-to wing order.",
     "Comment your sauce pick.",
-    "Comment the sauce order you would not let your friends mess up.",
+    "Vote for flats or drums.",
     "Comment if you're team flats or team drums.",
   ],
 };
@@ -245,17 +245,14 @@ const CURATED_CAPTIONS = new Set<string>([
   "Tag the friend who would destroy this plate.",
   "If they don't answer in 10 minutes, they owe you wings.",
   "Share this with someone who needs a wing night.",
-  "This is your sign to order wings.",
+  "Send this to the friend who needs wings.",
   "Tag someone who takes sauce choice way too seriously.",
   "Send this to the group chat and see who folds first.",
-  "Wing night is calling.",
-  "Save this for your next wing run.",
-  "Someone you know needs these wings.",
+  "Who's down for wing night?",
+  "Send this to the friend who needs a wing run.",
   "Comment your go-to wing order.",
   "Tag the person who always says they're only having one.",
   "Send this to your wing night crew.",
-  "Crispy, saucy, dangerous.",
-  "The group chat needs a wing night.",
   ...Object.values(CAPTION_STYLE_TEMPLATES).flat(),
 ]);
 
@@ -279,6 +276,7 @@ const BANNED_GENERIC_PHRASES = [
   "if this post had",
   "had a voicemail",
   "left a voicemail",
+  "voicemail",
   "called and said",
   "texted and said",
   "this wing called",
@@ -343,6 +341,22 @@ const PERSONIFICATION_PATTERNS = [
   /\bcalled and said\b/i,
   /\btexted and said\b/i,
   /\bthis (?:wing|plate|post|photo) called\b/i,
+];
+
+const ENGAGEMENT_ACTION_PATTERNS = [
+  /\bsend\b/i,
+  /\bshare\b/i,
+  /\btag\b/i,
+  /\bcomment\b/i,
+  /\blike\b/i,
+  /\breply\b/i,
+  /\bgroup chat\b/i,
+  /\bowe\b/i,
+  /\bowes\b/i,
+  /\bvote\b/i,
+  /\bpick\b/i,
+  /\bchoose\b/i,
+  /\bwho(?:'s| is)\b/i,
 ];
 
 function normalizeCaptionText(text: string): string {
@@ -410,17 +424,22 @@ function validateCaption(caption: string): { valid: boolean; reasons: string[]; 
       break;
     }
   }
+  const hasEngagementAction = ENGAGEMENT_ACTION_PATTERNS.some((pattern) => pattern.test(lowered));
   const hasPrimarySignal = PRIMARY_WING_SIGNAL_PATTERNS.some((pattern) => pattern.test(lowered));
   const hasSupportingSignal = SUPPORTING_SIGNAL_PATTERNS.some((pattern) => pattern.test(lowered));
+  const hasEngagementAction = ENGAGEMENT_ACTION_PATTERNS.some((pattern) => pattern.test(lowered));
   const hasFriendOrGroupCta = [/\bgroup chat\b/i, /\bfriend\b/i, /\bcrew\b/i, /\bplate\b/i, /\border\b/i, /\bowe\b/i, /\bowes\b/i].some((pattern) => pattern.test(lowered));
-  if (!isCurated && !hasPrimarySignal && !hasSupportingSignal) {
+  if (!isCurated && !hasPrimarySignal && !hasSupportingSignal && !hasEngagementAction) {
     reasons.push("missing_buffago_signal");
   }
-  if (!isCurated && !hasPrimarySignal && !hasFriendOrGroupCta) {
+  if (!isCurated && !hasPrimarySignal && !hasFriendOrGroupCta && !hasEngagementAction) {
     reasons.push("missing_wing_specificity");
   }
-  if (!isCurated && !hasPrimarySignal && !hasSupportingSignal) {
+  if (!isCurated && !hasPrimarySignal && !hasSupportingSignal && !hasEngagementAction) {
     reasons.push("too_abstract_or_generic");
+  }
+  if (!hasEngagementAction) {
+    reasons.push("missing_engagement_action");
   }
   if ((normalized.match(/[.!?]/g) ?? []).length > 2) {
     reasons.push("too_many_sentences");
@@ -990,7 +1009,7 @@ async function handleTextOrImageRequest(
 
     const systemPrompt = request.request_type === "image_prompt"
       ? "Generate a production-ready Buffago image prompt as cinematic comedy scene direction. Include supported visual metadata. Return only the structured JSON requested."
-      : "Generate a ready-to-post Buffago caption package. Use template-first captions, do not be clever, do not use internet slang, do not personify wings or plates, and keep captions short and shareable. Return only the structured JSON requested.";
+      : "Generate a ready-to-post Buffago caption package. Use CTA-first captions, do not be clever, do not use internet slang, do not personify wings or plates, and keep captions short, direct, and shareable. Return only the structured JSON requested.";
     const promptLibrary = normalizePromptLibrary(request.prompt_library);
     const promptLibraryVersion = request.prompt_library_version ?? "prompt-library-v1";
     const input = [

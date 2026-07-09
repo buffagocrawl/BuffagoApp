@@ -36,8 +36,9 @@ Create food posts that feel sendable, taggable, comment-worthy, and instantly so
 ## Caption Rules
 - Keep it short
 - Keep it direct
-- Push tag, send, share, comment, save, or plan behavior
+- Push tag, send, share, comment, like, reply, vote, choose, or plan behavior
 - Match the image text angle exactly
+- Never publish a caption that only describes the wings without asking for an action
 
 ## Working Examples
 - Image text: SEND THIS TO YOUR WING CREW

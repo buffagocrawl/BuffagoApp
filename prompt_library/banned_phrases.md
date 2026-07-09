@@ -15,12 +15,16 @@ Prompt Version: prompt-library-v2
 - Internet is broken
 - Understood the assignment
 - If this wing had a voicemail
+- Bring napkins
 - Had a job
 - Paid rent
 - Main character
 - Brought receipts
 - Illegal levels
 - Wings talking, thinking, texting, calling, or acting human
+- POV:
+- This wing said
+- This sauce said
 
 ## Avoid Also
 - Overused emojis

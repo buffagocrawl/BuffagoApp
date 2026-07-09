@@ -259,14 +259,14 @@ def test_dry_run_and_failed_posts_do_not_block_reuse() -> None:
 
 
 def test_overlay_text_uses_caption_hook_without_hashtags() -> None:
-    text = select_overlay_text("Daily wing reel because the scroll deserved sauce.\n\n#Buffago #WingNight")
+    text = select_overlay_text("Send this to someone who owes you wings.\n\n#Buffago #WingNight")
 
-    assert text == "DAILY WING REEL BECAUSE THE SCROLL DESERVED SAUCE"
+    assert text == "SEND THIS TO SOMEONE WHO OWES YOU WINGS."
     assert "#" not in text
 
 
 def test_overlay_text_falls_back_for_generic_caption() -> None:
-    assert select_overlay_text("8pm wing check.\n\n#Buffago") == "SAUCY WING NIGHT"
+    assert select_overlay_text("8pm wing check.\n\n#Buffago") == "FLATS OR DRUMS?\nPICK A SIDE."
 
 
 def test_processed_storage_path_uses_processed_folder_and_texted_suffix() -> None:

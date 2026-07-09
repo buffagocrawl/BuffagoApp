@@ -4,7 +4,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any
 
-from caption_rules import choose_caption_style, finalize_caption, finalize_overlay_text, validate_overlay_text
+from caption_rules import choose_caption_style, finalize_caption, finalize_caption_overlay_pair, finalize_overlay_text, validate_overlay_text
 from content_engine.visual_prompt_style import (
     apply_prompt_metadata,
     build_buffago_image_direction,
@@ -313,9 +313,16 @@ def fallback_text_output(
     )
     fallback_style = caption_plan["selected_caption_style"]
     fallback_caption = caption_plan["caption"]
+    pair_plan = finalize_caption_overlay_pair(
+        seed=f"{content_slot}:{':'.join(signals)}:pair",
+        caption_style=fallback_style,
+        raw_caption=fallback_caption,
+        allowed_styles=[fallback_style],
+        allow_openai_caption=False,
+    )
     if content_slot == "meme_post" or "sports_events" in signals:
         post_type = "meme"
-        caption = fallback_caption
+        caption = pair_plan["caption"]
         image_prompt, _metadata = _fallback_scene_prompt(content_slot, post_type)
         content_angle = f"Buffago {fallback_style} caption"
         why_this_post = "A safe wing-specific fallback caption keeps the brand playful without inventing facts."
@@ -323,7 +330,7 @@ def fallback_text_output(
         confidence = 0.78
     elif any("holiday" in signal for signal in signals):
         post_type = "food_holiday"
-        caption = fallback_caption
+        caption = pair_plan["caption"]
         image_prompt, _metadata = _fallback_scene_prompt(content_slot, post_type)
         content_angle = f"Food holiday {fallback_style} caption"
         why_this_post = "Food holidays are safe, relevant, and easier to keep wing-first with a curated fallback caption."
@@ -331,7 +338,7 @@ def fallback_text_output(
         confidence = 0.76
     elif content_slot == "buffago_post":
         post_type = "restaurant_spotlight"
-        caption = fallback_caption
+        caption = pair_plan["caption"]
         image_prompt, _metadata = _fallback_scene_prompt(content_slot, post_type)
         content_angle = f"Restaurant spotlight {fallback_style} caption"
         why_this_post = "Restaurant spotlight stays food-first and tied to the Buffago lane with a curated caption fallback."
@@ -339,7 +346,7 @@ def fallback_text_output(
         confidence = 0.84
     else:
         post_type = "community_update"
-        caption = _base_caption(content_slot)
+        caption = pair_plan["caption"]
         image_prompt, _metadata = _fallback_scene_prompt(content_slot, post_type)
         content_angle = "Community update"
         why_this_post = "Community updates keep the account local and positive without leaning on risky claims."
@@ -355,6 +362,7 @@ def fallback_text_output(
         "validation_passed": caption_plan["validation_passed"],
         "validation_failure_reason": caption_plan["validation_failure_reason"],
         "fallback_used": True,
+        "caption_overlay_concept": pair_plan["caption_overlay_concept"],
         "hashtags": hashtags,
         "image_prompt": image_prompt,
         "alt_text": "A Buffago-style wing post with a local, food-first tone.",

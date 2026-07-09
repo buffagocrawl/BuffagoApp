@@ -6,8 +6,7 @@ from typing import Any
 from caption_rules import (
     CAPTION_STYLE_ORDER,
     choose_caption_style,
-    finalize_caption,
-    finalize_overlay_text,
+    finalize_caption_overlay_pair,
 )
 from content_engine.alt_text_generator import generate_alt_text
 from content_engine.candidate_generator import ContentCandidate
@@ -39,6 +38,7 @@ class CaptionPackage:
     validation_failure_reason: str | None = None
     overlay_text: str = ""
     overlay_source: str = ""
+    caption_overlay_concept: str | None = None
     overlay_validation_passed: bool = False
     overlay_validation_failure_reason: str | None = None
 
@@ -73,8 +73,13 @@ def _pick_caption(candidate: ContentCandidate, external_context: dict[str, Any])
     style_pool = _style_pool(candidate, external_context)
     style_seed = f"{candidate.candidate_id}:{candidate.content_type}:style"
     style = choose_caption_style(seed=style_seed, allowed_styles=style_pool)
-    caption_plan = finalize_caption(seed=style_seed, style=style, allowed_styles=[style], allow_openai_caption=False)
-    return caption_plan["selected_caption_style"], caption_plan["caption"]
+    pair_plan = finalize_caption_overlay_pair(
+        seed=style_seed,
+        caption_style=style,
+        allowed_styles=[style],
+        allow_openai_caption=False,
+    )
+    return pair_plan["selected_caption_style"], pair_plan["caption"]
 
 
 def _quality_review(
@@ -124,28 +129,24 @@ def generate_caption_package(
     image_prompt = generate_image_prompt(candidate, snapshot=snapshot, external_context=external_context)
 
     selected_caption_style, draft_caption = _pick_caption(candidate, external_context)
-    caption_plan = finalize_caption(
+    pair_plan = finalize_caption_overlay_pair(
         seed=f"{candidate.candidate_id}:{candidate.content_type}:caption",
-        style=selected_caption_style,
+        caption_style=selected_caption_style,
         raw_caption=draft_caption,
+        raw_overlay=candidate.overlay_text,
         allowed_styles=[selected_caption_style],
         allow_openai_caption=False,
     )
-    cleaned_caption = caption_plan["caption"]
-    overlay_plan = finalize_overlay_text(
-        seed=f"{candidate.candidate_id}:{candidate.content_type}:overlay",
-        style=selected_caption_style,
-        caption=cleaned_caption,
-        raw_overlay=candidate.overlay_text,
-    )
-    validation = caption_plan["validation"]
+    cleaned_caption = pair_plan["caption"]
+    overlay_text = pair_plan["overlay_text"]
+    validation = pair_plan["caption_validation"]
     cleanup_notes = [
         "Caption generator uses short Buffago wing templates with strict validation.",
         f"Selected caption style: {selected_caption_style}.",
-        f"Caption source: {caption_plan['caption_source']}.",
-        f"Overlay source: {overlay_plan['overlay_source']}.",
+        f"Caption source: {pair_plan['caption_source']}.",
+        f"Overlay source: {pair_plan['overlay_source']}.",
     ]
-    fallback_used = bool(caption_plan["fallback_used"])
+    fallback_used = bool(pair_plan["fallback_used"])
 
     if fallback_used:
         cleanup_notes.append("Primary caption failed validation and was replaced with a curated fallback.")
@@ -183,10 +184,11 @@ def generate_caption_package(
         validation_passed=validation["passed"],
         fallback_used=fallback_used,
         caption_length=validation["caption_length"],
-        caption_source=caption_plan["caption_source"],
-        validation_failure_reason=caption_plan["validation_failure_reason"],
-        overlay_text=overlay_plan["overlay_text"],
-        overlay_source=overlay_plan["overlay_source"],
-        overlay_validation_passed=overlay_plan["validation_passed"],
-        overlay_validation_failure_reason=overlay_plan["validation_failure_reason"],
+        caption_source=pair_plan["caption_source"],
+        validation_failure_reason=pair_plan["validation_failure_reason"],
+        overlay_text=overlay_text,
+        overlay_source=pair_plan["overlay_source"],
+        caption_overlay_concept=pair_plan["caption_overlay_concept"],
+        overlay_validation_passed=pair_plan["overlay_validation"]["passed"],
+        overlay_validation_failure_reason=pair_plan["validation_failure_reason"],
     )

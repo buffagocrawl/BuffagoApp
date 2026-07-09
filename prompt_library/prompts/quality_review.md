@@ -12,6 +12,7 @@ Use this prompt as the final QA pass for a completed post.
 - Image quality prompt
 - Caption quality
 - CTA
+- Caption and overlay alignment
 - Hashtags
 - Food accuracy
 
@@ -23,4 +24,3 @@ Use this prompt as the final QA pass for a completed post.
   "score": 0
 }
 ```
-
