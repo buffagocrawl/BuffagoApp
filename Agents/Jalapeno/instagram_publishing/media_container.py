@@ -35,6 +35,10 @@ def _compose_publish_caption(caption: str, hashtags: list[str]) -> str:
     return compose_caption_with_hashtags(caption, hashtags)
 
 
+def _caption_body(caption: str) -> str:
+    return re.sub(r"(?:\s*#\w+)+\s*$", "", caption).strip()
+
+
 def _hashtag_context(content_decision: dict[str, Any], winner: dict[str, Any]) -> dict[str, Any]:
     metadata = content_decision.get("metadata") if isinstance(content_decision.get("metadata"), dict) else {}
     context: dict[str, Any] = {}
@@ -329,8 +333,9 @@ def load_approved_post_from_artifacts(
             "post_pair_validation_passed": post_pair_validation["passed"],
             "post_pair_validation_failure_reason": None if post_pair_validation["passed"] else ", ".join(post_pair_validation["reasons"]),
             "caption_overlay_concept": caption_plan["caption_overlay_concept"],
-            "selected_caption": caption,
+            "selected_caption": _caption_body(caption),
             "selected_overlay": overlay_text,
+            "caption_text": caption,
             "caption_options": winner.get("caption_options") if isinstance(winner.get("caption_options"), list) else [],
             "overlay_options": winner.get("overlay_options") if isinstance(winner.get("overlay_options"), list) else [],
             "ranking_reason": winner.get("ranking_reason"),

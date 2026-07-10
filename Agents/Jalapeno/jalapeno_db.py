@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -13,6 +14,289 @@ from supabase_client import SupabaseClient
 
 def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
+
+
+POST_CANDIDATE_SCHEMA_COLUMNS: tuple[str, ...] = (
+    "id",
+    "run_id",
+    "candidate_number",
+    "post_type",
+    "idea",
+    "reasoning",
+    "caption",
+    "hashtags",
+    "image_prompt",
+    "image_storage_path",
+    "image_url",
+    "raw_text_prompt",
+    "raw_image_prompt",
+    "raw_ai_response",
+    "engagement_prediction",
+    "uniqueness_score",
+    "brand_alignment_score",
+    "humor_score",
+    "quality_score",
+    "duplicate_score",
+    "overall_score",
+    "selected",
+    "rejection_reason",
+    "created_at",
+    "updated_at",
+    "caption_options",
+    "overlay_options",
+    "selected_caption",
+    "selected_overlay",
+    "ranking_reason",
+    "ranking_score",
+    "ranking_breakdown",
+    "openai_used",
+    "openai_model",
+    "fallback_reason",
+    "feedback_summary_version",
+    "feedback_summary",
+    "caption_text",
+    "copy_source",
+    "generated_at",
+)
+
+POST_CANDIDATE_SCHEMA_COLUMNS_SET = frozenset(POST_CANDIDATE_SCHEMA_COLUMNS)
+POST_CANDIDATE_JSONB_COLUMNS = frozenset(
+    {
+        "raw_text_prompt",
+        "raw_image_prompt",
+        "raw_ai_response",
+        "caption_options",
+        "overlay_options",
+        "ranking_breakdown",
+        "feedback_summary",
+    }
+)
+POST_CANDIDATE_ARRAY_COLUMNS = frozenset({"hashtags"})
+POST_CANDIDATE_BOOLEAN_COLUMNS = frozenset({"selected", "openai_used"})
+POST_CANDIDATE_TIMESTAMP_COLUMNS = frozenset({"created_at", "updated_at", "generated_at"})
+POST_CANDIDATE_NUMERIC_COLUMNS = frozenset(
+    {
+        "engagement_prediction",
+        "uniqueness_score",
+        "brand_alignment_score",
+        "humor_score",
+        "quality_score",
+        "duplicate_score",
+        "overall_score",
+        "ranking_score",
+    }
+)
+
+
+def _string_or_none(value: Any) -> str | None:
+    if isinstance(value, str):
+        stripped = value.strip()
+        if stripped:
+            return stripped
+    return None
+
+
+def _coerce_post_candidate_timestamp(value: Any) -> str | None:
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        dt = value if value.tzinfo is not None else value.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc).isoformat()
+    if isinstance(value, str):
+        stripped = value.strip()
+        if not stripped:
+            return None
+        try:
+            parsed = datetime.fromisoformat(stripped.replace("Z", "+00:00"))
+        except ValueError:
+            return stripped
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc).isoformat()
+    return str(value)
+
+
+def _coerce_post_candidate_json(value: Any) -> dict[str, Any] | list[Any] | None:
+    if value is None:
+        return None
+    if isinstance(value, dict):
+        return value
+    if isinstance(value, list):
+        return value
+    return None
+
+
+def _coerce_post_candidate_hashtags(value: Any) -> list[str] | None:
+    if not isinstance(value, list):
+        return None
+    hashtags = [str(item).strip() for item in value if isinstance(item, str) and str(item).strip()]
+    return hashtags or None
+
+
+def _caption_body_from_text(value: str | None) -> str | None:
+    if not value:
+        return None
+    body = re.sub(r"(?:\s*#\w+)+\s*$", "", value).strip()
+    return body or None
+
+
+def build_post_candidate_payload(
+    *,
+    run_id: UUID | str | None = None,
+    candidate_id: UUID | str | None = None,
+    candidate_number: int | None = None,
+    post_type: str | None = None,
+    idea: str | None = None,
+    reasoning: str | None = None,
+    caption: str | None = None,
+    hashtags: list[str] | None = None,
+    image_prompt: str | None = None,
+    image_storage_path: str | None = None,
+    image_url: str | None = None,
+    raw_text_prompt: dict[str, Any] | None = None,
+    raw_image_prompt: dict[str, Any] | None = None,
+    raw_ai_response: dict[str, Any] | None = None,
+    engagement_prediction: float | None = None,
+    uniqueness_score: float | None = None,
+    brand_alignment_score: float | None = None,
+    humor_score: float | None = None,
+    quality_score: float | None = None,
+    duplicate_score: float | None = None,
+    overall_score: float | None = None,
+    selected: bool | None = None,
+    rejection_reason: str | None = None,
+    created_at: datetime | str | None = None,
+    updated_at: datetime | str | None = None,
+    caption_options: list[dict[str, Any]] | None = None,
+    overlay_options: list[dict[str, Any]] | None = None,
+    selected_caption: str | None = None,
+    selected_overlay: str | None = None,
+    ranking_reason: str | None = None,
+    ranking_score: float | None = None,
+    ranking_breakdown: dict[str, Any] | None = None,
+    openai_used: bool | None = None,
+    openai_model: str | None = None,
+    fallback_reason: str | None = None,
+    feedback_summary_version: str | None = None,
+    feedback_summary: dict[str, Any] | None = None,
+    caption_text: str | None = None,
+    copy_source: str | None = None,
+    generated_at: datetime | str | None = None,
+    scores: dict[str, float] | None = None,
+) -> dict[str, Any]:
+    """Build a normalized payload for public.jalapeno_post_candidates.
+
+    Canonical caption contract:
+    - `caption_text` is the publishable caption used by downstream publishing.
+    - `selected_caption` is the chosen variant body, without trailing hashtags.
+    - `caption` is the legacy source caption retained for compatibility.
+    - `selected_overlay` is the final overlay chosen for the candidate.
+    """
+    publish_caption = _string_or_none(caption_text) or _string_or_none(caption)
+    selected_caption_value = _string_or_none(selected_caption) or _caption_body_from_text(publish_caption or _string_or_none(caption))
+    if publish_caption is None:
+        publish_caption = selected_caption_value or _string_or_none(caption)
+    legacy_caption = _string_or_none(caption) or selected_caption_value or publish_caption
+
+    payload: dict[str, Any] = {}
+    if run_id is not None:
+        payload["run_id"] = str(run_id)
+    if candidate_id is not None:
+        payload["id"] = str(candidate_id)
+    if candidate_number is not None:
+        payload["candidate_number"] = candidate_number
+    if post_type is not None:
+        payload["post_type"] = post_type
+    if idea is not None:
+        payload["idea"] = idea
+    if reasoning is not None:
+        payload["reasoning"] = reasoning
+    if legacy_caption is not None:
+        payload["caption"] = legacy_caption
+    normalized_hashtags = _coerce_post_candidate_hashtags(hashtags)
+    if normalized_hashtags is not None:
+        payload["hashtags"] = normalized_hashtags
+    if image_prompt is not None:
+        payload["image_prompt"] = image_prompt
+    if image_storage_path is not None:
+        payload["image_storage_path"] = image_storage_path
+    if image_url is not None:
+        payload["image_url"] = image_url
+    normalized_raw_text_prompt = _coerce_post_candidate_json(raw_text_prompt)
+    if normalized_raw_text_prompt is not None:
+        payload["raw_text_prompt"] = normalized_raw_text_prompt
+    normalized_raw_image_prompt = _coerce_post_candidate_json(raw_image_prompt)
+    if normalized_raw_image_prompt is not None:
+        payload["raw_image_prompt"] = normalized_raw_image_prompt
+    normalized_raw_ai_response = _coerce_post_candidate_json(raw_ai_response)
+    if normalized_raw_ai_response is not None:
+        payload["raw_ai_response"] = normalized_raw_ai_response
+    if engagement_prediction is not None:
+        payload["engagement_prediction"] = engagement_prediction
+    if uniqueness_score is not None:
+        payload["uniqueness_score"] = uniqueness_score
+    if brand_alignment_score is not None:
+        payload["brand_alignment_score"] = brand_alignment_score
+    if humor_score is not None:
+        payload["humor_score"] = humor_score
+    if quality_score is not None:
+        payload["quality_score"] = quality_score
+    if duplicate_score is not None:
+        payload["duplicate_score"] = duplicate_score
+    if overall_score is not None:
+        payload["overall_score"] = overall_score
+    if selected is True:
+        payload["selected"] = True
+    if rejection_reason is not None:
+        payload["rejection_reason"] = rejection_reason
+    normalized_created_at = _coerce_post_candidate_timestamp(created_at)
+    if normalized_created_at is not None:
+        payload["created_at"] = normalized_created_at
+    normalized_updated_at = _coerce_post_candidate_timestamp(updated_at)
+    if normalized_updated_at is not None:
+        payload["updated_at"] = normalized_updated_at
+    normalized_caption_options = _coerce_post_candidate_json(caption_options)
+    if normalized_caption_options is not None:
+        payload["caption_options"] = normalized_caption_options
+    normalized_overlay_options = _coerce_post_candidate_json(overlay_options)
+    if normalized_overlay_options is not None:
+        payload["overlay_options"] = normalized_overlay_options
+    if selected_caption_value is not None:
+        payload["selected_caption"] = selected_caption_value
+    if selected_overlay is not None:
+        payload["selected_overlay"] = selected_overlay
+    if ranking_reason is not None:
+        payload["ranking_reason"] = ranking_reason
+    if ranking_score is not None:
+        payload["ranking_score"] = ranking_score
+    normalized_ranking_breakdown = _coerce_post_candidate_json(ranking_breakdown)
+    if normalized_ranking_breakdown is not None:
+        payload["ranking_breakdown"] = normalized_ranking_breakdown
+    if openai_used is True:
+        payload["openai_used"] = True
+    if openai_model is not None:
+        payload["openai_model"] = openai_model
+    if fallback_reason is not None:
+        payload["fallback_reason"] = fallback_reason
+    if feedback_summary_version is not None:
+        payload["feedback_summary_version"] = feedback_summary_version
+    normalized_feedback_summary = _coerce_post_candidate_json(feedback_summary)
+    if normalized_feedback_summary is not None:
+        payload["feedback_summary"] = normalized_feedback_summary
+    if publish_caption is not None:
+        payload["caption_text"] = publish_caption
+    if copy_source is not None:
+        payload["copy_source"] = copy_source
+    normalized_generated_at = _coerce_post_candidate_timestamp(generated_at)
+    if normalized_generated_at is not None:
+        payload["generated_at"] = normalized_generated_at
+
+    if scores:
+        for key, value in scores.items():
+            if key in POST_CANDIDATE_SCHEMA_COLUMNS_SET and value is not None:
+                payload[key] = value
+
+    return {key: value for key, value in payload.items() if key in POST_CANDIDATE_SCHEMA_COLUMNS_SET}
 
 
 @dataclass(frozen=True, slots=True)
@@ -132,7 +416,8 @@ def fail_run(
 def insert_post_candidate(
     client: SupabaseClient,
     *,
-    run_id: UUID,
+    payload: dict[str, Any] | None = None,
+    run_id: UUID | None = None,
     candidate_id: UUID | None = None,
     candidate_number: int | None = None,
     post_type: str | None = None,
@@ -143,6 +428,13 @@ def insert_post_candidate(
     image_prompt: str | None = None,
     image_storage_path: str | None = None,
     image_url: str | None = None,
+    engagement_prediction: float | None = None,
+    uniqueness_score: float | None = None,
+    brand_alignment_score: float | None = None,
+    humor_score: float | None = None,
+    quality_score: float | None = None,
+    duplicate_score: float | None = None,
+    overall_score: float | None = None,
     caption_options: list[dict[str, Any]] | None = None,
     overlay_options: list[dict[str, Any]] | None = None,
     selected_caption: str | None = None,
@@ -150,7 +442,6 @@ def insert_post_candidate(
     caption_text: str | None = None,
     copy_source: str | None = None,
     generated_at: str | None = None,
-    reuse_blocked_reason: str | None = None,
     ranking_reason: str | None = None,
     ranking_score: float | None = None,
     ranking_breakdown: dict[str, Any] | None = None,
@@ -163,46 +454,53 @@ def insert_post_candidate(
     raw_image_prompt: dict[str, Any] | None = None,
     raw_ai_response: dict[str, Any] | None = None,
     scores: dict[str, float] | None = None,
-    selected: bool = False,
+    selected: bool | None = None,
     rejection_reason: str | None = None,
 ) -> dict[str, Any]:
-    payload: dict[str, Any] = {
-        "run_id": str(run_id),
-        "candidate_number": candidate_number,
-        "post_type": post_type,
-        "idea": idea,
-        "reasoning": reasoning,
-        "caption": caption,
-        "hashtags": hashtags,
-        "image_prompt": image_prompt,
-        "image_storage_path": image_storage_path,
-        "image_url": image_url,
-        "caption_options": caption_options or [],
-        "overlay_options": overlay_options or [],
-        "selected_caption": selected_caption,
-        "selected_overlay": selected_overlay,
-        "caption_text": caption_text,
-        "copy_source": copy_source,
-        "generated_at": generated_at,
-        "reuse_blocked_reason": reuse_blocked_reason,
-        "ranking_reason": ranking_reason,
-        "ranking_score": ranking_score,
-        "ranking_breakdown": ranking_breakdown or {},
-        "openai_used": openai_used if openai_used is not None else False,
-        "openai_model": openai_model,
-        "fallback_reason": fallback_reason,
-        "feedback_summary_version": feedback_summary_version,
-        "feedback_summary": feedback_summary or {},
-        "raw_text_prompt": raw_text_prompt or {},
-        "raw_image_prompt": raw_image_prompt or {},
-        "raw_ai_response": raw_ai_response or {},
-        "selected": selected,
-        "rejection_reason": rejection_reason,
-    }
-    if candidate_id is not None:
-        payload["id"] = str(candidate_id)
-    if scores:
-        payload.update(scores)
+    if payload is None:
+        if run_id is None:
+            raise ValueError("run_id is required when payload is not provided")
+        payload = build_post_candidate_payload(
+            run_id=run_id,
+            candidate_id=candidate_id,
+            candidate_number=candidate_number,
+            post_type=post_type,
+            idea=idea,
+            reasoning=reasoning,
+            caption=caption,
+            hashtags=hashtags,
+            image_prompt=image_prompt,
+            image_storage_path=image_storage_path,
+            image_url=image_url,
+            engagement_prediction=engagement_prediction,
+            uniqueness_score=uniqueness_score,
+            brand_alignment_score=brand_alignment_score,
+            humor_score=humor_score,
+            quality_score=quality_score,
+            duplicate_score=duplicate_score,
+            overall_score=overall_score,
+            caption_options=caption_options,
+            overlay_options=overlay_options,
+            selected_caption=selected_caption,
+            selected_overlay=selected_overlay,
+            caption_text=caption_text,
+            copy_source=copy_source,
+            generated_at=generated_at,
+            ranking_reason=ranking_reason,
+            ranking_score=ranking_score,
+            ranking_breakdown=ranking_breakdown,
+            openai_used=openai_used,
+            openai_model=openai_model,
+            fallback_reason=fallback_reason,
+            feedback_summary_version=feedback_summary_version,
+            feedback_summary=feedback_summary,
+            raw_text_prompt=raw_text_prompt,
+            raw_image_prompt=raw_image_prompt,
+            raw_ai_response=raw_ai_response,
+            scores=scores,
+            selected=selected,
+            rejection_reason=rejection_reason,
+        )
     rows = client.insert_row("jalapeno_post_candidates", payload)
     return rows[0] if rows else payload
 
@@ -222,6 +520,49 @@ def _list_of_strings(value: Any) -> list[str] | None:
     return items or None
 
 
+def _safe_error_response_text(exc: Exception, *, limit: int = 600) -> str:
+    text = str(exc)
+    cleaned = " ".join(text.replace("\r", " ").replace("\n", " ").split())
+    if len(cleaned) <= limit:
+        return cleaned
+    return f"{cleaned[:limit]}..."
+
+
+def _missing_column_from_supabase_error(exc: Exception) -> str | None:
+    text = str(exc)
+    direct_match = re.search(r"Could not find the '([^']+)' column of '([^']+)'", text)
+    if direct_match:
+        return direct_match.group(1)
+    pgrst_match = re.search(r"column\s+\"?([A-Za-z0-9_]+)\"?\s+does not exist", text, flags=re.IGNORECASE)
+    if pgrst_match:
+        return pgrst_match.group(1)
+    return None
+
+
+def _log_candidate_persistence_failure(
+    logger,
+    *,
+    run_id: str,
+    candidate_id: str | None,
+    operation: str,
+    payload: dict[str, Any],
+    exc: Exception,
+) -> None:
+    log_event(
+        logger,
+        "candidate_persistence_failed",
+        level="error",
+        table="jalapeno_post_candidates",
+        run_id=run_id,
+        candidate_id=candidate_id,
+        operation=operation,
+        payload_keys=sorted(payload.keys()),
+        payload_key_count=len(payload),
+        missing_column=_missing_column_from_supabase_error(exc),
+        error_response=_safe_error_response_text(exc),
+    )
+
+
 def ensure_selected_post_candidate(
     client: SupabaseClient,
     *,
@@ -231,6 +572,9 @@ def ensure_selected_post_candidate(
     logger=None,
 ) -> dict[str, Any]:
     candidate_id_raw = _string_or_none(winner_payload.get("candidate_id")) or _string_or_none(winner_payload.get("id"))
+    existing_rows: list[dict[str, Any]] = []
+    candidate_update_payload: dict[str, Any] = {}
+    insert_payload: dict[str, Any] = {}
     if not candidate_id_raw:
         message = "Selected candidate is missing candidate_id"
         log_event(logger, "candidate_persistence_failed", level="error", run_id=str(run_context.run_id), error=message)
@@ -266,6 +610,7 @@ def ensure_selected_post_candidate(
                 "candidate_id": str(candidate_id),
             },
         )
+        candidate_update_payload = build_post_candidate_payload(selected=True, updated_at=_utcnow())
         existing_rows = client.fetch_rows(
             "jalapeno_post_candidates",
             select="id,run_id,selected",
@@ -283,30 +628,28 @@ def ensure_selected_post_candidate(
 
         reasoning_lines = decision_summary.get("winner_reasoning", []) if isinstance(decision_summary, dict) else []
         reasoning = "\n".join(str(item) for item in reasoning_lines if str(item).strip()) or _string_or_none(winner_payload.get("reason_chosen"))
-        row = insert_post_candidate(
-            client,
+        insert_payload = build_post_candidate_payload(
             run_id=run_context.run_id,
             candidate_id=candidate_id,
             post_type=_string_or_none(winner_payload.get("scheduled_post_type")) or _string_or_none(winner_payload.get("content_type")) or run_context.post_type,
             idea=_string_or_none(winner_payload.get("working_title")) or _string_or_none(winner_payload.get("short_summary")),
             reasoning=reasoning,
-            caption=_string_or_none(winner_payload.get("caption")),
+            caption=_string_or_none(winner_payload.get("selected_caption")) or _string_or_none(winner_payload.get("caption")),
             hashtags=_list_of_strings(winner_payload.get("hashtags")),
             image_prompt=_string_or_none(winner_payload.get("image_prompt")),
             image_storage_path=_string_or_none(winner_payload.get("image_storage_path")),
             image_url=_string_or_none(winner_payload.get("image_url")) or _string_or_none(winner_payload.get("public_image_url")),
             caption_options=winner_payload.get("caption_options") if isinstance(winner_payload.get("caption_options"), list) else None,
             overlay_options=winner_payload.get("overlay_options") if isinstance(winner_payload.get("overlay_options"), list) else None,
-            selected_caption=_string_or_none(winner_payload.get("caption")),
-            selected_overlay=_string_or_none(winner_payload.get("overlay_text")),
-            caption_text=_string_or_none(winner_payload.get("caption")),
+            selected_caption=_caption_body_from_text(_string_or_none(winner_payload.get("selected_caption")) or _string_or_none(winner_payload.get("caption"))),
+            selected_overlay=_string_or_none(winner_payload.get("selected_overlay")) or _string_or_none(winner_payload.get("overlay_text")),
+            caption_text=_string_or_none(winner_payload.get("caption_text")) or _string_or_none(winner_payload.get("caption")),
             copy_source=_string_or_none(winner_payload.get("copy_source")),
             generated_at=_string_or_none(winner_payload.get("generated_at")),
-            reuse_blocked_reason=_string_or_none(winner_payload.get("reuse_blocked_reason")),
             ranking_reason=_string_or_none(winner_payload.get("ranking_reason")),
             ranking_score=winner_payload.get("ranking_score") if isinstance(winner_payload.get("ranking_score"), (int, float)) else None,
             ranking_breakdown=winner_payload.get("ranking_breakdown") if isinstance(winner_payload.get("ranking_breakdown"), dict) else None,
-            openai_used=bool(winner_payload.get("openai_used")) if winner_payload.get("openai_used") is not None else None,
+            openai_used=winner_payload.get("openai_used") if isinstance(winner_payload.get("openai_used"), bool) and winner_payload.get("openai_used") else None,
             openai_model=_string_or_none(winner_payload.get("openai_model")),
             fallback_reason=_string_or_none(winner_payload.get("fallback_reason")),
             feedback_summary_version=_string_or_none(winner_payload.get("feedback_summary_version")),
@@ -318,20 +661,23 @@ def ensure_selected_post_candidate(
             },
             scores={
                 key: winner_payload.get(key)
-                for key in ("quality_score", "overall_score", "duplicate_score")
+                for key in ("engagement_prediction", "uniqueness_score", "brand_alignment_score", "humor_score", "quality_score", "overall_score", "duplicate_score")
                 if isinstance(winner_payload.get(key), (int, float))
             },
             selected=True,
         )
+        row = insert_post_candidate(client, payload=insert_payload)
         mark_selected_candidate(client, run_id=run_context.run_id, candidate_id=candidate_id)
     except Exception as exc:
-        log_event(
+        operation = "update" if existing_rows else "insert"
+        error_payload = candidate_update_payload if existing_rows else insert_payload
+        _log_candidate_persistence_failure(
             logger,
-            "candidate_persistence_failed",
-            level="error",
             run_id=str(run_context.run_id),
             candidate_id=str(candidate_id),
-            error=str(exc),
+            operation=operation,
+            payload=error_payload,
+            exc=exc,
         )
         raise
     log_event(
@@ -344,17 +690,23 @@ def ensure_selected_post_candidate(
 
 
 def mark_selected_candidate(client: SupabaseClient, *, run_id: UUID, candidate_id: UUID) -> dict[str, Any]:
-    client.update_rows(
-        "jalapeno_post_candidates",
-        {"id": f"eq.{candidate_id}"},
-        {"selected": True, "updated_at": _utcnow().isoformat()},
-    )
+    update_payload = build_post_candidate_payload(selected=True, updated_at=_utcnow())
+    client.update_rows("jalapeno_post_candidates", {"id": f"eq.{candidate_id}"}, update_payload)
     rows = client.update_rows(
         "jalapeno_runs",
         {"run_id": f"eq.{run_id}"},
         {"selected_candidate_id": str(candidate_id), "updated_at": _utcnow().isoformat()},
     )
     return rows[0] if rows else {"run_id": str(run_id), "selected_candidate_id": str(candidate_id)}
+
+
+def missing_post_candidate_columns(client: SupabaseClient) -> list[str]:
+    columns = client.table_columns("jalapeno_post_candidates")
+    return sorted(POST_CANDIDATE_SCHEMA_COLUMNS_SET - set(columns))
+
+
+def format_post_candidate_schema_mismatch(missing_columns: list[str]) -> str:
+    return f"jalapeno_post_candidates schema mismatch. Missing columns: {', '.join(sorted(missing_columns))}"
 
 
 def insert_final_post(

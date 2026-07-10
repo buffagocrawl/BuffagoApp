@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -51,6 +52,13 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
     with path.open("w", encoding="utf-8") as handle:
         json.dump(payload, handle, indent=2, sort_keys=True, default=str)
         handle.write("\n")
+
+
+def _caption_body_from_text(value: str | None) -> str | None:
+    if not value:
+        return None
+    body = re.sub(r"(?:\s*#\w+)+\s*$", "", value).strip()
+    return body or None
 
 
 def _serialize_candidate(candidate: ContentCandidate, score: ScoredCandidate | None = None, duplicate: dict[str, Any] | None = None, caption: CaptionPackage | None = None) -> dict[str, Any]:
@@ -149,7 +157,7 @@ def _persist_decision_row(client: SupabaseClient, run_id: str, result: ContentDe
         "openai_used": result.decision_summary.get("openai_used", False),
         "fallback_reason": result.decision_summary.get("fallback_reason"),
         "ranking_reason": result.winner.get("ranking_reason"),
-        "selected_caption": result.winner.get("caption"),
+        "selected_caption": _caption_body_from_text(result.winner.get("caption")),
         "selected_overlay": result.winner.get("overlay_text"),
         "caption_text": result.winner.get("caption"),
         "copy_source": result.decision_summary.get("copy_source"),
@@ -405,11 +413,13 @@ class ContentDecisionEngine:
         )
         winner_payload.update(
             {
-                "caption_package": asdict(winner_caption),
-                "caption": winner_caption.caption,
-                "overlay_text": winner_caption.overlay_text,
-                "caption_style": winner_caption.caption_style,
-                "caption_type": winner_caption.caption_type,
+        "caption_package": asdict(winner_caption),
+        "caption": winner_caption.caption,
+        "caption_text": winner_caption.caption,
+        "selected_caption": _caption_body_from_text(winner_caption.caption) or winner_caption.caption,
+        "overlay_text": winner_caption.overlay_text,
+        "caption_style": winner_caption.caption_style,
+        "caption_type": winner_caption.caption_type,
                 "hashtags": winner_caption.hashtags,
                 "alt_text": winner_caption.alt_text,
                 "image_prompt": winner_caption.image_prompt,
@@ -454,8 +464,9 @@ class ContentDecisionEngine:
             "copy_source": winner_caption.copy_source,
             "generated_at": winner_caption.generated_at,
             "reuse_blocked_reason": winner_caption.reuse_blocked_reason,
-            "selected_caption": winner_caption.caption,
+            "selected_caption": _caption_body_from_text(winner_caption.caption) or winner_caption.caption,
             "selected_overlay": winner_caption.overlay_text,
+            "caption_text": winner_caption.caption,
             "caption_options": winner_caption.caption_options,
             "overlay_options": winner_caption.overlay_options,
             "content_direction_reason": (

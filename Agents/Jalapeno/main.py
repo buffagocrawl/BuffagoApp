@@ -31,7 +31,18 @@ from caption_rules import generate_caption_samples
 from data_snapshot import generate_latest_snapshot
 from external_context import generate_external_context
 from growth_loop import apply_strategy_recommendation, generate_growth_report, persist_post_pattern, recommend_strategy_from_rows, score_posts
-from jalapeno_db import JalapenoRunContext, complete_run, create_run, ensure_selected_post_candidate, fail_run, insert_error_row, insert_final_post
+from jalapeno_db import (
+    POST_CANDIDATE_SCHEMA_COLUMNS_SET,
+    JalapenoRunContext,
+    complete_run,
+    create_run,
+    ensure_selected_post_candidate,
+    fail_run,
+    format_post_candidate_schema_mismatch,
+    insert_error_row,
+    insert_final_post,
+    missing_post_candidate_columns,
+)
 from logging_utils import log_event
 from metrics_collector import collect_instagram_metrics
 from performance_context import build_performance_context
@@ -470,38 +481,7 @@ def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = Fals
             "updated_at",
         },
         "jalapeno_post_candidates": {
-            "id",
-            "run_id",
-            "candidate_number",
-            "post_type",
-            "idea",
-            "reasoning",
-            "caption",
-            "hashtags",
-            "image_prompt",
-            "image_storage_path",
-            "image_url",
-            "raw_text_prompt",
-            "raw_image_prompt",
-            "raw_ai_response",
-            "quality_score",
-            "overall_score",
-            "duplicate_score",
-            "selected",
-            "rejection_reason",
-            "caption_options",
-            "overlay_options",
-            "selected_caption",
-            "selected_overlay",
-            "ranking_reason",
-            "ranking_score",
-            "ranking_breakdown",
-            "openai_used",
-            "openai_model",
-            "fallback_reason",
-            "feedback_summary_version",
-            "feedback_summary",
-            "updated_at",
+            *POST_CANDIDATE_SCHEMA_COLUMNS_SET,
         },
         "jalapeno_posts": {
             "id",
@@ -774,9 +754,17 @@ def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = Fals
                 columns = client.table_columns(table_name)
             except SupabaseError as exc:
                 raise ConfigError(str(exc)) from exc
-            missing_columns = sorted(required_columns - columns)
+            missing_columns = (
+                missing_post_candidate_columns(client)
+                if table_name == "jalapeno_post_candidates"
+                else sorted(required_columns - columns)
+            )
             if missing_columns:
-                message = f"{table_name} missing columns: {', '.join(missing_columns)}"
+                message = (
+                    format_post_candidate_schema_mismatch(missing_columns)
+                    if table_name == "jalapeno_post_candidates"
+                    else f"{table_name} missing columns: {', '.join(missing_columns)}"
+                )
                 log_event(logger, "jalapeno_payload_schema_validation_failed", level="error", table=table_name, missing_columns=missing_columns)
                 raise ConfigError(message)
             log_event(logger, "jalapeno_payload_schema_validation_passed", table=table_name, column_count=len(columns))
@@ -1138,7 +1126,7 @@ def run_dry_run() -> int:
         print(f"Dry-run OpenAI used: {content_result.decision_summary.get('openai_used', False)}")
         print(f"Dry-run OpenAI model: {content_result.decision_summary.get('model_name', 'local-rules')}")
         print(f"Dry-run copy source: {content_result.decision_summary.get('copy_source', 'unknown')}")
-        print(f"Dry-run chosen caption: {content_result.decision_summary.get('selected_caption', content_result.winner.get('caption', ''))}")
+        print(f"Dry-run chosen caption: {content_result.decision_summary.get('caption_text', content_result.winner.get('caption', ''))}")
         print(f"Dry-run chosen overlay: {content_result.decision_summary.get('selected_overlay', content_result.winner.get('overlay_text', ''))}")
         print(f"Dry-run feedback summary version: {content_result.decision_summary.get('feedback_summary_version', 'unknown')}")
         if content_result.decision_summary.get("fallback_reason"):

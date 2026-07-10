@@ -21,6 +21,16 @@ FALLBACK_OVERLAYS = ("SEND THIS TO\nYOUR WING CREW", "WHO GETS THE\nLAST WING? V
 
 
 @dataclass(frozen=True, slots=True)
+class OverlaySelectionResult:
+    overlay_text: str
+    overlay_source: str
+    caption_overlay_concept: str | None
+    validation_passed: bool
+    validation_failure_reason: str | None
+    fallback_used: bool
+
+
+@dataclass(frozen=True, slots=True)
 class VideoOverlayResult:
     status: str
     overlay_text: str
@@ -97,6 +107,10 @@ def _first_caption_hook(caption: str) -> str:
 
 
 def select_overlay_text(caption: str) -> str:
+    return select_overlay_selection(caption).overlay_text
+
+
+def select_overlay_selection(caption: str) -> OverlaySelectionResult:
     hook = _clean_overlay_text(_first_caption_hook(caption))
     overlay_plan = finalize_overlay_text(
         seed=f"video-overlay:{normalize_seed_text(caption)}",
@@ -104,13 +118,31 @@ def select_overlay_text(caption: str) -> str:
         raw_overlay=hook if hook else None,
     )
     selected = overlay_plan["overlay_text"]
-    validation = validate_overlay_text(selected)
-    if validation["passed"] and validate_post_pair(caption, selected)["passed"]:
-        return selected.upper()
-    pair_validation = validate_post_pair(caption, FALLBACK_OVERLAYS[0])
-    if pair_validation["passed"]:
-        return FALLBACK_OVERLAYS[0]
-    return FALLBACK_OVERLAYS[1]
+    pair_validation = validate_post_pair(caption, selected)
+    if pair_validation["passed"] and overlay_plan["validation_passed"]:
+        return OverlaySelectionResult(
+            overlay_text=selected.upper(),
+            overlay_source=str(overlay_plan["overlay_source"] or "template"),
+            caption_overlay_concept=pair_validation["caption_overlay_concept"],
+            validation_passed=True,
+            validation_failure_reason=None,
+            fallback_used=bool(overlay_plan["fallback_used"]),
+        )
+
+    for fallback_overlay in FALLBACK_OVERLAYS:
+        fallback_validation = validate_post_pair(caption, fallback_overlay)
+        if fallback_validation["passed"]:
+            return OverlaySelectionResult(
+                overlay_text=fallback_overlay,
+                overlay_source="fallback",
+                caption_overlay_concept=fallback_validation["caption_overlay_concept"],
+                validation_passed=True,
+                validation_failure_reason=None,
+                fallback_used=True,
+            )
+
+    failure_reason = overlay_plan.get("validation_failure_reason") or ", ".join(pair_validation["reasons"])
+    raise RuntimeError(f"Unable to select a validated overlay for caption: {failure_reason}")
 
 
 def normalize_seed_text(text: str) -> str:
@@ -218,7 +250,8 @@ def create_text_overlay_video(
     logger=None,
 ) -> VideoOverlayResult:
     started_at = time.perf_counter()
-    overlay_text = select_overlay_text(caption)
+    overlay_selection = select_overlay_selection(caption)
+    overlay_text = overlay_selection.overlay_text
     target_path = processed_storage_path(asset.storage_path)
     base_fields = {
         "run_id": run_id,
@@ -232,9 +265,11 @@ def create_text_overlay_video(
     log_event(
         logger,
         "overlay_text_selected",
-        caption_overlay_concept=validate_post_pair(caption, overlay_text)["caption_overlay_concept"],
-        validation_passed=validate_post_pair(caption, overlay_text)["passed"],
+        caption_overlay_concept=overlay_selection.caption_overlay_concept,
+        validation_passed=overlay_selection.validation_passed,
         banned_phrase_detected=any(issue.startswith("banned_phrase:") for issue in validate_overlay_text(overlay_text)["issues"]),
+        overlay_source=overlay_selection.overlay_source,
+        fallback_used=overlay_selection.fallback_used,
         **base_fields,
     )
     try:
