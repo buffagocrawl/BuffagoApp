@@ -10,6 +10,7 @@ from typing import Any, Literal
 TOP_MARGIN = 80
 SIDE_MARGIN = 60
 BOTTOM_MARGIN = 80
+OVERLAY_VERTICAL_OFFSET_RATIO = 0.05
 BUFFAGO_ORANGE = (255, 122, 24)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -204,6 +205,10 @@ def _safe_bbox(width: int, height: int, safe_area: SafeArea) -> tuple[int, int, 
     return (safe_area.side, safe_area.top, width - safe_area.side, height - safe_area.bottom)
 
 
+def _overlay_vertical_offset(height: int) -> int:
+    return round(height * OVERLAY_VERTICAL_OFFSET_RATIO)
+
+
 def layout_meme_text(
     image: Any,
     text: str,
@@ -250,7 +255,7 @@ def layout_meme_text(
         elif position == "center":
             y = safe_top + (max_height - rendered_height) // 2 - relative_top
         else:
-            y = safe_top - relative_top
+            y = safe_top - relative_top + _overlay_vertical_offset(image.height)
         lines: list[TextLine] = []
         cursor_y = y
         left_edge = safe_right

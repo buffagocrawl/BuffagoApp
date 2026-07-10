@@ -10,7 +10,13 @@ if str(PROJECT_DIR) not in sys.path:
 from PIL import Image
 
 from image_pipeline.meme_formatter import format_meme_image
-from image_pipeline.meme_text_renderer import SafeArea, layout_meme_text, render_meme_text, sanitize_meme_text
+from image_pipeline.meme_text_renderer import (
+    OVERLAY_VERTICAL_OFFSET_RATIO,
+    SafeArea,
+    layout_meme_text,
+    render_meme_text,
+    sanitize_meme_text,
+)
 
 
 def test_sanitize_meme_text_normalizes_hidden_characters_and_carriage_returns() -> None:
@@ -43,6 +49,27 @@ def test_layout_wraps_and_scales_inside_safe_area() -> None:
     assert layout.bbox[3] <= layout.safe_bbox[3]
     for line in layout.lines:
         assert line.width <= layout.safe_bbox[2] - layout.safe_bbox[0]
+
+
+def test_layout_top_overlay_starts_lower_by_configured_offset() -> None:
+    image = Image.new("RGBA", (1080, 1920), (20, 20, 24, 255))
+    safe = SafeArea(top=80, side=60, bottom=80)
+
+    layout = layout_meme_text(
+        image,
+        "SEND THIS TO\nYOUR WING CREW",
+        position="top",
+        safe_area=safe,
+        emphasis=True,
+    )
+
+    expected_offset = round(image.height * OVERLAY_VERTICAL_OFFSET_RATIO)
+    old_top = safe.top
+
+    assert layout.valid
+    assert layout.bbox[1] == old_top + expected_offset
+    assert layout.bbox[1] >= layout.safe_bbox[1]
+    assert layout.bbox[3] <= layout.safe_bbox[3]
 
 
 def test_render_meme_text_highlights_final_punchline() -> None:
