@@ -2,11 +2,10 @@
   "all_candidates": [
     {
       "adjustments": {
-        "duplicate_penalty": -0.42,
-        "freshness_bonus": 4.0,
-        "theme_rotation_bonus": 4.0
+        "freshness_bonus": 4.0
       },
-      "candidate_id": "ec4239cb-5636-4123-b43a-fc800065b5d9",
+      "candidate_id": "5df15b0b-7a83-4fd7-a18d-17fc4f98d30c",
+      "caption_style": "food-first-local-opinion",
       "category_scores": {
         "brand_fit": 17.0,
         "conversation_starter": 4.0,
@@ -14,7 +13,7 @@
         "current_relevance": 6.0,
         "gamification_potential": 1.0,
         "likelihood_of_engagement": 15.5,
-        "originality": 19.76,
+        "originality": 20.0,
         "uses_recent_buffago_activity": 9.5,
         "visual_potential": 10.0
       },
@@ -22,52 +21,53 @@
         "Buffalo"
       ],
       "content_type": "restaurant_spotlight",
+      "creative_style": "realistic_food",
       "cta_category": "comment",
       "current_event_references": [],
       "duplicate_check": {
-        "comparison_notes": [
-          "caption=0.022",
-          "image=0.075"
-        ],
-        "duplicate_score": 0.012,
+        "comparison_notes": [],
+        "duplicate_score": 0.0,
         "rejected": false,
         "rejection_reason": null
       },
       "duplicate_reason": null,
-      "duplicate_score": 0.012,
-      "final_score": 91.09,
+      "duplicate_score": 0.0,
+      "final_score": 87.75,
       "food_categories": [
         "wings",
         "sauce"
       ],
       "holiday_references": [],
       "hook_style": "direct local hook",
+      "hook_text": "WHO'S EATING THIS WITH YOU?",
       "image_composition": "single hero plate with short caption space",
       "metadata": {
-        "camera_angle": "wing festival crowd shot with people gasping, cheering, and pointing at the saucy centerpiece",
-        "character_archetype": "The Ranch Guy",
-        "character_description": "overprotective of ranch, clutching sauce cups like valuables, proud and slightly defensive",
+        "camera_angle": "overhead chaos shot showing hands reaching, napkins flying, sauce cups sliding, and wings anchoring the frame",
+        "character_archetype": "The Sauce Scientist",
+        "character_description": "curious sauce tinkerer inspecting color, gloss, heat, and texture like a lab result",
         "comedy_beat": "the bartender facepalms as a wing debate becomes far too serious for a normal Tuesday",
         "learning_prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
         "prompt_anchors": [
           "food-first",
           "local credibility"
         ],
-        "prompt_version": "prompt-library-v1:buffago-visual-v2",
-        "scene_type": "packed sports bar",
+        "prompt_version": "prompt-library-v2:buffago-visual-v2",
+        "scene_type": "restaurant counter with regulars",
         "visual_style": "buffago_cinematic_comedy_food_v2",
         "wing_focus_level": "maximum"
       },
       "mood": "Friendly",
       "notes": [
-        "originality=19.76",
+        "originality=20.0",
         "engagement=15.5",
         "brand_fit=17.0",
         "activity=9.5",
         "relevance=6.0"
       ],
+      "overlay_text": "BEST WINGS IN Buffalo?",
       "platform": "instagram",
       "primary_theme": "restaurant focus",
+      "prompt_template_name": "buffago_post",
       "reason_chosen": "Top restaurant signal plus recent ratings make this the safest food-first anchor.",
       "rejected_duplicate": false,
       "restaurants_mentioned": [
@@ -88,16 +88,15 @@
       "suggested_image_concept": "Close-up wing tray at Crispy Corner with crisp texture and warm restaurant lighting.",
       "target_emotion": "Curious",
       "visual_style": "realistic",
-      "weighted_total": 83.51,
+      "weighted_total": 83.75,
       "working_title": "Why Crispy Corner keeps showing up"
     },
     {
       "adjustments": {
-        "duplicate_penalty": -1.33,
-        "freshness_bonus": 4.0,
-        "theme_rotation_bonus": 4.0
+        "freshness_bonus": 4.0
       },
-      "candidate_id": "69514d05-bb6c-482b-a36e-b15f0d3e7b55",
+      "candidate_id": "19270039-30c2-4f5a-a37e-75429aed4e1b",
+      "caption_style": "save-worthy-local-tip",
       "category_scores": {
         "brand_fit": 14.0,
         "conversation_starter": 2.0,
@@ -105,7 +104,7 @@
         "current_relevance": 6.0,
         "gamification_potential": 1.0,
         "likelihood_of_engagement": 9.5,
-        "originality": 19.24,
+        "originality": 20.0,
         "uses_recent_buffago_activity": 9.5,
         "visual_potential": 10.0
       },
@@ -113,52 +112,53 @@
         "Rochester"
       ],
       "content_type": "hidden_gem",
+      "creative_style": "realistic_food",
       "cta_category": "save",
       "current_event_references": [],
       "duplicate_check": {
-        "comparison_notes": [
-          "caption=0.146",
-          "image=0.085"
-        ],
-        "duplicate_score": 0.038,
+        "comparison_notes": [],
+        "duplicate_score": 0.0,
         "rejected": false,
         "rejection_reason": null
       },
       "duplicate_reason": null,
-      "duplicate_score": 0.038,
-      "final_score": 79.41,
+      "duplicate_score": 0.0,
+      "final_score": 77.5,
       "food_categories": [
         "wings",
         "local eats"
       ],
       "holiday_references": [],
       "hook_style": "secret tip",
+      "hook_text": "SEND THIS TO YOUR WING CREW",
       "image_composition": "tight composition with subtle depth of field",
       "metadata": {
-        "camera_angle": "overhead chaos shot showing hands reaching, napkins flying, sauce cups sliding, and wings anchoring the frame",
-        "character_archetype": "The Flats Purist",
-        "character_description": "treats flats as the only serious wing choice, precise, smug, and theatrically offended",
-        "comedy_beat": "a newcomer drops to one knee in awe of the first perfect wing while the table erupts around them",
+        "camera_angle": "bartender POV from behind the bar watching the argument unfold across a wing basket",
+        "character_archetype": "The Boneless Defender",
+        "character_description": "chaotic contrarian defending boneless wings against a horrified table",
+        "comedy_beat": "a sauce scientist inspects a wing under the kitchen pass lights while diners cheer the experiment",
         "learning_prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
         "prompt_anchors": [
           "curated",
           "local insider"
         ],
-        "prompt_version": "prompt-library-v1:buffago-visual-v2",
-        "scene_type": "restaurant counter with regulars",
+        "prompt_version": "prompt-library-v2:buffago-visual-v2",
+        "scene_type": "packed sports bar",
         "visual_style": "buffago_cinematic_comedy_food_v2",
         "wing_focus_level": "maximum"
       },
       "mood": "Friendly",
       "notes": [
-        "originality=19.24",
+        "originality=20.0",
         "engagement=9.5",
         "brand_fit=14.0",
         "activity=9.5",
         "relevance=6.0"
       ],
+      "overlay_text": "TAG YOUR WING CREW",
       "platform": "instagram",
       "primary_theme": "hidden gem",
+      "prompt_template_name": "buffago_post",
       "reason_chosen": "A second restaurant lets the feed feel curated instead of repetitive.",
       "rejected_duplicate": false,
       "restaurants_mentioned": [
@@ -179,17 +179,13 @@
       "suggested_image_concept": "Moody but bright table shot of Wing Vault with wings, celery, and sauce cups.",
       "target_emotion": "Encouraged",
       "visual_style": "realistic",
-      "weighted_total": 72.74,
+      "weighted_total": 73.5,
       "working_title": "Hidden gem: Wing Vault"
     },
     {
-      "adjustments": {
-        "diversity_bonus": 6.0,
-        "duplicate_penalty": -0.49,
-        "recently_used_theme_penalty": -6.0,
-        "recently_used_visual_style_penalty": -3.0
-      },
-      "candidate_id": "1655e3b6-5e0d-452b-867e-02ac34d0b6c3",
+      "adjustments": {},
+      "candidate_id": "4e4f0c04-6ce7-4202-88b5-54b7e59c9696",
+      "caption_style": "observational-joke",
       "category_scores": {
         "brand_fit": 17.0,
         "conversation_starter": 4.0,
@@ -197,58 +193,58 @@
         "current_relevance": 6.0,
         "gamification_potential": 1.0,
         "likelihood_of_engagement": 14.0,
-        "originality": 19.72,
+        "originality": 20.0,
         "uses_recent_buffago_activity": 4.0,
         "visual_potential": 10.0
       },
       "cities_mentioned": [],
       "content_type": "funny_observation",
+      "creative_style": "funny_meme",
       "cta_category": "comment",
       "current_event_references": [],
       "duplicate_check": {
-        "comparison_notes": [
-          "caption=0.05",
-          "image=0.037"
-        ],
-        "duplicate_score": 0.014,
+        "comparison_notes": [],
+        "duplicate_score": 0.0,
         "rejected": false,
         "rejection_reason": null
       },
       "duplicate_reason": null,
-      "duplicate_score": 0.014,
-      "final_score": 72.98,
+      "duplicate_score": 0.0,
+      "final_score": 76.75,
       "food_categories": [
         "wings"
       ],
       "holiday_references": [],
       "hook_style": "observational joke",
+      "hook_text": "FIRST REPLY BUYS THE WINGS",
       "image_composition": "split-panel or punchline-forward composition",
       "metadata": {
-        "camera_angle": "wing festival crowd shot with people gasping, cheering, and pointing at the saucy centerpiece",
-        "character_archetype": "The Wing Referee",
-        "character_description": "mock-official peacemaker using hand signals and exaggerated judgment over wing disputes",
-        "comedy_beat": "the bartender facepalms as a wing debate becomes far too serious for a normal Tuesday",
-        "diversity_hint": "boost",
+        "camera_angle": "tailgate wide shot with fans circling a heroic tray of wings during a ridiculous debate",
+        "character_archetype": "The Ranch Guy",
+        "character_description": "overprotective of ranch, clutching sauce cups like valuables, proud and slightly defensive",
+        "comedy_beat": "one person stands on a booth pointing a saucy wing like courtroom evidence while another shields the basket like treasure",
         "learning_prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
         "prompt_anchors": [
           "lightly sarcastic",
           "community banter"
         ],
-        "prompt_version": "prompt-library-v1:buffago-visual-v2",
-        "scene_type": "restaurant counter with regulars",
+        "prompt_version": "prompt-library-v2:buffago-visual-v2",
+        "scene_type": "busy brewery wing night",
         "visual_style": "buffago_cinematic_comedy_food_v2",
         "wing_focus_level": "maximum"
       },
       "mood": "Funny",
       "notes": [
-        "originality=19.72",
+        "originality=20.0",
         "engagement=14.0",
         "brand_fit=17.0",
         "activity=4.0",
         "relevance=6.0"
       ],
+      "overlay_text": "WHO ARE YOU BRINGING HERE?",
       "platform": "instagram",
       "primary_theme": "humor",
+      "prompt_template_name": "meme",
       "reason_chosen": "Humor keeps the brand human and is less likely to feel overproduced.",
       "rejected_duplicate": false,
       "restaurants_mentioned": [],
@@ -265,15 +261,13 @@
       "suggested_image_concept": "Meme-style table scene with wings, napkins, and a mildly dramatic reaction shot.",
       "target_emotion": "Amused",
       "visual_style": "meme",
-      "weighted_total": 76.47,
+      "weighted_total": 76.75,
       "working_title": "The wing napkin math problem"
     },
     {
-      "adjustments": {
-        "duplicate_penalty": -0.735,
-        "theme_rotation_bonus": 4.0
-      },
-      "candidate_id": "b411da15-9869-4176-83e1-ac074c20a1a5",
+      "adjustments": {},
+      "candidate_id": "2fd5d4c7-63e9-4481-bc89-7132eacbe0ca",
+      "caption_style": "educational-saveable",
       "category_scores": {
         "brand_fit": 14.0,
         "conversation_starter": 2.0,
@@ -281,58 +275,59 @@
         "current_relevance": 6.0,
         "gamification_potential": 1.0,
         "likelihood_of_engagement": 8.0,
-        "originality": 19.58,
+        "originality": 20.0,
         "uses_recent_buffago_activity": 4.0,
         "visual_potential": 9.5
       },
       "cities_mentioned": [],
       "content_type": "wing_fact",
+      "creative_style": "app_feature_graphic",
       "cta_category": "save",
       "current_event_references": [],
       "duplicate_check": {
-        "comparison_notes": [
-          "caption=0.071",
-          "image=0.066"
-        ],
-        "duplicate_score": 0.021,
+        "comparison_notes": [],
+        "duplicate_score": 0.0,
         "rejected": false,
         "rejection_reason": null
       },
       "duplicate_reason": null,
-      "duplicate_score": 0.021,
-      "final_score": 68.845,
+      "duplicate_score": 0.0,
+      "final_score": 66.0,
       "food_categories": [
         "wings",
         "sauce"
       ],
       "holiday_references": [],
       "hook_style": "fact hook",
+      "hook_text": "WHO GETS THE LAST WING?",
       "image_composition": "clean graphic layout with one hero detail",
       "metadata": {
-        "camera_angle": "bartender POV from behind the bar watching the argument unfold across a wing basket",
-        "character_archetype": "The Sauce Scientist",
-        "character_description": "curious sauce tinkerer inspecting color, gloss, heat, and texture like a lab result",
-        "comedy_beat": "a heat seeker takes one bite and tries to look brave while the whole restaurant silently clocks the panic",
+        "camera_angle": "phone-recording social-media POV, as if a bystander caught the ridiculous wing moment live",
+        "character_archetype": "The Heat Seeker",
+        "character_description": "brave spice chaser trying not to reveal the sauce is winning",
+        "comedy_beat": "a newcomer drops to one knee in awe of the first perfect wing while the table erupts around them",
         "learning_prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
         "prompt_anchors": [
           "educational",
           "easy to scan"
         ],
-        "prompt_version": "prompt-library-v1:buffago-visual-v2",
-        "scene_type": "neighborhood restaurant booth section",
+        "prompt_version": "prompt-library-v2:buffago-visual-v2",
+        "scene_type": "tailgate table",
         "visual_style": "buffago_cinematic_comedy_food_v2",
         "wing_focus_level": "high"
       },
       "mood": "Educational",
       "notes": [
-        "originality=19.58",
+        "originality=20.0",
         "engagement=8.0",
         "brand_fit=14.0",
         "activity=4.0",
         "relevance=6.0"
       ],
+      "overlay_text": "BEST WINGS IN TOWN?",
       "platform": "instagram",
       "primary_theme": "education",
+      "prompt_template_name": "buffago_post",
       "reason_chosen": "Educational posts diversify the feed and give people a reason to save or share.",
       "rejected_duplicate": false,
       "restaurants_mentioned": [],
@@ -348,15 +343,13 @@
       "suggested_image_concept": "Graphic-led food fact card with wings and a minimal Buffago color palette.",
       "target_emotion": "Informed",
       "visual_style": "app_marketing",
-      "weighted_total": 65.58,
+      "weighted_total": 66.0,
       "working_title": "Wing fact worth knowing"
     },
     {
-      "adjustments": {
-        "duplicate_penalty": -0.805,
-        "theme_rotation_bonus": 4.0
-      },
-      "candidate_id": "4f4f6a78-9b77-43a8-8294-5ce88db6bcc3",
+      "adjustments": {},
+      "candidate_id": "05005e17-937b-4c92-ad43-bd12f2217272",
+      "caption_style": "question-led-community",
       "category_scores": {
         "brand_fit": 15.0,
         "conversation_starter": 5.0,
@@ -364,7 +357,7 @@
         "current_relevance": 6.0,
         "gamification_potential": 2.0,
         "likelihood_of_engagement": 12.0,
-        "originality": 19.54,
+        "originality": 20.0,
         "uses_recent_buffago_activity": 6.5,
         "visual_potential": 10.0
       },
@@ -373,49 +366,50 @@
         "Rochester"
       ],
       "content_type": "community_highlight",
+      "creative_style": "sports_map_graphic",
       "cta_category": "question",
       "current_event_references": [],
       "duplicate_check": {
-        "comparison_notes": [
-          "caption=0.098",
-          "image=0.037"
-        ],
-        "duplicate_score": 0.023,
+        "comparison_notes": [],
+        "duplicate_score": 0.0,
         "rejected": false,
         "rejection_reason": null
       },
       "duplicate_reason": null,
-      "duplicate_score": 0.023,
-      "final_score": 80.485,
+      "duplicate_score": 0.0,
+      "final_score": 77.75,
       "food_categories": [],
       "holiday_references": [],
       "hook_style": "community opener",
+      "hook_text": "WHO'S DOWN FOR WING NIGHT?",
       "image_composition": "map-forward layout with playful route cues",
       "metadata": {
-        "camera_angle": "referee or sports broadcast angle with a mock-serious wing ruling happening at the table",
+        "camera_angle": "overhead chaos shot showing hands reaching, napkins flying, sauce cups sliding, and wings anchoring the frame",
         "character_archetype": "The Flats Purist",
         "character_description": "treats flats as the only serious wing choice, precise, smug, and theatrically offended",
-        "comedy_beat": "one person stands on a booth pointing a saucy wing like courtroom evidence while another shields the basket like treasure",
+        "comedy_beat": "a sauce scientist inspects a wing under the kitchen pass lights while diners cheer the experiment",
         "learning_prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
         "prompt_anchors": [
           "community",
           "local competition"
         ],
-        "prompt_version": "prompt-library-v1:buffago-visual-v2",
-        "scene_type": "tailgate table",
+        "prompt_version": "prompt-library-v2:buffago-visual-v2",
+        "scene_type": "neighborhood restaurant booth section",
         "visual_style": "buffago_cinematic_comedy_food_v2",
         "wing_focus_level": "high"
       },
       "mood": "Friendly",
       "notes": [
-        "originality=19.54",
+        "originality=20.0",
         "engagement=12.0",
         "brand_fit=15.0",
         "activity=6.5",
         "relevance=6.0"
       ],
+      "overlay_text": "WHO HAS THE BEST WINGS IN NEW YORK?",
       "platform": "instagram",
       "primary_theme": "community",
+      "prompt_template_name": "buffago_post",
       "reason_chosen": "Community content broadens the account beyond restaurants and signals real local activity.",
       "rejected_duplicate": false,
       "restaurants_mentioned": [],
@@ -436,15 +430,13 @@
       "suggested_image_concept": "Community map graphic with local pins and wing markers across active states.",
       "target_emotion": "Connected",
       "visual_style": "illustration",
-      "weighted_total": 77.29,
+      "weighted_total": 77.75,
       "working_title": "Buffago in NY"
     },
     {
-      "adjustments": {
-        "duplicate_penalty": -0.665,
-        "theme_rotation_bonus": 4.0
-      },
-      "candidate_id": "0e2d2617-382f-4b30-9a00-000a29413f3a",
+      "adjustments": {},
+      "candidate_id": "aa60106f-ee99-4abc-882c-805e8fece8af",
+      "caption_style": "app-feature-celebration",
       "category_scores": {
         "brand_fit": 17.0,
         "conversation_starter": 4.0,
@@ -452,57 +444,58 @@
         "current_relevance": 6.0,
         "gamification_potential": 4.0,
         "likelihood_of_engagement": 12.0,
-        "originality": 19.62,
+        "originality": 20.0,
         "uses_recent_buffago_activity": 6.5,
         "visual_potential": 9.5
       },
       "cities_mentioned": [],
       "content_type": "xp_milestone",
+      "creative_style": "app_demo",
       "cta_category": "question",
       "current_event_references": [],
       "duplicate_check": {
-        "comparison_notes": [
-          "caption=0.075",
-          "image=0.037"
-        ],
-        "duplicate_score": 0.019,
+        "comparison_notes": [],
+        "duplicate_score": 0.0,
         "rejected": false,
         "rejection_reason": null
       },
       "duplicate_reason": null,
-      "duplicate_score": 0.019,
-      "final_score": 82.705,
+      "duplicate_score": 0.0,
+      "final_score": 79.75,
       "food_categories": [
         "wings"
       ],
       "holiday_references": [],
       "hook_style": "achievement hook",
+      "hook_text": "TAG YOUR WING MVP",
       "image_composition": "bold badge-centered layout",
       "metadata": {
-        "camera_angle": "bartender POV from behind the bar watching the argument unfold across a wing basket",
-        "character_archetype": "The Wing Referee",
-        "character_description": "mock-official peacemaker using hand signals and exaggerated judgment over wing disputes",
-        "comedy_beat": "a newcomer drops to one knee in awe of the first perfect wing while the table erupts around them",
+        "camera_angle": "wing festival crowd shot with people gasping, cheering, and pointing at the saucy centerpiece",
+        "character_archetype": "The Sauce Scientist",
+        "character_description": "curious sauce tinkerer inspecting color, gloss, heat, and texture like a lab result",
+        "comedy_beat": "one person stands on a booth pointing a saucy wing like courtroom evidence while another shields the basket like treasure",
         "learning_prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
         "prompt_anchors": [
           "achievement",
           "community progress"
         ],
-        "prompt_version": "prompt-library-v1:buffago-visual-v2",
-        "scene_type": "packed sports bar",
+        "prompt_version": "prompt-library-v2:buffago-visual-v2",
+        "scene_type": "tailgate table",
         "visual_style": "buffago_cinematic_comedy_food_v2",
         "wing_focus_level": "high"
       },
       "mood": "Exciting",
       "notes": [
-        "originality=19.62",
+        "originality=20.0",
         "engagement=12.0",
         "brand_fit=17.0",
         "activity=6.5",
         "relevance=6.0"
       ],
+      "overlay_text": "BEST WINGS IN CT?",
       "platform": "instagram",
       "primary_theme": "gamification",
+      "prompt_template_name": "buffago_post",
       "reason_chosen": "Gamified content helps the feed feel like it belongs to the product, not just the marketing team.",
       "rejected_duplicate": false,
       "restaurants_mentioned": [],
@@ -519,15 +512,13 @@
       "suggested_image_concept": "Badge-style XP milestone graphic with a wing reward and bold level callout.",
       "target_emotion": "Motivated",
       "visual_style": "app_marketing",
-      "weighted_total": 79.37,
+      "weighted_total": 79.75,
       "working_title": "Someone just crossed a big XP line"
     },
     {
-      "adjustments": {
-        "duplicate_penalty": -0.63,
-        "theme_rotation_bonus": 4.0
-      },
-      "candidate_id": "5128c97e-0c57-4e3f-8fc7-b60f7b3108d0",
+      "adjustments": {},
+      "candidate_id": "710dec60-4ade-4221-b875-0b623202b63d",
+      "caption_style": "debate-starter",
       "category_scores": {
         "brand_fit": 15.0,
         "conversation_starter": 5.0,
@@ -535,7 +526,7 @@
         "current_relevance": 6.0,
         "gamification_potential": 4.0,
         "likelihood_of_engagement": 18.0,
-        "originality": 19.64,
+        "originality": 20.0,
         "uses_recent_buffago_activity": 10.0,
         "visual_potential": 9.5
       },
@@ -544,49 +535,50 @@
         "Rochester"
       ],
       "content_type": "leaderboard",
+      "creative_style": "app_demo",
       "cta_category": "comment",
       "current_event_references": [],
       "duplicate_check": {
-        "comparison_notes": [
-          "caption=0.071",
-          "image=0.038"
-        ],
-        "duplicate_score": 0.018,
+        "comparison_notes": [],
+        "duplicate_score": 0.0,
         "rejected": false,
         "rejection_reason": null
       },
       "duplicate_reason": null,
-      "duplicate_score": 0.018,
-      "final_score": 91.76,
+      "duplicate_score": 0.0,
+      "final_score": 88.75,
       "food_categories": [],
       "holiday_references": [],
       "hook_style": "ranking hook",
+      "hook_text": "WHO GETS THE LAST WING?",
       "image_composition": "stacked board with bold labels",
       "metadata": {
-        "camera_angle": "booth-level cinematic wide shot with motion blur, packed restaurant energy, and wings in the front focal plane",
+        "camera_angle": "tailgate wide shot with fans circling a heroic tray of wings during a ridiculous debate",
         "character_archetype": "The Drum Defender",
         "character_description": "big-energy drum supporter, points with conviction and celebrates every saucy bite",
-        "comedy_beat": "a newcomer drops to one knee in awe of the first perfect wing while the table erupts around them",
+        "comedy_beat": "a heat seeker takes one bite and tries to look brave while the whole restaurant silently clocks the panic",
         "learning_prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
         "prompt_anchors": [
           "comparison",
           "debate starter"
         ],
-        "prompt_version": "prompt-library-v1:buffago-visual-v2",
+        "prompt_version": "prompt-library-v2:buffago-visual-v2",
         "scene_type": "neighborhood restaurant booth section",
         "visual_style": "buffago_cinematic_comedy_food_v2",
         "wing_focus_level": "high"
       },
       "mood": "Competitive",
       "notes": [
-        "originality=19.64",
+        "originality=20.0",
         "engagement=18.0",
         "brand_fit=15.0",
         "activity=10.0",
         "relevance=6.0"
       ],
+      "overlay_text": "WHO HAS THE BEST WINGS IN NEW YORK?",
       "platform": "instagram",
       "primary_theme": "competition",
+      "prompt_template_name": "buffago_post",
       "reason_chosen": "Leaderboards create natural comparison and comments without needing a hard sell.",
       "rejected_duplicate": false,
       "restaurants_mentioned": [
@@ -609,34 +601,863 @@
       "suggested_image_concept": "Leaderboard graphic with wing spots and local city cues.",
       "target_emotion": "Competitive",
       "visual_style": "app_marketing",
-      "weighted_total": 88.39,
+      "weighted_total": 88.75,
       "working_title": "The current wing leaderboard mood"
     }
   ],
   "decision_summary": {
     "candidate_count": 7,
+    "caption_options": [
+      {
+        "caption": "Comment your sauce pick.",
+        "caption_source": "template",
+        "caption_style": "sauce_debate",
+        "feedback_summary_version": "feedback-v1",
+        "hashtags": [
+          "#BuffagoEats",
+          "#ConnecticutWings",
+          "#Wings",
+          "#LocalFood",
+          "#Foodie"
+        ],
+        "overlay_source": "template",
+        "overlay_text": "WHO GETS THE\nLAST WING? VOTE.",
+        "rejected": false,
+        "score": 73.0,
+        "score_breakdown": {
+          "clarity": 16.0,
+          "engagement_cta": 16.0,
+          "feedback_fit": 0.0,
+          "hashtag_quality": 17.0,
+          "originality": 14.0,
+          "overlay_brevity": 10.0
+        },
+        "score_reasons": [
+          "direct engagement CTA present",
+          "not repetitive against recent captions",
+          "exactly five hashtags",
+          "includes a question prompt"
+        ],
+        "source": "template",
+        "validation": {
+          "caption_angles": [
+            "comment",
+            "debate"
+          ],
+          "caption_overlay_concept": "comment",
+          "caption_validation": {
+            "caption_length": 24,
+            "caption_source": "template",
+            "engagement_actions": [
+              "\\bcomment\\b",
+              "\\bpick\\b"
+            ],
+            "hashtag_count": 0,
+            "issues": [],
+            "normalized_caption": "Comment your sauce pick.",
+            "passed": true,
+            "reasons": [],
+            "social_angles": [
+              "comment",
+              "debate"
+            ],
+            "valid": true
+          },
+          "issues": [],
+          "overlay_angles": [
+            "comment"
+          ],
+          "overlay_reinforces_caption": true,
+          "overlay_validation": {
+            "engagement_actions": [
+              "\\bvote\\b"
+            ],
+            "issues": [],
+            "line_count": 2,
+            "normalized_overlay": "WHO GETS THE\nLAST WING? VOTE.",
+            "overlay_source": "template",
+            "passed": true,
+            "reasons": [],
+            "social_angles": [
+              "comment"
+            ],
+            "valid": true,
+            "word_count": 6
+          },
+          "passed": true,
+          "reasons": [],
+          "valid": true
+        }
+      },
+      {
+        "caption": "Send this to your wing crew.",
+        "caption_source": "template",
+        "caption_style": "simple_hype",
+        "feedback_summary_version": "feedback-v1",
+        "hashtags": [
+          "#BuffagoEats",
+          "#ConnecticutWings",
+          "#Wings",
+          "#LocalFood",
+          "#Foodie"
+        ],
+        "overlay_source": "template",
+        "overlay_text": "WHO'S PULLING UP?",
+        "rejected": false,
+        "score": 71.0,
+        "score_breakdown": {
+          "clarity": 16.0,
+          "engagement_cta": 11.0,
+          "feedback_fit": 0.0,
+          "hashtag_quality": 17.0,
+          "originality": 14.0,
+          "overlay_brevity": 13.0
+        },
+        "score_reasons": [
+          "direct engagement CTA present",
+          "not repetitive against recent captions",
+          "exactly five hashtags",
+          "includes a question prompt"
+        ],
+        "source": "template",
+        "validation": {
+          "caption_angles": [
+            "send_share",
+            "tag_callout"
+          ],
+          "caption_overlay_concept": "send_share",
+          "caption_validation": {
+            "caption_length": 28,
+            "caption_source": "template",
+            "engagement_actions": [
+              "\\bsend\\b"
+            ],
+            "hashtag_count": 0,
+            "issues": [],
+            "normalized_caption": "Send this to your wing crew.",
+            "passed": true,
+            "reasons": [],
+            "social_angles": [
+              "send_share",
+              "tag_callout"
+            ],
+            "valid": true
+          },
+          "issues": [],
+          "overlay_angles": [
+            "plans"
+          ],
+          "overlay_reinforces_caption": true,
+          "overlay_validation": {
+            "engagement_actions": [
+              "\\bwho(?:'s| is)\\b"
+            ],
+            "issues": [],
+            "line_count": 1,
+            "normalized_overlay": "WHO'S PULLING UP?",
+            "overlay_source": "template",
+            "passed": true,
+            "reasons": [],
+            "social_angles": [
+              "plans"
+            ],
+            "valid": true,
+            "word_count": 3
+          },
+          "passed": true,
+          "reasons": [],
+          "valid": true
+        }
+      },
+      {
+        "caption": "Share this with the friend who owes you wings.",
+        "caption_source": "template",
+        "caption_style": "craving_prompt",
+        "feedback_summary_version": "feedback-v1",
+        "hashtags": [
+          "#BuffagoEats",
+          "#ConnecticutWings",
+          "#Wings",
+          "#LocalFood",
+          "#Foodie"
+        ],
+        "overlay_source": "template",
+        "overlay_text": "SEND THIS TO\nTHE GROUP CHAT",
+        "rejected": false,
+        "score": 71.0,
+        "score_breakdown": {
+          "clarity": 16.0,
+          "engagement_cta": 16.0,
+          "feedback_fit": 0.0,
+          "hashtag_quality": 17.0,
+          "originality": 14.0,
+          "overlay_brevity": 8.0
+        },
+        "score_reasons": [
+          "direct engagement CTA present",
+          "not repetitive against recent captions",
+          "exactly five hashtags"
+        ],
+        "source": "template",
+        "validation": {
+          "caption_angles": [
+            "challenge",
+            "send_share",
+            "tag_callout"
+          ],
+          "caption_overlay_concept": "send_share",
+          "caption_validation": {
+            "caption_length": 46,
+            "caption_source": "template",
+            "engagement_actions": [
+              "\\bowes\\b",
+              "\\bshare\\b"
+            ],
+            "hashtag_count": 0,
+            "issues": [],
+            "normalized_caption": "Share this with the friend who owes you wings.",
+            "passed": true,
+            "reasons": [],
+            "social_angles": [
+              "challenge",
+              "send_share",
+              "tag_callout"
+            ],
+            "valid": true
+          },
+          "issues": [],
+          "overlay_angles": [
+            "send_share"
+          ],
+          "overlay_reinforces_caption": true,
+          "overlay_validation": {
+            "engagement_actions": [
+              "\\bgroup chat\\b",
+              "\\bsend\\b"
+            ],
+            "issues": [],
+            "line_count": 2,
+            "normalized_overlay": "SEND THIS TO\nTHE GROUP CHAT",
+            "overlay_source": "template",
+            "passed": true,
+            "reasons": [],
+            "social_angles": [
+              "send_share"
+            ],
+            "valid": true,
+            "word_count": 6
+          },
+          "passed": true,
+          "reasons": [],
+          "valid": true
+        }
+      },
+      {
+        "caption": "Send this to your wing crew.",
+        "caption_source": "template",
+        "caption_style": "wing_night",
+        "feedback_summary_version": "feedback-v1",
+        "hashtags": [
+          "#BuffagoEats",
+          "#ConnecticutWings",
+          "#Wings",
+          "#LocalFood",
+          "#Foodie"
+        ],
+        "overlay_source": "template",
+        "overlay_text": "WHO'S DOWN FOR\nWING NIGHT?",
+        "rejected": false,
+        "score": 71.0,
+        "score_breakdown": {
+          "clarity": 16.0,
+          "engagement_cta": 11.0,
+          "feedback_fit": 0.0,
+          "hashtag_quality": 17.0,
+          "originality": 14.0,
+          "overlay_brevity": 13.0
+        },
+        "score_reasons": [
+          "direct engagement CTA present",
+          "not repetitive against recent captions",
+          "exactly five hashtags",
+          "includes a question prompt"
+        ],
+        "source": "template",
+        "validation": {
+          "caption_angles": [
+            "send_share",
+            "tag_callout"
+          ],
+          "caption_overlay_concept": "send_share",
+          "caption_validation": {
+            "caption_length": 28,
+            "caption_source": "template",
+            "engagement_actions": [
+              "\\bsend\\b"
+            ],
+            "hashtag_count": 0,
+            "issues": [],
+            "normalized_caption": "Send this to your wing crew.",
+            "passed": true,
+            "reasons": [],
+            "social_angles": [
+              "send_share",
+              "tag_callout"
+            ],
+            "valid": true
+          },
+          "issues": [],
+          "overlay_angles": [
+            "plans"
+          ],
+          "overlay_reinforces_caption": true,
+          "overlay_validation": {
+            "engagement_actions": [
+              "\\bwho(?:'s| is)\\b"
+            ],
+            "issues": [],
+            "line_count": 2,
+            "normalized_overlay": "WHO'S DOWN FOR\nWING NIGHT?",
+            "overlay_source": "template",
+            "passed": true,
+            "reasons": [],
+            "social_angles": [
+              "plans"
+            ],
+            "valid": true,
+            "word_count": 5
+          },
+          "passed": true,
+          "reasons": [],
+          "valid": true
+        }
+      },
+      {
+        "caption": "Tag the friend who never says no to wings.",
+        "caption_source": "template",
+        "caption_style": "tag_someone",
+        "feedback_summary_version": "feedback-v1",
+        "hashtags": [
+          "#BuffagoEats",
+          "#ConnecticutWings",
+          "#Wings",
+          "#LocalFood",
+          "#Foodie"
+        ],
+        "overlay_source": "template",
+        "overlay_text": "TAG YOUR\nWING FRIEND",
+        "rejected": false,
+        "score": 69.0,
+        "score_breakdown": {
+          "clarity": 16.0,
+          "engagement_cta": 11.0,
+          "feedback_fit": 0.0,
+          "hashtag_quality": 17.0,
+          "originality": 14.0,
+          "overlay_brevity": 11.0
+        },
+        "score_reasons": [
+          "direct engagement CTA present",
+          "not repetitive against recent captions",
+          "exactly five hashtags"
+        ],
+        "source": "template",
+        "validation": {
+          "caption_angles": [
+            "tag_callout"
+          ],
+          "caption_overlay_concept": "tag_callout",
+          "caption_validation": {
+            "caption_length": 42,
+            "caption_source": "template",
+            "engagement_actions": [
+              "\\btag\\b"
+            ],
+            "hashtag_count": 0,
+            "issues": [],
+            "normalized_caption": "Tag the friend who never says no to wings.",
+            "passed": true,
+            "reasons": [],
+            "social_angles": [
+              "tag_callout"
+            ],
+            "valid": true
+          },
+          "issues": [],
+          "overlay_angles": [
+            "tag_callout"
+          ],
+          "overlay_reinforces_caption": true,
+          "overlay_validation": {
+            "engagement_actions": [
+              "\\btag\\b"
+            ],
+            "issues": [],
+            "line_count": 2,
+            "normalized_overlay": "TAG YOUR\nWING FRIEND",
+            "overlay_source": "template",
+            "passed": true,
+            "reasons": [],
+            "social_angles": [
+              "tag_callout"
+            ],
+            "valid": true,
+            "word_count": 4
+          },
+          "passed": true,
+          "reasons": [],
+          "valid": true
+        }
+      },
+      {
+        "caption": "Vote for flats or drums.",
+        "caption_source": "template",
+        "caption_style": "comment_prompt",
+        "feedback_summary_version": "feedback-v1",
+        "hashtags": [
+          "#BuffagoEats",
+          "#ConnecticutWings",
+          "#Wings",
+          "#LocalFood",
+          "#Foodie"
+        ],
+        "overlay_source": "template",
+        "overlay_text": "SETTLE IT IN\nTHE COMMENTS",
+        "rejected": false,
+        "score": 67.0,
+        "score_breakdown": {
+          "clarity": 14.0,
+          "engagement_cta": 11.0,
+          "feedback_fit": 0.0,
+          "hashtag_quality": 17.0,
+          "originality": 14.0,
+          "overlay_brevity": 11.0
+        },
+        "score_reasons": [
+          "direct engagement CTA present",
+          "not repetitive against recent captions",
+          "exactly five hashtags"
+        ],
+        "source": "template",
+        "validation": {
+          "caption_angles": [
+            "comment",
+            "debate"
+          ],
+          "caption_overlay_concept": "comment",
+          "caption_validation": {
+            "caption_length": 24,
+            "caption_source": "template",
+            "engagement_actions": [
+              "\\bvote\\b"
+            ],
+            "hashtag_count": 0,
+            "issues": [],
+            "normalized_caption": "Vote for flats or drums.",
+            "passed": true,
+            "reasons": [],
+            "social_angles": [
+              "comment",
+              "debate"
+            ],
+            "valid": true
+          },
+          "issues": [],
+          "overlay_angles": [
+            "comment",
+            "debate"
+          ],
+          "overlay_reinforces_caption": true,
+          "overlay_validation": {
+            "engagement_actions": [],
+            "issues": [],
+            "line_count": 2,
+            "normalized_overlay": "SETTLE IT IN\nTHE COMMENTS",
+            "overlay_source": "template",
+            "passed": true,
+            "reasons": [],
+            "social_angles": [
+              "comment",
+              "debate"
+            ],
+            "valid": true,
+            "word_count": 5
+          },
+          "passed": true,
+          "reasons": [],
+          "valid": true
+        }
+      },
+      {
+        "caption": "Share this with the friend who never says no to wings.",
+        "caption_source": "template",
+        "caption_style": "send_to_friend",
+        "feedback_summary_version": "feedback-v1",
+        "hashtags": [
+          "#BuffagoEats",
+          "#ConnecticutWings",
+          "#Wings",
+          "#LocalFood",
+          "#Foodie"
+        ],
+        "overlay_source": "template",
+        "overlay_text": "SEND THIS TO\nYOUR WING CREW",
+        "rejected": false,
+        "score": 66.0,
+        "score_breakdown": {
+          "clarity": 16.0,
+          "engagement_cta": 11.0,
+          "feedback_fit": 0.0,
+          "hashtag_quality": 17.0,
+          "originality": 14.0,
+          "overlay_brevity": 8.0
+        },
+        "score_reasons": [
+          "direct engagement CTA present",
+          "not repetitive against recent captions",
+          "exactly five hashtags"
+        ],
+        "source": "template",
+        "validation": {
+          "caption_angles": [
+            "send_share",
+            "tag_callout"
+          ],
+          "caption_overlay_concept": "send_share",
+          "caption_validation": {
+            "caption_length": 54,
+            "caption_source": "template",
+            "engagement_actions": [
+              "\\bshare\\b"
+            ],
+            "hashtag_count": 0,
+            "issues": [],
+            "normalized_caption": "Share this with the friend who never says no to wings.",
+            "passed": true,
+            "reasons": [],
+            "social_angles": [
+              "send_share",
+              "tag_callout"
+            ],
+            "valid": true
+          },
+          "issues": [],
+          "overlay_angles": [
+            "send_share",
+            "tag_callout"
+          ],
+          "overlay_reinforces_caption": true,
+          "overlay_validation": {
+            "engagement_actions": [
+              "\\bsend\\b"
+            ],
+            "issues": [],
+            "line_count": 2,
+            "normalized_overlay": "SEND THIS TO\nYOUR WING CREW",
+            "overlay_source": "template",
+            "passed": true,
+            "reasons": [],
+            "social_angles": [
+              "send_share",
+              "tag_callout"
+            ],
+            "valid": true,
+            "word_count": 6
+          },
+          "passed": true,
+          "reasons": [],
+          "valid": true
+        }
+      },
+      {
+        "caption": "Reply in 10 minutes or you owe wings.",
+        "caption_source": "template",
+        "caption_style": "wing_debt",
+        "feedback_summary_version": "feedback-v1",
+        "hashtags": [
+          "#BuffagoEats",
+          "#ConnecticutWings",
+          "#Wings",
+          "#LocalFood",
+          "#Foodie"
+        ],
+        "overlay_source": "template",
+        "overlay_text": "FIRST REPLY\nBUYS THE WINGS",
+        "rejected": false,
+        "score": 66.0,
+        "score_breakdown": {
+          "clarity": 14.0,
+          "engagement_cta": 10.0,
+          "feedback_fit": 0.0,
+          "hashtag_quality": 17.0,
+          "originality": 14.0,
+          "overlay_brevity": 11.0
+        },
+        "score_reasons": [
+          "direct engagement CTA present",
+          "not repetitive against recent captions",
+          "exactly five hashtags",
+          "caption could be more explicit about engagement"
+        ],
+        "source": "template",
+        "validation": {
+          "caption_angles": [
+            "challenge"
+          ],
+          "caption_overlay_concept": "challenge",
+          "caption_validation": {
+            "caption_length": 37,
+            "caption_source": "template",
+            "engagement_actions": [
+              "\\bowe\\b",
+              "\\breply\\b"
+            ],
+            "hashtag_count": 0,
+            "issues": [],
+            "normalized_caption": "Reply in 10 minutes or you owe wings.",
+            "passed": true,
+            "reasons": [],
+            "social_angles": [
+              "challenge"
+            ],
+            "valid": true
+          },
+          "issues": [],
+          "overlay_angles": [
+            "challenge"
+          ],
+          "overlay_reinforces_caption": true,
+          "overlay_validation": {
+            "engagement_actions": [
+              "\\breply\\b"
+            ],
+            "issues": [],
+            "line_count": 2,
+            "normalized_overlay": "FIRST REPLY\nBUYS THE WINGS",
+            "overlay_source": "template",
+            "passed": true,
+            "reasons": [],
+            "social_angles": [
+              "challenge"
+            ],
+            "valid": true,
+            "word_count": 5
+          },
+          "passed": true,
+          "reasons": [],
+          "valid": true
+        }
+      }
+    ],
     "content_direction_reason": "No strong historic pattern yet; using current Buffago activity and duplicate avoidance.",
+    "copy_source": "fallback",
     "cost_estimate": 0.0,
     "duplicate_similarity_threshold": 0.72,
-    "generated_at": "2026-07-01T12:06:34.567597+00:00",
-    "memory_reasoning": [
-      "The last five posts are concentrated around one theme.",
-      "Theme rotation bonus should encourage diversification."
-    ],
+    "fallback_reason": "OPENAI_API_KEY missing",
+    "feedback_summary": {
+      "active_strategy": {},
+      "best_caption_types": [],
+      "best_cta_types": [],
+      "best_hashtag_patterns": [],
+      "best_image_styles": [],
+      "best_overlay_patterns": [],
+      "best_video_assets": [],
+      "duplicate_topics_to_avoid": [],
+      "generated_at": "2026-07-10T00:47:35.840166+00:00",
+      "preferred_posting_windows": [],
+      "prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
+      "recommended_adjustments": [],
+      "source_counts": {
+        "rows": 0
+      },
+      "strong_patterns": [],
+      "version": "feedback-v1",
+      "weak_patterns": [],
+      "worst_categories": [],
+      "worst_image_styles": []
+    },
+    "feedback_summary_version": "feedback-v1",
+    "generated_at": "2026-07-10T00:47:35.844839+00:00",
+    "memory_reasoning": [],
     "model_name": "local-rules",
+    "openai_model": null,
+    "openai_used": false,
+    "overlay_options": [
+      {
+        "caption_style": "sauce_debate",
+        "overlay_source": "template",
+        "overlay_text": "WHO GETS THE\nLAST WING? VOTE.",
+        "score": 73.0,
+        "score_breakdown": {
+          "clarity": 16.0,
+          "engagement_cta": 16.0,
+          "feedback_fit": 0.0,
+          "hashtag_quality": 17.0,
+          "originality": 14.0,
+          "overlay_brevity": 10.0
+        },
+        "score_reasons": [
+          "direct engagement CTA present",
+          "not repetitive against recent captions",
+          "exactly five hashtags",
+          "includes a question prompt"
+        ]
+      },
+      {
+        "caption_style": "simple_hype",
+        "overlay_source": "template",
+        "overlay_text": "WHO'S PULLING UP?",
+        "score": 71.0,
+        "score_breakdown": {
+          "clarity": 16.0,
+          "engagement_cta": 11.0,
+          "feedback_fit": 0.0,
+          "hashtag_quality": 17.0,
+          "originality": 14.0,
+          "overlay_brevity": 13.0
+        },
+        "score_reasons": [
+          "direct engagement CTA present",
+          "not repetitive against recent captions",
+          "exactly five hashtags",
+          "includes a question prompt"
+        ]
+      },
+      {
+        "caption_style": "craving_prompt",
+        "overlay_source": "template",
+        "overlay_text": "SEND THIS TO\nTHE GROUP CHAT",
+        "score": 71.0,
+        "score_breakdown": {
+          "clarity": 16.0,
+          "engagement_cta": 16.0,
+          "feedback_fit": 0.0,
+          "hashtag_quality": 17.0,
+          "originality": 14.0,
+          "overlay_brevity": 8.0
+        },
+        "score_reasons": [
+          "direct engagement CTA present",
+          "not repetitive against recent captions",
+          "exactly five hashtags"
+        ]
+      },
+      {
+        "caption_style": "wing_night",
+        "overlay_source": "template",
+        "overlay_text": "WHO'S DOWN FOR\nWING NIGHT?",
+        "score": 71.0,
+        "score_breakdown": {
+          "clarity": 16.0,
+          "engagement_cta": 11.0,
+          "feedback_fit": 0.0,
+          "hashtag_quality": 17.0,
+          "originality": 14.0,
+          "overlay_brevity": 13.0
+        },
+        "score_reasons": [
+          "direct engagement CTA present",
+          "not repetitive against recent captions",
+          "exactly five hashtags",
+          "includes a question prompt"
+        ]
+      },
+      {
+        "caption_style": "tag_someone",
+        "overlay_source": "template",
+        "overlay_text": "TAG YOUR\nWING FRIEND",
+        "score": 69.0,
+        "score_breakdown": {
+          "clarity": 16.0,
+          "engagement_cta": 11.0,
+          "feedback_fit": 0.0,
+          "hashtag_quality": 17.0,
+          "originality": 14.0,
+          "overlay_brevity": 11.0
+        },
+        "score_reasons": [
+          "direct engagement CTA present",
+          "not repetitive against recent captions",
+          "exactly five hashtags"
+        ]
+      },
+      {
+        "caption_style": "comment_prompt",
+        "overlay_source": "template",
+        "overlay_text": "SETTLE IT IN\nTHE COMMENTS",
+        "score": 67.0,
+        "score_breakdown": {
+          "clarity": 14.0,
+          "engagement_cta": 11.0,
+          "feedback_fit": 0.0,
+          "hashtag_quality": 17.0,
+          "originality": 14.0,
+          "overlay_brevity": 11.0
+        },
+        "score_reasons": [
+          "direct engagement CTA present",
+          "not repetitive against recent captions",
+          "exactly five hashtags"
+        ]
+      },
+      {
+        "caption_style": "send_to_friend",
+        "overlay_source": "template",
+        "overlay_text": "SEND THIS TO\nYOUR WING CREW",
+        "score": 66.0,
+        "score_breakdown": {
+          "clarity": 16.0,
+          "engagement_cta": 11.0,
+          "feedback_fit": 0.0,
+          "hashtag_quality": 17.0,
+          "originality": 14.0,
+          "overlay_brevity": 8.0
+        },
+        "score_reasons": [
+          "direct engagement CTA present",
+          "not repetitive against recent captions",
+          "exactly five hashtags"
+        ]
+      },
+      {
+        "caption_style": "wing_debt",
+        "overlay_source": "template",
+        "overlay_text": "FIRST REPLY\nBUYS THE WINGS",
+        "score": 66.0,
+        "score_breakdown": {
+          "clarity": 14.0,
+          "engagement_cta": 10.0,
+          "feedback_fit": 0.0,
+          "hashtag_quality": 17.0,
+          "originality": 14.0,
+          "overlay_brevity": 11.0
+        },
+        "score_reasons": [
+          "direct engagement CTA present",
+          "not repetitive against recent captions",
+          "exactly five hashtags",
+          "caption could be more explicit about engagement"
+        ]
+      }
+    ],
     "performance_context": {
+      "active_strategy": {},
+      "best_caption_types": [],
       "best_categories": [],
       "best_cta_types": [],
       "best_hashtag_patterns": [],
       "best_image_styles": [],
+      "best_overlay_patterns": [],
       "best_posts": {
         "30d": [],
         "7d": [],
         "90d": []
       },
+      "best_video_assets": [],
       "duplicate_topics_to_avoid": [],
-      "generated_at": "2026-07-01T12:06:34.064378+00:00",
+      "generated_at": "2026-07-10T00:47:35.840166+00:00",
       "prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
+      "recommended_adjustments": [],
       "source_counts": {
         "rows": 0
       },
@@ -648,12 +1469,16 @@
         "30d": [],
         "7d": [],
         "90d": []
-      }
+      },
+      "worst_video_assets": []
     },
     "platform": "instagram",
     "rejected_duplicate_count": 0,
-    "run_id": "78f72259-97dc-46c5-8f6b-b3b3f997057e",
+    "reuse_blocked_reason": null,
+    "run_id": "19ac6fbd-d3a5-4a9f-9f9e-067fee298814",
     "scheduled_post_type": null,
+    "selected_caption": "Comment your sauce pick. #BuffagoEats #ConnecticutWings #Wings #LocalFood #Foodie",
+    "selected_overlay": "WHO GETS THE\nLAST WING? VOTE.",
     "survivor_count": 7,
     "token_usage": {
       "input_tokens": 0,
@@ -666,55 +1491,897 @@
       "Someone just crossed a big XP line: +1.0 trend alignment bonus",
       "Buffago in NY: +3.0 community activity bonus; trend alignment bonus",
       "Hidden gem: Wing Vault: +2.5 freshness bonus; trend alignment bonus",
-      "The wing napkin math problem: +3.0 trend alignment bonus; theme rotation bonus",
+      "The wing napkin math problem: +1.0 trend alignment bonus",
       "Wing fact worth knowing: +1.0 trend alignment bonus",
       "Winner selected for balance of score, freshness, and feed variety: Why Crispy Corner keeps showing up"
     ]
   },
-  "generated_at": "2026-07-01T12:06:34.567597+00:00",
-  "run_id": "78f72259-97dc-46c5-8f6b-b3b3f997057e",
+  "generated_at": "2026-07-10T00:47:35.844839+00:00",
+  "run_id": "19ac6fbd-d3a5-4a9f-9f9e-067fee298814",
   "runner_up": {
-    "adjustments": {
-      "duplicate_penalty": -0.63,
-      "theme_rotation_bonus": 4.0
-    },
-    "candidate_id": "5128c97e-0c57-4e3f-8fc7-b60f7b3108d0",
+    "adjustments": {},
+    "candidate_id": "710dec60-4ade-4221-b875-0b623202b63d",
     "caption_package": {
       "alt_text": "app_marketing Instagram image, centered on Crispy Corner, with a competitive mood, crispy wings and sauce, hinting at Buffalo, local New York food scene, in Buffago colors with readable composition for screen readers.",
-      "body": "Turn ratings or crawl activity into a playful comparison format that invites debate. It should feel competitive, simple, and easy to reply to.",
-      "caption": "The current wing leaderboard mood. Turn ratings or crawl activity into a playful comparison format that invites debate. It should feel competitive, simple, and easy to reply to. Who would you move up the board?",
-      "cleanup_notes": [
-        "caption_cleanup prompt reviewed and applied locally.",
-        "Removed banned or overly generic phrasing.",
-        "quality_review prompt reviewed locally.",
-        "Prompt library guidance loaded successfully."
+      "body": "Tag the friend who never says no to wings. #Buffago #BuffaloNY #BestWings #SupportLocal #WingNight",
+      "caption": "Tag the friend who never says no to wings. #Buffago #BuffaloNY #BestWings #SupportLocal #WingNight",
+      "caption_length": 98,
+      "caption_options": [
+        {
+          "caption": "Tag the friend who never says no to wings.",
+          "caption_source": "template",
+          "caption_style": "tag_someone",
+          "feedback_summary_version": "feedback-v1",
+          "hashtags": [
+            "#Buffago",
+            "#BuffaloNY",
+            "#BestWings",
+            "#SupportLocal",
+            "#WingNight"
+          ],
+          "overlay_source": "template",
+          "overlay_text": "TAG YOUR\nWING MVP",
+          "rejected": false,
+          "score": 69.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 11.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 11.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags"
+          ],
+          "source": "template",
+          "validation": {
+            "caption_angles": [
+              "tag_callout"
+            ],
+            "caption_overlay_concept": "tag_callout",
+            "caption_validation": {
+              "caption_length": 42,
+              "caption_source": "template",
+              "engagement_actions": [
+                "\\btag\\b"
+              ],
+              "hashtag_count": 0,
+              "issues": [],
+              "normalized_caption": "Tag the friend who never says no to wings.",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "tag_callout"
+              ],
+              "valid": true
+            },
+            "issues": [],
+            "overlay_angles": [
+              "tag_callout"
+            ],
+            "overlay_reinforces_caption": true,
+            "overlay_validation": {
+              "engagement_actions": [
+                "\\btag\\b"
+              ],
+              "issues": [],
+              "line_count": 2,
+              "normalized_overlay": "TAG YOUR\nWING MVP",
+              "overlay_source": "template",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "tag_callout"
+              ],
+              "valid": true,
+              "word_count": 4
+            },
+            "passed": true,
+            "reasons": [],
+            "valid": true
+          }
+        },
+        {
+          "caption": "Who gets the last wing? Comment below.",
+          "caption_source": "template",
+          "caption_style": "comment_prompt",
+          "feedback_summary_version": "feedback-v1",
+          "hashtags": [
+            "#Buffago",
+            "#BuffaloNY",
+            "#BestWings",
+            "#SupportLocal",
+            "#WingNight"
+          ],
+          "overlay_source": "template",
+          "overlay_text": "SETTLE IT IN\nTHE COMMENTS",
+          "rejected": false,
+          "score": 69.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 11.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 11.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags",
+            "includes a question prompt"
+          ],
+          "source": "template",
+          "validation": {
+            "caption_angles": [
+              "comment"
+            ],
+            "caption_overlay_concept": "comment",
+            "caption_validation": {
+              "caption_length": 38,
+              "caption_source": "template",
+              "engagement_actions": [
+                "\\bcomment\\b"
+              ],
+              "hashtag_count": 0,
+              "issues": [],
+              "normalized_caption": "Who gets the last wing? Comment below.",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "comment"
+              ],
+              "valid": true
+            },
+            "issues": [],
+            "overlay_angles": [
+              "comment",
+              "debate"
+            ],
+            "overlay_reinforces_caption": true,
+            "overlay_validation": {
+              "engagement_actions": [],
+              "issues": [],
+              "line_count": 2,
+              "normalized_overlay": "SETTLE IT IN\nTHE COMMENTS",
+              "overlay_source": "template",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "comment",
+                "debate"
+              ],
+              "valid": true,
+              "word_count": 5
+            },
+            "passed": true,
+            "reasons": [],
+            "valid": true
+          }
+        },
+        {
+          "caption": "Tag the friend who needs wing night.",
+          "caption_source": "template",
+          "caption_style": "wing_night",
+          "feedback_summary_version": "feedback-v1",
+          "hashtags": [
+            "#Buffago",
+            "#BuffaloNY",
+            "#BestWings",
+            "#SupportLocal",
+            "#WingNight"
+          ],
+          "overlay_source": "template",
+          "overlay_text": "WING NIGHT\nROLL CALL",
+          "rejected": false,
+          "score": 67.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 9.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 11.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags"
+          ],
+          "source": "template",
+          "validation": {
+            "caption_angles": [
+              "plans",
+              "tag_callout"
+            ],
+            "caption_overlay_concept": "plans",
+            "caption_validation": {
+              "caption_length": 36,
+              "caption_source": "template",
+              "engagement_actions": [
+                "\\btag\\b"
+              ],
+              "hashtag_count": 0,
+              "issues": [],
+              "normalized_caption": "Tag the friend who needs wing night.",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "plans",
+                "tag_callout"
+              ],
+              "valid": true
+            },
+            "issues": [],
+            "overlay_angles": [
+              "plans"
+            ],
+            "overlay_reinforces_caption": true,
+            "overlay_validation": {
+              "engagement_actions": [],
+              "issues": [],
+              "line_count": 2,
+              "normalized_overlay": "WING NIGHT\nROLL CALL",
+              "overlay_source": "template",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "plans"
+              ],
+              "valid": true,
+              "word_count": 4
+            },
+            "passed": true,
+            "reasons": [],
+            "valid": true
+          }
+        },
+        {
+          "caption": "Send this to the person you're getting wings with.",
+          "caption_source": "template",
+          "caption_style": "craving_prompt",
+          "feedback_summary_version": "feedback-v1",
+          "hashtags": [
+            "#Buffago",
+            "#BuffaloNY",
+            "#BestWings",
+            "#SupportLocal",
+            "#WingNight"
+          ],
+          "overlay_source": "template",
+          "overlay_text": "SEND THIS TO\nYOUR WING CREW",
+          "rejected": false,
+          "score": 66.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 11.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 8.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags"
+          ],
+          "source": "template",
+          "validation": {
+            "caption_angles": [
+              "send_share"
+            ],
+            "caption_overlay_concept": "send_share",
+            "caption_validation": {
+              "caption_length": 50,
+              "caption_source": "template",
+              "engagement_actions": [
+                "\\bsend\\b"
+              ],
+              "hashtag_count": 0,
+              "issues": [],
+              "normalized_caption": "Send this to the person you're getting wings with.",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "send_share"
+              ],
+              "valid": true
+            },
+            "issues": [],
+            "overlay_angles": [
+              "send_share",
+              "tag_callout"
+            ],
+            "overlay_reinforces_caption": true,
+            "overlay_validation": {
+              "engagement_actions": [
+                "\\bsend\\b"
+              ],
+              "issues": [],
+              "line_count": 2,
+              "normalized_overlay": "SEND THIS TO\nYOUR WING CREW",
+              "overlay_source": "template",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "send_share",
+                "tag_callout"
+              ],
+              "valid": true,
+              "word_count": 6
+            },
+            "passed": true,
+            "reasons": [],
+            "valid": true
+          }
+        },
+        {
+          "caption": "Who is eating this with you?",
+          "caption_source": "template",
+          "caption_style": "simple_hype",
+          "feedback_summary_version": "feedback-v1",
+          "hashtags": [
+            "#Buffago",
+            "#BuffaloNY",
+            "#BestWings",
+            "#SupportLocal",
+            "#WingNight"
+          ],
+          "overlay_source": "template",
+          "overlay_text": "SEND THIS TO\nYOUR WING CREW",
+          "rejected": false,
+          "score": 62.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 7.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 8.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags",
+            "includes a question prompt"
+          ],
+          "source": "template",
+          "validation": {
+            "caption_angles": [
+              "tag_callout"
+            ],
+            "caption_overlay_concept": "tag_callout",
+            "caption_validation": {
+              "caption_length": 28,
+              "caption_source": "template",
+              "engagement_actions": [
+                "\\bwho(?:'s| is)\\b"
+              ],
+              "hashtag_count": 0,
+              "issues": [],
+              "normalized_caption": "Who is eating this with you?",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "tag_callout"
+              ],
+              "valid": true
+            },
+            "issues": [],
+            "overlay_angles": [
+              "send_share",
+              "tag_callout"
+            ],
+            "overlay_reinforces_caption": true,
+            "overlay_validation": {
+              "engagement_actions": [
+                "\\bsend\\b"
+              ],
+              "issues": [],
+              "line_count": 2,
+              "normalized_overlay": "SEND THIS TO\nYOUR WING CREW",
+              "overlay_source": "template",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "send_share",
+                "tag_callout"
+              ],
+              "valid": true,
+              "word_count": 6
+            },
+            "passed": true,
+            "reasons": [],
+            "valid": true
+          }
+        },
+        {
+          "caption": "Like if ranch wins.",
+          "caption_source": "template",
+          "caption_style": "sauce_debate",
+          "feedback_summary_version": "feedback-v1",
+          "hashtags": [
+            "#Buffago",
+            "#BuffaloNY",
+            "#BestWings",
+            "#SupportLocal",
+            "#WingNight"
+          ],
+          "overlay_source": "template",
+          "overlay_text": "VOTE RANCH OR\nBLUE CHEESE",
+          "rejected": false,
+          "score": 61.0,
+          "score_breakdown": {
+            "clarity": 14.0,
+            "engagement_cta": 5.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 11.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags",
+            "caption could be more explicit about engagement"
+          ],
+          "source": "template",
+          "validation": {
+            "caption_angles": [
+              "debate"
+            ],
+            "caption_overlay_concept": "debate",
+            "caption_validation": {
+              "caption_length": 19,
+              "caption_source": "template",
+              "engagement_actions": [
+                "\\blike\\b"
+              ],
+              "hashtag_count": 0,
+              "issues": [],
+              "normalized_caption": "Like if ranch wins.",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "debate"
+              ],
+              "valid": true
+            },
+            "issues": [],
+            "overlay_angles": [
+              "comment",
+              "debate"
+            ],
+            "overlay_reinforces_caption": true,
+            "overlay_validation": {
+              "engagement_actions": [
+                "\\bvote\\b"
+              ],
+              "issues": [],
+              "line_count": 2,
+              "normalized_overlay": "VOTE RANCH OR\nBLUE CHEESE",
+              "overlay_source": "template",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "comment",
+                "debate"
+              ],
+              "valid": true,
+              "word_count": 5
+            },
+            "passed": true,
+            "reasons": [],
+            "valid": true
+          }
+        },
+        {
+          "caption": "Drop this in the group chat and wait.",
+          "caption_source": "template",
+          "caption_style": "group_chat",
+          "feedback_summary_version": "feedback-v1",
+          "hashtags": [
+            "#Buffago",
+            "#BuffaloNY",
+            "#BestWings",
+            "#SupportLocal",
+            "#WingNight"
+          ],
+          "overlay_source": "template",
+          "overlay_text": "SEND THIS TO\nTHE GROUP CHAT",
+          "rejected": false,
+          "score": 60.0,
+          "score_breakdown": {
+            "clarity": 14.0,
+            "engagement_cta": 7.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 8.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags",
+            "caption could be more explicit about engagement"
+          ],
+          "source": "template",
+          "validation": {
+            "caption_angles": [
+              "send_share"
+            ],
+            "caption_overlay_concept": "send_share",
+            "caption_validation": {
+              "caption_length": 37,
+              "caption_source": "template",
+              "engagement_actions": [
+                "\\bgroup chat\\b"
+              ],
+              "hashtag_count": 0,
+              "issues": [],
+              "normalized_caption": "Drop this in the group chat and wait.",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "send_share"
+              ],
+              "valid": true
+            },
+            "issues": [],
+            "overlay_angles": [
+              "send_share"
+            ],
+            "overlay_reinforces_caption": true,
+            "overlay_validation": {
+              "engagement_actions": [
+                "\\bgroup chat\\b",
+                "\\bsend\\b"
+              ],
+              "issues": [],
+              "line_count": 2,
+              "normalized_overlay": "SEND THIS TO\nTHE GROUP CHAT",
+              "overlay_source": "template",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "send_share"
+              ],
+              "valid": true,
+              "word_count": 6
+            },
+            "passed": true,
+            "reasons": [],
+            "valid": true
+          }
+        },
+        {
+          "caption": "If they flake again, they owe the whole table wings.",
+          "caption_source": "template",
+          "caption_style": "wing_debt",
+          "feedback_summary_version": "feedback-v1",
+          "hashtags": [
+            "#Buffago",
+            "#BuffaloNY",
+            "#BestWings",
+            "#SupportLocal",
+            "#WingNight"
+          ],
+          "overlay_source": "template",
+          "overlay_text": "IF THEY DON'T REPLY\nTHEY OWE WINGS",
+          "rejected": false,
+          "score": 58.0,
+          "score_breakdown": {
+            "clarity": 14.0,
+            "engagement_cta": 5.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 8.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags"
+          ],
+          "source": "template",
+          "validation": {
+            "caption_angles": [
+              "challenge"
+            ],
+            "caption_overlay_concept": "challenge",
+            "caption_validation": {
+              "caption_length": 52,
+              "caption_source": "template",
+              "engagement_actions": [
+                "\\bowe\\b"
+              ],
+              "hashtag_count": 0,
+              "issues": [],
+              "normalized_caption": "If they flake again, they owe the whole table wings.",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "challenge"
+              ],
+              "valid": true
+            },
+            "issues": [],
+            "overlay_angles": [
+              "challenge"
+            ],
+            "overlay_reinforces_caption": true,
+            "overlay_validation": {
+              "engagement_actions": [
+                "\\bowe\\b",
+                "\\breply\\b"
+              ],
+              "issues": [],
+              "line_count": 2,
+              "normalized_overlay": "IF THEY DON'T REPLY\nTHEY OWE WINGS",
+              "overlay_source": "template",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "challenge"
+              ],
+              "valid": true,
+              "word_count": 7
+            },
+            "passed": true,
+            "reasons": [],
+            "valid": true
+          }
+        }
       ],
+      "caption_overlay_concept": "tag_callout",
+      "caption_source": "template",
+      "caption_style": "tag_someone",
+      "caption_type": "tag_someone",
+      "cleanup_notes": [
+        "Caption generator now ranks multiple caption and overlay variants before selecting a winner.",
+        "Selected caption style: tag_someone.",
+        "Caption source: template.",
+        "Overlay source: template.",
+        "Feedback summary version: feedback-v1.",
+        "OpenAI fallback reason: OPENAI_API_KEY missing.",
+        "caption_cleanup prompt reviewed against local caption rules.",
+        "quality_review prompt reviewed locally.",
+        "Prompt library guidance loaded successfully.",
+        "Final copy source: fallback."
+      ],
+      "copy_source": "fallback",
       "cta": "Who would you move up the board?",
-      "emoji_placement": "0 to 2 emojis near the hook or CTA, never in a wall.",
+      "emoji_placement": "Avoid emoji walls; use zero or one only when a template explicitly needs it.",
+      "fallback_reason": "OPENAI_API_KEY missing",
+      "fallback_used": true,
+      "feedback_summary": {
+        "active_strategy": {},
+        "best_caption_types": [],
+        "best_cta_types": [],
+        "best_hashtag_patterns": [],
+        "best_image_styles": [],
+        "best_overlay_patterns": [],
+        "best_video_assets": [],
+        "duplicate_topics_to_avoid": [],
+        "generated_at": "2026-07-10T00:47:35.874904+00:00",
+        "preferred_posting_windows": [],
+        "prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
+        "recommended_adjustments": [],
+        "source_counts": {
+          "rows": 0
+        },
+        "strong_patterns": [],
+        "version": "feedback-v1",
+        "weak_patterns": [],
+        "worst_categories": [],
+        "worst_image_styles": []
+      },
+      "feedback_summary_version": "feedback-v1",
+      "generated_at": "2026-07-10T00:47:35.874904+00:00",
       "hashtags": [
         "#Buffago",
-        "#BuffaloWings",
-        "#WingCrawl",
-        "#LocalFood",
-        "#WingCulture",
-        "#WingLeaderboard",
-        "#LocalRanking",
-        "#buffalo",
-        "#ny",
-        "#Wings",
-        "#Sauce",
-        "#BlueCheese"
+        "#BuffaloNY",
+        "#BestWings",
+        "#SupportLocal",
+        "#WingNight"
       ],
-      "hook": "The current wing leaderboard mood.",
-      "image_prompt": "Ultra realistic cinematic photography with a viral Instagram meme feel, not stock photography. Comedy first, food second, story third, with warm sports bar, brewery, or neighborhood restaurant lighting, highly expressive faces, natural imperfections, visible emotion, motion and action, shallow depth of field, an obvious focal point, background characters reacting naturally, no staged poses, no AI-looking smiles, professional food photography quality, and professional commercial photography quality. In a lively Buffalo wing crawl meetup inside a warm restaurant, wing-crawl regulars compare route ideas while a heroic platter of wings interrupts the planning. The conflict is visually obvious: the group cannot agree on the next stop because the current wings look too good to leave behind. The comedy beat is a newcomer drops to one knee in awe of the first perfect wing while the table erupts around them, with The Drum Defender, big-energy drum supporter, points with conviction and celebrates every saucy bite. Use booth-level cinematic wide shot with motion blur, packed restaurant energy, and wings in the front focal plane. The wings are the visual centerpiece in the foreground or clear focal plane: golden crisp edges, glossy buffalo-orange sauce, visible texture, steam, pepper and seasoning detail, creamy ranch or blue cheese cups nearby, celery and carrots as supporting props. The mood is communal, playful, active, and appetizing, full of triumphant wing confidence and active gestures like grabbing and pointing. Background characters should react naturally with gasps, cheers, facepalms, disbelief, or someone recording on a phone. Avoid a static seated conversation or two people simply sitting across a table; the scene should feel caught mid-action. No alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+      "hook": "tag_someone",
+      "image_prompt": "Ultra realistic cinematic photography with a viral Instagram meme feel, not stock photography. Comedy first, food second, story third, with warm sports bar, brewery, or neighborhood restaurant lighting, highly expressive faces, natural imperfections, visible emotion, motion and action, shallow depth of field, an obvious focal point, background characters reacting naturally, no staged poses, no AI-looking smiles, professional food photography quality, and professional commercial photography quality. In a lively Buffalo wing crawl meetup inside a warm restaurant, wing-crawl regulars compare route ideas while a heroic platter of wings interrupts the planning. The conflict is visually obvious: the group cannot agree on the next stop because the platter just turned into the plan. The comedy beat is a heat seeker takes one bite and tries to look brave while the whole restaurant silently clocks the panic, with The Drum Defender, big-energy drum supporter, points with conviction and celebrates every saucy bite. Use tailgate wide shot with fans circling a heroic tray of wings during a ridiculous debate. The wings are the visual centerpiece in the foreground or clear focal plane: golden crisp edges, glossy buffalo-orange sauce, visible texture, steam, pepper and seasoning detail, creamy ranch or blue cheese cups nearby, celery and carrots as supporting props. The mood is communal, playful, active, appetizing, and shareable, full of mock outrage and active gestures like gasping and pointing. Background characters should react naturally with gasps, cheers, facepalms, disbelief, or someone recording on a phone. Avoid a static seated conversation or two people simply sitting across a table; the scene should feel caught mid-action. No alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+      "openai_model": null,
+      "openai_used": false,
+      "overlay_options": [
+        {
+          "caption_style": "tag_someone",
+          "overlay_source": "template",
+          "overlay_text": "TAG YOUR\nWING MVP",
+          "score": 69.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 11.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 11.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags"
+          ]
+        },
+        {
+          "caption_style": "comment_prompt",
+          "overlay_source": "template",
+          "overlay_text": "SETTLE IT IN\nTHE COMMENTS",
+          "score": 69.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 11.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 11.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags",
+            "includes a question prompt"
+          ]
+        },
+        {
+          "caption_style": "wing_night",
+          "overlay_source": "template",
+          "overlay_text": "WING NIGHT\nROLL CALL",
+          "score": 67.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 9.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 11.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags"
+          ]
+        },
+        {
+          "caption_style": "craving_prompt",
+          "overlay_source": "template",
+          "overlay_text": "SEND THIS TO\nYOUR WING CREW",
+          "score": 66.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 11.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 8.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags"
+          ]
+        },
+        {
+          "caption_style": "simple_hype",
+          "overlay_source": "template",
+          "overlay_text": "SEND THIS TO\nYOUR WING CREW",
+          "score": 62.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 7.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 8.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags",
+            "includes a question prompt"
+          ]
+        },
+        {
+          "caption_style": "sauce_debate",
+          "overlay_source": "template",
+          "overlay_text": "VOTE RANCH OR\nBLUE CHEESE",
+          "score": 61.0,
+          "score_breakdown": {
+            "clarity": 14.0,
+            "engagement_cta": 5.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 11.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags",
+            "caption could be more explicit about engagement"
+          ]
+        },
+        {
+          "caption_style": "group_chat",
+          "overlay_source": "template",
+          "overlay_text": "SEND THIS TO\nTHE GROUP CHAT",
+          "score": 60.0,
+          "score_breakdown": {
+            "clarity": 14.0,
+            "engagement_cta": 7.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 8.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags",
+            "caption could be more explicit about engagement"
+          ]
+        },
+        {
+          "caption_style": "wing_debt",
+          "overlay_source": "template",
+          "overlay_text": "IF THEY DON'T REPLY\nTHEY OWE WINGS",
+          "score": 58.0,
+          "score_breakdown": {
+            "clarity": 14.0,
+            "engagement_cta": 5.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 8.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags"
+          ]
+        }
+      ],
+      "overlay_source": "template",
+      "overlay_text": "TAG YOUR\nWING MVP",
+      "overlay_validation_failure_reason": null,
+      "overlay_validation_passed": true,
       "quality_review": {
         "approved": true,
+        "caption_length": 98,
+        "fallback_used": false,
+        "hashtag_count": 5,
         "issues": [],
-        "prompt_version": "prompt-library-v1",
-        "score": 92
+        "prompt_version": "prompt-library-v2",
+        "score": 96,
+        "validation_passed": true
       },
-      "spacing": "The current wing leaderboard mood.\n\nTurn ratings or crawl activity into a playful comparison format that invites debate. It should feel competitive, simple, and easy to reply to.\n\nWho would you move up the board?"
+      "ranking_breakdown": {
+        "clarity": 16.0,
+        "engagement_cta": 11.0,
+        "feedback_fit": 0.0,
+        "hashtag_quality": 17.0,
+        "originality": 14.0,
+        "overlay_brevity": 11.0
+      },
+      "ranking_reason": "direct engagement CTA present; not repetitive against recent captions; exactly five hashtags",
+      "ranking_score": 69.0,
+      "reuse_blocked_reason": null,
+      "selected_caption_style": "tag_someone",
+      "spacing": "Tag the friend who never says no to wings. #Buffago #BuffaloNY #BestWings #SupportLocal #WingNight",
+      "validation_failure_reason": null,
+      "validation_passed": true
     },
+    "caption_style": "tag_someone",
+    "caption_type": "tag_someone",
     "category_scores": {
       "brand_fit": 15.0,
       "conversation_starter": 5.0,
@@ -722,7 +2389,7 @@
       "current_relevance": 6.0,
       "gamification_potential": 4.0,
       "likelihood_of_engagement": 18.0,
-      "originality": 19.64,
+      "originality": 20.0,
       "uses_recent_buffago_activity": 10.0,
       "visual_potential": 9.5
     },
@@ -731,40 +2398,44 @@
       "Rochester"
     ],
     "content_type": "leaderboard",
+    "creative_style": "app_demo",
     "cta_category": "comment",
     "current_event_references": [],
     "duplicate_reason": null,
-    "duplicate_score": 0.018,
-    "final_score": 91.76,
+    "duplicate_score": 0.0,
+    "final_score": 88.75,
     "food_categories": [],
     "holiday_references": [],
     "hook_style": "ranking hook",
+    "hook_text": "WHO GETS THE LAST WING?",
     "image_composition": "stacked board with bold labels",
     "metadata": {
-      "camera_angle": "booth-level cinematic wide shot with motion blur, packed restaurant energy, and wings in the front focal plane",
+      "camera_angle": "tailgate wide shot with fans circling a heroic tray of wings during a ridiculous debate",
       "character_archetype": "The Drum Defender",
       "character_description": "big-energy drum supporter, points with conviction and celebrates every saucy bite",
-      "comedy_beat": "a newcomer drops to one knee in awe of the first perfect wing while the table erupts around them",
+      "comedy_beat": "a heat seeker takes one bite and tries to look brave while the whole restaurant silently clocks the panic",
       "learning_prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
       "prompt_anchors": [
         "comparison",
         "debate starter"
       ],
-      "prompt_version": "prompt-library-v1:buffago-visual-v2",
+      "prompt_version": "prompt-library-v2:buffago-visual-v2",
       "scene_type": "neighborhood restaurant booth section",
       "visual_style": "buffago_cinematic_comedy_food_v2",
       "wing_focus_level": "high"
     },
     "mood": "Competitive",
     "notes": [
-      "originality=19.64",
+      "originality=20.0",
       "engagement=18.0",
       "brand_fit=15.0",
       "activity=10.0",
       "relevance=6.0"
     ],
+    "overlay_text": "TAG YOUR\nWING MVP",
     "platform": "instagram",
     "primary_theme": "competition",
+    "prompt_template_name": "buffago_post",
     "reason_chosen": "Leaderboards create natural comparison and comments without needing a hard sell.",
     "rejected_duplicate": false,
     "restaurants_mentioned": [
@@ -788,55 +2459,910 @@
     "suggested_image_concept": "Leaderboard graphic with wing spots and local city cues.",
     "target_emotion": "Competitive",
     "visual_style": "app_marketing",
-    "weighted_total": 88.39,
+    "weighted_total": 88.75,
     "working_title": "The current wing leaderboard mood"
   },
   "scheduled_post_type": null,
   "winner": {
     "adjustments": {
-      "duplicate_penalty": -0.42,
-      "freshness_bonus": 4.0,
-      "theme_rotation_bonus": 4.0
+      "freshness_bonus": 4.0
     },
     "alt_text": "realistic Instagram image, centered on Crispy Corner, with a curious mood, crispy wings and sauce, hinting at Buffalo, local New York food scene, featuring wings and sauce, in Buffago colors with readable composition for screen readers.",
-    "candidate_id": "ec4239cb-5636-4123-b43a-fc800065b5d9",
-    "caption": "Why Crispy Corner keeps showing up. Spotlight Crispy Corner in Buffalo as a high-signal favorite from recent Buffago activity. Keep the tone local, food-first, and conversational. Drop your go-to wing spot in the comments.",
+    "candidate_id": "5df15b0b-7a83-4fd7-a18d-17fc4f98d30c",
+    "caption": "Comment your sauce pick. #BuffagoEats #ConnecticutWings #Wings #LocalFood #Foodie",
     "caption_package": {
       "alt_text": "realistic Instagram image, centered on Crispy Corner, with a curious mood, crispy wings and sauce, hinting at Buffalo, local New York food scene, featuring wings and sauce, in Buffago colors with readable composition for screen readers.",
-      "body": "Spotlight Crispy Corner in Buffalo as a high-signal favorite from recent Buffago activity. Keep the tone local, food-first, and conversational.",
-      "caption": "Why Crispy Corner keeps showing up. Spotlight Crispy Corner in Buffalo as a high-signal favorite from recent Buffago activity. Keep the tone local, food-first, and conversational. Drop your go-to wing spot in the comments.",
+      "body": "Comment your sauce pick. #BuffagoEats #ConnecticutWings #Wings #LocalFood #Foodie",
+      "caption": "Comment your sauce pick. #BuffagoEats #ConnecticutWings #Wings #LocalFood #Foodie",
+      "caption_length": 81,
+      "caption_options": [
+        {
+          "caption": "Comment your sauce pick.",
+          "caption_source": "template",
+          "caption_style": "sauce_debate",
+          "feedback_summary_version": "feedback-v1",
+          "hashtags": [
+            "#BuffagoEats",
+            "#ConnecticutWings",
+            "#Wings",
+            "#LocalFood",
+            "#Foodie"
+          ],
+          "overlay_source": "template",
+          "overlay_text": "WHO GETS THE\nLAST WING? VOTE.",
+          "rejected": false,
+          "score": 73.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 16.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 10.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags",
+            "includes a question prompt"
+          ],
+          "source": "template",
+          "validation": {
+            "caption_angles": [
+              "comment",
+              "debate"
+            ],
+            "caption_overlay_concept": "comment",
+            "caption_validation": {
+              "caption_length": 24,
+              "caption_source": "template",
+              "engagement_actions": [
+                "\\bcomment\\b",
+                "\\bpick\\b"
+              ],
+              "hashtag_count": 0,
+              "issues": [],
+              "normalized_caption": "Comment your sauce pick.",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "comment",
+                "debate"
+              ],
+              "valid": true
+            },
+            "issues": [],
+            "overlay_angles": [
+              "comment"
+            ],
+            "overlay_reinforces_caption": true,
+            "overlay_validation": {
+              "engagement_actions": [
+                "\\bvote\\b"
+              ],
+              "issues": [],
+              "line_count": 2,
+              "normalized_overlay": "WHO GETS THE\nLAST WING? VOTE.",
+              "overlay_source": "template",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "comment"
+              ],
+              "valid": true,
+              "word_count": 6
+            },
+            "passed": true,
+            "reasons": [],
+            "valid": true
+          }
+        },
+        {
+          "caption": "Send this to your wing crew.",
+          "caption_source": "template",
+          "caption_style": "simple_hype",
+          "feedback_summary_version": "feedback-v1",
+          "hashtags": [
+            "#BuffagoEats",
+            "#ConnecticutWings",
+            "#Wings",
+            "#LocalFood",
+            "#Foodie"
+          ],
+          "overlay_source": "template",
+          "overlay_text": "WHO'S PULLING UP?",
+          "rejected": false,
+          "score": 71.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 11.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 13.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags",
+            "includes a question prompt"
+          ],
+          "source": "template",
+          "validation": {
+            "caption_angles": [
+              "send_share",
+              "tag_callout"
+            ],
+            "caption_overlay_concept": "send_share",
+            "caption_validation": {
+              "caption_length": 28,
+              "caption_source": "template",
+              "engagement_actions": [
+                "\\bsend\\b"
+              ],
+              "hashtag_count": 0,
+              "issues": [],
+              "normalized_caption": "Send this to your wing crew.",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "send_share",
+                "tag_callout"
+              ],
+              "valid": true
+            },
+            "issues": [],
+            "overlay_angles": [
+              "plans"
+            ],
+            "overlay_reinforces_caption": true,
+            "overlay_validation": {
+              "engagement_actions": [
+                "\\bwho(?:'s| is)\\b"
+              ],
+              "issues": [],
+              "line_count": 1,
+              "normalized_overlay": "WHO'S PULLING UP?",
+              "overlay_source": "template",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "plans"
+              ],
+              "valid": true,
+              "word_count": 3
+            },
+            "passed": true,
+            "reasons": [],
+            "valid": true
+          }
+        },
+        {
+          "caption": "Share this with the friend who owes you wings.",
+          "caption_source": "template",
+          "caption_style": "craving_prompt",
+          "feedback_summary_version": "feedback-v1",
+          "hashtags": [
+            "#BuffagoEats",
+            "#ConnecticutWings",
+            "#Wings",
+            "#LocalFood",
+            "#Foodie"
+          ],
+          "overlay_source": "template",
+          "overlay_text": "SEND THIS TO\nTHE GROUP CHAT",
+          "rejected": false,
+          "score": 71.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 16.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 8.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags"
+          ],
+          "source": "template",
+          "validation": {
+            "caption_angles": [
+              "challenge",
+              "send_share",
+              "tag_callout"
+            ],
+            "caption_overlay_concept": "send_share",
+            "caption_validation": {
+              "caption_length": 46,
+              "caption_source": "template",
+              "engagement_actions": [
+                "\\bowes\\b",
+                "\\bshare\\b"
+              ],
+              "hashtag_count": 0,
+              "issues": [],
+              "normalized_caption": "Share this with the friend who owes you wings.",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "challenge",
+                "send_share",
+                "tag_callout"
+              ],
+              "valid": true
+            },
+            "issues": [],
+            "overlay_angles": [
+              "send_share"
+            ],
+            "overlay_reinforces_caption": true,
+            "overlay_validation": {
+              "engagement_actions": [
+                "\\bgroup chat\\b",
+                "\\bsend\\b"
+              ],
+              "issues": [],
+              "line_count": 2,
+              "normalized_overlay": "SEND THIS TO\nTHE GROUP CHAT",
+              "overlay_source": "template",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "send_share"
+              ],
+              "valid": true,
+              "word_count": 6
+            },
+            "passed": true,
+            "reasons": [],
+            "valid": true
+          }
+        },
+        {
+          "caption": "Send this to your wing crew.",
+          "caption_source": "template",
+          "caption_style": "wing_night",
+          "feedback_summary_version": "feedback-v1",
+          "hashtags": [
+            "#BuffagoEats",
+            "#ConnecticutWings",
+            "#Wings",
+            "#LocalFood",
+            "#Foodie"
+          ],
+          "overlay_source": "template",
+          "overlay_text": "WHO'S DOWN FOR\nWING NIGHT?",
+          "rejected": false,
+          "score": 71.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 11.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 13.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags",
+            "includes a question prompt"
+          ],
+          "source": "template",
+          "validation": {
+            "caption_angles": [
+              "send_share",
+              "tag_callout"
+            ],
+            "caption_overlay_concept": "send_share",
+            "caption_validation": {
+              "caption_length": 28,
+              "caption_source": "template",
+              "engagement_actions": [
+                "\\bsend\\b"
+              ],
+              "hashtag_count": 0,
+              "issues": [],
+              "normalized_caption": "Send this to your wing crew.",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "send_share",
+                "tag_callout"
+              ],
+              "valid": true
+            },
+            "issues": [],
+            "overlay_angles": [
+              "plans"
+            ],
+            "overlay_reinforces_caption": true,
+            "overlay_validation": {
+              "engagement_actions": [
+                "\\bwho(?:'s| is)\\b"
+              ],
+              "issues": [],
+              "line_count": 2,
+              "normalized_overlay": "WHO'S DOWN FOR\nWING NIGHT?",
+              "overlay_source": "template",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "plans"
+              ],
+              "valid": true,
+              "word_count": 5
+            },
+            "passed": true,
+            "reasons": [],
+            "valid": true
+          }
+        },
+        {
+          "caption": "Tag the friend who never says no to wings.",
+          "caption_source": "template",
+          "caption_style": "tag_someone",
+          "feedback_summary_version": "feedback-v1",
+          "hashtags": [
+            "#BuffagoEats",
+            "#ConnecticutWings",
+            "#Wings",
+            "#LocalFood",
+            "#Foodie"
+          ],
+          "overlay_source": "template",
+          "overlay_text": "TAG YOUR\nWING FRIEND",
+          "rejected": false,
+          "score": 69.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 11.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 11.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags"
+          ],
+          "source": "template",
+          "validation": {
+            "caption_angles": [
+              "tag_callout"
+            ],
+            "caption_overlay_concept": "tag_callout",
+            "caption_validation": {
+              "caption_length": 42,
+              "caption_source": "template",
+              "engagement_actions": [
+                "\\btag\\b"
+              ],
+              "hashtag_count": 0,
+              "issues": [],
+              "normalized_caption": "Tag the friend who never says no to wings.",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "tag_callout"
+              ],
+              "valid": true
+            },
+            "issues": [],
+            "overlay_angles": [
+              "tag_callout"
+            ],
+            "overlay_reinforces_caption": true,
+            "overlay_validation": {
+              "engagement_actions": [
+                "\\btag\\b"
+              ],
+              "issues": [],
+              "line_count": 2,
+              "normalized_overlay": "TAG YOUR\nWING FRIEND",
+              "overlay_source": "template",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "tag_callout"
+              ],
+              "valid": true,
+              "word_count": 4
+            },
+            "passed": true,
+            "reasons": [],
+            "valid": true
+          }
+        },
+        {
+          "caption": "Vote for flats or drums.",
+          "caption_source": "template",
+          "caption_style": "comment_prompt",
+          "feedback_summary_version": "feedback-v1",
+          "hashtags": [
+            "#BuffagoEats",
+            "#ConnecticutWings",
+            "#Wings",
+            "#LocalFood",
+            "#Foodie"
+          ],
+          "overlay_source": "template",
+          "overlay_text": "SETTLE IT IN\nTHE COMMENTS",
+          "rejected": false,
+          "score": 67.0,
+          "score_breakdown": {
+            "clarity": 14.0,
+            "engagement_cta": 11.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 11.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags"
+          ],
+          "source": "template",
+          "validation": {
+            "caption_angles": [
+              "comment",
+              "debate"
+            ],
+            "caption_overlay_concept": "comment",
+            "caption_validation": {
+              "caption_length": 24,
+              "caption_source": "template",
+              "engagement_actions": [
+                "\\bvote\\b"
+              ],
+              "hashtag_count": 0,
+              "issues": [],
+              "normalized_caption": "Vote for flats or drums.",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "comment",
+                "debate"
+              ],
+              "valid": true
+            },
+            "issues": [],
+            "overlay_angles": [
+              "comment",
+              "debate"
+            ],
+            "overlay_reinforces_caption": true,
+            "overlay_validation": {
+              "engagement_actions": [],
+              "issues": [],
+              "line_count": 2,
+              "normalized_overlay": "SETTLE IT IN\nTHE COMMENTS",
+              "overlay_source": "template",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "comment",
+                "debate"
+              ],
+              "valid": true,
+              "word_count": 5
+            },
+            "passed": true,
+            "reasons": [],
+            "valid": true
+          }
+        },
+        {
+          "caption": "Share this with the friend who never says no to wings.",
+          "caption_source": "template",
+          "caption_style": "send_to_friend",
+          "feedback_summary_version": "feedback-v1",
+          "hashtags": [
+            "#BuffagoEats",
+            "#ConnecticutWings",
+            "#Wings",
+            "#LocalFood",
+            "#Foodie"
+          ],
+          "overlay_source": "template",
+          "overlay_text": "SEND THIS TO\nYOUR WING CREW",
+          "rejected": false,
+          "score": 66.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 11.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 8.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags"
+          ],
+          "source": "template",
+          "validation": {
+            "caption_angles": [
+              "send_share",
+              "tag_callout"
+            ],
+            "caption_overlay_concept": "send_share",
+            "caption_validation": {
+              "caption_length": 54,
+              "caption_source": "template",
+              "engagement_actions": [
+                "\\bshare\\b"
+              ],
+              "hashtag_count": 0,
+              "issues": [],
+              "normalized_caption": "Share this with the friend who never says no to wings.",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "send_share",
+                "tag_callout"
+              ],
+              "valid": true
+            },
+            "issues": [],
+            "overlay_angles": [
+              "send_share",
+              "tag_callout"
+            ],
+            "overlay_reinforces_caption": true,
+            "overlay_validation": {
+              "engagement_actions": [
+                "\\bsend\\b"
+              ],
+              "issues": [],
+              "line_count": 2,
+              "normalized_overlay": "SEND THIS TO\nYOUR WING CREW",
+              "overlay_source": "template",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "send_share",
+                "tag_callout"
+              ],
+              "valid": true,
+              "word_count": 6
+            },
+            "passed": true,
+            "reasons": [],
+            "valid": true
+          }
+        },
+        {
+          "caption": "Reply in 10 minutes or you owe wings.",
+          "caption_source": "template",
+          "caption_style": "wing_debt",
+          "feedback_summary_version": "feedback-v1",
+          "hashtags": [
+            "#BuffagoEats",
+            "#ConnecticutWings",
+            "#Wings",
+            "#LocalFood",
+            "#Foodie"
+          ],
+          "overlay_source": "template",
+          "overlay_text": "FIRST REPLY\nBUYS THE WINGS",
+          "rejected": false,
+          "score": 66.0,
+          "score_breakdown": {
+            "clarity": 14.0,
+            "engagement_cta": 10.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 11.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags",
+            "caption could be more explicit about engagement"
+          ],
+          "source": "template",
+          "validation": {
+            "caption_angles": [
+              "challenge"
+            ],
+            "caption_overlay_concept": "challenge",
+            "caption_validation": {
+              "caption_length": 37,
+              "caption_source": "template",
+              "engagement_actions": [
+                "\\bowe\\b",
+                "\\breply\\b"
+              ],
+              "hashtag_count": 0,
+              "issues": [],
+              "normalized_caption": "Reply in 10 minutes or you owe wings.",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "challenge"
+              ],
+              "valid": true
+            },
+            "issues": [],
+            "overlay_angles": [
+              "challenge"
+            ],
+            "overlay_reinforces_caption": true,
+            "overlay_validation": {
+              "engagement_actions": [
+                "\\breply\\b"
+              ],
+              "issues": [],
+              "line_count": 2,
+              "normalized_overlay": "FIRST REPLY\nBUYS THE WINGS",
+              "overlay_source": "template",
+              "passed": true,
+              "reasons": [],
+              "social_angles": [
+                "challenge"
+              ],
+              "valid": true,
+              "word_count": 5
+            },
+            "passed": true,
+            "reasons": [],
+            "valid": true
+          }
+        }
+      ],
+      "caption_overlay_concept": "comment",
+      "caption_source": "template",
+      "caption_style": "sauce_debate",
+      "caption_type": "sauce_debate",
       "cleanup_notes": [
-        "caption_cleanup prompt reviewed and applied locally.",
-        "Removed banned or overly generic phrasing.",
+        "Caption generator now ranks multiple caption and overlay variants before selecting a winner.",
+        "Selected caption style: sauce_debate.",
+        "Caption source: template.",
+        "Overlay source: template.",
+        "Feedback summary version: feedback-v1.",
+        "OpenAI fallback reason: OPENAI_API_KEY missing.",
+        "caption_cleanup prompt reviewed against local caption rules.",
         "quality_review prompt reviewed locally.",
-        "Prompt library guidance loaded successfully."
+        "Prompt library guidance loaded successfully.",
+        "Final copy source: fallback."
       ],
+      "copy_source": "fallback",
       "cta": "Drop your go-to wing spot in the comments.",
-      "emoji_placement": "0 to 2 emojis near the hook or CTA, never in a wall.",
+      "emoji_placement": "Avoid emoji walls; use zero or one only when a template explicitly needs it.",
+      "fallback_reason": "OPENAI_API_KEY missing",
+      "fallback_used": true,
+      "feedback_summary": {
+        "active_strategy": {},
+        "best_caption_types": [],
+        "best_cta_types": [],
+        "best_hashtag_patterns": [],
+        "best_image_styles": [],
+        "best_overlay_patterns": [],
+        "best_video_assets": [],
+        "duplicate_topics_to_avoid": [],
+        "generated_at": "2026-07-10T00:47:35.844839+00:00",
+        "preferred_posting_windows": [],
+        "prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
+        "recommended_adjustments": [],
+        "source_counts": {
+          "rows": 0
+        },
+        "strong_patterns": [],
+        "version": "feedback-v1",
+        "weak_patterns": [],
+        "worst_categories": [],
+        "worst_image_styles": []
+      },
+      "feedback_summary_version": "feedback-v1",
+      "generated_at": "2026-07-10T00:47:35.844839+00:00",
       "hashtags": [
-        "#Buffago",
-        "#BuffaloWings",
-        "#WingCrawl",
-        "#LocalFood",
-        "#WingCulture",
-        "#WingSpotlight",
-        "#RestaurantFind",
-        "#buffalo",
-        "#ny",
+        "#BuffagoEats",
+        "#ConnecticutWings",
         "#Wings",
-        "#Sauce",
-        "#BlueCheese"
+        "#LocalFood",
+        "#Foodie"
       ],
-      "hook": "Why Crispy Corner keeps showing up.",
-      "image_prompt": "Ultra realistic cinematic photography with a viral Instagram meme feel, not stock photography. Comedy first, food second, story third, with warm sports bar, brewery, or neighborhood restaurant lighting, highly expressive faces, natural imperfections, visible emotion, motion and action, shallow depth of field, an obvious focal point, background characters reacting naturally, no staged poses, no AI-looking smiles, professional food photography quality, and professional commercial photography quality. In a busy neighborhood wing restaurant at Crispy Corner in Buffalo, regulars, servers, and a few friends orbit a basket of wings that has become the center of attention. The conflict is visually obvious: everyone is trying to decide who gets the last perfect glossy wing while the basket is protected like treasure. The comedy beat is the bartender facepalms as a wing debate becomes far too serious for a normal Tuesday, with The Ranch Guy, overprotective of ranch, clutching sauce cups like valuables, proud and slightly defensive. Use wing festival crowd shot with people gasping, cheering, and pointing at the saucy centerpiece. The wings are the visual centerpiece in the foreground or clear focal plane: golden crisp edges, glossy buffalo-orange sauce, visible texture, steam, pepper and seasoning detail, creamy ranch or blue cheese cups nearby, celery and carrots as supporting props. The mood is hungry, funny, local, and slightly overdramatic, full of triumphant wing confidence and active gestures like dropping to knees and dropping to knees. Background characters should react naturally with gasps, cheers, facepalms, disbelief, or someone recording on a phone. Avoid a static seated conversation or two people simply sitting across a table; the scene should feel caught mid-action. No alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+      "hook": "sauce_debate",
+      "image_prompt": "Ultra realistic cinematic photography with a viral Instagram meme feel, not stock photography. Comedy first, food second, story third, with warm sports bar, brewery, or neighborhood restaurant lighting, highly expressive faces, natural imperfections, visible emotion, motion and action, shallow depth of field, an obvious focal point, background characters reacting naturally, no staged poses, no AI-looking smiles, professional food photography quality, and professional commercial photography quality. In a busy neighborhood wing restaurant at Crispy Corner in Buffalo, regulars, servers, and a few friends orbit a basket of wings that has become the center of attention. The conflict is visually obvious: someone says this should decide the wing-night plan and the whole table leans in. The comedy beat is the bartender facepalms as a wing debate becomes far too serious for a normal Tuesday, with The Sauce Scientist, curious sauce tinkerer inspecting color, gloss, heat, and texture like a lab result. Use overhead chaos shot showing hands reaching, napkins flying, sauce cups sliding, and wings anchoring the frame. The wings are the visual centerpiece in the foreground or clear focal plane: golden crisp edges, glossy buffalo-orange sauce, visible texture, steam, pepper and seasoning detail, creamy ranch or blue cheese cups nearby, celery and carrots as supporting props. The mood is hungry, local, social, and instantly shareable, full of triumphant wing confidence and active gestures like dropping to knees and pointing. Background characters should react naturally with gasps, cheers, facepalms, disbelief, or someone recording on a phone. Avoid a static seated conversation or two people simply sitting across a table; the scene should feel caught mid-action. No alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+      "openai_model": null,
+      "openai_used": false,
+      "overlay_options": [
+        {
+          "caption_style": "sauce_debate",
+          "overlay_source": "template",
+          "overlay_text": "WHO GETS THE\nLAST WING? VOTE.",
+          "score": 73.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 16.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 10.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags",
+            "includes a question prompt"
+          ]
+        },
+        {
+          "caption_style": "simple_hype",
+          "overlay_source": "template",
+          "overlay_text": "WHO'S PULLING UP?",
+          "score": 71.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 11.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 13.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags",
+            "includes a question prompt"
+          ]
+        },
+        {
+          "caption_style": "craving_prompt",
+          "overlay_source": "template",
+          "overlay_text": "SEND THIS TO\nTHE GROUP CHAT",
+          "score": 71.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 16.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 8.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags"
+          ]
+        },
+        {
+          "caption_style": "wing_night",
+          "overlay_source": "template",
+          "overlay_text": "WHO'S DOWN FOR\nWING NIGHT?",
+          "score": 71.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 11.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 13.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags",
+            "includes a question prompt"
+          ]
+        },
+        {
+          "caption_style": "tag_someone",
+          "overlay_source": "template",
+          "overlay_text": "TAG YOUR\nWING FRIEND",
+          "score": 69.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 11.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 11.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags"
+          ]
+        },
+        {
+          "caption_style": "comment_prompt",
+          "overlay_source": "template",
+          "overlay_text": "SETTLE IT IN\nTHE COMMENTS",
+          "score": 67.0,
+          "score_breakdown": {
+            "clarity": 14.0,
+            "engagement_cta": 11.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 11.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags"
+          ]
+        },
+        {
+          "caption_style": "send_to_friend",
+          "overlay_source": "template",
+          "overlay_text": "SEND THIS TO\nYOUR WING CREW",
+          "score": 66.0,
+          "score_breakdown": {
+            "clarity": 16.0,
+            "engagement_cta": 11.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 8.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags"
+          ]
+        },
+        {
+          "caption_style": "wing_debt",
+          "overlay_source": "template",
+          "overlay_text": "FIRST REPLY\nBUYS THE WINGS",
+          "score": 66.0,
+          "score_breakdown": {
+            "clarity": 14.0,
+            "engagement_cta": 10.0,
+            "feedback_fit": 0.0,
+            "hashtag_quality": 17.0,
+            "originality": 14.0,
+            "overlay_brevity": 11.0
+          },
+          "score_reasons": [
+            "direct engagement CTA present",
+            "not repetitive against recent captions",
+            "exactly five hashtags",
+            "caption could be more explicit about engagement"
+          ]
+        }
+      ],
+      "overlay_source": "template",
+      "overlay_text": "WHO GETS THE\nLAST WING? VOTE.",
+      "overlay_validation_failure_reason": null,
+      "overlay_validation_passed": true,
       "quality_review": {
         "approved": true,
+        "caption_length": 81,
+        "fallback_used": false,
+        "hashtag_count": 5,
         "issues": [],
-        "prompt_version": "prompt-library-v1",
-        "score": 92
+        "prompt_version": "prompt-library-v2",
+        "score": 96,
+        "validation_passed": true
       },
-      "spacing": "Why Crispy Corner keeps showing up.\n\nSpotlight Crispy Corner in Buffalo as a high-signal favorite from recent Buffago activity. Keep the tone local, food-first, and conversational.\n\nDrop your go-to wing spot in the comments."
+      "ranking_breakdown": {
+        "clarity": 16.0,
+        "engagement_cta": 16.0,
+        "feedback_fit": 0.0,
+        "hashtag_quality": 17.0,
+        "originality": 14.0,
+        "overlay_brevity": 10.0
+      },
+      "ranking_reason": "direct engagement CTA present; not repetitive against recent captions; exactly five hashtags; includes a question prompt",
+      "ranking_score": 73.0,
+      "reuse_blocked_reason": null,
+      "selected_caption_style": "sauce_debate",
+      "spacing": "Comment your sauce pick. #BuffagoEats #ConnecticutWings #Wings #LocalFood #Foodie",
+      "validation_failure_reason": null,
+      "validation_passed": true
     },
+    "caption_style": "sauce_debate",
+    "caption_type": "sauce_debate",
     "category_scores": {
       "brand_fit": 17.0,
       "conversation_starter": 4.0,
@@ -844,7 +3370,7 @@
       "current_relevance": 6.0,
       "gamification_potential": 1.0,
       "likelihood_of_engagement": 15.5,
-      "originality": 19.76,
+      "originality": 20.0,
       "uses_recent_buffago_activity": 9.5,
       "visual_potential": 10.0
     },
@@ -852,58 +3378,55 @@
       "Buffalo"
     ],
     "content_type": "restaurant_spotlight",
+    "creative_style": "realistic_food",
     "cta_category": "comment",
     "current_event_references": [],
     "duplicate_reason": null,
-    "duplicate_score": 0.012,
-    "final_score": 91.09,
+    "duplicate_score": 0.0,
+    "final_score": 87.75,
     "food_categories": [
       "wings",
       "sauce"
     ],
     "hashtags": [
-      "#Buffago",
-      "#BuffaloWings",
-      "#WingCrawl",
-      "#LocalFood",
-      "#WingCulture",
-      "#WingSpotlight",
-      "#RestaurantFind",
-      "#buffalo",
-      "#ny",
+      "#BuffagoEats",
+      "#ConnecticutWings",
       "#Wings",
-      "#Sauce",
-      "#BlueCheese"
+      "#LocalFood",
+      "#Foodie"
     ],
     "holiday_references": [],
     "hook_style": "direct local hook",
+    "hook_text": "WHO'S EATING THIS WITH YOU?",
     "image_composition": "single hero plate with short caption space",
-    "image_prompt": "Ultra realistic cinematic photography with a viral Instagram meme feel, not stock photography. Comedy first, food second, story third, with warm sports bar, brewery, or neighborhood restaurant lighting, highly expressive faces, natural imperfections, visible emotion, motion and action, shallow depth of field, an obvious focal point, background characters reacting naturally, no staged poses, no AI-looking smiles, professional food photography quality, and professional commercial photography quality. In a busy neighborhood wing restaurant at Crispy Corner in Buffalo, regulars, servers, and a few friends orbit a basket of wings that has become the center of attention. The conflict is visually obvious: everyone is trying to decide who gets the last perfect glossy wing while the basket is protected like treasure. The comedy beat is the bartender facepalms as a wing debate becomes far too serious for a normal Tuesday, with The Ranch Guy, overprotective of ranch, clutching sauce cups like valuables, proud and slightly defensive. Use wing festival crowd shot with people gasping, cheering, and pointing at the saucy centerpiece. The wings are the visual centerpiece in the foreground or clear focal plane: golden crisp edges, glossy buffalo-orange sauce, visible texture, steam, pepper and seasoning detail, creamy ranch or blue cheese cups nearby, celery and carrots as supporting props. The mood is hungry, funny, local, and slightly overdramatic, full of triumphant wing confidence and active gestures like dropping to knees and dropping to knees. Background characters should react naturally with gasps, cheers, facepalms, disbelief, or someone recording on a phone. Avoid a static seated conversation or two people simply sitting across a table; the scene should feel caught mid-action. No alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+    "image_prompt": "Ultra realistic cinematic photography with a viral Instagram meme feel, not stock photography. Comedy first, food second, story third, with warm sports bar, brewery, or neighborhood restaurant lighting, highly expressive faces, natural imperfections, visible emotion, motion and action, shallow depth of field, an obvious focal point, background characters reacting naturally, no staged poses, no AI-looking smiles, professional food photography quality, and professional commercial photography quality. In a busy neighborhood wing restaurant at Crispy Corner in Buffalo, regulars, servers, and a few friends orbit a basket of wings that has become the center of attention. The conflict is visually obvious: someone says this should decide the wing-night plan and the whole table leans in. The comedy beat is the bartender facepalms as a wing debate becomes far too serious for a normal Tuesday, with The Sauce Scientist, curious sauce tinkerer inspecting color, gloss, heat, and texture like a lab result. Use overhead chaos shot showing hands reaching, napkins flying, sauce cups sliding, and wings anchoring the frame. The wings are the visual centerpiece in the foreground or clear focal plane: golden crisp edges, glossy buffalo-orange sauce, visible texture, steam, pepper and seasoning detail, creamy ranch or blue cheese cups nearby, celery and carrots as supporting props. The mood is hungry, local, social, and instantly shareable, full of triumphant wing confidence and active gestures like dropping to knees and pointing. Background characters should react naturally with gasps, cheers, facepalms, disbelief, or someone recording on a phone. Avoid a static seated conversation or two people simply sitting across a table; the scene should feel caught mid-action. No alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
     "metadata": {
-      "camera_angle": "wing festival crowd shot with people gasping, cheering, and pointing at the saucy centerpiece",
-      "character_archetype": "The Ranch Guy",
-      "character_description": "overprotective of ranch, clutching sauce cups like valuables, proud and slightly defensive",
+      "camera_angle": "overhead chaos shot showing hands reaching, napkins flying, sauce cups sliding, and wings anchoring the frame",
+      "character_archetype": "The Sauce Scientist",
+      "character_description": "curious sauce tinkerer inspecting color, gloss, heat, and texture like a lab result",
       "comedy_beat": "the bartender facepalms as a wing debate becomes far too serious for a normal Tuesday",
       "learning_prompt_guidance": "Use recent Instagram performance before choosing the next Jalapeno post.\nPrefer patterns that are working and explain the content direction.\nAvoid recent duplicates and weak image styles.\nIf prior images underperformed, make the next image prompt more specific, appetizing, branded, and Instagram-safe.\nAvoid visible text inside generated images unless explicitly required.",
       "prompt_anchors": [
         "food-first",
         "local credibility"
       ],
-      "prompt_version": "prompt-library-v1:buffago-visual-v2",
-      "scene_type": "packed sports bar",
+      "prompt_version": "prompt-library-v2:buffago-visual-v2",
+      "scene_type": "restaurant counter with regulars",
       "visual_style": "buffago_cinematic_comedy_food_v2",
       "wing_focus_level": "maximum"
     },
     "mood": "Friendly",
     "notes": [
-      "originality=19.76",
+      "originality=20.0",
       "engagement=15.5",
       "brand_fit=17.0",
       "activity=9.5",
       "relevance=6.0"
     ],
+    "overlay_text": "WHO GETS THE\nLAST WING? VOTE.",
     "platform": "instagram",
     "primary_theme": "restaurant focus",
+    "prompt_template_name": "buffago_post",
     "reason_chosen": "Top restaurant signal plus recent ratings make this the safest food-first anchor.",
     "rejected_duplicate": false,
     "restaurants_mentioned": [
@@ -925,7 +3448,7 @@
     "suggested_image_concept": "Close-up wing tray at Crispy Corner with crisp texture and warm restaurant lighting.",
     "target_emotion": "Curious",
     "visual_style": "realistic",
-    "weighted_total": 83.51,
+    "weighted_total": 83.75,
     "working_title": "Why Crispy Corner keeps showing up"
   }
 }

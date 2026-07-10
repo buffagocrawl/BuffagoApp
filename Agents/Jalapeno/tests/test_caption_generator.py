@@ -6,6 +6,7 @@ import json
 import logging
 from pathlib import Path
 import sys
+from uuid import uuid4
 
 import pytest
 
@@ -17,9 +18,11 @@ from caption_rules import CAPTION_STYLE_ORDER, CURATED_FALLBACK_CAPTIONS, compos
 from ai_client import JalapenoAIClient  # noqa: E402
 from config import initialize_logging, load_configuration  # noqa: E402
 from content_engine.candidate_generator import ContentCandidate  # noqa: E402
+from content_engine import caption_generator as caption_generator_module  # noqa: E402
 from content_engine.caption_generator import AICopyRequiredError, generate_caption_package  # noqa: E402
 from content_engine.content_ranking import score_caption_overlay_variant  # noqa: E402
 from data_snapshot import generate_latest_snapshot  # noqa: E402
+from openai_client import OpenAIContentClient  # noqa: E402
 from validation import validate_content_engine_environment  # noqa: E402
 
 
@@ -31,6 +34,11 @@ def required_env(monkeypatch: pytest.MonkeyPatch) -> None:
         "TIMEZONE",
         "SUPABASE_URL",
         "SUPABASE_SERVICE_ROLE_KEY",
+        "OPENAI_API_KEY",
+        "USE_OPENAI",
+        "AI_ENABLED",
+        "ENABLE_AI_COPY",
+        "JALAPENO_REQUIRE_AI_ONLY_COPY",
         "META_APP_ID",
         "META_APP_SECRET",
         "META_LONG_LIVED_ACCESS_TOKEN",
@@ -192,6 +200,61 @@ def test_compose_caption_with_hashtags_repairs_embedded_caption_hashtags() -> No
     assert validate_caption(caption, require_hashtags=True)["passed"] is True
 
 
+def test_openai_client_parses_json_in_code_fences_and_prose() -> None:
+    class _FakeResponse:
+        status_code = 200
+        reason = "OK"
+
+        def json(self) -> dict[str, object]:
+            return {
+                "choices": [
+                    {
+                        "message": {
+                            "content": "Here you go:\n```json\n[{\"caption\":\"Send this to someone who owes you wings.\",\"overlay_text\":\"SEND THIS TO YOUR WING CREW\",\"cta_type\":\"send\",\"content_angle\":\"share\"}]\n```\nThanks."
+                        }
+                    }
+                ],
+                "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2},
+            }
+
+        @property
+        def text(self) -> str:
+            return ""
+
+    class _FakeSession:
+        def post(self, *args, **kwargs) -> _FakeResponse:
+            return _FakeResponse()
+
+    client = OpenAIContentClient("test-key", model="gpt-4.1-mini", session=_FakeSession())
+    result = client.generate_variant_set(
+        stage="caption_generation",
+        system_prompt="system",
+        user_prompt="user",
+        options_count=4,
+    )
+
+    assert result.success is True
+    assert isinstance(result.output, list)
+    assert result.output[0]["caption"] == "Send this to someone who owes you wings."
+
+
+def test_extract_openai_variant_payloads_accepts_single_object_and_alternate_keys() -> None:
+    payloads = caption_generator_module._extract_openai_variant_payloads(
+        {
+            "caption": "Tag the friend who would destroy this plate.",
+            "overlay": "TAG YOUR WING FRIEND",
+            "cta_type": "tag",
+            "content_angle": "share",
+        }
+    )
+
+    assert len(payloads) == 1
+    assert payloads[0]["caption"] == "Tag the friend who would destroy this plate."
+    assert payloads[0]["overlay_text"] == "TAG YOUR WING FRIEND"
+    assert payloads[0]["cta_type"] == "tag"
+    assert payloads[0]["content_angle"] == "share"
+
+
 @pytest.mark.parametrize(
     "overlay",
     [
@@ -319,7 +382,7 @@ def test_generate_caption_package_falls_back_when_primary_caption_is_invalid(mon
     )
     monkeypatch.setattr(
         "content_engine.caption_generator._openai_variant_plan",
-        lambda *args, **kwargs: ([], None, "OpenAI is not configured"),
+        lambda *args, **kwargs: ([], None, "OpenAI is not configured", None),
     )
     monkeypatch.setattr(
         "content_engine.caption_generator._pick_caption",
@@ -346,12 +409,135 @@ def test_generate_caption_package_falls_back_when_primary_caption_is_invalid(mon
     assert package.fallback_used is True
 
 
-def test_generate_caption_package_requires_openai_when_enforced(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_generate_caption_package_repairs_openai_variant_with_missing_cta(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("content_engine.caption_generator._local_variant_plan", lambda *args, **kwargs: [])
+    monkeypatch.setattr(
+        "content_engine.caption_generator._openai_variant_plan",
+        lambda *args, **kwargs: (
+            [
+                {
+                    "source": "openai",
+                    "caption": "Best wings in Connecticut? #Buffago #WingNight #Foodie",
+                    "overlay_text": "BEST WINGS?",
+                    "caption_style": "simple_hype",
+                    "caption_source": "openai",
+                    "overlay_source": "openai",
+                    "validation": {"passed": False, "issues": ["missing_engagement_action"]},
+                    "hashtags": ["#Buffago", "#WingNight", "#Foodie"],
+                    "feedback_summary_version": "feedback-v1",
+                    "openai_model": "gpt-4.1-mini",
+                }
+            ],
+            None,
+            None,
+            "raw response",
+        ),
+    )
+
+    package = generate_caption_package(
+        _candidate(),
+        snapshot={},
+        external_context={},
+        require_ai_copy=True,
+    )
+
+    assert package.copy_source == "repaired"
+    assert package.openai_used is True
+    assert len(package.hashtags) == 5
+    assert package.caption.count("#") == 5
+    assert validate_caption(package.caption, require_hashtags=True)["passed"] is True
+    assert "voicemail" not in package.caption.lower()
+    assert package.overlay_text
+    assert package.overlay_validation_passed is True
+
+
+def test_generate_caption_package_repairs_banned_voicemail_variant(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("content_engine.caption_generator._local_variant_plan", lambda *args, **kwargs: [])
+    monkeypatch.setattr(
+        "content_engine.caption_generator._openai_variant_plan",
+        lambda *args, **kwargs: (
+            [
+                {
+                    "source": "openai",
+                    "caption": "If this wing had a voicemail, it would say bring napkins. #Buffago #WingNight",
+                    "overlay_text": "TAG YOUR WING FRIEND",
+                    "caption_style": "simple_hype",
+                    "caption_source": "openai",
+                    "overlay_source": "openai",
+                    "validation": {"passed": False, "issues": ["banned_phrase:voicemail"]},
+                    "hashtags": ["#Buffago", "#WingNight"],
+                    "feedback_summary_version": "feedback-v1",
+                    "openai_model": "gpt-4.1-mini",
+                }
+            ],
+            None,
+            None,
+            "raw response",
+        ),
+    )
+
+    package = generate_caption_package(
+        _candidate(),
+        snapshot={},
+        external_context={},
+        require_ai_copy=True,
+    )
+
+    assert package.copy_source in {"repaired", "fallback"}
+    assert "voicemail" not in package.caption.lower()
+    assert len(package.hashtags) == 5
+    assert validate_caption(package.caption, require_hashtags=True)["passed"] is True
+
+
+def test_generate_caption_package_dry_run_fallback_does_not_raise_when_openai_returns_no_valid_variants(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("content_engine.caption_generator._local_variant_plan", lambda *args, **kwargs: [])
+    monkeypatch.setattr(
+        "content_engine.caption_generator._openai_variant_plan",
+        lambda *args, **kwargs: ([], None, "all_openai_variants_invalid", "raw response"),
+    )
+
+    package = generate_caption_package(
+        _candidate(),
+        snapshot={},
+        external_context={},
+        require_ai_copy=True,
+    )
+
+    assert package.copy_source == "fallback"
+    assert package.validation_passed is True
+    assert len(package.hashtags) == 5
+    assert package.caption.count("#") == 5
+    assert validate_caption(package.caption, require_hashtags=True)["passed"] is True
+
+
+def test_generate_caption_package_uses_fallback_when_openai_missing(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     monkeypatch.delenv("USE_OPENAI", raising=False)
     monkeypatch.delenv("AI_ENABLED", raising=False)
     monkeypatch.delenv("ENABLE_AI_COPY", raising=False)
     monkeypatch.delenv("JALAPENO_EMERGENCY_TEMPLATE_FALLBACK", raising=False)
+    monkeypatch.delenv("JALAPENO_REQUIRE_AI_ONLY_COPY", raising=False)
+
+    package = generate_caption_package(
+        _candidate(),
+        snapshot={},
+        external_context={},
+        require_ai_copy=True,
+    )
+
+    assert package.copy_source == "fallback"
+    assert package.validation_passed is True
+    assert len(package.hashtags) == 5
+    assert validate_caption(package.caption, require_hashtags=True)["passed"] is True
+
+
+def test_generate_caption_package_requires_openai_when_strict_mode_enabled(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("USE_OPENAI", raising=False)
+    monkeypatch.delenv("AI_ENABLED", raising=False)
+    monkeypatch.delenv("ENABLE_AI_COPY", raising=False)
+    monkeypatch.delenv("JALAPENO_EMERGENCY_TEMPLATE_FALLBACK", raising=False)
+    monkeypatch.setenv("JALAPENO_REQUIRE_AI_ONLY_COPY", "true")
 
     with pytest.raises(AICopyRequiredError, match="OPENAI_API_KEY missing"):
         generate_caption_package(
@@ -480,7 +666,9 @@ def test_curated_fallback_captions_are_all_cta_based() -> None:
         assert validation["engagement_actions"], caption
 
 
-def test_content_engine_logs_caption_style_validation_and_fallback_fields(tmp_path: Path) -> None:
+def test_content_engine_logs_caption_style_validation_and_fallback_fields() -> None:
+    tmp_path = PROJECT_DIR / "tmp" / f"jalapeno-caption-test-{uuid4().hex}"
+    tmp_path.mkdir(parents=True, exist_ok=True)
     config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
     snapshot = generate_latest_snapshot(output_path=tmp_path / "latest_snapshot.json").snapshot
     external_context = {

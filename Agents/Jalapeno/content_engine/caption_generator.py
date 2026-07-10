@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import Any
@@ -12,6 +13,9 @@ from caption_rules import (
     choose_caption_style,
     compose_caption_with_hashtags,
     finalize_caption_overlay_pair,
+    normalize_caption_text,
+    repair_hashtag_list,
+    split_caption_and_hashtags,
     validate_caption,
     validate_overlay_text,
     validate_post_pair,
@@ -102,8 +106,175 @@ def _ai_copy_skip_reason() -> str | None:
     return None
 
 
+def _ai_copy_strict_mode_enabled() -> bool:
+    parsed = _parse_bool_env("JALAPENO_REQUIRE_AI_ONLY_COPY")
+    return bool(parsed)
+
+
 def _normalize_text(value: str) -> str:
     return " ".join(str(value or "").strip().lower().split())
+
+
+def _truncate_for_log(value: Any, *, limit: int = 1200) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        text = value
+    else:
+        try:
+            text = json.dumps(value, ensure_ascii=True, sort_keys=True, default=str)
+        except TypeError:
+            text = str(value)
+    cleaned = " ".join(text.replace("\r", " ").replace("\n", " ").split())
+    if len(cleaned) <= limit:
+        return cleaned
+    return f"{cleaned[:limit]}..."
+
+
+def _remove_banned_phrases(text: str) -> str:
+    cleaned = text
+    for phrase in sorted(BANNED_GENERIC_PHRASES, key=len, reverse=True):
+        if not phrase:
+            continue
+        if phrase == "pov":
+            cleaned = re.sub(r"\bpov\b[:\s,-]*", "", cleaned, flags=re.IGNORECASE)
+        else:
+            cleaned = re.sub(re.escape(phrase), "", cleaned, flags=re.IGNORECASE)
+    cleaned = normalize_caption_text(cleaned)
+    cleaned = re.sub(r"\s+([?.!,])", r"\1", cleaned)
+    cleaned = re.sub(r"([?.!,])([A-Za-z])", r"\1 \2", cleaned)
+    return cleaned.strip(" ,.-")
+
+
+def _caption_field_value(payload: dict[str, Any], *keys: str) -> str:
+    for key in keys:
+        value = payload.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return ""
+
+
+def _normalize_openai_variant_item(payload: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "caption": _caption_field_value(payload, "caption", "instagram_caption", "caption_body", "caption_text", "text"),
+        "overlay_text": _caption_field_value(payload, "overlay_text", "overlay", "text_overlay", "overlayCaption", "overlay_caption"),
+        "cta_type": _caption_field_value(payload, "cta_type", "cta", "engagement_cta", "cta_category"),
+        "content_angle": _caption_field_value(payload, "content_angle", "angle", "caption_angle", "hook_angle"),
+        "caption_style": _caption_field_value(payload, "caption_style", "style", "hook_style"),
+        "source": _caption_field_value(payload, "source", "copy_source") or "openai",
+        "raw": dict(payload),
+    }
+
+
+def _extract_openai_variant_payloads(raw_output: Any) -> list[dict[str, Any]]:
+    if isinstance(raw_output, list):
+        items = [item for item in raw_output if isinstance(item, dict)]
+        return [_normalize_openai_variant_item(item) for item in items]
+    if not isinstance(raw_output, dict):
+        return []
+
+    for key in ("variants", "caption_options", "caption_variants", "options"):
+        value = raw_output.get(key)
+        if isinstance(value, list):
+            items = [item for item in value if isinstance(item, dict)]
+            if items:
+                return [_normalize_openai_variant_item(item) for item in items]
+    if any(key in raw_output for key in ("caption", "instagram_caption", "caption_body", "overlay_text", "overlay", "text_overlay")):
+        return [_normalize_openai_variant_item(raw_output)]
+    if isinstance(raw_output.get("variant"), dict):
+        return [_normalize_openai_variant_item(raw_output["variant"])]
+    return []
+
+
+def _repair_caption_body(candidate: ContentCandidate, caption: str, *, fallback_style: str, seed: str) -> tuple[str, str]:
+    cleaned = _remove_banned_phrases(caption)
+    cleaned = re.sub(r"#\w+", "", cleaned).strip()
+    cleaned = normalize_caption_text(cleaned)
+    validation = validate_caption(cleaned) if cleaned else {"passed": False, "issues": ["empty_caption"], "engagement_actions": []}
+    if not cleaned or not validation["passed"]:
+        pair_plan = finalize_caption_overlay_pair(
+            seed=seed,
+            caption_style=fallback_style,
+            allowed_styles=[fallback_style],
+            allow_openai_caption=False,
+        )
+        return pair_plan["caption"], str(pair_plan["selected_caption_style"])
+
+    if not validation["engagement_actions"] and candidate.suggested_cta:
+        cleaned = normalize_caption_text(f"{cleaned} {candidate.suggested_cta}")
+    if not validate_caption(cleaned)["passed"]:
+        pair_plan = finalize_caption_overlay_pair(
+            seed=seed,
+            caption_style=fallback_style,
+            raw_caption=cleaned,
+            allowed_styles=[fallback_style],
+            allow_openai_caption=False,
+        )
+        return pair_plan["caption"], str(pair_plan["selected_caption_style"])
+    return cleaned, fallback_style
+
+
+def _repair_openai_variant(
+    candidate: ContentCandidate,
+    variant: dict[str, Any],
+    *,
+    snapshot: dict[str, Any],
+    external_context: dict[str, Any],
+    feedback_summary: ContentFeedbackSummary,
+    index: int,
+) -> dict[str, Any]:
+    raw_caption = str(variant.get("caption") or "").strip()
+    raw_overlay = str(variant.get("overlay_text") or "").strip()
+    fallback_style = str(variant.get("caption_style") or variant.get("cta_type") or candidate.caption_style or candidate.content_type or "simple_hype").strip()
+    if fallback_style not in CAPTION_STYLE_ORDER:
+        fallback_style = choose_caption_style(
+            seed=f"{candidate.candidate_id}:{candidate.content_type}:repair-style:{index}",
+            allowed_styles=_style_pool(candidate, external_context),
+        )
+    repair_seed = f"{candidate.candidate_id}:{candidate.content_type}:repair:{index}"
+    repaired_caption_body, selected_style = _repair_caption_body(candidate, raw_caption, fallback_style=fallback_style, seed=repair_seed)
+    repaired_hashtags = generate_hashtags(candidate, snapshot=snapshot, external_context=external_context, limit=5)
+    pair_plan = finalize_caption_overlay_pair(
+        seed=repair_seed,
+        caption_style=selected_style,
+        raw_caption=repaired_caption_body,
+        raw_overlay=raw_overlay or None,
+        allowed_styles=[selected_style],
+        allow_openai_caption=True,
+    )
+    validation = validate_post_pair(pair_plan["caption"], pair_plan["overlay_text"])
+    caption_validation = validate_caption(_compose_caption(pair_plan["caption"], repaired_hashtags), require_hashtags=True)
+    if not validation["passed"] or not caption_validation["passed"]:
+        fallback_pair = finalize_caption_overlay_pair(
+            seed=repair_seed,
+            caption_style=selected_style,
+            raw_caption=repaired_caption_body,
+            raw_overlay=raw_overlay or None,
+            allowed_styles=[selected_style],
+            allow_openai_caption=False,
+        )
+        validation = validate_post_pair(fallback_pair["caption"], fallback_pair["overlay_text"])
+        caption_validation = validate_caption(_compose_caption(fallback_pair["caption"], repaired_hashtags), require_hashtags=True)
+        selected_style = fallback_pair["selected_caption_style"]
+        pair_plan = fallback_pair
+    return {
+        "source": "openai",
+        "copy_source": "repaired" if (raw_caption != pair_plan["caption"] or raw_overlay != pair_plan["overlay_text"] or raw_caption != repaired_caption_body) else "openai",
+        "caption": pair_plan["caption"],
+        "overlay_text": pair_plan["overlay_text"],
+        "caption_style": selected_style,
+        "caption_source": pair_plan["caption_source"],
+        "overlay_source": pair_plan["overlay_source"],
+        "validation": validation,
+        "caption_validation": caption_validation,
+        "pair_validation": validation,
+        "hashtags": repaired_hashtags,
+        "feedback_summary_version": feedback_summary.version,
+        "openai_model": variant.get("openai_model"),
+        "raw_variant": variant,
+        "repair_applied": True,
+        "repair_reason": None if validation["passed"] and caption_validation["passed"] else "repair_failed",
+    }
 
 
 def _token_similarity(left: str, right: str) -> float:
@@ -295,6 +466,10 @@ def _local_variant_plan(candidate: ContentCandidate, snapshot: dict[str, Any], e
     return variants
 
 
+def _openai_caption_response_format() -> dict[str, Any]:
+    return {"type": "json_object"}
+
+
 def _openai_variant_plan(
     candidate: ContentCandidate,
     *,
@@ -302,7 +477,7 @@ def _openai_variant_plan(
     external_context: dict[str, Any],
     feedback_summary: ContentFeedbackSummary,
     logger=None,
-) -> tuple[list[dict[str, Any]], OpenAIContentClient | None, str | None]:
+) -> tuple[list[dict[str, Any]], OpenAIContentClient | None, str | None, str | None]:
     skip_reason = _ai_copy_skip_reason()
     if skip_reason is not None:
         log_event(
@@ -313,10 +488,10 @@ def _openai_variant_plan(
             reason=skip_reason,
             ai_copy_source="template",
         )
-        return [], None, skip_reason
+        return [], None, skip_reason, None
     client = OpenAIContentClient.from_env(logger=logger)
     if client is None:
-        return [], None, "OpenAI is not configured"
+        return [], None, "OpenAI is not configured", None
 
     candidate_payload = candidate.to_dict()
     prompt_payload = {
@@ -325,32 +500,39 @@ def _openai_variant_plan(
         "external_context": external_context,
         "feedback_summary": feedback_summary.to_dict(),
         "requirements": {
-            "caption_options": 4,
-            "overlay_options": 4,
+            "variant_count": 4,
+            "response_format": "json_object_with_variants_array",
             "caption_rules": [
                 "Natural and punchy",
+                "Exactly 5 hashtags in every caption",
                 "Exactly one clear engagement CTA",
-                "Lean into tag, comment, share, question, pick-a-side, or send-this prompts",
+                "Lean into tag, comment, share, question, pick-a-side, save, or send-this prompts",
                 "Always produce exactly 5 hashtags",
                 "No stale joke templates",
                 "Avoid voicemail, understood the assignment, or bring napkins unless the context genuinely fits",
                 "No fake metrics or surreal food-personification",
                 "Do not include hashtags in the caption body",
+                "Avoid repeating captions used in the last 30 days",
+                "Avoid reusing videos marked as not reusable",
             ],
             "overlay_rules": [
+                "Max 8 words",
                 "Short and readable on video",
-                "Often ask a question",
+                "Often ask a question or share/comment prompt",
                 "Do not repeat the caption word-for-word",
+                "No hashtags",
+                "No emojis unless the overlay renderer supports them",
             ],
         },
     }
     system_prompt = (
         "You write Buffago Instagram caption ideas for Jalapeno. "
         "Keep the language direct, local, wing-obsessed, and engagement-first. "
-        "Always return captions that push sharing, tagging, comments, questions, or picking a side. "
-        "Always produce exactly 5 hashtags. "
-        "Avoid stale meme templates, voicemail jokes, understood the assignment, bring napkins, and generic food-influencer filler. "
-        "Return valid JSON only."
+        "Return JSON only, with no prose, markdown, or code fences. "
+        "Return a JSON object with a variants array containing exactly 4 objects. "
+        "Each variant must include caption, overlay_text, cta_type, and content_angle. "
+        "Captions must include exactly 5 hashtags, one clear engagement CTA, and no stale meme templates, voicemail jokes, understood the assignment, bring napkins, or generic food-influencer filler. "
+        "Overlay text must be short, readable, shareable, and often a question or prompt for comments or sharing."
     )
     user_prompt = json.dumps(prompt_payload, ensure_ascii=True, indent=2, sort_keys=True)
     result = client.generate_variant_set(
@@ -358,55 +540,89 @@ def _openai_variant_plan(
         system_prompt=system_prompt,
         user_prompt=user_prompt,
         options_count=4,
+        response_format=_openai_caption_response_format(),
     )
     if not result.success:
-        return [], client, result.fallback_reason
+        return [], client, result.fallback_reason, result.raw_content
 
     output = result.output
-    caption_options = output.get("caption_options")
-    overlay_options = output.get("overlay_options")
-    if not isinstance(caption_options, list):
-        caption_options = []
-    if not isinstance(overlay_options, list):
-        overlay_options = []
+    variants_payload = _extract_openai_variant_payloads(output)
+    log_event(
+        logger,
+        "openai_caption_variants_parsed",
+        candidate_id=candidate.candidate_id,
+        content_type=candidate.content_type,
+        parsed_variant_count=len(variants_payload),
+        raw_openai_response=_truncate_for_log(result.raw_content or output),
+    )
+    if not variants_payload:
+        log_event(
+            logger,
+            "openai_caption_variants_unusable",
+            level="warning",
+            candidate_id=candidate.candidate_id,
+            content_type=candidate.content_type,
+            raw_openai_response=_truncate_for_log(result.raw_content or output),
+        )
+        return [], client, "all_openai_variants_invalid", result.raw_content
 
     variants: list[dict[str, Any]] = []
-    for index, caption_option in enumerate(caption_options):
-        if not isinstance(caption_option, dict):
-            continue
-        caption_body = str(caption_option.get("caption_body") or caption_option.get("caption") or "").strip()
-        if not caption_body:
-            continue
-        caption_style = str(caption_option.get("caption_style") or candidate.caption_style or candidate.content_type).strip()
-        overlay_text = ""
-        if index < len(overlay_options) and isinstance(overlay_options[index], dict):
-            overlay_text = str(overlay_options[index].get("overlay_text") or overlay_options[index].get("text_overlay") or "").strip()
-        if not overlay_text:
-            overlay_text = str(caption_option.get("overlay_text") or candidate.overlay_text or "").strip()
-        variant_hashtags = generate_hashtags(candidate, snapshot=snapshot, external_context=external_context, limit=5)
-        pair_plan = finalize_caption_overlay_pair(
-            seed=f"{candidate.candidate_id}:{candidate.content_type}:openai:{index}",
-            caption_style=caption_style or None,
-            raw_caption=caption_body,
-            raw_overlay=overlay_text or None,
-            allowed_styles=[caption_style] if caption_style else None,
-            allow_openai_caption=True,
+    for index, caption_option in enumerate(variants_payload):
+        raw_caption = str(caption_option.get("caption") or "").strip()
+        raw_overlay = str(caption_option.get("overlay_text") or "").strip()
+        caption_validation = validate_caption(raw_caption) if raw_caption else {"passed": False, "issues": ["empty_caption"], "engagement_actions": []}
+        overlay_validation = validate_overlay_text(raw_overlay) if raw_overlay else {"passed": False, "issues": ["empty_overlay_text"], "engagement_actions": []}
+        pair_validation = validate_post_pair(raw_caption, raw_overlay) if raw_caption and raw_overlay else {"passed": False, "issues": ["missing_caption_or_overlay"], "reasons": ["missing_caption_or_overlay"]}
+        rejection_reasons = list(pair_validation.get("reasons") or [])
+        if not raw_caption:
+            rejection_reasons.append("missing_caption")
+        if not raw_overlay:
+            rejection_reasons.append("missing_overlay_text")
+        if rejection_reasons:
+            log_event(
+                logger,
+                "openai_caption_variant_rejected",
+                level="warning",
+                candidate_id=candidate.candidate_id,
+                content_type=candidate.content_type,
+                variant_index=index,
+                rejection_reason="; ".join(dict.fromkeys(rejection_reasons)),
+                caption_length=len(raw_caption),
+                hashtag_count=len(re.findall(r"(?<!\w)#([A-Za-z0-9_]+)", raw_caption)),
+                cta_detected=bool(caption_validation.get("engagement_actions")),
+                overlay_present=bool(raw_overlay),
+                raw_variant=_truncate_for_log(caption_option),
+            )
+        repaired_variant = _repair_openai_variant(
+            candidate,
+            caption_option,
+            snapshot=snapshot,
+            external_context=external_context,
+            feedback_summary=feedback_summary,
+            index=index,
         )
-        variants.append(
-            {
-                "source": "openai",
-                "caption": pair_plan["caption"],
-                "overlay_text": pair_plan["overlay_text"],
-                "caption_style": pair_plan["selected_caption_style"],
-                "caption_source": pair_plan["caption_source"],
-                "overlay_source": pair_plan["overlay_source"],
-                "validation": pair_plan["pair_validation"],
-                "hashtags": variant_hashtags,
-                "feedback_summary_version": feedback_summary.version,
-                "openai_model": result.model,
-            }
-        )
-    return variants, client, None
+        repaired_caption_validation = repaired_variant["caption_validation"]
+        repaired_pair_validation = repaired_variant["pair_validation"]
+        if not repaired_caption_validation["passed"] or not repaired_pair_validation["passed"]:
+            log_event(
+                logger,
+                "openai_caption_variant_repair_failed",
+                level="warning",
+                candidate_id=candidate.candidate_id,
+                content_type=candidate.content_type,
+                variant_index=index,
+                rejection_reason="; ".join(repaired_caption_validation["reasons"] + repaired_pair_validation["reasons"]),
+                caption_length=len(repaired_variant["caption"]),
+                hashtag_count=len(re.findall(r"(?<!\w)#([A-Za-z0-9_]+)", repaired_variant["caption"])),
+                cta_detected=bool(repaired_caption_validation.get("engagement_actions")),
+                overlay_present=bool(repaired_variant["overlay_text"]),
+                raw_variant=_truncate_for_log(caption_option),
+            )
+            continue
+        variants.append(repaired_variant)
+    if not variants:
+        return variants, client, "all_openai_variants_invalid", result.raw_content
+    return variants, client, None, result.raw_content
 
 
 def _score_variant_options(
@@ -422,23 +638,29 @@ def _score_variant_options(
     recent_hashtag_sets = _recent_hashtag_sets(recent_window)
     scored: list[dict[str, Any]] = []
     for variant in variants:
+        caption_body, embedded_hashtags = split_caption_and_hashtags(str(variant.get("caption") or ""))
+        variant_hashtags = list(variant.get("hashtags") or [])
+        repaired_hashtags = repair_hashtag_list(variant_hashtags + embedded_hashtags, expected_count=5)
+        normalized_variant = dict(variant)
+        normalized_variant["caption"] = caption_body
+        normalized_variant["hashtags"] = repaired_hashtags.hashtags
         score = score_caption_overlay_variant(
-            variant["caption"],
-            variant["overlay_text"],
-            variant["hashtags"],
+            normalized_variant["caption"],
+            normalized_variant["overlay_text"],
+            normalized_variant["hashtags"],
             candidate=candidate.to_dict(),
             feedback_summary=feedback_summary.to_dict(),
             recent_captions=recent_captions,
             recent_overlays=recent_overlays,
             recent_hashtag_sets=recent_hashtag_sets,
         )
-        variant_row = dict(variant)
+        variant_row = normalized_variant
         variant_row["score"] = score.score
         variant_row["score_breakdown"] = score.breakdown
         variant_row["score_reasons"] = score.reasons
         variant_row["rejected"] = score.rejected
-        caption_block_reason = _reuse_block_reason(variant["caption"], recent_captions, field_name="caption")
-        overlay_block_reason = _reuse_block_reason(variant["overlay_text"], recent_overlays, field_name="overlay")
+        caption_block_reason = _reuse_block_reason(normalized_variant["caption"], recent_captions, field_name="caption")
+        overlay_block_reason = _reuse_block_reason(normalized_variant["overlay_text"], recent_overlays, field_name="overlay")
         blocked_reasons = [reason for reason in (caption_block_reason, overlay_block_reason) if reason]
         if blocked_reasons:
             variant_row["rejected"] = True
@@ -480,14 +702,15 @@ def generate_caption_package(
     )
 
     local_variants = _local_variant_plan(candidate, snapshot, external_context, feedback_summary)
-    openai_variants, openai_client, openai_fallback_reason = _openai_variant_plan(
+    openai_variants, openai_client, openai_fallback_reason, openai_raw_response = _openai_variant_plan(
         candidate,
         snapshot=snapshot,
         external_context=external_context,
         feedback_summary=feedback_summary,
         logger=logger,
     )
-    if require_ai_copy and not openai_variants and not _emergency_template_fallback_enabled():
+    strict_ai_mode = _ai_copy_strict_mode_enabled()
+    if require_ai_copy and not openai_variants and strict_ai_mode and not _emergency_template_fallback_enabled():
         reason = openai_fallback_reason or "OpenAI caption generation produced no valid variants"
         log_event(
             logger,
@@ -532,24 +755,22 @@ def generate_caption_package(
             }
         ]
 
-    selectable_variants = [variant for variant in scored_variants if not variant.get("rejected")]
-    if require_ai_copy and not selectable_variants and not _emergency_template_fallback_enabled():
-        blocked_reasons = [str(variant.get("reuse_blocked_reason") or "").strip() for variant in scored_variants]
-        blocked_reasons = [reason for reason in blocked_reasons if reason]
-        reason = blocked_reasons[0] if blocked_reasons else (openai_fallback_reason or "All generated AI copy variants were rejected")
+    if openai_fallback_reason and not openai_variants:
         log_event(
             logger,
-            "ai_copy_generation_skipped",
+            "ai_copy_fallback_used",
             candidate_id=candidate.candidate_id,
             content_type=candidate.content_type,
-            reason=reason,
-            ai_copy_source="template",
+            fallback_reason=openai_fallback_reason,
+            raw_openai_response=_truncate_for_log(openai_raw_response),
         )
-        raise AICopyRequiredError(reason)
+
+    selectable_variants = [variant for variant in scored_variants if not variant.get("rejected")]
     selected_variant = selectable_variants[0] if selectable_variants else scored_variants[0]
     selected_caption_style = str(selected_variant.get("caption_style") or "simple_hype")
     selected_caption = str(selected_variant.get("caption") or "").strip()
     selected_overlay = str(selected_variant.get("overlay_text") or "").strip()
+    selected_hashtags = repair_hashtag_list(list(selected_variant.get("hashtags") or hashtags), expected_count=5).hashtags
     validation = validate_post_pair(selected_caption, selected_overlay)
     repair_applied = False
     if not validation["passed"]:
@@ -567,7 +788,7 @@ def generate_caption_package(
         selected_overlay = pair_plan["overlay_text"]
         validation = pair_plan["pair_validation"]
 
-    caption = _compose_caption(selected_caption, hashtags)
+    caption = _compose_caption(selected_caption, selected_hashtags)
     caption_validation = validate_caption(caption, require_hashtags=True)
     if not caption_validation["passed"]:
         repair_applied = True
@@ -579,7 +800,8 @@ def generate_caption_package(
             raw_overlay=candidate.overlay_text,
             allow_openai_caption=False,
         )
-        caption = _compose_caption(repair_plan["caption"], hashtags)
+        selected_hashtags = repair_hashtag_list(hashtags, expected_count=5).hashtags
+        caption = _compose_caption(repair_plan["caption"], selected_hashtags)
         selected_caption_style = repair_plan["selected_caption_style"]
         selected_overlay = repair_plan["overlay_text"]
         validation = repair_plan["pair_validation"]
@@ -609,7 +831,7 @@ def generate_caption_package(
 
     quality_review = _quality_review(
         caption,
-        hashtags,
+        selected_hashtags,
         alt_text,
         image_prompt,
         candidate,
@@ -618,10 +840,13 @@ def generate_caption_package(
     )
 
     ranking_reason = "; ".join(selected_variant.get("score_reasons", [])) or "Selected the highest-scoring caption/overlay pair."
-    fallback_used = bool(repair_applied or openai_fallback_reason)
+    fallback_used = bool(repair_applied or openai_fallback_reason or selected_variant.get("source") != "openai")
+    if selected_variant.get("source") == "openai":
+        copy_source = "repaired" if repair_applied else "openai"
+    else:
+        copy_source = "fallback"
     caption_source = "fallback" if repair_applied else str(selected_variant.get("caption_source") or "template")
-    copy_source = "fallback" if repair_applied else str(selected_variant.get("source") or "template")
-    if require_ai_copy and copy_source != "openai" and not _emergency_template_fallback_enabled():
+    if require_ai_copy and copy_source != "openai" and strict_ai_mode and not _emergency_template_fallback_enabled():
         reason = openai_fallback_reason or f"Final copy source was {copy_source}, not openai"
         log_event(
             logger,
@@ -632,6 +857,12 @@ def generate_caption_package(
             ai_copy_source=copy_source,
         )
         raise AICopyRequiredError(reason)
+    final_fallback_reason = openai_fallback_reason
+    if final_fallback_reason is None and copy_source == "repaired":
+        final_fallback_reason = "deterministic_repair_applied"
+    elif final_fallback_reason is None and copy_source == "fallback":
+        final_fallback_reason = "template_fallback_used"
+    cleanup_notes.append(f"Final copy source: {copy_source}.")
 
     log_event(
         logger,
@@ -663,7 +894,7 @@ def generate_caption_package(
         emoji_placement="Avoid emoji walls; use zero or one only when a template explicitly needs it.",
         cleanup_notes=cleanup_notes,
         quality_review=quality_review,
-        hashtags=hashtags,
+        hashtags=selected_hashtags,
         alt_text=alt_text,
         image_prompt=image_prompt,
         caption_style=selected_caption_style,
@@ -679,9 +910,9 @@ def generate_caption_package(
         caption_overlay_concept=validation["caption_overlay_concept"],
         overlay_validation_passed=validation["overlay_validation"]["passed"],
         overlay_validation_failure_reason=None if validation["overlay_validation"]["passed"] else ", ".join(validation["overlay_validation"]["reasons"]),
-        openai_used=copy_source == "openai",
+        openai_used=copy_source in {"openai", "repaired"},
         openai_model=str(selected_variant.get("openai_model") or openai_client.model) if openai_client else None,
-        fallback_reason=openai_fallback_reason,
+        fallback_reason=final_fallback_reason,
         copy_source=copy_source,
         generated_at=generated_at,
         reuse_blocked_reason=str(selected_variant.get("reuse_blocked_reason") or "").strip() or None,

@@ -18,10 +18,11 @@ OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions"
 class OpenAIContentResult:
     success: bool
     model: str
-    output: dict[str, Any]
+    output: Any
     usage: dict[str, Any]
     fallback_used: bool
     fallback_reason: str | None
+    raw_content: str | None = None
     error: str | None = None
 
 
@@ -78,13 +79,76 @@ class OpenAIContentClient:
             "Accept": "application/json",
         }
 
-    def _parse_json_text(self, text: str) -> dict[str, Any]:
-        payload = json.loads(text)
-        if not isinstance(payload, dict):
-            raise ValueError("OpenAI response content was not a JSON object")
-        return payload
+    def _strip_code_fences(self, text: str) -> str:
+        stripped = text.strip()
+        if not stripped.startswith("```"):
+            return stripped
+        lines = stripped.splitlines()
+        if len(lines) >= 2 and lines[0].startswith("```"):
+            if lines[-1].strip().startswith("```"):
+                body = "\n".join(lines[1:-1]).strip()
+                if body:
+                    return body
+        return stripped
 
-    def _chat_completions(self, *, system_prompt: str, user_prompt: str, stage: str, options_count: int) -> OpenAIContentResult:
+    def _extract_json_fragment(self, text: str) -> str | None:
+        start_index: int | None = None
+        stack: list[str] = []
+        in_string = False
+        escape = False
+        pairs = {"{": "}", "[": "]"}
+        closers = {"}": "{", "]": "["}
+        for index, char in enumerate(text):
+            if start_index is None:
+                if char in pairs:
+                    start_index = index
+                    stack.append(char)
+                continue
+            if in_string:
+                if escape:
+                    escape = False
+                elif char == "\\":
+                    escape = True
+                elif char == '"':
+                    in_string = False
+                continue
+            if char == '"':
+                in_string = True
+                continue
+            if char in pairs:
+                stack.append(char)
+                continue
+            if char in closers:
+                if not stack or stack[-1] != closers[char]:
+                    start_index = None
+                    stack = []
+                    continue
+                stack.pop()
+                if not stack and start_index is not None:
+                    return text[start_index : index + 1]
+        return None
+
+    def _parse_json_text(self, text: str) -> Any:
+        cleaned = self._strip_code_fences(text)
+        for candidate in (cleaned, cleaned.strip()):
+            try:
+                return json.loads(candidate)
+            except json.JSONDecodeError:
+                pass
+        fragment = self._extract_json_fragment(cleaned)
+        if fragment is not None:
+            return json.loads(fragment)
+        raise ValueError("OpenAI response content did not contain valid JSON")
+
+    def _chat_completions(
+        self,
+        *,
+        system_prompt: str,
+        user_prompt: str,
+        stage: str,
+        options_count: int,
+        response_format: dict[str, Any] | None = None,
+    ) -> OpenAIContentResult:
         started_at = time.perf_counter()
         log_event(
             self.logger,
@@ -93,16 +157,17 @@ class OpenAIContentClient:
             model=self.model,
             options_count=options_count,
         )
-        payload = {
+        payload: dict[str, Any] = {
             "model": self.model,
             "temperature": self.temperature,
             "max_tokens": self.max_output_tokens,
-            "response_format": {"type": "json_object"},
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
         }
+        if response_format is not None:
+            payload["response_format"] = response_format
         try:
             response = self._session.post(
                 OPENAI_CHAT_COMPLETIONS_URL,
@@ -148,6 +213,7 @@ class OpenAIContentClient:
                 usage=normalized_usage,
                 fallback_used=False,
                 fallback_reason=None,
+                raw_content=content,
                 error=None,
             )
         except Exception as exc:
@@ -174,6 +240,7 @@ class OpenAIContentClient:
                 },
                 fallback_used=True,
                 fallback_reason=str(exc),
+                raw_content=None,
                 error=str(exc),
             )
 
@@ -184,10 +251,12 @@ class OpenAIContentClient:
         system_prompt: str,
         user_prompt: str,
         options_count: int,
+        response_format: dict[str, Any] | None = None,
     ) -> OpenAIContentResult:
         return self._chat_completions(
             system_prompt=system_prompt,
             user_prompt=user_prompt,
             stage=stage,
             options_count=options_count,
+            response_format=response_format,
         )

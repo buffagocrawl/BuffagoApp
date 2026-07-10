@@ -1130,22 +1130,30 @@ def run_dry_run() -> int:
             run_id=str(uuid4()),
             dry_run=True,
             scheduled_post_type=content_engine_post_type,
-            require_ai_copy=True,
+            require_ai_copy=False,
         )
         print(f"Dry-run content decision written: {content_result.output_path}")
         print(f"Dry-run candidate count: {len(content_result.all_candidates)}")
         print(f"Dry-run winner type: {content_result.winner.get('content_type')}")
         print(f"Dry-run OpenAI used: {content_result.decision_summary.get('openai_used', False)}")
         print(f"Dry-run OpenAI model: {content_result.decision_summary.get('model_name', 'local-rules')}")
+        print(f"Dry-run copy source: {content_result.decision_summary.get('copy_source', 'unknown')}")
+        print(f"Dry-run chosen caption: {content_result.decision_summary.get('selected_caption', content_result.winner.get('caption', ''))}")
+        print(f"Dry-run chosen overlay: {content_result.decision_summary.get('selected_overlay', content_result.winner.get('overlay_text', ''))}")
         print(f"Dry-run feedback summary version: {content_result.decision_summary.get('feedback_summary_version', 'unknown')}")
         if content_result.decision_summary.get("fallback_reason"):
             print(f"Dry-run fallback reason: {content_result.decision_summary.get('fallback_reason')}")
+        if snapshot_result.is_fallback or external_result.is_fallback:
+            print(
+                "Dry-run warning: Supabase credentials or live data were unavailable, so content memory, recent-post reuse checks, and video-reuse history are using fallback data."
+            )
         log_event(
             logger,
             "dry_run_content_decision_summary",
             run_id=content_result.run_id,
             openai_used=content_result.decision_summary.get("openai_used", False),
             openai_model=content_result.decision_summary.get("model_name", "local-rules"),
+            copy_source=content_result.decision_summary.get("copy_source"),
             feedback_summary_version=content_result.decision_summary.get("feedback_summary_version", "unknown"),
             fallback_reason=content_result.decision_summary.get("fallback_reason"),
             candidate_count=len(content_result.all_candidates),

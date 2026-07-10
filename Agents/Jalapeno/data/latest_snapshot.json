@@ -54,7 +54,7 @@
         "crawl_type": "solo",
         "is_solo": true,
         "route_title": "Buffalo Heat Trail",
-        "start_time": "2026-07-01T12:06:20.008958+00:00",
+        "start_time": "2026-07-10T00:47:35.820419+00:00",
         "state": "NY",
         "status": "completed"
       },
@@ -63,7 +63,7 @@
         "crawl_type": "group",
         "is_solo": false,
         "route_title": "Rochester Wing Run",
-        "start_time": "2026-07-01T12:06:20.008958+00:00",
+        "start_time": "2026-07-10T00:47:35.820419+00:00",
         "state": "NY",
         "status": "in_progress"
       },
@@ -72,31 +72,31 @@
         "crawl_type": "solo",
         "is_solo": true,
         "route_title": "Lake Erie Lap",
-        "start_time": "2026-07-01T12:06:20.008958+00:00",
+        "start_time": "2026-07-10T00:47:35.820419+00:00",
         "state": "PA",
         "status": "planned"
       }
     ],
     "total_crawls": 18
   },
-  "generated_at": "2026-07-01T12:06:20.008958+00:00",
+  "generated_at": "2026-07-10T00:47:35.820419+00:00",
   "is_fallback": true,
   "new_restaurants": [
     {
       "city": "Buffalo",
-      "created_at": "2026-07-01T12:06:20.008958+00:00",
+      "created_at": "2026-07-10T00:47:35.820419+00:00",
       "restaurant_name": "Clutch Bar",
       "state": "NY"
     },
     {
       "city": "Syracuse",
-      "created_at": "2026-07-01T12:06:20.008958+00:00",
+      "created_at": "2026-07-10T00:47:35.820419+00:00",
       "restaurant_name": "Sauce Lab",
       "state": "NY"
     },
     {
       "city": "Rochester",
-      "created_at": "2026-07-01T12:06:20.008958+00:00",
+      "created_at": "2026-07-10T00:47:35.820419+00:00",
       "restaurant_name": "Crunch House",
       "state": "NY"
     }
@@ -107,7 +107,7 @@
       "badge_category": "ratings",
       "badge_code": "heat_seeker",
       "badge_name": "Heat Seeker",
-      "latest_unlocked_at": "2026-07-01T12:06:20.008958+00:00",
+      "latest_unlocked_at": "2026-07-10T00:47:35.820419+00:00",
       "unlock_count": 6,
       "xp_reward": 25
     },
@@ -115,7 +115,7 @@
       "badge_category": "crawls",
       "badge_code": "crawl_captain",
       "badge_name": "Crawl Captain",
-      "latest_unlocked_at": "2026-07-01T12:06:20.008958+00:00",
+      "latest_unlocked_at": "2026-07-10T00:47:35.820419+00:00",
       "unlock_count": 4,
       "xp_reward": 40
     },
@@ -123,7 +123,7 @@
       "badge_category": "streaks",
       "badge_code": "streak_starter",
       "badge_name": "Streak Starter",
-      "latest_unlocked_at": "2026-07-01T12:06:20.008958+00:00",
+      "latest_unlocked_at": "2026-07-10T00:47:35.820419+00:00",
       "unlock_count": 5,
       "xp_reward": 15
     }
@@ -131,7 +131,7 @@
   "recent_ratings": [
     {
       "city": "Buffalo",
-      "created_at": "2026-07-01T12:06:20.008958+00:00",
+      "created_at": "2026-07-10T00:47:35.820419+00:00",
       "overall": 9,
       "restaurant_name": "Crispy Corner",
       "state": "NY",
@@ -139,7 +139,7 @@
     },
     {
       "city": "Rochester",
-      "created_at": "2026-07-01T12:06:20.008958+00:00",
+      "created_at": "2026-07-10T00:47:35.820419+00:00",
       "overall": 8,
       "restaurant_name": "Wing Vault",
       "state": "NY",
@@ -147,7 +147,7 @@
     },
     {
       "city": "Albany",
-      "created_at": "2026-07-01T12:06:20.008958+00:00",
+      "created_at": "2026-07-10T00:47:35.820419+00:00",
       "overall": 8,
       "restaurant_name": "Sauce Street",
       "state": "NY",
@@ -156,7 +156,7 @@
   ],
   "source": {
     "opted_out_user_count": 0,
-    "supabase_available": true
+    "supabase_available": false
   },
   "summary": {
     "active_states_count": 3,
@@ -174,7 +174,7 @@
       "avg_overall": 8.7,
       "avg_weight_score": 8.8,
       "city": "Buffalo",
-      "last_rated_at": "2026-07-01T12:06:20.008958+00:00",
+      "last_rated_at": "2026-07-10T00:47:35.820419+00:00",
       "rating_count": 42,
       "restaurant_name": "Crispy Corner",
       "state": "NY"
@@ -183,7 +183,7 @@
       "avg_overall": 8.3,
       "avg_weight_score": 8.5,
       "city": "Rochester",
-      "last_rated_at": "2026-07-01T12:06:20.008958+00:00",
+      "last_rated_at": "2026-07-10T00:47:35.820419+00:00",
       "rating_count": 31,
       "restaurant_name": "Wing Vault",
       "state": "NY"
@@ -192,7 +192,7 @@
       "avg_overall": 8.0,
       "avg_weight_score": 8.2,
       "city": "Albany",
-      "last_rated_at": "2026-07-01T12:06:20.008958+00:00",
+      "last_rated_at": "2026-07-10T00:47:35.820419+00:00",
       "rating_count": 19,
       "restaurant_name": "Sauce Street",
       "state": "NY"
