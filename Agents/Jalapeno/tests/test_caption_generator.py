@@ -14,7 +14,7 @@ PROJECT_DIR = Path(__file__).resolve().parents[1]
 if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
-from caption_rules import CAPTION_STYLE_ORDER, CURATED_FALLBACK_CAPTIONS, compose_caption_with_hashtags, generate_caption_samples, repair_hashtag_list, validate_caption, validate_overlay_text, validate_post_pair  # noqa: E402
+from caption_rules import CAPTION_STYLE_ORDER, CURATED_FALLBACK_CAPTIONS, compose_caption_with_hashtags, ensure_exactly_five_hashtags, extract_caption_body, generate_caption_samples, repair_hashtag_list, validate_caption, validate_overlay_text, validate_post_pair  # noqa: E402
 from ai_client import JalapenoAIClient  # noqa: E402
 from config import initialize_logging, load_configuration  # noqa: E402
 from content_engine.candidate_generator import ContentCandidate  # noqa: E402
@@ -131,12 +131,25 @@ def test_validate_caption_rejects_hashtags_inside_caption() -> None:
 
 def test_validate_caption_accepts_exactly_five_hashtags_when_required() -> None:
     result = validate_caption(
-        "Send this to someone who owes you wings. #Buffago #WingLovers #CTFood #BuffaloWings #Foodie",
+        "Send this to someone who owes you wings.\n\n#Buffago #WingLovers #CTFood #BuffaloWings #Foodie",
         require_hashtags=True,
     )
 
     assert result["passed"] is True
     assert result["hashtag_count"] == 5
+
+
+def test_validate_caption_accepts_instagram_newlines() -> None:
+    caption = (
+        "Send this to the friend who thinks they can out-eat this plate. "
+        "Buffago can help find the next stop.\n\n"
+        "#Buffago #BuffaloWings #WingNight #ChickenWings #WingLovers"
+    )
+
+    result = validate_caption(caption, require_hashtags=True)
+
+    assert result["passed"] is True
+    assert "contains_actual_newlines" not in result["issues"]
 
 
 def test_repair_hashtag_list_fills_zero_hashtags_to_exactly_five() -> None:
@@ -155,6 +168,39 @@ def test_repair_hashtag_list_fills_four_hashtags_to_exactly_five() -> None:
 
     assert repaired.original_count == 4
     assert repaired.hashtags == ["#Buffago", "#BuffaloWings", "#WingNight", "#ChickenWings", "#Foodie"]
+
+
+def test_ensure_exactly_five_hashtags_repairs_regression_caption() -> None:
+    caption = (
+        "Send this to the friend who thinks they can out-eat this plate. "
+        "Buffago can help find the next stop.\n\n"
+        "#Buffago #BuffaloWings #WingNight #ChickenWings"
+    )
+
+    body, hashtags = ensure_exactly_five_hashtags(caption, None)
+
+    assert body == "Send this to the friend who thinks they can out-eat this plate. Buffago can help find the next stop."
+    assert hashtags == ["#Buffago", "#BuffaloWings", "#WingNight", "#ChickenWings", "#Foodie"]
+
+
+def test_ensure_exactly_five_hashtags_trims_six_hashtags() -> None:
+    body, hashtags = ensure_exactly_five_hashtags(
+        "Comment your wing order.",
+        ["#Buffago", "#BuffaloWings", "#WingNight", "#ChickenWings", "#WingLovers", "#Foodie"],
+    )
+
+    assert body == "Comment your wing order."
+    assert hashtags == ["#Buffago", "#BuffaloWings", "#WingNight", "#ChickenWings", "#WingLovers"]
+
+
+def test_ensure_exactly_five_hashtags_replaces_duplicates_and_bad_tags() -> None:
+    body, hashtags = ensure_exactly_five_hashtags(
+        "Tag the friend who would destroy this plate.",
+        ["buffago", "#BUFFAGO", "#WingNight", "#WingNight", "#", "Chicken Wings", "???", "#Foodie"],
+    )
+
+    assert body == "Tag the friend who would destroy this plate."
+    assert hashtags == ["#buffago", "#WingNight", "#ChickenWings", "#Foodie", "#BuffaloWings"]
 
 
 def test_repair_hashtag_list_keeps_five_hashtags_except_normalization() -> None:
@@ -196,8 +242,15 @@ def test_compose_caption_with_hashtags_repairs_embedded_caption_hashtags() -> No
     )
 
     assert caption.endswith("#BuffaloWings #Foodie #Buffago #WingNight #ConnecticutFood")
+    assert "\n\n" in caption
     assert " #Buffago tonight" not in caption
     assert validate_caption(caption, require_hashtags=True)["passed"] is True
+
+
+def test_extract_caption_body_preserves_caption_body_and_removes_hashtags() -> None:
+    caption = "Comment your go-to wing order.\n\n#Buffago #BuffaloWings #WingNight #ChickenWings #WingLovers"
+
+    assert extract_caption_body(caption) == "Comment your go-to wing order."
 
 
 def test_openai_client_parses_json_in_code_fences_and_prose() -> None:
@@ -345,8 +398,7 @@ def test_generate_caption_package_uses_allowed_styles_and_short_caption() -> Non
     assert package.fallback_used is True
     assert package.caption_source == "template"
     assert package.caption_length <= 160
-    assert "\\n" not in package.caption
-    assert "\n" not in package.caption
+    assert "\n\n" in package.caption
     assert len(package.hashtags) == 5
     assert package.caption.count("#") == 5
     assert validate_caption(package.caption, require_hashtags=True)["passed"] is True
@@ -400,7 +452,7 @@ def test_generate_caption_package_falls_back_when_primary_caption_is_invalid(mon
     assert package.caption_source == "fallback"
     assert package.caption_style in CAPTION_STYLE_ORDER
     assert "main character energy" not in package.caption.lower()
-    assert "\\n" not in package.caption
+    assert "\n\n" in package.caption
     assert package.overlay_validation_passed is True
     assert len(package.hashtags) == 5
     assert package.caption.count("#") == 5

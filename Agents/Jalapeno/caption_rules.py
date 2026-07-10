@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import random
 import re
-from typing import Any
+from typing import Any, Sequence
 
 
 HASHTAG_PATTERN = re.compile(r"(?<!\w)#([A-Za-z0-9_]+)")
@@ -347,6 +347,23 @@ def normalize_caption_text(text: str) -> str:
     return cleaned.strip()
 
 
+def _normalize_caption_line(text: str) -> str:
+    cleaned = text.replace("Ã¢â‚¬â„¢", "'").replace("\\n", " ").replace("\r", " ").replace("\n", " ")
+    cleaned = re.sub(r"\s+", " ", cleaned)
+    cleaned = re.sub(r"\s+([?.!,])", r"\1", cleaned)
+    cleaned = re.sub(r"([?.!,])([A-Za-z])", r"\1 \2", cleaned)
+    return cleaned.strip()
+
+
+def normalize_caption_body_text(text: str) -> str:
+    normalized_lines = [_normalize_caption_line(line) for line in text.replace("\r\n", "\n").replace("\r", "\n").split("\n")]
+    body = "\n".join(normalized_lines)
+    body = re.sub(r"\n{3,}", "\n\n", body)
+    body = re.sub(r"[ \t]+\n", "\n", body)
+    body = re.sub(r"\n[ \t]+", "\n", body)
+    return body.strip()
+
+
 def normalize_hashtag_text(tag: str) -> str:
     cleaned = re.sub(r"[^A-Za-z0-9_]+", "", tag.strip().lstrip("#"))
     return f"#{cleaned}" if cleaned else ""
@@ -384,11 +401,11 @@ class HashtagRepairResult:
 
 
 def split_caption_and_hashtags(caption: str) -> tuple[str, list[str]]:
-    normalized = normalize_caption_text(caption)
-    hashtags = [f"#{match.group(1)}" for match in HASHTAG_PATTERN.finditer(normalized)]
-    body = HASHTAG_PATTERN.sub("", normalized) if hashtags else normalized
-    body = re.sub(r"\s+", " ", body).strip(" ,")
-    return body, hashtags
+    raw = caption.replace("\r\n", "\n").replace("\r", "\n")
+    hashtags = [f"#{match.group(1)}" for match in HASHTAG_PATTERN.finditer(raw)]
+    body = HASHTAG_PATTERN.sub("", raw) if hashtags else raw
+    body = normalize_caption_body_text(body).strip(" ,")
+    return body, normalize_hashtag_list(hashtags)
 
 
 def _title_hashtag(value: str) -> str:
@@ -502,17 +519,38 @@ def repair_hashtag_list(
     )
 
 
+def extract_caption_body(caption: str) -> str:
+    body, _hashtags = split_caption_and_hashtags(caption)
+    return body
+
+
+def ensure_exactly_five_hashtags(
+    caption_body: str,
+    hashtags: Sequence[str] | str | None,
+    *,
+    context: dict[str, Any] | None = None,
+) -> tuple[str, list[str]]:
+    if isinstance(hashtags, str):
+        raw_hashtags = [f"#{match.group(1)}" for match in HASHTAG_PATTERN.finditer(hashtags)]
+    elif hashtags is None:
+        raw_hashtags = []
+    else:
+        raw_hashtags = [str(tag) for tag in hashtags]
+    normalized_body = extract_caption_body(caption_body)
+    repaired = repair_hashtag_list(raw_hashtags, expected_count=5, caption=caption_body, context=context)
+    return normalized_body, repaired.hashtags
+
+
 def compose_caption_with_hashtags(
     caption: str,
     hashtags: list[str],
     *,
     context: dict[str, Any] | None = None,
 ) -> str:
-    body, _caption_hashtags = split_caption_and_hashtags(caption)
+    body, repaired_hashtags = ensure_exactly_five_hashtags(caption, hashtags, context=context)
     if not body:
         raise ValueError("Caption body cannot be empty")
-    repaired = repair_hashtag_list(hashtags, expected_count=5, caption=caption, context=context)
-    return f"{body} {' '.join(repaired.hashtags)}"
+    return f"{body}\n\n{' '.join(repaired_hashtags)}"
 
 
 def style_templates(style: str) -> tuple[str, ...]:
@@ -574,6 +612,10 @@ def _caption_overlay_concept(caption: str, overlay_text: str | None = None) -> s
     if overlay_angles:
         return sorted(overlay_angles)[0]
     return None
+
+
+def infer_overlay_concept(caption: str, overlay_text: str | None = None) -> str | None:
+    return _caption_overlay_concept(caption, overlay_text)
 
 
 def _overlay_reinforces_caption(caption: str, overlay_text: str) -> bool:
@@ -677,9 +719,6 @@ def validate_caption(
         issues.append(f"caption_too_long:{len(normalized)}")
     if "\\n" in caption:
         issues.append("literal_newline_escape_present")
-    if normalized != caption and "\\n" not in caption and ("\n" in caption or "\r" in caption):
-        issues.append("contains_actual_newlines")
-
     for phrase in BANNED_GENERIC_PHRASES:
         if phrase == "pov":
             if re.search(r"\bpov\b", lowered):

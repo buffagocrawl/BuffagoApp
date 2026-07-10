@@ -1174,10 +1174,26 @@ def run_dry_run() -> int:
                 repository = VideoAssetRepository(client, config, logger=logger)
                 content = build_reel_content(repository, dry_run=True, logger=logger)
                 content_decision = content_decision_from_reel(str(run_uuid), content)
+                log_event(
+                    logger,
+                    "video_reel_caption_prepared",
+                    run_id=str(run_uuid),
+                    candidate_id=content.candidate_id,
+                    caption_validation_passed=True,
+                    caption_repaired=len(content.hashtags) != content.original_hashtag_count,
+                    caption_hashtag_count=len(content.hashtags),
+                    caption_hashtags=content.hashtags,
+                    original_hashtag_count=content.original_hashtag_count,
+                    final_hashtag_count=len(content.hashtags),
+                )
                 overlay_result = create_text_overlay_video(
                     client,
                     content.video_asset,
                     content.caption,
+                    caption_body=content.caption_body,
+                    caption_repaired=len(content.hashtags) != content.original_hashtag_count,
+                    caption_hashtags=content.hashtags,
+                    original_hashtag_count=content.original_hashtag_count,
                     run_id=str(run_uuid),
                     candidate_id=content.candidate_id,
                     logger=logger,
@@ -1212,7 +1228,7 @@ def run_dry_run() -> int:
                     overlay_text=str(overlay_fields["overlay_text"]),
                     overlay_status=str(overlay_fields["overlay_status"]),
                     overlay_error=overlay_fields["overlay_error"] if isinstance(overlay_fields["overlay_error"], str) else None,
-                    selected_caption=content.caption,
+                    selected_caption=content.caption_body,
                     selected_overlay=str(overlay_fields["overlay_text"]),
                     caption_text=content.caption,
                     copy_source="template",
@@ -1560,10 +1576,26 @@ def run_production(content_type: str | None = None) -> int:
             repository = VideoAssetRepository(client, config, logger=logger)
             content = build_reel_content(repository, dry_run=runtime_settings.dry_run, logger=logger)
             content_decision = content_decision_from_reel(run_id, content)
+            log_event(
+                logger,
+                "video_reel_caption_prepared",
+                run_id=run_id,
+                candidate_id=content.candidate_id,
+                caption_validation_passed=True,
+                caption_repaired=len(content.hashtags) != content.original_hashtag_count,
+                caption_hashtag_count=len(content.hashtags),
+                caption_hashtags=content.hashtags,
+                original_hashtag_count=content.original_hashtag_count,
+                final_hashtag_count=len(content.hashtags),
+            )
             overlay_result = create_text_overlay_video(
                 client,
                 content.video_asset,
                 content.caption,
+                caption_body=content.caption_body,
+                caption_repaired=len(content.hashtags) != content.original_hashtag_count,
+                caption_hashtags=content.hashtags,
+                original_hashtag_count=content.original_hashtag_count,
                 run_id=run_id,
                 candidate_id=content.candidate_id,
                 logger=logger,
@@ -1598,7 +1630,7 @@ def run_production(content_type: str | None = None) -> int:
                 overlay_text=str(overlay_fields["overlay_text"]),
                 overlay_status=str(overlay_fields["overlay_status"]),
                 overlay_error=overlay_fields["overlay_error"] if isinstance(overlay_fields["overlay_error"], str) else None,
-                selected_caption=content.caption,
+                selected_caption=content.caption_body,
                 selected_overlay=str(overlay_fields["overlay_text"]),
                 caption_text=content.caption,
                 copy_source="template",
@@ -1715,10 +1747,26 @@ def run_production(content_type: str | None = None) -> int:
                     logger=logger,
                 )
                 backup_decision = content_decision_from_reel(run_id, backup_content)
+                log_event(
+                    logger,
+                    "video_reel_caption_prepared",
+                    run_id=run_id,
+                    candidate_id=backup_content.candidate_id,
+                    caption_validation_passed=True,
+                    caption_repaired=len(backup_content.hashtags) != backup_content.original_hashtag_count,
+                    caption_hashtag_count=len(backup_content.hashtags),
+                    caption_hashtags=backup_content.hashtags,
+                    original_hashtag_count=backup_content.original_hashtag_count,
+                    final_hashtag_count=len(backup_content.hashtags),
+                )
                 backup_overlay_result = create_text_overlay_video(
                     client,
                     backup_content.video_asset,
                     backup_content.caption,
+                    caption_body=backup_content.caption_body,
+                    caption_repaired=len(backup_content.hashtags) != backup_content.original_hashtag_count,
+                    caption_hashtags=backup_content.hashtags,
+                    original_hashtag_count=backup_content.original_hashtag_count,
                     run_id=run_id,
                     candidate_id=backup_content.candidate_id,
                     logger=logger,
@@ -1753,7 +1801,7 @@ def run_production(content_type: str | None = None) -> int:
                     overlay_text=str(backup_overlay_fields["overlay_text"]),
                     overlay_status=str(backup_overlay_fields["overlay_status"]),
                     overlay_error=backup_overlay_fields["overlay_error"] if isinstance(backup_overlay_fields["overlay_error"], str) else None,
-                    selected_caption=backup_content.caption,
+                    selected_caption=backup_content.caption_body,
                     selected_overlay=str(backup_overlay_fields["overlay_text"]),
                     caption_text=backup_content.caption,
                     copy_source="template",

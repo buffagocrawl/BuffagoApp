@@ -12,6 +12,7 @@ from caption_rules import (
     CAPTION_STYLE_ORDER,
     choose_caption_style,
     compose_caption_with_hashtags,
+    ensure_exactly_five_hashtags,
     finalize_caption_overlay_pair,
     normalize_caption_text,
     repair_hashtag_list,
@@ -770,7 +771,10 @@ def generate_caption_package(
     selected_caption_style = str(selected_variant.get("caption_style") or "simple_hype")
     selected_caption = str(selected_variant.get("caption") or "").strip()
     selected_overlay = str(selected_variant.get("overlay_text") or "").strip()
-    selected_hashtags = repair_hashtag_list(list(selected_variant.get("hashtags") or hashtags), expected_count=5).hashtags
+    selected_caption, selected_hashtags = ensure_exactly_five_hashtags(
+        selected_caption,
+        list(selected_variant.get("hashtags") or hashtags),
+    )
     validation = validate_post_pair(selected_caption, selected_overlay)
     repair_applied = False
     if not validation["passed"]:
@@ -800,7 +804,7 @@ def generate_caption_package(
             raw_overlay=candidate.overlay_text,
             allow_openai_caption=False,
         )
-        selected_hashtags = repair_hashtag_list(hashtags, expected_count=5).hashtags
+        selected_hashtags = ensure_exactly_five_hashtags(repair_plan["caption"], hashtags)[1]
         caption = _compose_caption(repair_plan["caption"], selected_hashtags)
         selected_caption_style = repair_plan["selected_caption_style"]
         selected_overlay = repair_plan["overlay_text"]

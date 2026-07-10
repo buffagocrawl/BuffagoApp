@@ -88,7 +88,7 @@ class _PersistenceClient:
 def test_build_post_candidate_payload_normalizes_contract_fields() -> None:
     run_id = uuid4()
     candidate_id = uuid4()
-    publish_caption = "Send this to someone who owes you wings. #Buffago #WingNight"
+    publish_caption = "Send this to someone who owes you wings.\n\n#Buffago #WingNight"
     payload = build_post_candidate_payload(
         run_id=run_id,
         candidate_id=candidate_id,
@@ -227,8 +227,8 @@ def test_ensure_selected_post_candidate_persists_video_fields_with_caption_contr
             "candidate_id": "22222222-2222-2222-2222-222222222222",
             "content_type": "daily_wing_reel",
             "scheduled_post_type": "daily_wing_reel",
-            "caption": "Vote on the last wing. #Buffago #WingNight",
-            "hashtags": ["#Buffago", "#WingNight"],
+            "caption": "Vote on the last wing.\n\n#Buffago #BuffaloWings #WingNight #ChickenWings #WingLovers",
+            "hashtags": ["#Buffago", "#BuffaloWings", "#WingNight", "#ChickenWings", "#WingLovers"],
             "image_prompt": "Preloaded video asset",
             "overlay_text": "WHO GETS THE LAST WING? VOTE.",
             "copy_source": "template",
@@ -241,8 +241,9 @@ def test_ensure_selected_post_candidate_persists_video_fields_with_caption_contr
 
     persisted = client.candidates["22222222-2222-2222-2222-222222222222"]
     assert row["selected"] is True
-    assert persisted["caption_text"] == "Vote on the last wing. #Buffago #WingNight"
+    assert persisted["caption_text"] == "Vote on the last wing.\n\n#Buffago #BuffaloWings #WingNight #ChickenWings #WingLovers"
     assert persisted["selected_overlay"] == "WHO GETS THE LAST WING? VOTE."
     assert persisted["copy_source"] == "template"
     assert persisted["generated_at"] == "2026-01-01T12:30:00+00:00"
     assert persisted["selected_caption"] == "Vote on the last wing."
+    assert persisted["hashtags"] == ["#Buffago", "#BuffaloWings", "#WingNight", "#ChickenWings", "#WingLovers"]

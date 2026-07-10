@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from caption_rules import finalize_overlay_text, validate_overlay_text, validate_post_pair
+from caption_rules import extract_caption_body, infer_overlay_concept, validate_caption, validate_overlay_text
 from logging_utils import log_event
 from image_pipeline.meme_text_renderer import MemeTextStyle, SafeArea, render_meme_text, sanitize_meme_text
 from supabase_client import SupabaseClient
@@ -110,38 +110,33 @@ def select_overlay_text(caption: str) -> str:
     return select_overlay_selection(caption).overlay_text
 
 
-def select_overlay_selection(caption: str) -> OverlaySelectionResult:
-    hook = _clean_overlay_text(_first_caption_hook(caption))
-    overlay_plan = finalize_overlay_text(
-        seed=f"video-overlay:{normalize_seed_text(caption)}",
-        caption=caption,
-        raw_overlay=hook if hook else None,
-    )
-    selected = overlay_plan["overlay_text"]
-    pair_validation = validate_post_pair(caption, selected)
-    if pair_validation["passed"] and overlay_plan["validation_passed"]:
+def select_overlay_selection(caption: str, overlay_text: str | None = None) -> OverlaySelectionResult:
+    caption_body = extract_caption_body(caption)
+    candidate_overlay = overlay_text if isinstance(overlay_text, str) and overlay_text.strip() else _clean_overlay_text(_first_caption_hook(caption_body))
+    overlay_validation = validate_overlay_text(candidate_overlay) if candidate_overlay else {"passed": False, "issues": ["empty_overlay_text"]}
+    if candidate_overlay and overlay_validation["passed"]:
         return OverlaySelectionResult(
-            overlay_text=selected.upper(),
-            overlay_source=str(overlay_plan["overlay_source"] or "template"),
-            caption_overlay_concept=pair_validation["caption_overlay_concept"],
+            overlay_text=str(overlay_validation["normalized_overlay"]).upper(),
+            overlay_source="openai" if overlay_text else "caption_hook",
+            caption_overlay_concept=infer_overlay_concept(caption_body, candidate_overlay),
             validation_passed=True,
             validation_failure_reason=None,
-            fallback_used=bool(overlay_plan["fallback_used"]),
+            fallback_used=False,
         )
 
     for fallback_overlay in FALLBACK_OVERLAYS:
-        fallback_validation = validate_post_pair(caption, fallback_overlay)
+        fallback_validation = validate_overlay_text(fallback_overlay)
         if fallback_validation["passed"]:
             return OverlaySelectionResult(
-                overlay_text=fallback_overlay,
+                overlay_text=str(fallback_validation["normalized_overlay"]).upper(),
                 overlay_source="fallback",
-                caption_overlay_concept=fallback_validation["caption_overlay_concept"],
+                caption_overlay_concept=infer_overlay_concept(caption_body, fallback_overlay),
                 validation_passed=True,
                 validation_failure_reason=None,
                 fallback_used=True,
             )
 
-    failure_reason = overlay_plan.get("validation_failure_reason") or ", ".join(pair_validation["reasons"])
+    failure_reason = ", ".join(overlay_validation.get("issues") or ["no_valid_overlay_available"])
     raise RuntimeError(f"Unable to select a validated overlay for caption: {failure_reason}")
 
 
@@ -245,12 +240,19 @@ def create_text_overlay_video(
     asset: VideoAsset,
     caption: str,
     *,
+    caption_body: str | None = None,
+    overlay_text: str | None = None,
+    caption_repaired: bool = False,
+    caption_hashtags: list[str] | None = None,
+    original_hashtag_count: int | None = None,
     run_id: str,
     candidate_id: str,
     logger=None,
 ) -> VideoOverlayResult:
     started_at = time.perf_counter()
-    overlay_selection = select_overlay_selection(caption)
+    normalized_caption_body = extract_caption_body(caption_body or caption)
+    caption_validation = validate_caption(caption, require_hashtags=True)
+    overlay_selection = select_overlay_selection(normalized_caption_body, overlay_text=overlay_text)
     overlay_text = overlay_selection.overlay_text
     target_path = processed_storage_path(asset.storage_path)
     base_fields = {
@@ -261,6 +263,20 @@ def create_text_overlay_video(
         "processed_storage_path": target_path,
         "overlay_text": overlay_text,
     }
+    log_event(
+        logger,
+        "caption_overlay_validation",
+        caption_validation_passed=caption_validation["passed"],
+        caption_repaired=caption_repaired,
+        caption_hashtag_count=len(caption_hashtags or []),
+        caption_hashtags=caption_hashtags or [f"#{match.group(1)}" for match in re.finditer(r"(?<!\w)#([A-Za-z0-9_]+)", caption)],
+        original_hashtag_count=original_hashtag_count,
+        final_hashtag_count=len(caption_hashtags or []),
+        overlay_validation_passed=overlay_selection.validation_passed,
+        overlay_source=overlay_selection.overlay_source,
+        overlay_concept=overlay_selection.caption_overlay_concept,
+        **base_fields,
+    )
     log_event(logger, "video_overlay_started", **base_fields)
     log_event(
         logger,

@@ -6,12 +6,13 @@ from datetime import datetime, timezone
 from typing import Any
 from uuid import uuid4
 
+from caption_rules import ensure_exactly_five_hashtags
 from config import JalapenoConfig
 from logging_utils import log_event
 from video_assets import VideoAsset, VideoAssetRepository
 
 
-HASHTAGS = ["#Buffago", "#BuffaloWings", "#WingNight", "#ChickenWings"]
+HASHTAGS = ["#Buffago", "#BuffaloWings", "#WingNight", "#ChickenWings", "#WingLovers"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -19,7 +20,9 @@ class VideoReelContent:
     candidate_id: str
     video_asset: VideoAsset
     caption: str
+    caption_body: str
     hashtags: list[str]
+    original_hashtag_count: int
     caption_type: str
     content_type: str = "daily_wing_reel"
     scheduled_post_type: str = "daily_wing_reel"
@@ -36,7 +39,7 @@ def _caption_type(asset: VideoAsset) -> str:
     return choices[hash(asset.storage_path) % len(choices)]
 
 
-def generate_reel_caption(asset: VideoAsset, *, now: datetime | None = None) -> tuple[str, list[str], str]:
+def generate_reel_caption(asset: VideoAsset, *, now: datetime | None = None) -> tuple[str, str, list[str], str, int]:
     now = now or _utcnow()
     caption_type = _caption_type(asset)
     templates = {
@@ -70,8 +73,9 @@ def generate_reel_caption(asset: VideoAsset, *, now: datetime | None = None) -> 
     caption = options[int(now.timestamp()) % len(options)]
     if caption_type != "app_cta" and random.Random(asset.storage_path).random() < 0.25:
         caption += " Buffago can help find the next stop."
-    tags = HASHTAGS[:3] if caption_type == "poll" else HASHTAGS
-    return f"{caption}\n\n{' '.join(tags)}", tags, caption_type
+    tags = HASHTAGS[:4] if caption_type == "poll" else HASHTAGS[:4]
+    caption_body, repaired_hashtags = ensure_exactly_five_hashtags(caption, tags)
+    return f"{caption_body}\n\n{' '.join(repaired_hashtags)}", caption_body, repaired_hashtags, caption_type, len(tags)
 
 
 def build_reel_content(
@@ -82,7 +86,7 @@ def build_reel_content(
     logger=None,
 ) -> VideoReelContent:
     asset = repository.select_asset(excluded_ids=excluded_ids)
-    caption, hashtags, caption_type = generate_reel_caption(asset)
+    caption, caption_body, hashtags, caption_type, original_hashtag_count = generate_reel_caption(asset)
     candidate_id = str(uuid4())
     log_event(
         logger,
@@ -98,7 +102,9 @@ def build_reel_content(
         candidate_id=candidate_id,
         video_asset=asset,
         caption=caption,
+        caption_body=caption_body,
         hashtags=hashtags,
+        original_hashtag_count=original_hashtag_count,
         caption_type=caption_type,
     )
 
@@ -114,6 +120,8 @@ def content_decision_from_reel(run_id: str, content: VideoReelContent) -> dict[s
             "content_type": content.content_type,
             "scheduled_post_type": content.scheduled_post_type,
             "caption": content.caption,
+            "caption_text": content.caption,
+            "selected_caption": content.caption_body,
             "hashtags": content.hashtags,
             "image_prompt": "Preloaded Supabase Storage wing video asset; no AI image or video generated.",
             "approved": True,
