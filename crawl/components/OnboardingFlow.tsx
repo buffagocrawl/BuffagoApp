@@ -15,6 +15,7 @@ import RatingWizardDialog from './RatingWizardDialog';
 import WingmanAddDialog from './WingmanAddDialog';
 import { supabase } from '../lib/supabase';
 import { trackEvent } from '../lib/analytics';
+import * as quickRating from '../lib/quickRating';
 
 type StateRow = {
   state_id: number;
@@ -50,6 +51,11 @@ type RatingTagOption = {
   tag: string;
 };
 
+type QuickRatingMetric = {
+  key: keyof QuickRating;
+  label: string;
+};
+
 const ONBOARDING_DONE_KEY = 'buffago:onboarding_done_v3';
 const ONBOARDING_STATE_KEY = 'buffago:onboarding_state_v2';
 const ONBOARDING_PREFS_KEY = 'buffago:onboarding:prefs';
@@ -57,6 +63,13 @@ const ONBOARDING_DEST_KEY = 'buffago:onboarding_dest_v1';
 const ONBOARDING_SEED_RATING_KEY = 'buffago:onboarding:seed_rating';
 const ONBOARDING_RESUME_STEP_KEY = 'buffago:onboarding:resume_step';
 const ONBOARDING_DEST_SUGGESTION_KEY = 'buffago:onboarding:dest_suggestion';
+const { QUICK_RATING_FLOW_VARIANT, QUICK_RATING_MEASUREMENT_NOTE } = quickRating;
+const QUICK_RATING_METRICS: QuickRatingMetric[] = [
+  { key: 'overall', label: 'Overall' },
+  { key: 'sauce', label: 'Sauce / Rub' },
+  { key: 'crispiness', label: 'Crispiness' },
+  { key: 'meat', label: 'Chicken' },
+];
 
 const safeName = (s: any) => (s == null ? '' : String(s)).trim();
 
@@ -273,9 +286,10 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
   const [ratingSaving, setRatingSaving] = useState(false);
   const [ratingError, setRatingError] = useState('');
 
-
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewRoute, setPreviewRoute] = useState<any>(null);
+  const quickRatingStartedRef = useRef(false);
+  const quickRatingCompletedRef = useRef(false);
 
   useEffect(() => {
     stepRef.current = step;
@@ -485,6 +499,16 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
     });
   }, [destQ, dests]);
 
+  const quickRatingSummary = useMemo(
+    () =>
+      QUICK_RATING_METRICS.map(({ key, label }) => ({
+        key,
+        label,
+        value: rating[key],
+      })).filter((item) => item.value != null),
+    [rating]
+  );
+
   const savePrefs = async (nextPrefs: WingPrefs) => {
     try {
       await AsyncStorage.setItem(ONBOARDING_PREFS_KEY, JSON.stringify(nextPrefs));
@@ -556,6 +580,45 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
 
   const canSubmitRating = !!pickedDest?.id;
 
+  useEffect(() => {
+    if (step !== 3 || !pickedDest?.id) return;
+
+    quickRatingStartedRef.current = true;
+    quickRatingCompletedRef.current = false;
+
+    trackEvent({
+      eventName: 'quick_rating_started',
+      screen: 'onboarding',
+      userId,
+      stateId: pickedState?.state_id ?? null,
+      destinationId: String(pickedDest.id).startsWith('new:') ? null : pickedDest.id,
+      metadata: {
+        flow_variant: QUICK_RATING_FLOW_VARIANT,
+        dimensions: QUICK_RATING_METRICS.map((item) => item.key),
+        measurement_note: QUICK_RATING_MEASUREMENT_NOTE,
+      },
+    });
+
+    return () => {
+      if (!quickRatingStartedRef.current || quickRatingCompletedRef.current) return;
+
+      trackEvent({
+        eventName: 'quick_rating_abandoned',
+        screen: 'onboarding',
+        userId,
+        stateId: pickedState?.state_id ?? null,
+        destinationId: String(pickedDest.id).startsWith('new:') ? null : pickedDest.id,
+        metadata: {
+          flow_step: stepRef.current,
+          flow_variant: QUICK_RATING_FLOW_VARIANT,
+          measurement_note: QUICK_RATING_MEASUREMENT_NOTE,
+          resume_available: true,
+        },
+      });
+      quickRatingStartedRef.current = false;
+    };
+  }, [step, pickedDest?.id, pickedState?.state_id, userId]);
+
   const submitOnboardingRating = async (payload: any) => {
     try {
       const destId = pickedDest?.id ?? null;
@@ -622,6 +685,36 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
           local_only: isPseudo,
           tag_id: payload?.selectedTagId ?? null,
           would_order_again: payload?.wouldOrderAgain == null ? null : Boolean(payload.wouldOrderAgain),
+        },
+      });
+      quickRatingCompletedRef.current = true;
+      quickRatingStartedRef.current = false;
+      await trackEvent({
+        eventName: 'quick_rating_completed',
+        screen: 'onboarding',
+        userId,
+        stateId: pickedState?.state_id ?? null,
+        destinationId: isPseudo ? null : destId,
+        metadata: {
+          flow_variant: QUICK_RATING_FLOW_VARIANT,
+          overall: nextRating.overall,
+          sauce: nextRating.sauce,
+          crispiness: nextRating.crispiness,
+          meat: nextRating.meat,
+          measurement_note: QUICK_RATING_MEASUREMENT_NOTE,
+        },
+      });
+      await trackEvent({
+        eventName: 'onboarding_step_completed',
+        screen: 'onboarding',
+        userId,
+        stateId: pickedState?.state_id ?? null,
+        destinationId: isPseudo ? null : destId,
+        metadata: {
+          step: 3,
+          total_steps: TOTAL_STEPS,
+          flow_variant: QUICK_RATING_FLOW_VARIANT,
+          measurement_note: QUICK_RATING_MEASUREMENT_NOTE,
         },
       });
       setStep(4);
@@ -795,6 +888,18 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
         stateId: pickedState?.state_id ?? null,
         destinationId: d.id,
         metadata: { source_screen: 'onboarding', source: 'restaurant_list' },
+      });
+      await trackEvent({
+        eventName: 'onboarding_step_completed',
+        screen: 'onboarding',
+        userId,
+        stateId: pickedState?.state_id ?? null,
+        destinationId: d.id,
+        metadata: {
+          step: 2,
+          total_steps: TOTAL_STEPS,
+          source: 'restaurant_list',
+        },
       });
 
       setStep(3);
@@ -1134,7 +1239,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
       {step === 3 ? (
         <View style={styles.screen}>
           <View style={styles.center}>
-            <Text style={styles.title}>Rate your wings</Text>
+            <Text style={styles.title}>Quick rate your wings</Text>
             <Text style={styles.body}>
               {pickedDest?.name ? `How was ${pickedDest.name}?` : 'Rate this wing spot'}
             </Text>
@@ -1152,10 +1257,11 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
               }}
             >
               <Text style={{ fontWeight: '900', textAlign: 'center', marginBottom: 8 }}>
-                Same BuffaGo rating flow everywhere
+                Fast first rating
               </Text>
               <Text style={{ textAlign: 'center', opacity: 0.82, lineHeight: 20 }}>
-                Crawl, home, Buffacoins, and onboarding now all use the same wing rating experience.
+                Start with overall, sauce or rub, crispiness, and chicken quality. You can expand into the
+                deeper review later.
               </Text>
             </View>
 
@@ -1179,6 +1285,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
             destinationName={pickedDest?.name || 'Rate your wings'}
             tagOptions={ratingTags}
             saving={ratingSaving}
+            flowVariant={QUICK_RATING_FLOW_VARIANT}
             onDismiss={() => {
               if (!ratingSaving) goBack();
             }}
@@ -1199,10 +1306,11 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
         <View style={styles.center}>
           <Image source={require('../assets/wing-user.png')} style={styles.host} resizeMode="contain" />
 
-          <Text style={styles.title}>That was your first Wingdex entry</Text>
+          <Text style={styles.title}>Quick rating complete</Text>
 
           <Text style={styles.body}>
-            Your ratings don’t disappear. BuffaGo saves your progress automatically, so you can build out your Wingdex. To rate more, go on a wing crawl or use buffacoins!
+            Your first Wingdex entry is in. That gives BuffaGo an instant read on your taste so the app can
+            start feeling personal right away.
           </Text>
 
           <View style={{ height: 12 }} />
@@ -1216,18 +1324,37 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
               backgroundColor: 'rgba(255,255,255,0.06)',
             }}
           >
-            <Text style={{ fontWeight: '900', marginBottom: 6 }}>
-              Crawls are your preselected routes to follow. They&apos;re designed to help you find new local gems!
+            <Text style={{ fontWeight: '900', marginBottom: 10, textAlign: 'center' }}>
+              Your quick rating payoff
             </Text>
 
-            <Text style={{ opacity: 0.82, lineHeight: 20 }}>
-              Start a Crawl anytime. You can have more than one going at once.
-            </Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 10 }}>
+              {quickRatingSummary.map((item) => (
+                <View
+                  key={item.key}
+                  style={{
+                    minWidth: 108,
+                    paddingHorizontal: 12,
+                    paddingVertical: 10,
+                    borderRadius: 14,
+                    backgroundColor: 'rgba(255,255,255,0.05)',
+                    borderWidth: 1,
+                    borderColor: 'rgba(255,255,255,0.08)',
+                  }}
+                >
+                  <Text style={{ fontSize: 12, opacity: 0.72, textAlign: 'center' }}>{item.label}</Text>
+                  <Text style={{ fontSize: 22, fontWeight: '900', textAlign: 'center', marginTop: 4 }}>
+                    {item.value}/10
+                  </Text>
+                </View>
+              ))}
+            </View>
 
-            <View style={{ height: 10 }} />
+            <View style={{ height: 12 }} />
 
-            <Text style={{ opacity: 0.75, lineHeight: 20 }}>
-              BuffaGo saves automatically, so you can stop and pick up where you left off.
+            <Text style={{ opacity: 0.82, lineHeight: 20, textAlign: 'center' }}>
+              Want more detail later? Open this restaurant again for the full review with flavor, heat, tags,
+              and comeback notes.
             </Text>
           </View>
 

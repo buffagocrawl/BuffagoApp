@@ -4,6 +4,13 @@ import { View, Pressable, ScrollView, FlatList, StyleSheet } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import { Button, Dialog, Portal, ProgressBar, Text, useTheme } from 'react-native-paper';
+import {
+  FULL_RATING_FLOW_VARIANT,
+  QUICK_RATING_FLOW_VARIANT,
+  QUICK_RATING_STEPS,
+  buildRatingPayload,
+  getRatingFlowStepLabels,
+} from '../lib/quickRating';
 
 /** Clamp a score to integer 1–10 */
 const toNumber = (v, def = 5) => {
@@ -253,11 +260,12 @@ export default function RatingWizardDialog({
   onDismiss,
   onFinalize,
   finalizeLabel = 'Finalize',
+  flowVariant = FULL_RATING_FLOW_VARIANT,
 }) {
   const theme = useTheme();
   const surface = theme.colors.surface;
-
-  const totalSteps = 10;
+  const quickMode = flowVariant === QUICK_RATING_FLOW_VARIANT;
+  const totalSteps = quickMode ? QUICK_RATING_STEPS.length : 10;
   const [step, setStep] = useState(0);
 
   const [scores, setScores] = useState({ crispiness: 1, sauce: 1, meat: 1, overall: 1 });
@@ -288,20 +296,11 @@ export default function RatingWizardDialog({
     []
   );
 
-  const stepLabel = useMemo(() => {
-    return [
-      'Style',
-      sauceStyle === 1 ? 'Rub score' : 'Sauce score',
-      'Crispiness',
-      'Chicken',
-      'Overall',
-      'Flavor',
-      'Heat',
-      'Count',
-      'Tag',
-      'Comeback',
-    ][step];
-  }, [sauceStyle, step]);
+  const stepLabels = useMemo(
+    () => getRatingFlowStepLabels(flowVariant, sauceStyle),
+    [flowVariant, sauceStyle]
+  );
+  const stepLabel = stepLabels[step];
 
   const nextLabel = step < totalSteps - 1 ? 'Next' : finalizeLabel;
 
@@ -331,7 +330,8 @@ export default function RatingWizardDialog({
       return;
     }
 
-    const payload = {
+    const payload = buildRatingPayload({
+      flowVariant,
       scores: {
         crispiness: toNumber(scores.crispiness),
         sauce: toNumber(scores.sauce),
@@ -344,7 +344,7 @@ export default function RatingWizardDialog({
       wingsEaten: wingsEaten == null ? null : Number(wingsEaten),
       selectedTagId: selectedTagId ?? null,
       wouldOrderAgain: wouldOrderAgain == null ? null : !!wouldOrderAgain,
-    };
+    });
 
     await onFinalize?.(payload);
   };
@@ -361,6 +361,14 @@ export default function RatingWizardDialog({
         <DialogHeaderArrow title={destinationName || 'Rate this stop'} onBack={goBack} />
 
         <Dialog.Content>
+        {quickMode ? (
+          <View style={styles.quickIntroCard}>
+            <Text style={styles.quickIntroTitle}>Quick Rating</Text>
+            <Text style={styles.quickIntroBody}>
+              Start with one overall score plus three core wing dimensions. You can add deeper detail later.
+            </Text>
+          </View>
+        ) : null}
         <View style={styles.progressMetaRow}>
           <Text style={styles.progressMetaText}>
             Step {step + 1} of {totalSteps}
@@ -370,7 +378,51 @@ export default function RatingWizardDialog({
         <ProgressBar progress={(step + 1) / totalSteps} style={styles.ratingProgress} />
 
         <View style={{ marginTop: 16 }}>
-          {step === 0 ? (
+          {quickMode && step === 0 ? (
+            <SliderRowPretty
+              label={QUICK_RATING_STEPS[0].title}
+              value={scores.overall}
+              description={QUICK_RATING_STEPS[0].description}
+              badLabel={QUICK_RATING_STEPS[0].badLabel}
+              goodLabel={QUICK_RATING_STEPS[0].goodLabel}
+              onChange={(v) => setScores((s) => ({ ...s, overall: v }))}
+            />
+          ) : null}
+
+          {quickMode && step === 1 ? (
+            <SliderRowPretty
+              label={QUICK_RATING_STEPS[1].title}
+              value={scores.sauce}
+              description={QUICK_RATING_STEPS[1].description}
+              badLabel={QUICK_RATING_STEPS[1].badLabel}
+              goodLabel={QUICK_RATING_STEPS[1].goodLabel}
+              onChange={(v) => setScores((s) => ({ ...s, sauce: v }))}
+            />
+          ) : null}
+
+          {quickMode && step === 2 ? (
+            <SliderRowPretty
+              label={QUICK_RATING_STEPS[2].title}
+              value={scores.crispiness}
+              description={QUICK_RATING_STEPS[2].description}
+              badLabel={QUICK_RATING_STEPS[2].badLabel}
+              goodLabel={QUICK_RATING_STEPS[2].goodLabel}
+              onChange={(v) => setScores((s) => ({ ...s, crispiness: v }))}
+            />
+          ) : null}
+
+          {quickMode && step === 3 ? (
+            <SliderRowPretty
+              label={QUICK_RATING_STEPS[3].title}
+              value={scores.meat}
+              description={QUICK_RATING_STEPS[3].description}
+              badLabel={QUICK_RATING_STEPS[3].badLabel}
+              goodLabel={QUICK_RATING_STEPS[3].goodLabel}
+              onChange={(v) => setScores((s) => ({ ...s, meat: v }))}
+            />
+          ) : null}
+
+          {!quickMode && step === 0 ? (
             <View>
               <Text style={styles.stepTitle}>Sauce Style</Text>
               <View style={styles.choiceRow}>
@@ -403,7 +455,7 @@ export default function RatingWizardDialog({
             </View>
           ) : null}
 
-          {step === 1 ? (
+          {!quickMode && step === 1 ? (
             <SliderRowPretty
               label={sauceStyle === 1 ? 'Rub' : 'Sauce'}
               value={scores.sauce}
@@ -418,7 +470,7 @@ export default function RatingWizardDialog({
             />
           ) : null}
 
-          {step === 2 ? (
+          {!quickMode && step === 2 ? (
             <SliderRowPretty
               label="Crispiness"
               value={scores.crispiness}
@@ -429,7 +481,7 @@ export default function RatingWizardDialog({
             />
           ) : null}
 
-          {step === 3 ? (
+          {!quickMode && step === 3 ? (
             <SliderRowPretty
               label="Chicken Quality"
               value={scores.meat}
@@ -440,7 +492,7 @@ export default function RatingWizardDialog({
             />
           ) : null}
 
-          {step === 4 ? (
+          {!quickMode && step === 4 ? (
             <SliderRowPretty
               label="Overall Experience"
               value={scores.overall}
@@ -451,7 +503,7 @@ export default function RatingWizardDialog({
             />
           ) : null}
 
-          {step === 5 ? (
+          {!quickMode && step === 5 ? (
             <View>
               <Text style={styles.stepTitle}>Flavor Vibe</Text>
               <Text style={styles.stepDescription}>Choose up to 2 vibes that best describe the wing.</Text>
@@ -483,7 +535,7 @@ export default function RatingWizardDialog({
             </View>
           ) : null}
 
-          {step === 6 ? (
+          {!quickMode && step === 6 ? (
             <SliderRowPretty
               label="Spice Level"
               value={spiceLevel}
@@ -493,7 +545,7 @@ export default function RatingWizardDialog({
             />
           ) : null}
 
-          {step === 7 ? (
+          {!quickMode && step === 7 ? (
             <View style={{ alignItems: 'center' }}>
               <Text style={styles.stepTitle}>Wings Eaten</Text>
               <NumberWheel value={wingsEaten ?? 1} onChange={setWingsEaten} min={1} max={50} />
@@ -504,7 +556,7 @@ export default function RatingWizardDialog({
             </View>
           ) : null}
 
-          {step === 8 ? (
+          {!quickMode && step === 8 ? (
             <View style={{ marginTop: 4 }}>
               <Text style={styles.stepTitle}>Tag</Text>
               <Text style={styles.stepDescription}>
@@ -516,7 +568,7 @@ export default function RatingWizardDialog({
             </View>
           ) : null}
 
-          {step === 9 ? (
+          {!quickMode && step === 9 ? (
             <View>
               <Text style={styles.stepTitle}>Go back again?</Text>
               <View style={styles.thumbRow}>
@@ -602,6 +654,24 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '800',
     opacity: 0.68,
+  },
+  quickIntroCard: {
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 14,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
+  quickIntroTitle: {
+    fontSize: 15,
+    fontWeight: '900',
+    marginBottom: 4,
+  },
+  quickIntroBody: {
+    opacity: 0.82,
+    lineHeight: 19,
   },
   nextButtonContent: {
     minWidth: 96,
