@@ -1,3 +1,8 @@
+---
+name: serrano
+description: Run Buffago's Serrano product-management orchestration system. Use when the user wants to run discovery, inspect status, resume a run, approve a run, build after approval, run the security phase, release, or execute the full Serrano workflow.
+---
+
 # `$serrano`
 
 Use this skill to run Buffago's Serrano product-management orchestration system.
