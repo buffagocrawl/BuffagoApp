@@ -28,11 +28,30 @@ class WorkerResult:
     input_hash: str
 
 
-def worker_output_schema(role_name: str) -> dict[str, Any]:
+def strict_object_schema(*, properties: dict[str, Any], required: list[str] | tuple[str, ...]) -> dict[str, Any]:
     return {
         "type": "object",
         "additionalProperties": False,
-        "required": [
+        "required": list(required),
+        "properties": properties,
+    }
+
+
+def worker_output_schema(role_name: str) -> dict[str, Any]:
+    recommendation_properties = {
+        "id": {"type": "string"},
+        "title": {"type": "string"},
+        "problem": {"type": "string"},
+        "recommendation": {"type": "string"},
+        "expected_impact": {"type": "string"},
+        "effort": {"type": "string"},
+        "risk": {"type": "string"},
+        "confidence": {"type": "string"},
+        "metric": {"type": "string"},
+        "source_references": {"type": "array", "items": {"type": "string"}},
+    }
+    return strict_object_schema(
+        required=[
             "role",
             "summary",
             "observed_facts",
@@ -43,7 +62,7 @@ def worker_output_schema(role_name: str) -> dict[str, Any]:
             "confidence",
             "source_references",
         ],
-        "properties": {
+        properties={
             "role": {"type": "string", "const": role_name},
             "summary": {"type": "string"},
             "observed_facts": {"type": "array", "items": {"type": "string"}},
@@ -51,10 +70,8 @@ def worker_output_schema(role_name: str) -> dict[str, Any]:
             "evidence_gaps": {"type": "array", "items": {"type": "string"}},
             "recommendations": {
                 "type": "array",
-                "items": {
-                    "type": "object",
-                    "additionalProperties": True,
-                    "required": [
+                "items": strict_object_schema(
+                    required=[
                         "id",
                         "title",
                         "problem",
@@ -66,32 +83,33 @@ def worker_output_schema(role_name: str) -> dict[str, Any]:
                         "metric",
                         "source_references",
                     ],
-                    "properties": {
-                        "id": {"type": "string"},
-                        "title": {"type": "string"},
-                        "problem": {"type": "string"},
-                        "recommendation": {"type": "string"},
-                        "expected_impact": {"type": "string"},
-                        "effort": {"type": "string"},
-                        "risk": {"type": "string"},
-                        "confidence": {"type": "string"},
-                        "metric": {"type": "string"},
-                        "source_references": {"type": "array", "items": {"type": "string"}},
-                    },
-                },
+                    properties=recommendation_properties,
+                ),
             },
             "risks": {"type": "array", "items": {"type": "string"}},
             "confidence": {"type": "string"},
             "source_references": {"type": "array", "items": {"type": "string"}},
         },
-    }
+    )
 
 
 def final_plan_schema() -> dict[str, Any]:
-    return {
-        "type": "object",
-        "additionalProperties": True,
-        "required": [
+    initiative_schema = strict_object_schema(
+        required=["id", "title"],
+        properties={
+            "id": {"type": "string"},
+            "title": {"type": "string"},
+        },
+    )
+    prioritization_schema = strict_object_schema(
+        required=["id", "priority_score"],
+        properties={
+            "id": {"type": "string"},
+            "priority_score": {"type": "number"},
+        },
+    )
+    return strict_object_schema(
+        required=[
             "run_id",
             "evidence_period",
             "chosen_initiatives",
@@ -106,12 +124,12 @@ def final_plan_schema() -> dict[str, Any]:
             "rollback",
             "approval_status",
         ],
-        "properties": {
+        properties={
             "run_id": {"type": "string"},
             "evidence_period": {"type": "string"},
-            "chosen_initiatives": {"type": "array", "items": {"type": "object"}},
-            "rejected_initiatives": {"type": "array", "items": {"type": "object"}},
-            "prioritization_scores": {"type": "array", "items": {"type": "object"}},
+            "chosen_initiatives": {"type": "array", "items": initiative_schema},
+            "rejected_initiatives": {"type": "array", "items": initiative_schema},
+            "prioritization_scores": {"type": "array", "items": prioritization_schema},
             "acceptance_criteria": {"type": "array", "items": {"type": "string"}},
             "implementation_tasks": {"type": "array", "items": {"type": "string"}},
             "tests": {"type": "array", "items": {"type": "string"}},
@@ -121,7 +139,7 @@ def final_plan_schema() -> dict[str, Any]:
             "rollback": {"type": "array", "items": {"type": "string"}},
             "approval_status": {"type": "string"},
         },
-    }
+    )
 
 
 WAVE_1 = (
@@ -149,4 +167,3 @@ IMPLEMENTATION = WorkerSpec("implementation_agent", "implementation_agent.md", "
 SECURITY = WorkerSpec("security_red_team", "security_red_team.md", "security_review", WRITE_ALLOWED, "Review the implementation for security issues.", report_kind="security")
 VERIFICATION = WorkerSpec("product_manager_verification", "product_manager_verification.md", "verification", READ_ONLY, "Verify delivery against the approved plan.", report_kind="verification")
 RELEASE_NOTES = WorkerSpec("release_notes", "release_notes.md", "release_notes", READ_ONLY, "Write internal and user-facing release notes.", report_kind="release")
-

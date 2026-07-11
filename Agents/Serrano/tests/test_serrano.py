@@ -16,6 +16,7 @@ if str(SERRANO_DIR) not in sys.path:
 
 from serrano.cli import find_repo_root, format_state_summary, main  # noqa: E402
 from serrano.orchestrator import SerranoOrchestrator, load_configuration  # noqa: E402
+from serrano.schemas import final_plan_schema, worker_output_schema  # noqa: E402
 
 SKILL_RUNNER_PATH = PROJECT_ROOT / ".agents" / "skills" / "serrano" / "scripts" / "run_serrano.py"
 skill_runner_spec = spec_from_file_location("run_serrano_skill", SKILL_RUNNER_PATH)
@@ -45,6 +46,18 @@ def test_discovery_creates_resumable_run() -> None:
     assert (run_dir / "evidence" / "evidence_manifest.json").exists()
     assert (run_dir / "artifacts" / "final_product_plan.json").exists()
     assert state["status"] == "awaiting_approval"
+
+
+def test_generated_schemas_use_strict_nested_objects() -> None:
+    worker_schema = worker_output_schema("growth_analyst")
+    recommendation_schema = worker_schema["properties"]["recommendations"]["items"]
+    plan_schema = final_plan_schema()
+
+    assert recommendation_schema["additionalProperties"] is False
+    assert plan_schema["additionalProperties"] is False
+    assert plan_schema["properties"]["chosen_initiatives"]["items"]["additionalProperties"] is False
+    assert plan_schema["properties"]["rejected_initiatives"]["items"]["additionalProperties"] is False
+    assert plan_schema["properties"]["prioritization_scores"]["items"]["additionalProperties"] is False
 
 
 def test_resume_skips_completed_workers() -> None:
