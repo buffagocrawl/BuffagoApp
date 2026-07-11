@@ -22,12 +22,11 @@ import {
   sanitizeAuthError,
 } from '../../lib/facebookOAuth';
 import {
-  getFacebookIdentity,
   grantFacebookLinkRewardOnce,
   persistFacebookConnection,
-  readFacebookConnection,
+  refreshLinkedProviders,
 } from '../../lib/socialAccounts';
-import { Button } from 'react-native-paper';
+import { Button, useTheme } from 'react-native-paper';
 
 // Onboarding keys (match OnboardingFlow)
 const ONBOARDING_SEED_RATING_KEY = 'buffago:onboarding:seed_rating';
@@ -319,6 +318,7 @@ const applyOnboardingSeedRatingIfAny = async (userId) => {
 
 export default function AuthCallback() {
   const router = useRouter();
+  const { colors } = useTheme();
   const params = useLocalSearchParams();
   const liveUrl = Linking.useURL();
 
@@ -688,7 +688,11 @@ export default function AuthCallback() {
         );
         const { data: userData, error: userError } = await supabase.auth.getUser();
         if (userError) throw userError;
-        const user = userData?.user || null;
+        let user = userData?.user || null;
+        const providerState = user?.id
+          ? await refreshLinkedProviders()
+          : { facebook: false, providers: [], identities: [], error: null };
+        if (user?.id) user = { ...user, identities: providerState.identities || [] };
         console.info('[auth/callback] current user resolved', { userId: user?.id || null });
         await dbg(
           'oauth_user_refresh_finished',
@@ -696,9 +700,10 @@ export default function AuthCallback() {
             flowId,
             mode: flowMode,
             hasUserId: Boolean(user?.id),
-            hasFacebookIdentity: Boolean(getFacebookIdentity(user)),
+            hasFacebookIdentity: providerState.facebook,
             userId: user?.id || null,
-            providers: (user?.identities || []).map((identity) => identity?.provider).filter(Boolean),
+            providers: providerState.providers || [],
+            providerRefreshError: providerState.error,
             elapsedMs: Date.now() - flowStartedAt,
           },
           flowMode ? 'facebook' : 'auth'
@@ -711,18 +716,14 @@ export default function AuthCallback() {
             // non blocking
           }
 
-          if (getFacebookIdentity(user)) {
-            const providerList = (user.identities || []).map((identity) => identity?.provider).filter(Boolean);
+          if (providerState.facebook) {
+            const providerList = providerState.providers || [];
             await dbg(
               'facebook_profile_social_link_update_started',
               { flowId, mode: flowMode, userId: user.id, elapsedMs: Date.now() - flowStartedAt },
               'facebook'
             );
-            const existingFacebook = await readFacebookConnection(user.id);
-            const savedFacebook = await persistFacebookConnection(user, {
-              previousConnected: existingFacebook.connected,
-              previousConnectedAt: existingFacebook.connectedAt,
-            });
+            const savedFacebook = await persistFacebookConnection(user);
 
             await dbg(
               'facebook_final_ui_state',
@@ -814,10 +815,11 @@ export default function AuthCallback() {
 
           const verifiedUser = verifyUserData?.user || null;
           const verifiedUserId = verifiedUser?.id || null;
-          const verifiedProviders = (verifiedUser?.identities || [])
-            .map((identity) => identity?.provider)
-            .filter(Boolean);
-          const hasFacebookIdentity = Boolean(getFacebookIdentity(verifiedUser));
+          const verifiedProviderState = verifiedUserId
+            ? await refreshLinkedProviders({ syncCache: false })
+            : { facebook: false, providers: [], error: null };
+          const verifiedProviders = verifiedProviderState.providers || [];
+          const hasFacebookIdentity = verifiedProviderState.facebook;
 
           await dbg(
             'facebook_link_post_verification',
@@ -828,6 +830,7 @@ export default function AuthCallback() {
               sameUserId: expectedLinkUserId ? verifiedUserId === expectedLinkUserId : null,
               hasFacebookIdentity,
               providers: verifiedProviders,
+              providerRefreshError: verifiedProviderState.error,
               finalRoute: returnPath || '/user',
               elapsedMs: Date.now() - flowStartedAt,
             },
@@ -862,7 +865,7 @@ export default function AuthCallback() {
             outcome: 'success',
             hasUserId: Boolean(user?.id),
             hasSession: true,
-            hasFacebookIdentity: Boolean(getFacebookIdentity(user)),
+            hasFacebookIdentity: providerState.facebook,
             elapsedMs: Date.now() - flowStartedAt,
             callbackProcessingMs: Date.now() - callbackStartedAt,
           },
@@ -966,12 +969,24 @@ export default function AuthCallback() {
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16 }}>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 16,
+        backgroundColor: colors.background,
+      }}
+    >
       {processing ? <ActivityIndicator size="large" /> : null}
-      <Text style={{ marginTop: 12, opacity: 0.8, textAlign: 'center' }}>
+      <Text style={{ marginTop: 12, opacity: 0.8, textAlign: 'center', color: colors.onBackground }}>
         {processing ? 'Finishing sign-in…' : 'OAuth callback needs attention'}
       </Text>
-      {errMsg ? <Text style={{ marginTop: 12, opacity: 0.7, textAlign: 'center' }}>{errMsg}</Text> : null}
+      {errMsg ? (
+        <Text style={{ marginTop: 12, opacity: 0.7, textAlign: 'center', color: colors.onBackground }}>
+          {errMsg}
+        </Text>
+      ) : null}
       {!processing && errMsg ? (
         <View style={{ width: '100%', marginTop: 18, gap: 10 }}>
           <Button mode="contained" onPress={retry}>

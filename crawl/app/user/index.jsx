@@ -26,10 +26,9 @@ import {
 } from '../../lib/facebookOAuth';
 import { canUserAppearSocially } from '../../lib/socialVisibility';
 import {
-  getFacebookIdentity,
   grantFacebookLinkRewardOnce,
   persistFacebookConnection,
-  readFacebookConnection,
+  refreshLinkedProviders,
 } from '../../lib/socialAccounts';
 import {
   Text,
@@ -83,9 +82,15 @@ export default function UserSettings() {
   const [session, setSession] = useState(null);
   const [initialized, setInitialized] = useState(false);
   const [identities, setIdentities] = useState([]);
-  const [hasFacebook, setHasFacebook] = useState(false);
+  const [linkedProviders, setLinkedProviders] = useState({
+    facebook: false,
+    google: false,
+    email: false,
+    loading: true,
+    error: null,
+  });
   const [facebookConnectedAt, setFacebookConnectedAt] = useState(null);
-  const [facebookStatusSource, setFacebookStatusSource] = useState('unknown');
+  const [facebookStatusSource, setFacebookStatusSource] = useState('identities');
   const [linking, setLinking] = useState(false);
   const [snackMsg, setSnackMsg] = useState('');
   const [snackVisible, setSnackVisible] = useState(false);
@@ -165,6 +170,7 @@ export default function UserSettings() {
 
   const email = session?.user?.email ?? '';
   const rawAvatarUrl = session?.user?.user_metadata?.avatar_url ?? null;
+  const hasFacebook = linkedProviders.facebook;
 
   const computedAvatar = useMemo(() => {
     const fbFallback = getFacebookAvatarUrlFromIdentities(identities);
@@ -183,33 +189,60 @@ export default function UserSettings() {
   }, []);
 
   const refreshUserAndIdentities = useCallback(async () => {
-    const { data: sessData } = await supabase.auth.getSession();
-    const currentSession = sessData?.session ?? null;
-    setSession(currentSession);
+    setLinkedProviders((current) => ({ ...current, loading: true, error: null }));
 
-    const { data: userData } = await supabase.auth.getUser();
-    const ids = userData?.user?.identities ?? [];
-    setIdentities(ids);
+    try {
+      const { data: sessData } = await supabase.auth.getSession();
+      const currentSession = sessData?.session ?? null;
+      setSession(currentSession);
 
-    if (currentSession?.user?.id) {
-      const persisted = await readFacebookConnection(currentSession.user.id);
-      const identityConnected = Boolean(getFacebookIdentity(ids));
-      setHasFacebook(persisted.connected || (persisted.source === 'read_error' && identityConnected));
-      setFacebookConnectedAt(persisted.connectedAt);
-      setFacebookStatusSource(persisted.source);
+      if (!currentSession?.user?.id) {
+        setIdentities([]);
+        setLinkedProviders({
+          facebook: false,
+          google: false,
+          email: false,
+          loading: false,
+          error: null,
+        });
+        setFacebookConnectedAt(null);
+        setFacebookStatusSource('none');
+        return;
+      }
+
+      const providerState = await refreshLinkedProviders();
+      const ids = providerState.identities ?? [];
+      setIdentities(ids);
+      setLinkedProviders({
+        facebook: providerState.facebook,
+        google: providerState.google,
+        email: providerState.email,
+        loading: false,
+        error: providerState.error,
+      });
+      setFacebookConnectedAt(providerState.facebookConnectedAt || null);
+      setFacebookStatusSource(providerState.error ? 'identity_error' : 'identities');
       await dbg(
         'facebook_final_ui_state',
         {
-          persistedConnected: persisted.connected,
-          identityConnected,
-          source: persisted.source,
+          identityConnected: providerState.facebook,
+          source: providerState.error ? 'identity_error' : 'identities',
+          providers: providerState.providers || [],
+          error: providerState.error,
         },
         'facebook'
       );
-    } else {
-      setHasFacebook(false);
+    } catch (e) {
+      setIdentities([]);
+      setLinkedProviders({
+        facebook: false,
+        google: false,
+        email: false,
+        loading: false,
+        error: e?.message || 'Unable to refresh linked accounts',
+      });
       setFacebookConnectedAt(null);
-      setFacebookStatusSource('none');
+      setFacebookStatusSource('identity_error');
     }
   }, []);
 
@@ -419,11 +452,8 @@ export default function UserSettings() {
     try {
       if (awardedRef.current) return;
 
-      const { data } = await supabase.auth.getUser();
-      const user = data?.user;
-      if (!user) return;
-
-      const isFB = Boolean(getFacebookIdentity(user));
+      const providerState = await refreshLinkedProviders({ syncCache: false });
+      const isFB = providerState.facebook;
       if (!isFB) {
         await dbg('facebook_badge_skipped_no_identity', {}, 'facebook');
         return;
@@ -431,6 +461,9 @@ export default function UserSettings() {
 
       awardedRef.current = true;
 
+      const { data } = await supabase.auth.getUser();
+      const user = data?.user;
+      if (!user?.id) return;
       const reward = await grantFacebookLinkRewardOnce(user.id);
       if (reward.granted) {
         showToast('Facebook connected! +50 XP and badge earned.');
@@ -491,16 +524,15 @@ export default function UserSettings() {
 
       if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
         const user = newSession?.user;
-        if (user?.id && getFacebookIdentity(user)) {
+        const providerState = await refreshLinkedProviders();
+        if (user?.id && providerState.facebook) {
           try {
-            const persisted = await readFacebookConnection(user.id);
-            const saved = await persistFacebookConnection(user, {
-              previousConnected: persisted.connected,
-              previousConnectedAt: persisted.connectedAt,
+            const saved = await persistFacebookConnection({
+              ...user,
+              identities: providerState.identities || [],
             });
-            setHasFacebook(true);
             setFacebookConnectedAt(saved.connectedAt);
-            setFacebookStatusSource('users');
+            setFacebookStatusSource('identities');
             if (saved.newlyConnected) await maybeAwardFacebookBadge();
           } catch (e) {
             await dbg(
@@ -1023,12 +1055,12 @@ export default function UserSettings() {
               {session && (
                 <View style={{ marginTop: 6 }}>
                   <Text variant="labelSmall" style={{ opacity: 0.8 }}>
-                    Facebook: {hasFacebook ? 'Connected' : 'Not linked'}
+                    Facebook: {linkedProviders.loading ? 'Checking...' : hasFacebook ? 'Connected' : 'Not linked'}
                     {hasFacebook && facebookConnectedAt ? ` since ${new Date(facebookConnectedAt).toLocaleDateString()}` : ''}
                   </Text>
-                  {facebookStatusSource === 'read_error' ? (
+                  {facebookStatusSource === 'identity_error' || linkedProviders.error ? (
                     <Text variant="labelSmall" style={{ opacity: 0.7 }}>
-                      Connection detected, but profile sync needs database setup.
+                      Could not refresh linked account status. Reopen settings to retry.
                     </Text>
                   ) : null}
                 </View>

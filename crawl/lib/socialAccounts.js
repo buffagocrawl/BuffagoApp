@@ -1,6 +1,103 @@
 import { supabase } from './supabase';
 import { dbg } from './debugLog';
 
+const EMPTY_LINKED_PROVIDER_STATE = Object.freeze({
+  facebook: false,
+  google: false,
+  email: false,
+  providers: [],
+  identities: [],
+  facebookConnectedAt: null,
+  loading: false,
+  error: null,
+});
+
+let linkedProvidersRefreshPromise = null;
+
+function withTimeout(promise, ms, message) {
+  let timeoutId;
+  const timeout = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(message)), ms);
+  });
+
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timeoutId));
+}
+
+export function normalizeLinkedProviders(identities = []) {
+  const list = Array.isArray(identities) ? identities.filter(Boolean) : [];
+  const providers = [...new Set(list.map((identity) => identity?.provider).filter(Boolean))];
+
+  return {
+    facebook: providers.includes('facebook'),
+    google: providers.includes('google'),
+    email: providers.includes('email'),
+    providers,
+    identities: list,
+    facebookConnectedAt: null,
+    loading: false,
+    error: null,
+  };
+}
+
+export async function refreshLinkedProviders({ syncCache = true } = {}) {
+  if (linkedProvidersRefreshPromise) return linkedProvidersRefreshPromise;
+
+  linkedProvidersRefreshPromise = (async () => {
+    try {
+      const { data: sessionData, error: sessionError } = await withTimeout(
+        supabase.auth.getSession(),
+        12000,
+        'Timed out while checking the current session'
+      );
+      if (sessionError) throw sessionError;
+
+      const userId = sessionData?.session?.user?.id || null;
+      if (!userId) return { ...EMPTY_LINKED_PROVIDER_STATE };
+
+      const { data, error } = await withTimeout(
+        supabase.auth.getUserIdentities(),
+        12000,
+        'Timed out while checking linked accounts'
+      );
+      if (error) throw error;
+
+      const identities = data?.identities || (Array.isArray(data) ? data : []);
+      const state = normalizeLinkedProviders(identities);
+
+      let cacheResult = null;
+      if (syncCache) {
+        cacheResult = await syncFacebookConnectionCache(userId, state, { previousConnected: null }).catch(async (cacheError) => {
+          await dbg(
+            'facebook_profile_cache_sync_failed',
+            { message: cacheError?.message || 'unknown' },
+            'facebook'
+          );
+          return null;
+        });
+      }
+
+      return {
+        ...state,
+        facebookConnectedAt: state.facebook ? cacheResult?.connectedAt || null : null,
+      };
+    } catch (error) {
+      await dbg(
+        'linked_provider_refresh_failed',
+        { message: error?.message || 'unknown' },
+        'auth'
+      );
+      return {
+        ...EMPTY_LINKED_PROVIDER_STATE,
+        error: error?.message || 'Unable to refresh linked accounts',
+      };
+    } finally {
+      linkedProvidersRefreshPromise = null;
+    }
+  })();
+
+  return linkedProvidersRefreshPromise;
+}
+
 export function getFacebookIdentity(userOrIdentities) {
   const identities = Array.isArray(userOrIdentities)
     ? userOrIdentities
@@ -50,9 +147,54 @@ export async function readFacebookConnection(userId) {
   };
 }
 
+export async function syncFacebookConnectionCache(
+  userId,
+  providerStateOrIdentities,
+  { previousConnected = null, previousConnectedAt = null } = {}
+) {
+  if (!userId) return { connected: false, providerId: null, connectedAt: null, newlyConnected: false };
+
+  const identities = Array.isArray(providerStateOrIdentities)
+    ? providerStateOrIdentities
+    : providerStateOrIdentities?.identities || [];
+  const facebookIdentity = getFacebookIdentity(identities);
+  const connected = Boolean(facebookIdentity);
+  const providerId = getFacebookProviderId(identities);
+  const existing =
+    previousConnected === null
+      ? await readFacebookConnection(userId)
+      : {
+          connected: previousConnected,
+          connectedAt: previousConnectedAt,
+          source: 'provided',
+        };
+  const connectedAt = connected
+    ? existing.connected
+      ? existing.connectedAt || new Date().toISOString()
+      : new Date().toISOString()
+    : null;
+
+  const payload = {
+    user_id: userId,
+    facebook_connected: connected,
+    facebook_provider_id: connected ? providerId : null,
+    facebook_connected_at: connected ? connectedAt : null,
+  };
+
+  const { error } = await supabase.from('users').upsert(payload, { onConflict: 'user_id' });
+  if (error) throw error;
+
+  return {
+    connected,
+    providerId: connected ? providerId : null,
+    connectedAt,
+    newlyConnected: connected && !existing.connected,
+  };
+}
+
 export async function persistFacebookConnection(
   user,
-  { previousConnected = false, previousConnectedAt = null } = {}
+  { previousConnected = null, previousConnectedAt = null } = {}
 ) {
   const userId = user?.id;
   if (!userId) throw new Error('No authenticated user to link Facebook');
@@ -60,31 +202,34 @@ export async function persistFacebookConnection(
   const fb = getFacebookIdentity(user);
   if (!fb) throw new Error('Facebook identity not present after OAuth');
 
-  const providerId = getFacebookProviderId(user);
-  const connectedAt = previousConnected
-    ? previousConnectedAt || new Date().toISOString()
-    : new Date().toISOString();
-
   await dbg(
     'facebook_profile_update_attempt',
     {
       userId,
-      hasProviderId: Boolean(providerId),
+      hasProviderId: Boolean(getFacebookProviderId(user)),
       previousConnected: Boolean(previousConnected),
     },
     'facebook'
   );
 
-  const payload = {
-    user_id: userId,
-    facebook_connected: true,
-    facebook_provider_id: providerId,
-  };
-  if (!previousConnected) payload.facebook_connected_at = connectedAt;
+  try {
+    const saved = await syncFacebookConnectionCache(userId, user?.identities || [], {
+      previousConnected,
+      previousConnectedAt,
+    });
 
-  const { error } = await supabase.from('users').upsert(payload, { onConflict: 'user_id' });
+    await dbg(
+      'facebook_profile_update_succeeded',
+      {
+        userId,
+        hasProviderId: Boolean(saved.providerId),
+        connectedAt: saved.connectedAt,
+      },
+      'facebook'
+    );
 
-  if (error) {
+    return saved;
+  } catch (error) {
     await dbg(
       'facebook_profile_update_failed',
       {
@@ -95,23 +240,6 @@ export async function persistFacebookConnection(
     );
     throw error;
   }
-
-  await dbg(
-    'facebook_profile_update_succeeded',
-    {
-      userId,
-      hasProviderId: Boolean(providerId),
-      connectedAt,
-    },
-    'facebook'
-  );
-
-  return {
-    connected: true,
-    providerId,
-    connectedAt,
-    newlyConnected: !previousConnected,
-  };
 }
 
 export async function grantFacebookLinkRewardOnce(userId) {

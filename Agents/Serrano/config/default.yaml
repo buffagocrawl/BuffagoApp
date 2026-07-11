@@ -1,0 +1,22 @@
+serrano:
+  agent_name: Serrano
+  timezone: America/New_York
+  codex_command:
+    - codex.cmd
+    - exec
+  max_concurrent_workers: 3
+  model: ""
+  reasoning_level: medium
+  retry_count: 1
+  worker_timeout_seconds: 900
+  lookback_days: 30
+  retention_lookback_days: 90
+  dry_run_mode: false
+  implementation_enabled: false
+  security_autofix_enabled: false
+  artifact_retention_days: 30
+  supabase_url_env: SUPABASE_URL
+  supabase_read_key_env: SERRANO_SUPABASE_READ_KEY
+  allow_service_role_fallback: false
+  default_branch_name: serrano
+
