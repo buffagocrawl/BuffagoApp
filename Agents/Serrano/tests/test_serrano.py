@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
 
 import pytest
@@ -13,8 +14,14 @@ SERRANO_DIR = PROJECT_ROOT / "Agents" / "Serrano"
 if str(SERRANO_DIR) not in sys.path:
     sys.path.insert(0, str(SERRANO_DIR))
 
-from serrano.cli import find_repo_root, main  # noqa: E402
+from serrano.cli import find_repo_root, format_state_summary, main  # noqa: E402
 from serrano.orchestrator import SerranoOrchestrator, load_configuration  # noqa: E402
+
+SKILL_RUNNER_PATH = PROJECT_ROOT / ".agents" / "skills" / "serrano" / "scripts" / "run_serrano.py"
+skill_runner_spec = spec_from_file_location("run_serrano_skill", SKILL_RUNNER_PATH)
+assert skill_runner_spec and skill_runner_spec.loader
+skill_runner = module_from_spec(skill_runner_spec)
+skill_runner_spec.loader.exec_module(skill_runner)
 
 
 @pytest.fixture(autouse=True)
@@ -84,6 +91,26 @@ def test_status_returns_latest_run() -> None:
 
 def test_cli_default_discover() -> None:
     assert main([]) == 0
+
+
+def test_skill_runner_routes_natural_language_status() -> None:
+    assert skill_runner.canonicalize_args(["show", "latest", "status"], PROJECT_ROOT) == ["status"]
+
+
+def test_skill_runner_routes_latest_run_commands() -> None:
+    orchestrator = SerranoOrchestrator(load_configuration(PROJECT_ROOT))
+    state = orchestrator.discover()
+
+    assert skill_runner.canonicalize_args(["resume", "latest"], PROJECT_ROOT) == ["resume", state["run_id"]]
+    assert skill_runner.canonicalize_args(["approve", "current"], PROJECT_ROOT) == ["approve", state["run_id"]]
+
+
+def test_cli_summary_mentions_approval_gate() -> None:
+    state = SerranoOrchestrator(load_configuration(PROJECT_ROOT)).discover()
+    summary = format_state_summary(state, PROJECT_ROOT)
+
+    assert "Approval gate:" in summary
+    assert state["run_id"] in summary
 
 
 def test_worker_artifacts_include_json_and_markdown() -> None:
