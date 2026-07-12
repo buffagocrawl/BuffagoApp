@@ -6,3 +6,7 @@ Agents/**
 **/.pytest_cache/**
 **/__pycache__/
 **/__pycache__/**
+# Local Python and pytest artifacts
+/tmp/
+**/pytest-*
+**/.pytest_cache/
