@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from caption_rules import compose_caption_with_hashtags, finalize_caption_overlay_pair, repair_hashtag_list, validate_caption, validate_post_pair
+from caption_rules import compose_caption_with_hashtags, validate_caption, validate_overlay_text, validate_post_pair
 from logging_utils import log_event
 
 
@@ -31,38 +31,12 @@ def _list_of_strings(value: Any) -> list[str]:
     return items
 
 
-def _compose_publish_caption(caption: str, hashtags: list[str]) -> str:
-    return compose_caption_with_hashtags(caption, hashtags)
-
-
 def _caption_body(caption: str) -> str:
     return re.sub(r"(?:\s*#\w+)+\s*$", "", caption).strip()
 
 
-def _hashtag_context(content_decision: dict[str, Any], winner: dict[str, Any]) -> dict[str, Any]:
-    metadata = content_decision.get("metadata") if isinstance(content_decision.get("metadata"), dict) else {}
-    context: dict[str, Any] = {}
-    for source in (metadata, winner):
-        if not isinstance(source, dict):
-            continue
-        for key in (
-            "state",
-            "state_name",
-            "states_mentioned",
-            "town",
-            "city",
-            "cities_mentioned",
-            "restaurant",
-            "restaurant_name",
-            "restaurants_mentioned",
-            "crawl_context",
-            "crawl_name",
-            "crawl_title",
-        ):
-            value = source.get(key)
-            if value:
-                context[key] = value
-    return context
+def _compose_publish_caption(caption: str, hashtags: list[str]) -> str:
+    return compose_caption_with_hashtags(caption, hashtags)
 
 
 def _number_or_none(value: Any) -> float | None:
@@ -293,46 +267,36 @@ def load_approved_post_from_artifacts(
     if media_kind == "reel" and not public_video_url:
         raise ValueError("Approved Reel is missing public_video_url")
 
-    caption_body = re.sub(r"(?:\s*#\w+)+\s*$", "", caption).strip()
-    caption_plan = finalize_caption_overlay_pair(
-        seed=f"{run_id}:{candidate_id}:{content_type}",
-        caption_style=_string_or_none(winner.get("selected_caption_style")) or _string_or_none(winner.get("caption_style")),
-        raw_caption=caption_body,
-        raw_overlay=_string_or_none(winner.get("overlay_text")),
-        allow_openai_caption=False,
-    )
-    hashtag_context = _hashtag_context(content_decision, winner)
-    hashtag_repair = repair_hashtag_list(hashtags, expected_count=5, caption=caption, context=hashtag_context)
-    hashtags = hashtag_repair.hashtags
-    caption = compose_caption_with_hashtags(caption_plan["caption"], hashtags, context=hashtag_context)
-    overlay_text = caption_plan["overlay_text"]
+    overlay_text = _string_or_none(winner.get("overlay_text"))
     caption_validation = validate_caption(caption, require_hashtags=True)
-    overlay_plan = caption_plan
-    caption_source = caption_plan["caption_source"]
-    fallback_used = caption_plan["fallback_used"]
-    post_pair_validation = validate_post_pair(caption, overlay_text)
+    overlay_validation = validate_overlay_text(overlay_text) if overlay_text else {"passed": True, "reasons": [], "issues": []}
+    post_pair_validation = (
+        validate_post_pair(caption, overlay_text)
+        if overlay_text
+        else {
+            "passed": True,
+            "reasons": [],
+            "caption_overlay_concept": None,
+            "overlay_validation": overlay_validation,
+        }
+    )
     validation_failure_reason = None if caption_validation["passed"] else ", ".join(caption_validation["reasons"])
 
     metadata = dict(content_decision.get("metadata") or {}) if isinstance(content_decision.get("metadata"), dict) else {}
     metadata.update(
         {
-            "hashtag_repair_applied": hashtag_repair.changed,
-            "hashtag_repair_original_count": hashtag_repair.original_count,
-            "hashtag_repair_repaired_count": hashtag_repair.repaired_count,
-            "hashtag_repair_added_hashtags": hashtag_repair.added_hashtags,
-            "hashtag_repair_removed_hashtags": hashtag_repair.removed_hashtags,
             "final_hashtags": hashtags,
-            "caption_source": caption_source,
+            "caption_source": winner.get("caption_source") or decision_summary.get("caption_source") or winner.get("copy_source"),
             "caption_validation_passed": caption_validation["passed"],
             "caption_validation_failure_reason": validation_failure_reason,
-            "caption_fallback_used": fallback_used,
-            "overlay_source": overlay_plan["overlay_source"],
-            "overlay_validation_passed": overlay_plan["overlay_validation"]["passed"],
-            "overlay_validation_failure_reason": overlay_plan["validation_failure_reason"],
-            "overlay_fallback_used": overlay_plan["fallback_used"],
+            "caption_fallback_used": bool(winner.get("fallback_used")),
+            "overlay_source": winner.get("overlay_source"),
+            "overlay_validation_passed": overlay_validation["passed"],
+            "overlay_validation_failure_reason": None if overlay_validation["passed"] else ", ".join(overlay_validation["reasons"]),
+            "overlay_fallback_used": bool(winner.get("fallback_used")),
             "post_pair_validation_passed": post_pair_validation["passed"],
             "post_pair_validation_failure_reason": None if post_pair_validation["passed"] else ", ".join(post_pair_validation["reasons"]),
-            "caption_overlay_concept": caption_plan["caption_overlay_concept"],
+            "caption_overlay_concept": post_pair_validation["caption_overlay_concept"],
             "selected_caption": _caption_body(caption),
             "selected_overlay": overlay_text,
             "caption_text": caption,
@@ -351,18 +315,6 @@ def load_approved_post_from_artifacts(
             "reuse_blocked_reason": winner.get("reuse_blocked_reason") or decision_summary.get("reuse_blocked_reason"),
         }
     )
-    if hashtag_repair.changed:
-        log_event(
-            logger,
-            "publish_hashtags_repaired",
-            run_id=run_id,
-            candidate_id=candidate_id,
-            original_count=hashtag_repair.original_count,
-            repaired_count=hashtag_repair.repaired_count,
-            added_hashtags=hashtag_repair.added_hashtags,
-            removed_hashtags=hashtag_repair.removed_hashtags,
-            final_hashtags=hashtags,
-        )
 
     return ApprovedInstagramPost(
         run_id=run_id,

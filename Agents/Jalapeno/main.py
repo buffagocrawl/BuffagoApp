@@ -26,7 +26,9 @@ from config import (
     validate_phase1_environment,
     warn_missing_future_secrets,
 )
+from content_engine.caption_generator import AICopyRequiredError, generate_caption_package
 from content_engine.content_engine import run_content_decision_engine
+from content_memory import load_recent_published_posts
 from caption_rules import generate_caption_samples
 from data_snapshot import generate_latest_snapshot
 from external_context import generate_external_context
@@ -49,8 +51,9 @@ from performance_context import build_performance_context
 from reporting import generate_admin_report
 from supabase_client import SupabaseClient, SupabaseError
 from video_assets import VideoAssetError, VideoAssetRepository
+from instagram_publishing.publish_report import create_publish_report, send_publish_notification
 from video_overlay import apply_overlay_result_to_decision, create_text_overlay_video
-from video_reel_flow import build_reel_content, content_decision_from_reel
+from video_reel_flow import build_reel_plan, content_decision_from_reel
 from instagram_publishing.instagram_publishing import run_instagram_publishing_live_environment as run_instagram_publishing
 from validation import (
     validate_content_engine_environment,
@@ -341,6 +344,46 @@ def _overlay_metadata(result) -> dict[str, object]:
         "video_url": result.publish_video_url,
         "storage_path": result.publish_storage_path,
     }
+
+
+def _send_generation_failure_notification(
+    config,
+    *,
+    run_id: str,
+    candidate_id: str,
+    scheduled_post_type: str,
+    content_type: str,
+    failure_reason: str,
+    logger,
+    metadata: dict[str, object] | None = None,
+) -> None:
+    report = create_publish_report(
+        run_id=run_id,
+        scheduled_post_type=scheduled_post_type,
+        candidate_id=candidate_id,
+        content_type=content_type,
+        caption="",
+        hashtags=[],
+        image_url=None,
+        container_id=None,
+        published_media_id=None,
+        permalink=None,
+        status="generation_failed",
+        quality_score=0,
+        retry_count=int((metadata or {}).get("openai_retry_count") or 0),
+        failure_reason=failure_reason,
+        duration_ms=0,
+        cost_estimate=(metadata or {}).get("estimated_cost_usd") if isinstance((metadata or {}).get("estimated_cost_usd"), (int, float)) else None,
+        metadata=metadata or {},
+    )
+    send_publish_notification(
+        report=report,
+        logger=logger,
+        notifications_enabled=config.notifications.enabled,
+        console_enabled=config.notifications.channels.console,
+        email_enabled=config.notifications.channels.email,
+        webhook_enabled=config.notifications.channels.webhook,
+    )
 
 
 def run_validate(*, refresh_external_context: bool = False, skip_ai: bool = False) -> int:
@@ -1172,30 +1215,41 @@ def run_dry_run() -> int:
                     metadata={"mode": "dry-run", "post_type": post_type, "scheduled_post_type": scheduled_post_type, **github_metadata},
                 )
                 repository = VideoAssetRepository(client, config, logger=logger)
-                content = build_reel_content(repository, dry_run=True, logger=logger)
-                content_decision = content_decision_from_reel(str(run_uuid), content)
+                reel_plan = build_reel_plan(repository, dry_run=True, logger=logger)
+                recent_posts = load_recent_published_posts(client, limit=100)
+                caption_package = generate_caption_package(
+                    reel_plan.candidate,
+                    snapshot={},
+                    external_context={},
+                    performance_context={},
+                    recent_posts=recent_posts,
+                    logger=logger,
+                    require_ai_copy=False,
+                )
+                content_decision = content_decision_from_reel(str(run_uuid), reel_plan, caption_package)
                 log_event(
                     logger,
                     "video_reel_caption_prepared",
                     run_id=str(run_uuid),
-                    candidate_id=content.candidate_id,
-                    caption_validation_passed=True,
-                    caption_repaired=len(content.hashtags) != content.original_hashtag_count,
-                    caption_hashtag_count=len(content.hashtags),
-                    caption_hashtags=content.hashtags,
-                    original_hashtag_count=content.original_hashtag_count,
-                    final_hashtag_count=len(content.hashtags),
+                    candidate_id=reel_plan.candidate_id,
+                    caption_validation_passed=caption_package.validation_passed,
+                    caption_repaired=caption_package.repair_applied,
+                    caption_hashtag_count=len(caption_package.hashtags),
+                    caption_hashtags=caption_package.hashtags,
+                    original_hashtag_count=len(caption_package.hashtags),
+                    final_hashtag_count=len(caption_package.hashtags),
+                    copy_source=caption_package.copy_source,
                 )
                 overlay_result = create_text_overlay_video(
                     client,
-                    content.video_asset,
-                    content.caption,
-                    caption_body=content.caption_body,
-                    caption_repaired=len(content.hashtags) != content.original_hashtag_count,
-                    caption_hashtags=content.hashtags,
-                    original_hashtag_count=content.original_hashtag_count,
+                    reel_plan.video_asset,
+                    caption_package.caption,
+                    caption_body=caption_package.body,
+                    caption_repaired=caption_package.repair_applied,
+                    caption_hashtags=caption_package.hashtags,
+                    original_hashtag_count=len(caption_package.hashtags),
                     run_id=str(run_uuid),
-                    candidate_id=content.candidate_id,
+                    candidate_id=reel_plan.candidate_id,
                     logger=logger,
                 )
                 apply_overlay_result_to_decision(content_decision, overlay_result)
@@ -1210,15 +1264,15 @@ def run_dry_run() -> int:
                 dry_run_post = insert_final_post(
                     client,
                     run_id=run_uuid,
-                    candidate_id=UUID(content.candidate_id),
+                    candidate_id=UUID(reel_plan.candidate_id),
                     post_type=scheduled_post_type,
                     chosen_idea="Daily wing Reel dry run",
-                    generated_caption=content.caption,
-                    hashtags=content.hashtags,
+                    generated_caption=caption_package.caption,
+                    hashtags=caption_package.hashtags,
                     image_prompt="Preloaded Supabase Storage wing video asset; no AI image or video generated.",
-                    image_url=content.video_asset.public_url,
+                    image_url=reel_plan.video_asset.public_url,
                     media_source="supabase_video_asset",
-                    video_asset_id=UUID(content.video_asset.id),
+                    video_asset_id=UUID(reel_plan.video_asset.id),
                     storage_path=str(overlay_fields["storage_path"]),
                     video_url=str(overlay_fields["video_url"]),
                     original_video_url=str(overlay_fields["original_video_url"]),
@@ -1228,26 +1282,37 @@ def run_dry_run() -> int:
                     overlay_text=str(overlay_fields["overlay_text"]),
                     overlay_status=str(overlay_fields["overlay_status"]),
                     overlay_error=overlay_fields["overlay_error"] if isinstance(overlay_fields["overlay_error"], str) else None,
-                    selected_caption=content.caption_body,
+                    selected_caption=caption_package.body,
                     selected_overlay=str(overlay_fields["overlay_text"]),
-                    caption_text=content.caption,
-                    copy_source="template",
-                    generated_at=datetime.now(timezone.utc).isoformat(),
+                    caption_text=caption_package.caption,
+                    copy_source=caption_package.copy_source,
+                    generated_at=caption_package.generated_at,
+                    openai_used=caption_package.openai_used,
+                    openai_model=caption_package.openai_model,
+                    fallback_reason=caption_package.fallback_reason,
                     publish_status="dry_run",
                     metadata={
                         "dry_run": True,
                         "content_type": scheduled_post_type,
-                        "creative_style": content.video_asset.style or "realistic_food",
+                        "creative_style": reel_plan.video_asset.style or "realistic_food",
                         "hook_text": str(overlay_fields["overlay_text"]),
-                        "caption_style": content.caption_type,
+                        "caption_style": caption_package.caption_type,
                         "prompt_template_name": "daily_wing_reel",
                         "generated_prompt": "Preloaded Supabase Storage wing video asset; no AI image generation.",
                         "media_source": "supabase_video_asset",
-                        "video_asset_id": content.video_asset.id,
+                        "video_asset_id": reel_plan.video_asset.id,
                         "storage_path": overlay_fields["storage_path"],
                         "asset_path": overlay_fields["storage_path"],
-                        "caption_type": content.caption_type,
-                        "style": content.video_asset.style,
+                        "caption_type": caption_package.caption_type,
+                        "style": reel_plan.video_asset.style,
+                        "copy_source": caption_package.copy_source,
+                        "openai_model": caption_package.openai_model,
+                        "openai_request_id": caption_package.openai_request_id,
+                        "openai_attempt_count": caption_package.openai_attempt_count,
+                        "openai_retry_count": caption_package.openai_retry_count,
+                        "token_usage": caption_package.token_usage,
+                        "estimated_cost_usd": caption_package.estimated_cost_usd,
+                        "repair_applied": caption_package.repair_applied,
                         "no_publish": True,
                         **overlay_fields,
                     },
@@ -1257,15 +1322,15 @@ def run_dry_run() -> int:
                     logger,
                     "dry_run_video_reel_selected",
                     run_id=str(run_uuid),
-                    candidate_id=content.candidate_id,
-                    video_asset_id=content.video_asset.id,
+                    candidate_id=reel_plan.candidate_id,
+                    video_asset_id=reel_plan.video_asset.id,
                     storage_path=overlay_fields["storage_path"],
                     video_url=overlay_fields["video_url"],
                     original_storage_path=overlay_fields["original_storage_path"],
                     processed_storage_path=overlay_fields["processed_storage_path"],
                     overlay_text=overlay_fields["overlay_text"],
                     overlay_status=overlay_fields["overlay_status"],
-                    caption_preview=content.caption[:140],
+                    caption_preview=caption_package.caption[:140],
                     publish_skipped=True,
                 )
             except Exception as exc:
@@ -1574,30 +1639,142 @@ def run_production(content_type: str | None = None) -> int:
                     run_source=run_source,
                 )
             repository = VideoAssetRepository(client, config, logger=logger)
-            content = build_reel_content(repository, dry_run=runtime_settings.dry_run, logger=logger)
-            content_decision = content_decision_from_reel(run_id, content)
+            reel_plan = build_reel_plan(repository, dry_run=runtime_settings.dry_run, logger=logger)
+            recent_posts = load_recent_published_posts(client, limit=100)
+            try:
+                caption_package = generate_caption_package(
+                    reel_plan.candidate,
+                    snapshot={},
+                    external_context={},
+                    performance_context={},
+                    recent_posts=recent_posts,
+                    logger=logger,
+                    require_ai_copy=True,
+                )
+            except AICopyRequiredError as exc:
+                insert_error_row(
+                    client,
+                    run_id=UUID(run_id),
+                    candidate_id=UUID(reel_plan.candidate_id),
+                    stage="video_reel_copy_generation",
+                    error_type=type(exc).__name__,
+                    message=str(exc),
+                    raw_payload={
+                        "failure_category": exc.failure_category,
+                        "openai_model": exc.openai_model,
+                        "attempt_count": exc.attempt_count,
+                        "video_asset_id": reel_plan.video_asset.id,
+                        "storage_path": reel_plan.video_asset.storage_path,
+                    },
+                    is_retryable=False,
+                    retry_count=max(exc.attempt_count - 1, 0),
+                )
+                generation_failed_post = insert_final_post(
+                    client,
+                    run_id=run_uuid,
+                    candidate_id=UUID(reel_plan.candidate_id),
+                    post_type=scheduled_post_type,
+                    chosen_idea="Daily wing Reel",
+                    image_prompt="Preloaded Supabase Storage wing video asset; no AI image or video generated.",
+                    image_url=reel_plan.video_asset.public_url,
+                    media_source="supabase_video_asset",
+                    video_asset_id=UUID(reel_plan.video_asset.id),
+                    publish_status="generation_failed",
+                    copy_source="none",
+                    openai_used=False,
+                    openai_model=exc.openai_model,
+                    fallback_reason=str(exc),
+                    metadata={
+                        "failure_category": exc.failure_category,
+                        "publish_blocked": True,
+                        "openai_attempt_count": exc.attempt_count,
+                        "openai_retry_count": max(exc.attempt_count - 1, 0),
+                        "video_asset_id": reel_plan.video_asset.id,
+                        "storage_path": reel_plan.video_asset.storage_path,
+                        **github_metadata,
+                    },
+                )
+                _send_generation_failure_notification(
+                    config,
+                    run_id=run_id,
+                    candidate_id=reel_plan.candidate_id,
+                    scheduled_post_type=scheduled_post_type,
+                    content_type="daily_wing_reel",
+                    failure_reason=str(exc),
+                    logger=logger,
+                    metadata={
+                        "workflow_run_id": github_metadata.get("github_run_id"),
+                        "post_type": scheduled_post_type,
+                        "selected_video_asset": reel_plan.video_asset.storage_path,
+                        "video_asset_id": reel_plan.video_asset.id,
+                        "openai_model": exc.openai_model,
+                        "openai_attempt_count": exc.attempt_count,
+                        "openai_retry_count": max(exc.attempt_count - 1, 0),
+                        "failure_category": exc.failure_category,
+                        "publish_blocked": True,
+                        **github_metadata,
+                    },
+                )
+                mark_message = f"OpenAI copy generation failed for Reel: {exc}"
+                fail_run(
+                    client,
+                    run_id=UUID(run_id),
+                    message=mark_message,
+                    duration_ms=int((time.perf_counter() - started_at) * 1000),
+                    metadata={
+                        "mode": "production",
+                        "post_type": post_type,
+                        "scheduled_post_type": scheduled_post_type,
+                        "publish_blocked": True,
+                        "failure_category": exc.failure_category,
+                        "openai_model": exc.openai_model,
+                        "openai_attempt_count": exc.attempt_count,
+                        "post_id": generation_failed_post.get("id"),
+                        **github_metadata,
+                    },
+                )
+                log_event(
+                    logger,
+                    "production_publish_blocked_ai_failure",
+                    level="error",
+                    run_id=run_id,
+                    candidate_id=reel_plan.candidate_id,
+                    post_id=generation_failed_post.get("id"),
+                    copy_source="none",
+                    fallback_used=False,
+                    openai_attempt_count=exc.attempt_count,
+                    openai_model=exc.openai_model,
+                    failure_category=exc.failure_category,
+                    publish_blocked=True,
+                    selected_video_asset=reel_plan.video_asset.storage_path,
+                    error=str(exc),
+                )
+                raise
+            content_decision = content_decision_from_reel(run_id, reel_plan, caption_package)
             log_event(
                 logger,
                 "video_reel_caption_prepared",
                 run_id=run_id,
-                candidate_id=content.candidate_id,
-                caption_validation_passed=True,
-                caption_repaired=len(content.hashtags) != content.original_hashtag_count,
-                caption_hashtag_count=len(content.hashtags),
-                caption_hashtags=content.hashtags,
-                original_hashtag_count=content.original_hashtag_count,
-                final_hashtag_count=len(content.hashtags),
+                candidate_id=reel_plan.candidate_id,
+                caption_validation_passed=caption_package.validation_passed,
+                caption_repaired=caption_package.repair_applied,
+                caption_hashtag_count=len(caption_package.hashtags),
+                caption_hashtags=caption_package.hashtags,
+                original_hashtag_count=len(caption_package.hashtags),
+                final_hashtag_count=len(caption_package.hashtags),
+                copy_source=caption_package.copy_source,
+                openai_model=caption_package.openai_model,
             )
             overlay_result = create_text_overlay_video(
                 client,
-                content.video_asset,
-                content.caption,
-                caption_body=content.caption_body,
-                caption_repaired=len(content.hashtags) != content.original_hashtag_count,
-                caption_hashtags=content.hashtags,
-                original_hashtag_count=content.original_hashtag_count,
+                reel_plan.video_asset,
+                caption_package.caption,
+                caption_body=caption_package.body,
+                caption_repaired=caption_package.repair_applied,
+                caption_hashtags=caption_package.hashtags,
+                original_hashtag_count=len(caption_package.hashtags),
                 run_id=run_id,
-                candidate_id=content.candidate_id,
+                candidate_id=reel_plan.candidate_id,
                 logger=logger,
             )
             apply_overlay_result_to_decision(content_decision, overlay_result)
@@ -1612,15 +1789,15 @@ def run_production(content_type: str | None = None) -> int:
             inserted_post = insert_final_post(
                 client,
                 run_id=run_uuid,
-                candidate_id=UUID(content.candidate_id),
+                candidate_id=UUID(reel_plan.candidate_id),
                 post_type=scheduled_post_type,
                 chosen_idea="Daily wing Reel",
-                generated_caption=content.caption,
-                hashtags=content.hashtags,
+                generated_caption=caption_package.caption,
+                hashtags=caption_package.hashtags,
                 image_prompt="Preloaded Supabase Storage wing video asset; no AI image or video generated.",
-                image_url=content.video_asset.public_url,
+                image_url=reel_plan.video_asset.public_url,
                 media_source="supabase_video_asset",
-                video_asset_id=UUID(content.video_asset.id),
+                video_asset_id=UUID(reel_plan.video_asset.id),
                 storage_path=str(overlay_fields["storage_path"]),
                 video_url=str(overlay_fields["video_url"]),
                 original_video_url=str(overlay_fields["original_video_url"]),
@@ -1630,28 +1807,39 @@ def run_production(content_type: str | None = None) -> int:
                 overlay_text=str(overlay_fields["overlay_text"]),
                 overlay_status=str(overlay_fields["overlay_status"]),
                 overlay_error=overlay_fields["overlay_error"] if isinstance(overlay_fields["overlay_error"], str) else None,
-                selected_caption=content.caption_body,
+                selected_caption=caption_package.body,
                 selected_overlay=str(overlay_fields["overlay_text"]),
-                caption_text=content.caption,
-                copy_source="template",
-                generated_at=datetime.now(timezone.utc).isoformat(),
+                caption_text=caption_package.caption,
+                copy_source=caption_package.copy_source,
+                generated_at=caption_package.generated_at,
+                openai_used=caption_package.openai_used,
+                openai_model=caption_package.openai_model,
+                fallback_reason=caption_package.fallback_reason,
                 publish_status="drafted" if runtime_settings.dry_run else "publishing",
                 metadata={
                     "content_type": scheduled_post_type,
-                    "creative_style": content.video_asset.style or "realistic_food",
+                    "creative_style": reel_plan.video_asset.style or "realistic_food",
                     "hook_text": str(overlay_fields["overlay_text"]),
-                    "caption_style": content.caption_type,
+                    "caption_style": caption_package.caption_type,
                     "prompt_template_name": "daily_wing_reel",
                     "generated_prompt": "Preloaded Supabase Storage wing video asset; no AI image generation.",
                     "media_source": "supabase_video_asset",
-                    "video_asset_id": content.video_asset.id,
-                    "storage_bucket": content.video_asset.storage_bucket,
+                    "video_asset_id": reel_plan.video_asset.id,
+                    "storage_bucket": reel_plan.video_asset.storage_bucket,
                     "storage_path": overlay_fields["storage_path"],
                     "asset_path": overlay_fields["storage_path"],
-                    "caption_type": content.caption_type,
-                    "style": content.video_asset.style,
+                    "caption_type": caption_package.caption_type,
+                    "style": reel_plan.video_asset.style,
                     "post_type": scheduled_post_type,
                     "no_ai_media_generation": True,
+                    "copy_source": caption_package.copy_source,
+                    "openai_request_id": caption_package.openai_request_id,
+                    "openai_attempt_count": caption_package.openai_attempt_count,
+                    "openai_retry_count": caption_package.openai_retry_count,
+                    "openai_latency_ms": caption_package.openai_latency_ms,
+                    "token_usage": caption_package.token_usage,
+                    "estimated_cost_usd": caption_package.estimated_cost_usd,
+                    "repair_applied": caption_package.repair_applied,
                     **overlay_fields,
                 },
             )
@@ -1659,22 +1847,32 @@ def run_production(content_type: str | None = None) -> int:
             content_decision["post_id"] = inserted_post.get("id")
             content_decision["metadata"] = {
                 "media_source": "supabase_video_asset",
-                "video_asset_id": content.video_asset.id,
+                "video_asset_id": reel_plan.video_asset.id,
+                "copy_source": caption_package.copy_source,
+                "openai_model": caption_package.openai_model,
+                "openai_request_id": caption_package.openai_request_id,
+                "openai_attempt_count": caption_package.openai_attempt_count,
+                "openai_retry_count": caption_package.openai_retry_count,
+                "token_usage": caption_package.token_usage,
+                "estimated_cost_usd": caption_package.estimated_cost_usd,
+                "repair_applied": caption_package.repair_applied,
                 **overlay_fields,
             }
             log_event(
                 logger,
                 "video_reel_publish_started",
                 run_id=run_id,
-                candidate_id=content.candidate_id,
+                candidate_id=reel_plan.candidate_id,
                 post_id=inserted_post.get("id"),
-                video_asset_id=content.video_asset.id,
+                video_asset_id=reel_plan.video_asset.id,
                 storage_path=overlay_fields["storage_path"],
                 video_url=overlay_fields["video_url"],
                 original_storage_path=overlay_fields["original_storage_path"],
                 processed_storage_path=overlay_fields["processed_storage_path"],
                 overlay_text=overlay_fields["overlay_text"],
                 overlay_status=overlay_fields["overlay_status"],
+                copy_source=caption_package.copy_source,
+                openai_model=caption_package.openai_model,
                 dry_run=runtime_settings.dry_run,
                 posting_allowed=runtime_settings.posting_allowed,
                 meta_api_allowed=runtime_settings.meta_api_allowed,
@@ -1684,7 +1882,7 @@ def run_production(content_type: str | None = None) -> int:
                     logger,
                     "video_publish_request_dry_run",
                     run_id=run_id,
-                    candidate_id=content.candidate_id,
+                    candidate_id=reel_plan.candidate_id,
                     post_id=inserted_post.get("id"),
                     dry_run=runtime_settings.dry_run,
                     posting_allowed=runtime_settings.posting_allowed,
@@ -1703,29 +1901,29 @@ def run_production(content_type: str | None = None) -> int:
             except Exception as first_exc:
                 if not _is_backup_worthy_video_publish_failure(first_exc):
                     log_event(
-                        logger,
-                        "video_reel_backup_skipped",
-                        level="warning",
-                        run_id=run_id,
-                        candidate_id=content.candidate_id,
-                        video_asset_id=content.video_asset.id,
-                        storage_path=content.video_asset.storage_path,
-                        reason="config_or_state_failure",
-                        error=str(first_exc),
-                    )
-                    raise
+                    logger,
+                    "video_reel_backup_skipped",
+                    level="warning",
+                    run_id=run_id,
+                    candidate_id=reel_plan.candidate_id,
+                    video_asset_id=reel_plan.video_asset.id,
+                    storage_path=reel_plan.video_asset.storage_path,
+                    reason="config_or_state_failure",
+                    error=str(first_exc),
+                )
+                raise
                 insert_error_row(
                     client,
                     run_id=UUID(run_id),
                     post_id=UUID(str(inserted_post["id"])) if inserted_post.get("id") else None,
-                    candidate_id=UUID(content.candidate_id),
+                    candidate_id=UUID(reel_plan.candidate_id),
                     stage="video_reel_publish",
                     error_type=type(first_exc).__name__,
                     message=str(first_exc),
                     raw_payload={
                         "reason": "primary_video_asset_failed",
-                        "video_asset_id": content.video_asset.id,
-                        "storage_path": content.video_asset.storage_path,
+                        "video_asset_id": reel_plan.video_asset.id,
+                        "storage_path": reel_plan.video_asset.storage_path,
                     },
                     is_retryable=True,
                     retry_count=0,
@@ -1735,40 +1933,50 @@ def run_production(content_type: str | None = None) -> int:
                     "video_reel_primary_asset_failed_trying_backup",
                     level="warning",
                     run_id=run_id,
-                    candidate_id=content.candidate_id,
-                    video_asset_id=content.video_asset.id,
-                    storage_path=content.video_asset.storage_path,
+                    candidate_id=reel_plan.candidate_id,
+                    video_asset_id=reel_plan.video_asset.id,
+                    storage_path=reel_plan.video_asset.storage_path,
                     error=str(first_exc),
                 )
-                backup_content = build_reel_content(
+                backup_plan = build_reel_plan(
                     repository,
-                    excluded_ids={content.video_asset.id},
+                    excluded_ids={reel_plan.video_asset.id},
                     dry_run=runtime_settings.dry_run,
                     logger=logger,
                 )
-                backup_decision = content_decision_from_reel(run_id, backup_content)
+                backup_caption_package = generate_caption_package(
+                    backup_plan.candidate,
+                    snapshot={},
+                    external_context={},
+                    performance_context={},
+                    recent_posts=recent_posts,
+                    logger=logger,
+                    require_ai_copy=True,
+                )
+                backup_decision = content_decision_from_reel(run_id, backup_plan, backup_caption_package)
                 log_event(
                     logger,
                     "video_reel_caption_prepared",
                     run_id=run_id,
-                    candidate_id=backup_content.candidate_id,
-                    caption_validation_passed=True,
-                    caption_repaired=len(backup_content.hashtags) != backup_content.original_hashtag_count,
-                    caption_hashtag_count=len(backup_content.hashtags),
-                    caption_hashtags=backup_content.hashtags,
-                    original_hashtag_count=backup_content.original_hashtag_count,
-                    final_hashtag_count=len(backup_content.hashtags),
+                    candidate_id=backup_plan.candidate_id,
+                    caption_validation_passed=backup_caption_package.validation_passed,
+                    caption_repaired=backup_caption_package.repair_applied,
+                    caption_hashtag_count=len(backup_caption_package.hashtags),
+                    caption_hashtags=backup_caption_package.hashtags,
+                    original_hashtag_count=len(backup_caption_package.hashtags),
+                    final_hashtag_count=len(backup_caption_package.hashtags),
+                    copy_source=backup_caption_package.copy_source,
                 )
                 backup_overlay_result = create_text_overlay_video(
                     client,
-                    backup_content.video_asset,
-                    backup_content.caption,
-                    caption_body=backup_content.caption_body,
-                    caption_repaired=len(backup_content.hashtags) != backup_content.original_hashtag_count,
-                    caption_hashtags=backup_content.hashtags,
-                    original_hashtag_count=backup_content.original_hashtag_count,
+                    backup_plan.video_asset,
+                    backup_caption_package.caption,
+                    caption_body=backup_caption_package.body,
+                    caption_repaired=backup_caption_package.repair_applied,
+                    caption_hashtags=backup_caption_package.hashtags,
+                    original_hashtag_count=len(backup_caption_package.hashtags),
                     run_id=run_id,
-                    candidate_id=backup_content.candidate_id,
+                    candidate_id=backup_plan.candidate_id,
                     logger=logger,
                 )
                 apply_overlay_result_to_decision(backup_decision, backup_overlay_result)
@@ -1783,15 +1991,15 @@ def run_production(content_type: str | None = None) -> int:
                 backup_post = insert_final_post(
                     client,
                     run_id=run_uuid,
-                    candidate_id=UUID(backup_content.candidate_id),
+                    candidate_id=UUID(backup_plan.candidate_id),
                     post_type=scheduled_post_type,
                     chosen_idea="Daily wing Reel backup",
-                    generated_caption=backup_content.caption,
-                    hashtags=backup_content.hashtags,
+                    generated_caption=backup_caption_package.caption,
+                    hashtags=backup_caption_package.hashtags,
                     image_prompt="Preloaded Supabase Storage wing video asset backup; no AI image or video generated.",
-                    image_url=backup_content.video_asset.public_url,
+                    image_url=backup_plan.video_asset.public_url,
                     media_source="supabase_video_asset",
-                    video_asset_id=UUID(backup_content.video_asset.id),
+                    video_asset_id=UUID(backup_plan.video_asset.id),
                     storage_path=str(backup_overlay_fields["storage_path"]),
                     video_url=str(backup_overlay_fields["video_url"]),
                     original_video_url=str(backup_overlay_fields["original_video_url"]),
@@ -1801,27 +2009,37 @@ def run_production(content_type: str | None = None) -> int:
                     overlay_text=str(backup_overlay_fields["overlay_text"]),
                     overlay_status=str(backup_overlay_fields["overlay_status"]),
                     overlay_error=backup_overlay_fields["overlay_error"] if isinstance(backup_overlay_fields["overlay_error"], str) else None,
-                    selected_caption=backup_content.caption_body,
+                    selected_caption=backup_caption_package.body,
                     selected_overlay=str(backup_overlay_fields["overlay_text"]),
-                    caption_text=backup_content.caption,
-                    copy_source="template",
-                    generated_at=datetime.now(timezone.utc).isoformat(),
+                    caption_text=backup_caption_package.caption,
+                    copy_source=backup_caption_package.copy_source,
+                    generated_at=backup_caption_package.generated_at,
+                    openai_used=backup_caption_package.openai_used,
+                    openai_model=backup_caption_package.openai_model,
+                    fallback_reason=backup_caption_package.fallback_reason,
                     publish_status="drafted" if runtime_settings.dry_run else "publishing",
                     metadata={
                         "content_type": scheduled_post_type,
-                        "creative_style": backup_content.video_asset.style or "realistic_food",
+                        "creative_style": backup_plan.video_asset.style or "realistic_food",
                         "hook_text": str(backup_overlay_fields["overlay_text"]),
-                        "caption_style": backup_content.caption_type,
+                        "caption_style": backup_caption_package.caption_type,
                         "prompt_template_name": "daily_wing_reel",
                         "generated_prompt": "Preloaded Supabase Storage wing video asset backup; no AI image generation.",
                         "media_source": "supabase_video_asset",
-                        "video_asset_id": backup_content.video_asset.id,
-                        "storage_bucket": backup_content.video_asset.storage_bucket,
+                        "video_asset_id": backup_plan.video_asset.id,
+                        "storage_bucket": backup_plan.video_asset.storage_bucket,
                         "storage_path": backup_overlay_fields["storage_path"],
                         "asset_path": backup_overlay_fields["storage_path"],
-                        "caption_type": backup_content.caption_type,
-                        "style": backup_content.video_asset.style,
-                        "backup_for_video_asset_id": content.video_asset.id,
+                        "caption_type": backup_caption_package.caption_type,
+                        "style": backup_plan.video_asset.style,
+                        "backup_for_video_asset_id": reel_plan.video_asset.id,
+                        "copy_source": backup_caption_package.copy_source,
+                        "openai_request_id": backup_caption_package.openai_request_id,
+                        "openai_attempt_count": backup_caption_package.openai_attempt_count,
+                        "openai_retry_count": backup_caption_package.openai_retry_count,
+                        "token_usage": backup_caption_package.token_usage,
+                        "estimated_cost_usd": backup_caption_package.estimated_cost_usd,
+                        "repair_applied": backup_caption_package.repair_applied,
                         "no_ai_media_generation": True,
                         **backup_overlay_fields,
                     },
@@ -1830,7 +2048,7 @@ def run_production(content_type: str | None = None) -> int:
                 backup_decision["post_id"] = backup_post.get("id")
                 backup_decision["metadata"] = {
                     "media_source": "supabase_video_asset",
-                    "video_asset_id": backup_content.video_asset.id,
+                    "video_asset_id": backup_plan.video_asset.id,
                     **backup_overlay_fields,
                 }
                 publish_result = run_instagram_publishing(
@@ -1841,10 +2059,11 @@ def run_production(content_type: str | None = None) -> int:
                     client=client,
                     runtime_settings=runtime_settings,
                 )
-                content = backup_content
+                reel_plan = backup_plan
+                caption_package = backup_caption_package
                 overlay_fields = backup_overlay_fields
             if publish_result.result.get("status") in {"published", "published_with_permalink_pending"}:
-                repository.increment_used(content.video_asset)
+                repository.increment_used(reel_plan.video_asset)
             duration_ms = int((time.perf_counter() - started_at) * 1000)
             complete_run(
                 client,
@@ -1858,8 +2077,12 @@ def run_production(content_type: str | None = None) -> int:
                     "dry_run": runtime_settings.dry_run,
                     "run_source": run_source,
                     "publish_status": publish_result.result.get("status"),
+                    "copy_source": caption_package.copy_source,
+                    "fallback_used": False,
+                    "openai_attempt_count": caption_package.openai_attempt_count,
+                    "openai_model": caption_package.openai_model,
                     "media_source": "supabase_video_asset",
-                    "video_asset_id": content.video_asset.id,
+                    "video_asset_id": reel_plan.video_asset.id,
                     "storage_path": overlay_fields["storage_path"],
                     "original_storage_path": overlay_fields["original_storage_path"],
                     "processed_storage_path": overlay_fields["processed_storage_path"],
@@ -1882,8 +2105,12 @@ def run_production(content_type: str | None = None) -> int:
                 run_source=run_source,
                 success=True,
                 duration_ms=duration_ms,
+                copy_source=caption_package.copy_source,
+                fallback_used=False,
+                openai_attempt_count=caption_package.openai_attempt_count,
+                openai_model=caption_package.openai_model,
                 media_source="supabase_video_asset",
-                video_asset_id=content.video_asset.id,
+                video_asset_id=reel_plan.video_asset.id,
                 storage_path=overlay_fields["storage_path"],
                 original_storage_path=overlay_fields["original_storage_path"],
                 processed_storage_path=overlay_fields["processed_storage_path"],
@@ -1892,7 +2119,7 @@ def run_production(content_type: str | None = None) -> int:
             )
             print(f"Publish report written: {publish_result.report_path}")
             print(f"Publish status: {publish_result.result['status']}")
-            print(f"Video asset: {content.video_asset.storage_path}")
+            print(f"Video asset: {reel_plan.video_asset.storage_path}")
             print("Production Reel publish succeeded")
             return 0
 
@@ -1985,6 +2212,62 @@ def run_production(content_type: str | None = None) -> int:
         return 0
     except Exception as exc:
         duration_ms = int((time.perf_counter() - started_at) * 1000)
+        if isinstance(exc, AICopyRequiredError) and not _is_video_post(scheduled_post_type):
+            candidate_id = exc.candidate_id or str(uuid4())
+            failed_post = insert_final_post(
+                client,
+                run_id=UUID(run_id),
+                candidate_id=UUID(candidate_id) if exc.candidate_id else None,
+                post_type=scheduled_post_type,
+                chosen_idea="AI copy generation failed",
+                publish_status="generation_failed",
+                copy_source="none",
+                openai_used=False,
+                openai_model=exc.openai_model,
+                fallback_reason=str(exc),
+                metadata={
+                    "failure_category": exc.failure_category,
+                    "publish_blocked": True,
+                    "openai_attempt_count": exc.attempt_count,
+                    "openai_retry_count": max(exc.attempt_count - 1, 0),
+                    **github_metadata,
+                },
+            )
+            _send_generation_failure_notification(
+                config,
+                run_id=run_id,
+                candidate_id=candidate_id,
+                scheduled_post_type=scheduled_post_type,
+                content_type=exc.content_type or scheduled_post_type,
+                failure_reason=str(exc),
+                logger=logger,
+                metadata={
+                    "workflow_run_id": github_metadata.get("github_run_id"),
+                    "post_type": scheduled_post_type,
+                    "openai_model": exc.openai_model,
+                    "openai_attempt_count": exc.attempt_count,
+                    "openai_retry_count": max(exc.attempt_count - 1, 0),
+                    "failure_category": exc.failure_category,
+                    "publish_blocked": True,
+                    "post_id": failed_post.get("id"),
+                    **github_metadata,
+                },
+            )
+            log_event(
+                logger,
+                "production_publish_blocked_ai_failure",
+                level="error",
+                run_id=run_id,
+                candidate_id=candidate_id,
+                post_id=failed_post.get("id"),
+                copy_source="none",
+                fallback_used=False,
+                openai_attempt_count=exc.attempt_count,
+                openai_model=exc.openai_model,
+                failure_category=exc.failure_category,
+                publish_blocked=True,
+                error=str(exc),
+            )
         if _is_video_post(scheduled_post_type):
             try:
                 insert_error_row(

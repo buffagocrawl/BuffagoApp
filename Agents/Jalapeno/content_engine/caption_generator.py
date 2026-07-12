@@ -3,10 +3,12 @@ from __future__ import annotations
 import json
 import os
 import re
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
+from ai_config import AIConfig, load_ai_config
 from caption_rules import (
     BANNED_GENERIC_PHRASES,
     CAPTION_STYLE_ORDER,
@@ -60,6 +62,13 @@ class CaptionPackage:
     overlay_validation_failure_reason: str | None = None
     openai_used: bool = False
     openai_model: str | None = None
+    openai_request_id: str | None = None
+    openai_attempt_count: int = 0
+    openai_retry_count: int = 0
+    openai_latency_ms: int = 0
+    token_usage: dict[str, Any] = field(default_factory=dict)
+    estimated_cost_usd: float | None = None
+    repair_applied: bool = False
     fallback_reason: str | None = None
     copy_source: str = ""
     generated_at: str = ""
@@ -74,7 +83,40 @@ class CaptionPackage:
 
 
 class AICopyRequiredError(RuntimeError):
-    pass
+    def __init__(
+        self,
+        message: str,
+        *,
+        failure_category: str,
+        attempt_count: int = 0,
+        openai_model: str | None = None,
+        candidate_id: str | None = None,
+        content_type: str | None = None,
+        video_asset_id: str | None = None,
+        selected_asset: str | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.failure_category = failure_category
+        self.attempt_count = attempt_count
+        self.openai_model = openai_model
+        self.candidate_id = candidate_id
+        self.content_type = content_type
+        self.video_asset_id = video_asset_id
+        self.selected_asset = selected_asset
+
+
+@dataclass(frozen=True, slots=True)
+class OpenAICopyPlanResult:
+    variants: list[dict[str, Any]]
+    client: OpenAIContentClient | None
+    failure_reason: str | None
+    raw_content: str | None
+    attempt_count: int
+    total_latency_ms: int
+    total_usage: dict[str, Any]
+    last_request_id: str | None
+    last_error_category: str | None
+    repair_applied: bool
 
 
 def _utcnow() -> datetime:
@@ -93,10 +135,6 @@ def _parse_bool_env(name: str) -> bool | None:
     return None
 
 
-def _emergency_template_fallback_enabled() -> bool:
-    return bool(_parse_bool_env("JALAPENO_EMERGENCY_TEMPLATE_FALLBACK"))
-
-
 def _ai_copy_skip_reason() -> str | None:
     for name in ("USE_OPENAI", "AI_ENABLED", "ENABLE_AI_COPY"):
         parsed = _parse_bool_env(name)
@@ -107,9 +145,29 @@ def _ai_copy_skip_reason() -> str | None:
     return None
 
 
-def _ai_copy_strict_mode_enabled() -> bool:
-    parsed = _parse_bool_env("JALAPENO_REQUIRE_AI_ONLY_COPY")
-    return bool(parsed)
+def _require_ai_copy_for_mode(*, require_ai_copy: bool) -> bool:
+    env_value = _parse_bool_env("JALAPENO_REQUIRE_AI_COPY")
+    if require_ai_copy:
+        return True
+    return bool(env_value)
+
+
+def _sanitize_error_message(message: str, *, limit: int = 400) -> str:
+    cleaned = " ".join(str(message or "").replace("\r", " ").replace("\n", " ").split())
+    openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
+    if openai_key:
+        cleaned = cleaned.replace(openai_key, "[redacted-openai-key]")
+    if len(cleaned) <= limit:
+        return cleaned
+    return f"{cleaned[:limit]}..."
+
+
+def _sleep_with_backoff(ai_config: AIConfig, *, attempt: int) -> float:
+    delay = ai_config.openai_retry_base_seconds * (2 ** max(attempt - 1, 0))
+    jitter = min(0.5, delay * 0.25)
+    randomized = delay + ((attempt * 0.137) % (jitter or 1.0))
+    time.sleep(randomized)
+    return round(randomized, 3)
 
 
 def _normalize_text(value: str) -> str:
@@ -341,6 +399,39 @@ def _reuse_block_reason(text: str, recent_texts: list[str], *, field_name: str) 
     return None
 
 
+def _reuse_block_details(text: str, recent_posts: list[dict[str, Any]], *, key_names: tuple[str, ...], field_name: str) -> dict[str, Any] | None:
+    normalized = _normalize_text(text)
+    if not normalized:
+        return None
+    for row in recent_posts:
+        recent_text = ""
+        for key in key_names:
+            value = str(row.get(key) or "").strip()
+            if value:
+                recent_text = value
+                break
+        recent_normalized = _normalize_text(recent_text)
+        if not recent_normalized:
+            continue
+        reason: str | None = None
+        if recent_normalized == normalized:
+            reason = f"last_30_days_{field_name}_exact_match"
+        elif _token_similarity(normalized, recent_normalized) >= 0.86:
+            reason = f"last_30_days_{field_name}_near_duplicate"
+        if reason is None:
+            continue
+        duplicate_age_days = None
+        parsed = _parse_post_datetime(row)
+        if parsed is not None:
+            duplicate_age_days = round((_utcnow() - parsed).total_seconds() / 86400, 3)
+        return {
+            "reason": reason,
+            "duplicate_source_post_id": row.get("id") or row.get("post_id"),
+            "duplicate_age_days": duplicate_age_days,
+        }
+    return None
+
+
 def _style_pool(candidate: ContentCandidate, external_context: dict[str, Any]) -> list[str]:
     styles: list[str] = ["simple_hype", "craving_prompt"]
     content_type = candidate.content_type.lower()
@@ -474,25 +565,53 @@ def _openai_caption_response_format() -> dict[str, Any]:
 def _openai_variant_plan(
     candidate: ContentCandidate,
     *,
+    ai_config: AIConfig,
     snapshot: dict[str, Any],
     external_context: dict[str, Any],
     feedback_summary: ContentFeedbackSummary,
+    recent_posts: list[dict[str, Any]],
     logger=None,
-) -> tuple[list[dict[str, Any]], OpenAIContentClient | None, str | None, str | None]:
+) -> OpenAICopyPlanResult:
     skip_reason = _ai_copy_skip_reason()
     if skip_reason is not None:
         log_event(
             logger,
-            "ai_copy_generation_skipped",
+            "openai_copy_generation_exhausted",
             candidate_id=candidate.candidate_id,
             content_type=candidate.content_type,
             reason=skip_reason,
-            ai_copy_source="template",
+            failure_category="configuration_error",
+            copy_source="none",
+            fallback_used=False,
+            openai_attempt_count=0,
+            publish_blocked=True,
         )
-        return [], None, skip_reason, None
+        return OpenAICopyPlanResult(
+            variants=[],
+            client=None,
+            failure_reason=skip_reason,
+            raw_content=None,
+            attempt_count=0,
+            total_latency_ms=0,
+            total_usage={"input_tokens": 0, "output_tokens": 0, "total_tokens": 0, "estimated_cost_usd": None},
+            last_request_id=None,
+            last_error_category="configuration_error",
+            repair_applied=False,
+        )
     client = OpenAIContentClient.from_env(logger=logger)
     if client is None:
-        return [], None, "OpenAI is not configured", None
+        return OpenAICopyPlanResult(
+            variants=[],
+            client=None,
+            failure_reason="OpenAI is not configured",
+            raw_content=None,
+            attempt_count=0,
+            total_latency_ms=0,
+            total_usage={"input_tokens": 0, "output_tokens": 0, "total_tokens": 0, "estimated_cost_usd": None},
+            last_request_id=None,
+            last_error_category="configuration_error",
+            repair_applied=False,
+        )
 
     candidate_payload = candidate.to_dict()
     prompt_payload = {
@@ -536,94 +655,317 @@ def _openai_variant_plan(
         "Overlay text must be short, readable, shareable, and often a question or prompt for comments or sharing."
     )
     user_prompt = json.dumps(prompt_payload, ensure_ascii=True, indent=2, sort_keys=True)
-    result = client.generate_variant_set(
-        stage="caption_generation",
-        system_prompt=system_prompt,
-        user_prompt=user_prompt,
-        options_count=4,
-        response_format=_openai_caption_response_format(),
-    )
-    if not result.success:
-        return [], client, result.fallback_reason, result.raw_content
-
-    output = result.output
-    variants_payload = _extract_openai_variant_payloads(output)
-    log_event(
-        logger,
-        "openai_caption_variants_parsed",
-        candidate_id=candidate.candidate_id,
-        content_type=candidate.content_type,
-        parsed_variant_count=len(variants_payload),
-        raw_openai_response=_truncate_for_log(result.raw_content or output),
-    )
-    if not variants_payload:
+    total_usage = {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0, "estimated_cost_usd": None}
+    total_latency_ms = 0
+    last_request_id: str | None = None
+    last_error_category: str | None = None
+    last_failure_reason: str | None = None
+    any_repair_applied = False
+    completed_attempts = 0
+    for attempt in range(1, ai_config.openai_max_attempts + 1):
+        completed_attempts = attempt
         log_event(
             logger,
-            "openai_caption_variants_unusable",
-            level="warning",
+            "openai_copy_generation_attempt_started",
             candidate_id=candidate.candidate_id,
             content_type=candidate.content_type,
+            attempt=attempt,
+            max_attempts=ai_config.openai_max_attempts,
+            model=client.model,
+        )
+        result = client.generate_variant_set(
+            stage="caption_generation",
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            options_count=4,
+            response_format=_openai_caption_response_format(),
+        )
+        total_latency_ms += result.latency_ms
+        last_request_id = result.request_id or last_request_id
+        total_usage["input_tokens"] += int(result.usage.get("input_tokens") or 0)
+        total_usage["output_tokens"] += int(result.usage.get("output_tokens") or 0)
+        total_usage["total_tokens"] += int(result.usage.get("total_tokens") or 0)
+        if result.usage.get("estimated_cost_usd") is not None:
+            existing_cost = total_usage.get("estimated_cost_usd") or 0.0
+            total_usage["estimated_cost_usd"] = round(float(existing_cost) + float(result.usage["estimated_cost_usd"]), 6)
+        if not result.success:
+            last_error_category = result.error_category or "openai_request_failed"
+            last_failure_reason = result.fallback_reason or "OpenAI request failed"
+            log_event(
+                logger,
+                "openai_copy_generation_attempt_failed",
+                level="warning",
+                candidate_id=candidate.candidate_id,
+                content_type=candidate.content_type,
+                attempt=attempt,
+                max_attempts=ai_config.openai_max_attempts,
+                failure_category=last_error_category,
+                sanitized_error=_sanitize_error_message(last_failure_reason),
+                request_id=result.request_id,
+                status_code=result.status_code,
+                latency_ms=result.latency_ms,
+                retryable=result.retryable,
+            )
+            if result.retryable and attempt < ai_config.openai_max_attempts:
+                delay_seconds = _sleep_with_backoff(ai_config, attempt=attempt)
+                log_event(
+                    logger,
+                    "openai_copy_generation_retry_scheduled",
+                    candidate_id=candidate.candidate_id,
+                    content_type=candidate.content_type,
+                    attempt=attempt,
+                    next_attempt=attempt + 1,
+                    delay_seconds=delay_seconds,
+                    failure_category=last_error_category,
+                )
+                continue
+            break
+
+        output = result.output
+        variants_payload = _extract_openai_variant_payloads(output)
+        log_event(
+            logger,
+            "openai_caption_variants_parsed",
+            candidate_id=candidate.candidate_id,
+            content_type=candidate.content_type,
+            parsed_variant_count=len(variants_payload),
             raw_openai_response=_truncate_for_log(result.raw_content or output),
         )
-        return [], client, "all_openai_variants_invalid", result.raw_content
+        if not variants_payload:
+            last_error_category = "invalid_model_output"
+            last_failure_reason = "OpenAI returned no usable variants"
+            log_event(
+                logger,
+                "openai_copy_generation_attempt_failed",
+                level="warning",
+                candidate_id=candidate.candidate_id,
+                content_type=candidate.content_type,
+                attempt=attempt,
+                max_attempts=ai_config.openai_max_attempts,
+                failure_category=last_error_category,
+                sanitized_error=last_failure_reason,
+                request_id=result.request_id,
+                status_code=result.status_code,
+                latency_ms=result.latency_ms,
+                retryable=True,
+            )
+            if attempt < ai_config.openai_max_attempts:
+                delay_seconds = _sleep_with_backoff(ai_config, attempt=attempt)
+                log_event(
+                    logger,
+                    "openai_copy_generation_retry_scheduled",
+                    candidate_id=candidate.candidate_id,
+                    content_type=candidate.content_type,
+                    attempt=attempt,
+                    next_attempt=attempt + 1,
+                    delay_seconds=delay_seconds,
+                    failure_category=last_error_category,
+                )
+                continue
+            break
 
-    variants: list[dict[str, Any]] = []
-    for index, caption_option in enumerate(variants_payload):
-        raw_caption = str(caption_option.get("caption") or "").strip()
-        raw_overlay = str(caption_option.get("overlay_text") or "").strip()
-        caption_validation = validate_caption(raw_caption) if raw_caption else {"passed": False, "issues": ["empty_caption"], "engagement_actions": []}
-        overlay_validation = validate_overlay_text(raw_overlay) if raw_overlay else {"passed": False, "issues": ["empty_overlay_text"], "engagement_actions": []}
-        pair_validation = validate_post_pair(raw_caption, raw_overlay) if raw_caption and raw_overlay else {"passed": False, "issues": ["missing_caption_or_overlay"], "reasons": ["missing_caption_or_overlay"]}
-        rejection_reasons = list(pair_validation.get("reasons") or [])
-        if not raw_caption:
-            rejection_reasons.append("missing_caption")
-        if not raw_overlay:
-            rejection_reasons.append("missing_overlay_text")
-        if rejection_reasons:
+        variants: list[dict[str, Any]] = []
+        for index, caption_option in enumerate(variants_payload):
+            raw_caption = str(caption_option.get("caption") or "").strip()
+            raw_overlay = str(caption_option.get("overlay_text") or "").strip()
+            caption_validation = validate_caption(raw_caption) if raw_caption else {"passed": False, "issues": ["empty_caption"], "engagement_actions": []}
+            overlay_validation = validate_overlay_text(raw_overlay) if raw_overlay else {"passed": False, "issues": ["empty_overlay_text"], "engagement_actions": []}
+            pair_validation = validate_post_pair(raw_caption, raw_overlay) if raw_caption and raw_overlay else {"passed": False, "issues": ["missing_caption_or_overlay"], "reasons": ["missing_caption_or_overlay"]}
+            rejection_reasons = list(pair_validation.get("reasons") or [])
+            if not raw_caption:
+                rejection_reasons.append("missing_caption")
+            if not raw_overlay:
+                rejection_reasons.append("missing_overlay_text")
+            if rejection_reasons:
+                log_event(
+                    logger,
+                    "openai_caption_variant_rejected",
+                    level="warning",
+                    candidate_id=candidate.candidate_id,
+                    content_type=candidate.content_type,
+                    variant_index=index,
+                    rejection_reason="; ".join(dict.fromkeys(rejection_reasons)),
+                    caption_length=len(raw_caption),
+                    hashtag_count=len(re.findall(r"(?<!\w)#([A-Za-z0-9_]+)", raw_caption)),
+                    cta_detected=bool(caption_validation.get("engagement_actions")),
+                    overlay_present=bool(raw_overlay),
+                    raw_variant=_truncate_for_log(caption_option),
+                )
+            repaired_variant = _repair_openai_variant(
+                candidate,
+                caption_option,
+                snapshot=snapshot,
+                external_context=external_context,
+                feedback_summary=feedback_summary,
+                index=index,
+            )
+            repaired_caption_validation = repaired_variant["caption_validation"]
+            repaired_pair_validation = repaired_variant["pair_validation"]
+            if not repaired_caption_validation["passed"] or not repaired_pair_validation["passed"]:
+                log_event(
+                    logger,
+                    "openai_caption_variant_repair_failed",
+                    level="warning",
+                    candidate_id=candidate.candidate_id,
+                    content_type=candidate.content_type,
+                    variant_index=index,
+                    rejection_reason="; ".join(repaired_caption_validation["reasons"] + repaired_pair_validation["reasons"]),
+                    caption_length=len(repaired_variant["caption"]),
+                    hashtag_count=len(re.findall(r"(?<!\w)#([A-Za-z0-9_]+)", repaired_variant["caption"])),
+                    cta_detected=bool(repaired_caption_validation.get("engagement_actions")),
+                    overlay_present=bool(repaired_variant["overlay_text"]),
+                    raw_variant=_truncate_for_log(caption_option),
+                )
+                continue
+            repaired_variant["openai_model"] = client.model
+            any_repair_applied = any_repair_applied or bool(repaired_variant.get("repair_applied"))
+            variants.append(repaired_variant)
+        if not variants:
+            last_error_category = "invalid_model_output"
+            last_failure_reason = "All OpenAI variants failed validation"
             log_event(
                 logger,
-                "openai_caption_variant_rejected",
+                "openai_copy_generation_attempt_failed",
                 level="warning",
                 candidate_id=candidate.candidate_id,
                 content_type=candidate.content_type,
-                variant_index=index,
-                rejection_reason="; ".join(dict.fromkeys(rejection_reasons)),
-                caption_length=len(raw_caption),
-                hashtag_count=len(re.findall(r"(?<!\w)#([A-Za-z0-9_]+)", raw_caption)),
-                cta_detected=bool(caption_validation.get("engagement_actions")),
-                overlay_present=bool(raw_overlay),
-                raw_variant=_truncate_for_log(caption_option),
+                attempt=attempt,
+                max_attempts=ai_config.openai_max_attempts,
+                failure_category=last_error_category,
+                sanitized_error=last_failure_reason,
+                request_id=result.request_id,
+                status_code=result.status_code,
+                latency_ms=result.latency_ms,
+                retryable=True,
             )
-        repaired_variant = _repair_openai_variant(
+            if attempt < ai_config.openai_max_attempts:
+                delay_seconds = _sleep_with_backoff(ai_config, attempt=attempt)
+                log_event(
+                    logger,
+                    "openai_copy_generation_retry_scheduled",
+                    candidate_id=candidate.candidate_id,
+                    content_type=candidate.content_type,
+                    attempt=attempt,
+                    next_attempt=attempt + 1,
+                    delay_seconds=delay_seconds,
+                    failure_category=last_error_category,
+                )
+                continue
+            break
+
+        scored_openai_variants = _score_variant_options(
             candidate,
-            caption_option,
-            snapshot=snapshot,
-            external_context=external_context,
+            variants=variants,
             feedback_summary=feedback_summary,
-            index=index,
+            recent_posts=recent_posts,
         )
-        repaired_caption_validation = repaired_variant["caption_validation"]
-        repaired_pair_validation = repaired_variant["pair_validation"]
-        if not repaired_caption_validation["passed"] or not repaired_pair_validation["passed"]:
+        duplicate_blocked = [variant for variant in scored_openai_variants if variant.get("reuse_blocked_reason")]
+        selectable = [variant for variant in scored_openai_variants if not variant.get("rejected")]
+        for blocked_variant in duplicate_blocked:
             log_event(
                 logger,
-                "openai_caption_variant_repair_failed",
+                "caption_duplicate_detected",
+                candidate_id=candidate.candidate_id,
+                content_type=candidate.content_type,
+                caption_duplicate_detected=True,
+                duplicate_source_post_id=blocked_variant.get("duplicate_source_post_id"),
+                duplicate_age_days=blocked_variant.get("duplicate_age_days"),
+                reuse_blocked_reason=blocked_variant.get("reuse_blocked_reason"),
+            )
+        if not selectable:
+            last_error_category = "duplicate_or_rejected"
+            last_failure_reason = "All OpenAI variants were rejected as duplicates or invalid"
+            log_event(
+                logger,
+                "openai_copy_generation_attempt_failed",
                 level="warning",
                 candidate_id=candidate.candidate_id,
                 content_type=candidate.content_type,
-                variant_index=index,
-                rejection_reason="; ".join(repaired_caption_validation["reasons"] + repaired_pair_validation["reasons"]),
-                caption_length=len(repaired_variant["caption"]),
-                hashtag_count=len(re.findall(r"(?<!\w)#([A-Za-z0-9_]+)", repaired_variant["caption"])),
-                cta_detected=bool(repaired_caption_validation.get("engagement_actions")),
-                overlay_present=bool(repaired_variant["overlay_text"]),
-                raw_variant=_truncate_for_log(caption_option),
+                attempt=attempt,
+                max_attempts=ai_config.openai_max_attempts,
+                failure_category=last_error_category,
+                sanitized_error=last_failure_reason,
+                request_id=result.request_id,
+                status_code=result.status_code,
+                latency_ms=result.latency_ms,
+                retryable=True,
             )
-            continue
-        variants.append(repaired_variant)
-    if not variants:
-        return variants, client, "all_openai_variants_invalid", result.raw_content
-    return variants, client, None, result.raw_content
+            if attempt < ai_config.openai_max_attempts:
+                delay_seconds = _sleep_with_backoff(ai_config, attempt=attempt)
+                log_event(
+                    logger,
+                    "openai_copy_generation_retry_scheduled",
+                    candidate_id=candidate.candidate_id,
+                    content_type=candidate.content_type,
+                    attempt=attempt,
+                    next_attempt=attempt + 1,
+                    delay_seconds=delay_seconds,
+                    failure_category=last_error_category,
+                )
+                continue
+            break
+
+        log_event(
+            logger,
+            "openai_copy_generation_succeeded",
+            candidate_id=candidate.candidate_id,
+            content_type=candidate.content_type,
+            attempt=attempt,
+            max_attempts=ai_config.openai_max_attempts,
+            model=client.model,
+            request_id=result.request_id,
+            latency_ms=result.latency_ms,
+            total_latency_ms=total_latency_ms,
+            openai_attempt_count=attempt,
+            retry_count=attempt - 1,
+            token_usage=total_usage,
+            estimated_cost_usd=total_usage.get("estimated_cost_usd"),
+            repair_applied=any_repair_applied,
+        )
+        return OpenAICopyPlanResult(
+            variants=scored_openai_variants,
+            client=client,
+            failure_reason=None,
+            raw_content=result.raw_content,
+            attempt_count=attempt,
+            total_latency_ms=total_latency_ms,
+            total_usage=total_usage,
+            last_request_id=result.request_id,
+            last_error_category=None,
+            repair_applied=any_repair_applied,
+        )
+
+    log_event(
+        logger,
+        "openai_copy_generation_exhausted",
+        level="error",
+        candidate_id=candidate.candidate_id,
+        content_type=candidate.content_type,
+        model=client.model,
+        openai_attempt_count=completed_attempts,
+        retry_count=max(completed_attempts - 1, 0),
+        failure_category=last_error_category or "openai_request_failed",
+        sanitized_error=_sanitize_error_message(last_failure_reason or "OpenAI copy generation failed"),
+        request_id=last_request_id,
+        total_latency_ms=total_latency_ms,
+        token_usage=total_usage,
+        estimated_cost_usd=total_usage.get("estimated_cost_usd"),
+        copy_source="none",
+        fallback_used=False,
+        publish_blocked=True,
+    )
+    return OpenAICopyPlanResult(
+        variants=[],
+        client=client,
+        failure_reason=last_failure_reason or "OpenAI copy generation failed",
+        raw_content=None,
+        attempt_count=completed_attempts,
+        total_latency_ms=total_latency_ms,
+        total_usage=total_usage,
+        last_request_id=last_request_id,
+        last_error_category=last_error_category or "openai_request_failed",
+        repair_applied=any_repair_applied,
+    )
 
 
 def _score_variant_options(
@@ -660,12 +1002,27 @@ def _score_variant_options(
         variant_row["score_breakdown"] = score.breakdown
         variant_row["score_reasons"] = score.reasons
         variant_row["rejected"] = score.rejected
-        caption_block_reason = _reuse_block_reason(normalized_variant["caption"], recent_captions, field_name="caption")
-        overlay_block_reason = _reuse_block_reason(normalized_variant["overlay_text"], recent_overlays, field_name="overlay")
+        caption_block_details = _reuse_block_details(
+            normalized_variant["caption"],
+            recent_window,
+            key_names=("selected_caption", "generated_caption", "caption"),
+            field_name="caption",
+        )
+        overlay_block_details = _reuse_block_details(
+            normalized_variant["overlay_text"],
+            recent_window,
+            key_names=("selected_overlay", "overlay_text", "hook_text"),
+            field_name="overlay",
+        )
+        caption_block_reason = caption_block_details["reason"] if caption_block_details else None
+        overlay_block_reason = overlay_block_details["reason"] if overlay_block_details else None
         blocked_reasons = [reason for reason in (caption_block_reason, overlay_block_reason) if reason]
         if blocked_reasons:
             variant_row["rejected"] = True
             variant_row["reuse_blocked_reason"] = "; ".join(blocked_reasons)
+            detail_source = caption_block_details or overlay_block_details or {}
+            variant_row["duplicate_source_post_id"] = detail_source.get("duplicate_source_post_id")
+            variant_row["duplicate_age_days"] = detail_source.get("duplicate_age_days")
             variant_row["score_reasons"] = list(variant_row["score_reasons"]) + ["reuse_blocked"]
         scored.append(variant_row)
     return sorted(scored, key=lambda row: row.get("score", 0.0), reverse=True)
@@ -685,6 +1042,7 @@ def generate_caption_package(
     logger=None,
     require_ai_copy: bool = False,
 ) -> CaptionPackage:
+    ai_config = load_ai_config()
     cleanup_prompt = load_prompt_text("caption_cleanup")
     quality_prompt = load_prompt_text("quality_review")
     recent_posts = recent_posts or []
@@ -702,26 +1060,54 @@ def generate_caption_package(
         require_ai_copy=require_ai_copy,
     )
 
-    local_variants = _local_variant_plan(candidate, snapshot, external_context, feedback_summary)
-    openai_variants, openai_client, openai_fallback_reason, openai_raw_response = _openai_variant_plan(
+    allow_copy_fallback = ai_config.allow_copy_fallback and not _require_ai_copy_for_mode(require_ai_copy=require_ai_copy)
+    openai_plan = _openai_variant_plan(
         candidate,
+        ai_config=ai_config,
         snapshot=snapshot,
         external_context=external_context,
         feedback_summary=feedback_summary,
+        recent_posts=recent_posts,
         logger=logger,
     )
-    strict_ai_mode = _ai_copy_strict_mode_enabled()
-    if require_ai_copy and not openai_variants and strict_ai_mode and not _emergency_template_fallback_enabled():
+    openai_variants = openai_plan.variants
+    openai_client = openai_plan.client
+    openai_fallback_reason = openai_plan.failure_reason
+    openai_raw_response = openai_plan.raw_content
+    local_variants = _local_variant_plan(candidate, snapshot, external_context, feedback_summary) if allow_copy_fallback else []
+    if _require_ai_copy_for_mode(require_ai_copy=require_ai_copy) and not openai_variants:
         reason = openai_fallback_reason or "OpenAI caption generation produced no valid variants"
         log_event(
             logger,
-            "ai_copy_generation_skipped",
+            "production_publish_blocked_ai_failure",
             candidate_id=candidate.candidate_id,
             content_type=candidate.content_type,
-            reason=reason,
-            ai_copy_source="template",
+            reason=_sanitize_error_message(reason),
+            failure_category=openai_plan.last_error_category or "openai_request_failed",
+            copy_source="none",
+            fallback_used=False,
+            openai_attempt_count=openai_plan.attempt_count,
+            openai_model=openai_client.model if openai_client else None,
+            publish_blocked=True,
         )
-        raise AICopyRequiredError(reason)
+        raise AICopyRequiredError(
+            reason,
+            failure_category=openai_plan.last_error_category or "openai_request_failed",
+            attempt_count=openai_plan.attempt_count,
+            openai_model=openai_client.model if openai_client else None,
+            candidate_id=candidate.candidate_id,
+            content_type=candidate.content_type,
+        )
+    if not openai_variants and not allow_copy_fallback:
+        reason = openai_fallback_reason or "OpenAI copy generation produced no valid variants and fallback is disabled"
+        raise AICopyRequiredError(
+            reason,
+            failure_category=openai_plan.last_error_category or "openai_request_failed",
+            attempt_count=openai_plan.attempt_count,
+            openai_model=openai_client.model if openai_client else None,
+            candidate_id=candidate.candidate_id,
+            content_type=candidate.content_type,
+        )
     all_variants = [variant for variant in (*openai_variants, *local_variants) if isinstance(variant, dict)]
     scored_variants = _score_variant_options(
         candidate,
@@ -759,11 +1145,13 @@ def generate_caption_package(
     if openai_fallback_reason and not openai_variants:
         log_event(
             logger,
-            "ai_copy_fallback_used",
+            "copy_source_selected",
             candidate_id=candidate.candidate_id,
             content_type=candidate.content_type,
-            fallback_reason=openai_fallback_reason,
-            raw_openai_response=_truncate_for_log(openai_raw_response),
+            copy_source="fallback" if allow_copy_fallback else "none",
+            fallback_used=bool(allow_copy_fallback),
+            fallback_reason=_sanitize_error_message(openai_fallback_reason),
+            openai_attempt_count=openai_plan.attempt_count,
         )
 
     selectable_variants = [variant for variant in scored_variants if not variant.get("rejected")]
@@ -820,11 +1208,11 @@ def generate_caption_package(
     ]
     fallback_used = bool(selected_variant.get("source") == "template" and openai_fallback_reason)
     if selected_variant.get("source") == "openai":
-        cleanup_notes.append("OpenAI variant generation was available and used as part of the ranking pool.")
+        cleanup_notes.append("OpenAI variant generation succeeded and was used as the source of truth for copy.")
     if openai_fallback_reason:
         cleanup_notes.append(f"OpenAI fallback reason: {openai_fallback_reason}.")
     if repair_applied:
-        cleanup_notes.append("Primary caption failed validation and was replaced with a curated fallback.")
+        cleanup_notes.append("Validation repair was applied to AI-generated copy before publishing.")
     if selected_variant.get("reuse_blocked_reason"):
         cleanup_notes.append(f"Reuse blocked: {selected_variant.get('reuse_blocked_reason')}.")
 
@@ -844,54 +1232,46 @@ def generate_caption_package(
     )
 
     ranking_reason = "; ".join(selected_variant.get("score_reasons", [])) or "Selected the highest-scoring caption/overlay pair."
-    fallback_used = bool(repair_applied or openai_fallback_reason or selected_variant.get("source") != "openai")
-    if selected_variant.get("source") == "openai":
-        copy_source = "repaired" if repair_applied else "openai"
-    else:
-        copy_source = "fallback"
-    caption_source = "fallback" if repair_applied else str(selected_variant.get("caption_source") or "template")
-    if require_ai_copy and copy_source != "openai" and strict_ai_mode and not _emergency_template_fallback_enabled():
+    copy_source = "openai" if selected_variant.get("source") == "openai" else "fallback"
+    fallback_used = copy_source != "openai"
+    caption_source = "openai" if copy_source == "openai" else str(selected_variant.get("caption_source") or "template")
+    if _require_ai_copy_for_mode(require_ai_copy=require_ai_copy) and copy_source != "openai":
         reason = openai_fallback_reason or f"Final copy source was {copy_source}, not openai"
-        log_event(
-            logger,
-            "ai_copy_generation_skipped",
+        raise AICopyRequiredError(
+            reason,
+            failure_category=openai_plan.last_error_category or "openai_request_failed",
+            attempt_count=openai_plan.attempt_count,
+            openai_model=openai_client.model if openai_client else None,
             candidate_id=candidate.candidate_id,
             content_type=candidate.content_type,
-            reason=reason,
-            ai_copy_source=copy_source,
         )
-        raise AICopyRequiredError(reason)
-    final_fallback_reason = openai_fallback_reason
-    if final_fallback_reason is None and copy_source == "repaired":
-        final_fallback_reason = "deterministic_repair_applied"
-    elif final_fallback_reason is None and copy_source == "fallback":
-        final_fallback_reason = "template_fallback_used"
+    final_fallback_reason = openai_fallback_reason if copy_source != "openai" else None
     cleanup_notes.append(f"Final copy source: {copy_source}.")
 
     log_event(
         logger,
-        "ai_caption_selected",
+        "copy_source_selected",
         candidate_id=candidate.candidate_id,
         content_type=candidate.content_type,
-        ai_copy_source=copy_source,
+        copy_source=copy_source,
+        fallback_used=fallback_used,
         caption_source=caption_source,
         caption_text=caption,
-        reuse_blocked_reason=selected_variant.get("reuse_blocked_reason"),
-    )
-    log_event(
-        logger,
-        "ai_overlay_selected",
-        candidate_id=candidate.candidate_id,
-        content_type=candidate.content_type,
-        ai_copy_source=copy_source,
-        overlay_source=str(selected_variant.get("overlay_source") or "template"),
         overlay_text=selected_overlay,
         reuse_blocked_reason=selected_variant.get("reuse_blocked_reason"),
+        openai_model=openai_client.model if openai_client else None,
+        openai_request_id=openai_plan.last_request_id,
+        openai_attempt_count=openai_plan.attempt_count,
+        retry_count=max(openai_plan.attempt_count - 1, 0),
+        token_usage=openai_plan.total_usage,
+        estimated_cost_usd=openai_plan.total_usage.get("estimated_cost_usd"),
+        latency_ms=openai_plan.total_latency_ms,
+        repair_applied=repair_applied or openai_plan.repair_applied,
     )
 
     return CaptionPackage(
         hook=selected_caption_style,
-        body=caption,
+        body=selected_caption,
         cta=candidate.suggested_cta,
         caption=caption,
         spacing=caption,
@@ -914,8 +1294,15 @@ def generate_caption_package(
         caption_overlay_concept=validation["caption_overlay_concept"],
         overlay_validation_passed=validation["overlay_validation"]["passed"],
         overlay_validation_failure_reason=None if validation["overlay_validation"]["passed"] else ", ".join(validation["overlay_validation"]["reasons"]),
-        openai_used=copy_source in {"openai", "repaired"},
+        openai_used=copy_source == "openai",
         openai_model=str(selected_variant.get("openai_model") or openai_client.model) if openai_client else None,
+        openai_request_id=openai_plan.last_request_id,
+        openai_attempt_count=openai_plan.attempt_count,
+        openai_retry_count=max(openai_plan.attempt_count - 1, 0),
+        openai_latency_ms=openai_plan.total_latency_ms,
+        token_usage=dict(openai_plan.total_usage),
+        estimated_cost_usd=openai_plan.total_usage.get("estimated_cost_usd"),
+        repair_applied=repair_applied or openai_plan.repair_applied,
         fallback_reason=final_fallback_reason,
         copy_source=copy_source,
         generated_at=generated_at,

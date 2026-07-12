@@ -428,20 +428,31 @@ class ContentDecisionEngine:
         )
         runner_up_payload = None
         if selection.runner_up is not None:
-            runner_up_caption = generate_caption_package(
-                selection.runner_up.candidate,
-                snapshot=snapshot,
-                external_context=external_context,
-                performance_context=performance_context,
-                recent_posts=recent_posts,
-                logger=logger,
-                require_ai_copy=False,
-            )
-            runner_up_payload = _serialize_candidate(selection.runner_up.candidate, score=selection.runner_up, caption=runner_up_caption)
-            runner_up_payload["overlay_text"] = runner_up_caption.overlay_text
-            runner_up_payload["caption_style"] = runner_up_caption.caption_style
-            runner_up_payload["caption_type"] = runner_up_caption.caption_type
-            runner_up_payload["scheduled_post_type"] = scheduled_post_type
+            try:
+                runner_up_caption = generate_caption_package(
+                    selection.runner_up.candidate,
+                    snapshot=snapshot,
+                    external_context=external_context,
+                    performance_context=performance_context,
+                    recent_posts=recent_posts,
+                    logger=logger,
+                    require_ai_copy=False,
+                )
+            except Exception as exc:  # pragma: no cover - additive context should not block the winner
+                log_event(
+                    logger,
+                    "runner_up_caption_generation_skipped",
+                    level="warning",
+                    run_id=active_run_id,
+                    candidate_id=selection.runner_up.candidate.candidate_id,
+                    reason=str(exc),
+                )
+            else:
+                runner_up_payload = _serialize_candidate(selection.runner_up.candidate, score=selection.runner_up, caption=runner_up_caption)
+                runner_up_payload["overlay_text"] = runner_up_caption.overlay_text
+                runner_up_payload["caption_style"] = runner_up_caption.caption_style
+                runner_up_payload["caption_type"] = runner_up_caption.caption_type
+                runner_up_payload["scheduled_post_type"] = scheduled_post_type
 
         decision_summary = {
             "run_id": active_run_id,

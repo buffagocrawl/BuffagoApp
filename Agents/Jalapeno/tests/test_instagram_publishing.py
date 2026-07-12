@@ -336,7 +336,7 @@ def test_reel_precheck_allows_supabase_video_without_image_validation() -> None:
     assert result.passed is True
 
 
-def test_load_approved_post_regenerates_bad_overlay_text() -> None:
+def test_load_approved_post_preserves_canonical_overlay_text() -> None:
     content_decision = {
         "run_id": "11111111-1111-1111-1111-111111111111",
         "scheduled_post_type": "buffago_post",
@@ -362,13 +362,13 @@ def test_load_approved_post_regenerates_bad_overlay_text() -> None:
 
     post = load_approved_post_from_artifacts(content_decision, image_pipeline=image_pipeline)
 
-    assert post.overlay_text != "IF THIS WING HAD A VOICEMAIL"
-    assert "voicemail" not in (post.overlay_text or "").lower()
-    assert post.metadata["overlay_fallback_used"] is True
-    assert post.metadata["post_pair_validation_passed"] is True
+    assert post.overlay_text == "IF THIS WING HAD A VOICEMAIL"
+    assert post.metadata["selected_overlay"] == "IF THIS WING HAD A VOICEMAIL"
+    assert post.metadata["overlay_validation_passed"] is False
+    assert post.metadata["post_pair_validation_passed"] is False
 
 
-def test_load_approved_post_repairs_hashtags_and_logs(tmp_path: Path) -> None:
+def test_load_approved_post_preserves_canonical_hashtags_without_publish_time_repair(tmp_path: Path) -> None:
     config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
     stream = StringIO()
     logger = initialize_logging(replace(config, log_directory=tmp_path / "logs"), stream=stream)
@@ -399,14 +399,11 @@ def test_load_approved_post_repairs_hashtags_and_logs(tmp_path: Path) -> None:
 
     post = load_approved_post_from_artifacts(content_decision, image_pipeline=image_pipeline, logger=logger)
 
-    assert len(post.hashtags) == 5
-    assert "#HartfordEats" in post.hashtags
-    assert post.metadata["hashtag_repair_applied"] is True
-    assert post.metadata["hashtag_repair_original_count"] == 4
+    assert post.hashtags == ["#BuffaloWings", "#BuffaloWings", "#Foodie!!"]
+    assert post.metadata["final_hashtags"] == ["#BuffaloWings", "#BuffaloWings", "#Foodie!!"]
+    assert post.metadata["caption_validation_passed"] is False
     log_output = stream.getvalue()
-    assert "publish_hashtags_repaired" in log_output
-    assert 'original_count=4' in log_output
-    assert 'repaired_count=5' in log_output
+    assert "publish_hashtags_repaired" not in log_output
 
 
 def test_reel_artifact_uses_processed_video_when_overlay_completed() -> None:
@@ -599,7 +596,7 @@ def test_simulated_publish_reuses_existing_media_id(tmp_path: Path, monkeypatch:
     assert second["status"] in {"published", "published_with_permalink_pending"}
 
 
-def test_publish_instagram_post_repairs_hashtag_count_before_precheck(tmp_path: Path) -> None:
+def test_publish_instagram_post_blocks_invalid_hashtag_count_before_precheck(tmp_path: Path) -> None:
     config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
     config = replace(
         config,
@@ -626,9 +623,9 @@ def test_publish_instagram_post_repairs_hashtag_count_before_precheck(tmp_path: 
         report_path=tmp_path / "report.json",
     )
 
-    assert result["status"] in {"published", "published_with_permalink_pending"}
-    assert result["report"]["caption_preview"].count("#") == 5
-    assert len(result["report"]["hashtags"]) == 5
+    assert result["status"] == "precheck_failed"
+    assert result["failure_reason"] == "hashtag count must be exactly 5"
+    assert result["report"]["status"] == "precheck_failed"
 
 
 class _PublishFlowSupabaseClient:

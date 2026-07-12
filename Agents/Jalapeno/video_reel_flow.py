@@ -1,29 +1,21 @@
 from __future__ import annotations
 
-import random
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 from uuid import uuid4
 
-from caption_rules import ensure_exactly_five_hashtags
-from config import JalapenoConfig
+from content_engine.candidate_generator import ContentCandidate
+from content_engine.caption_generator import CaptionPackage
 from logging_utils import log_event
 from video_assets import VideoAsset, VideoAssetRepository
 
 
-HASHTAGS = ["#Buffago", "#BuffaloWings", "#WingNight", "#ChickenWings", "#WingLovers"]
-
-
 @dataclass(frozen=True, slots=True)
-class VideoReelContent:
+class VideoReelPlan:
     candidate_id: str
     video_asset: VideoAsset
-    caption: str
-    caption_body: str
-    hashtags: list[str]
-    original_hashtag_count: int
-    caption_type: str
+    candidate: ContentCandidate
     content_type: str = "daily_wing_reel"
     scheduled_post_type: str = "daily_wing_reel"
 
@@ -39,90 +31,81 @@ def _caption_type(asset: VideoAsset) -> str:
     return choices[hash(asset.storage_path) % len(choices)]
 
 
-def generate_reel_caption(asset: VideoAsset, *, now: datetime | None = None) -> tuple[str, str, list[str], str, int]:
-    now = now or _utcnow()
-    caption_type = _caption_type(asset)
-    templates = {
-        "funny": [
-            "Send this to the friend who thinks they can out-eat this plate.",
-            "Tag the friend who would try to finish this basket.",
-            "Like this if wing night is non-negotiable.",
-        ],
-        "hype": [
-            "Send this to the group chat and make wing night happen.",
-            "Comment your sauce pick before someone else chooses for you.",
-            "Like if this counts as dinner.",
-        ],
-        "poll": [
-            "Vote now: flats or drums?",
-            "Comment your go-to wing order.",
-            "Pick a side and send this to the friend who disagrees.",
-        ],
-        "local": [
-            "Share this with someone who owes you a wing stop.",
-            "Tag your wing-night person and make the plan.",
-            "Send this if your city takes wing night seriously.",
-        ],
-        "app_cta": [
-            "Download Buffago and start your next wing crawl.",
-            "Share this with the friend who always wants the next spot.",
-            "Tag someone and build your next wing plan in Buffago.",
-        ],
-    }
-    options = templates.get(caption_type, templates["funny"])
-    caption = options[int(now.timestamp()) % len(options)]
-    if caption_type != "app_cta" and random.Random(asset.storage_path).random() < 0.25:
-        caption += " Buffago can help find the next stop."
-    tags = HASHTAGS[:4] if caption_type == "poll" else HASHTAGS[:4]
-    caption_body, repaired_hashtags = ensure_exactly_five_hashtags(caption, tags)
-    return f"{caption_body}\n\n{' '.join(repaired_hashtags)}", caption_body, repaired_hashtags, caption_type, len(tags)
-
-
-def build_reel_content(
+def build_reel_plan(
     repository: VideoAssetRepository,
     *,
     excluded_ids: set[str] | None = None,
     dry_run: bool,
     logger=None,
-) -> VideoReelContent:
+) -> VideoReelPlan:
     asset = repository.select_asset(excluded_ids=excluded_ids)
-    caption, caption_body, hashtags, caption_type, original_hashtag_count = generate_reel_caption(asset)
     candidate_id = str(uuid4())
+    caption_type = _caption_type(asset)
+    candidate = ContentCandidate(
+        candidate_id=candidate_id,
+        content_type="daily_wing_reel",
+        creative_style=asset.style or "realistic_food_video",
+        reason_chosen="Selected the oldest eligible active Supabase video asset for today's Reel slot.",
+        working_title="Daily wing Reel",
+        short_summary="Preloaded wing Reel from Supabase Storage with OpenAI-generated caption and overlay.",
+        hook_text="DAILY WING REEL",
+        overlay_text="",
+        target_emotion="Hungry",
+        suggested_cta="Send this to the person you're getting wings with.",
+        suggested_image_concept="Use the selected Buffago wing Reel as the media source and write copy that matches the footage.",
+        suggested_caption_angle="Keep the caption tied directly to the Reel and make the CTA specific to wing plans or debate.",
+        caption_style=caption_type,
+        prompt_template_name="daily_wing_reel",
+        primary_theme="daily wing reel",
+        secondary_theme="video appetite trigger",
+        mood="Playful",
+        hook_style="reel_social_prompt",
+        cta_category="send",
+        food_categories=["wings", "wing night"],
+        source_signals=["video_asset_library"],
+        visual_style=asset.style or "realistic_food_video",
+        image_composition="existing vertical Reel footage with safe overlay zone",
+        metadata={
+            "video_asset_id": asset.id,
+            "storage_bucket": asset.storage_bucket,
+            "storage_path": asset.storage_path,
+            "public_video_url": asset.public_url,
+            "caption_type": caption_type,
+            "media_source": "supabase_video_asset",
+        },
+    )
     log_event(
         logger,
-        "video_reel_content_generated",
+        "video_reel_candidate_selected",
         candidate_id=candidate_id,
         video_asset_id=asset.id,
         storage_path=asset.storage_path,
         caption_type=caption_type,
-        caption_preview=caption[:140],
         dry_run=dry_run,
     )
-    return VideoReelContent(
+    return VideoReelPlan(
         candidate_id=candidate_id,
         video_asset=asset,
-        caption=caption,
-        caption_body=caption_body,
-        hashtags=hashtags,
-        original_hashtag_count=original_hashtag_count,
-        caption_type=caption_type,
+        candidate=candidate,
     )
 
 
-def content_decision_from_reel(run_id: str, content: VideoReelContent) -> dict[str, Any]:
-    asset = content.video_asset
+def content_decision_from_reel(run_id: str, plan: VideoReelPlan, caption_package: CaptionPackage) -> dict[str, Any]:
+    asset = plan.video_asset
     return {
         "run_id": run_id,
         "generated_at": _utcnow().isoformat(),
-        "scheduled_post_type": content.scheduled_post_type,
+        "scheduled_post_type": plan.scheduled_post_type,
         "winner": {
-            "candidate_id": content.candidate_id,
-            "content_type": content.content_type,
-            "scheduled_post_type": content.scheduled_post_type,
-            "caption": content.caption,
-            "caption_text": content.caption,
-            "selected_caption": content.caption_body,
-            "hashtags": content.hashtags,
+            "candidate_id": plan.candidate_id,
+            "content_type": plan.content_type,
+            "scheduled_post_type": plan.scheduled_post_type,
+            "caption": caption_package.caption,
+            "caption_text": caption_package.caption,
+            "selected_caption": caption_package.body,
+            "selected_overlay": caption_package.overlay_text,
+            "overlay_text": caption_package.overlay_text,
+            "hashtags": caption_package.hashtags,
             "image_prompt": "Preloaded Supabase Storage wing video asset; no AI image or video generated.",
             "approved": True,
             "video_url": asset.public_url,
@@ -131,10 +114,28 @@ def content_decision_from_reel(run_id: str, content: VideoReelContent) -> dict[s
             "storage_bucket": asset.storage_bucket,
             "storage_path": asset.storage_path,
             "media_source": "supabase_video_asset",
-            "caption_type": content.caption_type,
+            "caption_type": caption_package.caption_type,
+            "caption_style": caption_package.caption_style,
+            "selected_caption_style": caption_package.selected_caption_style,
+            "caption_source": caption_package.caption_source,
+            "overlay_source": caption_package.overlay_source,
+            "openai_used": caption_package.openai_used,
+            "openai_model": caption_package.openai_model,
+            "copy_source": caption_package.copy_source,
+            "fallback_reason": caption_package.fallback_reason,
+            "generated_at": caption_package.generated_at,
+            "reuse_blocked_reason": caption_package.reuse_blocked_reason,
+            "caption_options": caption_package.caption_options,
+            "overlay_options": caption_package.overlay_options,
+            "ranking_reason": caption_package.ranking_reason,
+            "ranking_score": caption_package.ranking_score,
+            "ranking_breakdown": caption_package.ranking_breakdown,
+            "feedback_summary_version": caption_package.feedback_summary_version,
+            "feedback_summary": caption_package.feedback_summary,
+            "repair_applied": caption_package.repair_applied,
             "style": asset.style,
             "working_title": "Daily wing Reel",
-            "short_summary": "Preloaded wing video Reel from Supabase Storage.",
+            "short_summary": "Preloaded wing video Reel from Supabase Storage with OpenAI-generated copy.",
         },
         "runner_up": None,
         "all_candidates": [],
@@ -143,8 +144,23 @@ def content_decision_from_reel(run_id: str, content: VideoReelContent) -> dict[s
             "media_source": "supabase_video_asset",
             "video_asset_id": asset.id,
             "storage_path": asset.storage_path,
-            "caption_type": content.caption_type,
+            "caption_type": caption_package.caption_type,
             "style": asset.style,
+            "openai_used": caption_package.openai_used,
+            "openai_model": caption_package.openai_model,
+            "copy_source": caption_package.copy_source,
+            "fallback_reason": caption_package.fallback_reason,
+            "generated_at": caption_package.generated_at,
+            "selected_caption": caption_package.body,
+            "selected_overlay": caption_package.overlay_text,
+            "caption_text": caption_package.caption,
+            "token_usage": caption_package.token_usage,
+            "cost_estimate": caption_package.estimated_cost_usd or 0.0,
+            "openai_request_id": caption_package.openai_request_id,
+            "openai_attempt_count": caption_package.openai_attempt_count,
+            "openai_retry_count": caption_package.openai_retry_count,
+            "openai_latency_ms": caption_package.openai_latency_ms,
+            "repair_applied": caption_package.repair_applied,
             "winner_reasoning": ["Selected the oldest eligible active Supabase video asset."],
         },
     }

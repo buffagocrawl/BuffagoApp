@@ -14,7 +14,15 @@ Phase 2 adds the database and logging foundation:
 - cost and metrics scaffolding
 - conservative RLS posture
 
-Phase 5 adds the AI generation bridge through Supabase Edge Functions, and the content engine can also use direct OpenAI calls when `OPENAI_API_KEY` is available. When OpenAI is missing, Jalapeno falls back to local deterministic templates instead of crashing.
+Phase 5 adds the AI generation bridge through Supabase Edge Functions, and the content engine can also use direct OpenAI calls when `OPENAI_API_KEY` is available.
+
+Production publishing now treats OpenAI-generated caption and overlay copy as mandatory:
+
+- production posts must publish with newly generated OpenAI copy for the current run
+- production never falls back to deterministic templates, reused captions, or canned overlay text
+- OpenAI copy generation retries transient failures up to `JALAPENO_OPENAI_MAX_ATTEMPTS`
+- if valid AI copy is still unavailable after retries, Jalapeno blocks publishing, marks the run failed, sends the normal publish failure notification, and exits non-zero
+- dry-run, local development, and tests can only use fallback copy when `JALAPENO_ALLOW_COPY_FALLBACK=true` is set explicitly
 
 The new Content Decision Engine sits on top of that foundation and behaves like a human social media manager:
 
@@ -121,6 +129,35 @@ Optional AI backend overrides:
 - `JALAPENO_AI_FUNCTION_TOKEN`
 - `OPENAI_API_KEY`
 - `OPENAI_MODEL`
+
+Copy-generation controls:
+
+- `JALAPENO_REQUIRE_AI_COPY`
+  - production should leave this enabled
+  - production blocks publish if valid OpenAI copy is unavailable
+- `JALAPENO_OPENAI_MAX_ATTEMPTS`
+  - default `3`
+  - counts the initial request plus retries
+- `JALAPENO_OPENAI_RETRY_BASE_SECONDS`
+  - default `1.0`
+  - Jalapeno applies bounded exponential backoff with jitter for transient failures
+- `JALAPENO_ALLOW_COPY_FALLBACK`
+  - default `false`
+  - only enables fallback copy outside production when set explicitly
+
+Production logging and persistence include:
+
+- `copy_source`
+- `openai_model`
+- `openai_request_id` when available
+- `openai_attempt_count`
+- `openai_retry_count`
+- token usage
+- estimated cost
+- latency
+- final caption
+- final overlay
+- whether repair was applied
 
 Meta integration secrets remain separate:
 

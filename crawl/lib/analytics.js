@@ -3,6 +3,7 @@ import Constants from 'expo-constants';
 import * as Crypto from 'expo-crypto';
 import { AppState, Platform } from 'react-native';
 import { supabase } from './supabase';
+const onboardingStepSix = require('./onboardingStepSix');
 
 const ANON_ID_KEY = 'buffago:analytics:anonymous_id';
 const SESSION_ID_KEY = 'buffago:analytics:session_id';
@@ -109,6 +110,30 @@ export async function trackEvent({
 
     await AsyncStorage.setItem(LAST_ACTIVE_KEY, String(Date.now()));
 
+    let nextMetadata = compactMetadata({
+      screen_name: screen,
+      app_version: appVersion(),
+      platform: Platform.OS,
+      timestamp: new Date().toISOString(),
+      ...metadata,
+    });
+
+    if (eventName === 'rating_started') {
+      const rawStepSixContext = await AsyncStorage.getItem(onboardingStepSix.STEP_SIX_CONTEXT_KEY);
+      if (rawStepSixContext) {
+        try {
+          const stepSixContext = JSON.parse(rawStepSixContext);
+          nextMetadata = compactMetadata({
+            ...nextMetadata,
+            ...onboardingStepSix.buildRatingStartedMetadataFromContext(stepSixContext, {
+              source_screen: screen,
+            }),
+          });
+          await AsyncStorage.removeItem(onboardingStepSix.STEP_SIX_CONTEXT_KEY);
+        } catch {}
+      }
+    }
+
     const payload = {
       event_name: String(eventName),
       screen,
@@ -121,13 +146,7 @@ export async function trackEvent({
       destination_id: destinationId ?? null,
       platform: Platform.OS,
       app_version: appVersion(),
-      metadata: compactMetadata({
-        screen_name: screen,
-        app_version: appVersion(),
-        platform: Platform.OS,
-        timestamp: new Date().toISOString(),
-        ...metadata,
-      }),
+      metadata: nextMetadata,
     };
 
     const { error } = await supabase.from('user_events').insert(payload);

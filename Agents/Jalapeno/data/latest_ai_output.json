@@ -3,436 +3,307 @@
   "backend_available": true,
   "brand_result": {
     "backend_available": true,
-    "errors": [],
+    "errors": [
+      "AI generation skipped by request"
+    ],
     "model": "gpt-5.4-mini",
     "output": {
       "notes": [
-        "Hashtags are relevant and not overly noisy.",
-        "Image prompt keeps humor playful and food-first; no brand safety issues beyond avoiding any alcohol emphasis in execution."
+        "No model call was required for this fallback result",
+        "Safe to continue validation with generated fallback content"
       ],
       "passed": true,
       "reasons": [
-        "Caption is local, food-first, and community-focused around New York wing crawls.",
-        "Tone stays playful and Buffago-branded without attacking restaurants or users.",
-        "Uses real crawl and wing-related signals plus a simple call to action.",
-        "No politics, NSFW, hate, alcohol-centered, or misleading metric claims detected."
+        "Fallback validation used for brand_validation",
+        "Content slot buffago_post stays in the food-first lane"
       ],
       "risk_level": "low"
     },
-    "raw_response": {
-      "errors": [],
-      "model": "gpt-5.4-mini",
-      "output": {
-        "notes": [
-          "Hashtags are relevant and not overly noisy.",
-          "Image prompt keeps humor playful and food-first; no brand safety issues beyond avoiding any alcohol emphasis in execution."
-        ],
-        "passed": true,
-        "reasons": [
-          "Caption is local, food-first, and community-focused around New York wing crawls.",
-          "Tone stays playful and Buffago-branded without attacking restaurants or users.",
-          "Uses real crawl and wing-related signals plus a simple call to action.",
-          "No politics, NSFW, hate, alcohol-centered, or misleading metric claims detected."
-        ],
-        "risk_level": "low"
-      },
-      "request_type": "brand_validation",
-      "safety": {
-        "notes": [
-          "Hashtags are relevant and not overly noisy.",
-          "Image prompt keeps humor playful and food-first; no brand safety issues beyond avoiding any alcohol emphasis in execution.",
-          "Deterministic safety scan passed."
-        ],
-        "passed": true,
-        "reasons": [
-          "Caption is local, food-first, and community-focused around New York wing crawls.",
-          "Tone stays playful and Buffago-branded without attacking restaurants or users.",
-          "Uses real crawl and wing-related signals plus a simple call to action.",
-          "No politics, NSFW, hate, alcohol-centered, or misleading metric claims detected."
-        ],
-        "risk_level": "low"
-      },
-      "schema_version": "1.0",
-      "success": true,
-      "usage": {
-        "estimated_cost_usd": null,
-        "input_tokens": 4021,
-        "output_tokens": 121,
-        "total_tokens": 4142
-      }
-    },
+    "raw_response": null,
     "request_type": "brand_validation",
     "safety": {
-      "notes": [
-        "Hashtags are relevant and not overly noisy.",
-        "Image prompt keeps humor playful and food-first; no brand safety issues beyond avoiding any alcohol emphasis in execution.",
-        "Deterministic safety scan passed."
-      ],
+      "notes": [],
       "passed": true,
       "reasons": [
-        "Caption is local, food-first, and community-focused around New York wing crawls.",
-        "Tone stays playful and Buffago-branded without attacking restaurants or users.",
-        "Uses real crawl and wing-related signals plus a simple call to action.",
-        "No politics, NSFW, hate, alcohol-centered, or misleading metric claims detected."
+        "Fallback output used"
       ],
       "risk_level": "low"
     },
     "schema_version": "1.0",
-    "success": true,
+    "success": false,
     "usage": {
       "estimated_cost_usd": null,
-      "input_tokens": 4021,
-      "output_tokens": 121,
-      "total_tokens": 4142
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0
     },
-    "used_fallback": false
+    "used_fallback": true
   },
   "brand_validation": {
     "notes": [
-      "Hashtags are relevant and not overly noisy.",
-      "Image prompt keeps humor playful and food-first; no brand safety issues beyond avoiding any alcohol emphasis in execution."
+      "No model call was required for this fallback result",
+      "Safe to continue validation with generated fallback content"
     ],
     "passed": true,
     "reasons": [
-      "Caption is local, food-first, and community-focused around New York wing crawls.",
-      "Tone stays playful and Buffago-branded without attacking restaurants or users.",
-      "Uses real crawl and wing-related signals plus a simple call to action.",
-      "No politics, NSFW, hate, alcohol-centered, or misleading metric claims detected."
+      "Fallback validation used for brand_validation",
+      "Content slot buffago_post stays in the food-first lane"
     ],
     "risk_level": "low"
   },
-  "generated_at": "2026-07-01T12:06:33.933921+00:00",
+  "generated_at": "2026-07-12T16:35:52.137255+00:00",
   "image_prompt": {
     "brand_safety_notes": [
-      "Keep the humor playful and food-first, not mean.",
-      "Use generic sports-night energy without referencing specific teams, scores, or matchups.",
-      "No alcohol-focused framing; drinks can be background only if present and incidental.",
-      "Respectful restaurant vibe: funny chaos, not trash talk."
+      "Meme tone kept positive and local",
+      "No offensive stereotypes",
+      "No fake claims"
     ],
-    "composition_notes": "Booth-level cinematic wide shot, wing basket centered in the frame, expressive foreground chaos, bartender and diners reacting in the background, warm glow, shallow depth of field, commercial food photography polish with natural mess and movement.",
+    "camera_angle": "dramatic close-up from plate level with sauce shine and faces reacting behind the wings",
+    "character_archetype": "The Heat Seeker",
+    "character_description": "brave spice chaser trying not to reveal the sauce is winning",
+    "comedy_beat": "a sauce scientist inspects a wing under the kitchen pass lights while diners cheer the experiment",
+    "composition_notes": "Keep the wings in the foreground or sharp focal plane, make the argument readable through action and reactions, and avoid static table conversation.",
     "content_slot": "meme_post",
-    "image_prompt": "A packed Buffalo sports bar during a midweek game night, with a wing basket on the table as the absolute center of attention: golden crisp wings coated in glossy buffalo sauce, steam rising, ranch and blue cheese cups, celery and carrots scattered like the table just survived a tiny wing skirmish. In the foreground, one friend is dramatically clutching a drumstick like evidence, another is half-standing in disbelief, and a third is pointing at the basket with mock outrage like the last wing was personally stolen. The bartender in the background facepalms while nearby diners stare, one person records the chaos on a phone, and a TV glow reflects off the room with summer patio and watch-party energy. Shot from a booth-level cinematic angle with shallow depth of field, warm sports bar lighting, lively imperfect expressions, humorous tension, and a clear visual punchline that feels like a viral wing meme, no visible words, no captions, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
-    "needs_text_overlay": false,
-    "negative_prompt_guidance": "Avoid visible text, captions, logos, app UI, fake screens, staged stock-photo smiles, overly clean tables, cartoon rendering, abstract shapes, extra limbs, distorted hands, blurry food, dull wings, dry texture, and corporate lifestyle aesthetics.",
-    "style": "realistic",
-    "text_overlay": null
+    "image_prompt": "Ultra realistic cinematic photography with a viral Instagram meme feel, not stock photography. Comedy first, food second, story third, with warm sports bar, brewery, or neighborhood restaurant lighting, highly expressive faces, natural imperfections, visible emotion, motion and action, shallow depth of field, an obvious focal point, background characters reacting naturally, no staged poses, no AI-looking smiles, professional food photography quality, and professional commercial photography quality. In a packed sports bar at peak wing-night noise, friends, nearby diners, and one person holding up a phone all crowd around a basket of wings. The conflict is visually obvious: the table is split over flats versus drums and everyone reacts like the answer matters right now. The comedy beat is a sauce scientist inspects a wing under the kitchen pass lights while diners cheer the experiment, with The Heat Seeker, brave spice chaser trying not to reveal the sauce is winning. Use dramatic close-up from plate level with sauce shine and faces reacting behind the wings. The wings are the visual centerpiece in the foreground or clear focal plane: golden crisp edges, glossy buffalo-orange sauce, visible texture, steam, pepper and seasoning detail, creamy ranch or blue cheese cups nearby, celery and carrots as supporting props. The mood is social, scroll-stopping, hungry, and instantly readable, full of restaurant-freezes-in-silence energy and active gestures like cheering and defending a basket. Background characters should react naturally with gasps, cheers, facepalms, disbelief, or someone recording on a phone. Avoid a static seated conversation or two people simply sitting across a table; the scene should feel caught mid-action. No alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+    "needs_text_overlay": true,
+    "negative_prompt_guidance": "Avoid politics, people-facing tragedy jokes, brand logos, alcohol focus, cluttered backgrounds, text inside the generated image, and stock-photo staging.",
+    "prompt_version": "prompt-library-v2:buffago-visual-v2",
+    "scene_type": "restaurant counter with regulars",
+    "style": "meme",
+    "text_overlay": "WHO'S PULLING UP?",
+    "visual_style": "buffago_cinematic_comedy_food_v2",
+    "wing_focus_level": "maximum"
   },
   "image_result": {
     "backend_available": true,
-    "errors": [],
+    "errors": [
+      "AI generation skipped by request"
+    ],
     "model": "gpt-5.4-mini",
     "output": {
       "brand_safety_notes": [
-        "Keep the humor playful and food-first, not mean.",
-        "Use generic sports-night energy without referencing specific teams, scores, or matchups.",
-        "No alcohol-focused framing; drinks can be background only if present and incidental.",
-        "Respectful restaurant vibe: funny chaos, not trash talk."
+        "Meme tone kept positive and local",
+        "No offensive stereotypes",
+        "No fake claims"
       ],
-      "composition_notes": "Booth-level cinematic wide shot, wing basket centered in the frame, expressive foreground chaos, bartender and diners reacting in the background, warm glow, shallow depth of field, commercial food photography polish with natural mess and movement.",
+      "camera_angle": "dramatic close-up from plate level with sauce shine and faces reacting behind the wings",
+      "character_archetype": "The Heat Seeker",
+      "character_description": "brave spice chaser trying not to reveal the sauce is winning",
+      "comedy_beat": "a sauce scientist inspects a wing under the kitchen pass lights while diners cheer the experiment",
+      "composition_notes": "Keep the wings in the foreground or sharp focal plane, make the argument readable through action and reactions, and avoid static table conversation.",
       "content_slot": "meme_post",
-      "image_prompt": "A packed Buffalo sports bar during a midweek game night, with a wing basket on the table as the absolute center of attention: golden crisp wings coated in glossy buffalo sauce, steam rising, ranch and blue cheese cups, celery and carrots scattered like the table just survived a tiny wing skirmish. In the foreground, one friend is dramatically clutching a drumstick like evidence, another is half-standing in disbelief, and a third is pointing at the basket with mock outrage like the last wing was personally stolen. The bartender in the background facepalms while nearby diners stare, one person records the chaos on a phone, and a TV glow reflects off the room with summer patio and watch-party energy. Shot from a booth-level cinematic angle with shallow depth of field, warm sports bar lighting, lively imperfect expressions, humorous tension, and a clear visual punchline that feels like a viral wing meme, no visible words, no captions, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
-      "needs_text_overlay": false,
-      "negative_prompt_guidance": "Avoid visible text, captions, logos, app UI, fake screens, staged stock-photo smiles, overly clean tables, cartoon rendering, abstract shapes, extra limbs, distorted hands, blurry food, dull wings, dry texture, and corporate lifestyle aesthetics.",
-      "style": "realistic",
-      "text_overlay": null
+      "image_prompt": "Ultra realistic cinematic photography with a viral Instagram meme feel, not stock photography. Comedy first, food second, story third, with warm sports bar, brewery, or neighborhood restaurant lighting, highly expressive faces, natural imperfections, visible emotion, motion and action, shallow depth of field, an obvious focal point, background characters reacting naturally, no staged poses, no AI-looking smiles, professional food photography quality, and professional commercial photography quality. In a packed sports bar at peak wing-night noise, friends, nearby diners, and one person holding up a phone all crowd around a basket of wings. The conflict is visually obvious: the table is split over flats versus drums and everyone reacts like the answer matters right now. The comedy beat is a sauce scientist inspects a wing under the kitchen pass lights while diners cheer the experiment, with The Heat Seeker, brave spice chaser trying not to reveal the sauce is winning. Use dramatic close-up from plate level with sauce shine and faces reacting behind the wings. The wings are the visual centerpiece in the foreground or clear focal plane: golden crisp edges, glossy buffalo-orange sauce, visible texture, steam, pepper and seasoning detail, creamy ranch or blue cheese cups nearby, celery and carrots as supporting props. The mood is social, scroll-stopping, hungry, and instantly readable, full of restaurant-freezes-in-silence energy and active gestures like cheering and defending a basket. Background characters should react naturally with gasps, cheers, facepalms, disbelief, or someone recording on a phone. Avoid a static seated conversation or two people simply sitting across a table; the scene should feel caught mid-action. No alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+      "needs_text_overlay": true,
+      "negative_prompt_guidance": "Avoid politics, people-facing tragedy jokes, brand logos, alcohol focus, cluttered backgrounds, text inside the generated image, and stock-photo staging.",
+      "prompt_version": "prompt-library-v2:buffago-visual-v2",
+      "scene_type": "restaurant counter with regulars",
+      "style": "meme",
+      "text_overlay": "WHO'S PULLING UP?",
+      "visual_style": "buffago_cinematic_comedy_food_v2",
+      "wing_focus_level": "maximum"
     },
-    "raw_response": {
-      "errors": [],
-      "model": "gpt-5.4-mini",
-      "output": {
-        "brand_safety_notes": [
-          "Keep the humor playful and food-first, not mean.",
-          "Use generic sports-night energy without referencing specific teams, scores, or matchups.",
-          "No alcohol-focused framing; drinks can be background only if present and incidental.",
-          "Respectful restaurant vibe: funny chaos, not trash talk."
-        ],
-        "composition_notes": "Booth-level cinematic wide shot, wing basket centered in the frame, expressive foreground chaos, bartender and diners reacting in the background, warm glow, shallow depth of field, commercial food photography polish with natural mess and movement.",
-        "content_slot": "meme_post",
-        "image_prompt": "A packed Buffalo sports bar during a midweek game night, with a wing basket on the table as the absolute center of attention: golden crisp wings coated in glossy buffalo sauce, steam rising, ranch and blue cheese cups, celery and carrots scattered like the table just survived a tiny wing skirmish. In the foreground, one friend is dramatically clutching a drumstick like evidence, another is half-standing in disbelief, and a third is pointing at the basket with mock outrage like the last wing was personally stolen. The bartender in the background facepalms while nearby diners stare, one person records the chaos on a phone, and a TV glow reflects off the room with summer patio and watch-party energy. Shot from a booth-level cinematic angle with shallow depth of field, warm sports bar lighting, lively imperfect expressions, humorous tension, and a clear visual punchline that feels like a viral wing meme, no visible words, no captions, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
-        "needs_text_overlay": false,
-        "negative_prompt_guidance": "Avoid visible text, captions, logos, app UI, fake screens, staged stock-photo smiles, overly clean tables, cartoon rendering, abstract shapes, extra limbs, distorted hands, blurry food, dull wings, dry texture, and corporate lifestyle aesthetics.",
-        "style": "realistic",
-        "text_overlay": null
-      },
-      "request_type": "image_prompt",
-      "safety": {
-        "matches": [],
-        "notes": [
-          "Deterministic safety scan passed."
-        ],
-        "passed": true,
-        "reasons": [],
-        "risk_level": "low"
-      },
-      "schema_version": "1.0",
-      "success": true,
-      "usage": {
-        "estimated_cost_usd": null,
-        "input_tokens": 5783,
-        "output_tokens": 403,
-        "total_tokens": 6186
-      }
-    },
+    "raw_response": null,
     "request_type": "image_prompt",
     "safety": {
-      "matches": [],
-      "notes": [
-        "Deterministic safety scan passed."
-      ],
+      "notes": [],
       "passed": true,
-      "reasons": [],
+      "reasons": [
+        "Fallback output used"
+      ],
       "risk_level": "low"
     },
     "schema_version": "1.0",
-    "success": true,
+    "success": false,
     "usage": {
       "estimated_cost_usd": null,
-      "input_tokens": 5783,
-      "output_tokens": 403,
-      "total_tokens": 6186
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0
     },
-    "used_fallback": false
+    "used_fallback": true
   },
-  "run_id": "48d2c90b-f850-4fba-9dae-6fd461f4ec55",
+  "run_id": "7178a6c9-b9e7-497e-9bf6-7a4570977fec",
   "schema_version": "1.0",
   "text_content": {
-    "alt_text": "Buffago graphic showing a New York wing crawl with highlighted spots in Buffalo, Rochester, and Albany.",
+    "alt_text": "A Buffago-style wing post with a local, food-first tone.",
     "brand_safety_notes": [
-      "No restaurant criticism included.",
-      "No politics, alcohol, or controversial references.",
-      "Uses only non-specific sports-season energy and local food discovery."
+      "No politics or disaster humor",
+      "No private user data used",
+      "No fake metrics or endorsements"
     ],
-    "caption": "Midweek sauce check: New York is putting up numbers and the wing trail is not taking a day off. \ud83d\uddfa\ufe0f\n\nCrispy Corner in Buffalo, Wing Vault in Rochester, and Sauce Street in Albany are all keeping the leaderboard busy. Meanwhile, Clutch Bar, Sauce Lab, and Crunch House just joined the map, because apparently wing season does not believe in chill.\n\nGot a spot your crew should crawl next? Drop it in the comments, rate your next wings, and keep your journey moving.",
-    "confidence_score": 0.96,
-    "content_angle": "Highlight active New York wing activity, new restaurant additions, and invite the community to plan the next crawl.",
+    "caption": "Who is pulling up for wings?\n\n#BuffagoWings #ConnecticutWings #WingNight #WingReels #WingCrawl",
+    "caption_overlay_concept": "plans",
+    "caption_source": "fallback",
+    "confidence_score": 0.78,
+    "content_angle": "Buffago simple_hype caption",
     "content_slot": "buffago_post",
+    "fallback_used": true,
     "hashtags": [
-      "#Buffago",
-      "#WingCrawl",
-      "#WingLovers",
-      "#BuffaloNY",
-      "#RochesterNY",
-      "#AlbanyNY",
-      "#NYFood",
-      "#WingJourney"
+      "#BuffagoWings",
+      "#ConnecticutWings",
+      "#WingNight",
+      "#WingReels",
+      "#WingCrawl"
     ],
-    "image_prompt": "A bold, playful Buffago social graphic with a New York wing crawl map, wing icons connecting Buffalo, Rochester, and Albany, and subtle leaderboard elements. Summer patio vibe, bright colors, clean typography, community-first feel.",
-    "post_type": "crawl_prompt",
+    "image_prompt": "Ultra realistic cinematic photography with a viral Instagram meme feel, not stock photography. Comedy first, food second, story third, with warm sports bar, brewery, or neighborhood restaurant lighting, highly expressive faces, natural imperfections, visible emotion, motion and action, shallow depth of field, an obvious focal point, background characters reacting naturally, no staged poses, no AI-looking smiles, professional food photography quality, and professional commercial photography quality. In a packed sports bar at peak wing-night noise, friends, nearby diners, and one person holding up a phone all crowd around a basket of wings. The conflict is visually obvious: the table is split over flats versus drums and everyone reacts like the answer matters right now. The comedy beat is one person stands on a booth pointing a saucy wing like courtroom evidence while another shields the basket like treasure, with The Wing Referee, mock-official peacemaker using hand signals and exaggerated judgment over wing disputes. Use bartender POV from behind the bar watching the argument unfold across a wing basket. The wings are the visual centerpiece in the foreground or clear focal plane: golden crisp edges, glossy buffalo-orange sauce, visible texture, steam, pepper and seasoning detail, creamy ranch or blue cheese cups nearby, celery and carrots as supporting props. The mood is social, scroll-stopping, hungry, and instantly readable, full of triumphant wing confidence and active gestures like defending a basket and gasping. Background characters should react naturally with gasps, cheers, facepalms, disbelief, or someone recording on a phone. Avoid a static seated conversation or two people simply sitting across a table; the scene should feel caught mid-action. No alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+    "post_type": "meme",
+    "selected_caption_style": "simple_hype",
     "source_signals_used": [
-      "recent_ratings",
-      "top_restaurants",
-      "new_restaurants",
-      "active_states",
-      "crawl_activity",
-      "day_of_week_hooks",
-      "summer patio season",
-      "where should we crawl next?"
+      "food_holidays",
+      "local_or_national_events",
+      "sports_events",
+      "trend_topics",
+      "news_topics"
     ],
-    "why_this_post": "New York is the strongest activity signal across ratings, crawls, and new restaurant additions. A crawl prompt ties the data together while staying local, community-focused, and wing-first."
+    "validation_failure_reason": null,
+    "validation_passed": true,
+    "why_this_post": "A safe wing-specific fallback caption keeps the brand playful without inventing facts."
   },
   "text_result": {
     "backend_available": true,
-    "errors": [],
+    "errors": [
+      "AI generation skipped by request"
+    ],
     "model": "gpt-5.4-mini",
     "output": {
-      "alt_text": "Buffago graphic showing a New York wing crawl with highlighted spots in Buffalo, Rochester, and Albany.",
+      "alt_text": "A Buffago-style wing post with a local, food-first tone.",
       "brand_safety_notes": [
-        "No restaurant criticism included.",
-        "No politics, alcohol, or controversial references.",
-        "Uses only non-specific sports-season energy and local food discovery."
+        "No politics or disaster humor",
+        "No private user data used",
+        "No fake metrics or endorsements"
       ],
-      "caption": "Midweek sauce check: New York is putting up numbers and the wing trail is not taking a day off. \ud83d\uddfa\ufe0f\n\nCrispy Corner in Buffalo, Wing Vault in Rochester, and Sauce Street in Albany are all keeping the leaderboard busy. Meanwhile, Clutch Bar, Sauce Lab, and Crunch House just joined the map, because apparently wing season does not believe in chill.\n\nGot a spot your crew should crawl next? Drop it in the comments, rate your next wings, and keep your journey moving.",
-      "confidence_score": 0.96,
-      "content_angle": "Highlight active New York wing activity, new restaurant additions, and invite the community to plan the next crawl.",
+      "caption": "Who is pulling up for wings?\n\n#BuffagoWings #ConnecticutWings #WingNight #WingReels #WingCrawl",
+      "caption_overlay_concept": "plans",
+      "caption_source": "fallback",
+      "confidence_score": 0.78,
+      "content_angle": "Buffago simple_hype caption",
       "content_slot": "buffago_post",
+      "fallback_used": true,
       "hashtags": [
-        "#Buffago",
-        "#WingCrawl",
-        "#WingLovers",
-        "#BuffaloNY",
-        "#RochesterNY",
-        "#AlbanyNY",
-        "#NYFood",
-        "#WingJourney"
+        "#BuffagoWings",
+        "#ConnecticutWings",
+        "#WingNight",
+        "#WingReels",
+        "#WingCrawl"
       ],
-      "image_prompt": "A bold, playful Buffago social graphic with a New York wing crawl map, wing icons connecting Buffalo, Rochester, and Albany, and subtle leaderboard elements. Summer patio vibe, bright colors, clean typography, community-first feel.",
-      "post_type": "crawl_prompt",
+      "image_prompt": "Ultra realistic cinematic photography with a viral Instagram meme feel, not stock photography. Comedy first, food second, story third, with warm sports bar, brewery, or neighborhood restaurant lighting, highly expressive faces, natural imperfections, visible emotion, motion and action, shallow depth of field, an obvious focal point, background characters reacting naturally, no staged poses, no AI-looking smiles, professional food photography quality, and professional commercial photography quality. In a packed sports bar at peak wing-night noise, friends, nearby diners, and one person holding up a phone all crowd around a basket of wings. The conflict is visually obvious: the table is split over flats versus drums and everyone reacts like the answer matters right now. The comedy beat is one person stands on a booth pointing a saucy wing like courtroom evidence while another shields the basket like treasure, with The Wing Referee, mock-official peacemaker using hand signals and exaggerated judgment over wing disputes. Use bartender POV from behind the bar watching the argument unfold across a wing basket. The wings are the visual centerpiece in the foreground or clear focal plane: golden crisp edges, glossy buffalo-orange sauce, visible texture, steam, pepper and seasoning detail, creamy ranch or blue cheese cups nearby, celery and carrots as supporting props. The mood is social, scroll-stopping, hungry, and instantly readable, full of triumphant wing confidence and active gestures like defending a basket and gasping. Background characters should react naturally with gasps, cheers, facepalms, disbelief, or someone recording on a phone. Avoid a static seated conversation or two people simply sitting across a table; the scene should feel caught mid-action. No alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+      "post_type": "meme",
+      "selected_caption_style": "simple_hype",
       "source_signals_used": [
-        "recent_ratings",
-        "top_restaurants",
-        "new_restaurants",
-        "active_states",
-        "crawl_activity",
-        "day_of_week_hooks",
-        "summer patio season",
-        "where should we crawl next?"
+        "food_holidays",
+        "local_or_national_events",
+        "sports_events",
+        "trend_topics",
+        "news_topics"
       ],
-      "why_this_post": "New York is the strongest activity signal across ratings, crawls, and new restaurant additions. A crawl prompt ties the data together while staying local, community-focused, and wing-first."
+      "validation_failure_reason": null,
+      "validation_passed": true,
+      "why_this_post": "A safe wing-specific fallback caption keeps the brand playful without inventing facts."
     },
-    "raw_response": {
-      "errors": [],
-      "model": "gpt-5.4-mini",
-      "output": {
-        "alt_text": "Buffago graphic showing a New York wing crawl with highlighted spots in Buffalo, Rochester, and Albany.",
-        "brand_safety_notes": [
-          "No restaurant criticism included.",
-          "No politics, alcohol, or controversial references.",
-          "Uses only non-specific sports-season energy and local food discovery."
-        ],
-        "caption": "Midweek sauce check: New York is putting up numbers and the wing trail is not taking a day off. \ud83d\uddfa\ufe0f\n\nCrispy Corner in Buffalo, Wing Vault in Rochester, and Sauce Street in Albany are all keeping the leaderboard busy. Meanwhile, Clutch Bar, Sauce Lab, and Crunch House just joined the map, because apparently wing season does not believe in chill.\n\nGot a spot your crew should crawl next? Drop it in the comments, rate your next wings, and keep your journey moving.",
-        "confidence_score": 0.96,
-        "content_angle": "Highlight active New York wing activity, new restaurant additions, and invite the community to plan the next crawl.",
-        "content_slot": "buffago_post",
-        "hashtags": [
-          "#Buffago",
-          "#WingCrawl",
-          "#WingLovers",
-          "#BuffaloNY",
-          "#RochesterNY",
-          "#AlbanyNY",
-          "#NYFood",
-          "#WingJourney"
-        ],
-        "image_prompt": "A bold, playful Buffago social graphic with a New York wing crawl map, wing icons connecting Buffalo, Rochester, and Albany, and subtle leaderboard elements. Summer patio vibe, bright colors, clean typography, community-first feel.",
-        "post_type": "crawl_prompt",
-        "source_signals_used": [
-          "recent_ratings",
-          "top_restaurants",
-          "new_restaurants",
-          "active_states",
-          "crawl_activity",
-          "day_of_week_hooks",
-          "summer patio season",
-          "where should we crawl next?"
-        ],
-        "why_this_post": "New York is the strongest activity signal across ratings, crawls, and new restaurant additions. A crawl prompt ties the data together while staying local, community-focused, and wing-first."
-      },
-      "request_type": "text_content",
-      "safety": {
-        "matches": [],
-        "notes": [
-          "Deterministic safety scan passed."
-        ],
-        "passed": true,
-        "reasons": [],
-        "risk_level": "low"
-      },
-      "schema_version": "1.0",
-      "success": true,
-      "usage": {
-        "estimated_cost_usd": null,
-        "input_tokens": 5338,
-        "output_tokens": 382,
-        "total_tokens": 5720
-      }
-    },
+    "raw_response": null,
     "request_type": "text_content",
     "safety": {
-      "matches": [],
-      "notes": [
-        "Deterministic safety scan passed."
-      ],
+      "notes": [],
       "passed": true,
-      "reasons": [],
+      "reasons": [
+        "Fallback output used"
+      ],
       "risk_level": "low"
     },
     "schema_version": "1.0",
-    "success": true,
+    "success": false,
     "usage": {
       "estimated_cost_usd": null,
-      "input_tokens": 5338,
-      "output_tokens": 382,
-      "total_tokens": 5720
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0
     },
-    "used_fallback": false
+    "used_fallback": true
   },
   "usage": {
-    "generated_at": "2026-07-01T12:06:33.933921+00:00",
+    "generated_at": "2026-07-12T16:35:52.137255+00:00",
     "records": [
       {
-        "backend_used": true,
+        "backend_used": false,
         "chosen_cta": null,
         "chosen_hashtags": [
-          "#Buffago",
-          "#WingCrawl",
-          "#WingLovers",
-          "#BuffaloNY",
-          "#RochesterNY",
-          "#AlbanyNY",
-          "#NYFood",
-          "#WingJourney"
+          "#BuffagoWings",
+          "#ConnecticutWings",
+          "#WingNight",
+          "#WingReels",
+          "#WingCrawl"
         ],
-        "content_category": "crawl_prompt",
+        "content_category": "meme",
         "content_slot": "buffago_post",
         "estimated_cost_usd": null,
-        "generation_time_ms": 6194,
-        "image_generation_prompt": "A bold, playful Buffago social graphic with a New York wing crawl map, wing icons connecting Buffalo, Rochester, and Albany, and subtle leaderboard elements. Summer patio vibe, bright colors, clean typography, community-first feel.",
-        "input_size_chars": 7806,
-        "input_tokens": 5338,
+        "generation_time_ms": 2,
+        "image_generation_prompt": "Ultra realistic cinematic photography with a viral Instagram meme feel, not stock photography. Comedy first, food second, story third, with warm sports bar, brewery, or neighborhood restaurant lighting, highly expressive faces, natural imperfections, visible emotion, motion and action, shallow depth of field, an obvious focal point, background characters reacting naturally, no staged poses, no AI-looking smiles, professional food photography quality, and professional commercial photography quality. In a packed sports bar at peak wing-night noise, friends, nearby diners, and one person holding up a phone all crowd around a basket of wings. The conflict is visually obvious: the table is split over flats versus drums and everyone reacts like the answer matters right now. The comedy beat is one person stands on a booth pointing a saucy wing like courtroom evidence while another shields the basket like treasure, with The Wing Referee, mock-official peacemaker using hand signals and exaggerated judgment over wing disputes. Use bartender POV from behind the bar watching the argument unfold across a wing basket. The wings are the visual centerpiece in the foreground or clear focal plane: golden crisp edges, glossy buffalo-orange sauce, visible texture, steam, pepper and seasoning detail, creamy ranch or blue cheese cups nearby, celery and carrots as supporting props. The mood is social, scroll-stopping, hungry, and instantly readable, full of triumphant wing confidence and active gestures like defending a basket and gasping. Background characters should react naturally with gasps, cheers, facepalms, disbelief, or someone recording on a phone. Avoid a static seated conversation or two people simply sitting across a table; the scene should feel caught mid-action. No alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+        "input_size_chars": 7973,
+        "input_tokens": 0,
         "model": "gpt-5.4-mini",
-        "output_size_chars": 1805,
-        "output_tokens": 382,
+        "output_size_chars": 2995,
+        "output_tokens": 0,
         "prompt_name": "buffago_post",
-        "prompt_version": "prompt-library-v1",
-        "rejected_reason": null,
+        "prompt_version": "prompt-library-v2",
+        "rejected_reason": "AI generation skipped by request",
         "request_type": "text_content",
-        "review_score": 96.0,
-        "total_tokens": 5720,
-        "used_fallback": false
+        "review_score": 78.0,
+        "total_tokens": 0,
+        "used_fallback": true
       },
       {
-        "backend_used": true,
+        "backend_used": false,
         "chosen_cta": null,
         "chosen_hashtags": null,
         "content_category": "meme_post",
         "content_slot": "meme_post",
         "estimated_cost_usd": null,
-        "generation_time_ms": 4776,
-        "image_generation_prompt": "A packed Buffalo sports bar during a midweek game night, with a wing basket on the table as the absolute center of attention: golden crisp wings coated in glossy buffalo sauce, steam rising, ranch and blue cheese cups, celery and carrots scattered like the table just survived a tiny wing skirmish. In the foreground, one friend is dramatically clutching a drumstick like evidence, another is half-standing in disbelief, and a third is pointing at the basket with mock outrage like the last wing was personally stolen. The bartender in the background facepalms while nearby diners stare, one person records the chaos on a phone, and a TV glow reflects off the room with summer patio and watch-party energy. Shot from a booth-level cinematic angle with shallow depth of field, warm sports bar lighting, lively imperfect expressions, humorous tension, and a clear visual punchline that feels like a viral wing meme, no visible words, no captions, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
-        "input_size_chars": 7806,
-        "input_tokens": 5783,
+        "generation_time_ms": 0,
+        "image_generation_prompt": "Ultra realistic cinematic photography with a viral Instagram meme feel, not stock photography. Comedy first, food second, story third, with warm sports bar, brewery, or neighborhood restaurant lighting, highly expressive faces, natural imperfections, visible emotion, motion and action, shallow depth of field, an obvious focal point, background characters reacting naturally, no staged poses, no AI-looking smiles, professional food photography quality, and professional commercial photography quality. In a packed sports bar at peak wing-night noise, friends, nearby diners, and one person holding up a phone all crowd around a basket of wings. The conflict is visually obvious: the table is split over flats versus drums and everyone reacts like the answer matters right now. The comedy beat is a sauce scientist inspects a wing under the kitchen pass lights while diners cheer the experiment, with The Heat Seeker, brave spice chaser trying not to reveal the sauce is winning. Use dramatic close-up from plate level with sauce shine and faces reacting behind the wings. The wings are the visual centerpiece in the foreground or clear focal plane: golden crisp edges, glossy buffalo-orange sauce, visible texture, steam, pepper and seasoning detail, creamy ranch or blue cheese cups nearby, celery and carrots as supporting props. The mood is social, scroll-stopping, hungry, and instantly readable, full of restaurant-freezes-in-silence energy and active gestures like cheering and defending a basket. Background characters should react naturally with gasps, cheers, facepalms, disbelief, or someone recording on a phone. Avoid a static seated conversation or two people simply sitting across a table; the scene should feel caught mid-action. No alcohol focus, no distorted anatomy, no uncanny faces, no cluttered stock-photo energy, no visible words, no captions, no meme text, no logos, no signage, no screenshots, no UI, no prompt text, no fake app screens, no abstract placeholder shapes.",
+        "input_size_chars": 7973,
+        "input_tokens": 0,
         "model": "gpt-5.4-mini",
-        "output_size_chars": 2008,
-        "output_tokens": 403,
+        "output_size_chars": 3136,
+        "output_tokens": 0,
         "prompt_name": "image_generation",
-        "prompt_version": "prompt-library-v1",
-        "rejected_reason": null,
+        "prompt_version": "prompt-library-v2",
+        "rejected_reason": "AI generation skipped by request",
         "request_type": "image_prompt",
         "review_score": null,
-        "total_tokens": 6186,
-        "used_fallback": false
+        "total_tokens": 0,
+        "used_fallback": true
       },
       {
-        "backend_used": true,
+        "backend_used": false,
         "chosen_cta": null,
         "chosen_hashtags": null,
         "content_category": "brand_validation",
         "content_slot": "buffago_post",
         "estimated_cost_usd": null,
-        "generation_time_ms": 2945,
+        "generation_time_ms": 0,
         "image_generation_prompt": null,
-        "input_size_chars": 7806,
-        "input_tokens": 4021,
+        "input_size_chars": 7973,
+        "input_tokens": 0,
         "model": "gpt-5.4-mini",
-        "output_size_chars": 558,
-        "output_tokens": 121,
+        "output_size_chars": 286,
+        "output_tokens": 0,
         "prompt_name": "quality_review",
-        "prompt_version": "prompt-library-v1",
+        "prompt_version": "prompt-library-v2",
         "rejected_reason": null,
         "request_type": "brand_validation",
         "review_score": 100.0,
-        "total_tokens": 4142,
-        "used_fallback": false
+        "total_tokens": 0,
+        "used_fallback": true
       }
     ],
-    "run_id": "48d2c90b-f850-4fba-9dae-6fd461f4ec55",
+    "run_id": "7178a6c9-b9e7-497e-9bf6-7a4570977fec",
     "totals": {
       "estimated_cost_usd": null,
-      "input_tokens": 15142,
-      "output_tokens": 906,
-      "total_tokens": 16048
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0
     }
   },
-  "used_backend": true,
-  "used_fallback": false
+  "used_backend": false,
+  "used_fallback": true
 }

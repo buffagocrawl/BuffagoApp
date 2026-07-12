@@ -1,7 +1,8 @@
 // components/OnboardingFlow.tsx
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { Image, Pressable, ScrollView, View } from 'react-native';
+import { Image, Platform, Pressable, ScrollView, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import {
   Text,
@@ -14,8 +15,9 @@ import {
 import RatingWizardDialog from './RatingWizardDialog';
 import WingmanAddDialog from './WingmanAddDialog';
 import { supabase } from '../lib/supabase';
-import { trackEvent } from '../lib/analytics';
+import { getAnalyticsSessionId, getAnonymousId, trackEvent } from '../lib/analytics';
 import * as quickRating from '../lib/quickRating';
+import * as onboardingStepSix from '../lib/onboardingStepSix';
 
 type StateRow = {
   state_id: number;
@@ -247,12 +249,30 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
   const [step, setStep] = useState<number>(0);
   const TOTAL_STEPS = 8;
   const completedRef = useRef(false);
+  const stepSixGateViewedRef = useRef(false);
   const stepRef = useRef(0);
   const userIdRef = useRef<string | null>(null);
   const pickedStateRef = useRef<StateRow | null>(null);
   const pickedDestRef = useRef<DestRow | null>(null);
 
   const prefact = (params?.prefact || '').toString();
+  const currentAppVersion = Constants.expoConfig?.version ?? Constants.manifest?.version ?? null;
+  const stepSixVariant = useMemo(
+    () =>
+      onboardingStepSix.resolveStepSixVariant({
+        isInternalBuild: onboardingStepSix.isInternalOrTestBuild({
+          isDev: typeof __DEV__ !== 'undefined' && __DEV__,
+          appOwnership: Constants.appOwnership || null,
+          executionEnvironment: Constants.executionEnvironment || null,
+        }),
+        rolloutFlag: process.env.EXPO_PUBLIC_ONBOARDING_STEP6_TREATMENT,
+      }),
+    []
+  );
+  const stepSixCopy = useMemo(
+    () => onboardingStepSix.getStepSixCopy(stepSixVariant),
+    [stepSixVariant]
+  );
 
   const [prefs, setPrefs] = useState<WingPrefs>({
     wing_piece: null,
@@ -334,6 +354,44 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
     safeComplete();
   };
 
+  const trackStepSixTransitionEvent = useCallback(
+    async (eventName: string, extra: Record<string, any> = {}) => {
+      const [anonymousUserId, sessionId] = await Promise.all([getAnonymousId(), getAnalyticsSessionId()]);
+      const destinationId =
+        pickedDest?.id && !String(pickedDest.id).startsWith('new:') ? pickedDest.id : null;
+      const metadata = onboardingStepSix.buildStepSixMetadata({
+        variant: stepSixVariant,
+        eventName,
+        ctaLabel: stepSixCopy.ctaLabel,
+        ctaDestination: onboardingStepSix.STEP_SIX_DESTINATION,
+        sessionId,
+        anonymousUserId,
+        clientPlatform: Platform.OS,
+        appVersion: currentAppVersion,
+        extra,
+      });
+
+      await trackEvent({
+        eventName,
+        screen: 'onboarding',
+        userId,
+        stateId: pickedState?.state_id ?? null,
+        destinationId,
+        metadata,
+      });
+
+      return { anonymousUserId, sessionId };
+    },
+    [
+      currentAppVersion,
+      pickedDest?.id,
+      pickedState?.state_id,
+      stepSixCopy.ctaLabel,
+      stepSixVariant,
+      userId,
+    ]
+  );
+
   useEffect(() => {
     trackEvent({
       eventName: 'onboarding_started',
@@ -371,6 +429,25 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
       metadata: { step, total_steps: TOTAL_STEPS },
     });
   }, [step, userId, pickedState?.state_id, pickedDest?.id]);
+
+  useEffect(() => {
+    if (step !== 7 || stepSixGateViewedRef.current) return;
+    let alive = true;
+
+    (async () => {
+      const pendingContext = await AsyncStorage.getItem(onboardingStepSix.STEP_SIX_CONTEXT_KEY);
+      if (!alive || !pendingContext) return;
+
+      stepSixGateViewedRef.current = true;
+      await trackStepSixTransitionEvent('account_gate_viewed', {
+        source_transition: 'step6_to_account_gate',
+      });
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, [step, trackStepSixTransitionEvent]);
 
   useEffect(() => {
     let alive = true;
@@ -1454,11 +1531,9 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
         <View style={styles.center}>
           <Image source={require('../assets/wing-user.png')} style={styles.host} resizeMode="contain" />
 
-          <Text style={styles.title}>Are you ready?</Text>
+          <Text style={styles.title}>{stepSixCopy.title}</Text>
 
-          <Text style={styles.body}>
-            Let&apos;s get your wing journey officialy started!
-          </Text>
+          <Text style={styles.body}>{stepSixCopy.body}</Text>
 
           <View style={{ height: 14 }} />
 
@@ -1511,14 +1586,42 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
 
           <View style={{ height: 18 }} />
 
+          <Text style={[styles.tiny, { maxWidth: 420, textAlign: 'center' }]}>
+            {stepSixCopy.helper}
+          </Text>
+
+          <View style={{ height: 18 }} />
+
           <Button
             mode="contained"
-            onPress={goNext}
+            onPress={async () => {
+              const { anonymousUserId, sessionId } = await trackStepSixTransitionEvent('cta_clicked', {
+                source_transition: 'step6_to_account_gate',
+              });
+
+              try {
+                const context = onboardingStepSix.createPendingStepSixContext({
+                  variant: stepSixVariant,
+                  ctaLabel: stepSixCopy.ctaLabel,
+                  ctaDestination: onboardingStepSix.STEP_SIX_DESTINATION,
+                  sessionId,
+                  anonymousUserId,
+                  clientPlatform: Platform.OS,
+                  appVersion: currentAppVersion,
+                });
+                await AsyncStorage.setItem(
+                  onboardingStepSix.STEP_SIX_CONTEXT_KEY,
+                  JSON.stringify(context)
+                );
+              } catch {}
+
+              setStep(7);
+            }}
             style={styles.primaryBtn}
             contentStyle={{ paddingVertical: 10 }}
             labelStyle={{ fontWeight: '900' }}
           >
-            Take me to the app
+            {stepSixCopy.ctaLabel}
           </Button>
 
           <ProgressDots step={step} total={TOTAL_STEPS} />

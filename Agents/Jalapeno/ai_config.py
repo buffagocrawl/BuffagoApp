@@ -70,6 +70,9 @@ class AIConfig:
     timeout_seconds: float
     retry_count: int
     retry_backoff_seconds: float
+    openai_max_attempts: int
+    openai_retry_base_seconds: float
+    allow_copy_fallback: bool
     temperature: float
     daily_cost_limit_usd: float | None
     per_run_cost_limit_usd: float | None
@@ -114,6 +117,44 @@ def _coerce_string(value: Any, key: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ConfigError(f"Invalid AI config value for {key}")
     return value.strip()
+
+
+def _env_bool(name: str, *, default: bool) -> bool:
+    raw = os.getenv(name)
+    if raw is None or not raw.strip():
+        return default
+    normalized = raw.strip().lower()
+    if normalized in {"1", "true", "yes", "y", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "n", "off"}:
+        return False
+    raise ConfigError(f"{name} must be a boolean value")
+
+
+def _env_int(name: str, *, default: int) -> int:
+    raw = os.getenv(name)
+    if raw is None or not raw.strip():
+        return default
+    try:
+        value = int(raw.strip())
+    except ValueError as exc:
+        raise ConfigError(f"{name} must be an integer") from exc
+    if value < 1:
+        raise ConfigError(f"{name} must be at least 1")
+    return value
+
+
+def _env_float(name: str, *, default: float) -> float:
+    raw = os.getenv(name)
+    if raw is None or not raw.strip():
+        return default
+    try:
+        value = float(raw.strip())
+    except ValueError as exc:
+        raise ConfigError(f"{name} must be a number") from exc
+    if value < 0:
+        raise ConfigError(f"{name} must be non-negative")
+    return value
 
 
 def _load_ai_section(config_path: Path = CONFIG_FILE) -> dict[str, Any]:
@@ -216,6 +257,9 @@ def load_ai_config(config_path: Path = CONFIG_FILE) -> AIConfig:
         timeout_seconds=float(_coerce_optional_float(section["timeout_seconds"], "timeout_seconds") or 0),
         retry_count=int(_coerce_optional_int(section["retry_count"], "retry_count") or 0),
         retry_backoff_seconds=float(_coerce_optional_float(section["retry_backoff_seconds"], "retry_backoff_seconds") or 0),
+        openai_max_attempts=_env_int("JALAPENO_OPENAI_MAX_ATTEMPTS", default=3),
+        openai_retry_base_seconds=_env_float("JALAPENO_OPENAI_RETRY_BASE_SECONDS", default=1.0),
+        allow_copy_fallback=_env_bool("JALAPENO_ALLOW_COPY_FALLBACK", default=False),
         temperature=float(_coerce_optional_float(section["temperature"], "temperature") or 0),
         daily_cost_limit_usd=_coerce_optional_float(section.get("daily_cost_limit_usd"), "daily_cost_limit_usd"),
         per_run_cost_limit_usd=_coerce_optional_float(section.get("per_run_cost_limit_usd"), "per_run_cost_limit_usd"),

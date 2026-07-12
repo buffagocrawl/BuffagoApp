@@ -22,6 +22,11 @@ class OpenAIContentResult:
     usage: dict[str, Any]
     fallback_used: bool
     fallback_reason: str | None
+    status_code: int | None = None
+    request_id: str | None = None
+    latency_ms: int = 0
+    error_category: str | None = None
+    retryable: bool = False
     raw_content: str | None = None
     error: str | None = None
 
@@ -78,6 +83,14 @@ class OpenAIContentClient:
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
+
+    @staticmethod
+    def _sanitize_error(message: str, *, limit: int = 400) -> str:
+        cleaned = " ".join(str(message or "").replace("\r", " ").replace("\n", " ").split())
+        cleaned = cleaned.replace(os.getenv("OPENAI_API_KEY", "").strip(), "[redacted-openai-key]") if os.getenv("OPENAI_API_KEY", "").strip() else cleaned
+        if len(cleaned) <= limit:
+            return cleaned
+        return f"{cleaned[:limit]}..."
 
     def _strip_code_fences(self, text: str) -> str:
         stripped = text.strip()
@@ -175,9 +188,28 @@ class OpenAIContentClient:
                 json=payload,
                 timeout=self.timeout_seconds,
             )
+            request_id = response.headers.get("x-request-id") or response.headers.get("request-id")
             if response.status_code >= 400:
-                message = response.text.strip() or response.reason
-                raise RuntimeError(f"OpenAI request failed ({response.status_code}): {message}")
+                message = self._sanitize_error(response.text.strip() or response.reason)
+                if response.status_code == 401:
+                    category = "invalid_api_key"
+                    retryable = False
+                elif response.status_code == 429:
+                    category = "rate_limit"
+                    retryable = True
+                elif response.status_code >= 500:
+                    category = "server_error"
+                    retryable = True
+                elif response.status_code == 400:
+                    category = "invalid_request"
+                    retryable = False
+                elif response.status_code == 404:
+                    category = "unsupported_model"
+                    retryable = False
+                else:
+                    category = "http_error"
+                    retryable = False
+                raise RuntimeError(f"{category}: OpenAI request failed ({response.status_code}): {message}")
             data = response.json()
             if not isinstance(data, dict):
                 raise ValueError("OpenAI response was not a JSON object")
@@ -205,6 +237,7 @@ class OpenAIContentClient:
                 options_count=options_count,
                 duration_ms=duration_ms,
                 total_tokens=normalized_usage["total_tokens"],
+                request_id=request_id,
             )
             return OpenAIContentResult(
                 success=True,
@@ -213,11 +246,53 @@ class OpenAIContentClient:
                 usage=normalized_usage,
                 fallback_used=False,
                 fallback_reason=None,
+                status_code=response.status_code,
+                request_id=request_id,
+                latency_ms=duration_ms,
+                error_category=None,
+                retryable=False,
                 raw_content=content,
                 error=None,
             )
         except Exception as exc:
             duration_ms = int((time.perf_counter() - started_at) * 1000)
+            error_text = self._sanitize_error(str(exc))
+            lowered = error_text.lower()
+            status_code = None
+            request_id = None
+            retryable = False
+            error_category = "unknown_error"
+            if "openai request failed (" in lowered:
+                status_match = None
+                try:
+                    status_match = int(lowered.split("openai request failed (", 1)[1].split(")", 1)[0])
+                except Exception:
+                    status_match = None
+                status_code = status_match
+            if "invalid_api_key:" in lowered:
+                error_category = "invalid_api_key"
+            elif "rate_limit:" in lowered:
+                error_category = "rate_limit"
+                retryable = True
+            elif "server_error:" in lowered:
+                error_category = "server_error"
+                retryable = True
+            elif "invalid_request:" in lowered:
+                error_category = "invalid_request"
+            elif "unsupported_model:" in lowered:
+                error_category = "unsupported_model"
+            elif "did not contain valid json" in lowered:
+                error_category = "malformed_json"
+                retryable = True
+            elif "missing choices" in lowered or "missing message content" in lowered or "was not a json object" in lowered:
+                error_category = "invalid_response"
+                retryable = True
+            elif "timed out" in lowered or "timeout" in lowered:
+                error_category = "timeout"
+                retryable = True
+            elif "connection" in lowered or "max retries exceeded" in lowered:
+                error_category = "connection_error"
+                retryable = True
             log_event(
                 self.logger,
                 "openai_request_failed",
@@ -226,7 +301,9 @@ class OpenAIContentClient:
                 model=self.model,
                 options_count=options_count,
                 duration_ms=duration_ms,
-                error=str(exc),
+                error=error_text,
+                error_category=error_category,
+                retryable=retryable,
             )
             return OpenAIContentResult(
                 success=False,
@@ -239,9 +316,14 @@ class OpenAIContentClient:
                     "estimated_cost_usd": None,
                 },
                 fallback_used=True,
-                fallback_reason=str(exc),
+                fallback_reason=error_text,
+                status_code=status_code,
+                request_id=request_id,
+                latency_ms=duration_ms,
+                error_category=error_category,
+                retryable=retryable,
                 raw_content=None,
-                error=str(exc),
+                error=error_text,
             )
 
     def generate_variant_set(

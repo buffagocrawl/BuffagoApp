@@ -1,0 +1,27 @@
+table_name,trigger_name,event_manipulation,action_timing,action_orientation,action_statement
+buffacoin_ledger,trg_buffacoin_ledger_apply_delta,INSERT,AFTER,ROW,EXECUTE FUNCTION buffacoin_apply_ledger_delta()
+buffacoin_wallets,trg_buffacoin_wallets_updated_at,UPDATE,BEFORE,ROW,EXECUTE FUNCTION buffacoin_wallets_touch_updated_at()
+crawls,trg_crawl_after_update,UPDATE,AFTER,ROW,EXECUTE FUNCTION on_crawl_after_update()
+crawls,trg_crawl_after_write,INSERT,AFTER,ROW,"EXECUTE FUNCTION ""Badge_Add_Crawl_Milestones""()"
+crawls,trg_crawl_after_write,UPDATE,AFTER,ROW,"EXECUTE FUNCTION ""Badge_Add_Crawl_Milestones""()"
+destination_ratings,trg_rating_after_insert,INSERT,AFTER,ROW,"EXECUTE FUNCTION ""Badge_Add_Rating_Milestones""()"
+jalapeno_content_candidates,jalapeno_content_candidates_set_updated_at,UPDATE,BEFORE,ROW,EXECUTE FUNCTION set_updated_at()
+jalapeno_content_decisions,jalapeno_content_decisions_set_updated_at,UPDATE,BEFORE,ROW,EXECUTE FUNCTION set_updated_at()
+jalapeno_content_memory,jalapeno_content_memory_set_updated_at,UPDATE,BEFORE,ROW,EXECUTE FUNCTION set_updated_at()
+jalapeno_content_strategy,jalapeno_content_strategy_set_updated_at,UPDATE,BEFORE,ROW,EXECUTE FUNCTION set_updated_at()
+jalapeno_image_assets,jalapeno_image_assets_set_updated_at,UPDATE,BEFORE,ROW,EXECUTE FUNCTION set_updated_at()
+jalapeno_instagram_posts,jalapeno_instagram_posts_set_updated_at,UPDATE,BEFORE,ROW,EXECUTE FUNCTION set_updated_at()
+jalapeno_post_candidates,jalapeno_post_candidates_set_updated_at,UPDATE,BEFORE,ROW,EXECUTE FUNCTION set_updated_at()
+jalapeno_post_patterns,jalapeno_post_patterns_set_updated_at,UPDATE,BEFORE,ROW,EXECUTE FUNCTION set_updated_at()
+jalapeno_post_scores,jalapeno_post_scores_set_updated_at,UPDATE,BEFORE,ROW,EXECUTE FUNCTION set_updated_at()
+jalapeno_posts,jalapeno_posts_set_updated_at,UPDATE,BEFORE,ROW,EXECUTE FUNCTION set_updated_at()
+jalapeno_runs,jalapeno_runs_set_updated_at,UPDATE,BEFORE,ROW,EXECUTE FUNCTION set_updated_at()
+jalapeno_settings,jalapeno_settings_set_updated_at,UPDATE,BEFORE,ROW,EXECUTE FUNCTION set_updated_at()
+jalapeno_video_assets,jalapeno_video_assets_set_updated_at,UPDATE,BEFORE,ROW,EXECUTE FUNCTION set_updated_at()
+user_badges,trg_user_badges_ad,DELETE,AFTER,ROW,EXECUTE FUNCTION tf_user_badges_count_after_del()
+user_badges,trg_user_badges_ai,INSERT,AFTER,ROW,EXECUTE FUNCTION tf_user_badges_count_after_ins()
+user_badges,trg_user_badges_au,UPDATE,AFTER,ROW,EXECUTE FUNCTION tf_user_badges_count_after_upd()
+user_meta,tr_user_meta_touch,UPDATE,BEFORE,ROW,EXECUTE FUNCTION tg_touch_updated_at()
+user_preferences,trg_user_preferences_updated_at,UPDATE,BEFORE,ROW,EXECUTE FUNCTION set_updated_at()
+user_wing_battle_votes,trg_user_wing_battle_votes_updated_at,UPDATE,BEFORE,ROW,EXECUTE FUNCTION set_updated_at()
+users,trg_new_user_starting_coins,INSERT,AFTER,ROW,EXECUTE FUNCTION give_new_user_starting_coins()
