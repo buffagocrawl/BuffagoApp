@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from caption_rules import extract_caption_body, infer_overlay_concept, validate_caption, validate_overlay_text
+from creative_pair import create_creative_pair, deterministic_overlay, validate_creative_pair
 from logging_utils import log_event
 from image_pipeline.meme_text_renderer import MemeTextStyle, SafeArea, render_meme_text, sanitize_meme_text
 from supabase_client import SupabaseClient
@@ -59,6 +60,7 @@ class VideoOverlayResult:
             "original_storage_path": self.original_storage_path,
             "processed_storage_path": self.processed_storage_path,
             "overlay_text": self.overlay_text,
+            "rendered_overlay_text": self.overlay_text,
             "overlay_status": self.status,
             "overlay_error": self.error,
         }
@@ -114,23 +116,27 @@ def select_overlay_selection(caption: str, overlay_text: str | None = None) -> O
     caption_body = extract_caption_body(caption)
     candidate_overlay = overlay_text if isinstance(overlay_text, str) and overlay_text.strip() else _clean_overlay_text(_first_caption_hook(caption_body))
     overlay_validation = validate_overlay_text(candidate_overlay) if candidate_overlay else {"passed": False, "issues": ["empty_overlay_text"]}
-    if candidate_overlay and overlay_validation["passed"]:
+    pair_validation = validate_creative_pair(caption_body, candidate_overlay)
+    if candidate_overlay and overlay_validation["passed"] and pair_validation.passed:
         return OverlaySelectionResult(
             overlay_text=str(overlay_validation["normalized_overlay"]).upper(),
             overlay_source="openai" if overlay_text else "caption_hook",
-            caption_overlay_concept=infer_overlay_concept(caption_body, candidate_overlay),
+            caption_overlay_concept=pair_validation.caption_cta_type.value,
             validation_passed=True,
             validation_failure_reason=None,
             fallback_used=False,
         )
 
-    for fallback_overlay in FALLBACK_OVERLAYS:
+    caption_is_valid = validate_caption(caption_body)["passed"]
+    fallback_options = (deterministic_overlay(caption_body),) if caption_is_valid else (FALLBACK_OVERLAYS[1],)
+    for fallback_overlay in fallback_options:
         fallback_validation = validate_overlay_text(fallback_overlay)
-        if fallback_validation["passed"]:
+        fallback_pair_validation = validate_creative_pair(caption_body, fallback_overlay)
+        if fallback_validation["passed"] and (fallback_pair_validation.passed or not caption_is_valid):
             return OverlaySelectionResult(
                 overlay_text=str(fallback_validation["normalized_overlay"]).upper(),
                 overlay_source="fallback",
-                caption_overlay_concept=infer_overlay_concept(caption_body, fallback_overlay),
+                caption_overlay_concept=fallback_pair_validation.caption_cta_type.value,
                 validation_passed=True,
                 validation_failure_reason=None,
                 fallback_used=True,
@@ -254,6 +260,9 @@ def create_text_overlay_video(
     caption_validation = validate_caption(caption, require_hashtags=True)
     overlay_selection = select_overlay_selection(normalized_caption_body, overlay_text=overlay_text)
     overlay_text = overlay_selection.overlay_text
+    pair_validation = validate_creative_pair(caption, overlay_text)
+    if not pair_validation.passed:
+        raise RuntimeError(f"creative validation failed before render: {', '.join(pair_validation.errors)}")
     target_path = processed_storage_path(asset.storage_path)
     base_fields = {
         "run_id": run_id,
@@ -277,6 +286,11 @@ def create_text_overlay_video(
         overlay_concept=overlay_selection.caption_overlay_concept,
         **base_fields,
     )
+    pair = create_creative_pair(caption_text=caption, overlay_text=overlay_text,
+                                caption_source="final", overlay_source=overlay_selection.overlay_source)
+    log_event(logger, "creative_pair_render_started", caption_cta_type=pair_validation.caption_cta_type.value,
+              overlay_cta_type=pair_validation.overlay_cta_type.value, caption_hash=pair.caption_hash,
+              overlay_hash=pair.overlay_hash, **base_fields)
     log_event(logger, "video_overlay_started", **base_fields)
     log_event(
         logger,

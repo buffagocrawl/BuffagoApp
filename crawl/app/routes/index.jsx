@@ -1,4 +1,4 @@
-﻿// app/routes/index.jsx
+// app/routes/index.jsx
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { View, FlatList, RefreshControl, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -826,7 +826,7 @@ export default function RoutesIndex() {
                   textStyle={{ color: themed.onYellow, fontWeight: '700' }}
                   icon="progress-clock"
                 >
-                  You've stopped at {progress.hits} of {progress.total}
+                  You&apos;ve stopped at {progress.hits} of {progress.total}
                 </Chip>
               ) : null}
             </View>

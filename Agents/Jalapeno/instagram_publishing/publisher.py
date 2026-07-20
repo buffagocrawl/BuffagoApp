@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 from uuid import UUID
 
-from caption_rules import validate_post_pair
+from creative_pair import normalize_pair_text, validate_creative_pair
 from config import JalapenoConfig
 from instagram_publishing.container_status import ContainerStatusResult, wait_for_container_ready
 from instagram_publishing.instagram_client import (
@@ -225,10 +225,27 @@ def precheck_approved_post(
         passed = False
         reason = "hashtag count must be exactly 5"
     else:
-        pair_validation = validate_post_pair(post.caption, post.overlay_text)
-        if not pair_validation["passed"]:
+        pair_validation = validate_creative_pair(post.caption, post.overlay_text)
+        metadata = post.metadata if isinstance(post.metadata, dict) else {}
+        state_values = (
+            metadata.get("validated_caption_text"),
+            metadata.get("validated_overlay_text"),
+            metadata.get("rendered_overlay_text"),
+        )
+        expected_values = (post.caption, post.overlay_text, post.overlay_text)
+        drifted = any(value is not None and normalize_pair_text(str(value)) != normalize_pair_text(str(expected))
+                      for value, expected in zip(state_values, expected_values))
+        log_event(logger, "creative_pair_publish_precheck", run_id=post.run_id,
+                  candidate_id=post.candidate_id, post_id=post.post_id,
+                  caption_cta_type=pair_validation.caption_cta_type.value,
+                  overlay_cta_type=pair_validation.overlay_cta_type.value,
+                  validation_errors=list(pair_validation.errors), state_drift=drifted)
+        if drifted:
             passed = False
-            reason = f"creative validation failed: {', '.join(pair_validation['reasons'])}"
+            reason = "creative validation failed: creative_pair_state_drift"
+        elif not pair_validation.passed:
+            passed = False
+            reason = f"creative validation failed: {', '.join(pair_validation.errors)}"
     if passed and (dry_run or config.instagram.dry_run):
         passed = False
         reason = "dry_run enabled"

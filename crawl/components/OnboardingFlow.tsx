@@ -1,9 +1,10 @@
 // components/OnboardingFlow.tsx
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { Image, Platform, Pressable, ScrollView, View } from 'react-native';
+import { Image, Platform, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Text,
   Button,
@@ -245,11 +246,18 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
   const { colors } = useTheme();
   const router = useRouter();
   const params = useLocalSearchParams<{ prefact?: string; returnStep?: string }>();
+  const insets = useSafeAreaInsets();
+  const { width: windowWidth, height: windowHeight, fontScale } = useWindowDimensions();
 
   const [step, setStep] = useState<number>(0);
   const TOTAL_STEPS = 8;
   const completedRef = useRef(false);
   const stepSixGateViewedRef = useRef(false);
+  const finalScreenViewedRef = useRef(false);
+  const finalCtaVisibleRef = useRef(false);
+  const finalLayoutWarningRef = useRef(false);
+  const finalScreenRenderStartedAtRef = useRef<number | null>(null);
+  const finalPrimaryCtaRef = useRef<any>(null);
   const stepRef = useRef(0);
   const userIdRef = useRef<string | null>(null);
   const pickedStateRef = useRef<StateRow | null>(null);
@@ -257,6 +265,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
 
   const prefact = (params?.prefact || '').toString();
   const currentAppVersion = Constants.expoConfig?.version ?? Constants.manifest?.version ?? null;
+  const orientation = windowWidth > windowHeight ? 'landscape' : 'portrait';
   const stepSixVariant = useMemo(
     () =>
       onboardingStepSix.resolveStepSixVariant({
@@ -338,7 +347,38 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
     safeComplete();
   };
 
+  const trackOnboardingCompletePressed = useCallback(
+    async (flowType: 'account' | 'guest') => {
+      await trackEvent({
+        eventName: 'onboarding_complete_pressed',
+        screen: 'onboarding',
+        userId,
+        stateId: pickedState?.state_id ?? null,
+        destinationId: pickedDest?.id && !String(pickedDest.id).startsWith('new:') ? pickedDest.id : null,
+        metadata: {
+          flow_type: flowType,
+          screen_width: Math.round(windowWidth),
+          screen_height: Math.round(windowHeight),
+          safe_area_inset_bottom: Math.round(insets.bottom),
+          orientation,
+        },
+      });
+    },
+    [
+      insets.bottom,
+      orientation,
+      pickedDest?.id,
+      pickedState?.state_id,
+      userId,
+      windowHeight,
+      windowWidth,
+    ]
+  );
+
   const goToLogin = async () => {
+    if (step === 7) {
+      await trackOnboardingCompletePressed('account');
+    }
     try {
       await AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1');
     } catch {}
@@ -392,6 +432,120 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
     ]
   );
 
+  const finalScreenAnalyticsMetadata = useCallback(
+    () => ({
+      device_platform: Platform.OS,
+      screen_width: Math.round(windowWidth),
+      screen_height: Math.round(windowHeight),
+      safe_area_bottom_inset: Math.round(insets.bottom),
+      orientation,
+      font_scale: Number(fontScale.toFixed(2)),
+    }),
+    [fontScale, insets.bottom, orientation, windowHeight, windowWidth]
+  );
+
+  const trackFinalLayoutWarning = useCallback(
+    async (reason: string, buttonFrame: Record<string, any> | null = null) => {
+      if (finalLayoutWarningRef.current) return;
+      finalLayoutWarningRef.current = true;
+      console.warn('[onboarding] final CTA layout warning', { reason, buttonFrame });
+
+      await trackEvent({
+        eventName: 'onboarding_layout_warning',
+        screen: 'onboarding',
+        userId,
+        stateId: pickedState?.state_id ?? null,
+        destinationId: pickedDest?.id && !String(pickedDest.id).startsWith('new:') ? pickedDest.id : null,
+        metadata: {
+          ...finalScreenAnalyticsMetadata(),
+          reason,
+          button_frame: buttonFrame,
+          safe_area: {
+            top: Math.round(insets.top),
+            right: Math.round(insets.right),
+            bottom: Math.round(insets.bottom),
+            left: Math.round(insets.left),
+          },
+        },
+      });
+    },
+    [
+      finalScreenAnalyticsMetadata,
+      insets.bottom,
+      insets.left,
+      insets.right,
+      insets.top,
+      pickedDest?.id,
+      pickedState?.state_id,
+      userId,
+    ]
+  );
+
+  const measureFinalPrimaryCta = useCallback(() => {
+    if (step !== 7) return;
+
+    const node = finalPrimaryCtaRef.current;
+    if (!node || typeof node.measureInWindow !== 'function') {
+      trackFinalLayoutWarning('button_not_measurable');
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      node.measureInWindow(async (x: number, y: number, width: number, height: number) => {
+        const buttonFrame = {
+          x: Math.round(x),
+          y: Math.round(y),
+          width: Math.round(width),
+          height: Math.round(height),
+        };
+
+        if (![x, y, width, height].every((value) => Number.isFinite(value)) || width <= 0 || height <= 0) {
+          await trackFinalLayoutWarning('button_measurement_invalid', buttonFrame);
+          return;
+        }
+
+        const visibleViewportBottom = windowHeight - insets.bottom;
+        const isVisible = y >= 0 && y + height <= visibleViewportBottom;
+
+        if (!isVisible) {
+          await trackFinalLayoutWarning('button_outside_viewport', buttonFrame);
+          return;
+        }
+
+        if (finalCtaVisibleRef.current) return;
+        finalCtaVisibleRef.current = true;
+
+        await trackEvent({
+          eventName: 'onboarding_cta_visible',
+          screen: 'onboarding',
+          userId,
+          stateId: pickedState?.state_id ?? null,
+          destinationId:
+            pickedDest?.id && !String(pickedDest.id).startsWith('new:') ? pickedDest.id : null,
+          metadata: {
+            milliseconds_from_screen_render: finalScreenRenderStartedAtRef.current
+              ? Date.now() - finalScreenRenderStartedAtRef.current
+              : null,
+            bottom_inset: Math.round(insets.bottom),
+            button_y_position: Math.round(y),
+            button_height: Math.round(height),
+            visible_viewport_bottom: Math.round(visibleViewportBottom),
+            ...finalScreenAnalyticsMetadata(),
+          },
+        });
+      });
+    });
+  }, [
+    finalScreenAnalyticsMetadata,
+    insets.bottom,
+    pickedDest?.id,
+    pickedState?.state_id,
+    step,
+    trackFinalLayoutWarning,
+    userId,
+    windowHeight,
+  ]);
+
   useEffect(() => {
     trackEvent({
       eventName: 'onboarding_started',
@@ -431,6 +585,36 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
   }, [step, userId, pickedState?.state_id, pickedDest?.id]);
 
   useEffect(() => {
+    if (step !== 7) {
+      finalScreenViewedRef.current = false;
+      finalCtaVisibleRef.current = false;
+      finalLayoutWarningRef.current = false;
+      finalScreenRenderStartedAtRef.current = null;
+      return;
+    }
+
+    finalScreenRenderStartedAtRef.current = Date.now();
+
+    if (finalScreenViewedRef.current) return;
+    finalScreenViewedRef.current = true;
+
+    trackEvent({
+      eventName: 'onboarding_final_screen_viewed',
+      screen: 'onboarding',
+      userId,
+      stateId: pickedState?.state_id ?? null,
+      destinationId: pickedDest?.id && !String(pickedDest.id).startsWith('new:') ? pickedDest.id : null,
+      metadata: finalScreenAnalyticsMetadata(),
+    });
+  }, [
+    finalScreenAnalyticsMetadata,
+    pickedDest?.id,
+    pickedState?.state_id,
+    step,
+    userId,
+  ]);
+
+  useEffect(() => {
     if (step !== 7 || stepSixGateViewedRef.current) return;
     let alive = true;
 
@@ -448,6 +632,16 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
       alive = false;
     };
   }, [step, trackStepSixTransitionEvent]);
+
+  useEffect(() => {
+    if (step !== 7) return;
+
+    const timeout = setTimeout(() => {
+      measureFinalPrimaryCta();
+    }, 0);
+
+    return () => clearTimeout(timeout);
+  }, [measureFinalPrimaryCta, step]);
 
   useEffect(() => {
     let alive = true;
@@ -985,7 +1179,16 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
   );
 
   return (
-    <View style={[styles.wrap, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      edges={['top', 'left', 'right']}
+      style={[
+        styles.wrap,
+        {
+          backgroundColor: colors.background,
+          paddingBottom: step === 7 ? 0 : insets.bottom + 12,
+        },
+      ]}
+    >
       {step !== 0 && step !== 3 ? (
         <View style={{ paddingTop: 6, flexDirection: 'row', alignItems: 'center' }}>
           <Pressable onPress={goBack} hitSlop={12} style={{ paddingVertical: 8, paddingHorizontal: 8 }}>
@@ -1629,41 +1832,91 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
       ) : null}
 
       {step === 7 ? (
-        <View style={styles.center}>
-          <Text style={styles.title}>Save your journey</Text>
-          <Text style={styles.body}>
-            Create an account to keep XP, streaks, and your full Wingdex. Or continue as a guest.
-          </Text>
-
-          <View style={{ height: 18 }} />
-
-          <Button mode="contained" onPress={goToLogin} style={styles.primaryBtn} contentStyle={{ paddingVertical: 10 }}>
-            Create account
-          </Button>
-
-          <View style={{ height: 12 }} />
-
-          <Button
-            mode="outlined"
-            onPress={async () => {
-              try {
-                await AsyncStorage.removeItem(ONBOARDING_SEED_RATING_KEY);
-                await AsyncStorage.removeItem(ONBOARDING_DEST_SUGGESTION_KEY);
-              } catch {}
-
-              await complete();
-              router.replace('/(tabs)/home');
-            }}
-            style={styles.primaryBtn}
-            contentStyle={{ paddingVertical: 10 }}
+        <View style={styles.screen}>
+          <ScrollView
+            style={styles.flexFill}
+            contentContainerStyle={[
+              styles.finalStepContent,
+              {
+                paddingTop: 12,
+                paddingBottom: 24,
+              },
+            ]}
+            keyboardShouldPersistTaps="handled"
           >
-            Continue as guest
-          </Button>
+            <Text style={styles.title}>Save your journey</Text>
+            <Text style={styles.body}>
+              Create an account to keep XP, streaks, and your full Wingdex. Or continue as a guest.
+            </Text>
 
-          <ProgressDots step={step} total={TOTAL_STEPS} />
+            <View style={{ height: 18 }} />
+
+            <View
+              style={{
+                width: '100%',
+                maxWidth: 520,
+                padding: 14,
+                borderRadius: 18,
+                backgroundColor: 'rgba(255,255,255,0.06)',
+                borderWidth: 1,
+                borderColor: 'rgba(255,255,255,0.10)',
+                alignSelf: 'center',
+              }}
+            >
+              <Text style={{ fontWeight: '900', textAlign: 'center', marginBottom: 8 }}>
+                Keep your progress
+              </Text>
+              <Text style={{ textAlign: 'center', opacity: 0.82, lineHeight: 20 }}>
+                Accounts keep your XP, streaks, and full Wingdex synced. Guest mode still works if you want to
+                jump in now.
+              </Text>
+            </View>
+
+            <ProgressDots step={step} total={TOTAL_STEPS} />
+          </ScrollView>
+
+          <View
+            style={[
+              styles.finalStepFooter,
+              {
+                paddingBottom: insets.bottom + 16,
+              },
+            ]}
+          >
+            <View ref={finalPrimaryCtaRef} onLayout={() => measureFinalPrimaryCta()} collapsable={false}>
+              <Button
+                mode="contained"
+                onPress={goToLogin}
+                style={styles.primaryBtn}
+                contentStyle={{ paddingVertical: 10 }}
+              >
+                Create account
+              </Button>
+            </View>
+
+            <View style={{ height: 12 }} />
+
+            <Button
+              mode="outlined"
+              onPress={async () => {
+                await trackOnboardingCompletePressed('guest');
+                try {
+                  await AsyncStorage.removeItem(ONBOARDING_SEED_RATING_KEY);
+                  await AsyncStorage.removeItem(ONBOARDING_DEST_SUGGESTION_KEY);
+                } catch {}
+
+                await complete();
+                router.replace('/(tabs)/home');
+              }}
+              style={styles.primaryBtn}
+              contentStyle={{ paddingVertical: 10 }}
+            >
+              Continue as guest
+            </Button>
+          </View>
         </View>
       ) : null}
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -1677,7 +1930,10 @@ const styles: any = {
     zIndex: 9999,
     elevation: 50,
     padding: 22,
-    paddingTop: 40,
+    paddingTop: 16,
+  },
+  flexFill: {
+    flex: 1,
   },
   center: {
     flex: 1,
@@ -1689,6 +1945,15 @@ const styles: any = {
     paddingTop: 10,
     alignItems: 'stretch',
     justifyContent: 'flex-start',
+  },
+  finalStepContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  finalStepFooter: {
+    paddingTop: 12,
+    backgroundColor: 'transparent',
   },
   host: {
     width: 170,

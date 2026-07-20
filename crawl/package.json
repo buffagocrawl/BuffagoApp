@@ -9,7 +9,12 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "test:quick-rating": "node ./scripts/test-quick-rating.js"
+    "test:quick-rating": "node ./scripts/test-quick-rating.js",
+    "test:auth": "node --test --experimental-default-type=module ./tests/auth/*.test.js",
+    "test:analytics": "node --test --experimental-default-type=module ./tests/analytics/*.test.js",
+    "test:growth": "node --test --experimental-default-type=module ./tests/auth/growth-loops.test.js",
+    "test:rls": "node --test --experimental-default-type=module ./tests/database/*.test.js",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

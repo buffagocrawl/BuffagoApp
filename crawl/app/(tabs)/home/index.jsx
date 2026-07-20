@@ -10,6 +10,7 @@ import {
   Pressable,
   DeviceEventEmitter,
   Linking,
+  Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Button, useTheme, Dialog, Portal, Avatar, TextInput } from 'react-native-paper';
@@ -23,6 +24,16 @@ import WelcomeWizard from '../../../components/WelcomeWizard';
 import DestinationPickerWizard from '../../../components/DestinationPickerWizard';
 import RatingWizardDialog from '../../../components/RatingWizardDialog';
 import { trackEvent } from '../../../lib/analytics';
+import {
+  buildRestaurantOwnerSnapshot,
+  buildShareArtifact,
+  buildWeeklyMissionSummary,
+} from '../../../lib/growthLoops';
+import {
+  ENABLE_GROWTH_MISSIONS,
+  ENABLE_RESTAURANT_OWNER_LOOP,
+  ENABLE_SHARE_INVITE_LOOP,
+} from '../../../config/features';
 
 import { useOnboardingGate } from '../../../hooks/useOnboardingGate';
 import LocationGate from '../../../components/LocationGate';
@@ -38,6 +49,16 @@ const HOME_NEXT_SPOT_EVENT = 'buffago:home_next_spot_selected';
 
 const BUFFAGO_ORANGE = '#FF7A18';
 const clamp01 = (n) => Math.max(0, Math.min(1, Number(n) || 0));
+const SUPPORT_SHARE_PACKET_FOOTER = 'I own or manage this restaurant and want to claim or enroll it on BuffaGo.';
+const startOfWeekIso = () => {
+  const current = new Date();
+  const day = current.getDay();
+  const diff = current.getDate() - day + (day === 0 ? -6 : 1);
+  const next = new Date(current);
+  next.setHours(0, 0, 0, 0);
+  next.setDate(diff);
+  return next.toISOString();
+};
 
 const fmt2 = (n) => {
   if (n === null || n === undefined) return '—';
@@ -433,10 +454,107 @@ export default function Home() {
     at: null,
     within24h: false,
   });
+  const [missionSummary, setMissionSummary] = useState(() => buildWeeklyMissionSummary());
+  const [ownerSnapshot, setOwnerSnapshot] = useState(null);
+  const [ownerSnapshotLoading, setOwnerSnapshotLoading] = useState(false);
 
   const openWelcomeWizard = useCallback(() => {
     setWelcomeOpen(true);
   }, [session?.user?.id]);
+
+  const refreshMissionSummary = useCallback(async () => {
+    if (!ENABLE_GROWTH_MISSIONS) return;
+
+    if (!session?.user?.id) {
+      setMissionSummary(
+        buildWeeklyMissionSummary({
+          ratingsThisWeek: homeRated?.within24h ? 1 : 0,
+          sharesThisWeek: 0,
+          invitesThisWeek: 0,
+          crawlStopsVisited: activeCrawl?.visitedCount ?? 0,
+        })
+      );
+      return;
+    }
+
+    const weekStart = startOfWeekIso();
+    try {
+      const [ratingsRes, sharesRes, invitesRes] = await Promise.all([
+        supabase
+          .from('destination_ratings')
+          .select('destination_id', { count: 'exact', head: true })
+          .eq('user_id', session.user.id)
+          .gte('created_at', weekStart),
+        supabase
+          .from('user_events')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', session.user.id)
+          .eq('event_name', 'share_completed')
+          .gte('occurred_at', weekStart),
+        supabase
+          .from('user_events')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', session.user.id)
+          .in('event_name', ['invite_sent', 'friend_request_sent'])
+          .gte('occurred_at', weekStart),
+      ]);
+
+      setMissionSummary(
+        buildWeeklyMissionSummary({
+          ratingsThisWeek: ratingsRes.count ?? 0,
+          sharesThisWeek: sharesRes.count ?? 0,
+          invitesThisWeek: invitesRes.count ?? 0,
+          crawlStopsVisited: Math.max(activeCrawl?.visitedCount ?? 0, ratingsRes.count ?? 0),
+        })
+      );
+    } catch {
+      setMissionSummary(
+        buildWeeklyMissionSummary({
+          ratingsThisWeek: homeRated?.within24h ? 1 : 0,
+          sharesThisWeek: 0,
+          invitesThisWeek: 0,
+          crawlStopsVisited: activeCrawl?.visitedCount ?? 0,
+        })
+      );
+    }
+  }, [activeCrawl?.visitedCount, homeRated?.within24h, session?.user?.id]);
+
+  const refreshOwnerSnapshot = useCallback(async () => {
+    if (!ENABLE_RESTAURANT_OWNER_LOOP || !closest?.id) {
+      setOwnerSnapshot(null);
+      return;
+    }
+
+    setOwnerSnapshotLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('analytics_agent_restaurant_summary')
+        .select('destination_name, rating_count, avg_weight_score')
+        .eq('destination_id', closest.id)
+        .limit(1);
+
+      if (error) throw error;
+
+      const summary = data?.[0] || {};
+      setOwnerSnapshot(
+        buildRestaurantOwnerSnapshot({
+          restaurantName: summary.destination_name || closest.name,
+          ratingCount: summary.rating_count,
+          averageScore: summary.avg_weight_score,
+        })
+      );
+    } catch {
+      setOwnerSnapshot(
+        buildRestaurantOwnerSnapshot({
+          restaurantName: closest.name,
+          ratingCount: 0,
+          averageScore: null,
+        })
+      );
+    } finally {
+      setOwnerSnapshotLoading(false);
+    }
+  }, [closest?.id, closest?.name]);
 
   const onboardingRedirectedRef = useRef(false);
   useEffect(() => {
@@ -971,6 +1089,14 @@ export default function Home() {
   useEffect(() => {
     if (status === 'granted' && coords) reloadPreferredFromStorage();
   }, [status, coords?.latitude, coords?.longitude, reloadPreferredFromStorage]);
+
+  useEffect(() => {
+    refreshMissionSummary();
+  }, [refreshMissionSummary]);
+
+  useEffect(() => {
+    refreshOwnerSnapshot();
+  }, [refreshOwnerSnapshot]);
 
   useEffect(() => {
     if (status !== 'granted') return;
@@ -2232,6 +2358,109 @@ export default function Home() {
   const alreadyRatedThis =
   homeRated?.destinationId === closest?.id && !!homeRated?.within24h;
 
+  const shareClosestSpot = useCallback(async () => {
+    if (!ENABLE_SHARE_INVITE_LOOP || !closest?.id) return;
+
+    const artifact = buildShareArtifact({
+      restaurantName: closest.name,
+      score: homeRated?.score,
+      city: closest.city,
+      crawlTitle: selectedRoute?.title ?? nearest?.routeTitle ?? null,
+    });
+
+    await trackEvent({
+      eventName: 'share_sheet_opened',
+      screen: 'home',
+      userId: session?.user?.id ?? null,
+      destinationId: closest.id,
+      metadata: { content_type: 'restaurant', source: 'home_next_place' },
+    });
+    await trackEvent({
+      eventName: 'feature_entry',
+      screen: 'home',
+      userId: session?.user?.id ?? null,
+      destinationId: closest.id,
+      metadata: { feature_name: 'share_invite_loop', source: 'home_next_place' },
+    });
+
+    try {
+      await Share.share(artifact);
+      await trackEvent({
+        eventName: 'share_completed',
+        screen: 'home',
+        userId: session?.user?.id ?? null,
+        destinationId: closest.id,
+        metadata: { content_type: 'restaurant', source: 'home_next_place' },
+      });
+    } catch (error) {
+      await trackEvent({
+        eventName: 'share_failed',
+        screen: 'home',
+        userId: session?.user?.id ?? null,
+        destinationId: closest.id,
+        metadata: {
+          content_type: 'restaurant',
+          source: 'home_next_place',
+          error_message: error?.message || String(error),
+        },
+      });
+    }
+  }, [
+    closest?.city,
+    closest?.id,
+    closest?.name,
+    homeRated?.score,
+    nearest?.routeTitle,
+    selectedRoute?.title,
+    session?.user?.id,
+  ]);
+
+  const shareOwnerClaimPacket = useCallback(async () => {
+    if (!ENABLE_RESTAURANT_OWNER_LOOP || !closest?.id || !ownerSnapshot) return;
+
+    await trackEvent({
+      eventName: 'restaurant_owner_claim_started',
+      screen: 'home',
+      userId: session?.user?.id ?? null,
+      destinationId: closest.id,
+      metadata: { source: 'home_owner_snapshot' },
+    });
+    await trackEvent({
+      eventName: 'feature_entry',
+      screen: 'home',
+      userId: session?.user?.id ?? null,
+      destinationId: closest.id,
+      metadata: { feature_name: 'restaurant_owner_loop', source: 'home_owner_snapshot' },
+    });
+
+    try {
+      await Share.share({
+        title: ownerSnapshot.title,
+        message: [
+          ownerSnapshot.title,
+          ownerSnapshot.subtitle,
+          ...ownerSnapshot.metrics.map((metric) => `${metric.label}: ${metric.value}`),
+          SUPPORT_SHARE_PACKET_FOOTER,
+        ].join('\n'),
+      });
+      await trackEvent({
+        eventName: 'restaurant_owner_claim_completed',
+        screen: 'home',
+        userId: session?.user?.id ?? null,
+        destinationId: closest.id,
+        metadata: { source: 'home_owner_snapshot' },
+      });
+    } catch (error) {
+      await trackEvent({
+        eventName: 'restaurant_owner_claim_failed',
+        screen: 'home',
+        userId: session?.user?.id ?? null,
+        destinationId: closest.id,
+        metadata: { source: 'home_owner_snapshot', error_message: error?.message || String(error) },
+      });
+    }
+  }, [closest?.id, ownerSnapshot, session?.user?.id]);
+
   // ---------- open wizard from Home ----------
   const openHomeRatingWizard = useCallback(async () => {
     if (!closest?.id) return;
@@ -2422,6 +2651,18 @@ export default function Home() {
             weight_score: weightScore,
             would_order_again: wouldOrderAgain,
             is_guest: !uid,
+          },
+        });
+        await trackEvent({
+          eventName: 'recommendation_adopted',
+          screen: 'home',
+          userId: uid,
+          destinationId: destId,
+          crawlId,
+          metadata: {
+            recommendation_surface: 'home_next_place',
+            source: 'closest_restaurant_card',
+            weight_score: weightScore,
           },
         });
         await trackEvent({
@@ -2896,6 +3137,85 @@ export default function Home() {
             )}
           </View>
 
+          {ENABLE_GROWTH_MISSIONS ? (
+            <View style={styles.closestCard}>
+              <Text style={styles.closestHeader}>Weekly mission</Text>
+              <Text style={styles.closestName} numberOfLines={2}>
+                {missionSummary.headline}
+              </Text>
+              <Text style={styles.closestAddr}>
+                {missionSummary.completedCount}/{missionSummary.totalCount} loops complete this week
+              </Text>
+
+              <View style={{ marginTop: 12, gap: 8 }}>
+                {missionSummary.items.map((item) => (
+                  <View key={item.key} style={styles.missionRow}>
+                    <Text style={styles.missionCopy}>{item.label}</Text>
+                    <Text style={styles.missionProgress}>
+                      {item.current}/{item.target}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+
+              <Button
+                mode="contained-tonal"
+                style={[styles.searchBtn, { marginTop: 12 }]}
+                onPress={async () => {
+                  await trackEvent({
+                    eventName: 'feature_entry',
+                    screen: 'home',
+                    userId: session?.user?.id ?? null,
+                    destinationId: closest?.id ?? null,
+                    metadata: { feature_name: 'growth_missions', source: 'home_mission_card' },
+                  });
+
+                  if (!closest?.id || alreadyRatedThis) {
+                    setBattleDialogOpen(true);
+                    return;
+                  }
+
+                  openHomeRatingWizard();
+                }}
+              >
+                {alreadyRatedThis ? 'Keep the streak moving' : 'Complete the next step'}
+              </Button>
+            </View>
+          ) : null}
+
+          {ENABLE_RESTAURANT_OWNER_LOOP && ownerSnapshot ? (
+            <View style={styles.closestCard}>
+              <Text style={styles.closestHeader}>Restaurant tools</Text>
+              <Text style={styles.closestName} numberOfLines={2}>
+                {ownerSnapshot.title}
+              </Text>
+              <Text style={styles.closestAddr}>{ownerSnapshot.subtitle}</Text>
+
+              {ownerSnapshotLoading ? (
+                <View style={{ alignItems: 'center', paddingVertical: 12 }}>
+                  <ActivityIndicator />
+                </View>
+              ) : (
+                <View style={{ flexDirection: 'row', gap: 10, marginTop: 12 }}>
+                  {ownerSnapshot.metrics.map((metric) => (
+                    <View key={metric.key} style={styles.ownerMetricCard}>
+                      <Text style={styles.ownerMetricLabel}>{metric.label}</Text>
+                      <Text style={styles.ownerMetricValue}>{metric.value}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              <Button
+                mode="contained"
+                style={[styles.rateBtn, { marginTop: 12 }]}
+                onPress={shareOwnerClaimPacket}
+              >
+                {ownerSnapshot.ctaLabel}
+              </Button>
+            </View>
+          ) : null}
+
           {/* Hero Actions */}
           <View style={styles.heroActionsRow}>
             {battleTotal > 0 && !battleComplete ? (
@@ -2910,8 +3230,16 @@ export default function Home() {
               title="Wing Facts"
               icon="🍗"
               onPress={openWingFacts}
-              fullWidth={!(battleTotal > 0 && !battleComplete)}
+              fullWidth={!(battleTotal > 0 && !battleComplete) && !ENABLE_SHARE_INVITE_LOOP}
             />
+            {ENABLE_SHARE_INVITE_LOOP ? (
+              <HeroActionPill
+                title="Share spot"
+                icon="Share"
+                onPress={shareClosestSpot}
+                fullWidth={!(battleTotal > 0 && !battleComplete)}
+              />
+            ) : null}
           </View>
         </ScrollView>
 
@@ -3539,6 +3867,41 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.10)',
     backgroundColor: 'rgba(255,255,255,0.03)',
     padding: 14,
+  },
+  missionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  missionCopy: {
+    flex: 1,
+    opacity: 0.88,
+    lineHeight: 20,
+  },
+  missionProgress: {
+    fontWeight: '900',
+    opacity: 0.92,
+  },
+  ownerMetricCard: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+  },
+  ownerMetricLabel: {
+    fontSize: 11,
+    opacity: 0.72,
+    textAlign: 'center',
+  },
+  ownerMetricValue: {
+    marginTop: 4,
+    fontSize: 18,
+    fontWeight: '900',
+    textAlign: 'center',
   },
   closestHeader: { fontSize: 11, opacity: 0.75, letterSpacing: 1, textAlign: 'center', marginBottom: 6 },
   closestName: { fontSize: 18, fontWeight: '900', textAlign: 'center', color: 'rgba(255,255,255,0.95)' },

@@ -332,6 +332,17 @@ def _is_backup_worthy_video_publish_failure(exc: Exception) -> bool:
     return any(marker in message for marker in media_markers)
 
 
+def _video_failure_classification(exc: Exception) -> str:
+    message = str(exc).lower()
+    if "caption_overlay_mismatch" in message:
+        return "creative_unrepairable"
+    if "creative validation" in message or "creative_pair_state_drift" in message:
+        return "creative_unrepairable"
+    if any(marker in message for marker in ("secret", "disabled", "dry_run", "test_mode", "approved is false")):
+        return "configuration"
+    return "external_api" if _is_backup_worthy_video_publish_failure(exc) else "configuration"
+
+
 def _overlay_metadata(result) -> dict[str, object]:
     return {
         "original_video_url": result.original_video_url,
@@ -339,10 +350,30 @@ def _overlay_metadata(result) -> dict[str, object]:
         "original_storage_path": result.original_storage_path,
         "processed_storage_path": result.processed_storage_path,
         "overlay_text": result.overlay_text,
+        "rendered_overlay_text": result.overlay_text,
         "overlay_status": result.status,
         "overlay_error": result.error,
         "video_url": result.publish_video_url,
         "storage_path": result.publish_storage_path,
+    }
+
+
+def _creative_pair_metadata(package) -> dict[str, object]:
+    pair = getattr(package, "creative_pair", None)
+    if pair is None:
+        return {}
+    return {
+        "caption_cta_type": pair.cta_type.value,
+        "overlay_cta_type": pair.overlay_cta_type.value,
+        "content_angle": pair.content_angle,
+        "creative_validation_status": pair.validation_status,
+        "creative_validation_errors": list(pair.validation_errors),
+        "creative_repair_count": pair.repair_count,
+        "creative_failure_classification": pair.failure_classification.value if pair.failure_classification else None,
+        "validated_caption_text": pair.caption_text,
+        "validated_overlay_text": pair.overlay_text,
+        "caption_hash": pair.caption_hash,
+        "overlay_hash": pair.overlay_hash,
     }
 
 
@@ -1245,6 +1276,7 @@ def run_dry_run() -> int:
                     reel_plan.video_asset,
                     caption_package.caption,
                     caption_body=caption_package.body,
+                    overlay_text=caption_package.overlay_text,
                     caption_repaired=caption_package.repair_applied,
                     caption_hashtags=caption_package.hashtags,
                     original_hashtag_count=len(caption_package.hashtags),
@@ -1254,6 +1286,7 @@ def run_dry_run() -> int:
                 )
                 apply_overlay_result_to_decision(content_decision, overlay_result)
                 overlay_fields = _overlay_metadata(overlay_result)
+                overlay_fields.update(_creative_pair_metadata(caption_package))
                 ensure_selected_post_candidate(
                     client,
                     run_context=run_context,
@@ -1770,6 +1803,7 @@ def run_production(content_type: str | None = None) -> int:
                 reel_plan.video_asset,
                 caption_package.caption,
                 caption_body=caption_package.body,
+                overlay_text=caption_package.overlay_text,
                 caption_repaired=caption_package.repair_applied,
                 caption_hashtags=caption_package.hashtags,
                 original_hashtag_count=len(caption_package.hashtags),
@@ -1779,6 +1813,7 @@ def run_production(content_type: str | None = None) -> int:
             )
             apply_overlay_result_to_decision(content_decision, overlay_result)
             overlay_fields = _overlay_metadata(overlay_result)
+            overlay_fields.update(_creative_pair_metadata(caption_package))
             ensure_selected_post_candidate(
                 client,
                 run_context=run_context,
@@ -1844,6 +1879,13 @@ def run_production(content_type: str | None = None) -> int:
                 },
             )
             persist_post_pattern(client, inserted_post)
+            log_event(logger, "creative_pair_persisted", run_id=run_id,
+                      candidate_id=reel_plan.candidate_id, post_id=inserted_post.get("id"),
+                      video_asset_id=reel_plan.video_asset.id,
+                      processed_storage_path=overlay_fields.get("processed_storage_path"),
+                      caption_cta_type=overlay_fields.get("caption_cta_type"),
+                      overlay_cta_type=overlay_fields.get("overlay_cta_type"),
+                      caption_hash=overlay_fields.get("caption_hash"), overlay_hash=overlay_fields.get("overlay_hash"))
             content_decision["post_id"] = inserted_post.get("id")
             content_decision["metadata"] = {
                 "media_source": "supabase_video_asset",
@@ -1908,7 +1950,8 @@ def run_production(content_type: str | None = None) -> int:
                     candidate_id=reel_plan.candidate_id,
                     video_asset_id=reel_plan.video_asset.id,
                     storage_path=reel_plan.video_asset.storage_path,
-                    reason="config_or_state_failure",
+                    reason=_video_failure_classification(first_exc),
+                    failure_classification=_video_failure_classification(first_exc),
                     error=str(first_exc),
                 )
                 raise
@@ -1972,6 +2015,7 @@ def run_production(content_type: str | None = None) -> int:
                     backup_plan.video_asset,
                     backup_caption_package.caption,
                     caption_body=backup_caption_package.body,
+                    overlay_text=backup_caption_package.overlay_text,
                     caption_repaired=backup_caption_package.repair_applied,
                     caption_hashtags=backup_caption_package.hashtags,
                     original_hashtag_count=len(backup_caption_package.hashtags),
@@ -1981,6 +2025,7 @@ def run_production(content_type: str | None = None) -> int:
                 )
                 apply_overlay_result_to_decision(backup_decision, backup_overlay_result)
                 backup_overlay_fields = _overlay_metadata(backup_overlay_result)
+                backup_overlay_fields.update(_creative_pair_metadata(backup_caption_package))
                 ensure_selected_post_candidate(
                     client,
                     run_context=run_context,

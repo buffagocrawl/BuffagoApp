@@ -9,12 +9,13 @@ import { dbg } from '../../lib/debugLog';
 import { trackEvent } from '../../lib/analytics';
 import {
   clearStoredLinkSessionSnapshot,
-  clearFacebookFlowState,
+  clearOAuthFlowState,
   describeUrl,
   getStoredLinkSessionSnapshot,
   isOAuthFlowInProgress,
   OAUTH_FLOW_ID_KEY,
   OAUTH_FLOW_MODE_KEY,
+  OAUTH_PROVIDER_KEY,
   OAUTH_FLOW_STARTED_AT_KEY,
   OAUTH_LINK_USER_ID_KEY,
   OAUTH_RETURN_PATH_KEY,
@@ -27,6 +28,7 @@ import {
   refreshLinkedProviders,
 } from '../../lib/socialAccounts';
 import { Button, useTheme } from 'react-native-paper';
+import { resolveCallbackFallbackRoute, withCallbackTimeout } from '../../lib/authCallbackHelpers';
 
 // Onboarding keys (match OnboardingFlow)
 const ONBOARDING_SEED_RATING_KEY = 'buffago:onboarding:seed_rating';
@@ -341,28 +343,37 @@ export default function AuthCallback() {
     const finish = async () => {
       const callbackStartedAt = Date.now();
       let flowId = null;
+      let flowProvider = null;
       let flowMode = null;
       let flowStartedAt = callbackStartedAt;
       setProcessing(true);
       setErrMsg('');
       try {
-        console.info('[auth/callback] processing started');
-        flowId = await AsyncStorage.getItem(OAUTH_FLOW_ID_KEY);
-        flowMode = await AsyncStorage.getItem(OAUTH_FLOW_MODE_KEY);
-        const storedStartedAt = Number(await AsyncStorage.getItem(OAUTH_FLOW_STARTED_AT_KEY));
-        if (Number.isFinite(storedStartedAt) && storedStartedAt > 0) flowStartedAt = storedStartedAt;
+        flowProvider = await AsyncStorage.getItem(OAUTH_PROVIDER_KEY);
+        await trackEvent({
+          eventName: 'auth_callback_started',
+          screen: 'auth/callback',
+          metadata: { provider: flowProvider || 'unknown', retry_attempt: attempt },
+        });
+        await withCallbackTimeout((async () => {
+          console.info('[auth/callback] processing started');
+          flowId = await AsyncStorage.getItem(OAUTH_FLOW_ID_KEY);
+          flowMode = await AsyncStorage.getItem(OAUTH_FLOW_MODE_KEY);
+          const storedStartedAt = Number(await AsyncStorage.getItem(OAUTH_FLOW_STARTED_AT_KEY));
+          if (Number.isFinite(storedStartedAt) && storedStartedAt > 0) flowStartedAt = storedStartedAt;
 
-        await dbg(
-          'oauth_callback_screen_started',
-          {
-            flowId,
-            mode: flowMode,
-            hasRouteReturnUrl: typeof params?.returnUrl === 'string' && params.returnUrl.length > 0,
-            hasLiveUrl: typeof liveUrl === 'string' && liveUrl.length > 0,
-            elapsedMs: Date.now() - flowStartedAt,
-          },
-          flowMode ? 'facebook' : 'auth'
-        );
+          await dbg(
+            'oauth_callback_screen_started',
+            {
+              flowId,
+              provider: flowProvider,
+              mode: flowMode,
+              hasRouteReturnUrl: typeof params?.returnUrl === 'string' && params.returnUrl.length > 0,
+              hasLiveUrl: typeof liveUrl === 'string' && liveUrl.length > 0,
+              elapsedMs: Date.now() - flowStartedAt,
+            },
+            flowProvider === 'facebook' ? 'facebook' : 'auth'
+          );
 
         let url =
           typeof params?.returnUrl === 'string' && params.returnUrl.length > 0
@@ -375,7 +386,7 @@ export default function AuthCallback() {
           const cached = await AsyncStorage.getItem(OAUTH_RETURN_URL_KEY);
           if (cached) {
             url = cached;
-            await dbg('oauth_callback_url_source', { flowId, mode: flowMode, source: 'cache' }, flowMode ? 'facebook' : 'auth');
+            await dbg('oauth_callback_url_source', { flowId, provider: flowProvider, mode: flowMode, source: 'cache' }, flowProvider === 'facebook' ? 'facebook' : 'auth');
           }
         }
 
@@ -383,17 +394,17 @@ export default function AuthCallback() {
           const initialUrl = await Linking.getInitialURL();
           if (initialUrl) {
             url = initialUrl;
-            await dbg('oauth_callback_url_source', { flowId, mode: flowMode, source: 'initial_url' }, flowMode ? 'facebook' : 'auth');
+            await dbg('oauth_callback_url_source', { flowId, provider: flowProvider, mode: flowMode, source: 'initial_url' }, flowProvider === 'facebook' ? 'facebook' : 'auth');
           }
         }
 
         if (!url) {
           await dbg(
             'oauth_callback_url_missing',
-            { flowId, mode: flowMode, elapsedMs: Date.now() - flowStartedAt },
-            flowMode ? 'facebook' : 'auth'
+            { flowId, provider: flowProvider, mode: flowMode, elapsedMs: Date.now() - flowStartedAt },
+            flowProvider === 'facebook' ? 'facebook' : 'auth'
           );
-          if (flowMode) {
+          if (flowProvider === 'facebook') {
             await dbg(
               'facebook_link_missing_redirect',
               {
@@ -417,7 +428,7 @@ export default function AuthCallback() {
           throw new Error('No OAuth callback URL found');
         }
 
-        if (flowMode) {
+        if (flowProvider === 'facebook') {
           await dbg(
             'facebook_link_callback_received',
             {
@@ -443,15 +454,14 @@ export default function AuthCallback() {
         const returnPath = (await AsyncStorage.getItem(OAUTH_RETURN_PATH_KEY)) || null;
         const expectedLinkUserId = (await AsyncStorage.getItem(OAUTH_LINK_USER_ID_KEY)) || null;
         const linkSessionSnapshot = await getStoredLinkSessionSnapshot();
-        const safeFallbackRoute =
-          returnPath ||
-          (flowMode === 'link_identity' ? '/user' : '/auth/login');
+        const safeFallbackRoute = resolveCallbackFallbackRoute({ returnPath, mode: flowMode });
         setFallbackRoute(safeFallbackRoute);
 
         await dbg(
           'facebook_redirect_url_received',
           {
             flowId,
+            provider: flowProvider,
             mode: flowMode,
             redirectUrl: url,
             callback: describeUrl(url),
@@ -459,7 +469,7 @@ export default function AuthCallback() {
             snapshotUserId: linkSessionSnapshot?.userId || null,
             elapsedMs: Date.now() - flowStartedAt,
           },
-          flowMode ? 'facebook' : 'auth'
+          flowProvider === 'facebook' ? 'facebook' : 'auth'
         );
 
         const parsed = safeParseUrl(url);
@@ -494,7 +504,7 @@ export default function AuthCallback() {
               callback: describeUrl(url),
               elapsedMs: Date.now() - flowStartedAt,
             },
-            flowMode ? 'facebook' : 'auth'
+            flowProvider === 'facebook' ? 'facebook' : 'auth'
           );
           if (!cancelled) router.replace(safeFallbackRoute);
           return;
@@ -510,7 +520,7 @@ export default function AuthCallback() {
             refreshCredential: secretSummary(refreshToken),
             elapsedMs: Date.now() - flowStartedAt,
           },
-          flowMode ? 'facebook' : 'auth'
+          flowProvider === 'facebook' ? 'facebook' : 'auth'
         );
 
         await dbg(
@@ -525,7 +535,7 @@ export default function AuthCallback() {
             hasExpectedLinkUser: Boolean(expectedLinkUserId),
             elapsedMs: Date.now() - flowStartedAt,
           },
-          flowMode ? 'facebook' : 'auth'
+          flowProvider === 'facebook' ? 'facebook' : 'auth'
         );
 
         if (callbackError) {
@@ -541,7 +551,7 @@ export default function AuthCallback() {
               authCode: secretSummary(code),
               elapsedMs: Date.now() - flowStartedAt,
             },
-            flowMode ? 'facebook' : 'auth'
+            flowProvider === 'facebook' ? 'facebook' : 'auth'
           );
           const { data, error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) {
@@ -553,7 +563,7 @@ export default function AuthCallback() {
                 ...sanitizeAuthError(error),
                 elapsedMs: Date.now() - flowStartedAt,
               },
-              flowMode ? 'facebook' : 'auth'
+              flowProvider === 'facebook' ? 'facebook' : 'auth'
             );
             throw error;
           }
@@ -563,7 +573,7 @@ export default function AuthCallback() {
           await dbg(
             'oauth_code_exchange_succeeded',
             { flowId, mode: flowMode, hasUserId: true, userId, elapsedMs: Date.now() - flowStartedAt },
-            flowMode ? 'facebook' : 'auth'
+            flowProvider === 'facebook' ? 'facebook' : 'auth'
           );
         } else if (accessToken && refreshToken) {
           await dbg(
@@ -575,7 +585,7 @@ export default function AuthCallback() {
               refreshCredential: secretSummary(refreshToken),
               elapsedMs: Date.now() - flowStartedAt,
             },
-            flowMode ? 'facebook' : 'auth'
+            flowProvider === 'facebook' ? 'facebook' : 'auth'
           );
           const { data, error } = await supabase.auth.setSession({
             access_token: accessToken,
@@ -590,7 +600,7 @@ export default function AuthCallback() {
                 ...sanitizeAuthError(error),
                 elapsedMs: Date.now() - flowStartedAt,
               },
-              flowMode ? 'facebook' : 'auth'
+              flowProvider === 'facebook' ? 'facebook' : 'auth'
             );
             throw error;
           }
@@ -600,7 +610,7 @@ export default function AuthCallback() {
           await dbg(
             'oauth_set_session_succeeded',
             { flowId, mode: flowMode, hasUserId: true, userId, elapsedMs: Date.now() - flowStartedAt },
-            flowMode ? 'facebook' : 'auth'
+            flowProvider === 'facebook' ? 'facebook' : 'auth'
           );
         } else if (flowMode === 'link_identity' && expectedLinkUserId) {
           await dbg(
@@ -644,9 +654,9 @@ export default function AuthCallback() {
               : null,
             elapsedMs: Date.now() - flowStartedAt,
           },
-          flowMode ? 'facebook' : 'auth'
+          flowProvider === 'facebook' ? 'facebook' : 'auth'
         );
-        if (flowMode) {
+        if (flowProvider === 'facebook') {
           await dbg(
             'facebook_session_final_state',
             {
@@ -684,7 +694,7 @@ export default function AuthCallback() {
         await dbg(
           'oauth_user_refresh_started',
           { flowId, mode: flowMode, elapsedMs: Date.now() - flowStartedAt },
-          flowMode ? 'facebook' : 'auth'
+          flowProvider === 'facebook' ? 'facebook' : 'auth'
         );
         const { data: userData, error: userError } = await supabase.auth.getUser();
         if (userError) throw userError;
@@ -706,7 +716,7 @@ export default function AuthCallback() {
             providerRefreshError: providerState.error,
             elapsedMs: Date.now() - flowStartedAt,
           },
-          flowMode ? 'facebook' : 'auth'
+          flowProvider === 'facebook' ? 'facebook' : 'auth'
         );
 
         if (user?.id) {
@@ -716,7 +726,7 @@ export default function AuthCallback() {
             // non blocking
           }
 
-          if (providerState.facebook) {
+          if (flowProvider === 'facebook' && providerState.facebook) {
             const providerList = providerState.providers || [];
             await dbg(
               'facebook_profile_social_link_update_started',
@@ -791,7 +801,7 @@ export default function AuthCallback() {
             if (savedFacebook.newlyConnected) {
               await grantFacebookLinkRewardOnce(user.id);
             }
-          } else if (flowMode === 'link_identity' || flowMode === 'sign_in') {
+          } else if (flowProvider === 'facebook' && (flowMode === 'link_identity' || flowMode === 'sign_in')) {
             await dbg(
               'facebook_identity_missing_after_callback',
               {
@@ -852,13 +862,14 @@ export default function AuthCallback() {
           OAUTH_RETURN_PATH_KEY,
           OAUTH_LINK_USER_ID_KEY,
           OAUTH_FLOW_ID_KEY,
+          OAUTH_PROVIDER_KEY,
           OAUTH_FLOW_MODE_KEY,
           OAUTH_FLOW_STARTED_AT_KEY,
         ]);
         await clearStoredLinkSessionSnapshot();
 
         await dbg(
-          flowMode ? 'facebook_flow_finished' : 'oauth_flow_finished',
+          flowProvider === 'facebook' ? 'facebook_flow_finished' : 'oauth_flow_finished',
           {
             flowId,
             mode: flowMode,
@@ -869,10 +880,19 @@ export default function AuthCallback() {
             elapsedMs: Date.now() - flowStartedAt,
             callbackProcessingMs: Date.now() - callbackStartedAt,
           },
-          flowMode ? 'facebook' : 'auth'
+          flowProvider === 'facebook' ? 'facebook' : 'auth'
         );
 
         const finalRoute = returnPath || '/(tabs)/home';
+        await trackEvent({
+          eventName: 'auth_callback_completed',
+          screen: 'auth/callback',
+          metadata: {
+            provider: flowProvider || 'unknown',
+            elapsed_ms: Date.now() - callbackStartedAt,
+            mode: flowMode || 'sign_in',
+          },
+        });
         console.info('[auth/callback] final route decision', {
           finalRoute,
           userId: user?.id || null,
@@ -886,14 +906,24 @@ export default function AuthCallback() {
             finalUserId: user?.id || null,
             elapsedMs: Date.now() - flowStartedAt,
           },
-          flowMode ? 'facebook' : 'auth'
+          flowProvider === 'facebook' ? 'facebook' : 'auth'
         );
 
         if (!cancelled) router.replace(finalRoute);
+        })(), flowProvider);
       } catch (e) {
         const msg = String(e?.message || e);
+        await trackEvent({
+          eventName: 'auth_callback_failed',
+          screen: 'auth/callback',
+          metadata: {
+            provider: flowProvider || 'unknown',
+            error_code: e?.code || 'callback_failed',
+            elapsed_ms: Date.now() - callbackStartedAt,
+          },
+        });
         console.warn('OAuth callback failed', msg);
-        if (flowMode) {
+        if (flowProvider === 'facebook') {
           await dbg(
             'facebook_link_failure',
             {
@@ -920,7 +950,7 @@ export default function AuthCallback() {
           });
         }
         await dbg(
-          flowMode ? 'facebook_flow_finished' : 'oauth_callback_failed',
+          flowProvider === 'facebook' ? 'facebook_flow_finished' : 'oauth_callback_failed',
           {
             flowId,
             mode: flowMode,
@@ -929,21 +959,28 @@ export default function AuthCallback() {
             elapsedMs: Date.now() - flowStartedAt,
             callbackProcessingMs: Date.now() - callbackStartedAt,
           },
-          flowMode ? 'facebook' : 'auth'
+          flowProvider === 'facebook' ? 'facebook' : 'auth'
         );
-        if (flowMode) {
-          const flowStillActive = await isOAuthFlowInProgress({ mode: 'link_identity' });
+        if (flowProvider === 'facebook') {
+          const flowStillActive = await isOAuthFlowInProgress({ mode: 'link_identity', provider: 'facebook' });
           const snapshot = await getStoredLinkSessionSnapshot();
           if (flowStillActive && snapshot) {
             try {
               await restoreLinkSessionSnapshot(snapshot, flowId);
             } catch {}
           }
-          await clearFacebookFlowState();
+          await clearOAuthFlowState();
+        } else {
+          await clearOAuthFlowState();
         }
 
         if (!cancelled) {
           setErrMsg(msg);
+          await trackEvent({
+            eventName: 'auth_recovery_shown',
+            screen: 'auth/callback',
+            metadata: { provider: flowProvider || 'unknown' },
+          });
         }
       } finally {
         if (!cancelled) setProcessing(false);
@@ -958,10 +995,20 @@ export default function AuthCallback() {
   }, [attempt, params?.code, params?.returnUrl, liveUrl, router]);
 
   const retry = () => {
+    trackEvent({
+      eventName: 'auth_recovery_selected',
+      screen: 'auth/callback',
+      metadata: { recovery_action: 'retry' },
+    });
     setAttempt((value) => value + 1);
   };
 
   const signOutAndRecover = async () => {
+    await trackEvent({
+      eventName: 'auth_recovery_selected',
+      screen: 'auth/callback',
+      metadata: { recovery_action: 'return_to_login' },
+    });
     try {
       await supabase.auth.signOut();
     } catch {}
@@ -992,7 +1039,14 @@ export default function AuthCallback() {
           <Button mode="contained" onPress={retry}>
             Retry callback
           </Button>
-          <Button mode="outlined" onPress={() => router.replace(fallbackRoute)}>
+          <Button mode="outlined" onPress={async () => {
+            await trackEvent({
+              eventName: 'auth_recovery_selected',
+              screen: 'auth/callback',
+              metadata: { recovery_action: 'continue_safely' },
+            });
+            router.replace(fallbackRoute);
+          }}>
             Continue safely
           </Button>
           <Button mode="text" onPress={signOutAndRecover}>

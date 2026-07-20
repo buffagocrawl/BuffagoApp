@@ -3,6 +3,7 @@ import Constants from 'expo-constants';
 import * as Crypto from 'expo-crypto';
 import { AppState, Platform } from 'react-native';
 import { supabase } from './supabase';
+import { sanitizeAnalyticsMetadata } from './analyticsSchema';
 const onboardingStepSix = require('./onboardingStepSix');
 
 const ANON_ID_KEY = 'buffago:analytics:anonymous_id';
@@ -26,15 +27,7 @@ function uuid() {
   }
 }
 
-function compactMetadata(input) {
-  const out = {};
-  for (const [key, value] of Object.entries(input || {})) {
-    if (value === undefined) continue;
-    if (typeof value === 'function') continue;
-    out[key] = value;
-  }
-  return out;
-}
+const compactMetadata = sanitizeAnalyticsMetadata;
 
 function appVersion() {
   return Constants.expoConfig?.version ?? Constants.manifest?.version ?? null;
@@ -85,18 +78,20 @@ export async function rotateAnalyticsSession() {
   return getAnalyticsSessionId({ rotate: true });
 }
 
-export async function trackEvent({
-  eventName,
-  screen = null,
-  userId = undefined,
-  anonymousId = undefined,
-  sessionId = undefined,
-  stateId = null,
-  routeId = null,
-  crawlId = null,
-  destinationId = null,
-  metadata = {},
-} = {}) {
+/** @param {any} options */
+export async function trackEvent(options = {}) {
+  const {
+    eventName,
+    screen = null,
+    userId = undefined,
+    anonymousId = undefined,
+    sessionId = undefined,
+    stateId = null,
+    routeId = null,
+    crawlId = null,
+    destinationId = null,
+    metadata = {},
+  } = options;
   if (!enabled() || !eventName) return;
 
   try {
@@ -185,8 +180,7 @@ export async function trackErrorShown(screen, error, metadata = {}) {
     eventName: 'error_shown',
     screen,
     metadata: {
-      error_code: error?.code ?? null,
-      error_message: error?.message || String(error || ''),
+      error_code: error?.code ?? 'unknown',
       ...metadata,
     },
   });

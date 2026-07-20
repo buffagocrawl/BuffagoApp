@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { dbg } from '../lib/debugLog';
+import { trackEvent } from '../lib/analytics';
 
 const AuthContext = createContext({ session: null, user: null, initializing: true });
 
@@ -19,6 +20,9 @@ export function AuthProvider({ children }) {
       .then(({ data, error }) => {
         if (!active) return;
         setSession(data?.session ?? null);
+        if (data?.session) {
+          trackEvent({ eventName: 'auth_session_restored', screen: 'app_boot' });
+        }
         console.info('[auth] initial session load completed', {
           hasSession: Boolean(data?.session),
           userId: data?.session?.user?.id ?? null,

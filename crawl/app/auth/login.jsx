@@ -1,7 +1,4 @@
 ﻿// app/auth/login.jsx
-import * as Linking from 'expo-linking';
-import * as WebBrowser from 'expo-web-browser';
-import { ENABLE_GOOGLE_AUTH } from '../../config/features';
 import React, { useMemo, useState } from 'react';
 import {
   View,
@@ -28,12 +25,19 @@ import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase.js';
 import { dbg } from '../../lib/debugLog';
 import {
-  clearFacebookFlowState,
+  clearOAuthFlowState,
   facebookConfigChecklist,
   getFacebookRedirectUrl,
-  runFacebookOAuth,
+  runSocialOAuth,
   sanitizeAuthError,
 } from '../../lib/facebookOAuth';
+import {
+  executeSocialAuth,
+  getSocialAuthButtonModels,
+  getSocialAuthErrorMessage,
+} from '../../lib/socialAuthHelpers';
+import { ENABLE_GOOGLE_AUTH } from '../../config/features';
+import { trackEvent } from '../../lib/analytics';
 
 // Handoff page (Netlify) includes trailing slash
 const RESET_HANDOFF_URL = 'https://curious-quokka-dbae0b.netlify.app/';
@@ -42,15 +46,7 @@ const RESET_HANDOFF_URL = 'https://curious-quokka-dbae0b.netlify.app/';
 const ONBOARDING_SEED_RATING_KEY = 'buffago:onboarding:seed_rating';
 const ONBOARDING_DEST_SUGGESTION_KEY = 'buffago:onboarding:dest_suggestion';
 
-// Cache last OAuth return URL for callback screen fallback
-const OAUTH_RETURN_URL_KEY = 'buffago:oauth:return_url';
-
 const USERNAME_REGEX = /^[a-zA-Z0-9_]{3,20}$/;
-
-WebBrowser.maybeCompleteAuthSession();
-
-// Deep link for OAuth return
-const OAUTH_REDIRECT = Linking.createURL('auth/callback');
 
 // Same helper Ratings screen uses
 const deriveStateCode = (address) => {
@@ -106,6 +102,7 @@ export default function EmailAuthScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
+  const [activeSocialProvider, setActiveSocialProvider] = useState(null);
   const [showPwd, setShowPwd] = useState(false);
   const [snack, setSnack] = useState({ open: false, msg: '' });
 
@@ -358,84 +355,62 @@ export default function EmailAuthScreen() {
     await applyOnboardingSeedRatingIfAny(user.id);
   };
 
-  const onGoogle = async () => {
-    if (!ENABLE_GOOGLE_AUTH) return;
-    setBusy(true);
-    try {
-      await dbg('google_press');
+  const startSocialOAuth = async (provider) => {
+    const result = await runSocialOAuth({
+      provider,
+      mode: 'sign_in',
+      currentUserId: null,
+      returnPath: '/(tabs)/home',
+      screen: 'auth/login',
+    });
 
-      const redirectTo = OAUTH_REDIRECT;
-      await dbg('oauth_start', { redirectPath: redirectTo?.split('://')?.[1] ?? null });
-
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo, skipBrowserRedirect: true },
-      });
-      if (error) throw error;
-
-      const authUrl = data?.url;
-      await dbg('oauth_url_ready', { hasUrl: !!authUrl });
-
-      if (!authUrl) throw new Error('Google sign in could not start');
-
-      const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectTo);
-      await dbg('webbrowser_result', { type: result?.type || null, hasUrl: !!result?.url });
-
-      // Cache for callback.jsx
-      if (result?.url) {
-        await AsyncStorage.setItem(OAUTH_RETURN_URL_KEY, result.url);
-        await dbg('oauth_return_cached', { hasUrl: true });
-      } else {
-        await dbg('oauth_return_cached', { hasUrl: false });
-      }
-
-      // Hand off to callback screen to finish session + navigate once.
-      router.replace('/auth/callback');
-    } catch (e) {
-      await dbg('google_error', { msg: String(e?.message || e) });
-      show(e?.message || 'Google sign in failed');
-    } finally {
-      setBusy(false);
+    if (result.outcome === 'callback' || result.outcome === 'cancelled') {
+      return result;
     }
+
+    throw new Error(`Unexpected ${provider} auth result: ${result.resultType || result.outcome}`);
   };
 
-  const onFacebook = async () => {
-    setBusy(true);
+  const handleSocialAuth = async (provider) => {
     try {
-      const result = await runFacebookOAuth({
-        mode: 'sign_in',
-        currentUserId: null,
-        returnPath: '/(tabs)/home',
-        screen: 'auth/login',
+      await trackEvent({ eventName: 'auth_started', screen: 'auth/login', metadata: { auth_method: 'oauth' } });
+      await trackEvent({ eventName: 'auth_provider_selected', screen: 'auth/login', metadata: { provider } });
+      const result = await executeSocialAuth(provider, {
+        activeProvider: activeSocialProvider,
+        setActiveProvider: setActiveSocialProvider,
+        startOAuth: startSocialOAuth,
+        onCallbackReady: async () => {
+          router.replace('/auth/callback');
+        },
+        onCancelled: async (cancelledProvider) => {
+          show(`${cancelledProvider === 'google' ? 'Google' : 'Facebook'} sign-in cancelled.`);
+        },
       });
 
-      if (result.outcome === 'callback') {
-        router.replace('/auth/callback');
+      if (result.blocked || result.outcome === 'callback' || result.outcome === 'cancelled') {
         return;
       }
 
-      if (result.outcome === 'cancelled') {
-        show('Facebook sign-in cancelled.');
-        return;
-      }
-
-      throw new Error(`Unexpected Facebook auth result: ${result.resultType || result.outcome}`);
+      throw new Error(`Unexpected ${provider} auth result: ${result.outcome}`);
     } catch (e) {
-      await clearFacebookFlowState();
+      await clearOAuthFlowState();
+      const scope = provider === 'facebook' ? 'facebook' : 'auth';
       await dbg(
-        'facebook_oauth_failed',
+        `${provider}_oauth_failed`,
         {
+          provider,
           mode: 'sign_in',
           screen: 'auth/login',
           finalOutcome: 'failed',
           ...sanitizeAuthError(e),
-          config: facebookConfigChecklist(getFacebookRedirectUrl()),
+          config:
+            provider === 'facebook'
+              ? facebookConfigChecklist(getFacebookRedirectUrl())
+              : null,
         },
-        'facebook'
+        scope
       );
-      show(e?.message || 'Facebook sign-in failed');
-    } finally {
-      setBusy(false);
+      show(getSocialAuthErrorMessage(provider, e, 'sign in'));
     }
   };
 
@@ -444,6 +419,7 @@ export default function EmailAuthScreen() {
 
     setBusy(true);
     try {
+      await trackEvent({ eventName: 'auth_started', screen: 'auth/login', metadata: { auth_method: 'password' } });
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
 
@@ -550,6 +526,9 @@ export default function EmailAuthScreen() {
 
   const headerIconColor = theme.colors.onSurface;
   const screenBg = theme.colors.background;
+  const socialButtons = getSocialAuthButtonModels(activeSocialProvider).filter(
+    (button) => ENABLE_GOOGLE_AUTH || button.provider !== 'google'
+  );
 
   return (
     <View style={[styles.screen, { backgroundColor: screenBg }]}>
@@ -576,21 +555,28 @@ export default function EmailAuthScreen() {
                 {mode === 'signup' ? 'Create your BuffaGo account' : 'Sign in to BuffaGo'}
               </Text>
 
-              {/* ✅ Google first */}
-              {ENABLE_GOOGLE_AUTH && (
-                  <Button mode="outlined" icon="google" onPress={onGoogle} disabled={busy} style={styles.oauthBtn}>
-                Continue with Google
-              </Button>
-              )}
+              {socialButtons.map((button) => (
+                <Button
+                  key={button.provider}
+                  mode="outlined"
+                  icon={button.loading ? undefined : button.icon}
+                  loading={button.loading}
+                  disabled={button.disabled || busy}
+                  onPress={() => handleSocialAuth(button.provider)}
+                  style={[
+                    styles.oauthBtn,
+                    button.provider === 'google' ? styles.googleBtn : styles.facebookBtn,
+                  ]}
+                  contentStyle={styles.oauthBtnContent}
+                  labelStyle={styles.oauthBtnLabel}
+                  accessibilityLabel={button.label}
+                >
+                  {button.label}
+                </Button>
+              ))}
 
-              <Button mode="outlined" icon="facebook" onPress={onFacebook} disabled={busy} style={styles.oauthBtn}>
-                Continue with Facebook
-              </Button>
-
-              {/* ✅ Then choose manual path */}
               <Text style={styles.orText}>or continue with email</Text>
 
-              {/* ✅ Sign Up first, Sign In second */}
               <SegmentedButtons
                 value={mode}
                 onValueChange={setMode}
@@ -707,12 +693,27 @@ const styles = StyleSheet.create({
   },
   oauthBtn: {
     borderRadius: 12,
-    marginTop: 10,
+    marginTop: 6,
+  },
+  oauthBtnContent: {
+    minHeight: 52,
+  },
+  oauthBtnLabel: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  googleBtn: {
+    borderColor: '#DADCE0',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+  },
+  facebookBtn: {
+    borderColor: '#1877F2',
+    backgroundColor: 'rgba(24,119,242,0.08)',
   },
   orText: {
     textAlign: 'center',
     opacity: 0.6,
-    marginTop: 2,
+    marginTop: 4,
   },
   primaryBtn: {
     borderRadius: 12,

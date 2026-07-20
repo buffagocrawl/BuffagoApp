@@ -12,32 +12,66 @@ export const OAUTH_RETURN_URL_KEY = 'buffago:oauth:return_url';
 export const OAUTH_RETURN_PATH_KEY = 'buffago:oauth:return_path';
 export const OAUTH_LINK_USER_ID_KEY = 'buffago:oauth:link_user_id';
 export const OAUTH_FLOW_ID_KEY = 'buffago:oauth:flow_id';
+export const OAUTH_PROVIDER_KEY = 'buffago:oauth:provider';
 export const OAUTH_FLOW_MODE_KEY = 'buffago:oauth:flow_mode';
 export const OAUTH_FLOW_STARTED_AT_KEY = 'buffago:oauth:started_at';
 export const OAUTH_LINK_SESSION_KEY = 'buffago:oauth:link_session';
 
 const ANDROID_REDIRECT_GRACE_MS = 1800;
 
+const PROVIDER_SCOPES = {
+  facebook: 'public_profile,email',
+  google: 'email profile',
+};
+
+const PROVIDER_LABELS = {
+  facebook: 'Facebook',
+  google: 'Google',
+};
+
+export const SOCIAL_AUTH_PROVIDERS = Object.freeze([
+  {
+    provider: 'google',
+    label: 'Continue with Google',
+    icon: 'google',
+    analyticsScope: 'google',
+  },
+  {
+    provider: 'facebook',
+    label: 'Continue with Facebook',
+    icon: 'facebook',
+    analyticsScope: 'facebook',
+  },
+]);
+
 const elapsedMs = (startedAt) => Math.max(0, Date.now() - startedAt);
 
-async function emitFacebookLog(eventName, detail = {}, screen = null) {
+function getProviderLabel(provider) {
+  return PROVIDER_LABELS[provider] || provider;
+}
+
+function getProviderScope(provider) {
+  return provider === 'facebook' ? 'facebook' : 'auth';
+}
+
+async function emitProviderLog(provider, eventName, detail = {}, screen = null) {
   const payload = sanitizeForLogging({
-    provider: 'facebook',
+    provider,
     device_platform: Platform.OS,
     ...detail,
   });
 
   try {
-    console.info(`[facebook] ${eventName}`, payload);
+    console.info(`[${provider}] ${eventName}`, payload);
   } catch {}
 
   await Promise.allSettled([
-    dbg(eventName, payload, 'facebook'),
+    dbg(eventName, payload, getProviderScope(provider)),
     trackEvent({ eventName, screen, metadata: payload }),
   ]);
 }
 
-export function getFacebookRedirectUrl() {
+export function getOAuthRedirectUrl() {
   if (Constants.appOwnership === 'expo') {
     return makeRedirectUri({ path: 'auth/callback' });
   }
@@ -48,9 +82,13 @@ export function getFacebookRedirectUrl() {
   });
 }
 
+export function getFacebookRedirectUrl() {
+  return getOAuthRedirectUrl();
+}
+
 export function getFacebookRedirectDiagnostics() {
   return {
-    makeRedirectUri: getFacebookRedirectUrl(),
+    makeRedirectUri: getOAuthRedirectUrl(),
     linkingCreateUrl: Linking.createURL('auth/callback'),
     appOwnership: Constants.appOwnership || null,
     executionEnvironment: Constants.executionEnvironment || null,
@@ -132,9 +170,10 @@ export function facebookConfigChecklist(redirectUrl) {
   };
 }
 
-async function storeFlowState({ flowId, mode, returnPath, currentUserId, startedAt }) {
+async function storeFlowState({ flowId, provider, mode, returnPath, currentUserId, startedAt }) {
   await AsyncStorage.multiSet([
     [OAUTH_FLOW_ID_KEY, flowId],
+    [OAUTH_PROVIDER_KEY, provider],
     [OAUTH_FLOW_MODE_KEY, mode],
     [OAUTH_FLOW_STARTED_AT_KEY, String(startedAt)],
     [OAUTH_RETURN_PATH_KEY, returnPath],
@@ -149,6 +188,7 @@ async function storeFlowState({ flowId, mode, returnPath, currentUserId, started
 export async function readOAuthFlowState() {
   const entries = await AsyncStorage.multiGet([
     OAUTH_FLOW_ID_KEY,
+    OAUTH_PROVIDER_KEY,
     OAUTH_FLOW_MODE_KEY,
     OAUTH_FLOW_STARTED_AT_KEY,
     OAUTH_RETURN_PATH_KEY,
@@ -158,6 +198,7 @@ export async function readOAuthFlowState() {
   const map = Object.fromEntries(entries);
   return {
     flowId: map[OAUTH_FLOW_ID_KEY] || null,
+    provider: map[OAUTH_PROVIDER_KEY] || null,
     mode: map[OAUTH_FLOW_MODE_KEY] || null,
     startedAt: Number(map[OAUTH_FLOW_STARTED_AT_KEY]) || null,
     returnPath: map[OAUTH_RETURN_PATH_KEY] || null,
@@ -165,9 +206,10 @@ export async function readOAuthFlowState() {
   };
 }
 
-export async function isOAuthFlowInProgress({ mode = null } = {}) {
+export async function isOAuthFlowInProgress({ mode = null, provider = null } = {}) {
   const flowState = await readOAuthFlowState();
   if (!flowState.mode) return false;
+  if (provider && flowState.provider !== provider) return false;
   if (!mode) return true;
   return flowState.mode === mode;
 }
@@ -214,6 +256,7 @@ export async function clearFacebookFlowState() {
       OAUTH_RETURN_PATH_KEY,
       OAUTH_LINK_USER_ID_KEY,
       OAUTH_FLOW_ID_KEY,
+      OAUTH_PROVIDER_KEY,
       OAUTH_FLOW_MODE_KEY,
       OAUTH_FLOW_STARTED_AT_KEY,
     ]);
@@ -227,26 +270,41 @@ function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function runFacebookOAuth({
+export async function clearOAuthFlowState() {
+  await clearFacebookFlowState();
+}
+
+export async function runSocialOAuth({
+  provider,
   mode,
   currentUserId = null,
   returnPath,
   screen,
 }) {
   const startedAt = Date.now();
-  const flowId = `fb_${startedAt}_${Math.random().toString(16).slice(2, 8)}`;
-  const redirectUrl = getFacebookRedirectUrl();
-  const common = { flowId, mode, screen };
+  const flowId = `${provider}_${startedAt}_${Math.random().toString(16).slice(2, 8)}`;
+  const redirectUrl = getOAuthRedirectUrl();
+  const providerScope = getProviderScope(provider);
+  const common = { flowId, provider, mode, screen };
 
-  await storeFlowState({ flowId, mode, returnPath, currentUserId, startedAt });
+  if (!provider || !PROVIDER_SCOPES[provider]) {
+    throw new Error('Unsupported social auth provider');
+  }
+
+  if (mode === 'link_identity' && provider !== 'facebook') {
+    throw new Error(`${getProviderLabel(provider)} account linking is not supported here`);
+  }
+
+  await storeFlowState({ flowId, provider, mode, returnPath, currentUserId, startedAt });
   if (mode === 'link_identity') {
     const { data: sessionData } = await supabase.auth.getSession();
     await storeLinkSessionSnapshot(sessionData?.session ?? null, { flowId, screen });
   } else {
     await clearStoredLinkSessionSnapshot();
   }
-  await emitFacebookLog(
-    'facebook_link_start',
+  await emitProviderLog(
+    provider,
+    `${provider}_oauth_start`,
     {
       ...common,
       target_url: null,
@@ -256,14 +314,14 @@ export async function runFacebookOAuth({
     },
     screen
   );
-  await dbg('facebook_button_tapped', {
+  await dbg(`${provider}_button_tapped`, {
     ...common,
     ...facebookAppInfo(),
     hasSession: Boolean(currentUserId),
     redirect: describeUrl(redirectUrl),
     redirectDiagnostics: getFacebookRedirectDiagnostics(),
     elapsedMs: elapsedMs(startedAt),
-  }, 'facebook');
+  }, providerScope);
 
   let customTabsInfo = null;
   if (Platform.OS === 'android' && WebBrowser.getCustomTabsSupportingBrowsersAsync) {
@@ -274,7 +332,7 @@ export async function runFacebookOAuth({
     }
   }
 
-  await dbg('facebook_oauth_request_started', {
+  await dbg(`${provider}_oauth_request_started`, {
     ...common,
     redirect: describeUrl(redirectUrl),
     redirectDiagnostics: getFacebookRedirectDiagnostics(),
@@ -289,16 +347,16 @@ export async function runFacebookOAuth({
         }
       : null,
     elapsedMs: elapsedMs(startedAt),
-  }, 'facebook');
+  }, providerScope);
 
   const options = {
     redirectTo: redirectUrl,
-    scopes: 'public_profile,email',
+    scopes: PROVIDER_SCOPES[provider],
     skipBrowserRedirect: true,
   };
 
   await dbg(
-    'facebook_oauth_method_selected',
+    `${provider}_oauth_method_selected`,
     {
       ...common,
       method: mode === 'link_identity' ? 'linkIdentity' : 'signInWithOAuth',
@@ -306,17 +364,18 @@ export async function runFacebookOAuth({
       redirect: describeUrl(redirectUrl),
       elapsedMs: elapsedMs(startedAt),
     },
-    'facebook'
+    providerScope
   );
 
   const response =
     mode === 'link_identity'
-      ? await supabase.auth.linkIdentity({ provider: 'facebook', options })
-      : await supabase.auth.signInWithOAuth({ provider: 'facebook', options });
+      ? await supabase.auth.linkIdentity({ provider, options })
+      : await supabase.auth.signInWithOAuth({ provider, options });
 
   if (response.error) {
-    await emitFacebookLog(
-      'facebook_link_failure',
+    await emitProviderLog(
+      provider,
+      `${provider}_oauth_failure`,
       {
         ...common,
         phase: 'oauth_request',
@@ -327,18 +386,19 @@ export async function runFacebookOAuth({
       },
       screen
     );
-    await dbg('facebook_oauth_request_failed', {
+    await dbg(`${provider}_oauth_request_failed`, {
       ...common,
       ...sanitizeAuthError(response.error),
       elapsedMs: elapsedMs(startedAt),
-    }, 'facebook');
+    }, providerScope);
     throw response.error;
   }
 
   const authUrl = response.data?.url || null;
   if (!redirectUrl) {
-    await emitFacebookLog(
-      'facebook_link_missing_redirect',
+    await emitProviderLog(
+      provider,
+      `${provider}_oauth_missing_redirect`,
       {
         ...common,
         target_url: authUrl,
@@ -349,8 +409,9 @@ export async function runFacebookOAuth({
     throw new Error('Facebook redirect URL is missing');
   }
 
-  await emitFacebookLog(
-    'facebook_link_open_url',
+  await emitProviderLog(
+    provider,
+    `${provider}_oauth_open_url`,
     {
       ...common,
       target_url: authUrl,
@@ -359,21 +420,22 @@ export async function runFacebookOAuth({
     screen
   );
 
-  await dbg('facebook_oauth_request_succeeded', {
+  await dbg(`${provider}_oauth_request_succeeded`, {
     ...common,
     hasProviderUrl: Boolean(authUrl),
     providerUrl: authUrl ? describeUrl(authUrl) : null,
     authorizeUrl: authUrl,
     redirectDiagnostics: getFacebookRedirectDiagnostics(),
     elapsedMs: elapsedMs(startedAt),
-  }, 'facebook');
+  }, providerScope);
   if (!authUrl) {
-    await emitFacebookLog(
-      'facebook_link_failure',
+    await emitProviderLog(
+      provider,
+      `${provider}_oauth_failure`,
       {
         ...common,
         phase: 'oauth_url_missing',
-        error: 'No Facebook provider URL returned from Supabase',
+        error: `No ${getProviderLabel(provider)} provider URL returned from Supabase`,
         stack: null,
         target_url: null,
         redirect_url: redirectUrl,
@@ -387,8 +449,9 @@ export async function runFacebookOAuth({
     await WebBrowser.warmUpAsync?.();
     await WebBrowser.mayInitWithUrlAsync?.(authUrl);
   } catch (error) {
-    await emitFacebookLog(
-      'facebook_link_failure',
+    await emitProviderLog(
+      provider,
+      `${provider}_oauth_failure`,
       {
         ...common,
         phase: 'browser_warmup',
@@ -399,11 +462,11 @@ export async function runFacebookOAuth({
       },
       screen
     );
-    await dbg('facebook_browser_warmup_failed', {
+    await dbg(`${provider}_browser_warmup_failed`, {
       ...common,
       ...sanitizeAuthError(error),
       elapsedMs: elapsedMs(startedAt),
-    }, 'facebook');
+    }, providerScope);
   }
 
   let observedRedirectUrl = null;
@@ -412,18 +475,19 @@ export async function runFacebookOAuth({
     resolveRedirect = resolve;
   });
   const redirectSub = Linking.addEventListener('url', ({ url }) => {
-    dbg('facebook_linking_event_observed', {
+    dbg(`${provider}_linking_event_observed`, {
       ...common,
       url: url || null,
       parsed: url ? describeUrl(url) : null,
       matchesRedirect: Boolean(url && String(url).startsWith(redirectUrl)),
       elapsedMs: elapsedMs(startedAt),
-    }, 'facebook');
+    }, providerScope);
     if (!url || !String(url).startsWith(redirectUrl)) return;
     observedRedirectUrl = url;
     AsyncStorage.setItem(OAUTH_RETURN_URL_KEY, url).catch(() => {});
-    emitFacebookLog(
-      'facebook_link_callback_received',
+    emitProviderLog(
+      provider,
+      `${provider}_oauth_callback_received`,
       {
         ...common,
         callback: describeUrl(url),
@@ -432,25 +496,26 @@ export async function runFacebookOAuth({
       },
       screen
     ).catch(() => {});
-    dbg('facebook_redirect_deep_link_received', {
+    dbg(`${provider}_redirect_deep_link_received`, {
       ...common,
       callback: describeUrl(url),
       elapsedMs: elapsedMs(startedAt),
-    }, 'facebook');
+    }, providerScope);
     resolveRedirect?.(url);
   });
 
-  await dbg('facebook_browser_session_opening', {
+  await dbg(`${provider}_browser_session_opening`, {
     ...common,
     providerUrl: describeUrl(authUrl),
     redirect: describeUrl(redirectUrl),
     elapsedMs: elapsedMs(startedAt),
-  }, 'facebook');
+  }, providerScope);
 
   let result;
   try {
-    await emitFacebookLog(
-      'facebook_browser_session_selected',
+    await emitProviderLog(
+      provider,
+      `${provider}_browser_session_selected`,
       {
         ...common,
         target_url: authUrl,
@@ -460,8 +525,9 @@ export async function runFacebookOAuth({
       screen
     );
 
-    await emitFacebookLog(
-      'facebook_link_browser_opened',
+    await emitProviderLog(
+      provider,
+      `${provider}_browser_opened`,
       {
         ...common,
         target_url: authUrl,
@@ -471,27 +537,28 @@ export async function runFacebookOAuth({
     );
 
     result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
-    await dbg('facebook_browser_session_result', {
+    await dbg(`${provider}_browser_session_result`, {
       ...common,
       type: result?.type || null,
       hasUrl: Boolean(result?.url),
       resultUrl: result?.url ? describeUrl(result.url) : null,
       observedRedirect: Boolean(observedRedirectUrl),
       elapsedMs: elapsedMs(startedAt),
-    }, 'facebook');
+    }, providerScope);
 
     if (!result?.url && !observedRedirectUrl && Platform.OS === 'android') {
-      await dbg('facebook_android_redirect_grace_started', {
+      await dbg(`${provider}_android_redirect_grace_started`, {
         ...common,
         durationMs: ANDROID_REDIRECT_GRACE_MS,
         resultType: result?.type || null,
         elapsedMs: elapsedMs(startedAt),
-      }, 'facebook');
+      }, providerScope);
       await Promise.race([redirectPromise, wait(ANDROID_REDIRECT_GRACE_MS)]);
     }
   } catch (error) {
-    await emitFacebookLog(
-      'facebook_link_failure',
+    await emitProviderLog(
+      provider,
+      `${provider}_oauth_failure`,
       {
         ...common,
         phase: 'browser_session',
@@ -502,11 +569,11 @@ export async function runFacebookOAuth({
       },
       screen
     );
-    await dbg('facebook_browser_session_error', {
+    await dbg(`${provider}_browser_session_error`, {
       ...common,
       ...sanitizeAuthError(error),
       elapsedMs: elapsedMs(startedAt),
-    }, 'facebook');
+    }, providerScope);
     throw error;
   } finally {
     redirectSub?.remove?.();
@@ -518,19 +585,20 @@ export async function runFacebookOAuth({
   const callbackUrl = result?.url || observedRedirectUrl;
   if (callbackUrl) {
     await AsyncStorage.setItem(OAUTH_RETURN_URL_KEY, callbackUrl);
-    await dbg('facebook_callback_handoff_ready', {
+    await dbg(`${provider}_callback_handoff_ready`, {
       ...common,
       callback: describeUrl(callbackUrl),
       elapsedMs: elapsedMs(startedAt),
-    }, 'facebook');
+    }, providerScope);
     return { outcome: 'callback', callbackUrl, flowId, startedAt };
   }
 
   const outcome =
     result?.type === 'cancel' || result?.type === 'dismiss' ? 'cancelled' : 'failed';
   if (outcome === 'cancelled') {
-    await emitFacebookLog(
-      'facebook_link_cancelled',
+    await emitProviderLog(
+      provider,
+      `${provider}_oauth_cancelled`,
       {
         ...common,
         browser_result_type: result?.type || null,
@@ -541,8 +609,9 @@ export async function runFacebookOAuth({
       screen
     );
   } else {
-    await emitFacebookLog(
-      'facebook_link_timeout',
+    await emitProviderLog(
+      provider,
+      `${provider}_oauth_timeout`,
       {
         ...common,
         browser_result_type: result?.type || null,
@@ -553,13 +622,17 @@ export async function runFacebookOAuth({
       screen
     );
   }
-  await dbg('facebook_flow_finished', {
+  await dbg(`${provider}_oauth_finished`, {
     ...common,
     outcome,
     browserResultType: result?.type || null,
     config: facebookConfigChecklist(redirectUrl),
     elapsedMs: elapsedMs(startedAt),
-  }, 'facebook');
-  await clearFacebookFlowState();
+  }, providerScope);
+  await clearOAuthFlowState();
   return { outcome, callbackUrl: null, flowId, startedAt, resultType: result?.type || null };
+}
+
+export async function runFacebookOAuth(options) {
+  return runSocialOAuth({ provider: 'facebook', ...options });
 }

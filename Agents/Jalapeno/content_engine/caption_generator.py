@@ -30,6 +30,7 @@ from content_engine.feedback_summary import ContentFeedbackSummary, build_feedba
 from content_engine.hashtag_generator import generate_hashtags
 from content_engine.image_prompt_generator import generate_image_prompt
 from logging_utils import log_event
+from creative_pair import CreativePair, create_creative_pair, repair_creative_pair
 from openai_client import OpenAIContentClient
 from prompt_library_loader import PROMPT_LIBRARY_VERSION, load_prompt_text
 
@@ -80,6 +81,7 @@ class CaptionPackage:
     ranking_reason: str = ""
     ranking_score: float = 0.0
     ranking_breakdown: dict[str, Any] = field(default_factory=dict)
+    creative_pair: CreativePair | None = None
 
 
 class AICopyRequiredError(RuntimeError):
@@ -1199,6 +1201,51 @@ def generate_caption_package(
         validation = repair_plan["pair_validation"]
         caption_validation = validate_caption(caption, require_hashtags=True)
 
+    # The composed, hashtag-complete caption is the source of truth. Metadata
+    # from a rejected or repaired OpenAI variant must not survive this point.
+    creative_pair = create_creative_pair(
+        caption_text=caption,
+        overlay_text=selected_overlay,
+        caption_source="openai" if selected_variant.get("source") == "openai" else str(selected_variant.get("caption_source") or "template"),
+        overlay_source=str(selected_variant.get("overlay_source") or "template"),
+        repair_applied=repair_applied or openai_plan.repair_applied,
+    )
+    log_event(logger, "creative_pair_created", candidate_id=candidate.candidate_id,
+              caption_source=creative_pair.caption_source, overlay_source=creative_pair.overlay_source,
+              caption_cta_type=creative_pair.cta_type.value, overlay_cta_type=creative_pair.overlay_cta_type.value,
+              caption_hash=creative_pair.caption_hash, overlay_hash=creative_pair.overlay_hash)
+    log_event(logger, "creative_pair_caption_finalized", candidate_id=candidate.candidate_id,
+              caption_source=creative_pair.caption_source, caption_cta_type=creative_pair.cta_type.value,
+              content_angle=creative_pair.content_angle, caption_hash=creative_pair.caption_hash)
+    log_event(logger, "creative_pair_cta_classified", candidate_id=candidate.candidate_id,
+              caption_cta_type=creative_pair.cta_type.value, overlay_cta_type=creative_pair.overlay_cta_type.value)
+    log_event(logger, "creative_pair_validation_started", candidate_id=candidate.candidate_id,
+              caption_hash=creative_pair.caption_hash, overlay_hash=creative_pair.overlay_hash)
+    if creative_pair.validation_status != "passed":
+        log_event(logger, "creative_pair_validation_failed", level="warning", candidate_id=candidate.candidate_id,
+                  caption_cta_type=creative_pair.cta_type.value, overlay_cta_type=creative_pair.overlay_cta_type.value,
+                  validation_errors=list(creative_pair.validation_errors))
+        if creative_pair.validation_errors == ("caption_overlay_mismatch",):
+            log_event(logger, "creative_pair_repair_started", candidate_id=candidate.candidate_id,
+                      repair_attempt=1, repair_reason="caption_overlay_mismatch")
+            creative_pair = repair_creative_pair(creative_pair)
+            log_event(logger, "creative_pair_repair_completed", candidate_id=candidate.candidate_id,
+                      repair_attempt=creative_pair.repair_count, overlay_source=creative_pair.overlay_source,
+                      caption_cta_type=creative_pair.cta_type.value, overlay_cta_type=creative_pair.overlay_cta_type.value,
+                      validation_errors=list(creative_pair.validation_errors), overlay_hash=creative_pair.overlay_hash)
+    if creative_pair.validation_status != "passed":
+        raise RuntimeError("creative validation failed: " + ", ".join(creative_pair.validation_errors))
+    selected_overlay = creative_pair.overlay_text
+    validation = validate_post_pair(caption, selected_overlay)
+    repair_applied = creative_pair.repair_applied
+    log_event(logger, "creative_pair_validation_succeeded", candidate_id=candidate.candidate_id,
+              caption_cta_type=creative_pair.cta_type.value, overlay_cta_type=creative_pair.overlay_cta_type.value,
+              repair_attempt=creative_pair.repair_count, caption_hash=creative_pair.caption_hash,
+              overlay_hash=creative_pair.overlay_hash)
+    log_event(logger, "creative_pair_overlay_selected", candidate_id=candidate.candidate_id,
+              overlay_source=creative_pair.overlay_source, overlay_cta_type=creative_pair.overlay_cta_type.value,
+              overlay_hash=creative_pair.overlay_hash)
+
     cleanup_notes = [
         "Caption generator now ranks multiple caption and overlay variants before selecting a winner.",
         f"Selected caption style: {selected_caption_style}.",
@@ -1290,8 +1337,8 @@ def generate_caption_package(
         caption_source=caption_source,
         validation_failure_reason=None if caption_validation["passed"] else ", ".join(caption_validation["reasons"]),
         overlay_text=selected_overlay,
-        overlay_source=str(selected_variant.get("overlay_source") or "template"),
-        caption_overlay_concept=validation["caption_overlay_concept"],
+        overlay_source=creative_pair.overlay_source,
+        caption_overlay_concept=creative_pair.cta_type.value,
         overlay_validation_passed=validation["overlay_validation"]["passed"],
         overlay_validation_failure_reason=None if validation["overlay_validation"]["passed"] else ", ".join(validation["overlay_validation"]["reasons"]),
         openai_used=copy_source == "openai",
@@ -1324,4 +1371,5 @@ def generate_caption_package(
         ranking_reason=ranking_reason,
         ranking_score=float(selected_variant.get("score") or 0.0),
         ranking_breakdown=dict(selected_variant.get("score_breakdown") or {}),
+        creative_pair=creative_pair,
     )

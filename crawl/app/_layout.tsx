@@ -8,6 +8,7 @@ import * as Linking from 'expo-linking';
 import { Stack, usePathname } from 'expo-router'; 
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // Theme + Providers
 import { ThemeProvider } from '../providers/ThemeProvider';
@@ -535,13 +536,15 @@ export default function RootLayout() {
 
   return (
     <RootErrorBoundary>
-      <ThemeProvider>
-        <AuthProvider>
-          <QueryProvider>
-            <AppShell />
-          </QueryProvider>
-        </AuthProvider>
-      </ThemeProvider>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <QueryProvider>
+              <AppShell />
+            </QueryProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </SafeAreaProvider>
     </RootErrorBoundary>
   );
 }

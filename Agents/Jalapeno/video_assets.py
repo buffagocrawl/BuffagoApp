@@ -173,6 +173,12 @@ class VideoAssetRepository:
             eligible_count=len(eligible_assets),
             eligible_videos=len(eligible_assets),
             cooldown_days=self.config.video.reuse_cooldown_days,
+            preferred_cooldown_days=self.config.video.reuse_cooldown_days,
+            eligible_video_count=len(eligible_assets),
+            videos_blocked_by_cooldown=len(assets) - len(eligible_assets),
+            cooldown_fallback_used=used_fallback_reuse,
+            selected_video_last_used_at=selected.last_used_at,
+            selected_video_used_count=selected.used_count,
             fallback_reuse_scope="reuse_enabled_only" if used_fallback_reuse else None,
             fallback_reuse_message=(
                 "Cooldown exhausted; fallback reuse is limited to reuse_enabled=true videos."

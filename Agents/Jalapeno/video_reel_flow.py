@@ -92,6 +92,20 @@ def build_reel_plan(
 
 def content_decision_from_reel(run_id: str, plan: VideoReelPlan, caption_package: CaptionPackage) -> dict[str, Any]:
     asset = plan.video_asset
+    pair = caption_package.creative_pair
+    pair_metadata = ({
+        "caption_cta_type": pair.cta_type.value,
+        "overlay_cta_type": pair.overlay_cta_type.value,
+        "content_angle": pair.content_angle,
+        "creative_validation_status": pair.validation_status,
+        "creative_validation_errors": list(pair.validation_errors),
+        "creative_repair_count": pair.repair_count,
+        "creative_failure_classification": pair.failure_classification.value if pair.failure_classification else None,
+        "validated_caption_text": pair.caption_text,
+        "validated_overlay_text": pair.overlay_text,
+        "caption_hash": pair.caption_hash,
+        "overlay_hash": pair.overlay_hash,
+    } if pair else {})
     return {
         "run_id": run_id,
         "generated_at": _utcnow().isoformat(),
@@ -133,6 +147,7 @@ def content_decision_from_reel(run_id: str, plan: VideoReelPlan, caption_package
             "feedback_summary_version": caption_package.feedback_summary_version,
             "feedback_summary": caption_package.feedback_summary,
             "repair_applied": caption_package.repair_applied,
+            **pair_metadata,
             "style": asset.style,
             "working_title": "Daily wing Reel",
             "short_summary": "Preloaded wing video Reel from Supabase Storage with OpenAI-generated copy.",
@@ -161,6 +176,7 @@ def content_decision_from_reel(run_id: str, plan: VideoReelPlan, caption_package
             "openai_retry_count": caption_package.openai_retry_count,
             "openai_latency_ms": caption_package.openai_latency_ms,
             "repair_applied": caption_package.repair_applied,
+            **pair_metadata,
             "winner_reasoning": ["Selected the oldest eligible active Supabase video asset."],
         },
     }

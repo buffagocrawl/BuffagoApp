@@ -156,11 +156,45 @@ export default function FriendsPanel({ pendingBadge = 0, activityBadge = 0, onBa
 
   const shareQr = useCallback(async () => {
     if (!qrCode) return;
-    await Share.share({
-      title: 'Add me on BuffaGo',
-      message: `Add me as a wing friend on BuffaGo: ${friendInviteUrl(qrCode)}`,
-      url: friendInviteUrl(qrCode),
+    await trackEvent({
+      eventName: 'share_sheet_opened',
+      screen: 'friends',
+      metadata: { content_type: 'friend_invite', source: 'friend_qr' },
     });
+    await trackEvent({
+      eventName: 'feature_entry',
+      screen: 'friends',
+      metadata: { feature_name: 'share_invite_loop', source: 'friend_qr' },
+    });
+
+    try {
+      await Share.share({
+        title: 'Add me on BuffaGo',
+        message: `Add me as a wing friend on BuffaGo: ${friendInviteUrl(qrCode)}`,
+        url: friendInviteUrl(qrCode),
+      });
+      await trackEvent({
+        eventName: 'invite_sent',
+        screen: 'friends',
+        metadata: { invite_channel: 'native_share', source: 'friend_qr' },
+      });
+      await trackEvent({
+        eventName: 'share_completed',
+        screen: 'friends',
+        metadata: { content_type: 'friend_invite', source: 'friend_qr' },
+      });
+    } catch (e) {
+      await trackEvent({
+        eventName: 'share_failed',
+        screen: 'friends',
+        metadata: {
+          content_type: 'friend_invite',
+          source: 'friend_qr',
+          error_message: e?.message || String(e),
+        },
+      });
+      setError(e?.message || 'Could not share your friend code.');
+    }
   }, [qrCode]);
 
   const incoming = useMemo(() => invites.filter((row) => row.direction === 'incoming'), [invites]);

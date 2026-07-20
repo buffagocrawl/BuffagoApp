@@ -571,6 +571,20 @@ def ensure_selected_post_candidate(
     decision_summary: dict[str, Any] | None = None,
     logger=None,
 ) -> dict[str, Any]:
+    from creative_pair import validate_creative_pair
+
+    persisted_caption = _string_or_none(winner_payload.get("caption_text")) or _string_or_none(winner_payload.get("caption"))
+    persisted_overlay = _string_or_none(winner_payload.get("selected_overlay")) or _string_or_none(winner_payload.get("overlay_text"))
+    if persisted_caption and persisted_overlay:
+        pair_validation = validate_creative_pair(persisted_caption, persisted_overlay)
+        if not pair_validation.passed:
+            message = f"creative validation failed before candidate persistence: {', '.join(pair_validation.errors)}"
+            log_event(logger, "creative_pair_validation_failed", level="error", run_id=str(run_context.run_id),
+                      candidate_id=winner_payload.get("candidate_id"),
+                      caption_cta_type=pair_validation.caption_cta_type.value,
+                      overlay_cta_type=pair_validation.overlay_cta_type.value,
+                      validation_errors=list(pair_validation.errors))
+            raise ValueError(message)
     candidate_id_raw = _string_or_none(winner_payload.get("candidate_id")) or _string_or_none(winner_payload.get("id"))
     existing_rows: list[dict[str, Any]] = []
     candidate_update_payload: dict[str, Any] = {}

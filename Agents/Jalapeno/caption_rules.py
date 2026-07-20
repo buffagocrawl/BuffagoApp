@@ -851,40 +851,9 @@ def validate_overlay_text(
 
 
 def validate_post_pair(caption: str, overlay_text: str | None) -> dict[str, Any]:
-    issues: list[str] = []
-    caption_hashtags = HASHTAG_PATTERN.findall(normalize_caption_text(caption))
-    caption_validation = validate_caption(caption, require_hashtags=bool(caption_hashtags))
-    overlay_validation = validate_overlay_text(overlay_text) if isinstance(overlay_text, str) and overlay_text.strip() else None
-    caption_angles = set(caption_validation["social_angles"])
-    overlay_angles = set(overlay_validation["social_angles"]) if overlay_validation is not None else set()
-    caption_overlay_concept = _caption_overlay_concept(caption, overlay_text if isinstance(overlay_text, str) else None)
-    overlay_reinforces_caption = bool(overlay_text and _overlay_reinforces_caption(caption, overlay_text))
+    from creative_pair import validate_creative_pair
 
-    if not caption_validation["passed"]:
-        issues.extend(f"caption:{issue}" for issue in caption_validation["issues"])
-    if overlay_validation is not None and not overlay_validation["passed"]:
-        if overlay_reinforces_caption and set(overlay_validation["issues"]).issubset({"overlay_not_direct_enough", "overlay_missing_share_trigger"}):
-            pass
-        else:
-            issues.extend(f"overlay:{issue}" for issue in overlay_validation["issues"])
-    if overlay_validation is not None and caption_angles and overlay_angles and not (caption_angles & overlay_angles) and not overlay_reinforces_caption:
-        issues.append("caption_overlay_mismatch")
-    elif overlay_validation is not None and not overlay_reinforces_caption and not (caption_angles & overlay_angles):
-        issues.append("caption_overlay_concept_unrelated")
-
-    passed = not issues
-    return {
-        "valid": passed,
-        "passed": passed,
-        "issues": issues,
-        "reasons": issues,
-        "caption_validation": caption_validation,
-        "overlay_validation": overlay_validation,
-        "caption_angles": sorted(caption_angles),
-        "overlay_angles": sorted(overlay_angles),
-        "caption_overlay_concept": caption_overlay_concept,
-        "overlay_reinforces_caption": overlay_reinforces_caption,
-    }
+    return validate_creative_pair(caption, overlay_text).to_dict()
 
 
 def finalize_caption(

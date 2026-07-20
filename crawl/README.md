@@ -30,11 +30,19 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=
 EXPO_PUBLIC_GOOGLE_API_KEY=
 EXPO_PUBLIC_STRICT_ENV=false
 EXPO_PUBLIC_USE_PROXY=false
+EXPO_PUBLIC_ENABLE_GOOGLE_AUTH=true
+EXPO_PUBLIC_ENABLE_GROWTH_MISSIONS=true
+EXPO_PUBLIC_ENABLE_SHARE_INVITE_LOOP=true
+EXPO_PUBLIC_ENABLE_RESTAURANT_OWNER_LOOP=true
 ```
 
 Values prefixed with `EXPO_PUBLIC_` are visible in the mobile bundle. Keep
 OpenAI keys, Supabase service role keys, and unrestricted Google Places keys in
 Supabase Edge Function secrets only.
+
+The rollout switches above are intentionally additive. They let BuffaGo gate
+new onboarding, sharing, and restaurant-owner surfaces without breaking the
+existing rating, crawl, or auth flows.
 
 ## App Modules
 
@@ -80,3 +88,25 @@ This codebase is strongest as evidence of mobile product ownership plus
 platform thinking: auth, maps, user-generated content, gamification, Edge
 Functions, data quality controls, and AI-assisted validation all support one
 coherent real-world workflow.
+
+## Current Growth And Safety Notes
+
+- Activation is measured through `onboarding_completed`, repeat use through `app_opened`, and suggested-restaurant adoption through `recommendation_adopted`.
+- Share and invite loops stay additive: home uses a share packet for a recommended spot, and friends uses the existing QR flow plus native share instrumentation.
+- Restaurant-owner interest is intentionally lightweight for now: the app shows transparent public metrics and generates a claim/enroll packet without adding privileged owner access paths.
+- Rollback is feature-flag first. Prefer disabling `EXPO_PUBLIC_ENABLE_GROWTH_MISSIONS`, `EXPO_PUBLIC_ENABLE_SHARE_INVITE_LOOP`, or `EXPO_PUBLIC_ENABLE_RESTAURANT_OWNER_LOOP` before reverting code.
+
+## Activation Definition
+
+BuffaGo activation is complete only after a user's first valid wing rating is
+accepted and the confirmation/next-action state is shown. `activation_started`,
+`activation_rating_completed`, and `activation_completed` should share the same
+anonymous/session identity so time-to-activation can be derived without sending
+contact details. Guest/authenticated and new/returning status are safe booleans;
+provider tokens, email addresses, and raw errors are never analytics properties.
+
+Retention metrics remain production-derived: D1/D7 return compare a user's first
+activation date with later `app_opened` dates, weekly active usage counts distinct
+active identities in a seven-day window, and mission/crawl/recommendation rates use
+completed or accepted events divided by their corresponding viewed/started events.
+The repository contains instrumentation foundations, not production retention proof.

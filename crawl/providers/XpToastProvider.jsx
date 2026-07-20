@@ -1,11 +1,9 @@
 import React, { createContext, useContext, useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import { Snackbar, Text, Portal, useTheme } from 'react-native-paper';
 
-type Award = { amount: number; reason?: string };
-
 const XpCtx = createContext({
   show: (_amount, _reason) => {},
-  showMany: (_awards /** Award[] */) => {},
+  showMany: (_awards) => {},
   showText: (_text) => {},
 });
 export const useXpToast = () => useContext(XpCtx);
@@ -25,21 +23,21 @@ export default function XpToastProvider({ children }) {
     setVisible(true);
   }, [visible]);
 
-  const show = useCallback((amount: number, reason?: string) => {
-    const r = reason ? ` • ${reason}` : '';
+  const show = useCallback((amount, reason) => {
+    const r = reason ? ` â€¢ ${reason}` : '';
     q.current.push(`+${amount} XP${r}`);
     processNext();
   }, [processNext]);
 
-  const showText = useCallback((text: string) => {
+  const showText = useCallback((text) => {
     q.current.push(text);
     processNext();
   }, [processNext]);
 
-  const showMany = useCallback((awards: Award[]) => {
+  const showMany = useCallback((awards) => {
     if (!awards?.length) return;
     // Combine into one multi-line high-contrast toast
-    const lines = awards.map(a => `+${a.amount} XP${a.reason ? ` • ${a.reason}` : ''}`);
+    const lines = awards.map(a => `+${a.amount} XP${a.reason ? ` â€¢ ${a.reason}` : ''}`);
     showText(lines.join('\n'));
   }, [showText]);
 

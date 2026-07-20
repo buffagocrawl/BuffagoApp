@@ -1,5 +1,5 @@
 // src/lib/crawl.ts
-import { supabase } from '../../lib/supabase-hard'; // or your unified client path
+import { supabase } from '../../lib/supabase';
 import { customAlphabet } from 'nanoid';
 
 // short, readable code: ABCD12
@@ -8,7 +8,7 @@ const nano = customAlphabet('ABCDEFGHJKLMNPQRSTUVWXYZ23456789', 6);
 /**
  * Creates a crawl row.
  * NOTE: schema elsewhere showed columns: crawl_id (PK), route_id, user_id/host_user_id?, status, start_time, end_time.
- * Adjust `host_user_id` -> `user_id` if your table doesn’t have host_user_id.
+ * Adjust `host_user_id` -> `user_id` if your table doesnâ€™t have host_user_id.
  */
 export async function createCrawl({
   routeId,
