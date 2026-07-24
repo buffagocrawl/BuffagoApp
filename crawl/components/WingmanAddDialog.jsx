@@ -29,6 +29,7 @@ async function formatWingmanFunctionError(error) {
   return fallback;
 }
 
+/** @param {{visible: boolean, onDismiss?: () => void, initialRestaurant?: string, initialStateId?: number|null, initialStateCode?: string|null, userId?: string|null, onPickDestination?: (destination: {id: string, name: string|null, address: string|null, city: string|null, lat?: number|null, lng?: number|null}) => void, onManualReviewQueued?: (suggestion: unknown) => void, manualReviewQueuedMessage?: string, showCloseOnResultMessage?: boolean}} props */
 export default function WingmanAddDialog({
   visible,
   onDismiss,

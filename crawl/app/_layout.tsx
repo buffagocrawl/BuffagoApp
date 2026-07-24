@@ -39,6 +39,7 @@ import {
 import { installAppLifecycleTracking, rotateAnalyticsSession, trackEvent, trackScreenViewed } from '../lib/analytics';
 import { useOnboardingGate } from '../hooks/useOnboardingGate';
 import OnboardingFlow from '../components/OnboardingFlow';
+import ReferralAttributionBridge from '../components/ReferralAttributionBridge';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -401,6 +402,7 @@ function AppShell() {
         <LocationProvider>
           <StatusBar style="light" />
           <XpToastProvider>
+            <ReferralAttributionBridge />
             {/* Full screen onboarding overlay */}
             {onboardingOpen && !hideOnboardingOverlay ? (
               <OnboardingFlow
@@ -440,6 +442,7 @@ function AppShell() {
                 options={{ headerShown: false, presentation: 'modal' }}
               />
               <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
+              <Stack.Screen name="referrals" options={{ headerShown: false }} />
 
               {/* Legacy / compat */}
               <Stack.Screen name="reset" options={{ headerShown: false }} />

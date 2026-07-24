@@ -4,9 +4,15 @@ import { supabase } from '../lib/supabase';
 import { dbg } from '../lib/debugLog';
 import { trackEvent } from '../lib/analytics';
 
+/** @typedef {import('@supabase/supabase-js').Session} Session */
+/** @typedef {import('@supabase/supabase-js').User} User */
+/** @typedef {{session: Session|null, user: User|null, initializing: boolean}} AuthValue */
+
+/** @type {import('react').Context<AuthValue>} */
 const AuthContext = createContext({ session: null, user: null, initializing: true });
 
 export function AuthProvider({ children }) {
+  /** @type {[Session|null, import('react').Dispatch<import('react').SetStateAction<Session|null>>]} */
   const [session, setSession] = useState(null);
   const [initializing, setInitializing] = useState(true);
 

@@ -80,13 +80,18 @@ type TagRow = {
   count: number;
 };
 
-type PoolRow = WizardDestination & {
-  tagSet: Set<number>;
+type PoolRow = Omit<WizardDestination, 'address' | 'city' | 'lat' | 'lng' | 'distanceM' | 'avgScore' | 'ratingsCount'> & {
+  address: string | null;
+  city: string | null;
+  lat: number | null;
+  lng: number | null;
+  distanceM: number | null;
   avgScore: number;
   ratingsCount: number;
+  tagSet: Set<number>;
 
   // Used for internal sorting and filtering, always based on basisCoords
-  _pickDistanceM?: number | null;
+  _pickDistanceM: number | null;
 };
 
 export default function DestinationPickerWizard({
@@ -296,7 +301,7 @@ export default function DestinationPickerWizard({
               tagSet: a.tagSet,
             };
           })
-          .filter(Boolean as any)
+          .filter((row): row is PoolRow => row !== null)
           .sort((a, b) => {
             // keep "best wings" behavior first
             const scoreDiff = b.avgScore - a.avgScore;

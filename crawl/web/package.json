@@ -1,0 +1,7 @@
+{
+  "name": "buffago-referral-web",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": { "start": "node server.mjs", "check": "node --check server.mjs" },
+  "engines": { "node": ">=18" }
+}

@@ -529,16 +529,16 @@ export class WingmanService {
       return record.result;
     }
 
-    if (record.content != null) {
-      return record.content;
-    }
-
     if (record.output_text != null) {
       return record.output_text;
     }
 
     if (Array.isArray(record.content) && record.content.length > 0) {
       return record.content[0];
+    }
+
+    if (record.content != null) {
+      return record.content;
     }
 
     return raw;
