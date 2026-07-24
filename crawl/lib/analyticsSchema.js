@@ -40,6 +40,20 @@ export const ANALYTICS_EVENTS = Object.freeze({
   LEGENDARY_EMPTY_WORLD_FALLBACK: 'legendary_empty_world_fallback',
   LEGENDARY_KILL_SWITCH_APPLIED: 'legendary_kill_switch_applied',
   LEGENDARY_RETURN_SESSION: 'legendary_return_session',
+  REFERRAL_HUB_VIEWED: 'referral_hub_viewed',
+  REFERRAL_SHARE_STARTED: 'referral_share_started',
+  REFERRAL_SHARE_COMPLETED: 'referral_share_completed',
+  REFERRAL_CODE_COPIED: 'referral_code_copied',
+  REFERRAL_CODE_ENTERED: 'referral_code_entered',
+  REFERRAL_LINK_OPENED: 'referral_link_opened',
+  REFERRAL_CLAIM_SUCCEEDED: 'referral_claim_succeeded',
+  REFERRAL_CLAIM_FAILED: 'referral_claim_failed',
+  REFERRED_USER_SIGNED_UP: 'referred_user_signed_up',
+  REFERRAL_QUALIFICATION_COMPLETED: 'referral_qualification_completed',
+  REFERRAL_REWARD_ISSUED: 'referral_reward_issued',
+  REFERRAL_REWARD_FAILED: 'referral_reward_failed',
+  REFERRAL_BADGE_UNLOCKED: 'referral_badge_unlocked',
+  REFERRAL_PROMPT_CLICKED: 'referral_prompt_clicked',
 });
 
 const BLOCKED_KEY = /(token|secret|password|authorization|cookie|email|phone|error_message|access_key|refresh)/i;

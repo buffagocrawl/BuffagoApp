@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Join BuffaGo</title><meta name="description" content="A friend invited you to discover BuffaGo."><link rel="stylesheet" href="/styles.css"></head>
+<body><main class="card"><div class="logo">BuffaGo</div><div class="eyebrow">A wing-finding invitation</div><h1>Find your next favorite wings.</h1><p id="message">Your invitation is ready. Open BuffaGo to continue, or download the app to get started.</p><div class="actions"><a id="open" class="primary" href="#">Open BuffaGo</a><a class="secondary" href="https://apps.apple.com/">App Store</a><a class="secondary" href="https://play.google.com/store/apps/details?id=com.buffago.app">Google Play</a></div><p class="note">The invitation code is kept private on this device. Availability and attribution depend on your device and account state; installation alone does not guarantee attribution or rewards.</p><p id="status" class="status" role="status"></p></main><script>
+const code = decodeURIComponent(location.pathname.startsWith('/r/') ? location.pathname.slice(3) : '');
+const safe = /^[A-Za-z0-9_-]{1,128}$/.test(code);
+const message = document.querySelector('#message'); const open = document.querySelector('#open'); const status = document.querySelector('#status');
+if (!safe) { message.textContent = 'This invitation link is not valid. You can still download BuffaGo and explore the app.'; open.remove(); }
+else { open.href = 'buffago://r/' + encodeURIComponent(code); try { sessionStorage.setItem('buffago.referral.code', code); } catch {} window.setTimeout(() => { status.textContent = 'If BuffaGo did not open, use one of the download buttons below.'; }, 1200); }
+</script></body></html>

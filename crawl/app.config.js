@@ -24,6 +24,7 @@ module.exports = ({ config }) => ({
     supportsTablet: false,
     bundleIdentifier: "com.buffago.app",
     buildNumber: "9",
+    associatedDomains: ["applinks:buffago.com"],
   
     config: {
       googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_API_KEY,
@@ -71,6 +72,13 @@ module.exports = ({ config }) => ({
         action: "VIEW",
         category: ["BROWSABLE", "DEFAULT"],
         data: [{ scheme: "buffago", host: "auth", pathPrefix: "/reset" }],
+      },
+      // Production referral Universal Link / App Link.
+      {
+        action: "VIEW",
+        autoVerify: true,
+        category: ["BROWSABLE", "DEFAULT"],
+        data: [{ scheme: "https", host: "buffago.com", pathPrefix: "/r" }],
       },
     ],
   },

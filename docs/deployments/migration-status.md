@@ -16,7 +16,11 @@ into this repository.
 | 20260723143000_engagement_retention.sql | candidate | not applied here | manifest recorded | 67a4567 | 0d8230c136aeebbafe1887b262b9d3edf11a4af583c4d949094c373c56d26d8e |
 | 20260723144000_engagement_privacy.sql | candidate | not applied here | manifest recorded | 67a4567 | 9ee68dd94db115df65368db9fa897df26b8a338c76cfe2bbca26145faa584a09 |
 | 20260724012000_daily_engagement_notifications.sql | candidate | not applied here | manifest recorded | 67a4567 | a798fd9779a6a55f4a62c8089ef575b9a7eae787bd728de2e4700384c7063f72 |
+<<<<<<< HEAD
 | 20260724120000_current_schema_reconciliation.sql | candidate | not applied here | current-schema reconciliation; staging-only validation pending | release/daily-engagement-current-schema-candidate | c3760e51f19e7156c9d05d636a85137b628ca018023eb3245cbde45c5810dee6 |
+=======
+| 20260724133000_referral_profile_eligibility.sql | production | 2026-07-24 (reported) | deployed; read-only post-deployment verification | vhfxnizaxdanmvmouuaf | 41e408e42a273464f2a1d6297c4209e86dc2791fc43db7b25c5d88cd210c1123 |
+>>>>>>> 4fefdb1 (feat(referrals): add disabled referral system pending manual acceptance)
 
 The exact deployment order is: Strategy B baseline preflight, the retention
 migration, the privacy migration, then the daily-notifications migration.
