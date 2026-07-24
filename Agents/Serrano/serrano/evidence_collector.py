@@ -69,6 +69,9 @@ def collect_repository_inventory(repo_root: Path) -> dict[str, Any]:
             "prompt_library",
             "docs/product",
         ],
+        "evidence_paths": [
+            "evidence",
+        ],
         "test_paths": [
             "Agents/Jalapeno/tests",
             "crawl/scripts",
@@ -137,6 +140,7 @@ def collect_evidence_manifest(
             "risk_map": "crawl/supabase/docs/dead_or_risky_tables.md",
             "analytics_roadmap": "crawl/supabase/docs/knowing_our_users_roadmap.md",
             "product_review": "docs/product/buffago_product_gamification_recommendations.md",
+            "historical_evidence": "evidence",
         },
         "metric_date_ranges": {
             "marketing_review_default_days": 30,

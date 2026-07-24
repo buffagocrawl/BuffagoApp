@@ -83,6 +83,7 @@ class CodexRunner:
             f"Reasoning level: {request.reasoning_level}\n"
             "Return JSON only matching the provided schema.\n"
             "Use only the supplied evidence. If evidence is missing, state that clearly.\n\n"
+            "If you create repository-level evidence or auxiliary Markdown, place it under evidence/; do not create new Markdown files at the repository root.\n\n"
             "<input>\n"
             f"{json.dumps(request.input_payload, indent=2, sort_keys=True, default=str)}\n"
             "</input>\n"

@@ -47,6 +47,7 @@ Agents/Serrano/
   serrano/
   tests/
   runs/
+evidence/                  # repository-level historical review evidence
 .agents/skills/serrano/
 ```
 
@@ -166,6 +167,8 @@ Important outputs include:
 - `artifacts/measurement_plan.md`
 - `artifacts/risk_register.md`
 - `state/run_state.json`
+
+Repository-level historical review evidence is kept separately under `evidence/` so the repository root remains reserved for primary project files. New Serrano run evidence continues to live under `Agents/Serrano/runs/<run-id>/evidence/`.
 
 Worker outputs are stored in:
 

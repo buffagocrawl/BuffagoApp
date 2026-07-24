@@ -241,6 +241,7 @@ class SerranoOrchestrator:
                 "risk_map": "crawl/supabase/docs/dead_or_risky_tables.md",
                 "analytics_plan": "crawl/supabase/docs/user_logging_plan.md",
                 "product_review": "docs/product/buffago_product_gamification_recommendations.md",
+                "historical_evidence": "evidence",
             },
         }
 

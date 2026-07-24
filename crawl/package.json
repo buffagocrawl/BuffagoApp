@@ -19,6 +19,7 @@
     "database:current-contract": "node ./scripts/generate-current-schema-contract.mjs",
     "database:harness": "node ./scripts/database-runtime-harness.mjs",
     "database:fingerprint": "node ./scripts/schema-fingerprint.mjs",
+    "owner-validation": "node ./scripts/owner-validation.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

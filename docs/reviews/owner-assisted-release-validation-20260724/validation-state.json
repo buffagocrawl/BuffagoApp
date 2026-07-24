@@ -1,0 +1,26 @@
+{
+  "session": "owner-assisted-release-validation-20260724",
+  "owner": "Branden",
+  "createdAt": "2026-07-24",
+  "tests": [
+    {"id":"AUTH-001","title":"Google OAuth success","status":"BLOCKED","notes":"Requires owner on release device with provider credentials."},
+    {"id":"AUTH-002","title":"Google OAuth cancellation","status":"BLOCKED","notes":"Requires owner on release device."},
+    {"id":"AUTH-003","title":"Google OAuth interruption","status":"BLOCKED","notes":"Requires owner on release device."},
+    {"id":"AUTH-004","title":"Session expiry or forced sign-out","status":"BLOCKED","notes":"Requires safe test session and owner device."},
+    {"id":"AUTH-005","title":"Facebook provider state","status":"BLOCKED","notes":"Feature is default-off; live provider state not available."},
+    {"id":"NOTIF-001","title":"Initial permission","status":"BLOCKED","notes":"No physical Android device attached; iOS unavailable."},
+    {"id":"NOTIF-002","title":"Permission denial","status":"BLOCKED","notes":"No physical device attached."},
+    {"id":"NOTIF-003","title":"Permission restoration","status":"BLOCKED","notes":"No physical device attached."},
+    {"id":"NOTIF-004","title":"Foreground delivery","status":"BLOCKED","notes":"Provider delivery unavailable."},
+    {"id":"NOTIF-005","title":"Background delivery","status":"BLOCKED","notes":"Provider delivery unavailable."},
+    {"id":"NOTIF-006","title":"Terminated-app delivery","status":"BLOCKED","notes":"Provider delivery unavailable."},
+    {"id":"NOTIF-007","title":"Streak reminder suppression","status":"BLOCKED","notes":"Requires live notification and server session."},
+    {"id":"NOTIF-008","title":"Sign-out and account deletion","status":"BLOCKED","notes":"Requires live test account and notification delivery."},
+    {"id":"ONBOARD-001","title":"Clean first-time mobile journey","status":"BLOCKED","notes":"Requires owner physical device."},
+    {"id":"STREAK-001","title":"Live two-session concurrency","status":"BLOCKED","notes":"Requires authorized live Supabase environment."},
+    {"id":"REF-001","title":"Referral lifecycle","status":"BLOCKED","notes":"Referral feature remains default-off; no live environment."},
+    {"id":"RLS-001","title":"Live RLS isolation and mutation checks","status":"BLOCKED","notes":"Requires authorized safe live Supabase environment."},
+    {"id":"DELETE-001","title":"Disposable account deletion","status":"BLOCKED","notes":"Requires authorized live environment and disposable account."},
+    {"id":"BUFF-001","title":"Buffaverse comprehension sessions","status":"BLOCKED","notes":"Requires three participant sessions and recorded scores."}
+  ]
+}
