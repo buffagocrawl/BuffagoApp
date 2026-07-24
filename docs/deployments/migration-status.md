@@ -16,11 +16,13 @@ into this repository.
 | 20260723143000_engagement_retention.sql | candidate | not applied here | manifest recorded | 67a4567 | 0d8230c136aeebbafe1887b262b9d3edf11a4af583c4d949094c373c56d26d8e |
 | 20260723144000_engagement_privacy.sql | candidate | not applied here | manifest recorded | 67a4567 | 9ee68dd94db115df65368db9fa897df26b8a338c76cfe2bbca26145faa584a09 |
 | 20260724012000_daily_engagement_notifications.sql | candidate | not applied here | manifest recorded | 67a4567 | a798fd9779a6a55f4a62c8089ef575b9a7eae787bd728de2e4700384c7063f72 |
-<<<<<<< HEAD
-| 20260724120000_current_schema_reconciliation.sql | candidate | not applied here | current-schema reconciliation; staging-only validation pending | release/daily-engagement-current-schema-candidate | c3760e51f19e7156c9d05d636a85137b628ca018023eb3245cbde45c5810dee6 |
-=======
-| 20260724133000_referral_profile_eligibility.sql | production | 2026-07-24 (reported) | deployed; read-only post-deployment verification | vhfxnizaxdanmvmouuaf | 41e408e42a273464f2a1d6297c4209e86dc2791fc43db7b25c5d88cd210c1123 |
->>>>>>> 4fefdb1 (feat(referrals): add disabled referral system pending manual acceptance)
+| 20260724020000_buffaverse_phase1_foundation.sql | reported applied | not deployed by consolidation | exact bytes preserved; local ledger verification not available | Buffaverse Phase 1 recovery | pending local SHA-256 verification |
+| 20260724040000_reconcile_buffaverse_phase1_foundation.sql | reported applied | not deployed by consolidation | exact bytes preserved; local ledger verification not available | Buffaverse Phase 1 recovery | pending local SHA-256 verification |
+| 20260724050000_buffaverse_phase2_legendary_restaurants.sql | reported applied | not deployed by consolidation | exact bytes preserved; local ledger verification not available | Buffaverse Phase 2 approval reconciliation | pending local SHA-256 verification |
+| 20260724120000_current_schema_reconciliation.sql | pending | not applied here | explicitly pending; do not edit or deploy from this worktree | daily-engagement/current-schema workstream | c3760e51f19e7156c9d05d636a85137b628ca018023eb3245cbde45c5810dee6 |
+| 20260724133000_referral_profile_eligibility.sql | reported applied | not deployed by consolidation | exact bytes preserved; local ledger verification not available | referral system | 313860adf102c2868d8bb3df4cbf1f0bd6ef3ad710f7848b874a34aeb2563a43 |
+| 20260724140000_buffaverse_phase2_notification_boundary.sql | reported applied | not deployed by consolidation | exact bytes preserved; local ledger verification not available | Buffaverse Phase 2 approval reconciliation | pending local SHA-256 verification |
+| 20260724141000_buffaverse_phase2_local_geography_fix.sql | reported applied | not deployed by consolidation | exact bytes preserved; local ledger verification not available | Buffaverse Phase 2 approval reconciliation | pending local SHA-256 verification |
 
 The exact deployment order is: Strategy B baseline preflight, the retention
 migration, the privacy migration, then the daily-notifications migration.

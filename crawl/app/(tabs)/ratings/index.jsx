@@ -43,6 +43,11 @@ import { supabase } from '../../../lib/supabase.js';
 import { trackEvent } from '../../../lib/analytics';
 import { useLocationCtx } from '../../../providers/LocationProvider';
 import MapView, { Marker, PROVIDER_GOOGLE } from '../../../lib/platformMap';
+import { useLegendaryFeed } from '../../../hooks/useLegendaryFeed';
+import {
+  LegendaryDetailBanner,
+  LegendaryMapMarker,
+} from '../../../components/buffaverse/LegendarySurfaces';
 
 const WINGDEX_HINT_DISMISSED_KEY = 'buffago:wingdex_hint_dismissed';
 const HOME_NEXT_SPOT_KEY = 'buffago:homeNextSpot';
@@ -322,6 +327,7 @@ function StepDesc({ children }) {
 export default function PublicRatingsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { byRestaurant: legendaryByRestaurant } = useLegendaryFeed({ limit: 50 });
 
   const navigation = useNavigation();
 
@@ -2222,6 +2228,14 @@ export default function PublicRatingsScreen() {
                   paddingBottom: Math.max(18, insets.bottom + 18),
                 }}
               >
+              <LegendaryDetailBanner
+                event={legendaryByRestaurant.get(active.destination_id)}
+                onRate={() => {
+                  setOpen(false);
+                  onPressCoinRate(active);
+                }}
+              />
+
               <ScoreHeader
                 value={active.avgWeight}
                 label="BuffaGo Score"
@@ -2437,6 +2451,7 @@ export default function PublicRatingsScreen() {
                   })
                   .map((r) => {
                     const color = statusColorFor(r.destination_id);
+                    const legendaryEvent = legendaryByRestaurant.get(r.destination_id);
                     return (
                       <Marker
                         key={r.destination_id}
@@ -2450,7 +2465,11 @@ export default function PublicRatingsScreen() {
                           setOpenMap(false);
                         }}
                       >
-                        <View style={[styles.legendDot, { backgroundColor: color, borderColor: '#fff' }]} />
+                        {legendaryEvent ? (
+                          <LegendaryMapMarker event={legendaryEvent} />
+                        ) : (
+                          <View style={[styles.legendDot, { backgroundColor: color, borderColor: '#fff' }]} />
+                        )}
                       </Marker>
                     );
                   })}

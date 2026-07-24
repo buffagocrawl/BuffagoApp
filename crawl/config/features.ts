@@ -29,3 +29,16 @@ export const ENABLE_RESTAURANT_OWNER_LOOP = parseBooleanFlag(
   process.env.EXPO_PUBLIC_ENABLE_RESTAURANT_OWNER_LOOP,
   true
 );
+
+// Buffaverse production surfaces stay opt-in. The database flags remain the
+// authoritative second gate; these client flags prevent even a feed request
+// unless a release explicitly enables the corresponding surface.
+export const ENABLE_BUFFAVERSE = parseBooleanFlag(
+  process.env.EXPO_PUBLIC_ENABLE_BUFFAVERSE,
+  false
+);
+
+export const ENABLE_LEGENDARY_RESTAURANTS = parseBooleanFlag(
+  process.env.EXPO_PUBLIC_ENABLE_LEGENDARY_RESTAURANTS,
+  false
+);
