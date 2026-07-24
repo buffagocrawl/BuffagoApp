@@ -1,0 +1,19 @@
+{
+  "disposition": "BLOCKED",
+  "confirmedDefects": [],
+  "testDefects": [],
+  "environmentBlockers": [
+    {
+      "failureCategory": "DEVICE_BLOCKER",
+      "failureMessage": "Connected Android device is unavailable"
+    }
+  ],
+  "missingEvidence": [
+    "DEVICE_UNAVAILABLE"
+  ],
+  "requiredRemediation": [],
+  "rerunSuites": [
+    "smoke"
+  ],
+  "releaseImpact": "BLOCK"
+}

@@ -1,0 +1,72 @@
+{
+  "contractVersion": "1.0",
+  "runId": "20260724T134430-2a662a14",
+  "status": "BLOCKED",
+  "startedAt": "2026-07-24T17:44:30+00:00",
+  "finishedAt": "2026-07-24T17:44:30+00:00",
+  "suite": "smoke",
+  "environment": "production-readonly",
+  "device": {
+    "platform": "android",
+    "deviceId": "emulator-5554"
+  },
+  "summary": {
+    "acceptanceCriteriaCovered": [],
+    "artifactCount": 5
+  },
+  "flows": [
+    {
+      "flowId": "smoke",
+      "title": "smoke",
+      "status": "BLOCKED",
+      "durationMs": 0,
+      "preconditions": [
+        "Android emulator"
+      ],
+      "steps": [],
+      "assertions": [
+        "App launches without fatal error",
+        "A real Buffago surface renders",
+        "Primary navigation can be exercised"
+      ],
+      "screenshots": [
+        "screenshots/final.png"
+      ],
+      "hierarchy": "hierarchies/final.xml",
+      "logs": [
+        "logs/logcat.txt"
+      ],
+      "failureCategory": "DEVICE_BLOCKER",
+      "failureMessage": "Connected Android device is unavailable",
+      "retryCount": 0
+    }
+  ],
+  "failures": [
+    {
+      "failureCategory": "DEVICE_BLOCKER",
+      "failureMessage": "Connected Android device is unavailable"
+    }
+  ],
+  "artifacts": [
+    "environment.json",
+    "prerequisite-check.json",
+    "request.json",
+    "safety-check.json",
+    "logs/device-state.json"
+  ],
+  "safety": {
+    "environment": "production-readonly",
+    "productionDetected": true,
+    "mutationRequested": false,
+    "mutationAllowed": false,
+    "decision": "ALLOW",
+    "reasons": []
+  },
+  "redaction": {
+    "validated": true,
+    "status": "PASSED"
+  },
+  "limitations": [
+    "DEVICE_UNAVAILABLE"
+  ]
+}
