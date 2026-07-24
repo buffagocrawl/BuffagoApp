@@ -1,0 +1,22 @@
+appId: com.buffago.app
+name: Buffago startup-state-aware smoke suite
+tags: [smoke, non-mutating, auto]
+---
+- runFlow: app-launch.yaml
+- runFlow:
+    when:
+      visible:
+        id: onboarding.root
+    file: onboarding-state.yaml
+- runFlow:
+    when:
+      visible:
+        id: auth.screen
+    file: signed-out-state.yaml
+- runFlow:
+    when:
+      visible:
+        id: nav.home
+    file: authenticated-state.yaml
+- runFlow: no-fatal-error.yaml
+- takeScreenshot: smoke-auto-final

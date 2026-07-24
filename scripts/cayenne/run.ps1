@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-  [ValidateSet('smoke','auth','onboarding','full','accessibility','exploratory')][string]$Suite='smoke',
+  [ValidateSet('smoke','smoke-auto','smoke-clean','smoke-authenticated','auth','onboarding','full','accessibility','exploratory')][string]$Suite='smoke',
   [ValidateSet('local-mock','qa','production-readonly')][string]$Environment='production-readonly',
   [string]$DeviceId='emulator-5554', [string]$RunId, [switch]$CaptureVideo, [switch]$ResetApp,
   [switch]$Rebuild, [switch]$KeepFixtureData, [switch]$SerranoReview, [string]$OutputDirectory, [switch]$DryRun

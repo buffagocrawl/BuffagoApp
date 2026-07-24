@@ -1,0 +1,8 @@
+appId: com.buffago.app
+name: Buffago safely authenticated smoke suite
+tags: [smoke, non-mutating, authenticated]
+---
+- runFlow: app-launch.yaml
+- runFlow: authenticated-state.yaml
+- runFlow: no-fatal-error.yaml
+- takeScreenshot: smoke-authenticated-final

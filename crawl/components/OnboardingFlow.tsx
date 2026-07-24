@@ -1180,6 +1180,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
 
   return (
     <SafeAreaView
+      testID="onboarding.root"
       edges={['top', 'left', 'right']}
       style={[
         styles.wrap,
@@ -1191,7 +1192,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
     >
       {step !== 0 && step !== 3 ? (
         <View style={{ paddingTop: 6, flexDirection: 'row', alignItems: 'center' }}>
-          <Pressable onPress={goBack} hitSlop={12} style={{ paddingVertical: 8, paddingHorizontal: 8 }}>
+          <Pressable testID="onboarding.back" onPress={goBack} hitSlop={12} style={{ paddingVertical: 8, paddingHorizontal: 8 }}>
             <Text style={{ fontWeight: '900' }}>Back</Text>
           </Pressable>
         </View>
@@ -1220,6 +1221,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
 
           <View style={{ height: 18 }} />
           <Button
+            testID="onboarding.next"
             mode="contained"
             onPress={() => setStep(1)}
             style={styles.primaryBtn}
@@ -1232,7 +1234,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
 
           <ProgressDots step={step} total={TOTAL_STEPS} />
 
-          <Pressable onPress={goToLogin} style={{ marginTop: 12 }}>
+          <Pressable testID="onboarding.skip" onPress={goToLogin} style={{ marginTop: 12 }}>
             <Text style={{ textAlign: 'center', opacity: 0.8, fontWeight: '900' }}>
               Sign in to skip
             </Text>

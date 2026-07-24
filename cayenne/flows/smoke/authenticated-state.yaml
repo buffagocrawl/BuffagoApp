@@ -1,0 +1,54 @@
+appId: com.buffago.app
+name: Returning app navigation assertions
+tags: [smoke, non-mutating, authenticated]
+---
+- runFlow:
+    when:
+      visible:
+        id: nav.crawl
+    commands:
+      - tapOn:
+          id: nav.crawl
+      - assertVisible:
+          id: nav.crawl
+      - takeScreenshot: authenticated-crawl
+- runFlow:
+    when:
+      visible:
+        id: nav.wingdex
+    commands:
+      - tapOn:
+          id: nav.wingdex
+      - assertVisible:
+          id: nav.wingdex
+      - takeScreenshot: authenticated-wingdex
+- runFlow:
+    when:
+      visible:
+        id: nav.leaderboard
+    commands:
+      - tapOn:
+          id: nav.leaderboard
+      - assertVisible:
+          id: nav.leaderboard
+      - takeScreenshot: authenticated-leaderboard
+- runFlow:
+    when:
+      visible:
+        id: nav.profile
+    commands:
+      - tapOn:
+          id: nav.profile
+      - assertVisible:
+          id: nav.profile
+      - takeScreenshot: authenticated-profile
+- runFlow:
+    when:
+      visible:
+        id: nav.home
+    commands:
+      - tapOn:
+          id: nav.home
+      - assertVisible:
+          id: nav.home
+      - takeScreenshot: authenticated-home

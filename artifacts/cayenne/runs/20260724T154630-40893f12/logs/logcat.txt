@@ -1,0 +1,839 @@
+--------- beginning of main
+I/FontLog ( 1400): (REDACTED) Font PFD returned from cache for %s
+I/FontLog ( 1400): (REDACTED) Fetch %s end status %s
+I/AtlasPixelTipsContentPr( 4906): enter
+I/FontLog ( 1400): (REDACTED) Pulling font file for id = %d, cache size = %d
+--------- beginning of system
+D/BackgroundInstallControlService(  823): Package event received: 0
+E/ashmem  ( 4906): Pinning is deprecated since Android Q. Please use trim or other methods.
+D/Zygote  (  582): Forked child process 4949
+I/ActivityManager(  823): Start proc 4949:android.process.media/u0a103 for content provider {com.android.providers.downloads/com.android.providers.downloads.DownloadStorageProvider}
+I/FontLog ( 1400): (REDACTED) Received query %s, URI %s
+I/FontLog ( 1400): (REDACTED) Query [%s] resolved to %s
+I/RevelioTipsContentProvi( 4906): enter
+I/TidepodsRevelioTipsCont( 4906): enter
+I/FontLog ( 1400): (REDACTED) Font PFD returned from cache for %s
+I/FontLog ( 1400): (REDACTED) Fetch %s end status %s
+W/aeaj    ( 4700): Account id is not cached
+I/FontLog ( 1400): (REDACTED) Pulling font file for id = %d, cache size = %d
+I/FontLog ( 1400): (REDACTED) Received query %s, URI %s
+I/FontLog ( 1400): (REDACTED) Query [%s] resolved to %s
+I/FontLog ( 1400): (REDACTED) Font PFD returned from cache for %s
+I/FontLog ( 1400): (REDACTED) Fetch %s end status %s
+I/FontLog ( 1400): (REDACTED) Pulling font file for id = %d, cache size = %d
+I/Zygote  ( 4949): Process 4949 created for android.process.media
+I/d.process.media( 4949): Using CollectorTypeCMC GC.
+D/PersistedStoragePackageUninstalledReceiver( 3096): Received android.intent.action.PACKAGE_FULLY_REMOVED for dev.mobile.maestro.test for u0
+W/d.process.media( 4949): Unexpected CPU variant for x86: x86_64.
+W/d.process.media( 4949): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+D/nativeloader( 4949): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+I/DialerBaseApplication( 4906): onCreate
+D/DocumentsApplication( 4908): OverlayManager.setEnabled() result: true
+V/GrammaticalInflectionUtils(  823): AttributionSource: android.content.AttributionSource@a8807cf0 does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+I/lowmemorykiller(  275): Kill 'com.google.android.packageinstaller' (4582), uid 10105, oom_score_adj 955 to free 75044kB rss, 36096kB swap; reason: low watermark is breached
+E/ashmem  ( 4908): Pinning is deprecated since Android Q. Please use trim or other methods.
+D/Zygote  (  582): Forked child process 4965
+I/ActivityManager(  823): Start proc 4965:com.google.android.rkpdapp/u0a191 for broadcast {com.google.android.rkpdapp/com.android.rkpdapp.PackageRemovalReceiver}
+I/Zygote  ( 4965): Process 4965 created for com.google.android.rkpdapp
+I/android.rkpdapp( 4965): Using CollectorTypeCMC GC.
+W/android.rkpdapp( 4965): Unexpected CPU variant for x86: x86_64.
+W/android.rkpdapp( 4965): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+D/nativeloader( 4876): InitDefaultPublicLibraries for_preload=1: libandroid.so:libaaudio.so:libamidi.so:libbinder_ndk.so:libc.so:libcamera2ndk.so:libdl.so:libEGL.so:libGLESv1_CM.so:libGLESv2.so:libGLESv3.so:libicu.so:libicui18n.so:libicuuc.so:libjnigraphics.so:liblog.so:libmediandk.so:libm.so:libnativehelper.so:libnativewindow.so:libOpenMAXAL.so:libOpenSLES.so:libRS.so:libstdc++.so:libsync.so:libvulkan.so:libwebviewchromium_plat_support.so:libz.so
+I/auvs    ( 4700): Using pair HTTP connection
+D/nativeloader( 4949): Configuring clns-shared-9 for other apk /system/priv-app/DownloadProvider/DownloadProvider.apk. target_sdk_version=36, uses_libraries=, library_path=/system/priv-app/DownloadProvider/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.android.providers.downloads:/system/priv-app/DownloadProvider:/system/lib64:/system_ext/lib64
+D/nativeloader( 4965): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+I/ActivityManager(  823): Process com.google.android.packageinstaller (pid 4582) has died: cch  +55 CEM 
+I/Zygote  (  582): Process 4582 exited due to signal 9 (Killed)
+V/GraphicsEnvironment( 4949): Currently set values for:
+I/libprocessgroup(  823): Removed cgroup /sys/fs/cgroup/apps/uid_10105/pid_4582
+V/GraphicsEnvironment( 4949):   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment( 4949):   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment( 4949): com.android.providers.downloads is not listed in per-application setting
+V/GraphicsEnvironment( 4949): ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+V/GraphicsEnvironment( 4949): com.android.providers.downloads is not listed in ANGLE allowlist or settings, returning default
+V/GraphicsEnvironment( 4949): Neither updatable production driver nor prerelease driver is supported.
+W/chli    ( 4700): No value provided for the places model index flag.
+W/chli    ( 4700): No value provided for the places model index flag.
+D/nativeloader( 4949): Configuring clns-shared-10 for other apk /system/priv-app/MtpService/MtpService.apk. target_sdk_version=36, uses_libraries=, library_path=/system/priv-app/MtpService/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.android.mtp:/system/priv-app/MtpService:/system/lib64:/system_ext/lib64
+D/nativeloader( 4965): Configuring clns-shared-9 for other apk /apex/com.android.rkpd/priv-app/rkpdapp.google@361040400/rkpdapp.google.apk. target_sdk_version=36, uses_libraries=, library_path=/apex/com.android.rkpd/priv-app/rkpdapp.google@361040400/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.rkpdapp:/apex/com.android.rkpd/priv-app/rkpdapp.google@361040400:/system/lib64:/system_ext/lib64
+I/acpb    ( 4700): [Upload] Connected
+D/nativeloader( 4965): InitApexLibraries:
+D/nativeloader( 4965):   com_android_adservices: libhpke_jni.so:libtflite_support_classifiers_native.so
+D/nativeloader( 4965):   com_android_appsearch: libappsearchservice.so:libicing_anywhere.so
+D/nativeloader( 4965):   com_android_art: libartservice.so
+D/nativeloader( 4965):   com_android_bt: libbluetooth_jni.so
+D/nativeloader( 4965):   com_android_conscrypt: libjavacrypto.so
+D/nativeloader( 4965):   com_android_mediaprovider: libpdfclient.so
+D/nativeloader( 4965):   com_android_nfcservices: libnfc_nci_jni.so
+D/nativeloader( 4965):   com_android_ondevicepersonalization: libfcp_cpp_dep_jni.so:libfcp_hpke_jni.so
+D/nativeloader( 4965):   com_android_os_statsd: libstats_jni.so
+D/nativeloader( 4965):   com_android_tethering: libandroid_net_connectivity_com_android_net_module_util_jni.so:libandroid_net_connectivity_com_android_net_module_util_jni_CommonConnectivityJni.so:libframework-connectivity-jni.so:libframework-connectivity-tiramisu-jni.so:libmainlinecronet.140.0.7259.0.so:libservice-connectivity.so:libservice-thread-jni.so:stable_cronet_libcrypto.so:stable_cronet_libssl.so
+D/nativeloader( 4965):   com_android_uwb: libuwb_uci_jni_rust.so
+D/nativeloader( 4965):   com_android_virt: libvirtualizationservice_jni.so:libvirtualmachine_jni.so
+D/nativeloader( 4965):   com_android_wifi: lib
+I/ysm     ( 4906): SslGuard completed installation.
+I/aiea    ( 4700): getLocaleToModelSpecsMap
+I/aiea    ( 4700): Fetching latest config from MDD...
+E/ashmem  ( 4949): Pinning is deprecated since Android Q. Please use trim or other methods.
+V/GraphicsEnvironment( 4965): Currently set values for:
+V/GraphicsEnvironment( 4965):   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment( 4965):   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment( 4965): com.google.android.rkpdapp is not listed in per-application setting
+I/DialerInternalSemanticEventLoggerImpl( 4906): com.android.dialer.cui.impl.<redacted>:147 CUI event: APP_ON_CREATE; uniqueCallId: null
+V/GraphicsEnvironment( 4965): ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+V/GraphicsEnvironment( 4965): com.google.android.rkpdapp is not listed in ANGLE allowlist or settings, returning default
+V/GraphicsEnvironment( 4965): Neither updatable production driver nor prerelease driver is supported.
+D/nativeloader( 4876): Load libicu_jni.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+I/DialerGmsFlagCommitter( 4906): com.android.dialer.phenotype.GmsFlagCommitter.commit:52 flags committing
+D/app_process( 4876): u_setTimeZoneFilesDirectory("/apex/com.android.tzdata/etc/tz/versioned/9/icu") succeeded. 
+D/app_process( 4876): I18n APEX ICU file found: /apex/com.android.i18n/etc/icu/icudt76l.dat
+D/WM-WrkMgrInitializer( 4965): Initializing WorkManager with default configuration.
+I/DialerLocaleProvider( 4906): com.android.dialer.callrecording.impl.localeprovider.LocaleProvider.getNetworkCountryMatchesSimCountryInternal:192 NetworkCountryCode: US, SimCountryIso: US
+I/DialerLegacyCountryDetector( 4906): com.android.dialer.location.LegacyCountryDetector.getCurrentPhysicalCountryIso:143 returning Redacted-2-chars
+I/DialerLocaleProvider( 4906): com.android.dialer.callrecording.impl.localeprovider.LocaleProvider.getSupportedLocaleFromCountryCode:203 checking whether country US is supported by builtInAudio for start/end audio
+I/DialerLocaleProvider( 4906): com.android.dialer.callrecording.impl.localeprovider.LocaleProvider.getSupportedLocaleFromCountryCode:214 country US not supported by builtInAudio
+I/DialerLegacyCountryDetector( 4906): com.android.dialer.location.LegacyCountryDetector.getCurrentPhysicalCountryIso:143 returning Redacted-2-chars
+I/DialerTtsLocaleProvider( 4906): com.android.dialer.audio.audioinjector.localeprovider.TtsLocaleProvider$Companion.getSupportedLocaleFromCountryCode:78 checking whether country US is supported by TTS for start/end audio
+I/DialerTtsLocaleProvider( 4906): com.android.dialer.audio.audioinjector.localeprovider.TtsLocaleProvider$Companion.getSupportedLocaleFromCountryCode:89 country US not supported by TTS
+I/DialerCanRecord( 4906): com.android.dialer.callrecording.impl.canrecord.CanRecord.canRecordCall:82 Call recording is disabled in the current country
+I/DialerCallRecordingStartupListener( 4906): com.android.dialer.callrecording.startup.<redacted>:71 not prewarming TTS
+D/WM-PackageManagerHelper( 4965): Skipping component enablement for androidx.work.impl.background.systemjob.SystemJobService
+D/WM-Schedulers( 4965): Created SystemJobScheduler and enabled SystemJobService
+D/nativeloader( 4876): Load libjavacore.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+D/WM-ForceStopRunnable( 4965): The default process name was not specified.
+D/WM-ForceStopRunnable( 4965): Performing cleanup operations.
+I/auvs    ( 4700): Using pair HTTP connection
+D/nativeloader( 4876): Load libopenjdk.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+I/RkpdBroadcast( 4965): Caught package_removed intent, waking up.
+I/aiea    ( 4700): (REDACTED) Found map of size: %d
+V/GrammaticalInflectionUtils(  823): AttributionSource: android.content.AttributionSource@d174cbd8 does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+I/app_process( 4876): Priority-to-niceness mapping: 19, 16, 13, 10, 0, -2, -4, -5, -6, -8
+W/app_process( 4876): Unexpected CPU variant for x86: x86_64.
+W/app_process( 4876): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+I/acpb    ( 4700): [Upload] Connected
+I/RkpdBroadcast( 4965): Caught package_removed intent, waking up.
+E/sgy     ( 4700): onError
+E/sgy     ( 4700): ahbj: errorCode: 65561, engine: 2
+E/sgy     ( 4700): 	at auvu.a(PG:23)
+E/sgy     ( 4700): 	at acox.hr(PG:13)
+E/sgy     ( 4700): 	at ghft.e(PG:9)
+E/sgy     ( 4700): 	at aigh.d(PG:154)
+E/sgy     ( 4700): 	at aigh.iJ(PG:26)
+E/sgy     ( 4700): 	at acoy.c(PG:102)
+E/sgy     ( 4700): 	at acoz.run(PG:1)
+E/sgy     ( 4700): 	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:520)
+E/sgy     ( 4700): 	at java.util.concurrent.FutureTask.run(FutureTask.java:317)
+E/sgy     ( 4700): 	at ahmf.run(PG:20)
+E/sgy     ( 4700): 	at ahnd.run(PG:3)
+E/sgy     ( 4700): 	at ahnd.run(PG:3)
+E/sgy     ( 4700): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1154)
+E/sgy     ( 4700): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:652)
+E/sgy     ( 4700): 	at java.lang.Thread.run(Thread.java:1563)
+E/sgy     ( 4700): 	at ahlt.run(PG:42)
+E/sgy     ( 4700): Caused by: ahbl: errorCode: 65586, engine: 2
+E/sgy     ( 4700): 	at acox.hr(PG:6)
+E/sgy     ( 4700): 	... 14 more
+E/sgy     ( 4700): Caused by: ahbh: errorCode: 401, engine: 2
+E/sgy     ( 4700): 	at sgv.b(PG:30)
+E/sgy     ( 4700): 	at acpu.hF(PG:11)
+E/sgy     ( 4700): 	at aigh.d(PG:129)
+E/sgy     ( 4700): 	... 12 more
+W/rui     ( 4700): Failed to sync device settings.
+I/rui     ( 4700): Retrying to sync device settings.
+E/ashmem  ( 4965): Pinning is deprecated since Android Q. Please use trim or other methods.
+W/app_process( 4876): ClassLoaderContext shared library size mismatch. Expected=2, found=0 (PCL[]{PCL[/system/framework/android.test.base.jar*3940810275]#PCL[/system/framework/android.test.mock.jar*2487254073]} | PCL[])
+D/Zygote  (  582): Forked child process 4991
+I/ActivityManager(  823): Start proc 4991:com.google.android.adservices.api/u0a215 for broadcast {com.google.android.adservices.api/com.android.adservices.service.common.PackageChangedReceiver}
+W/earchbox:search( 4700): Suspending all threads took: 7.530ms
+I/DialerLoggingTelephonyCache( 4906): com.google.android.dialershared.telephony.LoggingTelephonyCache.setUpNetworkMemoize:97 getNetworkOperatorName
+I/DialerLoggingTelephonyCache( 4906): com.google.android.dialershared.telephony.LoggingTelephonyCache.setUpNetworkMemoize:106 getNetworkCountryIso
+I/DialerLoggingTelephonyCache( 4906): com.google.android.dialershared.telephony.LoggingTelephonyCache.setUpNetworkMemoize:115 getNetworkOperator
+W/app_process( 4876): ClassLoaderContext classpath size mismatch. expected=0, found=1 (PCL[]{PCL[/system/framework/android.test.runner.jar*3420963098]{PCL[/system/framework/android.test.base.jar*3940810275]#PCL[/system/framework/android.test.mock.jar*2487254073]}#PCL[/system/framework/android.test.base.jar*3940810275]} | PCL[/system/framework/android.test.runner.jar*3420963098])
+I/Zygote  ( 4991): Process 4991 created for com.google.android.adservices.api
+I/.adservices.api( 4991): Using CollectorTypeCMC GC.
+I/DialerShortcutsJobScheduler( 4906): com.android.dialer.shortcuts.ShortcutsJobScheduler.schedule:55 schedule
+W/.adservices.api( 4991): Unexpected CPU variant for x86: x86_64.
+W/.adservices.api( 4991): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+I/DialerSharpieScamDetectionConfigProvider( 4906): com.android.dialer.sharpie.impl.scamdetection.config.<redacted>:46 Providing config: [SharpieConfig(modelConfig=BertHades, allowedRegionCode=[US])]
+I/RkpdBroadcast( 4965): Deleted associated keys for uid: 10220
+I/RkpdBroadcast( 4965): Deleted associated keys for uid: 10219
+I/DialerLoggingTelephonyCache( 4906): com.google.android.dialershared.telephony.LoggingTelephonyCache.setUpNetworkMemoize:139 getSimCarrierIdName
+I/DialerLoggingTelephonyCache( 4906): com.google.android.dialershared.telephony.LoggingTelephonyCache.setUpNetworkMemoize:148 getSimCountryIso
+D/WM-SystemJobScheduler( 4965): Reconciling jobs
+W/JobServiceContext(  823): Sending onNetworkChanged for a job that isn't started. JobStatus{3d113df androidx.work.systemjobscheduler:u0a137/124 #TikTokWorker#com.android.dialer.voicemail.service.impl.VvmTaskWorker#@androidx.work.systemjobscheduler@com.google.android.dialer/androidx.work.impl.background.systemjob.SystemJobService u=0 s=10137 TIME=-8s841ms:none NET READY}
+I/DialerShortcutsJobScheduler( 4906): com.android.dialer.shortcuts.ShortcutsJobScheduler.scheduleJobInternal:82 job already scheduled.
+D/nativeloader( 4991): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+I/DialerMainActivityStartupMonitor( 4906): com.android.dialer.startup.mainactivitystartup.<redacted>$lambda$0:32 mainActivityCreated: false
+I/DialerInternalSemanticEventLoggerImpl( 4906): com.android.dialer.cui.impl.<redacted>:147 CUI event: APP_ON_CREATE_RUNNABLE_COMPLETED_BEFORE_MAIN_ACTIVITY_CREATED; uniqueCallId: null
+W/JobInfo ( 4700): Job 'com.google.android.googlequicksearchbox/com.google.android.apps.gsa.tasks.BackgroundTasksJobService#-353' has a deadline with functional constraints and an extremely short time window of 0 ms (delay=120000, deadline=120000). The functional constraints are not likely to be satisfied when the job runs.
+E/ActivityThread( 4906): Failed to find provider info for androidx.car.app.connection
+W/JobInfo (  823): Job 'com.google.android.googlequicksearchbox/com.google.android.apps.gsa.tasks.BackgroundTasksJobService#-353' has a deadline with functional constraints and an extremely short time window of 0 ms (delay=120000, deadline=120000). The functional constraints are not likely to be satisfied when the job runs.
+I/DialerDefaultProcessValidator( 4906): com.google.apps.tiktok.contrib.work.impl.DefaultProcessValidator.validateAsynchronouslyAndMaybeCrash:68 Validating WorkManager process
+W/JobInfo (  823): Job 'com.google.android.googlequicksearchbox/com.google.android.apps.gsa.tasks.BackgroundTasksJobService#-353' has a deadline with functional constraints and an extremely short time window of 0 ms (delay=120000, deadline=120000). The functional constraints are not likely to be satisfied when the job runs.
+I/DialerDefaultProcessValidator( 4906): com.google.apps.tiktok.contrib.work.impl.DefaultProcessValidator.validateInternal:97 Processes: NONE, true, com.google.android.dialer, com.google.android.dialer
+D/WM-PackageManagerHelper( 4906): Skipping component enablement for androidx.work.impl.background.systemjob.SystemJobService
+D/WM-Schedulers( 4906): Created SystemJobScheduler and enabled SystemJobService
+D/WM-ForceStopRunnable( 4906): The default process name was not specified.
+D/WM-ForceStopRunnable( 4906): Performing cleanup operations.
+W/CarApp.Conn( 4906): Null response from content provider when checking connection to the car, treating as disconnected
+I/DialerAndroidAutoStatusLookupImpl( 4906): com.android.dialer.androidautostatuslookup.impl.<redacted>:97 Android Auto connected in 0 mode [CONTEXT ratelimit_period="1 MINUTES" ]
+I/DialerInternalSemanticEventLoggerImpl( 4906): com.android.dialer.cui.impl.<redacted>:233 Cancelled logging CUI AppStartToMainActivity to GIL due to cancelEvent
+W/JobScheduler(  823): Job didn't exist in JobStore: ffb3467 #u0a149/-353 com.google.android.googlequicksearchbox/com.google.android.apps.gsa.tasks.BackgroundTasksJobService
+D/nativeloader( 4949): Configuring clns-shared-11 for other apk /system/priv-app/MediaProviderLegacy/MediaProviderLegacy.apk. target_sdk_version=36, uses_libraries=, library_path=/system/priv-app/MediaProviderLegacy/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.android.providers.media:/system/priv-app/MediaProviderLegacy:/system/lib64:/system_ext/lib64
+D/ApplicationLoaders( 4991): Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+I/DialerLogcatLoggingBindings( 4906): com.android.dialer.logging.logcat.LogcatLoggingBindings.logImpression:54 Impression: CALL_SCREEN_INIT_AT_STARTUP
+I/DialerLogcatLoggingBindings( 4906): com.android.dialer.logging.logcat.LogcatLoggingBindings.logImpression:47 Impression: APP_LAUNCHED
+D/WM-SystemJobService( 4906): onStartJob for WorkGenerationalId(workSpecId=400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9, generation=0)
+D/nativeloader( 4876): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+D/AndroidRuntime( 4876): Calling main entry com.android.commands.uiautomator.Launcher
+D/ApplicationLoaders( 4991): Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar
+W/ahnb    ( 4700): (REDACTED) Queue length for executor %s is now %d. Perhaps some tasks are too long, or the pool is too small.
+D/FileUtils(  823): Rounded bytes from 2061062144 to 4000000000
+D/WM-SystemJobScheduler( 4906): Reconciling jobs
+D/WM-ForceStopRunnable( 4965): Found unfinished work, scheduling it.
+D/nativeloader( 4991): Configuring clns-shared-9 for other apk /apex/com.android.adservices/priv-app/AdServicesApkGoogle@361040400/AdServicesApkGoogle.apk. target_sdk_version=36, uses_libraries=, library_path=/apex/com.android.adservices/priv-app/AdServicesApkGoogle@361040400/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.adservices.api:/apex/com.android.adservices/priv-app/AdServicesApkGoogle@361040400:/system/lib64:/system_ext/lib64
+I/DialerLoggingConsentCheckerImpl( 4906): com.google.android.dialershared.logging.consent.impl.<redacted>:72 timer stop with success, timer present: false
+I/AconfigPackage( 4876): android.media.swcodec.flags is mapped to com.android.media.swcodec
+I/AconfigPackage( 4876): com.android.permission.flags is mapped to com.android.permission
+I/AconfigPackage( 4876): com.android.permissioncontroller.flags is mapped to com.android.permission
+W/JobInfo ( 4965): Requested important-while-foreground flag for job20 is ignored and takes no effect
+D/WM-SystemJobScheduler( 4965): Scheduling work ID 89123d7e-460a-4abf-b3c9-616324dbcf0cJob ID 20
+I/AconfigPackage( 4876): com.android.icu is mapped to com.android.i18n
+D/nativeloader( 4991): InitApexLibraries:
+D/nativeloader( 4991):   com_android_adservices: libhpke_jni.so:libtflite_support_classifiers_native.so
+D/nativeloader( 4991):   com_android_appsearch: libappsearchservice.so:libicing_anywhere.so
+D/nativeloader( 4991):   com_android_art: libartservice.so
+D/nativeloader( 4991):   com_android_bt: libbluetooth_jni.so
+D/nativeloader( 4991):   com_android_conscrypt: libjavacrypto.so
+D/nativeloader( 4991):   com_android_mediaprovider: libpdfclient.so
+D/nativeloader( 4991):   com_android_nfcservices: libnfc_nci_jni.so
+D/nativeloader( 4991):   com_android_ondevicepersonalization: libfcp_cpp_dep_jni.so:libfcp_hpke_jni.so
+D/nativeloader( 4991):   com_android_os_statsd: libstats_jni.so
+D/nativeloader( 4991):   com_android_tethering: libandroid_net_connectivity_com_android_net_module_util_jni.so:libandroid_net_connectivity_com_android_net_module_util_jni_CommonConnectivityJni.so:libframework-connectivity-jni.so:libframework-connectivity-tiramisu-jni.so:libmainlinecronet.140.0.7259.0.so:libservice-connectivity.so:libservice-thread-jni.so:stable_cronet_libcrypto.so:stable_cronet_libssl.so
+D/nativeloader( 4991):   com_android_uwb: libuwb_uci_jni_rust.so
+D/nativeloader( 4991):   com_android_virt: libvirtualizationservice_jni.so:libvirtualmachine_jni.so
+D/nativeloader( 4991):   com_android_wifi: lib
+I/AconfigPackage( 4876): com.android.appsearch.flags is mapped to com.android.appsearch
+D/WM-GreedyScheduler( 4965): Starting tracking for 89123d7e-460a-4abf-b3c9-616324dbcf0c
+I/AconfigPackage( 4876): android.uprobestats.mainline.flags is mapped to com.android.uprobestats
+I/AconfigPackage( 4876): com.android.crashrecovery.flags is mapped to com.android.crashrecovery
+I/AconfigPackage( 4876): android.provider.flags is mapped to com.android.configinfrastructure
+I/AconfigPackage( 4876): com.android.server.deviceconfig is mapped to com.android.configinfrastructure
+I/AconfigPackage( 4876): com.android.compos.flags is mapped to com.android.compos
+I/AconfigPackage( 4876): com.android.art.flags is mapped to com.android.art
+I/AconfigPackage( 4876): com.android.art.rw.flags is mapped to com.android.art
+I/AconfigPackage( 4876): com.android.libcore is mapped to com.android.art
+D/BackgroundInstallControlService(  823): Package event received: 0
+I/AconfigPackage( 4876): com.android.telephony.flags is mapped to com.android.telephonycore
+I/alpi    ( 4700): (REDACTED) Initializing MicroDataManager InitializeType-%d, isForced-%b, isActivePhoneEnrollment-%b isActiveGoogleHomeEnrollment-%b
+V/GrammaticalInflectionUtils(  823): AttributionSource: android.content.AttributionSource@140adee7 does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+D/WM-ConstraintTracker( 4965): BatteryChargingTracker: initial state = false
+D/WM-BrdcstRcvrCnstrntTrc( 4965): BatteryChargingTracker: registering receiver
+I/DialerLoggingConsentCheckerImpl( 4906): com.google.android.dialershared.logging.consent.impl.<redacted>:72 timer stop with success, timer present: false
+I/AconfigPackage( 4876): com.android.media.extractor.flags is mapped to com.android.media
+I/AconfigPackage( 4876): com.android.media.mainline.flags is mapped to com.android.media
+D/WM-ForceStopRunnable( 4906): Found unfinished work, scheduling it.
+I/AconfigPackage( 4876): com.android.wifi.flags is mapped to com.android.wifi
+D/WM-ConstraintTracker( 4965): BatteryNotLowTracker: initial state = true
+D/WM-BrdcstRcvrCnstrntTrc( 4965): BatteryNotLowTracker: registering receiver
+I/AconfigPackage( 4876): com.android.org.conscrypt.flags is mapped to com.android.conscrypt
+I/AconfigPackage( 4876): com.android.org.conscrypt.net.flags is mapped to com.android.conscrypt
+I/aiea    ( 4700): getLocaleToModelSpecsMap
+I/aiea    ( 4700): Fetching latest config from MDD...
+I/AconfigPackage( 4876): com.android.healthfitness.flags is mapped to com.android.healthfitness
+I/aiea    ( 4700): (REDACTED) Found map of size: %d
+I/AconfigPackage( 4876): com.android.ipsec.flags is mapped to com.android.ipsec
+I/AconfigPackage( 4876): com.android.nfc.module.flags is mapped to com.android.nfcservices
+D/Zygote  (  582): Forked child process 5026
+I/AconfigPackage( 4876): com.android.adservices.ondevicepersonalization.flags is mapped to com.android.ondevicepersonalization
+W/adoq    ( 4700): Abort, client detached.
+W/adoq    ( 4700): Abort, client detached.
+I/ActivityManager(  823): Start proc 5026:com.android.externalstorage/u0a104 for content provider {com.android.externalstorage/com.android.externalstorage.ExternalStorageProvider}
+W/adoq    ( 4700): Abort, client detached.
+I/aifu    ( 4700): (REDACTED) Location for model with model type: %s and locale: %s, is : %s
+I/AconfigPackage( 4876): com.android.adbd.flags is mapped to com.android.adbd
+I/aiga    ( 4700): (REDACTED) #getHotwordModel [locale: %s, modelType: %s]
+I/AconfigPackage( 4876): com.android.bluetooth.flags is mapped to com.android.bt
+D/WM-ConstraintTracker( 4965): NetworkStateTracker24: initial state = NetworkState(isConnected=true, isValidated=true, isMetered=false, isNotRoaming=true)
+D/WM-NetworkStateTracker( 4965): Registering network callback
+I/AconfigPackage( 4876): com.android.devicelock.flags is mapped to com.android.devicelock
+W/JobInfo ( 4906): Requested important-while-foreground flag for job0 is ignored and takes no effect
+I/AconfigPackage( 4876): android.os.profiling is mapped to com.android.profiling
+I/AconfigPackage( 4876): android.os.profiling.anomaly.flags is mapped to com.android.profiling
+D/WM-SystemJobScheduler( 4906): Scheduling work ID 37a56bb7-ffa2-406e-9926-1ff2e0a2bc2dJob ID 0
+D/ConnectivityService(  823): requestNetwork for uid/pid:10191/4965 activeRequest: null callbackRequest: 195 [NetworkRequest [ REQUEST id=196, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10191 RequestorUid: 10191 RequestorPkg: com.google.android.rkpdapp UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647 isUidTracked: false declaredMethods: AVAIL|LOST|NC
+I/AconfigPackage( 4876): com.android.os.statsd.flags is mapped to com.android.os.statsd
+I/AconfigPackage( 4876): com.android.rkpd.flags is mapped to com.android.rkpd
+D/WM-PackageManagerHelper( 4965): Skipping component enablement for androidx.work.impl.background.systemalarm.RescheduleReceiver
+D/WM-GreedyScheduler( 4965): Constraints not met: Cancelling work ID WorkGenerationalId(workSpecId=89123d7e-460a-4abf-b3c9-616324dbcf0c, generation=0)
+I/Zygote  ( 5026): Process 5026 created for com.android.externalstorage
+I/externalstorage( 5026): Using CollectorTypeCMC GC.
+W/externalstorage( 5026): Unexpected CPU variant for x86: x86_64.
+W/externalstorage( 5026): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+V/GraphicsEnvironment( 4991): Currently set values for:
+V/GraphicsEnvironment( 4991):   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment( 4991):   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment( 4991): com.google.android.adservices.api is not listed in per-application setting
+V/GraphicsEnvironment( 4991): ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+V/GraphicsEnvironment( 4991): com.google.android.adservices.api is not listed in ANGLE allowlist or settings, returning default
+I/AconfigPackage( 4876): com.android.cellbroadcastreceiver.flags is mapped to com.android.cellbroadcast
+V/GraphicsEnvironment( 4991): Neither updatable production driver nor prerelease driver is supported.
+D/ConnectivityService(  823): NetReassign [196 : null → 100] [c 9] [a 5] [i 1]
+I/AconfigPackage( 4876): com.android.adservices.flags is mapped to com.android.adservices
+I/AconfigPackage( 4876): com.android.sdksandbox.flags is mapped to com.android.adservices
+D/WifiNetworkFactory(  823): got request NetworkRequest [ REQUEST id=196, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10191 RequestorUid: 10191 RequestorPkg: com.google.android.rkpdapp UnderlyingNetworks: Null] ]
+D/UntrustedWifiNetworkFactory(  823): got request NetworkRequest [ REQUEST id=196, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10191 RequestorUid: 10191 RequestorPkg: com.google.android.rkpdapp UnderlyingNetworks: Null] ]
+D/WM-NetworkStateTracker( 4965): Network capabilities changed: [ Transports: WIFI Capabilities: NOT_METERED&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&VALIDATED&NOT_ROAMING&FOREGROUND&NOT_CONGESTED&NOT_SUSPENDED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED LinkUpBandwidth>=12000Kbps LinkDnBandwidth>=30000Kbps TransportInfo: <SSID: <unknown ssid>, BSSID: 02:00:00:00:00:00, MAC: 02:00:00:00:00:00, IP: /10.0.2.16, Security type: 0, Supplicant state: COMPLETED, Wi-Fi standard: legacy, RSSI: -50, Link speed: 1Mbps, Tx Link speed: 1Mbps, Max Supported Tx Link speed: 11Mbps, Rx Link speed: 2Mbps, Max Supported Rx Link speed: 11Mbps, Frequency: 2447MHz, Net ID: -1, Metered hint: false, score: 83, isUsable: true, CarrierMerged: false, SubscriptionId: -1, IsPrimary: -1, Trusted: true, Restricted: false, Ephemeral: false, OEM paid: false, OEM private: false, OSU AP: false, FQDN: <none>, Provider friendly name: <none>, Requesting package name: <none><none>MLO Information: , Is TID-To-Link negotiation supported by the AP: false, AP MLD Address: <none>, AP MLO Link Id: <none>, AP MLO Affiliated links: <none>, Vendor Data: <none>> SignalStrength: -50 UnderlyingNetworks: Null]
+D/OemPaidWifiNetworkFactory(  823): got request NetworkRequest [ REQUEST id=196, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10191 RequestorUid: 10191 RequestorPkg: com.google.android.rkpdapp UnderlyingNetworks: Null] ]
+D/MultiInternetWifiNetworkFactory(  823): got request NetworkRequest [ REQUEST id=196, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10191 RequestorUid: 10191 RequestorPkg: com.google.android.rkpdapp UnderlyingNetworks: Null] ]
+W/JobInfo ( 4906): Requested important-while-foreground flag for job5 is ignored and takes no effect
+D/WM-SystemJobScheduler( 4906): Scheduling work ID 8e611044-f571-4c93-aecb-e9d9cb1dbe2aJob ID 5
+I/AconfigPackage( 4876): com.android.uwb.flags is mapped to com.android.uwb
+I/AconfigPackage( 4876): com.android.ranging.flags is mapped to com.android.uwb
+I/AconfigPackage( 4876): android.graphics.pdf.flags is mapped to com.android.mediaprovider
+I/AconfigPackage( 4876): com.android.providers.media.flags is mapped to com.android.mediaprovider
+I/AconfigPackage( 4876): android.graphics.pdf.flags.readonly is mapped to com.android.mediaprovider
+I/AconfigPackage( 4876): com.android.net.ct.flags is mapped to com.android.tethering
+I/AconfigPackage( 4876): com.android.tethering.mainline.beta is mapped to com.android.tethering
+I/AconfigPackage( 4876): com.android.net.flags is mapped to com.android.tethering
+I/AconfigPackage( 4876): com.android.nearby.flags is mapped to com.android.tethering
+I/AconfigPackage( 4876): android.net.vcn is mapped to com.android.tethering
+I/AconfigPackage( 4876): com.android.tethering.beta.test is mapped to com.android.tethering
+I/AconfigPackage( 4876): android.net.http is mapped to com.android.tethering
+I/AconfigPackage( 4876): com.android.net.thread.flags is mapped to com.android.tethering
+W/JobInfo ( 4906): Requested important-while-foreground flag for job6 is ignored and takes no effect
+I/AconfigPackage( 4876): com.android.system.virtualmachine.flags is mapped to com.android.virt
+D/WM-SystemJobScheduler( 4906): Scheduling work ID a2a54084-543e-406c-bdd5-db2c67397164Job ID 6
+E/FeatureFlagsImplExport( 4876): android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package android.xr cannot be found on the device
+W/JobInfo ( 4906): Requested important-while-foreground flag for job9 is ignored and takes no effect
+D/UiAutomationConnection( 4876): Created on user UserHandle{0}
+I/UiAutomation( 4876): Initialized for user 0 on display 0
+W/UiAutomation( 4876): Created with deprecatead constructor, assumes DEFAULT_DISPLAY
+D/AccessibilityManagerService(  823): changeCurrentUserForTestAutomationIfNeededLocked(0): ignoring because device doesn't support visible background users
+I/UiAutomationManager(  823): Registering UiTestAutomationService (id=com.android.server.accessibility/UiAutomation, flags=0x0) when called by user 0
+D/WM-SystemJobScheduler( 4906): Scheduling work ID df2b7267-08c6-4dab-aec0-d0d4fcf23308Job ID 9
+V/AccessibilityManagerService(  823): onUserStateChangedLocked for userId: 0, forceUpdate: false
+I/AiAiEcho( 1603): Settings changed for uri: content://settings/secure/accessibility_enabled
+V/AccessibilityUserState(  823): updateShortcutTargets: type:accessibility_shortcut_target_service, current:{}, new:{}
+V/AccessibilityUserState(  823): updateShortcutTargets: type:accessibility_button_targets, current:{}, new:{}
+V/AccessibilityUserState(  823): updateShortcutTargets: type:accessibility_gesture_targets, current:{}, new:{}
+V/AccessibilityUserState(  823): updateShortcutTargets: type:accessibility_qs_targets, current:{}, new:{}
+V/AccessibilityUserState(  823): updateShortcutTargets: type:accessibility_key_gesture_targets, current:{}, new:{}
+W/MagnificationConnectionManager(  823): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+W/JobInfo ( 4906): Requested important-while-foreground flag for job10 is ignored and takes no effect
+D/WM-SystemJobScheduler( 4906): Scheduling work ID f5861d21-bf7d-468a-9f78-43dd15bb74fbJob ID 10
+W/libbinder.IPCThreadState(  823): Sending oneway calls to frozen process.
+I/AiAiEcho( 1603): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1603): EchoTargets: 
+I/AiAiEcho( 1603): Filtered by AiAi flag check: 
+I/AiAiEcho( 1603): [CONTEXT ratelimit_period="10 SECONDS" ]
+W/libbinder.IPCThreadState(  823): Sending oneway calls to frozen process.
+W/libbinder.IPCThreadState(  823): Sending oneway calls to frozen process.
+I/alsv    ( 4700): NGA disabled due to not being eligible.
+D/BatterySaverPolicy(  823): accessibility changed to true, updating policy.
+I/AiAiEcho( 1603): #remoteViewsTwiddler: feature disabled.
+I/AiAiEcho( 1603): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1603): EchoTargets: 
+I/AiAiEcho( 1603): Filtered by AiAi flag check: 
+I/AiAiEcho( 1603): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/AiAiEcho( 1603): #remoteViewsTwiddler: feature disabled.
+W/JobInfo ( 4906): Requested important-while-foreground flag for job11 is ignored and takes no effect
+D/WM-SystemJobScheduler( 4906): Scheduling work ID 8d432338-6ef3-496d-9254-0dc785bd0405Job ID 11
+D/nativeloader( 5026): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+I/AiAiEcho( 1603): #postPredictionTargets: Sending updates to UISurface home with targets# 0 (types=[])
+I/AiAiEcho( 1603): #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+D/HttpFlagsLoader( 4700): Found application exporting HTTP flags: com.google.android.gms
+W/JobInfo ( 4906): Requested important-while-foreground flag for job12 is ignored and takes no effect
+D/WM-SystemJobScheduler( 4906): Scheduling work ID 595848cd-ee5a-467e-b3f8-d2884b7aea14Job ID 12
+I/DialerFlags( 4906): com.android.dialer.phenotype.Flags.registerDialerMendelConfigPackage:152 phenotype register status: true
+W/JobInfo ( 4906): Requested important-while-foreground flag for job13 is ignored and takes no effect
+D/WM-SystemJobScheduler( 4906): Scheduling work ID 8fe97d6b-82bb-4083-9fe0-71abdd235559Job ID 13
+D/HttpFlagsLoader( 4700): HTTP flags file path: /data/user_de/0/com.google.android.gms/app_httpflags/flags.binarypb
+V/AccessibilityManagerService(  823): onUserStateChangedLocked for userId: 0, forceUpdate: false
+V/AccessibilityUserState(  823): updateShortcutTargets: type:accessibility_shortcut_target_service, current:{}, new:{}
+V/AccessibilityUserState(  823): updateShortcutTargets: type:accessibility_button_targets, current:{}, new:{}
+V/AccessibilityUserState(  823): updateShortcutTargets: type:accessibility_gesture_targets, current:{}, new:{}
+V/AccessibilityUserState(  823): updateShortcutTargets: type:accessibility_qs_targets, current:{}, new:{}
+V/AccessibilityUserState(  823): updateShortcutTargets: type:accessibility_key_gesture_targets, current:{}, new:{}
+W/MagnificationConnectionManager(  823): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+W/libbinder.IPCThreadState(  823): Sending oneway calls to frozen process.
+D/WM-SystemJobScheduler( 4906): Scheduling work ID aa7867c0-97ab-498c-bcec-e67a76d57dc6Job ID 32
+D/HttpFlagsLoader( 4700): Successfully loaded HTTP flags: # gmsc@a4e40922
+I/HttpFlagsLoader( 4700): HTTP flags log line (Impl): Using live production flag values from Google
+I/AiAiEcho( 1603): Settings changed for uri: content://settings/secure/accessibility_enabled
+W/libbinder.IPCThreadState(  823): Sending oneway calls to frozen process.
+I/AiAiEcho( 1603): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1603): EchoTargets: 
+I/AiAiEcho( 1603): Filtered by AiAi flag check: 
+I/AiAiEcho( 1603): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/AiAiEcho( 1603): #remoteViewsTwiddler: feature disabled.
+I/AiAiEcho( 1603): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1603): EchoTargets: 
+I/AiAiEcho( 1603): Filtered by AiAi flag check: 
+I/AiAiEcho( 1603): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/AiAiEcho( 1603): #remoteViewsTwiddler: feature disabled.
+D/WM-SystemJobScheduler( 4906): Scheduling work ID 9703a0e5-0d08-4e05-9a91-ceeb12bb2d33Job ID 36
+I/AiAiEcho( 1603): #postPredictionTargets: Sending updates to UISurface home with targets# 0 (types=[])
+D/AccessibilitySourceService( 3096): enabled a11y services count 0
+D/AccessibilitySourceService( 3096): a11y source sending 0 issue to sc
+D/WM-SystemJobScheduler( 4906): Scheduling work ID 4d6e4d7e-9cf3-41aa-bfd7-8e58110132abJob ID 37
+D/SafetySourceDataValidat(  823): No cert check requested for package com.google.android.permissioncontroller
+I/HttpEngBuilderWrap( 4700): NetworkQualityEstimator is unsupported when HttpEngineNativeProvider is used
+I/AiAiEcho( 1603): #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+I/aiga    ( 4700): (REDACTED) #getHotwordModelFromMobstore [mobstoreUri: %s]
+I/ApplicationContextProvider( 4991): onCreate(): setting application context from android.app.Application@a00fcec
+W/SsPagerDots( 1082): Total number of pages invalid: 0. Assuming 1 page.
+I/adservices-shared( 4991): set(): set singleton context as android.app.Application@a00fcec
+D/nativeloader( 5026): Configuring clns-shared-9 for other apk /system/priv-app/ExternalStorageProvider/ExternalStorageProvider.apk. target_sdk_version=36, uses_libraries=, library_path=/system/priv-app/ExternalStorageProvider/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.android.externalstorage:/system/priv-app/ExternalStorageProvider:/system/lib64:/system_ext/lib64
+W/JobInfo ( 4906): Requested important-while-foreground flag for job38 is ignored and takes no effect
+D/WM-SystemJobScheduler( 4906): Scheduling work ID cae8a57d-23a9-439e-9f45-0c9c25335d07Job ID 38
+D/AccessibilityManagerService(  823): .getAccessibilityShortcutTargets {shortcutType=32, userId=0}
+W/SsPagerDots( 1082): Total number of pages invalid: 0. Assuming 1 page.
+D/WM-SystemJobScheduler( 4906): Scheduling work ID 7305e194-3d77-42d7-b3b2-527ef0331c14Job ID 44
+I/DialerFlags( 4906): com.android.dialer.phenotype.Flags$1.onSuccess:128 finished with result: true
+I/DialerAndroidAutoEnabledFn( 4906): com.android.dialer.androidauto.impl.AndroidAutoEnabledFn.isEnabled:23 enabled by flag [CONTEXT ratelimit_period="1 MINUTES" ]
+V/GraphicsEnvironment( 5026): Currently set values for:
+V/GraphicsEnvironment( 5026):   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment( 5026):   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment( 5026): com.android.externalstorage is not listed in per-application setting
+V/GraphicsEnvironment( 5026): ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+V/GraphicsEnvironment( 5026): com.android.externalstorage is not listed in ANGLE allowlist or settings, returning default
+V/GraphicsEnvironment( 5026): Neither updatable production driver nor prerelease driver is supported.
+I/aifu    ( 4700): (REDACTED) MicroDataManager InitializationTask. googleHotwordData is null: true, hotwordModel is null: %b , sourceLocationOfCurrentHotwordModel %s
+D/HttpFlagsLoader( 4700): Found application exporting HTTP flags: com.google.android.gms
+D/HttpFlagsLoader( 4700): HTTP flags file path: /data/user_de/0/com.google.android.gms/app_httpflags/flags.binarypb
+I/aiea    ( 4700): getLocaleToModelSpecsMap
+I/aiea    ( 4700): Fetching latest config from MDD...
+I/aiea    ( 4700): (REDACTED) Found map of size: %d
+D/WM-SystemJobScheduler( 4906): Scheduling work ID cf78e2ad-05e5-4a38-88ef-a8ff5127c261Job ID 119
+I/DialerDialerCarAppServiceStateUpdater( 4906): com.android.dialer.androidauto.impl.carservice.DialerCarAppServiceStateUpdater$updateCarAppServiceState$1.invokeSuspend:69 CarAppService enabled state: desiredValue: false, protoStoreValue: false
+I/DialerDialerCarAppServiceStateUpdater( 4906): com.android.dialer.androidauto.impl.carservice.DialerCarAppServiceStateUpdater$updateCarAppServiceState$1.invokeSuspend:82 Skipping CarAppService PackageManager state update
+I/DialerDobbyEnabledFn( 4906): com.android.dialer.dobby.enabledfn.DobbyEnabledFn.isEnabled:23 disabled by flag [CONTEXT ratelimit_period="1 MINUTES" ]
+I/DialerDarpaComponentEnabledStateUpdater( 4906): com.android.dialer.darpa.impl.DarpaComponentEnabledStateUpdater$update$2.invokeSuspend:38 update FEATURE_CALLER_ID_AND_SPAM:1
+E/ashmem  ( 5026): Pinning is deprecated since Android Q. Please use trim or other methods.
+D/ExternalStorage( 5026): After updating volumes, found 2 active roots
+W/JobInfo ( 4906): Requested important-while-foreground flag for job124 is ignored and takes no effect
+D/WM-SystemJobScheduler( 4906): Scheduling work ID 400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9Job ID 124
+W/earchbox:search( 4700): Suspending all threads took: 7.559ms
+D/WM-SystemJobService( 4906): onStopJob for WorkGenerationalId(workSpecId=400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9, generation=0)
+I/DialerDarpaComponentEnabledStateUpdater( 4906): com.android.dialer.darpa.impl.DarpaComponentEnabledStateUpdater$update$2.invokeSuspend:38 update FEATURE_SPAM_BLOCKING:1
+I/DialerDarpaComponentEnabledStateUpdater( 4906): com.android.dialer.darpa.impl.DarpaComponentEnabledStateUpdater$update$2.invokeSuspend:38 update FEATURE_DOBBY:2
+D/BackgroundInstallControlService(  823): Package event received: 0
+I/DialerDarpaPhenotypeFlagsCommitSucceededListener( 4906): com.android.dialer.darpa.impl.DarpaPhenotypeFlagsCommitSucceededListener$onFlagsCommittedSuccessfully$2.onSuccess:30 update component enabled states successfully
+D/HttpFlagsLoader( 4700): Successfully loaded HTTP flags: # android.net.connectivity.org.chromium.net.httpflags.Flags@a4e40922
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "ChromiumBaseFeature_OverrideConnectionOptions"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "Cronet_InitializeBuildInfoOnStartup"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.google.android.gms"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.android.vending"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       bool_value: false
+D/HttpFlagsLoader( 4700):       min_version: "135.0.7011.0"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "Cronet_CronetUmaAllowList"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "ChromiumBaseFeature_OverrideClientConnectionOptions_PARAM_ForceOff"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "Cronet_enable_adaptive_network_hosts"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "ChromiumBaseFeature_OverrideConnectionOptions_PARAM_ForceOn"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "Cronet_adaptive_network_dev_toast"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "Cronet_log_me"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       string_value: "Using live production flag values from Google"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "Cronet_enable_adaptive_network_for_all"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "Cronet_enable_adaptive_network_paths"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "Cronet_UseScoreBasedProviderSelection"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.google.android.gms"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.android.vending"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.google."
+D/HttpFlagsLoader( 4700):       bool_value: true
+D/HttpFlagsLoader( 4700):       min_version: "147.0.7695.0"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.android."
+D/HttpFlagsLoader( 4700):       bool_value: true
+D/HttpFlagsLoader( 4700):       min_version: "147.0.7695.0"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "Cronet_ForceHttpEngineInFallback"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.google.android.gms"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.android.vending"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       bool_value: true
+D/HttpFlagsLoader( 4700):       min_version: "137.0.7141.0"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "Cronet_override_network_thread_priority"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.google.android.gms"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.android.vending"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       int_value: 0
+D/HttpFlagsLoader( 4700):       min_version: "126.0.6465.0"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "ChromiumBaseFeature_CronetMigrateSessionsEarlyV2EnableRetryOnAlternateNetworkBeforeHandshake"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "Cronet_OverrideNativeCronetWithHttpEngine"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.google.android.gms"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.android.vending"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.google.android.googlequicksearchbox"
+D/HttpFlagsLoader( 4700):       bool_value: true
+D/HttpFlagsLoader( 4700):       min_version: "139.0.7205.3"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.google.android.apps.maps"
+D/HttpFlagsLoader( 4700):       bool_value: true
+D/HttpFlagsLoader( 4700):       min_version: "139.0.7205.3"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.google.android.gm"
+D/HttpFlagsLoader( 4700):       bool_value: true
+D/HttpFlagsLoader( 4700):       min_version: "139.0.7205.3"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.google.android.calendar"
+D/HttpFlagsLoader( 4700):       bool_value: true
+D/HttpFlagsLoader( 4700):       min_version: "139.0.7205.3"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "ChromiumBaseFeature_UseLockFreeX509Verification"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "Cronet_fast_idempotent_paths"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "Cronet_UpdateNetworkStateOnlyOnceOnStartup"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.google.android.gms"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.android.vending"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       bool_value: true
+D/HttpFlagsLoader( 4700):       min_version: "134.0.6948.0"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "ChromiumBaseFeature_QuicUseReadMultiple"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "Cronet_OverrideWithHttpEngine"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.google.android.gms"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.android.vending"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.google.android.googlequicksearchbox"
+D/HttpFlagsLoader( 4700):       bool_value: true
+D/HttpFlagsLoader( 4700):       min_version: "139.0.7205.3"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.google.android.apps.maps"
+D/HttpFlagsLoader( 4700):       bool_value: true
+D/HttpFlagsLoader( 4700):       min_version: "139.0.7205.3"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.google.android.gm"
+D/HttpFlagsLoader( 4700):       bool_value: true
+D/HttpFlagsLoader( 4700):       min_version: "139.0.7205.3"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):     constrained_values {
+D/HttpFlagsLoader( 4700):       app_id: "com.google.android.calendar"
+D/HttpFlagsLoader( 4700):       bool_value: true
+D/HttpFlagsLoader( 4700):       min_version: "139.0.7205.3"
+D/HttpFlagsLoader( 4700):     }
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "ChromiumBaseFeature_kQuicRegisterConnectionClosePayloadV2"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "ChromiumBaseFeature_OverrideConnectionOptions_PARAM_ForceOff"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "Cronet_enable_adaptive_network"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "ChromiumBaseFeature_OverrideClientConnectionOptions"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/HttpFlagsLoader( 4700): flags {
+D/HttpFlagsLoader( 4700):   key: "ChromiumBaseFeature_OverrideClientConnectionOptions_PARAM_ForceOn"
+D/HttpFlagsLoader( 4700):   value {
+D/HttpFlagsLoader( 4700):   }
+D/HttpFlagsLoader( 4700): }
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: 37a56bb7-ffa2-406e-9926-1ff2e0a2bc2d}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: 8e611044-f571-4c93-aecb-e9d9cb1dbe2a}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: a2a54084-543e-406c-bdd5-db2c67397164}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: df2b7267-08c6-4dab-aec0-d0d4fcf23308}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: f5861d21-bf7d-468a-9f78-43dd15bb74fb}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: 8d432338-6ef3-496d-9254-0dc785bd0405}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: 595848cd-ee5a-467e-b3f8-d2884b7aea14}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: 8fe97d6b-82bb-4083-9fe0-71abdd235559}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Starting tracking for cae8a57d-23a9-439e-9f45-0c9c25335d07,400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9
+I/HttpFlagsLoader( 4700): HTTP flags log line (Impl): Using live production flag values from Google
+W/JobScheduler(  823): Job didn't exist in JobStore: 3d113df {androidx.work.systemjobscheduler} #u0a137/124 #TikTokWorker#com.android.dialer.voicemail.service.impl.VvmTaskWorker#@androidx.work.systemjobscheduler@com.google.android.dialer/androidx.work.impl.background.systemjob.SystemJobService
+D/WM-SystemJobService( 4906): onStartJob for WorkGenerationalId(workSpecId=400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9, generation=0)
+D/WM-Processor( 4906): fjl: processing WorkGenerationalId(workSpecId=400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9, generation=0)
+D/WM-Processor( 4906): WorkerWrapper interrupted for 400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9
+D/WM-StopWorkRunnable( 4906): StopWorkRunnable for 400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9; Processor.stopWork = true
+E/ashmem  ( 4991): Pinning is deprecated since Android Q. Please use trim or other methods.
+D/DesktopExperienceFlags( 4700): Toggle override initialized to: false
+D/WM-Processor( 4906): fjl: processing WorkGenerationalId(workSpecId=400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9, generation=0)
+D/ConnectivityService(  823): requestNetwork for uid/pid:10149/4700 activeRequest: null callbackRequest: 197 [NetworkRequest [ REQUEST id=198, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10149 RequestorUid: 10149 RequestorPkg: com.google.android.googlequicksearchbox UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647 isUidTracked: false declaredMethods: AVAIL|LOST|NC|LP
+I/cn_CronetLibraryLoader( 4700): Cronet version: 140.0.7259.0, arch: x86_64
+D/WM-WorkerWrapper( 4906): Status for 400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9 is ENQUEUED; not doing any work and rescheduling for later execution
+D/WifiNetworkFactory(  823): got request NetworkRequest [ REQUEST id=198, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10149 RequestorUid: 10149 RequestorPkg: com.google.android.googlequicksearchbox UnderlyingNetworks: Null] ]
+D/UntrustedWifiNetworkFactory(  823): got request NetworkRequest [ REQUEST id=198, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10149 RequestorUid: 10149 RequestorPkg: com.google.android.googlequicksearchbox UnderlyingNetworks: Null] ]
+D/ConnectivityService(  823): NetReassign [198 : null → 100] [c 0] [a 9] [i 4]
+D/BackgroundInstallControlService(  823): Package event received: 0
+D/OemPaidWifiNetworkFactory(  823): got request NetworkRequest [ REQUEST id=198, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10149 RequestorUid: 10149 RequestorPkg: com.google.android.googlequicksearchbox UnderlyingNetworks: Null] ]
+D/MultiInternetWifiNetworkFactory(  823): got request NetworkRequest [ REQUEST id=198, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10149 RequestorUid: 10149 RequestorPkg: com.google.android.googlequicksearchbox UnderlyingNetworks: Null] ]
+D/CompatChangeReporter(  823): Compat change id reported: 349487600; UID 10149; state: ENABLED
+D/WM-Processor( 4906): fjl 400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9 executed; reschedule = true
+I/adservices( 4991): Setting AdServicesManager static context as android.app.Application@a00fcec
+D/WM-SystemJobService( 4906): 400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9 executed on JobScheduler
+D/WM-GreedyScheduler( 4906): Stopping tracking for WorkGenerationalId(workSpecId=400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9, generation=0)
+D/ConnectivityService(  823): NetReassign [no changes] [c 0] [a 2] [i 5]
+D/WM-WorkerWrapper( 4906): Starting work for com.google.apps.tiktok.contrib.work.TikTokListenableWorker
+I/DialerVvmTaskWorkerDelegate( 4906): com.android.dialer.voicemail.service.impl.scheduler.VvmTaskWorker$VvmTaskWorkerDelegate.executeVvmJob:191 Beginning execution of job ID: 0
+I/DialerSingletonScopedExternalsLogging( 4906): com.google.android.dialershared.externals.logging.<redacted>:66 event: VVM_TASK_WORKER_EXECUTE_VVM_JOB, function parameters: [0], return value: <empty> [CONTEXT enable_persistent_logger=true ]
+I/DialerSingletonScopedExternalsLogging( 4906): com.google.android.dialershared.externals.logging.<redacted>:75 event: TIKTOK_WORK_EXECUTION_MONITOR_ON_WORK_STARTED, function parameters: [400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9,com.android.dialer.voicemail.service.impl.VvmTaskWorker], return value: <empty>
+D/WM-ConstraintTracker( 4906): fmt: initial state = NetworkState(isConnected=true, isValidated=true, isMetered=false, isNotRoaming=true)
+D/WM-NetworkStateTracker( 4906): Registering network callback
+D/ConnectivityService(  823): requestNetwork for uid/pid:10137/4906 activeRequest: null callbackRequest: 200 [NetworkRequest [ REQUEST id=201, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10137 RequestorUid: 10137 RequestorPkg: com.google.android.dialer UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647 isUidTracked: false declaredMethods: AVAIL|LOST|NC
+D/WM-NetworkStateTracker( 4906): Unregistering network callback
+D/WifiNetworkFactory(  823): got request NetworkRequest [ REQUEST id=201, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10137 RequestorUid: 10137 RequestorPkg: com.google.android.dialer UnderlyingNetworks: Null] ]
+D/ConnectivityService(  823): NetReassign [201 : null → 100] [c 1] [a 3] [i 1]
+D/UntrustedWifiNetworkFactory(  823): got request NetworkRequest [ REQUEST id=201, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10137 RequestorUid: 10137 RequestorPkg: com.google.android.dialer UnderlyingNetworks: Null] ]
+D/OemPaidWifiNetworkFactory(  823): got request NetworkRequest [ REQUEST id=201, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10137 RequestorUid: 10137 RequestorPkg: com.google.android.dialer UnderlyingNetworks: Null] ]
+D/MultiInternetWifiNetworkFactory(  823): got request NetworkRequest [ REQUEST id=201, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10137 RequestorUid: 10137 RequestorPkg: com.google.android.dialer UnderlyingNetworks: Null] ]
+W/ConnectivityManager.CallbackHandler( 4906): callback not found for CALLBACK_AVAILABLE message
+D/WM-ConstraintTracker( 4906): fmj: initial state = false
+D/WM-BrdcstRcvrCnstrntTrc( 4906): fmj: registering receiver
+I/DialerVvmCarrierIdentifierImpl( 4906): com.android.dialer.voicemail.service.impl.carriermapping.<redacted>:101 Looking up carrier name for phone account handle: 1 [CONTEXT ratelimit_period="1 MINUTES" ]
+D/WM-GreedyScheduler( 4906): Cancelling work ID 400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: 37a56bb7-ffa2-406e-9926-1ff2e0a2bc2d}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: 8e611044-f571-4c93-aecb-e9d9cb1dbe2a}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: a2a54084-543e-406c-bdd5-db2c67397164}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: df2b7267-08c6-4dab-aec0-d0d4fcf23308}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: f5861d21-bf7d-468a-9f78-43dd15bb74fb}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: 8d432338-6ef3-496d-9254-0dc785bd0405}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: 595848cd-ee5a-467e-b3f8-d2884b7aea14}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: 8fe97d6b-82bb-4083-9fe0-71abdd235559}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Starting tracking for cae8a57d-23a9-439e-9f45-0c9c25335d07
+D/WM-PackageManagerHelper( 4906): Skipping component enablement for androidx.work.impl.background.systemalarm.RescheduleReceiver
+D/WM-GreedyScheduler( 4906): Constraints not met: Cancelling work ID WorkGenerationalId(workSpecId=cae8a57d-23a9-439e-9f45-0c9c25335d07, generation=0)
+I/DialerVvmCarrierIdentifierImpl( 4906): com.android.dialer.voicemail.service.impl.carriermapping.<redacted>:123 found carrier name: VVM_CARRIER_TMO_US [CONTEXT enable_persistent_logger=true ]
+I/DialerRestVoicemailEnabledFn( 4906): com.android.dialer.voicemail.service.impl.vvmclients.rest.RestVoicemailEnabledFn.isEnabled:67 device is supported, enabling. [CONTEXT ratelimit_period="1 MINUTES" ]
+I/DialerVoicemailModule( 4906): com.android.voicemail.impl.VoicemailModule.provideVoicemailClient:66 Providing stub due to flag
+D/DesktopExperienceFlags( 4906): Toggle override initialized to: false
+D/TileServices( 1082): Couldn't find tile for ComponentInfo{com.google.android.apps.wellbeing/com.google.android.apps.wellbeing.focusmode.quicksettings.FocusModeTileService}(0)
+I/DialerVvmExecutorImpl( 4906): com.android.dialer.voicemail.service.impl.scheduler.VvmExecutorImpl.execute:250 Beginning VVM action: SYNC with retryCount: 1 for ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, 1, UserHandle{0} [CONTEXT enable_persistent_logger=true ]
+D/TileServices( 1082): Couldn't find tile for ComponentInfo{com.google.android.apps.wellbeing/com.google.android.apps.wellbeing.focusmode.quicksettings.FocusModeTileService}(0)
+E/DialerRestVvmCarrierService( 4906): com.android.dialer.voicemail.service.impl.vvmclients.rest.RestVvmCarrierService.getMsisdn:420 Retrieved phone number in an unexpected format: +15551234567 [CONTEXT disable_client_error_logging=true ]
+E/DialerRestVvmCarrierService( 4906): abmo: MEDIUM
+E/DialerRestVvmCarrierService( 4906): 	at a.dg(PG:15)
+E/DialerRestVvmCarrierService( 4906): 	at rbn.apply(PG:99)
+E/DialerRestVvmCarrierService( 4906): 	at aarq.apply(PG:13)
+E/DialerRestVvmCarrierService( 4906): 	at abzd.d(PG:3)
+E/DialerRestVvmCarrierService( 4906): 	at abze.run(PG:38)
+E/DialerRestVvmCarrierService( 4906): 	at vxo.run(PG:7)
+E/DialerRestVvmCarrierService( 4906): 	at absv.run(PG:44)
+E/DialerRestVvmCarrierService( 4906): 	at vxh.run(PG:305)
+E/DialerRestVvmCarrierService( 4906): 	at svb.run(PG:269)
+E/DialerRestVvmCarrierService( 4906): 	at java.lang.Thread.run(Thread.java:1563)
+E/DialerRestVvmCarrierService( 4906): 	at vyq.run(PG:61)
+I/DialerLogcatLoggingBindings( 4906): com.android.dialer.logging.logcat.LogcatLoggingBindings.logImpression:54 Impression: ANDROID_API_UNEXPECTED_PHONE_NUMBER_FORMAT
+I/DialerLogcatLoggingBindings( 4906): com.android.dialer.logging.logcat.LogcatLoggingBindings.logImpression:47 Impression: VVM_SYNC_STARTED
+I/DialerLoggingConsentCheckerImpl( 4906): com.google.android.dialershared.logging.consent.impl.<redacted>:72 timer stop with success, timer present: false
+I/DialerLoggingConsentCheckerImpl( 4906): com.google.android.dialershared.logging.consent.impl.<redacted>:72 timer stop with success, timer present: false
+I/DialerSingletonScopedExternalsLogging( 4906): com.google.android.dialershared.externals.logging.<redacted>:75 event: TELEPHONY_BOOTSTRAP_AUTHENTICATION_REQUEST, function parameters: [], return value: Default
+W/DialerGbaCredentialProvider( 4906): com.android.dialer.voicemail.service.impl.vvmclients.rest.GbaCredentialProvider$1.onAuthenticationFailure:93 GBA failed with reason: 1 [CONTEXT disable_client_error_logging=true ]
+W/DialerVvmExecutorImpl( 4906): com.android.dialer.voicemail.service.impl.scheduler.VvmExecutorImpl.executeWorkOnCarrierService:459 Could not complete vvm work with action: SYNC. Error: [GeneralFailureReason: UNSPECIFIED, RestFailureReason: GBA_AUTHENTICATION_FAILURE_FEATURE_NOT_SUPPORTED, OmtpFailureReason: OMTP_UNSPECIFIED] for ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, 1, UserHandle{0} [CONTEXT disable_client_error_logging=true enable_persistent_logger=true ]
+W/libbinder.IPCThreadState( 4906): Transaction failed because process frozen.
+I/DialerVvmExecutorImpl( 4906): com.android.dialer.voicemail.service.impl.scheduler.VvmExecutorImpl.executeWork:215 VvmResult is: # qyh@1db0ddb for ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, 1, UserHandle{0}
+E/libbinder.IPCThreadState( 4906): Binder transaction failure. id: 196383, cmd: BR_FROZEN_REPLY (29202), error: 0 (Success)
+E/JavaBinder( 4906): !!! FAILED BINDER TRANSACTION !!!  (parcel size = 84)
+I/DialerLoggingConsentCheckerImpl( 4906): com.google.android.dialershared.logging.consent.impl.<redacted>:72 timer stop with success, timer present: false
+W/ActivityManager(  823): pid 4906 com.google.android.dialer sent binder code 24 with flags 0 and got error -2147483646
+D/ActivityManager(  823): Too many transaction errors, throttling freezer binder callback.
+I/ActivityThread( 4906): Removing dead content provider:android.content.ContentProviderProxy@6c04377
+W/libbinder.IPCThreadState(  823): Transaction failed because process frozen.
+E/libbinder.IPCThreadState(  823): Binder transaction failure. id: 196431, cmd: BR_FROZEN_REPLY (29202), error: 0 (Success)
+I/ActivityManager(  823): Process android.process.acore (pid 4660) early provider death
+I/ActivityManager(  823): Process android.process.acore (pid 4660) has died: cch CEM 
+I/DialerSingletonScopedExternalsLogging( 4906): com.google.android.dialershared.externals.logging.<redacted>:75 event: TIKTOK_WORK_EXECUTION_MONITOR_ON_WORK_FINISHED, function parameters: [400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9,com.android.dialer.voicemail.service.impl.VvmTaskWorker], return value: Retry
+E/abzi    ( 4906): Got more than one input Future failure. Logging failures after the first
+E/abzi    ( 4906): zya: android.os.DeadObjectException: Transaction failed on small parcel; remote process probably died, but this could also be caused by running out of binder buffer space
+E/abzi    ( 4906): 	at aalj.ad(PG:70)
+E/abzi    ( 4906): 	at aalj.f(PG:20)
+E/abzi    ( 4906): 	at aaaa.a(PG:19)
+E/abzi    ( 4906): 	at ywp.d(PG:6)
+E/abzi    ( 4906): 	at ywr.run(PG:74)
+E/abzi    ( 4906): 	at aars.run(PG:21)
+E/abzi    ( 4906): 	at vxo.run(PG:7)
+E/abzi    ( 4906): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1154)
+E/abzi    ( 4906): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:652)
+E/abzi    ( 4906): 	at vxh.run(PG:305)
+E/abzi    ( 4906): 	at vjp.run(PG:460)
+E/abzi    ( 4906): 	at java.lang.Thread.run(Thread.java:1563)
+E/abzi    ( 4906): 	at vyq.run(PG:61)
+E/abzi    ( 4906): Caused by: android.os.DeadObjectException: Transaction failed on small parcel; remote process probably died, but this could also be caused by running out of binder buffer space
+E/abzi    ( 4906): 	at android.os.BinderProxy.transactNative(Native Method)
+E/abzi    ( 4906): 	at android.os.BinderProxy.transact(BinderProxy.java:592)
+E/abzi    ( 4906): 	at android.content.ContentProviderProxy.createCancellationSignal(ContentProviderNative.java:832)
+E/abzi    ( 4906): 	at android.content.ContentProviderClient.query(ContentProviderClient.java:193)
+E/abzi    ( 4906): 	at android.content.ContentProviderClient.query(ContentProviderClient.java:178)
+E/abzi    ( 4906): 	at aalj.ad(PG:23)
+E/abzi    ( 4906): 	... 12 more
+I/Zygote  (  582): Process 4660 exited due to signal 9 (Killed)
+V/ActivityManager(  823): Got obituary of 4660:android.process.acore
+D/CountryDetector(  823): No listener is left
+I/DialerLoggingConsentCheckerImpl( 4906): com.google.android.dialershared.logging.consent.impl.<redacted>:72 timer stop with success, timer present: false
+I/WM-WorkerWrapper( 4906): Worker result RETRY for Work [ id=400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9, tags={ com.google.apps.tiktok.contrib.work.TikTokListenableWorker,1,SYNC,TikTokWorker#com.android.dialer.voicemail.service.impl.VvmTaskWorker } ]
+D/WM-Processor( 4906): fjl 400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9 executed; reschedule = true
+D/WM-GreedyScheduler( 4906): Cancelling work ID 400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9
+I/libprocessgroup(  823): Removed cgroup /sys/fs/cgroup/apps/uid_10096/pid_4660
+D/WM-SystemJobScheduler( 4906): Scheduling work ID 400e6f90-030e-49b8-9ad4-f6ce1fa9f6f9Job ID 125
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: 37a56bb7-ffa2-406e-9926-1ff2e0a2bc2d}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: 8e611044-f571-4c93-aecb-e9d9cb1dbe2a}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: a2a54084-543e-406c-bdd5-db2c67397164}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: df2b7267-08c6-4dab-aec0-d0d4fcf23308}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: f5861d21-bf7d-468a-9f78-43dd15bb74fb}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: 8d432338-6ef3-496d-9254-0dc785bd0405}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: 595848cd-ee5a-467e-b3f8-d2884b7aea14}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Ignoring {WorkSpec: 8fe97d6b-82bb-4083-9fe0-71abdd235559}. Requires device idle.
+D/WM-GreedyScheduler( 4906): Starting tracking for cae8a57d-23a9-439e-9f45-0c9c25335d07
+I/HalDevMgr(  823): bestIfaceCreationProposal is null, requestIface=STA, existingIface=[name=wlan0 type=STA]
+I/AccessibilityNodeInfoDumper( 4876): Skipping invisible child: android.view.accessibility.AccessibilityNodeInfo@276b7; boundsInParent: Rect(0, 0 - 1080, 0); boundsInScreen: Rect(0, 0 - 1080, 0); boundsInWindow: Rect(0, 0 - 1080, 0); packageName: com.buffago.app; className: android.widget.LinearLayout; text: null; error: null; maxTextLength: -1; stateDescription: null; contentDescription: null; tooltipText: null; containerTitle: null; viewIdResName: null; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; granularScrollingSupported: false; importantForAccessibility: false; visible: false; actions: [AccessibilityAction: ACTION_SELECT - null, AccessibilityAction: ACTION_CLEAR_SELECTION - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_SHOW_ON_SCREEN - null]; isTextSelectable: false
+I/AccessibilityNodeInfoDumper( 4876): Skipping invisible child: android.view.accessibility.AccessibilityNodeInfo@272f6; boundsInParent: Rect(0, 0 - 1080, 0); boundsInScreen: Rect(0, 0 - 1080, 0); boundsInWindow: Rect(0, 0 - 1080, 0); packageName: com.buffago.app; className: android.view.ViewGroup; text: null; error: null; maxTextLength: -1; stateDescription: null; contentDescription: null; tooltipText: null; containerTitle: null; viewIdResName: null; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; granularScrollingSupported: false; importantForAccessibility: false; visible: false; actions: [AccessibilityAction: ACTION_SELECT - null, AccessibilityAction: ACTION_CLEAR_SELECTION - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_SHOW_ON_SCREEN - null]; isTextSelectable: false
+W/AccessibilityNodeInfoDumper( 4876): Fetch time: 96ms
+V/AccessibilityManagerService(  823): onUserStateChangedLocked for userId: 0, forceUpdate: false
+V/AccessibilityUserState(  823): updateShortcutTargets: type:accessibility_shortcut_target_service, current:{}, new:{}
+V/AccessibilityUserState(  823): updateShortcutTargets: type:accessibility_button_targets, current:{}, new:{}
+V/AccessibilityUserState(  823): updateShortcutTargets: type:accessibility_gesture_targets, current:{}, new:{}
+V/AccessibilityUserState(  823): updateShortcutTargets: type:accessibility_qs_targets, current:{}, new:{}
+V/AccessibilityUserState(  823): updateShortcutTargets: type:accessibility_key_gesture_targets, current:{}, new:{}
+W/MagnificationConnectionManager(  823): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+D/AccessibilityManagerService(  823): restoreCurrentUserForTestAutomationIfNeededLocked(): ignoring because device doesn't support visible background users
+I/AiAiEcho( 1603): Settings changed for uri: content://settings/secure/accessibility_enabled
+W/libbinder.IPCThreadState(  823): Sending oneway calls to frozen process.
+W/libbinder.IPCThreadState(  823): Sending oneway calls to frozen process.
+I/alsv    ( 4700): NGA disabled due to not being eligible.
+I/AiAiEcho( 1603): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1603): EchoTargets: 
+I/AiAiEcho( 1603): Filtered by AiAi flag check: 
+I/AiAiEcho( 1603): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/AiAiEcho( 1603): #remoteViewsTwiddler: feature disabled.
+W/libbinder.IPCThreadState( 4876): call to talkWithDriver in joinThreadPool returned error: -9 (Bad file descriptor), FD: -1
+I/AiAiEcho( 1603): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1603): EchoTargets: 
+I/AiAiEcho( 1603): Filtered by AiAi flag check: 
+I/AiAiEcho( 1603): [CONTEXT ratelimit_period="10 SECONDS" ]
+W/libbinder.IPCThreadState( 4876): call to talkWithDriver in joinThreadPool returned error: -9 (Bad file descriptor), FD: -1
+W/libbinder.IPCThreadState( 4876): call to talkWithDriver in joinThreadPool returned error: -9 (Bad file descriptor), FD: -1
+I/AiAiEcho( 1603): #remoteViewsTwiddler: feature disabled.
+D/AndroidRuntime( 4876): Shutting down VM
+I/AiAiEcho( 1603): #postPredictionTargets: Sending updates to UISurface home with targets# 0 (types=[])
+I/AiAiEcho( 1603): #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+W/libbinder.IPCThreadState(  823): Sending oneway calls to frozen process.
+D/BatterySaverPolicy(  823): accessibility changed to false, updating policy.
+W/SsPagerDots( 1082): Total number of pages invalid: 0. Assuming 1 page.
+D/BoundBrokerSvc( 1755): onUnbind: Intent { act=com.google.android.gms.potokens.service.START dat=chimera-action:/... xflg=0x4 cmp=com.google.android.gms/.chimera.GmsApiService }
+D/OomAdjuster(  823): Not killing cached processes

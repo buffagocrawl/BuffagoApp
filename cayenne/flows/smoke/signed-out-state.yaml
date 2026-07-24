@@ -1,0 +1,15 @@
+appId: com.buffago.app
+name: Signed-out startup assertions
+tags: [smoke, non-mutating, signed-out]
+---
+- assertVisible:
+    id: app.root
+- assertVisible:
+    id: auth.screen
+- assertVisible:
+    id: auth.email.input
+- assertVisible:
+    id: auth.password.input
+- assertVisible:
+    id: auth.signin.button
+- takeScreenshot: startup-signed-out

@@ -3,7 +3,7 @@ from pathlib import Path
 import sys
 import pytest
 sys.path.insert(0, str(Path(__file__).parents[1] / 'scripts'))
-from cayenne_runtime import disposition, redact, safety, validate_selectors
+from cayenne_runtime import detect_startup_state, disposition, redact, safety, smoke_assertion_metadata, validate_selectors
 import android_lifecycle as al
 from android_lifecycle import AndroidLifecycle, RuntimeFailure
 
@@ -29,6 +29,55 @@ def test_serrano_failed_app_defect_rejects():
 def test_serrano_missing_evidence_is_insufficient():
     result={'status':'PASSED','safety':{'decision':'ALLOW'},'failures':[],'limitations':['missing screenshot'],'redaction':{'validated':True},'summary':{'acceptanceCriteriaCovered':[]}}
     assert disposition(result,{'acceptanceCriteria':['launch']})['disposition']=='INSUFFICIENT_EVIDENCE'
+
+def hierarchy(*selectors):
+    return "<hierarchy>" + "".join(f'<node resource-id="{selector}" />' for selector in selectors) + "</hierarchy>"
+
+def valid_smoke(state):
+    return {
+        'suite':'smoke-auto','status':'PASSED','detectedStartupState':state,
+        'startupStateValidation':'PASSED','universalAssertionResult':'PASSED',
+        'stateSpecificAssertionResult':'PASSED','safety':{'decision':'ALLOW'},
+        'failures':[],'limitations':[],'redaction':{'validated':True},
+        'summary':{'acceptanceCriteriaCovered':['launch']},
+    }
+
+def test_onboarding_detected():
+    assert detect_startup_state(hierarchy('app.root','onboarding.root'))['detectedStartupState']=='CLEAN_ONBOARDING'
+
+def test_auth_screen_detected():
+    assert detect_startup_state(hierarchy('app.root','auth.screen'))['detectedStartupState']=='SIGNED_OUT'
+
+def test_authenticated_navigation_detected():
+    assert detect_startup_state(hierarchy('app.root','nav.home'))['detectedStartupState']=='AUTHENTICATED'
+
+def test_multiple_startup_states_detected():
+    result=detect_startup_state(hierarchy('onboarding.root','auth.screen'))
+    assert not result['valid'] and result['reason']=='MULTIPLE_STARTUP_STATES'
+
+def test_no_startup_state_detected():
+    result=detect_startup_state(hierarchy('app.root'))
+    assert not result['valid'] and result['reason']=='NO_STARTUP_STATE'
+
+def test_authenticated_assertions_not_applicable_during_onboarding():
+    metadata=smoke_assertion_metadata('CLEAN_ONBOARDING')
+    authenticated=[item for item in metadata['skippedAssertions'] if item['assertion']=='Authenticated primary navigation']
+    assert authenticated==[{'assertion':'Authenticated primary navigation','status':'NOT_APPLICABLE'}]
+
+def test_serrano_approves_valid_onboarding_smoke():
+    assert disposition(valid_smoke('CLEAN_ONBOARDING'),{'acceptanceCriteria':['launch']})['disposition']=='APPROVE'
+
+def test_serrano_approves_valid_authenticated_smoke():
+    assert disposition(valid_smoke('AUTHENTICATED'),{'acceptanceCriteria':['launch']})['disposition']=='APPROVE'
+
+def test_serrano_insufficient_when_startup_state_is_ambiguous():
+    result=valid_smoke(None)
+    result['startupStateValidation']='FAILED'
+    assert disposition(result,{'acceptanceCriteria':['launch']})['disposition']=='INSUFFICIENT_EVIDENCE'
+
+def test_production_readonly_auto_smoke_preserves_safety():
+    result=safety('production-readonly',False,False,'https://example.supabase.co',{})
+    assert result['decision']=='ALLOW' and result['productionDetected'] and not result['mutationAllowed']
 
 def lifecycle(tmp_path, monkeypatch):
     adb=tmp_path/'adb.exe'; emulator=tmp_path/'emulator.exe'
