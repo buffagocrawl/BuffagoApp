@@ -17,3 +17,7 @@ Agents/Jalapeno/tmp/
 Agents/Serrano/runs/*
 !Agents/Serrano/runs/.gitkeep
 Agents/Serrano/.venv/
+
+# Generated Expo exports are deployment/CI artifacts, not source.
+/crawl/output/
+/output/buffaverse-web-correction/

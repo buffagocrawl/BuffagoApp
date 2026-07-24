@@ -21,6 +21,8 @@
     "database:fingerprint": "node ./scripts/schema-fingerprint.mjs",
     "owner-validation": "node ./scripts/owner-validation.mjs",
     "typecheck": "tsc --noEmit",
+    "security:scan": "node ../scripts/security/scan-secrets.mjs",
+    "security:scan-staged": "node ../scripts/security/scan-secrets.mjs --staged",
     "cayenne:check": "powershell -NoProfile -ExecutionPolicy Bypass -File ..\\scripts\\cayenne\\check-prerequisites.ps1",
     "cayenne:smoke": "powershell -NoProfile -ExecutionPolicy Bypass -File ..\\scripts\\cayenne\\run.ps1 -Suite smoke -Environment production-readonly",
     "cayenne:serrano": "powershell -NoProfile -ExecutionPolicy Bypass -File ..\\scripts\\cayenne\\run.ps1 -Suite smoke -Environment production-readonly -SerranoReview",

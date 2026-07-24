@@ -6,7 +6,17 @@ Values prefixed with `EXPO_PUBLIC_` are bundled into the mobile app and must be 
 
 `OPENAI_API_KEY` and `SUPABASE_SERVICE_ROLE_KEY` must live only in backend environments such as Supabase Edge Function secrets. Mobile app code must call Edge Functions for privileged work instead of calling OpenAI or using service role credentials directly.
 
-`EXPO_PUBLIC_GOOGLE_API_KEY` must be a mobile/client Google key restricted in Google Cloud to the intended APIs, app package names, bundle IDs, and signing fingerprints.
+`EXPO_PUBLIC_GOOGLE_API_KEY` is compiled into client JavaScript whenever app
+code references it. It must never be a server/web-service credential. Use
+separate Google keys per platform and environment, with API restrictions plus
+the matching Android package/certificate, iOS bundle ID, or web referrer
+restriction. Client calls to Google Maps Platform web-service endpoints should
+go through an authenticated server proxy unless the endpoint's documented
+mobile restriction headers are implemented and verified.
+
+Run `npm run security:scan` from `crawl/` before committing. Generated Expo
+exports under `crawl/output/` and `output/buffaverse-web-correction/` are
+ignored and must be deployed or retained as CI artifacts instead of committed.
 
 ## RLS And Abuse-Prevention Review
 
