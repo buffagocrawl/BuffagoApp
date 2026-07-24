@@ -531,7 +531,7 @@ export default function EmailAuthScreen() {
   );
 
   return (
-    <View style={[styles.screen, { backgroundColor: screenBg }]}>
+    <View testID="auth.screen" style={[styles.screen, { backgroundColor: screenBg }]}>
       <View style={styles.topBar}>
         <Pressable onPress={() => router.back()} hitSlop={12} style={styles.backBtn}>
           <MaterialCommunityIcons name="arrow-left" size={26} color={headerIconColor} />
@@ -557,6 +557,7 @@ export default function EmailAuthScreen() {
 
               {socialButtons.map((button) => (
                 <Button
+                  testID={button.provider === 'google' ? 'auth.google.button' : 'auth.facebook.button'}
                   key={button.provider}
                   mode="outlined"
                   icon={button.loading ? undefined : button.icon}
@@ -605,6 +606,7 @@ export default function EmailAuthScreen() {
               ) : null}
 
               <TextInput
+                testID="auth.email.input"
                 label="Email"
                 value={email}
                 onChangeText={setEmail}
@@ -618,6 +620,7 @@ export default function EmailAuthScreen() {
               </HelperText>
 
               <TextInput
+                testID="auth.password.input"
                 label="Password"
                 value={password}
                 onChangeText={setPassword}
@@ -631,6 +634,7 @@ export default function EmailAuthScreen() {
               </HelperText>
 
               <Button
+                testID="auth.signin.button"
                 mode="contained"
                 onPress={mode === 'signin' ? onSignIn : onSignUp}
                 disabled={!canSubmit || busy}

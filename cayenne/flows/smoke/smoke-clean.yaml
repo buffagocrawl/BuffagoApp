@@ -1,0 +1,10 @@
+appId: com.buffago.app
+name: Buffago clean-install smoke suite
+tags: [smoke, non-mutating, clean]
+---
+- runFlow: app-launch.yaml
+- assertVisible:
+    id: onboarding.root
+- runFlow: onboarding-state.yaml
+- runFlow: no-fatal-error.yaml
+- takeScreenshot: smoke-clean-final

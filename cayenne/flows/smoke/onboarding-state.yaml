@@ -1,0 +1,23 @@
+appId: com.buffago.app
+name: Clean onboarding startup assertions
+tags: [smoke, non-mutating, onboarding]
+---
+- assertVisible:
+    id: app.root
+- assertVisible:
+    id: onboarding.root
+- assertVisible:
+    id: onboarding.next
+- assertVisible:
+    id: onboarding.skip
+- takeScreenshot: startup-clean-onboarding
+- tapOn:
+    id: onboarding.next
+- assertVisible:
+    id: onboarding.back
+- takeScreenshot: startup-onboarding-forward
+- tapOn:
+    id: onboarding.back
+- assertVisible:
+    id: onboarding.next
+- takeScreenshot: startup-onboarding-back
