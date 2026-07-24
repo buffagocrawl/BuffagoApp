@@ -6,7 +6,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = Resolve-Path (Join-Path $PSScriptRoot '..')
 $preflight = Join-Path $root 'supabase/validation/buffago-baseline-preflight.sql'
-$migrationDir = Join-Path $root 'supabase/migrations/deployed'
+$migrationDir = Join-Path $root 'supabase/migrations'
 
 Write-Host 'Running BuffaGo baseline preflight (read-only)...'
 & $Psql $DatabaseUrl --set ON_ERROR_STOP=1 --file $preflight

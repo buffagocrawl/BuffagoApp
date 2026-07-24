@@ -4,7 +4,7 @@ Status: **Not approved. Human approval required.**
 
 Release candidate source is base commit `0cdfc7fef4e98b04d83b658cc691b7fc2e226b5b` plus the uncommitted, narrowly scoped closure changes in this worktree. There is no standalone release commit because the worktree contains pre-existing user changes; production must use a reviewed commit containing the complete intended diff.
 
-Database: Strategy B, external BuffaGo baseline; `public.users` is the profile table and `auth.users` is authoritative identity. Run `crawl/scripts/apply-engagement-migrations.ps1 -DatabaseUrl <url>`; it runs the preflight first and stops safely on missing prerequisites.
+Database: Strategy B, external BuffaGo baseline; `public.users` is the profile table and `auth.users` is authoritative identity. Run `crawl/scripts/apply-engagement-migrations.ps1 -DatabaseUrl <url>`; it preflights and then applies the ordered SQL files in `crawl/supabase/migrations`, excluding `deployed-archive.sql`.
 
 Platform: web supported. Native maps are behind `platformMap.native.js`; web uses the explicit map/geofence limitation fallback. Web export passed.
 
