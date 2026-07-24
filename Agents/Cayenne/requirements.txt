@@ -1,0 +1,1 @@
+# Cayenne uses Python's standard library; this file documents its intentionally small dependency surface.

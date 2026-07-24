@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cayenne/run-request/1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "request_id", "requested_by", "repository", "environment", "platforms", "suite", "required_journeys", "options"],
+  "properties": {
+    "schema_version": {"const": "1.0"}, "request_id": {"type": "string", "minLength": 1}, "requested_by": {"const": "serrano"}, "repository": {"type": "string"}, "branch": {"type": ["string", "null"]}, "commit": {"type": ["string", "null"]}, "base_commit": {"type": ["string", "null"]}, "environment": {"enum": ["local", "development", "qa", "staging"]}, "platforms": {"type": "array", "items": {"enum": ["android", "web", "ios"]}, "minItems": 1}, "suite": {"type": "string"}, "changed_features": {"type": "array", "items": {"type": "string"}}, "required_journeys": {"type": "array", "items": {"type": "string"}, "minItems": 1}, "visual_checkpoints": {"type": "array", "items": {"type": "string"}}, "database_assertions": {"type": "array"}, "blocking_severity": {"type": "string"}, "options": {"type": "object"}
+  }
+}

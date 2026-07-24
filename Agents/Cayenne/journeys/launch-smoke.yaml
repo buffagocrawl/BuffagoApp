@@ -1,0 +1,9 @@
+appId: com.buffago.app
+name: launch-smoke
+tags:
+  - smoke
+steps:
+  - launchApp
+  - waitForAnimationToEnd
+  - takeScreenshot: launch-smoke
+

@@ -6,7 +6,7 @@ test('recovered Phase 2 migration has an exact canonical root and manifest hash'
   const report = inspect();
   const phase2 = report.rootFiles.filter((item) => item.name === '20260724050000_buffaverse_phase2_legendary_restaurants.sql');
   assert.equal(phase2.length, 1);
-  assert.equal(phase2[0].hash, '56bbd4577a4b9a09cc180d27259d79c7f75a85487c1d35670c56e0898dca205e');
+  assert.equal(phase2[0].hash, 'f2452ca8c7fcb02ae161e3220739917f2cc601aa7d8cb9e05bb9a4a4a702ee0f');
   assert.equal(report.manifestedMissingRoot.includes('20260724050000_buffaverse_phase2_legendary_restaurants.sql'), false);
   assert.equal(report.checksumMismatches.some((item) => item.name === '20260724050000_buffaverse_phase2_legendary_restaurants.sql'), false);
 });

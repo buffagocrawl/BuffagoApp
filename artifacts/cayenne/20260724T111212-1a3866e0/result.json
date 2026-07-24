@@ -1,0 +1,68 @@
+{
+  "accessibility": [],
+  "base_commit": null,
+  "build": {
+    "status": "skipped"
+  },
+  "cleanup": {
+    "lock_removed": true,
+    "status": "passed"
+  },
+  "database_assertions": [],
+  "environment": "qa",
+  "evidence": [
+    {
+      "id": "ev-d5eb45b5b45cb992",
+      "path": "request.json"
+    }
+  ],
+  "failures": [],
+  "finished_at": "2026-07-24T15:12:12+00:00",
+  "flakiness": {
+    "retry_count": 0
+  },
+  "infrastructure_incidents": [
+    {
+      "classification": "environment_failure",
+      "message": "Execution adapter not available"
+    }
+  ],
+  "journeys": [
+    {
+      "database_assertions": [],
+      "feature": "unspecified",
+      "fixture": null,
+      "journey_id": "launch-smoke",
+      "logs": [],
+      "screenshots": [],
+      "status": "inconclusive",
+      "steps": []
+    }
+  ],
+  "launch": {
+    "status": "skipped"
+  },
+  "missing_evidence": [
+    "journey:launch-smoke"
+  ],
+  "platforms": [
+    "android"
+  ],
+  "redaction": {
+    "status": "passed"
+  },
+  "request_id": "serrano-797079c1-c2cd-423f-b5c3-ceb7089ca501",
+  "required_journeys": [
+    "launch-smoke"
+  ],
+  "run_id": "20260724T111212-1a3866e0",
+  "schema_version": "1.0",
+  "serrano_consumption_ready": false,
+  "started_at": "2026-07-24T15:12:12+00:00",
+  "status": "inconclusive",
+  "tested_commit": "b0d52b2ee4958fb609222b0b790273a4610537d9",
+  "tool_versions": {
+    "cayenne": "1.0.0"
+  },
+  "visual": []
+}

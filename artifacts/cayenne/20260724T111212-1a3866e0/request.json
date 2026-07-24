@@ -1,0 +1,26 @@
+{
+  "base_commit": null,
+  "blocking_severity": "high",
+  "branch": "",
+  "changed_features": [],
+  "commit": "",
+  "database_assertions": [],
+  "environment": "qa",
+  "options": {
+    "capture_logs": true,
+    "capture_video": false,
+    "reset_fixtures": false
+  },
+  "platforms": [
+    "android"
+  ],
+  "repository": "BuffagoApp",
+  "request_id": "serrano-797079c1-c2cd-423f-b5c3-ceb7089ca501",
+  "requested_by": "serrano",
+  "required_journeys": [
+    "launch-smoke"
+  ],
+  "schema_version": "1.0",
+  "suite": "smoke",
+  "visual_checkpoints": []
+}

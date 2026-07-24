@@ -7,8 +7,9 @@ from pathlib import Path
 from typing import Any
 
 from .orchestrator import SerranoOrchestrator, load_configuration
+from .cayenne_integration import ingest_cayenne_result, run_runtime_validation
 
-SUPPORTED_COMMANDS = ("status", "resume", "discover", "approve", "build", "security", "release", "full")
+SUPPORTED_COMMANDS = ("status", "resume", "discover", "approve", "build", "security", "release", "full", "run-runtime-validation", "ingest-runtime-result")
 
 
 def find_repo_root(start: Path | None = None) -> Path:
@@ -23,6 +24,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Serrano product-management orchestrator")
     parser.add_argument("command", nargs="?", default="discover", choices=SUPPORTED_COMMANDS)
     parser.add_argument("run_id", nargs="?")
+    parser.add_argument("--request", type=Path)
+    parser.add_argument("--result", type=Path)
+    parser.add_argument("--dry-run", action="store_true")
     return parser
 
 
@@ -55,6 +59,16 @@ def run_command(argv: list[str] | None = None) -> dict[str, Any]:
         if not args.run_id:
             raise RuntimeError("release requires <run-id>")
         state = orchestrator.release(args.run_id)
+    elif args.command == "run-runtime-validation":
+        if not args.request:
+            raise RuntimeError("run-runtime-validation requires --request <path>")
+        request = json.loads(args.request.read_text(encoding="utf-8-sig"))
+        state = run_runtime_validation(repo_root, request, dry_run=args.dry_run)
+    elif args.command == "ingest-runtime-result":
+        if not args.result:
+            raise RuntimeError("ingest-runtime-result requires --result <path>")
+        result = json.loads(args.result.read_text(encoding="utf-8-sig"))
+        state = ingest_cayenne_result(repo_root, result)
     else:
         state = orchestrator.full(args.run_id)
 
@@ -97,7 +111,10 @@ def format_state_summary(state: dict[str, Any], repo_root: Path) -> str:
 def main(argv: list[str] | None = None) -> int:
     repo_root = find_repo_root()
     state = run_command(argv)
-    print(format_state_summary(state, repo_root))
+    if "current_phase" in state:
+        print(format_state_summary(state, repo_root))
+    else:
+        print(json.dumps(state, indent=2, sort_keys=True))
     return 0
 
 

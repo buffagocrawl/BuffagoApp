@@ -1,0 +1,14 @@
+{
+  "android_home": true,
+  "commands": {
+    "adb": "C:\\Users\\Brand\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.EXE",
+    "emulator": "C:\\Users\\Brand\\AppData\\Local\\Android\\Sdk\\emulator\\emulator.EXE",
+    "java": "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath\\java.EXE",
+    "maestro": null,
+    "node": "C:\\Program Files\\nodejs\\node.EXE",
+    "npm": "C:\\Program Files\\nodejs\\npm.CMD",
+    "python": "C:\\Users\\Brand\\AppData\\Local\\Programs\\Python\\Python312\\python.EXE"
+  },
+  "qa_environment_configured": false,
+  "repository": "C:\\Users\\Brand\\repo\\BuffagoApp"
+}

@@ -64,6 +64,8 @@ class CodexRunner:
                 input=self._compose_prompt(request),
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 check=False,
                 timeout=request.timeout_seconds,
                 cwd=self.repo_root,
@@ -139,4 +141,3 @@ class CodexRunner:
             "confidence": "medium",
             "source_references": ["evidence/evidence_manifest.json"],
         }
-

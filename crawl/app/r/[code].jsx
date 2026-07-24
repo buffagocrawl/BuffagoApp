@@ -1,8 +1,8 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { PENDING_REFERRAL_KEY } from '../../lib/referrals';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { recognizeReferral } from '../../lib/referrals';
+import { REFERRALS_ENABLED } from '../../config/referrals';
 
 export default function ReferralRoute() {
   const { code } = useLocalSearchParams();
@@ -10,18 +10,22 @@ export default function ReferralRoute() {
   const referralCode = Array.isArray(code) ? code[0] : code;
 
   useEffect(() => {
-    if (typeof referralCode === 'string' && referralCode.trim()) {
-      AsyncStorage.setItem(PENDING_REFERRAL_KEY, referralCode.trim()).catch(() => {});
-    }
+    if (!REFERRALS_ENABLED || typeof referralCode !== 'string' || !referralCode.trim()) return;
+    recognizeReferral(referralCode.trim(), {
+      source: 'shared_link',
+      placement: 'deep_link_route',
+      screen: 'referral_link',
+    }).catch(() => {});
   }, [referralCode]);
 
   return (
     <View style={styles.screen}>
       <Text style={styles.brand}>BuffaGo</Text>
-      <Text style={styles.title}>You’ve been invited to find your next favorite wings.</Text>
+      <Text style={styles.title}>You&apos;ve been invited to find your next favorite wings.</Text>
       <Text style={styles.body}>
-        Your invitation is saved on this device. Sign in or create an account to continue.
-        Referral rewards are currently unavailable.
+        {REFERRALS_ENABLED
+          ? 'Your invitation is saved on this device. Sign in or create an account to continue.'
+          : 'Referral invitations are not available right now, but you can still explore Buffago.'}
       </Text>
       <Pressable style={styles.button} onPress={() => router.replace('/auth/login')}>
         <Text style={styles.buttonText}>Continue to BuffaGo</Text>

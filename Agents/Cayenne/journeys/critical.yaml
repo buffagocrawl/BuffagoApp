@@ -1,0 +1,9 @@
+appId: com.buffago.app
+name: critical-journey-contract
+tags:
+  - contract
+# Runtime adapters may expand this file once the QA session adapter is configured.
+steps:
+  - launchApp
+  - assertVisible: "BuffaGo"
+
