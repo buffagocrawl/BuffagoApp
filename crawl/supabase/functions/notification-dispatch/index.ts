@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -26,7 +27,7 @@ Deno.serve(async (request) => {
   if (secret && request.headers.get('x-dispatch-secret') !== secret) return new Response('unauthorized', { status: 401 });
 
   await client.rpc('queue_streak_at_risk_notifications');
-  const { data: events, error } = await client.from('notification_outbox').select('id,user_id,event_type,deep_link,copy_data').in('status', ['queued', 'retry']).lte('next_attempt_at', new Date().toISOString()).limit(100) as { data: Array<any> | null, error: unknown };
+  const { data: events, error } = await client.from('notification_outbox').select('id,user_id,event_type,deep_link,copy_data').in('status', ['queued', 'retry']).lte('next_attempt_at', new Date().toISOString()).limit(100) as { data: any[] | null, error: unknown };
   if (error) return Response.json({ ok: false, error: 'outbox_read_failed' }, { status: 500 });
 
   const results = [];
