@@ -1,0 +1,66 @@
+{
+  "contractVersion": "1.0",
+  "runId": "20260724T132343-d5c1b43e",
+  "status": "INCONCLUSIVE",
+  "startedAt": "2026-07-24T17:23:43+00:00",
+  "finishedAt": "2026-07-24T17:23:43+00:00",
+  "suite": "smoke",
+  "environment": "production-readonly",
+  "device": {
+    "platform": "android",
+    "deviceId": "emulator-5554"
+  },
+  "summary": {
+    "acceptanceCriteriaCovered": [],
+    "artifactCount": 4
+  },
+  "flows": [
+    {
+      "flowId": "smoke",
+      "title": "smoke",
+      "status": "INCONCLUSIVE",
+      "durationMs": 0,
+      "preconditions": [
+        "Android emulator"
+      ],
+      "steps": [],
+      "assertions": [
+        "App launches without fatal error",
+        "A real Buffago surface renders",
+        "Primary navigation can be exercised"
+      ],
+      "screenshots": [
+        "screenshots/final.png"
+      ],
+      "hierarchy": "hierarchies/final.xml",
+      "logs": [
+        "logs/logcat.txt"
+      ],
+      "failureCategory": null,
+      "failureMessage": null,
+      "retryCount": 0
+    }
+  ],
+  "failures": [],
+  "artifacts": [
+    "environment.json",
+    "prerequisite-check.json",
+    "request.json",
+    "safety-check.json"
+  ],
+  "safety": {
+    "environment": "production-readonly",
+    "productionDetected": true,
+    "mutationRequested": false,
+    "mutationAllowed": false,
+    "decision": "ALLOW",
+    "reasons": []
+  },
+  "redaction": {
+    "validated": true,
+    "status": "PASSED"
+  },
+  "limitations": [
+    "DRY_RUN_NO_RUNTIME_EXECUTION"
+  ]
+}

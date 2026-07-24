@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuites>
+  <testsuite name="Test Suite" device="Medium_Phone_API_36.1" tests="1" failures="1" time="64.0">
+    <testcase id="Buffago deterministic smoke suite" name="Buffago deterministic smoke suite" classname="Buffago deterministic smoke suite" file="cayenne\flows\smoke\smoke-suite.yaml" time="64.0" status="ERROR">
+      <properties>
+        <property name="tags" value="smoke, non-mutating"/>
+      </properties>
+      <failure>Assertion is false: id: app.root is visible</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

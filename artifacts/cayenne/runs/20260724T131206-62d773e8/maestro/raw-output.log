@@ -1,0 +1,6 @@
+
+Waiting for flows to complete...
+[Failed] Buffago deterministic smoke suite (18s) (Assertion is false: id: app.root is visible)
+
+1/1 Flow Failed
+

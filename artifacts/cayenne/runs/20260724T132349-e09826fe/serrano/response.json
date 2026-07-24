@@ -1,0 +1,17 @@
+{
+  "disposition": "INSUFFICIENT_EVIDENCE",
+  "confirmedDefects": [],
+  "testDefects": [
+    {
+      "failureCategory": "TEST_DEFECT",
+      "failureMessage": "Maestro smoke suite failed"
+    }
+  ],
+  "environmentBlockers": [],
+  "missingEvidence": [],
+  "requiredRemediation": [],
+  "rerunSuites": [
+    "smoke"
+  ],
+  "releaseImpact": "WARN"
+}

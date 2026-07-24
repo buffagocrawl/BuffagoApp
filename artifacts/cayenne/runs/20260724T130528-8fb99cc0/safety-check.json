@@ -1,0 +1,8 @@
+{
+  "environment": "production-readonly",
+  "productionDetected": true,
+  "mutationRequested": false,
+  "mutationAllowed": false,
+  "decision": "ALLOW",
+  "reasons": []
+}
