@@ -21,3 +21,14 @@ An immutable closure code candidate exists at 7937e76c6e9bab3f28c9e3d2479e029c45
 ## Release-candidate reconstruction
 
 `b39be7580a80637f64471e1407e52a4139f069c2` is the reproducible clean candidate. It passes source-level and export validation from an isolated checkout. The declared Strategy B baseline remains an external prerequisite: the local preflight listed 34 missing objects and stopped before deltas. No physical-device, provider, or production approval claim is made. The panel score remains 93.125.
+
+Database-baseline recovery verified the linked project read-only and replayed the
+target SQL in one disposable local Supabase environment. This did not produce a
+passing release gate: the recovered schema was already post-engagement, no
+versioned pre-engagement baseline or second clean environment was proven, and
+the candidate lacks the complete executable runtime matrix requested here.
+# Executive summary — current-schema release
+
+Buffago can proceed to controlled staging validation for meaningful daily engagement, XP claiming, and three notification categories against the current production schema. The product owner accepted that Platform Baseline v1 cannot be recovered and that empty-database provisioning remains platform debt; no production mutation is authorized.
+
+Branch `workstream/daily-engagement-current-schema` preserves frozen history and adds a 29-check Current Supported Schema Contract v1, fail-fast preflight, forward reconciliation, explicit `limited_time_events` compatibility, staging dispatcher, and Expo notification configuration. All risky flags remain off. iOS physical validation is blocked by unavailable macOS/Xcode/iPhone hardware; Android/provider validation remains executable. Human approval is required.

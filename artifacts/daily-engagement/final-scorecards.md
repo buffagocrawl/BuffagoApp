@@ -32,6 +32,10 @@ The panel reviewed the actual closure evidence. Scores were not increased for un
 | 35-year-old casual golfer | 93 | Field confirmation of disable/unobtrusive behavior |
 
 Closure average: 93.125. Lowest reviewer: 93. Result: FAIL against average 95. Production approval remains withheld.
+
+## Current-schema pragmatic reassessment — pending execution
+
+Rerun the eight required reviewers after staging evidence. Target average >=95, no reviewer below 90, no category below 90. Database scoring must distinguish current-schema compatibility, incomplete greenfield provisioning, reconciliation safety, and device-validation gaps; accepted debt affects disaster-recovery/platform-maintainability only.
 ## Final hardening panel status
 
 The prior closure panel score of 93.125 remains the latest valid panel result. The panel was not rerun against a passing immutable candidate because exact-candidate TypeScript failed and physical/provider evidence is absent. No score was inflated.

@@ -15,3 +15,7 @@ This is stronger than login XP because it rewards Buffagoâ€™s actual value loopâ
 Server time is authoritative. PostgreSQL IANA zones handle DST. The first valid timezone is pinned; a new zone must be reported consistently for 24 hours before becoming effective. This tolerates travel with a bounded delay and prevents repeated flips from creating extra local days. Unknown zones use UTC.
 
 Offline UI may show cached state as last known. It never says a reward is permanently granted until RPC confirmation. Foreground/session restoration retries one in-flight check; database uniqueness makes retries and multiple devices safe.
+
+## Database compatibility decision
+
+The product owner intentionally accepted the unresolved historical baseline debt. Buffago Current Supported Schema Contract v1 is the supported release boundary. It is generated from current-production metadata and release migrations, checks only release dependencies, and makes no historical claim. Reconciliation is forward-only, never edits the migration ledger, never drops shared objects, and fails closed on incompatible definitions.

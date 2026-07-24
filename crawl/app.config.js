@@ -24,6 +24,7 @@ module.exports = ({ config }) => ({
     supportsTablet: false,
     bundleIdentifier: "com.buffago.app",
     buildNumber: "9",
+    associatedDomains: ["applinks:buffago.com"],
   
     config: {
       googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_API_KEY,
@@ -32,6 +33,8 @@ module.exports = ({ config }) => ({
     infoPlist: {
       NSLocationWhenInUseUsageDescription:
         "BuffaGo uses your location to verify you’re at a wing stop so you can rate wings and progress through crawls.",
+      NSLocationAlwaysAndWhenInUseUsageDescription:
+        "BuffaGo uses background location only for the next active crawl stop you choose, so it can remind you when you are nearby.",
       LSApplicationQueriesSchemes: ["fb", "fbauth2"],
       ITSAppUsesNonExemptEncryption: false,
     },
@@ -43,7 +46,7 @@ module.exports = ({ config }) => ({
 
     // Fine, but note: Expo Location will add what it needs.
     // Keeping explicit permission is OK.
-    permissions: ["ACCESS_FINE_LOCATION"],
+    permissions: ["ACCESS_FINE_LOCATION", "ACCESS_BACKGROUND_LOCATION", "POST_NOTIFICATIONS"],
 
     adaptiveIcon: {
       foregroundImage: "./assets/adaptive-icon.png",
@@ -70,6 +73,13 @@ module.exports = ({ config }) => ({
         category: ["BROWSABLE", "DEFAULT"],
         data: [{ scheme: "buffago", host: "auth", pathPrefix: "/reset" }],
       },
+      // Production referral Universal Link / App Link.
+      {
+        action: "VIEW",
+        autoVerify: true,
+        category: ["BROWSABLE", "DEFAULT"],
+        data: [{ scheme: "https", host: "buffago.com", pathPrefix: "/r" }],
+      },
     ],
   },
 
@@ -88,6 +98,14 @@ module.exports = ({ config }) => ({
     "expo-router",
     "expo-font",
     "expo-location",
+    [
+      "expo-notifications",
+      {
+        icon: "./assets/icon.png",
+        color: "#FFFBE9",
+        sounds: [],
+      },
+    ],
     "expo-web-browser",
     [
       "expo-splash-screen",
