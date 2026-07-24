@@ -1,0 +1,20 @@
+{
+  "disposition": "BLOCKED",
+  "confirmedDefects": [],
+  "testDefects": [],
+  "environmentBlockers": [
+    {
+      "failureCategory": "ENVIRONMENT_BLOCKER",
+      "runtimeCategory": "BUNDLE_LOAD_FAILURE",
+      "failureMessage": "Metro could not prebuild the Android bundle: [WinError 10054] An existing connection was forcibly closed by the remote host"
+    }
+  ],
+  "missingEvidence": [
+    "BUNDLE_LOAD_FAILURE"
+  ],
+  "requiredRemediation": [],
+  "rerunSuites": [
+    "smoke-auto"
+  ],
+  "releaseImpact": "BLOCK"
+}

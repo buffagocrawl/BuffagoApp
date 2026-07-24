@@ -1,0 +1,982 @@
+TAP version 13
+# Subtest: canonical funnel event names remain stable
+ok 1 - canonical funnel event names remain stable
+  ---
+  duration_ms: 0.8052
+  type: 'test'
+  ...
+# Subtest: analytics metadata rejects secrets, contact data, nested payloads, and raw errors
+ok 2 - analytics metadata rejects secrets, contact data, nested payloads, and raw errors
+  ---
+  duration_ms: 0.8374
+  type: 'test'
+  ...
+# Subtest: analytics strings are bounded
+ok 3 - analytics strings are bounded
+  ---
+  duration_ms: 0.1284
+  type: 'test'
+  ...
+# Subtest: weekly mission summary reports next mission and completion ratio
+ok 4 - weekly mission summary reports next mission and completion ratio
+  ---
+  duration_ms: 1.3007
+  type: 'test'
+  ...
+# Subtest: weekly mission summary caps progress at the mission target
+ok 5 - weekly mission summary caps progress at the mission target
+  ---
+  duration_ms: 0.3018
+  type: 'test'
+  ...
+# Subtest: share artifact includes score, location, and crawl when available
+ok 6 - share artifact includes score, location, and crawl when available
+  ---
+  duration_ms: 0.4502
+  type: 'test'
+  ...
+# Subtest: restaurant owner snapshot stays transparent when no metrics exist yet
+ok 7 - restaurant owner snapshot stays transparent when no metrics exist yet
+  ---
+  duration_ms: 1.316
+  type: 'test'
+  ...
+# Subtest: social auth buttons include Google first and Facebook second
+ok 8 - social auth buttons include Google first and Facebook second
+  ---
+  duration_ms: 2.0406
+  type: 'test'
+  ...
+# Subtest: social auth button state shows selected provider loading and disables both buttons
+ok 9 - social auth button state shows selected provider loading and disables both buttons
+  ---
+  duration_ms: 0.1537
+  type: 'test'
+  ...
+# Subtest: executeSocialAuth calls OAuth with Google provider and clears loading state
+ok 10 - executeSocialAuth calls OAuth with Google provider and clears loading state
+  ---
+  duration_ms: 0.2264
+  type: 'test'
+  ...
+# Subtest: executeSocialAuth calls OAuth with Facebook provider
+ok 11 - executeSocialAuth calls OAuth with Facebook provider
+  ---
+  duration_ms: 0.2093
+  type: 'test'
+  ...
+# Subtest: executeSocialAuth blocks duplicate taps while another provider is active
+ok 12 - executeSocialAuth blocks duplicate taps while another provider is active
+  ---
+  duration_ms: 0.1463
+  type: 'test'
+  ...
+# Subtest: executeSocialAuth resets loading state after cancellation
+ok 13 - executeSocialAuth resets loading state after cancellation
+  ---
+  duration_ms: 0.2341
+  type: 'test'
+  ...
+# Subtest: executeSocialAuth resets loading state after error
+ok 14 - executeSocialAuth resets loading state after error
+  ---
+  duration_ms: 0.4538
+  type: 'test'
+  ...
+# Subtest: getSocialAuthErrorMessage returns provider fallback when no message exists
+ok 15 - getSocialAuthErrorMessage returns provider fallback when no message exists
+  ---
+  duration_ms: 0.1985
+  type: 'test'
+  ...
+# Subtest: callback fallback routes stay safe for auth and linking flows
+ok 16 - callback fallback routes stay safe for auth and linking flows
+  ---
+  duration_ms: 0.2844
+  type: 'test'
+  ...
+# Subtest: callback timeout surfaces provider-specific errors
+ok 17 - callback timeout surfaces provider-specific errors
+  ---
+  duration_ms: 5.0193
+  type: 'test'
+  ...
+# Subtest: Boss Battle fixtures cover live, cold-start, completed, and expired states
+ok 18 - Boss Battle fixtures cover live, cold-start, completed, and expired states
+  ---
+  duration_ms: 1.1758
+  type: 'test'
+  ...
+# Subtest: Boss Battle projection clamps progress and preserves honest counts
+ok 19 - Boss Battle projection clamps progress and preserves honest counts
+  ---
+  duration_ms: 0.2158
+  type: 'test'
+  ...
+# Subtest: integration state resolves collisions deterministically
+ok 20 - integration state resolves collisions deterministically
+  ---
+  duration_ms: 1.0264
+  type: 'test'
+  ...
+# Subtest: showcase fixtures cover the required product states
+ok 21 - showcase fixtures cover the required product states
+  ---
+  duration_ms: 0.8035
+  type: 'test'
+  ...
+# Subtest: showcase fixtures are deterministic and never write production data
+ok 22 - showcase fixtures are deterministic and never write production data
+  ---
+  duration_ms: 0.9972
+  type: 'test'
+  ...
+# Subtest: benchmark fixture sizes are exact and bounded
+ok 23 - benchmark fixture sizes are exact and bounded
+  ---
+  duration_ms: 0.3188
+  type: 'test'
+  ...
+# Subtest: legendary merge and clustering are bounded pure operations
+ok 24 - legendary merge and clustering are bounded pure operations
+  ---
+  duration_ms: 1.2973
+  type: 'test'
+  ...
+# Subtest: live feed projection exposes only bounded active Legendary events
+ok 25 - live feed projection exposes only bounded active Legendary events
+  ---
+  duration_ms: 1.9027
+  type: 'test'
+  ...
+# Subtest: live feed projection remains deterministic and keyed by restaurant
+ok 26 - live feed projection remains deterministic and keyed by restaurant
+  ---
+  duration_ms: 12.4224
+  type: 'test'
+  ...
+# Subtest: personalization uses honest cold-start fallbacks
+ok 27 - personalization uses honest cold-start fallbacks
+  ---
+  duration_ms: 0.7462
+  type: 'test'
+  ...
+# Subtest: Buffaverse active sequence preserves noncontiguous identifiers
+ok 28 - Buffaverse active sequence preserves noncontiguous identifiers
+  ---
+  duration_ms: 2.2703
+  type: 'test'
+  ...
+# Subtest: Phase 3 completion authorizes Phase 5 and keeps Phase 4 data-deferred
+ok 29 - Phase 3 completion authorizes Phase 5 and keeps Phase 4 data-deferred
+  ---
+  duration_ms: 0.3736
+  type: 'test'
+  ...
+# Subtest: level progress clamps malformed and terminal thresholds safely
+ok 30 - level progress clamps malformed and terminal thresholds safely
+  ---
+  duration_ms: 0.8484
+  type: 'test'
+  ...
+# Subtest: summary normalizes partial data without inventing progress
+ok 31 - summary normalizes partial data without inventing progress
+  ---
+  duration_ms: 0.7389
+  type: 'test'
+  ...
+# Subtest: objective excludes first rating after activity and never dead-ends
+ok 32 - objective excludes first rating after activity and never dead-ends
+  ---
+  duration_ms: 0.2503
+  type: 'test'
+  ...
+# Subtest: milestone boundaries and celebration keys are deterministic
+ok 33 - milestone boundaries and celebration keys are deterministic
+  ---
+  duration_ms: 0.9857
+  type: 'test'
+  ...
+# Subtest: baseline preflight reports all prerequisite categories before engagement SQL
+ok 34 - baseline preflight reports all prerequisite categories before engagement SQL
+  ---
+  duration_ms: 1.1738
+  type: 'test'
+  ...
+# Subtest: migration runner stops before applying deltas when preflight fails
+ok 35 - migration runner stops before applying deltas when preflight fails
+  ---
+  duration_ms: 0.2161
+  type: 'test'
+  ...
+# Subtest: Boss Battles are additive, default-off, and reward-reference-only
+ok 36 - Boss Battles are additive, default-off, and reward-reference-only
+  ---
+  duration_ms: 1.3585
+  type: 'test'
+  ...
+# Subtest: Legendary notification migration is additive and creates no rows
+ok 37 - Legendary notification migration is additive and creates no rows
+  ---
+  duration_ms: 1.0303
+  type: 'test'
+  ...
+# Subtest: Legendary notification enqueue is service-role only and triple-flag gated
+ok 38 - Legendary notification enqueue is service-role only and triple-flag gated
+  ---
+  duration_ms: 0.4948
+  type: 'test'
+  ...
+# Subtest: Legendary notification boundary covers preferences, caps, dedupe, expiry, quiet hours, and cancellation
+ok 39 - Legendary notification boundary covers preferences, caps, dedupe, expiry, quiet hours, and cancellation
+  ---
+  duration_ms: 1.0861
+  type: 'test'
+  ...
+# Subtest: Legendary notification boundary never calls a provider or mints a reward
+ok 40 - Legendary notification boundary never calls a provider or mints a reward
+  ---
+  duration_ms: 0.2414
+  type: 'test'
+  ...
+# Subtest: local Legendary creation supplies the Phase 1 geography key
+ok 41 - local Legendary creation supplies the Phase 1 geography key
+  ---
+  duration_ms: 1.1344
+  type: 'test'
+  ...
+# Subtest: corrective creator remains service-role only and additive
+ok 42 - corrective creator remains service-role only and additive
+  ---
+  duration_ms: 0.5034
+  type: 'test'
+  ...
+# Subtest: current supported contract is release-scoped and not historical baseline
+ok 43 - current supported contract is release-scoped and not historical baseline
+  ---
+  duration_ms: 1.3334
+  type: 'test'
+  ...
+# Subtest: generated preflight distinguishes missing and incompatible definitions and is read-only
+ok 44 - generated preflight distinguishes missing and incompatible definitions and is read-only
+  ---
+  duration_ms: 0.4241
+  type: 'test'
+  ...
+# Subtest: limited_time_events is fail-closed when incompatible and compatibility-created only when absent
+ok 45 - limited_time_events is fail-closed when incompatible and compatibility-created only when absent
+  ---
+  duration_ms: 0.2211
+  type: 'test'
+  ...
+# Subtest: reconciliation preserves flags, preferences, history, and safe RLS posture
+ok 46 - reconciliation preserves flags, preferences, history, and safe RLS posture
+  ---
+  duration_ms: 0.3244
+  type: 'test'
+  ...
+# Subtest: daily checks and notification events have database uniqueness guarantees
+ok 47 - daily checks and notification events have database uniqueness guarantees
+  ---
+  duration_ms: 2.0639
+  type: 'test'
+  ...
+# Subtest: device time is ignored and timezone changes are pinned
+ok 48 - device time is ignored and timezone changes are pinned
+  ---
+  duration_ms: 0.4544
+  type: 'test'
+  ...
+# Subtest: RLS and grants prevent client writes to protected state
+ok 49 - RLS and grants prevent client writes to protected state
+  ---
+  duration_ms: 1.0644
+  type: 'test'
+  ...
+# Subtest: new notification preferences and risky flags default off
+ok 50 - new notification preferences and risky flags default off
+  ---
+  duration_ms: 0.3805
+  type: 'test'
+  ...
+# Subtest: policy creation is rerun-safe after a partial Supabase migration
+ok 51 - policy creation is rerun-safe after a partial Supabase migration
+  ---
+  duration_ms: 0.5084
+  type: 'test'
+  ...
+# Subtest: delivery rechecks privacy, friendship, quiet hours, and source state
+ok 52 - delivery rechecks privacy, friendship, quiet hours, and source state
+  ---
+  duration_ms: 0.4334
+  type: 'test'
+  ...
+# Subtest: engagement privacy migration is authenticated and avoids exact-location fields
+ok 53 - engagement privacy migration is authenticated and avoids exact-location fields
+  ---
+  duration_ms: 0.9689
+  type: 'test'
+  ...
+# Subtest: retention tables have RLS, ownership policies, constraints, and indexes
+ok 54 - retention tables have RLS, ownership policies, constraints, and indexes
+  ---
+  duration_ms: 0.9648
+  type: 'test'
+  ...
+# Subtest: retention migration bootstraps mission primitives when growth foundation is absent
+ok 55 - retention migration bootstraps mission primitives when growth foundation is absent
+  ---
+  duration_ms: 0.1383
+  type: 'test'
+  ...
+# Subtest: assignment and reward operations are server-authoritative and idempotent
+ok 56 - assignment and reward operations are server-authoritative and idempotent
+  ---
+  duration_ms: 0.223
+  type: 'test'
+  ...
+# Subtest: engagement progress verifies canonical source ownership before writing receipts
+ok 57 - engagement progress verifies canonical source ownership before writing receipts
+  ---
+  duration_ms: 0.2987
+  type: 'test'
+  ...
+# Subtest: daily, weekly, streak, timezone, notifications, and disabled event fixture exist
+ok 58 - daily, weekly, streak, timezone, notifications, and disabled event fixture exist
+  ---
+  duration_ms: 0.141
+  type: 'test'
+  ...
+# Subtest: limited events enforce the supported flag and level eligibility server-side
+ok 59 - limited events enforce the supported flag and level eligibility server-side
+  ---
+  duration_ms: 0.1076
+  type: 'test'
+  ...
+# Subtest: rollback guidance is documented and production event reads exclude fixtures
+ok 60 - rollback guidance is documented and production event reads exclude fixtures
+  ---
+  duration_ms: 0.1531
+  type: 'test'
+  ...
+# Subtest: growth tables enable RLS and claims cannot self-approve
+ok 61 - growth tables enable RLS and claims cannot self-approve
+  ---
+  duration_ms: 0.7937
+  type: 'test'
+  ...
+# Subtest: mission rewards are idempotent and promotions stay separate from destinations
+ok 62 - mission rewards are idempotent and promotions stay separate from destinations
+  ---
+  duration_ms: 0.2011
+  type: 'test'
+  ...
+# Subtest: owner metrics are aggregate and gated by approved ownership
+ok 63 - owner metrics are aggregate and gated by approved ownership
+  ---
+  duration_ms: 0.1096
+  type: 'test'
+  ...
+# Subtest: recovered Phase 2 migration has an exact canonical root and manifest hash
+ok 64 - recovered Phase 2 migration has an exact canonical root and manifest hash
+  ---
+  duration_ms: 6.1298
+  type: 'test'
+  ...
+# Subtest: known current-schema migration is explicitly registered and checksum-stable
+ok 65 - known current-schema migration is explicitly registered and checksum-stable
+  ---
+  duration_ms: 2.9926
+  type: 'test'
+  ...
+# Subtest: recovered Phase 1 migrations are present as unique root files
+ok 66 - recovered Phase 1 migrations are present as unique root files
+  ---
+  duration_ms: 2.4559
+  type: 'test'
+  ...
+# Subtest: authoritative referral-system-v1 migration remains present and checksum-stable
+ok 67 - authoritative referral-system-v1 migration remains present and checksum-stable
+  ---
+  duration_ms: 1.2946
+  type: 'test'
+  ...
+# Subtest: referral migration defines normalized lifecycle and database duplicate defenses
+ok 68 - referral migration defines normalized lifecycle and database duplicate defenses
+  ---
+  duration_ms: 2.5376
+  type: 'test'
+  ...
+# Subtest: RLS denies direct referral lifecycle and reward mutation
+ok 69 - RLS denies direct referral lifecycle and reward mutation
+  ---
+  duration_ms: 1.0731
+  type: 'test'
+  ...
+# Subtest: canonical rating RPC owns proximity acceptance and referral settlement transaction
+ok 70 - canonical rating RPC owns proximity acceptance and referral settlement transaction
+  ---
+  duration_ms: 0.6521
+  type: 'test'
+  ...
+# Subtest: self-referral, existing accounts, remote ratings, and duplicate rewards are blocked
+ok 71 - self-referral, existing accounts, remote ratings, and duplicate rewards are blocked
+  ---
+  duration_ms: 0.4726
+  type: 'test'
+  ...
+# Subtest: reconciliation defaults to dry-run and apply mode is service-only and auditable
+ok 72 - reconciliation defaults to dry-run and apply mode is service-only and auditable
+  ---
+  duration_ms: 0.3964
+  type: 'test'
+  ...
+# Subtest: verified referral badges use qualified records at 1, 5, and 10 without milestone XP
+ok 73 - verified referral badges use qualified records at 1, 5, and 10 without milestone XP
+  ---
+  duration_ms: 0.2619
+  type: 'test'
+  ...
+# Subtest: claim validation covers case folding invalid disabled self existing and one-inviter rules
+ok 74 - claim validation covers case folding invalid disabled self existing and one-inviter rules
+  ---
+  duration_ms: 0.2976
+  type: 'test'
+  ...
+# Subtest: notification and badge side effects are idempotent and preference gated
+ok 75 - notification and badge side effects are idempotent and preference gated
+  ---
+  duration_ms: 0.236
+  type: 'test'
+  ...
+# Subtest: account deletion preserves audit and flags review instead of cascading rewards
+ok 76 - account deletion preserves audit and flags review instead of cascading rewards
+  ---
+  duration_ms: 0.6526
+  type: 'test'
+  ...
+# Subtest: migration is rerun-safe and production starts disabled
+ok 77 - migration is rerun-safe and production starts disabled
+  ---
+  duration_ms: 0.6201
+  type: 'test'
+  ...
+# Subtest: service reporting covers shares opens signups qualification cost placement and retention
+ok 78 - service reporting covers shares opens signups qualification cost placement and retention
+  ---
+  duration_ms: 0.63
+  type: 'test'
+  ...
+# Subtest: engagement flags have safe documented defaults
+ok 79 - engagement flags have safe documented defaults
+  ---
+  duration_ms: 0.7153
+  type: 'test'
+  ...
+# Subtest: engagement flags accept explicit Expo public overrides
+ok 80 - engagement flags accept explicit Expo public overrides
+  ---
+  duration_ms: 0.4078
+  type: 'test'
+  ...
+# Subtest: daily engagement check sends timezone context but no device timestamp
+ok 81 - daily engagement check sends timezone context but no device timestamp
+  ---
+  duration_ms: 1.3144
+  type: 'test'
+  ...
+# Subtest: view model distinguishes pending and confirmed meaningful activity
+ok 82 - view model distinguishes pending and confirmed meaningful activity
+  ---
+  duration_ms: 0.345
+  type: 'test'
+  ...
+# Subtest: RPC failures never create a locally confirmed reward
+ok 83 - RPC failures never create a locally confirmed reward
+  ---
+  duration_ms: 0.459
+  type: 'test'
+  ...
+# Subtest: mission host appears for an actionable mission
+ok 84 - mission host appears for an actionable mission
+  ---
+  duration_ms: 0.764
+  type: 'test'
+  ...
+# Subtest: mission host never appears during active crawl navigation
+ok 85 - mission host never appears during active crawl navigation
+  ---
+  duration_ms: 0.15
+  type: 'test'
+  ...
+# Subtest: mission host stays out of loading and non-mission states
+ok 86 - mission host stays out of loading and non-mission states
+  ---
+  duration_ms: 0.1039
+  type: 'test'
+  ...
+# Subtest: daily assignment is deterministic and constrained to eligible actions
+ok 87 - daily assignment is deterministic and constrained to eligible actions
+  ---
+  duration_ms: 1.4308
+  type: 'test'
+  ...
+# Subtest: timezone date keys use the user local day and reject invalid zones
+ok 88 - timezone date keys use the user local day and reject invalid zones
+  ---
+  duration_ms: 19.1961
+  type: 'test'
+  ...
+# Subtest: streak extends once, restarts after a missed day, and tracks longest
+ok 89 - streak extends once, restarts after a missed day, and tracks longest
+  ---
+  duration_ms: 0.2679
+  type: 'test'
+  ...
+# Subtest: event and mission presentation states are explicit
+ok 90 - event and mission presentation states are explicit
+  ---
+  duration_ms: 0.3529
+  type: 'test'
+  ...
+# Subtest: dashboard and action service use narrow RPC contracts
+ok 91 - dashboard and action service use narrow RPC contracts
+  ---
+  duration_ms: 1.3969
+  type: 'test'
+  ...
+# Subtest: service rejects incomplete input and exposes RPC failure without private payloads
+ok 92 - service rejects incomplete input and exposes RPC failure without private payloads
+  ---
+  duration_ms: 0.5379
+  type: 'test'
+  ...
+# Subtest: active crawl deterministically outranks mission and restaurant
+ok 93 - active crawl deterministically outranks mission and restaurant
+  ---
+  duration_ms: 0.8772
+  type: 'test'
+  ...
+# Subtest: location denial creates a usable primary action
+ok 94 - location denial creates a usable primary action
+  ---
+  duration_ms: 0.2138
+  type: 'test'
+  ...
+# Subtest: battle mission uses only available battle actions
+ok 95 - battle mission uses only available battle actions
+  ---
+  duration_ms: 3.281
+  type: 'test'
+  ...
+# Subtest: crawl mission progress survives hydrated crawl state
+ok 96 - crawl mission progress survives hydrated crawl state
+  ---
+  duration_ms: 0.1781
+  type: 'test'
+  ...
+# Subtest: completed canonical mission exposes one safe claim action
+ok 97 - completed canonical mission exposes one safe claim action
+  ---
+  duration_ms: 0.1949
+  type: 'test'
+  ...
+# Subtest: maps canonical daily and weekly assignments into Home view models
+ok 98 - maps canonical daily and weekly assignments into Home view models
+  ---
+  duration_ms: 1.3262
+  type: 'test'
+  ...
+# Subtest: fallback is restricted to unavailable migration or connectivity failures
+ok 99 - fallback is restricted to unavailable migration or connectivity failures
+  ---
+  duration_ms: 0.3809
+  type: 'test'
+  ...
+# Subtest: notification routes cover rating, crawl, streak, and friend activity
+ok 100 - notification routes cover rating, crawl, streak, and friend activity
+  ---
+  duration_ms: 1.0355
+  type: 'test'
+  ...
+# Subtest: cold-start expired session preserves return route through auth
+ok 101 - cold-start expired session preserves return route through auth
+  ---
+  duration_ms: 0.2
+  type: 'test'
+  ...
+# Subtest: deleted, private, or stale destination falls back safely
+ok 102 - deleted, private, or stale destination falls back safely
+  ---
+  duration_ms: 1.2188
+  type: 'test'
+  ...
+# Subtest: malformed and unsupported links never route to arbitrary content
+ok 103 - malformed and unsupported links never route to arbitrary content
+  ---
+  duration_ms: 0.2211
+  type: 'test'
+  ...
+# Subtest: foreground proximity accepts a precise point near 161 meters and rejects low accuracy
+ok 104 - foreground proximity accepts a precise point near 161 meters and rejects low accuracy
+  ---
+  duration_ms: 0.8588
+  type: 'test'
+  ...
+# Subtest: hysteresis prevents enter/exit boundary bouncing
+ok 105 - hysteresis prevents enter/exit boundary bouncing
+  ---
+  duration_ms: 0.1452
+  type: 'test'
+  ...
+# Subtest: only the next incomplete crawl stop is registered
+ok 106 - only the next incomplete crawl stop is registered
+  ---
+  duration_ms: 0.2693
+  type: 'test'
+  ...
+# Subtest: map screens use the platform boundary instead of importing native maps
+ok 107 - map screens use the platform boundary instead of importing native maps
+  ---
+  duration_ms: 3.0687
+  type: 'test'
+  ...
+# Subtest: web map fallback states native limitations
+ok 108 - web map fallback states native limitations
+  ---
+  duration_ms: 0.3197
+  type: 'test'
+  ...
+# Subtest: privacy preferences preserve backward-compatible defaults
+ok 109 - privacy preferences preserve backward-compatible defaults
+  ---
+  duration_ms: 1.1884
+  type: 'test'
+  ...
+# Subtest: social opt out maps to a visible user-facing feed preference
+ok 110 - social opt out maps to a visible user-facing feed preference
+  ---
+  duration_ms: 0.1524
+  type: 'test'
+  ...
+# Subtest: referral funnel events are registered in the analytics catalog
+ok 111 - referral funnel events are registered in the analytics catalog
+  ---
+  duration_ms: 0.9421
+  type: 'test'
+  ...
+# Subtest: referral analytics strip sensitive and nested fields
+ok 112 - referral analytics strip sensitive and nested fields
+  ---
+  duration_ms: 0.8863
+  type: 'test'
+  ...
+# Subtest: referral codes normalize case and separators
+ok 113 - referral codes normalize case and separators
+  ---
+  duration_ms: 1.3631
+  type: 'test'
+  ...
+# Subtest: rating acceptance keeps public 100-yard guidance and hidden 0.5-mile tolerance distinct
+ok 114 - rating acceptance keeps public 100-yard guidance and hidden 0.5-mile tolerance distinct
+  ---
+  duration_ms: 0.2409
+  type: 'test'
+  ...
+# Subtest: referral milestone progress is based on verified qualified count
+ok 115 - referral milestone progress is based on verified qualified count
+  ---
+  duration_ms: 0.7521
+  type: 'test'
+  ...
+# Subtest: referral deep-link route uses centralized validation and attribution
+ok 116 - referral deep-link route uses centralized validation and attribution
+  ---
+  duration_ms: 0.7671
+  type: 'test'
+  ...
+# Subtest: disabled referral deep-link state does not promise a saved invitation
+ok 117 - disabled referral deep-link state does not promise a saved invitation
+  ---
+  duration_ms: 0.154
+  type: 'test'
+  ...
+# Subtest: Referral Hub includes stable loading error empty summary share and manual entry states
+ok 118 - Referral Hub includes stable loading error empty summary share and manual entry states
+  ---
+  duration_ms: 0.7811
+  type: 'test'
+  ...
+# Subtest: deferred attribution listens for cold warm and auth transitions
+ok 119 - deferred attribution listens for cold warm and auth transitions
+  ---
+  duration_ms: 0.71
+  type: 'test'
+  ...
+# Subtest: native share copy uses centralized reward and configurable URL
+ok 120 - native share copy uses centralized reward and configurable URL
+  ---
+  duration_ms: 0.1344
+  type: 'test'
+  ...
+1..120
+# tests 120
+# suites 0
+# pass 120
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 443.4949
+
+> crawl@1.0.0 typecheck
+> tsc --noEmit
+
+
+> crawl@1.0.0 lint
+> expo lint
+
+env: load .env.development
+env: export EXPO_PUBLIC_SUPABASE_URL EXPO_PUBLIC_SUPABASE_ANON_KEY EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID EXPO_PUBLIC_USE_PROXY
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\(tabs)\_layout.tsx
+  1:1  warning  Unexpected Unicode BOM (Byte Order Mark)  unicode-bom
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\(tabs)\home\index.jsx
+   341:10  warning  'coinRewardClaiming' is assigned a value but never used                                                                    no-unused-vars
+   470:6   warning  React Hook useCallback has an unnecessary dependency: 'session.user.id'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+   810:10  warning  'factIndex' is assigned a value but never used                                                                             no-unused-vars
+   907:13  warning  'pref' is assigned a value but never used                                                                                  no-unused-vars
+  1098:6   warning  React Hook useEffect has a missing dependency: 'coords'. Either include it or remove the dependency array                  react-hooks/exhaustive-deps
+  1119:9   warning  'refreshDistanceNow' is assigned a value but never used                                                                    no-unused-vars
+  1601:6   warning  React Hook useCallback has a missing dependency: 'coords'. Either include it or remove the dependency array                react-hooks/exhaustive-deps
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\(tabs)\journey\index.jsx
+  1:1  warning  Unexpected Unicode BOM (Byte Order Mark)  unicode-bom
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\(tabs)\leaderboards\index.jsx
+   973:9  warning  The 'nameOf' function makes the dependencies of useCallback Hook (at line 1046) change on every render. To fix this, wrap the definition of 'nameOf' in its own useCallback() Hook  react-hooks/exhaustive-deps
+   973:9  warning  The 'nameOf' function makes the dependencies of useMemo Hook (at line 1081) change on every render. To fix this, wrap the definition of 'nameOf' in its own useCallback() Hook      react-hooks/exhaustive-deps
+   973:9  warning  The 'nameOf' function makes the dependencies of useMemo Hook (at line 1100) change on every render. To fix this, wrap the definition of 'nameOf' in its own useCallback() Hook      react-hooks/exhaustive-deps
+   973:9  warning  The 'nameOf' function makes the dependencies of useMemo Hook (at line 1128) change on every render. To fix this, wrap the definition of 'nameOf' in its own useCallback() Hook      react-hooks/exhaustive-deps
+   973:9  warning  The 'nameOf' function makes the dependencies of useMemo Hook (at line 1164) change on every render. To fix this, wrap the definition of 'nameOf' in its own useCallback() Hook      react-hooks/exhaustive-deps
+  1110:6  warning  React Hook useMemo has an unnecessary dependency: 'usersMap'. Either exclude it or remove the dependency array                                                                      react-hooks/exhaustive-deps
+  1154:6  warning  React Hook useMemo has an unnecessary dependency: 'usersMap'. Either exclude it or remove the dependency array                                                                      react-hooks/exhaustive-deps
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\(tabs)\ratings\index.jsx
+     7:3   warning  'FlatList' is defined but never used                                                                                                                                                             no-unused-vars
+   239:10  warning  'SliderRowPretty' is defined but never used                                                                                                                                                      no-unused-vars
+   316:7   warning  'clamp01' is assigned a value but never used                                                                                                                                                     no-unused-vars
+   318:10  warning  'StepTitle' is defined but never used                                                                                                                                                            no-unused-vars
+   322:10  warning  'StepDesc' is defined but never used                                                                                                                                                             no-unused-vars
+   425:14  warning  'e' is defined but never used. Allowed unused caught errors must match /^_/u                                                                                                                     no-unused-vars
+   498:8   warning  React Hook useCallback has missing dependencies: 'currentState', 'locationMode', 'stateCodeFilter', and 'user?.id'. Either include them or remove the dependency array                           react-hooks/exhaustive-deps
+   549:25  warning  'setSelectedTagId' is assigned a value but never used                                                                                                                                            no-unused-vars
+   559:9   warning  The 'RADIUS_OPTIONS' array makes the dependencies of useCallback Hook (at line 1398) change on every render. To fix this, wrap the initialization of 'RADIUS_OPTIONS' in its own useMemo() Hook  react-hooks/exhaustive-deps
+   753:9   warning  'tagsForFilter' is assigned a value but never used                                                                                                                                               no-unused-vars
+  1756:11  warning  'myAvg' is assigned a value but never used                                                                                                                                                       no-unused-vars
+  1757:11  warning  'ratingsLabel' is assigned a value but never used                                                                                                                                                no-unused-vars
+  1898:9   warning  'dashboardMetrics' is assigned a value but never used                                                                                                                                            no-unused-vars
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\(tabs)\routes\index.jsx
+  547:6  warning  React Hook useCallback has a missing dependency: 'coords'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\_layout.tsx
+  1:1  warning  Unexpected Unicode BOM (Byte Order Mark)  unicode-bom
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\auth\callback.jsx
+  1:1  warning  Unexpected Unicode BOM (Byte Order Mark)  unicode-bom
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\auth\change-password.jsx
+  1:1  warning  Unexpected Unicode BOM (Byte Order Mark)  unicode-bom
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\auth\login.jsx
+  1:1  warning  Unexpected Unicode BOM (Byte Order Mark)  unicode-bom
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\buffaverse\boss-battles.jsx
+  3:16  warning  'View' is defined but never used  no-unused-vars
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\buffaverse\showcase.jsx
+  3:16  warning  'View' is defined but never used  no-unused-vars
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\crawl\[id].jsx
+    1:1  warning  Unexpected Unicode BOM (Byte Order Mark)                                                                                    unicode-bom
+  285:9  warning  'theme' is assigned a value but never used                                                                                  no-unused-vars
+  460:9  warning  'isDark' is assigned a value but never used                                                                                 no-unused-vars
+  566:5  warning  React Hook useCallback has a missing dependency: 'computeCrawlCoinAward'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\home\index.jsx
+   29:8   warning  'WelcomeWizard' is defined but never used                                                                    no-unused-vars
+   71:10  warning  'wingBattleReasonNY' is defined but never used                                                               no-unused-vars
+  307:10  warning  'selectedRoute' is assigned a value but never used                                                           no-unused-vars
+  370:10  warning  'wizardOpen' is assigned a value but never used                                                              no-unused-vars
+  570:6   warning  React Hook useEffect has a missing dependency: 'coords'. Either include it or remove the dependency array    react-hooks/exhaustive-deps
+  677:9   warning  'milesAway' is assigned a value but never used                                                               no-unused-vars
+  977:6   warning  React Hook useCallback has a missing dependency: 'coords'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\leaderboards\index.jsx
+  108:7  warning  'TokenIcon' is assigned a value but never used                                                                   no-unused-vars
+  149:7  warning  'UserChip' is assigned a value but never used                                                                    no-unused-vars
+  681:6  warning  React Hook useEffect has a missing dependency: 'crawlsByUser'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  739:6  warning  React Hook useMemo has a missing dependency: 'nameOf'. Either include it or remove the dependency array          react-hooks/exhaustive-deps
+  768:6  warning  React Hook useMemo has a missing dependency: 'nameOf'. Either include it or remove the dependency array          react-hooks/exhaustive-deps
+  770:9  warning  'lbUniqueRestaurants' is assigned a value but never used                                                         no-unused-vars
+  790:6  warning  React Hook useMemo has a missing dependency: 'nameOf'. Either include it or remove the dependency array          react-hooks/exhaustive-deps
+  792:9  warning  'lbCrawlsCompleted' is assigned a value but never used                                                           no-unused-vars
+  809:6  warning  React Hook useMemo has a missing dependency: 'nameOf'. Either include it or remove the dependency array          react-hooks/exhaustive-deps
+  838:6  warning  React Hook useMemo has a missing dependency: 'nameOf'. Either include it or remove the dependency array          react-hooks/exhaustive-deps
+  866:6  warning  React Hook useMemo has a missing dependency: 'nameOf'. Either include it or remove the dependency array          react-hooks/exhaustive-deps
+  909:6  warning  React Hook useMemo has a missing dependency: 'nameOf'. Either include it or remove the dependency array          react-hooks/exhaustive-deps
+  931:6  warning  React Hook useMemo has a missing dependency: 'nameOf'. Either include it or remove the dependency array          react-hooks/exhaustive-deps
+  949:6  warning  React Hook useMemo has a missing dependency: 'nameOf'. Either include it or remove the dependency array          react-hooks/exhaustive-deps
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\onboarding\crawl-preview.jsx
+    7:3   warning  'Image' is defined but never used                   no-unused-vars
+    9:3   warning  'Pressable' is defined but never used               no-unused-vars
+   13:10  warning  'MaterialCommunityIcons' is defined but never used  no-unused-vars
+   77:9   warning  'theme' is assigned a value but never used          no-unused-vars
+  201:9   warning  'theme' is assigned a value but never used          no-unused-vars
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\profile\history\BadgesScreen.tsx
+  1:1  warning  Unexpected Unicode BOM (Byte Order Mark)  unicode-bom
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\profile\history\YearlyWingSummary.jsx
+    1:1  warning  Unexpected Unicode BOM (Byte Order Mark)                unicode-bom
+   10:3  warning  'Button' is defined but never used                      no-unused-vars
+  139:5  warning  'year' is assigned a value but never used               no-unused-vars
+  142:5  warning  'calories' is assigned a value but never used           no-unused-vars
+  144:5  warning  'waterLiters' is assigned a value but never used        no-unused-vars
+  146:5  warning  'beers16ozRounded' is assigned a value but never used   no-unused-vars
+  149:5  warning  'sugarGramsRounded' is assigned a value but never used  no-unused-vars
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\profile\history\index.jsx
+  1:1  warning  Unexpected Unicode BOM (Byte Order Mark)  unicode-bom
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\profile\index.jsx
+  1:1  warning  Unexpected Unicode BOM (Byte Order Mark)  unicode-bom
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\reset.jsx
+  3:10  warning  'View' is defined but never used  no-unused-vars
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\routes\index.jsx
+  140:9  warning  The 'hasCompleted' function makes the dependencies of useMemo Hook (at line 472) change on every render. To fix this, wrap the definition of 'hasCompleted' in its own useCallback() Hook      react-hooks/exhaustive-deps
+  140:9  warning  The 'hasCompleted' function makes the dependencies of useCallback Hook (at line 688) change on every render. To fix this, wrap the definition of 'hasCompleted' in its own useCallback() Hook  react-hooks/exhaustive-deps
+  140:9  warning  The 'hasCompleted' function makes the dependencies of useCallback Hook (at line 762) change on every render. To fix this, wrap the definition of 'hasCompleted' in its own useCallback() Hook  react-hooks/exhaustive-deps
+  411:6  warning  React Hook useCallback has a missing dependency: 'coords'. Either include it or remove the dependency array                                                                                    react-hooks/exhaustive-deps
+
+C:\Users\Brand\repo\BuffagoApp\crawl\app\user\index.jsx
+    1:1   warning  Unexpected Unicode BOM (Byte Order Mark)             unicode-bom
+  135:10  warning  'draftBattle' is assigned a value but never used     no-unused-vars
+  135:23  warning  'setDraftBattle' is assigned a value but never used  no-unused-vars
+
+C:\Users\Brand\repo\BuffagoApp\crawl\components\CoinRewardModal.jsx
+  1:1   warning  Unexpected Unicode BOM (Byte Order Mark)  unicode-bom
+  1:28  warning  'useMemo' is defined but never used       no-unused-vars
+
+C:\Users\Brand\repo\BuffagoApp\crawl\components\DestinationPickerWizard.tsx
+   65:23  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead  @typescript-eslint/array-type
+  179:23  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead  @typescript-eslint/array-type
+
+C:\Users\Brand\repo\BuffagoApp\crawl\components\GamificationHeader.jsx
+   4:45  warning  'Avatar' is defined but never used                  no-unused-vars
+  46:9   warning  'xpDisplayNow' is assigned a value but never used   no-unused-vars
+  47:9   warning  'xpDisplayNext' is assigned a value but never used  no-unused-vars
+
+C:\Users\Brand\repo\BuffagoApp\crawl\components\LocationGate.tsx
+  4:32  warning  'C:\Users\Brand\repo\BuffagoApp\crawl\providers\LocationProvider.tsx' imported multiple times  import/no-duplicates
+  5:38  warning  'C:\Users\Brand\repo\BuffagoApp\crawl\providers\LocationProvider.tsx' imported multiple times  import/no-duplicates
+
+C:\Users\Brand\repo\BuffagoApp\crawl\components\OnboardingFlow.tsx
+    77:7   warning  'safeName' is assigned a value but never used                                                                        @typescript-eslint/no-unused-vars
+   318:10  warning  'previewLoading' is assigned a value but never used                                                                  @typescript-eslint/no-unused-vars
+   319:10  warning  'previewRoute' is assigned a value but never used                                                                    @typescript-eslint/no-unused-vars
+   852:9   warning  'canSubmitRating' is assigned a value but never used                                                                 @typescript-eslint/no-unused-vars
+  1091:6   warning  React Hook useEffect has a missing dependency: 'loadPreviewRoute'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\Brand\repo\BuffagoApp\crawl\components\ProfileWelcomeWizard.tsx
+  1:1  warning  Unexpected Unicode BOM (Byte Order Mark)  unicode-bom
+
+C:\Users\Brand\repo\BuffagoApp\crawl\components\RatingWizardDialog.jsx
+  119:9  warning  'theme' is assigned a value but never used  no-unused-vars
+
+C:\Users\Brand\repo\BuffagoApp\crawl\components\RoutesWelcomeWizard.tsx
+  1:1  warning  Unexpected Unicode BOM (Byte Order Mark)  unicode-bom
+
+C:\Users\Brand\repo\BuffagoApp\crawl\components\SliderRowPretty.jsx
+  2:17  warning  'useMemo' is defined but never used  no-unused-vars
+
+C:\Users\Brand\repo\BuffagoApp\crawl\components\SubmitRouteSimpleDialog.jsx
+  2:10  warning  'View' is defined but never used  no-unused-vars
+
+C:\Users\Brand\repo\BuffagoApp\crawl\components\ThemeToggle.jsx
+  1:1  warning  Unexpected Unicode BOM (Byte Order Mark)  unicode-bom
+
+✖ 104 problems (0 errors, 104 warnings)
+  0 errors and 19 warnings potentially fixable with the `--fix` option.
+
+
+> crawl@1.0.0 migration:integrity
+> node ./scripts/check-migration-integrity.mjs
+
+Root migrations: 18
+Legacy archives: 0
+Migration integrity PASSED.
+env: load .env.development
+env: export EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID EXPO_PUBLIC_GOOGLE_API_KEY EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID EXPO_PUBLIC_SUPABASE_ANON_KEY EXPO_PUBLIC_SUPABASE_URL EXPO_PUBLIC_USE_PROXY
+Running 18 checks on your project...
+18/18 checks passed. No issues detected!
+env: load .env.production
+env: export EXPO_PUBLIC_SUPABASE_URL EXPO_PUBLIC_SUPABASE_ANON_KEY EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID EXPO_PUBLIC_GOOGLE_API_KEY EXPO_PUBLIC_USE_PROXY EXPO_PUBLIC_REFERRAL_BASE_URL EXPO_PUBLIC_REFERRAL_DOMAIN EXPO_PUBLIC_ENABLE_REFERRALS
+Starting Metro Bundler
+Web node_modules\expo-router\entry.js ▓▓▓▓▓░░░░░░░░░░░ 34.6% (29/94)
+| [33m» [1mandroid[22m: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor[39m
+Web node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓░░░░░░░ 62.2% (385/489)
+Web node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓░░░░░░ 64.7% ( 734/1048)
+Web node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░ 91.9% (1392/1452)
+Web Bundled 13665ms node_modules\expo-router\entry.js (1613 modules)
+
+› Assets (41):
+assets\Buffago-token.0fb963e66089b217d2c4b95750148b64.png (1.94 MB)
+assets\crawl-bg.160fd590c406090f930de158980a324b.png (2.59 MB)
+assets\images\buffago-logo.e933c48238b26ebdfeaf6a12d8b05129.png (64.2 kB)
+assets\wing-user.79627c9ea2788afaf0b8ac7820e7da15.png (2.01 MB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\AntDesign.3f78af31cca60105799838a1a7a59fbd.ttf (130 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\Entypo.31b5ffea3daddc69dd01a1f3d6cf63c5.ttf (66.2 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\EvilIcons.140c53a7643ea949007aa9a282153849.ttf (13.5 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\Feather.ca4b48e04dc1ce10bfbddb262c8b835f.ttf (55.6 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\FontAwesome.b06871f281fee6b241d60582ae9369b9.ttf (166 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\FontAwesome5_Brands.3b89dd103490708d19a95adcae52210e.ttf (134 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\FontAwesome5_Regular.1f77739ca9ff2188b539c36f30ffa2be.ttf (33.7 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\FontAwesome5_Solid.605ed7926cf39a2ad5ec2d1f9d391d3d.ttf (203 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\FontAwesome6_Brands.56c8d80832e37783f12c05db7c8849e2.ttf (209 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\FontAwesome6_Regular.370dd5af19f8364907b6e2c41f45dbbf.ttf (68 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\FontAwesome6_Solid.adec7d6f310bc577f05e8fe06a5daccf.ttf (424 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\Fontisto.b49ae8ab2dbccb02c4d11caaacf09eab.ttf (314 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\Foundation.e20945d7c929279ef7a6f1db184a4470.ttf (57 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\Ionicons.b4eb097d35f44ed943676fd56f6bdc51.ttf (390 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\MaterialCommunityIcons.6e435534bd35da5fef04168860a9b8fa.ttf (1.31 MB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\MaterialIcons.4e85bc9ebe07e0340c9c4fc2f6c38908.ttf (357 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\Octicons.871378c6eab492a3e689a9385dc45a12.ttf (69.4 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\SimpleLineIcons.d2285965fe34b05465047401b8595dd0.ttf (54.1 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\Zocial.1681f34aaca71b8dfb70756bca331eb2.ttf (25.8 kB)
+node_modules\@react-navigation\elements\lib\module\assets\back-icon-mask.0a328cd9c1afd0afe8e3b1ec5165b1b4.png (653 B)
+node_modules\@react-navigation\elements\lib\module\assets\back-icon.35ba0eaec5a4f5ed12ca16fabeae451d.png (207 B)
+node_modules\@react-navigation\elements\lib\module\assets\clear-icon.c94f6478e7ae0cdd9f15de1fcb9e5e55.png (4 variations | 425 B)
+node_modules\@react-navigation\elements\lib\module\assets\close-icon.808e1b1b9b53114ec2838071a7e6daa7.png (4 variations | 235 B)
+node_modules\@react-navigation\elements\lib\module\assets\search-icon.286d67d3f74808a60a78d3ebf1a5fb57.png (928 B)
+node_modules\expo-router\assets\arrow_down.017bc6ba3fc25503e5eb5e53826d48a8.png (9.46 kB)
+node_modules\expo-router\assets\error.d1ea1496f9057eb392d5bbf3732a61b7.png (469 B)
+node_modules\expo-router\assets\file.19eeb73b9593a38f8e9f418337fc7d10.png (138 B)
+node_modules\expo-router\assets\forward.d8b800c443b8972542883e0b9de2bdc6.png (188 B)
+node_modules\expo-router\assets\pkg.ab19f4cbc543357183a20571f68380a3.png (364 B)
+node_modules\expo-router\assets\sitemap.412dd9275b6b48ad28f5e3d81bb1f626.png (465 B)
+node_modules\expo-router\assets\unmatched.20e71bdf79e3a97bf55fd9e164041578.png (4.75 kB)
+
+› web bundles (1):
+_expo/static/js/web/entry-90f0a9500862684f40b5a95276e702a7.js (3.79 MB)
+
+› Files (2):
+index.html (1.17 kB)
+metadata.json (49 B)
+
+Exported: dist

@@ -1,0 +1,235 @@
+{
+  "contractVersion": "1.0",
+  "runId": "20260724T160707-7949764f",
+  "status": "BLOCKED",
+  "startedAt": "2026-07-24T20:07:07+00:00",
+  "finishedAt": "2026-07-24T20:08:28+00:00",
+  "requestedSuite": "smoke",
+  "suite": "smoke-auto",
+  "environment": "production-readonly",
+  "device": {
+    "platform": "android",
+    "deviceId": "emulator-5554"
+  },
+  "detectedStartupState": null,
+  "startupStateCandidates": [],
+  "startupStateValidation": "FAILED",
+  "universalAssertionResult": "FAILED",
+  "stateSpecificAssertionResult": "INSUFFICIENT_EVIDENCE",
+  "universalAssertions": [
+    {
+      "assertion": "App launches",
+      "status": "PASSED"
+    },
+    {
+      "assertion": "app.root appears",
+      "status": "PASSED"
+    },
+    {
+      "assertion": "No fatal runtime error",
+      "status": "PASSED"
+    },
+    {
+      "assertion": "Exactly one valid startup state",
+      "status": "FAILED"
+    }
+  ],
+  "stateSpecificAssertions": [],
+  "skippedAssertions": [
+    {
+      "assertion": "onboarding.root and app.root remain visible",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Onboarding navigation controls are discoverable",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Safe onboarding forward/back interaction succeeds",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "auth.screen is visible",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Sign-in controls render",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Available primary navigation renders",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Each visited authenticated surface renders",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Authenticated primary navigation",
+      "status": "NOT_APPLICABLE"
+    }
+  ],
+  "skipReason": "Assertions for startup states other than an unambiguous detected state are not applicable",
+  "summary": {
+    "acceptanceCriteriaCovered": [],
+    "artifactCount": 10
+  },
+  "runtime": {
+    "adbStart": {
+      "status": "STARTED",
+      "warnings": []
+    },
+    "emulatorStart": {
+      "status": "STARTED",
+      "avd": "Medium_Phone_API_36.1",
+      "pid": 4736,
+      "arguments": [
+        "-no-snapshot-load",
+        "-port",
+        "5554"
+      ]
+    },
+    "adbRecovery": {
+      "status": "RECOVERED",
+      "states": [
+        "offline",
+        "missing",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "device"
+      ],
+      "reconnect": true,
+      "adbRestart": true
+    },
+    "emulatorBoot": {
+      "status": "BOOTED"
+    },
+    "package": {
+      "status": "INSTALLED",
+      "package": "com.buffago.app"
+    },
+    "metroStart": {
+      "status": "STARTED",
+      "pid": 6092,
+      "log": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\cayenne\\runs\\20260724T160707-7949764f\\logs\\metro.log"
+    },
+    "failure": {
+      "category": "BUNDLE_LOAD_FAILURE",
+      "message": "Metro could not prebuild the Android bundle: [WinError 10054] An existing connection was forcibly closed by the remote host"
+    }
+  },
+  "cleanup": {
+    "status": "PASSED",
+    "ownedPids": [
+      4736,
+      6092
+    ],
+    "cleanedPids": []
+  },
+  "flows": [
+    {
+      "flowId": "smoke-auto",
+      "title": "smoke-auto",
+      "status": "BLOCKED",
+      "durationMs": 0,
+      "preconditions": [
+        "Android emulator"
+      ],
+      "steps": [],
+      "assertions": [
+        "App launches",
+        "app.root appears",
+        "No fatal runtime error",
+        "Exactly one valid startup state",
+        "Detected startup state passes its required assertions"
+      ],
+      "detectedStartupState": null,
+      "stateSpecificAssertions": [],
+      "skippedAssertions": [
+        {
+          "assertion": "onboarding.root and app.root remain visible",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Onboarding navigation controls are discoverable",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Safe onboarding forward/back interaction succeeds",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "auth.screen is visible",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Sign-in controls render",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Available primary navigation renders",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Each visited authenticated surface renders",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Authenticated primary navigation",
+          "status": "NOT_APPLICABLE"
+        }
+      ],
+      "skipReason": "Assertions for startup states other than an unambiguous detected state are not applicable",
+      "screenshots": [],
+      "hierarchy": "hierarchies/final.xml",
+      "logs": [
+        "logs/logcat.txt",
+        "logs/metro.log",
+        "maestro/raw-output.log"
+      ],
+      "failureCategory": "ENVIRONMENT_BLOCKER",
+      "failureMessage": "Metro could not prebuild the Android bundle: [WinError 10054] An existing connection was forcibly closed by the remote host",
+      "retryCount": 0
+    }
+  ],
+  "failures": [
+    {
+      "failureCategory": "ENVIRONMENT_BLOCKER",
+      "runtimeCategory": "BUNDLE_LOAD_FAILURE",
+      "failureMessage": "Metro could not prebuild the Android bundle: [WinError 10054] An existing connection was forcibly closed by the remote host"
+    }
+  ],
+  "artifacts": [
+    "environment.json",
+    "prerequisite-check.json",
+    "request.json",
+    "safety-check.json",
+    "logs/adb-start.log",
+    "logs/emulator.stderr.log",
+    "logs/emulator.stdout.log",
+    "logs/metro.log",
+    "runtime/lifecycle.json",
+    "runtime/processes.json"
+  ],
+  "safety": {
+    "environment": "production-readonly",
+    "productionDetected": true,
+    "mutationRequested": false,
+    "mutationAllowed": false,
+    "decision": "ALLOW",
+    "reasons": []
+  },
+  "redaction": {
+    "validated": true,
+    "status": "PASSED"
+  },
+  "limitations": [
+    "BUNDLE_LOAD_FAILURE"
+  ]
+}
