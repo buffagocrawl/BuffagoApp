@@ -19,6 +19,18 @@ Run date: 2026-07-24 (local disposable Supabase, captured Buffago schema baselin
 - Notification outbox dedupe: **passed**; repeated and concurrent keys produced one outbox row.
 
 Release gate: **FAIL for production approval**. Database and native bundle validation pass, but the migration pack needs an explicit baseline strategy, web export remains broken, and real-device/provider notification and geofence validation are still required.
+
+## Reconstruction candidate `b39be7580a80637f64471e1407e52a4139f069c2`
+
+- Isolated checkout: clean, exact SHA above.
+- TypeScript: passed.
+- Full candidate JavaScript suite: **68 passed, 0 failed**.
+- Focused daily-engagement suite: **41 passed, 0 failed**.
+- Lint: **0 errors, 102 warnings**.
+- Android, iOS, and web exports: passed.
+- Migration integrity: passed; 9 root migrations and committed checksums.
+- Strategy B preflight: failed as expected against the unprovisioned local database; 34 missing prerequisites were listed and no engagement migration ran.
+- Strategy B apply, partial recovery, schema/RLS/RPC runtime, concurrent reward, and notification outbox runtime checks: blocked pending the correctly provisioned baseline.
 ## Closure rerun
 
 - TypeScript passed; web, Android, and iOS exports passed after the platform boundary.

@@ -18,3 +18,6 @@ Web support is retained and the native-only map import is behind a platform boun
 ## Final hardening hold
 
 An immutable closure code candidate exists at 7937e76c6e9bab3f28c9e3d2479e029c458ee7fa, but exact-candidate TypeScript fails because broader pre-existing source changes remain outside that commit. The current worktree passes 160/160 JavaScript tests, TypeScript, lint, and web export. Physical iOS/Android validation is blocked by missing devices/tooling, so final approval and panel advancement remain withheld.
+## Release-candidate reconstruction
+
+`b39be7580a80637f64471e1407e52a4139f069c2` is the reproducible clean candidate. It passes source-level and export validation from an isolated checkout. The declared Strategy B baseline remains an external prerequisite: the local preflight listed 34 missing objects and stopped before deltas. No physical-device, provider, or production approval claim is made. The panel score remains 93.125.
