@@ -1,0 +1,11 @@
+appId: com.buffago.app
+name: Cayenne connect Expo dev client
+---
+- launchApp
+- tapOn: "http://localhost:8081"
+- eraseText
+- inputText: "http://10.0.2.2:8081"
+- tapOn: "Connect"
+- extendedWaitUntil:
+    visible: "BuffaGo"
+    timeout: 30000

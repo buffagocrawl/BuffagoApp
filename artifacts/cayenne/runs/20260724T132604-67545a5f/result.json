@@ -1,0 +1,77 @@
+{
+  "contractVersion": "1.0",
+  "runId": "20260724T132604-67545a5f",
+  "status": "BLOCKED",
+  "startedAt": "2026-07-24T17:26:04+00:00",
+  "finishedAt": "2026-07-24T17:27:51+00:00",
+  "suite": "smoke",
+  "environment": "production-readonly",
+  "device": {
+    "platform": "android",
+    "deviceId": "emulator-5554"
+  },
+  "summary": {
+    "acceptanceCriteriaCovered": [],
+    "artifactCount": 10
+  },
+  "flows": [
+    {
+      "flowId": "smoke",
+      "title": "smoke",
+      "status": "BLOCKED",
+      "durationMs": 0,
+      "preconditions": [
+        "Android emulator"
+      ],
+      "steps": [],
+      "assertions": [
+        "App launches without fatal error",
+        "A real Buffago surface renders",
+        "Primary navigation can be exercised"
+      ],
+      "screenshots": [
+        "screenshots/final.png"
+      ],
+      "hierarchy": "hierarchies/final.xml",
+      "logs": [
+        "logs/logcat.txt"
+      ],
+      "failureCategory": "ENVIRONMENT_BLOCKER",
+      "failureMessage": "Expo development client did not connect to Metro; its saved server requires explicit local host selection.",
+      "retryCount": 0
+    }
+  ],
+  "failures": [
+    {
+      "failureCategory": "ENVIRONMENT_BLOCKER",
+      "failureMessage": "Expo development client did not connect to Metro; its saved server requires explicit local host selection."
+    }
+  ],
+  "artifacts": [
+    "environment.json",
+    "prerequisite-check.json",
+    "request.json",
+    "safety-check.json",
+    "hierarchies/final.xml",
+    "logs/device-state.json",
+    "logs/logcat.txt",
+    "maestro/junit.xml",
+    "maestro/raw-output.log",
+    "screenshots/final.png"
+  ],
+  "safety": {
+    "environment": "production-readonly",
+    "productionDetected": true,
+    "mutationRequested": false,
+    "mutationAllowed": false,
+    "decision": "ALLOW",
+    "reasons": []
+  },
+  "redaction": {
+    "validated": true,
+    "status": "PASSED"
+  },
+  "limitations": [
+    "DEV_CLIENT_SERVER_SELECTION_REQUIRED"
+  ]
+}

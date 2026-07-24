@@ -1,0 +1,4 @@
+param([Parameter(Mandatory=$true)][string]$RunId,[switch]$Cleanup)
+$root=(Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path; $envFile=Join-Path $root 'crawl\.env.development'; $url=''; if(Test-Path $envFile){$line=Get-Content $envFile | Where-Object {$_ -match '^EXPO_PUBLIC_SUPABASE_URL='} | Select-Object -First 1; if($line){$url=$line.Split('=',2)[1]}}
+if($url -match 'supabase\.co|buffago\.com'){ Write-Output '{"status":"BLOCKED_EXTERNAL_QA_CREDENTIALS","reason":"Production Supabase host detected; no fixture mutation performed."}'; exit 2 }
+$dir=Join-Path $root "artifacts\cayenne\runs\$RunId"; New-Item -ItemType Directory -Force $dir | Out-Null; @{runId=$RunId;namespace="cayenne:$RunId";status=if($Cleanup){'CLEANUP_REQUESTED'}else{'INTERFACE_READY'}} | ConvertTo-Json | Set-Content (Join-Path $dir 'fixture-report.json'); Write-Output "Fixture interface ready for $RunId"

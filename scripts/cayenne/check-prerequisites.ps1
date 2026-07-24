@@ -1,4 +1,1 @@
-param()
-$root = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
-$env:PYTHONPATH = Join-Path $root 'Agents\Cayenne'
-python -m cayenne.cli check-prerequisites --repo-root $root
+$root=(Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path; $env:PYTHONPATH=Join-Path $root 'cayenne\scripts'; $py=(Get-Command python -ErrorAction SilentlyContinue); if(-not $py){$py=Get-Command (Join-Path $env:LOCALAPPDATA 'Programs\Python\Python312\python.exe')}; & $py.Source -c "import shutil,json; print(json.dumps({'java':bool(shutil.which('java')),'adb':bool(shutil.which('adb')),'maestro':bool(shutil.which('maestro')),'androidPackage':'com.buffago.app'},indent=2))"

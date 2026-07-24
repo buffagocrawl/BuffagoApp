@@ -74,6 +74,8 @@
             options={{
               title: 'Home',
               tabBarLabel: 'Home',
+              tabBarButtonTestID: 'nav.home',
+              tabBarAccessibilityLabel: 'Home navigation',
               tabBarIcon: ({ color }) => (
                 <MaterialCommunityIcons
                   name="home-variant"
@@ -89,6 +91,8 @@
             options={{
               title: 'Routes',
               tabBarLabel: 'Crawls',
+              tabBarButtonTestID: 'nav.crawl',
+              tabBarAccessibilityLabel: 'Crawls navigation',
               tabBarIcon: ({ color }) => (
                 <MaterialCommunityIcons
                   name="map-marker-path"
@@ -104,6 +108,8 @@
             options={{
               title: 'Wingdex',
               tabBarLabel: 'Wingdex',
+              tabBarButtonTestID: 'nav.wingdex',
+              tabBarAccessibilityLabel: 'Wingdex navigation',
               tabBarIcon: ({ color }) => (
                 <MaterialCommunityIcons
                   name="food-drumstick"
@@ -119,6 +125,8 @@
             options={{
               title: 'Social',
               tabBarLabel: 'Social',
+              tabBarButtonTestID: 'nav.leaderboard',
+              tabBarAccessibilityLabel: 'Social navigation',
               tabBarBadge: signedIn && socialBadges.total > 0 ? socialBadges.total : undefined,
               tabBarBadgeStyle: { backgroundColor: theme.colors.error, color: theme.colors.onError },
               tabBarIcon: ({ color }) => (
@@ -136,6 +144,8 @@
             options={{
               title: signedIn ? 'Your Journey' : 'Sign In',
               tabBarLabel: signedIn ? 'Journey' : 'Sign In',
+              tabBarButtonTestID: 'nav.profile',
+              tabBarAccessibilityLabel: signedIn ? 'Profile navigation' : 'Sign in navigation',
               tabBarIcon: ({ color }) => (
                 <MaterialCommunityIcons
                   name={signedIn ? 'timeline-text' : 'login-variant'}

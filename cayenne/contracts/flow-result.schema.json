@@ -1,0 +1,5 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema", "type": "object",
+  "required": ["flowId", "title", "status", "durationMs", "preconditions", "steps", "assertions", "screenshots", "hierarchy", "logs", "failureCategory", "failureMessage", "retryCount"],
+  "properties": {"flowId": {"type": "string"}, "title": {"type": "string"}, "status": {"enum": ["PASSED", "FAILED", "BLOCKED", "INCONCLUSIVE"]}, "durationMs": {"type": "number"}, "failureCategory": {"type": ["string", "null"]}, "retryCount": {"type": "integer"}}
+}

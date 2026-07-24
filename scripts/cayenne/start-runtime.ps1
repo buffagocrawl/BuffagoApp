@@ -1,0 +1,2 @@
+param([string]$DeviceId='emulator-5554')
+$state=& adb -s $DeviceId get-state 2>$null; if($LASTEXITCODE -eq 0){Write-Output "Connected: $DeviceId"; exit 0}; $avd=(emulator -list-avds | Select-Object -First 1); if(-not $avd){throw 'No Android AVD configured.'}; Start-Process emulator -ArgumentList "@$avd","-no-snapshot" -WindowStyle Hidden; & adb -s $DeviceId wait-for-device; & adb -s $DeviceId shell getprop sys.boot_completed

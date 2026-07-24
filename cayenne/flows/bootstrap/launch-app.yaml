@@ -1,0 +1,42 @@
+appId: com.buffago.app
+name: Cayenne launch Buffago
+tags: [bootstrap, non-mutating]
+onFlowStart:
+  - runFlow: handle-permissions.yaml
+---
+- launchApp:
+    clearState: false
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      visible: "Fetch development servers"
+    commands:
+      - tapOn: "Fetch development servers"
+- runFlow:
+    when:
+      visible: "Connect"
+    commands:
+      - tapOn: "http://localhost:8081"
+      - eraseText
+      - inputText: "http://10.0.2.2:8081"
+      - tapOn: "Connect"
+- runFlow:
+    when:
+      visible: "Connect"
+    commands:
+      - tapOn: "Connect"
+- runFlow:
+    when:
+      visible: "http://10.0.2.2:8081"
+    commands:
+      - tapOn: "http://10.0.2.2:8081"
+- runFlow:
+    when:
+      visible: "Skip"
+    commands:
+      - tapOn: "Skip"
+- extendedWaitUntil:
+    visible:
+      id: app.root
+    timeout: 15000
+- takeScreenshot: bootstrap-app-root

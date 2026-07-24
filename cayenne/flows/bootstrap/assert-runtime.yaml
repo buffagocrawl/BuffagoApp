@@ -1,0 +1,10 @@
+appId: com.buffago.app
+name: Cayenne runtime assertion
+---
+- extendedWaitUntil:
+    visible:
+      id: app.root
+    timeout: 60000
+- assertNotVisible:
+    id: app.error
+- takeScreenshot: runtime-ready

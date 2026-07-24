@@ -1,0 +1,14 @@
+appId: com.buffago.app
+name: Email sign-in (QA credentials only)
+tags: [auth, qa-only]
+---
+- tapOn: "Sign In"
+- tapOn:
+    id: auth.email.input
+- inputText: ${CAYENNE_QA_USER_EMAIL}
+- tapOn:
+    id: auth.password.input
+- inputText: ${CAYENNE_QA_USER_PASSWORD}
+- tapOn:
+    id: auth.signin.button
+- takeScreenshot: auth-signed-in

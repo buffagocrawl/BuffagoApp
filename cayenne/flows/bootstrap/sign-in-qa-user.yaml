@@ -1,0 +1,10 @@
+appId: com.buffago.app
+name: Cayenne QA sign-in (optional)
+tags: [bootstrap, qa-only, mutating]
+---
+- comment: Credentials are injected by the runner; this flow is never run against production.
+- runFlow:
+    file: ../auth/sign-in-email.yaml
+    env:
+      CAYENNE_QA_USER_EMAIL: ${CAYENNE_QA_USER_EMAIL}
+      CAYENNE_QA_USER_PASSWORD: ${CAYENNE_QA_USER_PASSWORD}

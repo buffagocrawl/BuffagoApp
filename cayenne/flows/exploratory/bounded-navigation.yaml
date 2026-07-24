@@ -1,0 +1,12 @@
+appId: com.buffago.app
+name: Cayenne bounded exploratory navigation
+tags: [exploratory, non-mutating]
+---
+- runFlow: ../bootstrap/launch-app.yaml
+- takeScreenshot: exploratory-home
+- tapOn:
+    id: nav.crawl
+- takeScreenshot: exploratory-crawl
+- tapOn:
+    id: nav.wingdex
+- takeScreenshot: exploratory-wingdex

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["contractVersion", "runId", "status", "startedAt", "finishedAt", "suite", "environment", "device", "summary", "flows", "failures", "artifacts", "safety", "redaction", "limitations"],
+  "properties": {
+    "contractVersion": {"const": "1.0"}, "runId": {"type": "string"},
+    "status": {"enum": ["PASSED", "FAILED", "BLOCKED", "INCONCLUSIVE"]}, "suite": {"type": "string"}, "environment": {"type": "string"},
+    "flows": {"type": "array"}, "failures": {"type": "array"}, "artifacts": {"type": "array"}, "limitations": {"type": "array"}
+  }, "additionalProperties": true
+}

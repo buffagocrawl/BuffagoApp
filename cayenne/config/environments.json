@@ -1,0 +1,1 @@
+{"environments":["local-mock","qa","production-readonly"],"mutatingAllowed":["local-mock","qa"],"productionHostPatterns":["supabase.co","buffago.com"],"packageName":"com.buffago.app","requiredJavaMajor":21}
