@@ -14,6 +14,7 @@
     "test:analytics": "node --test --experimental-default-type=module ./tests/analytics/*.test.js",
     "test:growth": "node --test --experimental-default-type=module ./tests/auth/growth-loops.test.js",
     "test:rls": "node --test --experimental-default-type=module ./tests/database/*.test.js",
+    "migration:integrity": "node ./scripts/check-migration-integrity.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
