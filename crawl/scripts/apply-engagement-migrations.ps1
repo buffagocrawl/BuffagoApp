@@ -15,7 +15,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Get-ChildItem $migrationDir -Filter '*.sql' -File |
-  Where-Object { $_.Name -notlike 'deployed-archive.sql' } |
+  Where-Object { $_.Name -match '^\d{14}_[a-z0-9][a-z0-9_-]*\.sql$' } |
   Sort-Object Name |
   ForEach-Object {
     Write-Host "Applying $($_.Name)..."
