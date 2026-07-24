@@ -15,3 +15,6 @@ The server-authoritative daily engagement and notification foundation now passes
 ## Closure status
 
 Web support is retained and the native-only map import is behind a platform boundary. Database deployment now has an explicit Strategy B prerequisite and fail-before-apply preflight. Production remains blocked because physical iOS/Android push, deep-link, provider, and real-world proximity evidence could not be collected in this Windows workspace.
+## Final hardening hold
+
+An immutable closure code candidate exists at 7937e76c6e9bab3f28c9e3d2479e029c458ee7fa, but exact-candidate TypeScript fails because broader pre-existing source changes remain outside that commit. The current worktree passes 160/160 JavaScript tests, TypeScript, lint, and web export. Physical iOS/Android validation is blocked by missing devices/tooling, so final approval and panel advancement remain withheld.

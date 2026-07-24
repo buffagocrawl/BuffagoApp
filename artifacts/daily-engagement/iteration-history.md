@@ -27,3 +27,10 @@ Loop 1 does not pass because full typecheck, deployed migration/RLS validation, 
 - Resolved the supported web export blocker with native/web platform map files and regression tests. Web, Android, and iOS exports pass.
 - Physical validation was attempted at the environment boundary: no Android device is attached and macOS/Xcode is unavailable. No device/provider result was fabricated.
 - Independent closure panel rerun remains below the 95 average gate; production approval stays withheld.
+## Final hardening run - 2026-07-23
+
+- Created immutable closure commits; final code candidate under review is 7937e76c6e9bab3f28c9e3d2479e029c458ee7fa.
+- Corrected the migration runner to use the root migration directory and apply only timestamped migration filenames.
+- Full current-worktree JavaScript suite passed 160/160; current TypeScript, lint, and web export passed.
+- Clean exact-candidate worktree validation found TypeScript failures because the candidate does not include the broader pre-existing uncommitted source changes. This is a candidate packaging blocker, not a device pass.
+- Physical validation could not start: adb reported zero devices and xcrun is unavailable. Production approval remains withheld.
