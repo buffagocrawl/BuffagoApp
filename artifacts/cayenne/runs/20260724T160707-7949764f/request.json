@@ -1,0 +1,26 @@
+{
+  "contractVersion": "1.0",
+  "runId": "20260724T160707-7949764f",
+  "requestedBy": "serrano",
+  "requestedSuite": "smoke",
+  "suite": "smoke-auto",
+  "environment": "production-readonly",
+  "mutationAllowed": false,
+  "device": {
+    "platform": "android",
+    "deviceId": "emulator-5554"
+  },
+  "evidenceRequirements": [
+    "screenshot",
+    "hierarchy",
+    "logcat",
+    "maestro-junit"
+  ],
+  "acceptanceCriteria": [
+    "App launches",
+    "app.root appears",
+    "No fatal runtime error",
+    "Exactly one valid startup state",
+    "Detected startup state passes its required assertions"
+  ]
+}
