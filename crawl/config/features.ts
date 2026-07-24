@@ -42,3 +42,13 @@ export const ENABLE_LEGENDARY_RESTAURANTS = parseBooleanFlag(
   process.env.EXPO_PUBLIC_ENABLE_LEGENDARY_RESTAURANTS,
   false
 );
+
+export const ENABLE_RESTAURANT_BOSS_BATTLES = parseBooleanFlag(
+  process.env.EXPO_PUBLIC_ENABLE_RESTAURANT_BOSS_BATTLES,
+  false
+);
+
+export const ENABLE_BUFFAVERSE_PERSONALIZATION = parseBooleanFlag(
+  process.env.EXPO_PUBLIC_ENABLE_BUFFAVERSE_PERSONALIZATION,
+  false
+);
