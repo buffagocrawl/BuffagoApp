@@ -25,3 +25,12 @@ Release gate: **FAIL for production approval**. Database and native bundle valid
 - Lint: 0 errors, 95 warnings. New platform and baseline-preflight regression tests passed.
 - The full repository test command was not clean because current migration files are stored under supabase/migrations/deployed while existing contract tests still address deleted root paths; one unrelated Buffaverse contract also fails on its pre-existing SQL-shape assertion. Prior release evidence remains 150 passed, 0 failed.
 - Physical-device/provider tests are blocked: no attached Android device and no macOS/Xcode toolchain. No pass is claimed.
+
+## Final hardening run
+
+- Exact candidate 7937e76c6e9bab3f28c9e3d2479e029c458ee7fa: focused closure tests 4/4 passed; candidate web export passed.
+- Exact candidate TypeScript check: FAILED because the candidate commit intentionally excludes unrelated pre-existing uncommitted source changes; failures include casing conflicts and existing app/function typing/import errors. The current worktree TypeScript check passes after dependency restoration.
+- Current complete JavaScript suite: 160 passed, 0 failed.
+- Current lint: 0 errors, 95 warnings. Current web export: passed.
+- iOS/Android physical/provider/deep-link/proximity totals: 0 passed, 0 failed, 20+ blocked by no attached device and unavailable Xcode tooling. No device pass is claimed.
+- Final approval gate remains blocked; no panel score increase is warranted.
