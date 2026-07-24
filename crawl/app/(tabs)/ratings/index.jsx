@@ -43,8 +43,6 @@ import { supabase } from '../../../lib/supabase.js';
 import { trackEvent } from '../../../lib/analytics';
 import { useLocationCtx } from '../../../providers/LocationProvider';
 import MapView, { Marker, PROVIDER_GOOGLE } from '../../../lib/platformMap';
-import LegendaryMarker from '../../../components/buffaverse/LegendaryMarker';
-import { clusterLegendaryMarkers, completeLegendaryForRating, fetchLegendaryFeed, fetchLegendaryFlags, legendaryMarkerModel } from '../../../lib/buffaverse/legendaryRestaurants';
 
 const WINGDEX_HINT_DISMISSED_KEY = 'buffago:wingdex_hint_dismissed';
 const HOME_NEXT_SPOT_KEY = 'buffago:homeNextSpot';
@@ -584,10 +582,6 @@ export default function PublicRatingsScreen() {
 
   // map legend filter
   const [mapLegendFilter, setMapLegendFilter] = useState(null);
-  const [legendaryMapEvents, setLegendaryMapEvents] = useState([]);
-  const [selectedLegendaryId, setSelectedLegendaryId] = useState(null);
-  const [legendaryMapState, setLegendaryMapState] = useState('idle');
-  const [legendaryDetailEvent, setLegendaryDetailEvent] = useState(null);
 
   // Buffacoin state
   const [user, setUser] = useState(null);
@@ -604,42 +598,6 @@ export default function PublicRatingsScreen() {
   const [coinRatingDest, setCoinRatingDest] = useState(null);
   const [coinSubmitting, setCoinSubmitting] = useState(false);
   const [wingdexHintVisible, setWingdexHintVisible] = useState(false);
-
-  useEffect(() => {
-    if (!openMap) return undefined;
-    let alive = true;
-    const loadLegendaryMap = async () => {
-      try {
-        const flags = await fetchLegendaryFlags();
-        if (!flags.enabled || flags.flags?.['buffaverse.legendary_restaurants.map_marker'] !== true) {
-          if (alive) { setLegendaryMapEvents([]); setLegendaryMapState('disabled'); }
-          return;
-        }
-        const events = await fetchLegendaryFeed(supabase, 25);
-        if (alive) { setLegendaryMapEvents(events); setLegendaryMapState(events.length ? 'ready' : 'empty'); }
-      } catch {
-        if (alive) { setLegendaryMapState('stale'); setLegendaryMapEvents((previous) => previous.filter((event) => new Date(event.ends_at).getTime() > Date.now())); }
-      }
-    };
-    loadLegendaryMap();
-    const refresh = setInterval(loadLegendaryMap, 60000);
-    return () => { alive = false; clearInterval(refresh); };
-  }, [openMap]);
-
-  useEffect(() => {
-    if (!open || !active?.destination_id) { setLegendaryDetailEvent(null); return undefined; }
-    let alive = true;
-    (async () => {
-      try {
-        const flags = await fetchLegendaryFlags();
-        if (!flags.enabled || flags.flags?.['buffaverse.legendary_restaurants.detail'] !== true) return;
-        const events = await fetchLegendaryFeed(supabase, 25);
-        const match = events.find((event) => (event.display_metadata?.restaurant_id || event.eligibility?.restaurant_id) === active.destination_id);
-        if (alive) setLegendaryDetailEvent(match || null);
-      } catch { if (alive) setLegendaryDetailEvent(null); }
-    })();
-    return () => { alive = false; };
-  }, [open, active?.destination_id]);
 
   useEffect(() => {
     let alive = true;
@@ -1613,7 +1571,7 @@ export default function PublicRatingsScreen() {
     };
 
     // 4) Insert rating
-    const { data: insertedRating, error: insErr } = await supabase.from('destination_ratings').insert(insertPayload).select('id').single();
+    const { error: insErr } = await supabase.from('destination_ratings').insert(insertPayload);
     if (insErr) {
       await trackEvent({
         eventName: 'rating_failed',
@@ -1626,13 +1584,6 @@ export default function PublicRatingsScreen() {
       console.warn('destination_ratings insert failed', insErr.message || insErr);
       Alert.alert('Rating', insErr.message || 'Could not submit rating.');
       return;
-    }
-
-    try {
-      await completeLegendaryForRating({ destinationId: coinRatingDest.destination_id, ratingId: insertedRating?.id });
-    } catch (legendaryError) {
-      // Rating success must never be rolled back by optional Legendary settlement; the server RPC remains retry-safe.
-      console.warn('Legendary completion boundary deferred', legendaryError?.message || legendaryError);
     }
 
     // ✅ keep "rated by me" sets correct immediately
@@ -1958,9 +1909,6 @@ export default function PublicRatingsScreen() {
   }, [filtered, myRated]);
 
   const showCoinHeader = Boolean(user?.id);
-  const legendaryMarkers = useMemo(() => (legendaryMapEvents || []).map(legendaryMarkerModel), [legendaryMapEvents]);
-  const legendaryDestinationIds = useMemo(() => new Set(legendaryMarkers.map((marker) => marker.restaurantId).filter(Boolean)), [legendaryMarkers]);
-  const visibleLegendaryMarkers = useMemo(() => clusterLegendaryMarkers(legendaryMarkers, selectedLegendaryId ? 'close' : 'default'), [legendaryMarkers, selectedLegendaryId]);
   const TokenIcon = useCallback(
   ({ size = 16 }) =>
     coinImg ? (
@@ -2274,17 +2222,6 @@ export default function PublicRatingsScreen() {
                   paddingBottom: Math.max(18, insets.bottom + 18),
                 }}
               >
-              {legendaryDetailEvent ? (
-                <View style={styles.legendaryDetailPanel} accessible accessibilityLabel={`Legendary restaurant mission. ${legendaryDetailEvent.display_metadata?.reason_label || 'A limited-time Buffago discovery moment'}. Ends ${new Date(legendaryDetailEvent.ends_at).toLocaleString()}`}>
-                  <Text style={styles.legendaryDetailKicker}>★ LEGENDARY RIGHT NOW</Text>
-                  <Text style={styles.legendaryDetailReason}>{legendaryDetailEvent.display_metadata?.reason_label || 'A limited-time Buffago discovery moment'}</Text>
-                  <Text style={styles.legendaryDetailWindow}>Ends {new Date(legendaryDetailEvent.ends_at).toLocaleString()} · Complete an eligible rating here before it ends.</Text>
-                  <Button mode="contained" icon="star-four-points" onPress={() => router.push(`/buffaverse/legendary/${legendaryDetailEvent.id}`)} style={{ marginTop: 8 }}>
-                    Open Legendary mission
-                  </Button>
-                  <Text style={styles.legendaryDetailDisclaimer}>Buffago-curated, not sponsored unless explicitly stated.</Text>
-                </View>
-              ) : null}
               <ScoreHeader
                 value={active.avgWeight}
                 label="BuffaGo Score"
@@ -2491,7 +2428,6 @@ export default function PublicRatingsScreen() {
               >
                 {(filtered || [])
                   .filter((r) => Number.isFinite(Number(r.lat)) && Number.isFinite(Number(r.lng)))
-                  .filter((r) => !legendaryDestinationIds.has(r.destination_id))
                   .filter((r) => {
                     if (!mapLegendFilter) return true;
                     const isRated = myRated.has(r.destination_id);
@@ -2518,28 +2454,6 @@ export default function PublicRatingsScreen() {
                       </Marker>
                     );
                   })}
-                {visibleLegendaryMarkers.map((marker) => (
-                  <Marker
-                    key={marker.id}
-                    coordinate={marker.coordinate}
-                    anchor={{ x: 0.5, y: 0.92 }}
-                    zIndex={selectedLegendaryId === marker.eventId ? 20 : 10}
-                    onPress={() => {
-                      if (marker.cluster) {
-                        setSelectedLegendaryId(marker.eventIds[0]);
-                        return;
-                      }
-                      setSelectedLegendaryId(marker.eventId);
-                      const event = legendaryMapEvents.find((item) => item.id === marker.eventId);
-                      if (event) {
-                        setOpenMap(false);
-                        router.push(`/buffaverse/legendary/${event.id}`);
-                      }
-                    }}
-                  >
-                    <LegendaryMarker marker={marker} selected={selectedLegendaryId === marker.eventId} />
-                  </Marker>
-                ))}
               </MapView>
             </View>
 
@@ -2558,13 +2472,6 @@ export default function PublicRatingsScreen() {
                   </Text>
                 </View>
               </Pressable>
-              <View style={styles.legendRow} accessibilityRole="text" accessibilityLabel="Legendary marker uses a star and flame shape, not color alone">
-                <View style={styles.legendLegendarySwatch}><Text style={styles.legendLegendaryStar}>★</Text></View>
-                <Text>Legendary now — star-flame marker</Text>
-              </View>
-              {legendaryMapState === 'stale' ? <Text style={{ marginTop: 6, opacity: 0.65 }}>Showing the last known Legendary events. They may have changed.</Text> : null}
-              {legendaryMapState === 'disabled' ? <Text style={{ marginTop: 6, opacity: 0.65 }}>Legendary markers are currently off.</Text> : null}
-              {legendaryMapState === 'empty' ? <Text style={{ marginTop: 6, opacity: 0.65 }}>No Legendary restaurants are active in this area.</Text> : null}
 
               <Pressable
                 onPress={() => setMapLegendFilter((prev) => (prev === 'rated' ? null : 'rated'))}
@@ -3022,17 +2929,10 @@ const styles = StyleSheet.create({
 
   legendRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   legendSwatch: { width: 14, height: 14, borderRadius: 7 },
-  legendLegendarySwatch: { width: 24, height: 24, borderRadius: 12, backgroundColor: '#211D2B', borderWidth: 1, borderColor: '#F36A2F', alignItems: 'center', justifyContent: 'center' },
-  legendLegendaryStar: { color: '#FFD166', fontSize: 14 },
   legendDot: { width: 16, height: 16, borderRadius: 8, borderWidth: 2 },
 
   legendRowPressable: { paddingVertical: 8, paddingHorizontal: 10, borderRadius: 12, marginTop: 6 },
   legendRowPressableActive: { opacity: 1 },
-  legendaryDetailPanel: { marginTop: 12, marginBottom: 12, padding: 16, borderRadius: 18, backgroundColor: '#211D2B', borderWidth: 1, borderColor: '#F36A2F' },
-  legendaryDetailKicker: { color: '#FFD166', fontWeight: '900', letterSpacing: 1 },
-  legendaryDetailReason: { color: '#fff', fontSize: 18, fontWeight: '800', marginTop: 6 },
-  legendaryDetailWindow: { color: '#FFD4BD', marginTop: 6, lineHeight: 20 },
-  legendaryDetailDisclaimer: { color: '#BEB8C6', fontSize: 11, marginTop: 8 },
   legendActiveText: { fontWeight: '800' },
   rateBtnTopRight: {
   alignSelf: 'flex-end',
