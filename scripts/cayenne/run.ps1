@@ -1,18 +1,16 @@
+[CmdletBinding()]
 param(
-  [string]$Branch,
-  [string]$Commit,
-  [string]$Suite = 'smoke',
-  [string]$Environment = 'qa',
-  [switch]$DryRun
+  [ValidateSet('smoke','auth','onboarding','full','accessibility','exploratory')][string]$Suite='smoke',
+  [ValidateSet('local-mock','qa','production-readonly')][string]$Environment='production-readonly',
+  [string]$DeviceId='emulator-5554', [string]$RunId, [switch]$CaptureVideo, [switch]$ResetApp,
+  [switch]$Rebuild, [switch]$KeepFixtureData, [switch]$SerranoReview, [string]$OutputDirectory, [switch]$DryRun
 )
-$root = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
-$request = [ordered]@{
-  schema_version='1.0'; request_id=('serrano-' + [guid]::NewGuid().ToString()); requested_by='serrano'; repository='BuffagoApp'; branch=$Branch; commit=$Commit; base_commit=$null; environment=$Environment; platforms=@('android'); suite=$Suite; changed_features=@(); required_journeys=@('launch-smoke'); visual_checkpoints=@(); database_assertions=@(); blocking_severity='high'; options=@{capture_video=$false; capture_logs=$true; reset_fixtures=$false}
-}
-$requestPath = Join-Path $root 'artifacts\cayenne\request.json'
-New-Item -ItemType Directory -Force (Split-Path $requestPath) | Out-Null
-$request | ConvertTo-Json -Depth 10 | Set-Content -Encoding UTF8 $requestPath
-$env:PYTHONPATH = Join-Path $root 'Agents\Cayenne'
-$args = @('-m','cayenne.cli','run','--repo-root',$root,'--request',$requestPath)
-if ($DryRun) { $args += '--dry-run' }
-python @args
+$ErrorActionPreference='Stop'
+$root=(Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+$py=Get-Command python -ErrorAction SilentlyContinue
+if (-not $py) { $candidate=Join-Path $env:LOCALAPPDATA 'Programs\Python\Python312\python.exe'; if(Test-Path $candidate){$py=Get-Command $candidate}else{throw 'Python is required for Cayenne orchestration.'} }
+$args=@('-u',(Join-Path $root 'cayenne\scripts\run_runtime.py'),'--suite',$Suite,'--environment',$Environment,'--device-id',$DeviceId)
+if($RunId){$args+=@('--run-id',$RunId)}; if($CaptureVideo){$args+='--capture-video'}; if($ResetApp){$args+='--reset-app'}; if($Rebuild){$args+='--rebuild'}; if($KeepFixtureData){$args+='--keep-fixture-data'}; if($SerranoReview){$args+='--serrano-review'}; if($OutputDirectory){$args+=@('--output-directory',$OutputDirectory)}; if($DryRun){$args+='--dry-run'}
+$env:PYTHONPATH=Join-Path $root 'cayenne\scripts'
+& $py.Source @args
+exit $LASTEXITCODE

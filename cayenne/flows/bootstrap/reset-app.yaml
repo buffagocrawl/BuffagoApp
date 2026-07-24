@@ -1,0 +1,7 @@
+appId: com.buffago.app
+name: Cayenne reset app state
+tags: [bootstrap, non-mutating]
+---
+- clearState
+- launchApp
+- takeScreenshot: reset-app

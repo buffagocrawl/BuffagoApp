@@ -1,0 +1,19 @@
+appId: com.buffago.app
+name: Buffago smoke primary navigation
+tags: [smoke, non-mutating]
+---
+- tapOn:
+    id: nav.crawl
+- takeScreenshot: smoke-crawl
+- tapOn:
+    id: nav.wingdex
+- takeScreenshot: smoke-wingdex
+- tapOn:
+    id: nav.leaderboard
+- takeScreenshot: smoke-leaderboard
+- tapOn:
+    id: nav.profile
+- takeScreenshot: smoke-profile
+- tapOn:
+    id: nav.home
+- takeScreenshot: smoke-home

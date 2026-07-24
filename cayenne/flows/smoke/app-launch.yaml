@@ -1,0 +1,9 @@
+appId: com.buffago.app
+name: Buffago smoke app launch
+tags: [smoke, non-mutating]
+---
+- runFlow: ../bootstrap/launch-app.yaml
+- runFlow: ../bootstrap/assert-runtime.yaml
+- assertVisible:
+    id: app.root
+- takeScreenshot: smoke-launch

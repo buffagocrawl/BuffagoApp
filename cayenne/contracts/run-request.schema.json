@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["contractVersion", "runId", "requestedBy", "suite", "environment", "mutationAllowed", "device", "evidenceRequirements"],
+  "properties": {
+    "contractVersion": {"const": "1.0"}, "runId": {"type": "string", "minLength": 1},
+    "requestedBy": {"enum": ["serrano", "owner", "ci"]}, "suite": {"enum": ["smoke", "auth", "onboarding", "full"]},
+    "environment": {"enum": ["local-mock", "qa", "production-readonly"]}, "mutationAllowed": {"type": "boolean"},
+    "device": {"type": "object", "required": ["platform", "deviceId"], "properties": {"platform": {"const": "android"}, "deviceId": {"type": "string"}}},
+    "evidenceRequirements": {"type": "array", "items": {"type": "string"}}
+  }, "additionalProperties": true
+}

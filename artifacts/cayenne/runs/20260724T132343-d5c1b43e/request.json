@@ -1,0 +1,22 @@
+{
+  "contractVersion": "1.0",
+  "runId": "20260724T132343-d5c1b43e",
+  "requestedBy": "serrano",
+  "suite": "smoke",
+  "environment": "production-readonly",
+  "mutationAllowed": false,
+  "device": {
+    "platform": "android",
+    "deviceId": "emulator-5554"
+  },
+  "evidenceRequirements": [
+    "screenshot",
+    "hierarchy",
+    "logcat"
+  ],
+  "acceptanceCriteria": [
+    "App launches without fatal error",
+    "A real Buffago surface renders",
+    "Primary navigation can be exercised"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "disposition": "BLOCKED",
+  "confirmedDefects": [],
+  "testDefects": [],
+  "environmentBlockers": [
+    {
+      "failureCategory": "ENVIRONMENT_BLOCKER",
+      "failureMessage": "Expo development client did not connect to Metro; its saved server requires explicit local host selection."
+    }
+  ],
+  "missingEvidence": [
+    "DEV_CLIENT_SERVER_SELECTION_REQUIRED"
+  ],
+  "requiredRemediation": [],
+  "rerunSuites": [
+    "smoke"
+  ],
+  "releaseImpact": "BLOCK"
+}

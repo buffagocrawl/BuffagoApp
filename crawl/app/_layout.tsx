@@ -101,6 +101,8 @@ function AppBootSplash() {
 
   return (
     <View
+      testID="app.loading"
+      accessibilityLabel="BuffaGo loading"
       style={{
         flex: 1,
         alignItems: 'center',
@@ -145,6 +147,8 @@ function AppStatusScreen({
 
   return (
     <View
+      testID="app.error"
+      accessibilityLabel={title}
       style={{
         flex: 1,
         alignItems: 'center',
@@ -397,6 +401,11 @@ function AppShell() {
   const hideOnboardingOverlay = pathname === '/onboarding/crawl-preview'; 
 
   return (
+    <View
+      testID="app.root"
+      accessibilityLabel="BuffaGo app root"
+      style={{ flex: 1 }}
+    >
     <PaperProvider theme={paperTheme}>
       <NavThemeProvider value={navTheme}>
         <LocationProvider>
@@ -451,6 +460,7 @@ function AppShell() {
         </LocationProvider>
       </NavThemeProvider>
     </PaperProvider>
+    </View>
   );
 }
 

@@ -1,0 +1,17 @@
+{
+  "version": "1.0",
+  "selectors": {
+    "app.root": "app.root", "app.loading": "app.loading", "app.error": "app.error",
+    "permission.location.request": "permission.location.request", "permission.location.continue": "permission.location.continue",
+    "permission.notification.request": "permission.notification.request", "permission.notification.continue": "permission.notification.continue",
+    "auth.screen": "auth.screen", "auth.email.input": "auth.email.input", "auth.password.input": "auth.password.input",
+    "auth.signin.button": "auth.signin.button", "auth.google.button": "auth.google.button", "auth.facebook.button": "auth.facebook.button",
+    "auth.error": "auth.error", "auth.signed-in-marker": "auth.signed-in-marker",
+    "onboarding.root": "onboarding.root", "onboarding.next": "onboarding.next", "onboarding.back": "onboarding.back", "onboarding.skip": "onboarding.skip", "onboarding.complete": "onboarding.complete",
+    "nav.home": "nav.home", "nav.wingdex": "nav.wingdex", "nav.crawl": "nav.crawl", "nav.leaderboard": "nav.leaderboard", "nav.passport": "nav.passport", "nav.profile": "nav.profile",
+    "rating.root": "rating.root", "rating.crispiness": "rating.crispiness", "rating.sauce": "rating.sauce", "rating.meat": "rating.meat", "rating.overall": "rating.overall", "rating.submit": "rating.submit", "rating.success": "rating.success", "rating.error": "rating.error",
+    "referral.root": "referral.root", "referral.code": "referral.code", "referral.copy": "referral.copy", "referral.share": "referral.share", "referral.status": "referral.status",
+    "engagement.root": "engagement.root", "engagement.streak": "engagement.streak", "engagement.mission": "engagement.mission", "engagement.reward": "engagement.reward",
+    "buffaverse.root": "buffaverse.root", "buffaverse.map": "buffaverse.map", "buffaverse.event": "buffaverse.event", "buffaverse.countdown": "buffaverse.countdown", "buffaverse.join": "buffaverse.join", "buffaverse.complete": "buffaverse.complete"
+  }
+}

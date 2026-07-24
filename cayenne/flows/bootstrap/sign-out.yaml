@@ -1,0 +1,6 @@
+appId: com.buffago.app
+name: Cayenne sign out
+tags: [bootstrap, qa-only]
+---
+- back
+- takeScreenshot: signed-out

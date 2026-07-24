@@ -5,8 +5,8 @@
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
     "test:quick-rating": "node ./scripts/test-quick-rating.js",
@@ -20,7 +20,12 @@
     "database:harness": "node ./scripts/database-runtime-harness.mjs",
     "database:fingerprint": "node ./scripts/schema-fingerprint.mjs",
     "owner-validation": "node ./scripts/owner-validation.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "cayenne:check": "powershell -NoProfile -ExecutionPolicy Bypass -File ..\\scripts\\cayenne\\check-prerequisites.ps1",
+    "cayenne:smoke": "powershell -NoProfile -ExecutionPolicy Bypass -File ..\\scripts\\cayenne\\run.ps1 -Suite smoke -Environment production-readonly",
+    "cayenne:serrano": "powershell -NoProfile -ExecutionPolicy Bypass -File ..\\scripts\\cayenne\\run.ps1 -Suite smoke -Environment production-readonly -SerranoReview",
+    "cayenne:contracts": "powershell -NoProfile -ExecutionPolicy Bypass -File ..\\scripts\\cayenne\\validate-contracts.ps1",
+    "cayenne:selectors": "powershell -NoProfile -ExecutionPolicy Bypass -File ..\\scripts\\cayenne\\validate-selectors.ps1"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
