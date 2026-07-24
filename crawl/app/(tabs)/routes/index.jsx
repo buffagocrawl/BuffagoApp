@@ -1,4 +1,4 @@
-﻿// app/(tabs)/routes/index.jsx
+// app/(tabs)/routes/index.jsx
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { View, FlatList, RefreshControl, StyleSheet, ScrollView, Animated, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,7 +16,7 @@ import {
   TextInput,
   HelperText,
 } from 'react-native-paper';
-import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from '../../../lib/platformMap';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../../../lib/supabase.js';
 import { useLocationCtx } from '../../../providers/LocationProvider';
