@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "key": {
+    "fingerprint": "AIza...j-Ck",
+    "sha256": "71a615ca530f8b80e3251d10f99d970de66f1a97c35cf1b00f1e3bfa0d3d8b0f"
+  },
+  "current_occurrences": [
+    {
+      "path": "output/buffaverse-web-correction/_expo/static/js/web/entry-5fd3fb0b503b7b53f10d81384127ea83.js",
+      "line": 1267,
+      "tracked": true,
+      "generated": true,
+      "present_on_main": true,
+      "present_on_origin_main": true,
+      "source_variable": "EXPO_PUBLIC_GOOGLE_API_KEY",
+      "runtime_usage": "client-side Directions API (Legacy)"
+    },
+    {
+      "path": "crawl/.env.development",
+      "line": 12,
+      "tracked": false,
+      "generated": false,
+      "present_on_main": false,
+      "present_on_origin_main": false,
+      "source_variable": "EXPO_PUBLIC_GOOGLE_API_KEY",
+      "runtime_usage": "local Expo client build input"
+    },
+    {
+      "path": "crawl/.env.production",
+      "line": 12,
+      "tracked": false,
+      "generated": false,
+      "present_on_main": false,
+      "present_on_origin_main": false,
+      "source_variable": "EXPO_PUBLIC_GOOGLE_API_KEY",
+      "runtime_usage": "local Expo production build input"
+    },
+    {
+      "path": "EAS project f08e790e-af47-4fc1-ba5e-707a0a15f7be / production",
+      "line": null,
+      "tracked": false,
+      "generated": false,
+      "present_on_main": false,
+      "present_on_origin_main": false,
+      "source_variable": "EXPO_PUBLIC_GOOGLE_API_KEY",
+      "runtime_usage": "EAS production build input",
+      "visibility": "PUBLIC"
+    }
+  ],
+  "history": {
+    "first_introduced_commit": "7f1efc7fe1642d9d3bf39fc2882fda820a71f5d4",
+    "current_main_commit": "a00b3bbf6c5657b3d3318e14cbdcf0a7d1da1966",
+    "commits_containing_value": 15,
+    "unique_google_key_values": 1,
+    "pull_request_path": 3
+  }
+}
