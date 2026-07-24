@@ -52,3 +52,18 @@ export const ENABLE_BUFFAVERSE_PERSONALIZATION = parseBooleanFlag(
   process.env.EXPO_PUBLIC_ENABLE_BUFFAVERSE_PERSONALIZATION,
   false
 );
+
+export const ENABLE_BUFFAVERSE_HOME = parseBooleanFlag(
+  process.env.EXPO_PUBLIC_ENABLE_BUFFAVERSE_HOME,
+  false
+);
+
+export const ENABLE_BUFFAVERSE_SHARING = parseBooleanFlag(
+  process.env.EXPO_PUBLIC_ENABLE_BUFFAVERSE_SHARING,
+  false
+);
+
+export const ENABLE_BUFFAVERSE_CELEBRATIONS = parseBooleanFlag(
+  process.env.EXPO_PUBLIC_ENABLE_BUFFAVERSE_CELEBRATIONS,
+  false
+);

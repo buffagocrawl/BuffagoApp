@@ -8,12 +8,15 @@ import { supabase } from '../../../lib/supabase.js';
 
 // ✅ app/(tabs)/journey -> app/profile/history
 import HistoryScreen from '../../profile/history/index.jsx';
+import BuffaverseOverview from '../../../components/buffaverse/BuffaverseOverview';
+import { ENABLE_BUFFAVERSE } from '../../../config/features';
 
 export default function JourneyTab() {
   const router = useRouter();
 
   const [ready, setReady] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -88,6 +91,12 @@ export default function JourneyTab() {
     );
   }
 
-  // Signed in: HistoryScreen owns the header/layout and already handles safe area.
+  if (ENABLE_BUFFAVERSE && !showHistory) {
+    return <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+      <BuffaverseOverview onOpenHistory={() => setShowHistory(true)} />
+    </SafeAreaView>;
+  }
+
+  // History remains available as a linked detail view from Buffaverse.
   return <HistoryScreen />;
 }
