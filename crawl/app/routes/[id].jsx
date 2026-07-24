@@ -11,7 +11,7 @@ import {
 } from 'react-native-paper';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from '../../lib/platformMap';
 
 import { useRouteStops } from '../../hooks/useRoutes';
 import { getWalkingPath } from '../../utils/walkRoute';

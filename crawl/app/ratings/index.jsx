@@ -20,7 +20,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { supabase } from '../../lib/supabase.js';
 import { trackEvent } from '../../lib/analytics';
 import { useLocationCtx } from '../../providers/LocationProvider';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from '../../lib/platformMap';
 
 /* ---------------- helpers ---------------- */
 const fmt2 = (n) => {

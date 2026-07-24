@@ -3,7 +3,7 @@ import { PaperProvider } from 'react-native-paper';
 import { useColorScheme } from 'react-native';
 import { lightTheme, darkTheme } from './src/theme/theme';
 import { StatusBar } from 'expo-status-bar';
-import HomeScreen from './src/screens/HomeScreen';
+import HomeScreen from './src/screens/Homescreen';
 import './lib/supabase';
 
 export default function App() {

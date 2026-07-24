@@ -252,6 +252,8 @@ function DialogHeaderArrow({ title, onBack }) {
  *   wouldOrderAgain
  * }
  */
+/** @typedef {{id: number|string, label?: string, tag?: string}} RatingTagOption */
+/** @param {{visible: boolean, destinationName?: string, tagOptions?: RatingTagOption[], saving?: boolean, onDismiss?: () => void, onFinalize?: (payload: unknown) => void|Promise<void>, finalizeLabel?: string, flowVariant?: string}} props */
 export default function RatingWizardDialog({
   visible,
   destinationName,
@@ -270,7 +272,7 @@ export default function RatingWizardDialog({
 
   const [scores, setScores] = useState({ crispiness: 1, sauce: 1, meat: 1, overall: 1 });
   const [sauceStyle, setSauceStyle] = useState(2);
-  const [flavorVibe, setFlavorVibe] = useState([]);
+  const [flavorVibe, setFlavorVibe] = useState(/** @type {number[]} */ ([]));
   const [spiceLevel, setSpiceLevel] = useState(5);
   const [wouldOrderAgain, setWouldOrderAgain] = useState(null);
   const [wingsEaten, setWingsEaten] = useState(6);

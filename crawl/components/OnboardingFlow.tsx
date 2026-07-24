@@ -264,15 +264,15 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
   const pickedDestRef = useRef<DestRow | null>(null);
 
   const prefact = (params?.prefact || '').toString();
-  const currentAppVersion = Constants.expoConfig?.version ?? Constants.manifest?.version ?? null;
+  const currentAppVersion = Constants.expoConfig?.version ?? null;
   const orientation = windowWidth > windowHeight ? 'landscape' : 'portrait';
   const stepSixVariant = useMemo(
     () =>
       onboardingStepSix.resolveStepSixVariant({
         isInternalBuild: onboardingStepSix.isInternalOrTestBuild({
           isDev: typeof __DEV__ !== 'undefined' && __DEV__,
-          appOwnership: Constants.appOwnership || null,
-          executionEnvironment: Constants.executionEnvironment || null,
+          appOwnership: Constants.appOwnership ?? null,
+          executionEnvironment: Constants.executionEnvironment ?? null,
         }),
         rolloutFlag: process.env.EXPO_PUBLIC_ONBOARDING_STEP6_TREATMENT,
       }),
@@ -996,7 +996,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
         screen: 'onboarding',
         userId,
         stateId: pickedState?.state_id ?? null,
-        metadata: { source: 'onboarding_seed', error: String(e?.message || e) },
+        metadata: { source: 'onboarding_seed', error: e instanceof Error ? e.message : String(e) },
       });
       await trackEvent({
         eventName: 'error_shown',
@@ -1005,7 +1005,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
         stateId: pickedState?.state_id ?? null,
         metadata: {
           source: 'onboarding_seed',
-          error_message: String(e?.message || e),
+          error_message: e instanceof Error ? e.message : String(e),
         },
       });
       setRatingError('Could not save that rating. Please try again.');

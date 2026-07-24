@@ -1,6 +1,6 @@
 import 'dotenv/config';
-import { WingmanService } from '../lib/wingman/WingmanService.ts';
-import type { WingmanInput } from '../lib/wingman/types.ts';
+import { WingmanService } from '../lib/Wingman/WingmanService';
+import type { WingmanInput } from '../lib/Wingman/types';
 
 async function main() {
   const wingman = new WingmanService();
