@@ -13,6 +13,13 @@ from uuid import uuid4
 import yaml
 
 from .codex_runner import CodexRequest, CodexRunner
+from .confidence import (
+    APP_EXPERIENCE_CATEGORIES,
+    RELEASE_CATEGORIES,
+    RETENTION_CATEGORIES,
+    calculate_confidence,
+    render_confidence_card,
+)
 from .evidence_collector import collect_evidence_manifest, detect_codex_command
 from .logging_config import initialize_logger, log_event
 from .run_state import RunPaths, RunStateStore, build_run_paths, stable_hash
@@ -109,6 +116,7 @@ class SerranoOrchestrator:
         self._run_wave(paths, state, logger, list(WAVE_3), "wave_3", self._synthesis_context(paths, [SYNTHESIS_2.name]))
         self._run_single(paths, state, logger, FINAL_PLAN, self._synthesis_context(paths, [SYNTHESIS_2.name, "ceo_final_review", "cfo_business_review", "caio_feedback_loop_review"]))
         self._materialize_final_plan(paths, state, logger)
+        self._materialize_confidence_artifacts(paths, state)
         state["status"] = "awaiting_approval"
         state["current_phase"] = "final_product_plan"
         RunStateStore(paths).save(state)
@@ -403,6 +411,29 @@ class SerranoOrchestrator:
             state["approved_plan_hash"] = None
             state["status"] = "awaiting_reapproval"
             log_event(logger, "approval_invalidated", reason="plan_hash_changed")
+        RunStateStore(paths).save(state)
+
+    def _materialize_confidence_artifacts(self, paths: RunPaths, state: dict[str, Any]) -> None:
+        """Create independent report cards before a review has scored evidence.
+
+        Discovery evidence cannot silently become a blended approval score.  A later
+        reviewer must add category scores and evidence links to these artifacts.
+        """
+        reviewed_at = state.get("updated_at", state.get("started_at", "unknown"))
+        reports = (
+            ("release-confidence.md", calculate_confidence("Release Confidence", [], total_categories=len(RELEASE_CATEGORIES)), "No release category has been scored yet.", "Collect intended-platform release evidence."),
+            ("app-experience-confidence.md", calculate_confidence("App Experience Confidence", [], total_categories=len(APP_EXPERIENCE_CATEGORIES)), "No task-level experience evidence has been scored yet.", "Run task-based usability observations."),
+            ("user-retention-confidence.md", calculate_confidence("User Retention Confidence", [], total_categories=len(RETENTION_CATEGORIES), retention_evidence=None), "No behavioral cohort evidence has been scored yet.", "Instrument activation and external cohorts."),
+        )
+        for name, report, blocker, opportunity in reports:
+            path = paths.artifact_dir / name
+            path.write_text(render_confidence_card(report, reviewed_at=reviewed_at, largest_blocker=blocker, largest_opportunity=opportunity), encoding="utf-8")
+            state["artifacts"][name] = str(path)
+        state["artifacts"]["confidence-score-history.md"] = str(paths.artifact_dir / "confidence-score-history.md")
+        (paths.artifact_dir / "confidence-score-history.md").write_text(
+            "# Confidence score history\n\nNo independent confidence score has been calculated for this run. Legacy blended averages cannot approve release.\n",
+            encoding="utf-8",
+        )
         RunStateStore(paths).save(state)
 
     def _require_current_approval(self, paths: RunPaths, state: dict[str, Any]) -> None:
