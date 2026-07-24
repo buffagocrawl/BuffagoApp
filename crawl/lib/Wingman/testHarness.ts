@@ -1,6 +1,6 @@
 import 'dotenv/config';
-import { WingmanService } from '../lib/wingman/WingmanService';
-import type { WingmanInput } from '../lib/wingman/types';
+import { WingmanService } from './WingmanService';
+import type { WingmanInput } from './types';
 
 async function runSingleTest(wingman: WingmanService, test: WingmanInput) {
   console.log('\n==================================================');

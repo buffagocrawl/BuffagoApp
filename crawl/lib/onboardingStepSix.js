@@ -25,6 +25,7 @@ const STEP_SIX_COPY = {
   },
 };
 
+/** @param {{isDev?: boolean, appOwnership?: string|null, executionEnvironment?: string|null}} [options] */
 function isInternalOrTestBuild({
   isDev = false,
   appOwnership = null,
@@ -54,6 +55,7 @@ function getStepSixCopy(variant = STEP_SIX_CONTROL) {
   return STEP_SIX_COPY[variant] || STEP_SIX_COPY[STEP_SIX_CONTROL];
 }
 
+/** @param {{variant?: string, eventName?: string, ctaLabel?: string|null, ctaDestination?: string, sessionId?: string|null, anonymousUserId?: string|null, clientPlatform?: string|null, appVersion?: string|null, extra?: Record<string, unknown>}} [options] */
 function buildStepSixMetadata({
   variant = STEP_SIX_CONTROL,
   eventName,
@@ -83,6 +85,7 @@ function buildStepSixMetadata({
   };
 }
 
+/** @param {{variant?: string, ctaLabel?: string|null, ctaDestination?: string, sessionId?: string|null, anonymousUserId?: string|null, clientPlatform?: string|null, appVersion?: string|null}} [options] */
 function createPendingStepSixContext({
   variant = STEP_SIX_CONTROL,
   ctaLabel = null,
