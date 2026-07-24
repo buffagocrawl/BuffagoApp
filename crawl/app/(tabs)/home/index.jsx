@@ -33,6 +33,8 @@ import {
   ENABLE_GROWTH_MISSIONS,
   ENABLE_RESTAURANT_OWNER_LOOP,
   ENABLE_SHARE_INVITE_LOOP,
+  ENABLE_BUFFAVERSE_HOME,
+  ENABLE_BUFFAVERSE,
 } from '../../../config/features';
 
 import { useOnboardingGate } from '../../../hooks/useOnboardingGate';
@@ -43,6 +45,7 @@ import { fetchRandomFunFact } from '../../../utils/funFacts';
 import { nyDateString } from '../../../utils/nyDate';
 import { useLegendaryFeed } from '../../../hooks/useLegendaryFeed';
 import { LegendaryHomeHero } from '../../../components/buffaverse/LegendarySurfaces';
+import BuffaverseHomeCard from '../../../components/buffaverse/BuffaverseHomeCard';
 
 const SEARCH_RADIUS_M = 160934; // 100 miles
 const MS_5_MIN = 30 * 1000;
@@ -2974,6 +2977,16 @@ export default function Home() {
               router.push('/(tabs)/ratings');
             }}
           />
+
+          {isSignedIn && ENABLE_BUFFAVERSE && ENABLE_BUFFAVERSE_HOME ? (
+            <BuffaverseHomeCard
+              level={hudStats.level}
+              title={shownTitle || hudStats.levelTitle}
+              xp={hudStats.xp}
+              objective="Rate your next restaurant to keep your journey moving."
+              onPress={() => router.push('/(tabs)/journey')}
+            />
+          ) : null}
 
           {/* Signed-in: Level row */}
           {isSignedIn ? (
