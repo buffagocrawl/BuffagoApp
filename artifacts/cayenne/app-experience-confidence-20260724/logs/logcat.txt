@@ -1,0 +1,638 @@
+--------- beginning of main
+W/BugleRcsEngine( 4700): Unable to send RCS extension log [CONTEXT thread_id=51 ]
+W/JobInfo ( 4700): Requested important-while-foreground flag for job1207 is ignored and takes no effect
+D/WM-SystemJobScheduler( 4700): Scheduling work ID 6e5e838f-4fec-47d3-93be-d796baa06b61Job ID 1207
+I/Finsky  ( 4561): [57] SCH: Scheduling 1 system job(s)
+W/JobInfo ( 4561): Job 'com.android.vending/com.google.android.finsky.scheduler.process.mainimpl.PhoneskyJobServiceMain#9725' has a deadline with no functional constraints. The deadline won't improve job execution latency. Consider removing the deadline.
+I/Finsky  ( 4561): [57] SCH: Scheduling system job Id: 9725, L: 24784840, D: 25684840, C: false, I: false, N: 0
+W/JobInfo (  817): Job 'com.android.vending/com.google.android.finsky.scheduler.process.mainimpl.PhoneskyJobServiceMain#9725' has a deadline with no functional constraints. The deadline won't improve job execution latency. Consider removing the deadline.
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 8c5b160a-e59b-449b-b113-e93c7d39179f}. Requires device idle.
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 44eb5204-e215-46cc-8a81-e8836d391501}. Requires device idle.
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 63898424-72da-4d14-a674-875b55c6cad8}. Requires device idle.
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 6e5e838f-4fec-47d3-93be-d796baa06b61}. Requires device idle.
+D/WM-GreedyScheduler( 4700): Starting tracking for 36646bda-42fa-4185-b168-773de9058ced,78842e60-956d-4877-870e-6784eba47381,6e7bea87-29cd-4a06-95f0-cf9d242e862c
+D/nativeloader( 4931): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+D/AndroidRuntime( 4931): Calling main entry com.android.commands.uiautomator.Launcher
+D/nativeloader( 5007): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+W/.gms.persistent( 1414): Missing inline cache for void bjkv.d(android.content.Context, jgxi)
+W/.gms.persistent( 1414): Missing inline cache for void bjkv.d(android.content.Context, jgxi)
+W/.gms.persistent( 1414): Missing inline cache for void bjkv.d(android.content.Context, jgxi)
+W/.gms.persistent( 1414): Missing inline cache for void bjkv.d(android.content.Context, jgxi)
+W/.gms.persistent( 1414): Missing inline cache for void bjkv.d(android.content.Context, jgxi)
+W/.gms.persistent( 1414): Missing inline cache for void bjkv.d(android.content.Context, jgxi)
+W/.gms.persistent( 1414): Missing inline cache for void bjkv.d(android.content.Context, jgxi)
+I/BugleNetwork( 4700): Startup: registering tachyon for phone.
+I/RcsProvisioningManager( 4700): Skipping backfill of identity mapping.
+I/BugleRcsEngine( 4700): [SR]: Single Registration is disabled. Skipping Single Registration capability check for subId: 1, OS.isAtLeastS:[true], enableSingleRegistrationProvisioning:[false] [CONTEXT thread_id=84 ]
+I/BugleRcsEngine( 4700): No RCS Configuration was found in Bugle for simID: redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="ProvisioningEngineDataRetriever" thread_id=84 ]
+W/BugleRcs( 4700): getAvailablePhoneNumbers: accessing uninitialized provisioning identities.
+W/BugleRcs( 4700): ekru: FULL
+W/BugleRcs( 4700): 	at dgia.m(PG:54)
+W/BugleRcs( 4700): 	at dgqp.z(PG:3)
+W/BugleRcs( 4700): 	at dgpb.apply(PG:5)
+W/BugleRcs( 4700): 	at eiia.apply(PG:13)
+W/BugleRcs( 4700): 	at eoop.d(PG:3)
+W/BugleRcs( 4700): 	at eooq.run(PG:38)
+W/BugleRcs( 4700): 	at dqkn.run(PG:7)
+W/BugleRcs( 4700): 	at elfh.run(PG:44)
+W/BugleRcs( 4700): 	at dqnf.run(PG:18)
+W/BugleRcs( 4700): 	at dqjv.run(PG:8)
+W/BugleRcs( 4700): 	at java.lang.Thread.run(Thread.java:1563)
+W/BugleRcs( 4700): 	at dqlo.run(PG:61)
+I/BugleRcsProvisioning( 4700): RcsAvailability configuration availability and enabled status: simId: redacted-pii:sim_id[chars:20,last3:897], SipConnectionType: DUAL_REG, isConfigurationAvailableAndEnabled: false
+I/BugleRcs( 4700): No phone numbers available.
+I/BugleRcs( 4700): ekru: FULL
+I/BugleRcs( 4700): 	at dgia.m(PG:126)
+I/BugleRcs( 4700): 	at dgqp.z(PG:3)
+I/BugleRcs( 4700): 	at dgpb.apply(PG:5)
+I/BugleRcs( 4700): 	at eiia.apply(PG:13)
+I/BugleRcs( 4700): 	at eoop.d(PG:3)
+I/BugleRcs( 4700): 	at eooq.run(PG:38)
+I/BugleRcs( 4700): 	at dqkn.run(PG:7)
+I/BugleRcs( 4700): 	at elfh.run(PG:44)
+I/BugleRcs( 4700): 	at dqnf.run(PG:18)
+I/BugleRcs( 4700): 	at dqjv.run(PG:8)
+I/BugleRcs( 4700): 	at java.lang.Thread.run(Thread.java:1563)
+I/BugleRcs( 4700): 	at dqlo.run(PG:61)
+I/BugleRcsProvisioning( 4700): Checking isConfigServerUrlAvailable with simId: redacted-pii:sim_id[chars:20,last3:897], 
+D/WM-GreedyScheduler( 4700): Cancelling work ID 3a2f9ed6-252e-4ea5-9f57-416b9401f449
+I/BugleRcsEngine( 4700): getConfigServerUrl with simId: redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="ProvisioningServerUtil" thread_id=84 ]
+I/BugleRcsEngine( 4700): Using config server URL from cebl [CONTEXT log_prefix="ProvisioningServerUtil" thread_id=84 ]
+I/AconfigPackage( 4931): android.media.swcodec.flags is mapped to com.android.media.swcodec
+I/AconfigPackage( 4931): com.android.permission.flags is mapped to com.android.permission
+I/AconfigPackage( 4931): com.android.permissioncontroller.flags is mapped to com.android.permission
+I/AconfigPackage( 4931): com.android.icu is mapped to com.android.i18n
+I/BugleRcsProvisioning( 4700): RcsAvailability: Subscription Id: 1, simId: redacted-pii:sim_id[chars:20,last3:897], sipConnectionType: DUAL_REG, isRcsAvailable: false
+D/WM-SystemJobScheduler( 4700): Scheduling work ID 3a2f9ed6-252e-4ea5-9f57-416b9401f449Job ID 1208
+I/AconfigPackage( 4931): com.android.appsearch.flags is mapped to com.android.appsearch
+I/BugleRcsEngine( 4700): No RCS Configuration was found in Bugle for simID: redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="ProvisioningEngineDataRetriever" thread_id=84 ]
+I/BugleRcsProvisioning( 4700): updateAvailabilityForRcsProvisioningId. SimId: redacted-pii:sim_id[chars:20,last3:897], currentAvailability: 10, newAvailability: 10, hint: NO_HINT
+I/AconfigPackage( 4931): android.uprobestats.mainline.flags is mapped to com.android.uprobestats
+I/BugleRcsProvisioning( 4700): scheduleProvisioningForEligibleSims
+I/BugleRcsProvisioning( 4700): RcsProvisioningTrigger: onRcsAvailabilityUpdate : availability is updated to Carrier RCS is not set up, lastAvailabilityLocal is null, simId hash = -3996307846450650572, simId = redacted-pii:sim_id[chars:20,last3:897], isPev3Enabled = true
+I/AconfigPackage( 4931): com.android.crashrecovery.flags is mapped to com.android.crashrecovery
+I/AconfigPackage( 4931): android.provider.flags is mapped to com.android.configinfrastructure
+I/AconfigPackage( 4931): com.android.server.deviceconfig is mapped to com.android.configinfrastructure
+I/ckhm    ( 4700): scheduleProvisioningForEligibleSims: operationTrigger: 5 bugle trigger event: 4
+W/BugleNetwork( 4700): No available phone number to start tachyon for.
+I/BugleRcsProvisioning( 4700): RcsAvailability: Subscription Id: 1, simId: redacted-pii:sim_id[chars:20,last3:897], sipConnectionType: DUAL_REG, isRcsAvailable: false
+D/SafetySourceDataValidat(  817): No cert check requested for package com.google.android.permissioncontroller
+I/ckhm    ( 4700): scheduleProvisioningForAllEligibleSims: operationTrigger: 5 bugle trigger event: 4
+I/AconfigPackage( 4931): com.android.compos.flags is mapped to com.android.compos
+I/AconfigPackage( 4931): com.android.art.flags is mapped to com.android.art
+I/AconfigPackage( 4931): com.android.art.rw.flags is mapped to com.android.art
+I/AconfigPackage( 4931): com.android.libcore is mapped to com.android.art
+I/AconfigPackage( 4931): com.android.telephony.flags is mapped to com.android.telephonycore
+I/BugleRcsEngine( 4700): getRcsProvisioningGoogleTosConfiguration # cjxn@5d5fcd, consentState = 0, ServerUpdateTime = 0 [CONTEXT log_prefix="ProvisioningEngineDataRetriever" thread_id=72 ]
+I/AconfigPackage( 4931): com.android.media.extractor.flags is mapped to com.android.media
+I/AconfigPackage( 4931): com.android.media.mainline.flags is mapped to com.android.media
+I/AconfigPackage( 4931): com.android.wifi.flags is mapped to com.android.wifi
+I/BugleRcsEngine( 4700): No RCS Configuration was found in Bugle for simID: redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="ProvisioningEngineDataRetriever" thread_id=85 ]
+I/AconfigPackage( 4931): com.android.org.conscrypt.flags is mapped to com.android.conscrypt
+I/AconfigPackage( 4931): com.android.org.conscrypt.net.flags is mapped to com.android.conscrypt
+V/GrammaticalInflectionUtils(  817): AttributionSource: android.content.AttributionSource@58a3c776 does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+D/DocumentsApplication( 4966): OverlayManager.setEnabled() result: true
+I/AconfigPackage( 4931): com.android.healthfitness.flags is mapped to com.android.healthfitness
+I/ckhm    ( 4700): scheduleProvisioningForRcsProvisioningId: rcsProvisioningId: redacted-pii:sim_id[chars:20,last3:897] operationTrigger: 5 bugle trigger event: 4
+I/AconfigPackage( 4931): com.android.ipsec.flags is mapped to com.android.ipsec
+I/AconfigPackage( 4931): com.android.nfc.module.flags is mapped to com.android.nfcservices
+D/PersistedStoragePackageUninstalledReceiver( 3526): Received android.intent.action.PACKAGE_FULLY_REMOVED for dev.mobile.maestro.test for u0
+I/AconfigPackage( 4931): com.android.adservices.ondevicepersonalization.flags is mapped to com.android.ondevicepersonalization
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 8c5b160a-e59b-449b-b113-e93c7d39179f}. Requires device idle.
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 44eb5204-e215-46cc-8a81-e8836d391501}. Requires device idle.
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 63898424-72da-4d14-a674-875b55c6cad8}. Requires device idle.
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 6e5e838f-4fec-47d3-93be-d796baa06b61}. Requires device idle.
+D/WM-GreedyScheduler( 4700): Starting tracking for 36646bda-42fa-4185-b168-773de9058ced,78842e60-956d-4877-870e-6784eba47381,6e7bea87-29cd-4a06-95f0-cf9d242e862c
+I/AconfigPackage( 4931): com.android.adbd.flags is mapped to com.android.adbd
+D/Zygote  (  579): Forked child process 5022
+--------- beginning of system
+I/ActivityManager(  817): Start proc 5022:com.google.android.rkpdapp/u0a191 for broadcast {com.google.android.rkpdapp/com.android.rkpdapp.PackageRemovalReceiver}
+I/Bugle   ( 4700): RcsAvailabilityUtilForProvisioningEngineV2: onCsLibPhenotypeUpdated
+W/BugleRcsEngine( 4700): Unable to send diagnostic log [CONTEXT thread_id=82 ]
+I/AconfigPackage( 4931): com.android.bluetooth.flags is mapped to com.android.bt
+E/ashmem  ( 4966): Pinning is deprecated since Android Q. Please use trim or other methods.
+I/AconfigPackage( 4931): com.android.devicelock.flags is mapped to com.android.devicelock
+I/BugleRcsEngine( 4700): SystemBinding enabled: true [CONTEXT log_prefix="SystemBindingManager" thread_id=76 ]
+I/BugleRcsEngine( 4700): System Binding updated [CONTEXT thread_id=58 ]
+D/nativeloader( 5007): Configuring clns-shared-9 for other apk /system/priv-app/ExternalStorageProvider/ExternalStorageProvider.apk. target_sdk_version=36, uses_libraries=, library_path=/system/priv-app/ExternalStorageProvider/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.android.externalstorage:/system/priv-app/ExternalStorageProvider:/system/lib64:/system_ext/lib64
+I/AconfigPackage( 4931): android.os.profiling is mapped to com.android.profiling
+I/AconfigPackage( 4931): android.os.profiling.anomaly.flags is mapped to com.android.profiling
+I/BugleRcsProvisioning( 4700): updateAvailabilityForRcsProvisioningId. SimId: redacted-pii:sim_id[chars:20,last3:897], currentAvailability: 10, newAvailability: 10, hint: NO_HINT
+I/Zygote  ( 5022): Process 5022 created for com.google.android.rkpdapp
+I/android.rkpdapp( 5022): Using CollectorTypeCMC GC.
+W/android.rkpdapp( 5022): Unexpected CPU variant for x86: x86_64.
+W/android.rkpdapp( 5022): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+I/AconfigPackage( 4931): com.android.os.statsd.flags is mapped to com.android.os.statsd
+I/AconfigPackage( 4931): com.android.rkpd.flags is mapped to com.android.rkpd
+W/BugleRcsEngine( 4700): Unable to send diagnostic log [CONTEXT thread_id=51 ]
+I/AconfigPackage( 4931): com.android.cellbroadcastreceiver.flags is mapped to com.android.cellbroadcast
+D/WM-GreedyScheduler( 4700): Cancelling work ID 78842e60-956d-4877-870e-6784eba47381
+I/AconfigPackage( 4931): com.android.adservices.flags is mapped to com.android.adservices
+I/AconfigPackage( 4931): com.android.sdksandbox.flags is mapped to com.android.adservices
+I/AconfigPackage( 4931): com.android.uwb.flags is mapped to com.android.uwb
+I/AconfigPackage( 4931): com.android.ranging.flags is mapped to com.android.uwb
+I/BugleRcsProvisioning( 4700): RcsProvisioningTrigger: Should not schedule Revoke Google Consent Task because both the consent types are empty in the Storage
+D/nativeloader( 5022): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+I/AconfigPackage( 4931): android.graphics.pdf.flags is mapped to com.android.mediaprovider
+I/AconfigPackage( 4931): com.android.providers.media.flags is mapped to com.android.mediaprovider
+I/AconfigPackage( 4931): android.graphics.pdf.flags.readonly is mapped to com.android.mediaprovider
+V/GraphicsEnvironment( 5007): Currently set values for:
+I/AconfigPackage( 4931): com.android.net.ct.flags is mapped to com.android.tethering
+I/AconfigPackage( 4931): com.android.tethering.mainline.beta is mapped to com.android.tethering
+I/AconfigPackage( 4931): com.android.net.flags is mapped to com.android.tethering
+I/AconfigPackage( 4931): com.android.nearby.flags is mapped to com.android.tethering
+I/AconfigPackage( 4931): android.net.vcn is mapped to com.android.tethering
+I/AconfigPackage( 4931): com.android.tethering.beta.test is mapped to com.android.tethering
+I/AconfigPackage( 4931): android.net.http is mapped to com.android.tethering
+I/AconfigPackage( 4931): com.android.net.thread.flags is mapped to com.android.tethering
+I/AconfigPackage( 4931): com.android.system.virtualmachine.flags is mapped to com.android.virt
+E/FeatureFlagsImplExport( 4931): android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package android.xr cannot be found on the device
+V/GraphicsEnvironment( 5007):   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment( 5007):   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment( 5007): com.android.externalstorage is not listed in per-application setting
+V/GraphicsEnvironment( 5007): ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+V/GraphicsEnvironment( 5007): com.android.externalstorage is not listed in ANGLE allowlist or settings, returning default
+W/JobInfo ( 4700): Requested important-while-foreground flag for job1209 is ignored and takes no effect
+D/WM-SystemJobScheduler( 4700): Scheduling work ID 78842e60-956d-4877-870e-6784eba47381Job ID 1209
+V/GraphicsEnvironment( 5007): Neither updatable production driver nor prerelease driver is supported.
+D/UiAutomationConnection( 4931): Created on user UserHandle{0}
+I/UiAutomation( 4931): Initialized for user 0 on display 0
+W/UiAutomation( 4931): Created with deprecatead constructor, assumes DEFAULT_DISPLAY
+D/AccessibilityManagerService(  817): changeCurrentUserForTestAutomationIfNeededLocked(0): ignoring because device doesn't support visible background users
+I/UiAutomationManager(  817): Registering UiTestAutomationService (id=com.android.server.accessibility/UiAutomation, flags=0x0) when called by user 0
+I/BugleRcsProvisioning( 4700): RcsProvisioningTrigger: Did not schedule RevokeGoogleConsentTask
+V/AccessibilityManagerService(  817): onUserStateChangedLocked for userId: 0, forceUpdate: false
+I/BugleRcsProvisioning( 4700): RcsProvisioningTrigger: onCsLibPhenotypeUpdated, enableProvisioningTaskInBugle = true
+V/AccessibilityUserState(  817): updateShortcutTargets: type:accessibility_shortcut_target_service, current:{}, new:{}
+I/BugleRcsProvisioning( 4700): RcsProvisioningTrigger: updateAvailabilityForAllSimsAsync : hint = CSLIB_PHENOTYPE_UPDATE logTriggerEvent = true
+V/AccessibilityUserState(  817): updateShortcutTargets: type:accessibility_button_targets, current:{}, new:{}
+V/AccessibilityUserState(  817): updateShortcutTargets: type:accessibility_gesture_targets, current:{}, new:{}
+V/AccessibilityUserState(  817): updateShortcutTargets: type:accessibility_qs_targets, current:{}, new:{}
+V/AccessibilityUserState(  817): updateShortcutTargets: type:accessibility_key_gesture_targets, current:{}, new:{}
+W/MagnificationConnectionManager(  817): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+I/AiAiEcho( 1627): Settings changed for uri: content://settings/secure/accessibility_enabled
+E/ashmem  ( 5007): Pinning is deprecated since Android Q. Please use trim or other methods.
+I/BugleRcsEngine( 4700): [SR]: Single Registration is disabled. Skipping Single Registration capability check for subId: 1, OS.isAtLeastS:[true], enableSingleRegistrationProvisioning:[false] [CONTEXT thread_id=74 ]
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 8c5b160a-e59b-449b-b113-e93c7d39179f}. Requires device idle.
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 44eb5204-e215-46cc-8a81-e8836d391501}. Requires device idle.
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 63898424-72da-4d14-a674-875b55c6cad8}. Requires device idle.
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 6e5e838f-4fec-47d3-93be-d796baa06b61}. Requires device idle.
+I/ckhm    ( 4700): RcsProvisioningTrigger: DR is active, initializing DR provisioning. DUAL_REG
+D/WM-GreedyScheduler( 4700): Starting tracking for 36646bda-42fa-4185-b168-773de9058ced,78842e60-956d-4877-870e-6784eba47381,6e7bea87-29cd-4a06-95f0-cf9d242e862c
+I/AiAiEcho( 1627): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1627): EchoTargets: 
+I/AiAiEcho( 1627): Filtered by AiAi flag check: 
+I/AiAiEcho( 1627): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/BugleRcsEngine( 4700): No RCS Configuration was found in Bugle for simID: redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="ProvisioningEngineDataRetriever" thread_id=72 ]
+D/ExternalStorage( 5007): After updating volumes, found 2 active roots
+I/BugleRcsEngine( 4700): [SR]: Single Registration is disabled. Skipping Single Registration capability check for subId: 1, OS.isAtLeastS:[true], enableSingleRegistrationProvisioning:[false] [CONTEXT thread_id=60 ]
+D/WM-GreedyScheduler( 4700): Cancelling work ID 36646bda-42fa-4185-b168-773de9058ced
+D/BatterySaverPolicy(  817): accessibility changed to true, updating policy.
+I/alsv    ( 2153): NGA disabled due to not being eligible.
+I/BugleRcsEngine( 4700): No RCS Configuration was found in Bugle for simID: redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="ProvisioningEngineDataRetriever" thread_id=60 ]
+W/JobInfo ( 4700): Requested important-while-foreground flag for job1210 is ignored and takes no effect
+D/WM-SystemJobScheduler( 4700): Scheduling work ID 36646bda-42fa-4185-b168-773de9058cedJob ID 1210
+I/BugleRcsEngine( 4700): Scheduled provisioning task with 0 seconds delay, KEEP policy, trigger is APP_STARTUP, workerId is e9ee0bc9-467c-4192-bdb1-612b2701a9ba, simId is redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="provisioning" thread_id=60 ]
+V/AccessibilityManagerService(  817): onUserStateChangedLocked for userId: 0, forceUpdate: false
+I/AiAiEcho( 1627): #remoteViewsTwiddler: feature disabled.
+I/AiAiEcho( 1627): Predicting[0]:  [CONTEXT sampling_count=5 ]
+V/AccessibilityUserState(  817): updateShortcutTargets: type:accessibility_shortcut_target_service, current:{}, new:{}
+V/AccessibilityUserState(  817): updateShortcutTargets: type:accessibility_button_targets, current:{}, new:{}
+V/AccessibilityUserState(  817): updateShortcutTargets: type:accessibility_gesture_targets, current:{}, new:{}
+V/AccessibilityUserState(  817): updateShortcutTargets: type:accessibility_qs_targets, current:{}, new:{}
+V/AccessibilityUserState(  817): updateShortcutTargets: type:accessibility_key_gesture_targets, current:{}, new:{}
+I/AiAiEcho( 1627): EchoTargets: 
+I/AiAiEcho( 1627): Filtered by AiAi flag check: 
+I/AiAiEcho( 1627): [CONTEXT ratelimit_period="10 SECONDS" ]
+W/MagnificationConnectionManager(  817): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+I/AiAiEcho( 1627): #remoteViewsTwiddler: feature disabled.
+I/AiAiEcho( 1627): #postPredictionTargets: Sending updates to UISurface home with targets# 0 (types=[])
+I/AiAiEcho( 1627): #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+I/AiAiEcho( 1627): Settings changed for uri: content://settings/secure/accessibility_enabled
+I/AiAiEcho( 1627): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1627): EchoTargets: 
+I/AiAiEcho( 1627): Filtered by AiAi flag check: 
+I/AiAiEcho( 1627): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/AiAiEcho( 1627): #remoteViewsTwiddler: feature disabled.
+I/AiAiEcho( 1627): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1627): EchoTargets: 
+I/AiAiEcho( 1627): Filtered by AiAi flag check: 
+I/AiAiEcho( 1627): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/AiAiEcho( 1627): #remoteViewsTwiddler: feature disabled.
+I/AiAiEcho( 1627): #postPredictionTargets: Sending updates to UISurface home with targets# 0 (types=[])
+I/AiAiEcho( 1627): #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+D/AccessibilitySourceService( 3526): enabled a11y services count 0
+D/AccessibilitySourceService( 3526): a11y source sending 0 issue to sc
+D/SafetySourceDataValidat(  817): No cert check requested for package com.google.android.permissioncontroller
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 8c5b160a-e59b-449b-b113-e93c7d39179f}. Requires device idle.
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 44eb5204-e215-46cc-8a81-e8836d391501}. Requires device idle.
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 63898424-72da-4d14-a674-875b55c6cad8}. Requires device idle.
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 6e5e838f-4fec-47d3-93be-d796baa06b61}. Requires device idle.
+D/WM-GreedyScheduler( 4700): Starting tracking for 36646bda-42fa-4185-b168-773de9058ced,78842e60-956d-4877-870e-6784eba47381,6e7bea87-29cd-4a06-95f0-cf9d242e862c
+I/WM-WorkerWrapper( 4700): Worker result SUCCESS for Work [ id=a453558b-7448-49f1-b56e-8b3e84e2ce1a, tags={ com.google.android.apps.messaging.shared.datamodel.workqueue.WorkQueueWorkerShim,data_upgrade- } ]
+D/BackgroundInstallControlService(  817): Package event received: 0
+D/WM-Processor( 4700): qcu a453558b-7448-49f1-b56e-8b3e84e2ce1a executed; reschedule = false
+D/WM-SystemJobService( 4700): a453558b-7448-49f1-b56e-8b3e84e2ce1a executed on JobScheduler
+I/Bugle   ( 4700): RcsAvailabilityUtilForProvisioningEngineV2: updateAvailabilityForAllSimsAsync, hint: CSLIB_PHENOTYPE_UPDATE
+I/BugleRcsProvisioning( 4700): updateAvailabilityForAllSimsAsync: scheduling updateAvailabilityForRcsProvisioningId call. Hint: CSLIB_PHENOTYPE_UPDATE, enableWelcomePopupWithoutGoogleTos: false, reshowSuccessPopup: false
+I/BugleRcsProvisioning( 4700): updateRcsAvailabilityForMultipleSims: hint: CSLIB_PHENOTYPE_UPDATE, canReshowWelcomeMessage: false
+V/GrammaticalInflectionUtils(  817): AttributionSource: android.content.AttributionSource@c27950ce does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+D/WM-GreedyScheduler( 4700): Cancelling work ID a453558b-7448-49f1-b56e-8b3e84e2ce1a
+D/nativeloader( 5022): Configuring clns-shared-9 for other apk /apex/com.android.rkpd/priv-app/rkpdapp.google@361040400/rkpdapp.google.apk. target_sdk_version=36, uses_libraries=, library_path=/apex/com.android.rkpd/priv-app/rkpdapp.google@361040400/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.rkpdapp:/apex/com.android.rkpd/priv-app/rkpdapp.google@361040400:/system/lib64:/system_ext/lib64
+D/nativeloader( 5022): InitApexLibraries:
+D/nativeloader( 5022):   com_android_adservices: libhpke_jni.so:libtflite_support_classifiers_native.so
+D/nativeloader( 5022):   com_android_appsearch: libappsearchservice.so:libicing_anywhere.so
+D/nativeloader( 5022):   com_android_art: libartservice.so
+D/nativeloader( 5022):   com_android_bt: libbluetooth_jni.so
+D/nativeloader( 5022):   com_android_conscrypt: libjavacrypto.so
+D/nativeloader( 5022):   com_android_mediaprovider: libpdfclient.so
+D/nativeloader( 5022):   com_android_nfcservices: libnfc_nci_jni.so
+D/nativeloader( 5022):   com_android_ondevicepersonalization: libfcp_cpp_dep_jni.so:libfcp_hpke_jni.so
+D/nativeloader( 5022):   com_android_os_statsd: libstats_jni.so
+D/nativeloader( 5022):   com_android_tethering: libandroid_net_connectivity_com_android_net_module_util_jni.so:libandroid_net_connectivity_com_android_net_module_util_jni_CommonConnectivityJni.so:libframework-connectivity-jni.so:libframework-connectivity-tiramisu-jni.so:libmainlinecronet.140.0.7259.0.so:libservice-connectivity.so:libservice-thread-jni.so:stable_cronet_libcrypto.so:stable_cronet_libssl.so
+D/nativeloader( 5022):   com_android_uwb: libuwb_uci_jni_rust.so
+D/nativeloader( 5022):   com_android_virt: libvirtualizationservice_jni.so:libvirtualmachine_jni.so
+D/nativeloader( 5022):   com_android_wifi: lib
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 8c5b160a-e59b-449b-b113-e93c7d39179f}. Requires device idle.
+D/Zygote  (  579): Forked child process 5036
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 44eb5204-e215-46cc-8a81-e8836d391501}. Requires device idle.
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 63898424-72da-4d14-a674-875b55c6cad8}. Requires device idle.
+D/WM-GreedyScheduler( 4700): Ignoring {WorkSpec: 6e5e838f-4fec-47d3-93be-d796baa06b61}. Requires device idle.
+D/WM-GreedyScheduler( 4700): Starting tracking for 36646bda-42fa-4185-b168-773de9058ced,78842e60-956d-4877-870e-6784eba47381,6e7bea87-29cd-4a06-95f0-cf9d242e862c
+I/ActivityManager(  817): Start proc 5036:android.process.media/u0a103 for content provider {com.android.mtp/com.android.mtp.MtpDocumentsProvider}
+I/BugleRcsEngine( 4700): [SR]: Single Registration is disabled. Skipping Single Registration capability check for subId: 1, OS.isAtLeastS:[true], enableSingleRegistrationProvisioning:[false] [CONTEXT thread_id=60 ]
+I/BugleRcsEngine( 4700): No RCS Configuration was found in Bugle for simID: redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="ProvisioningEngineDataRetriever" thread_id=60 ]
+I/BugleRcsProvisioning( 4700): RcsAvailability configuration availability and enabled status: simId: redacted-pii:sim_id[chars:20,last3:897], SipConnectionType: DUAL_REG, isConfigurationAvailableAndEnabled: false
+I/BugleRcsProvisioning( 4700): Checking isConfigServerUrlAvailable with simId: redacted-pii:sim_id[chars:20,last3:897], 
+I/BugleRcsEngine( 4700): getConfigServerUrl with simId: redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="ProvisioningServerUtil" thread_id=60 ]
+I/BugleRcsEngine( 4700): Using config server URL from cebl [CONTEXT log_prefix="ProvisioningServerUtil" thread_id=60 ]
+I/BugleRcsProvisioning( 4700): RcsAvailability: Subscription Id: 1, simId: redacted-pii:sim_id[chars:20,last3:897], sipConnectionType: DUAL_REG, isRcsAvailable: false
+I/BugleRcsEngine( 4700): No RCS Configuration was found in Bugle for simID: redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="ProvisioningEngineDataRetriever" thread_id=60 ]
+I/BugleRcsProvisioning( 4700): updateAvailabilityForRcsProvisioningId. SimId: redacted-pii:sim_id[chars:20,last3:897], currentAvailability: 10, newAvailability: 10, hint: CSLIB_PHENOTYPE_UPDATE
+W/SsPagerDots( 1072): Total number of pages invalid: 0. Assuming 1 page.
+I/BugleRcsProvisioning( 4700): scheduleProvisioningForEligibleSims
+I/ckhm    ( 4700): scheduleProvisioningForEligibleSims: operationTrigger: 2 bugle trigger event: 9
+I/ckhm    ( 4700): scheduleProvisioningForAllEligibleSims: operationTrigger: 2 bugle trigger event: 9
+I/ckhm    ( 4700): scheduleProvisioningForRcsProvisioningId: rcsProvisioningId: redacted-pii:sim_id[chars:20,last3:897] operationTrigger: 2 bugle trigger event: 9
+I/RcsProvisioningManager( 4700): Receive onRcsAvailabilityUpdate, SIM = redacted-pii:sim_id[chars:20,last3:897], availability = RcsAvailability{mAvailability=CARRIER_SETUP_PENDING (Carrier RCS is not set up)}
+I/Zygote  ( 5036): Process 5036 created for android.process.media
+I/d.process.media( 5036): Using CollectorTypeCMC GC.
+I/BugleRcsEngine( 4700): [SR]: Single Registration is disabled. Skipping Single Registration capability check for subId: 1, OS.isAtLeastS:[true], enableSingleRegistrationProvisioning:[false] [CONTEXT thread_id=60 ]
+W/d.process.media( 5036): Unexpected CPU variant for x86: x86_64.
+W/d.process.media( 5036): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+I/ckhm    ( 4700): RcsProvisioningTrigger: DR is active, initializing DR provisioning. DUAL_REG
+I/RcsProvisioningManager( 4700): <redacted> : Notify RcsProvisioningChangeListener cejo@4c9c159 onRcsProvisioningChange, SIM = redacted-pii:sim_id[chars:35,last3:97)], available rcs provisioning ids  = 
+I/RcsProvisioningManager( 4700): Cannot notify RcsVerifiedPhoneNumberListener because current availability is CARRIER_SETUP_PENDING instead of AVAILABLE.
+I/RcsProvisioningManager( 4700): <redacted> : Notify RcsProvisioningChangeListener dawc@bdea1a0 onRcsProvisioningChange, SIM = redacted-pii:sim_id[chars:35,last3:97)], available rcs provisioning ids  = 
+I/RcsProvisioningManager( 4700): AvailabilityObserver.onUpdate : Notify RcsAvailabilityListener cozm@b5e27cf onRcsAvailabilityUpdate, SIM = redacted-pii:sim_id[chars:20,last3:897], availability = 10
+D/WM-GreedyScheduler( 4700): Constraints not met: Cancelling work ID WorkGenerationalId(workSpecId=78842e60-956d-4877-870e-6784eba47381, generation=12)
+I/BugleTransport( 4700): Retrieved RCS available simIds: []
+I/BugleTransport( 4700): Deregister all SIMs except for SIMs with subIds: [] from chat transport: SINGLE_REGISTRATION.
+D/WM-GreedyScheduler( 4700): Constraints not met: Cancelling work ID WorkGenerationalId(workSpecId=36646bda-42fa-4185-b168-773de9058ced, generation=12)
+I/BugleTransport( 4700): Deregister all SIMs except for SIMs with subIds: [] from chat transport: DUAL_REGISTRATION.
+I/BugleRcsEngine( 4700): [SR]: Single Registration is disabled. Skipping Single Registration capability check for subId: 1, OS.isAtLeastS:[true], enableSingleRegistrationProvisioning:[false] [CONTEXT thread_id=53 ]
+W/RcsClientLib( 4700): Service is deprecated skipping connection attempt: RcsEngineLifecycleServiceV2
+W/RcsClientLib( 4700): Service is deprecated skipping connection attempt: RcsEngineLifecycleServiceV2
+E/BugleRcs( 4700): RcsEngineLifecycleManagerV2: RcsServiceConnectionException was raised while waiting to connect to RcsEngineLifecycleServiceV2
+E/BugleRcs( 4700): crsk: RcsServiceConnectionException:com.google.android.rcs.client.lifecycle.RcsEngineLifecycleServiceV2:UNKNOWN
+E/BugleRcs( 4700): 	at crrr.a(PG:54)
+E/BugleRcs( 4700): 	at kol.a(PG:19)
+E/BugleRcs( 4700): 	at crrs.a(PG:14)
+E/BugleRcs( 4700): 	at eiht.a(PG:13)
+E/BugleRcs( 4700): 	at eota.a(PG:3)
+E/BugleRcs( 4700): 	at eory.run(PG:19)
+E/BugleRcs( 4700): 	at eotc.run(PG:5)
+E/BugleRcs( 4700): 	at dqkn.run(PG:7)
+E/BugleRcs( 4700): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1154)
+E/BugleRcs( 4700): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:652)
+E/BugleRcs( 4700): 	at dqju.run(PG:6)
+E/BugleRcs( 4700): 	at java.lang.Thread.run(Thread.java:1563)
+E/BugleRcs( 4700): 	at dqlo.run(PG:61)
+I/BugleRcsEngine( 4700): No RCS Configuration was found in Bugle for simID: redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="ProvisioningEngineDataRetriever" thread_id=72 ]
+E/BugleRcs( 4700): RcsEngineLifecycleManagerV2: RcsServiceConnectionException was raised while waiting to connect to RcsEngineLifecycleServiceV2
+E/BugleRcs( 4700): crsk: RcsServiceConnectionException:com.google.android.rcs.client.lifecycle.RcsEngineLifecycleServiceV2:UNKNOWN
+E/BugleRcs( 4700): 	at crrr.a(PG:54)
+E/BugleRcs( 4700): 	at kol.a(PG:19)
+E/BugleRcs( 4700): 	at crrs.a(PG:14)
+E/BugleRcs( 4700): 	at eiht.a(PG:13)
+E/BugleRcs( 4700): 	at eota.a(PG:3)
+E/BugleRcs( 4700): 	at eory.run(PG:19)
+E/BugleRcs( 4700): 	at eotc.run(PG:5)
+E/BugleRcs( 4700): 	at dqkn.run(PG:7)
+E/BugleRcs( 4700): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1154)
+E/BugleRcs( 4700): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:652)
+E/BugleRcs( 4700): 	at dqju.run(PG:6)
+E/BugleRcs( 4700): 	at java.lang.Thread.run(Thread.java:1563)
+E/BugleRcs( 4700): 	at dqlo.run(PG:61)
+I/BugleTransport( 4700): Deregister all SIMs except for SIMs with subIds: [] from chat transport: TACHYGRAM.
+I/BugleRcsEngine( 4700): No RCS Configuration was found in Bugle for simID: redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="ProvisioningEngineDataRetriever" thread_id=53 ]
+D/nativeloader( 5036): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+I/BugleRcsProvisioning( 4700): RcsProvisioningTrigger: onRcsAvailabilityUpdate : isPreviousDisabled = true, isCurrentDisabled = false, config[simId:redacted-pii:sim_id[chars:20,last3:897]] = [Type: 0, Version: 0, Validity: 0, Last updated: 0, Remaining validity: 0, Reconfiguration requested: false, Messaging technology: SIMPLE_IM, rcsVolteSingleRegistration: falseInvalid configreason: INVALID_CONFIG_REASON_UNSPECIFIED], hasToken: false, isValidAndUpdated: false
+V/GraphicsEnvironment( 5022): Currently set values for:
+V/GraphicsEnvironment( 5022):   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment( 5022):   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment( 5022): com.google.android.rkpdapp is not listed in per-application setting
+V/GraphicsEnvironment( 5022): ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+V/GraphicsEnvironment( 5022): com.google.android.rkpdapp is not listed in ANGLE allowlist or settings, returning default
+V/GraphicsEnvironment( 5022): Neither updatable production driver nor prerelease driver is supported.
+I/BugleRcsProvisioning( 4700): RcsProvisioningTrigger: Schedule KEEP provision when trigger configuration not valid
+I/BugleRcsProvisioning( 4700): scheduleProvisioningForRcsProvisioningId rcsProvisioningId: redacted-pii:sim_id[chars:35,last3:97)], provisioningTriggerEvent: 0
+D/AccessibilityManagerService(  817): .getAccessibilityShortcutTargets {shortcutType=32, userId=0}
+D/WM-WrkMgrInitializer( 5022): Initializing WorkManager with default configuration.
+I/ckhm    ( 4700): scheduleProvisioningForRcsProvisioningId: rcsProvisioningId: redacted-pii:sim_id[chars:20,last3:897] operationTrigger: 6 bugle trigger event: 0
+I/BugleRcsProvisioning( 4700): RcsProvisioningTrigger: onRcsAvailabilityUpdate : availability is updated to Carrier RCS is not set up, lastAvailabilityLocal is Carrier RCS is not set up, simId hash = -3996307846450650572, simId = redacted-pii:sim_id[chars:20,last3:897], isPev3Enabled = true
+I/BugleRcsEngine( 4700): [SR]: Single Registration is disabled. Skipping Single Registration capability check for subId: 1, OS.isAtLeastS:[true], enableSingleRegistrationProvisioning:[false] [CONTEXT thread_id=60 ]
+I/ckhm    ( 4700): RcsProvisioningTrigger: DR is active, initializing DR provisioning. DUAL_REG
+I/BugleRcsProvisioning( 4700): RcsProvisioningTrigger: onRcsAvailabilityUpdate : availability is updated to Carrier RCS is not set up, lastAvailabilityLocal is Carrier RCS is not set up, simId hash = -3996307846450650572, simId = redacted-pii:sim_id[chars:20,last3:897], isPev3Enabled = true
+W/SsPagerDots( 1072): Total number of pages invalid: 0. Assuming 1 page.
+I/BugleRcsEngine( 4700): [SR]: Single Registration is disabled. Skipping Single Registration capability check for subId: 1, OS.isAtLeastS:[true], enableSingleRegistrationProvisioning:[false] [CONTEXT thread_id=72 ]
+D/WM-PackageManagerHelper( 5022): Skipping component enablement for androidx.work.impl.background.systemjob.SystemJobService
+D/WM-Schedulers( 5022): Created SystemJobScheduler and enabled SystemJobService
+D/WM-ForceStopRunnable( 5022): The default process name was not specified.
+I/BugleClearcutLogger( 4700): qosTierResolver for LOG_SPEC_TRIGGER_EVENT_WHEN_CARRIER_SETUP_PENDING is null. Using DEFAULT QoS tier as there's no specific QoS configuration for this log spec.
+D/WM-ForceStopRunnable( 5022): Performing cleanup operations.
+D/nativeloader( 5036): Configuring clns-shared-9 for other apk /system/priv-app/MtpService/MtpService.apk. target_sdk_version=36, uses_libraries=, library_path=/system/priv-app/MtpService/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.android.mtp:/system/priv-app/MtpService:/system/lib64:/system_ext/lib64
+V/GrammaticalInflectionUtils(  817): AttributionSource: android.content.AttributionSource@8198165e does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+I/RkpdBroadcast( 5022): Caught package_removed intent, waking up.
+I/RkpdBroadcast( 5022): Caught package_removed intent, waking up.
+I/BugleRcsEngine( 4700): Scheduled provisioning task with 0 seconds delay, KEEP policy, trigger is CSLIB_PHENOTYPE_UPDATE, workerId is 700e033e-cab5-47a5-87cd-b129ca999768, simId is redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="provisioning" thread_id=53 ]
+E/ashmem  ( 5022): Pinning is deprecated since Android Q. Please use trim or other methods.
+I/BugleRcsEngine( 4700): No RCS Configuration was found in Bugle for simID: redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="ProvisioningEngineDataRetriever" thread_id=72 ]
+I/BugleRcsEngine( 4700): Scheduled provisioning task with 0 seconds delay, KEEP policy, trigger is UNDEFINED_TRIGGER_EVENT, workerId is 71fece74-373b-4e17-bb88-13e982338d92, simId is redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="provisioning" thread_id=72 ]
+D/Zygote  (  579): Forked child process 5051
+I/ActivityManager(  817): Start proc 5051:com.google.android.adservices.api/u0a215 for broadcast {com.google.android.adservices.api/com.android.adservices.service.common.PackageChangedReceiver}
+I/RkpdBroadcast( 5022): Deleted associated keys for uid: 10219
+I/RkpdBroadcast( 5022): Deleted associated keys for uid: 10220
+D/WM-SystemJobScheduler( 5022): Reconciling jobs
+V/GraphicsEnvironment( 5036): Currently set values for:
+V/GraphicsEnvironment( 5036):   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment( 5036):   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment( 5036): com.android.mtp is not listed in per-application setting
+V/GraphicsEnvironment( 5036): ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+V/GraphicsEnvironment( 5036): com.android.mtp is not listed in ANGLE allowlist or settings, returning default
+V/GraphicsEnvironment( 5036): Neither updatable production driver nor prerelease driver is supported.
+I/Zygote  ( 5051): Process 5051 created for com.google.android.adservices.api
+I/.adservices.api( 5051): Using CollectorTypeCMC GC.
+W/.adservices.api( 5051): Unexpected CPU variant for x86: x86_64.
+W/.adservices.api( 5051): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+D/WM-ForceStopRunnable( 5022): Found unfinished work, scheduling it.
+D/nativeloader( 5051): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+E/ashmem  ( 5036): Pinning is deprecated since Android Q. Please use trim or other methods.
+W/JobInfo ( 5022): Requested important-while-foreground flag for job24 is ignored and takes no effect
+D/WM-SystemJobScheduler( 5022): Scheduling work ID c8d60e6f-960b-43cc-b9fd-3fb6a722e15eJob ID 24
+D/WM-GreedyScheduler( 5022): Starting tracking for c8d60e6f-960b-43cc-b9fd-3fb6a722e15e
+D/ApplicationLoaders( 5051): Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+D/ApplicationLoaders( 5051): Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar
+D/WM-ConstraintTracker( 5022): BatteryChargingTracker: initial state = false
+D/WM-BrdcstRcvrCnstrntTrc( 5022): BatteryChargingTracker: registering receiver
+D/WM-ConstraintTracker( 5022): BatteryNotLowTracker: initial state = true
+D/WM-BrdcstRcvrCnstrntTrc( 5022): BatteryNotLowTracker: registering receiver
+D/WM-ConstraintTracker( 5022): NetworkStateTracker24: initial state = NetworkState(isConnected=true, isValidated=true, isMetered=false, isNotRoaming=true)
+D/WM-NetworkStateTracker( 5022): Registering network callback
+D/nativeloader( 5036): Configuring clns-shared-10 for other apk /system/priv-app/DownloadProvider/DownloadProvider.apk. target_sdk_version=36, uses_libraries=, library_path=/system/priv-app/DownloadProvider/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.android.providers.downloads:/system/priv-app/DownloadProvider:/system/lib64:/system_ext/lib64
+D/ConnectivityService(  817): requestNetwork for uid/pid:10191/5022 activeRequest: null callbackRequest: 199 [NetworkRequest [ REQUEST id=200, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10191 RequestorUid: 10191 RequestorPkg: com.google.android.rkpdapp UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647 isUidTracked: false declaredMethods: AVAIL|LOST|NC
+D/nativeloader( 5051): Configuring clns-shared-9 for other apk /apex/com.android.adservices/priv-app/AdServicesApkGoogle@361040400/AdServicesApkGoogle.apk. target_sdk_version=36, uses_libraries=, library_path=/apex/com.android.adservices/priv-app/AdServicesApkGoogle@361040400/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.adservices.api:/apex/com.android.adservices/priv-app/AdServicesApkGoogle@361040400:/system/lib64:/system_ext/lib64
+D/nativeloader( 5051): InitApexLibraries:
+D/nativeloader( 5051):   com_android_adservices: libhpke_jni.so:libtflite_support_classifiers_native.so
+D/nativeloader( 5051):   com_android_appsearch: libappsearchservice.so:libicing_anywhere.so
+D/nativeloader( 5051):   com_android_art: libartservice.so
+D/nativeloader( 5051):   com_android_bt: libbluetooth_jni.so
+D/nativeloader( 5051):   com_android_conscrypt: libjavacrypto.so
+D/nativeloader( 5051):   com_android_mediaprovider: libpdfclient.so
+D/nativeloader( 5051):   com_android_nfcservices: libnfc_nci_jni.so
+D/nativeloader( 5051):   com_android_ondevicepersonalization: libfcp_cpp_dep_jni.so:libfcp_hpke_jni.so
+D/nativeloader( 5051):   com_android_os_statsd: libstats_jni.so
+D/nativeloader( 5051):   com_android_tethering: libandroid_net_connectivity_com_android_net_module_util_jni.so:libandroid_net_connectivity_com_android_net_module_util_jni_CommonConnectivityJni.so:libframework-connectivity-jni.so:libframework-connectivity-tiramisu-jni.so:libmainlinecronet.140.0.7259.0.so:libservice-connectivity.so:libservice-thread-jni.so:stable_cronet_libcrypto.so:stable_cronet_libssl.so
+D/nativeloader( 5051):   com_android_uwb: libuwb_uci_jni_rust.so
+D/nativeloader( 5051):   com_android_virt: libvirtualizationservice_jni.so:libvirtualmachine_jni.so
+D/nativeloader( 5051):   com_android_wifi: lib
+D/WM-PackageManagerHelper( 5022): Skipping component enablement for androidx.work.impl.background.systemalarm.RescheduleReceiver
+D/WM-NetworkStateTracker( 5022): Network capabilities changed: [ Transports: WIFI Capabilities: NOT_METERED&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&VALIDATED&NOT_ROAMING&FOREGROUND&NOT_CONGESTED&NOT_SUSPENDED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED LinkUpBandwidth>=12000Kbps LinkDnBandwidth>=30000Kbps TransportInfo: <SSID: <unknown ssid>, BSSID: 02:00:00:00:00:00, MAC: 02:00:00:00:00:00, IP: /10.0.2.16, Security type: 0, Supplicant state: COMPLETED, Wi-Fi standard: legacy, RSSI: -50, Link speed: 2Mbps, Tx Link speed: 2Mbps, Max Supported Tx Link speed: 11Mbps, Rx Link speed: -1Mbps, Max Supported Rx Link speed: 11Mbps, Frequency: 2447MHz, Net ID: -1, Metered hint: false, score: 83, isUsable: true, CarrierMerged: false, SubscriptionId: -1, IsPrimary: -1, Trusted: true, Restricted: false, Ephemeral: false, OEM paid: false, OEM private: false, OSU AP: false, FQDN: <none>, Provider friendly name: <none>, Requesting package name: <none><none>MLO Information: , Is TID-To-Link negotiation supported by the AP: false, AP MLD Address: <none>, AP MLO Link Id: <none>, AP MLO Affiliated links: <none>, Vendor Data: <none>> SignalStrength: -50 UnderlyingNetworks: Null]
+D/WM-GreedyScheduler( 5022): Constraints not met: Cancelling work ID WorkGenerationalId(workSpecId=c8d60e6f-960b-43cc-b9fd-3fb6a722e15e, generation=0)
+D/WifiNetworkFactory(  817): got request NetworkRequest [ REQUEST id=200, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10191 RequestorUid: 10191 RequestorPkg: com.google.android.rkpdapp UnderlyingNetworks: Null] ]
+D/ConnectivityService(  817): NetReassign [200 : null → 100] [c 0] [a 5] [i 16]
+D/UntrustedWifiNetworkFactory(  817): got request NetworkRequest [ REQUEST id=200, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10191 RequestorUid: 10191 RequestorPkg: com.google.android.rkpdapp UnderlyingNetworks: Null] ]
+D/OemPaidWifiNetworkFactory(  817): got request NetworkRequest [ REQUEST id=200, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10191 RequestorUid: 10191 RequestorPkg: com.google.android.rkpdapp UnderlyingNetworks: Null] ]
+D/MultiInternetWifiNetworkFactory(  817): got request NetworkRequest [ REQUEST id=200, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10191 RequestorUid: 10191 RequestorPkg: com.google.android.rkpdapp UnderlyingNetworks: Null] ]
+V/GraphicsEnvironment( 5051): Currently set values for:
+V/GraphicsEnvironment( 5051):   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment( 5051):   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment( 5051): com.google.android.adservices.api is not listed in per-application setting
+V/GraphicsEnvironment( 5051): ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+V/GraphicsEnvironment( 5051): com.google.android.adservices.api is not listed in ANGLE allowlist or settings, returning default
+V/GraphicsEnvironment( 5051): Neither updatable production driver nor prerelease driver is supported.
+D/nativeloader( 5036): Configuring clns-shared-11 for other apk /system/priv-app/MediaProviderLegacy/MediaProviderLegacy.apk. target_sdk_version=36, uses_libraries=, library_path=/system/priv-app/MediaProviderLegacy/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.android.providers.media:/system/priv-app/MediaProviderLegacy:/system/lib64:/system_ext/lib64
+I/ApplicationContextProvider( 5051): onCreate(): setting application context from android.app.Application@ece691
+I/adservices-shared( 5051): set(): set singleton context as android.app.Application@ece691
+D/BackgroundInstallControlService(  817): Package event received: 0
+D/WifiNl80211Manager(  817): Scan result ready event
+D/WifiNative(  817): Scan result ready event
+I/WifiScanner( 1414): onFullResults
+E/ashmem  ( 5051): Pinning is deprecated since Android Q. Please use trim or other methods.
+I/HalDevMgr(  817): bestIfaceCreationProposal is null, requestIface=STA, existingIface=[name=wlan0 type=STA]
+D/BackgroundInstallControlService(  817): Package event received: 0
+I/adservices( 5051): Setting AdServicesManager static context as android.app.Application@ece691
+D/TileServices( 1072): Couldn't find tile for ComponentInfo{com.google.android.apps.wellbeing/com.google.android.apps.wellbeing.focusmode.quicksettings.FocusModeTileService}(0)
+W/.apps.wellbeing( 2317): Suspending all threads took: 5.165ms
+D/BoundBrokerSvc( 1740): onUnbind: Intent { act=com.google.android.gms.potokens.service.START dat=chimera-action:/... xflg=0x4 cmp=com.google.android.gms/.chimera.GmsApiService }
+I/AccessibilityNodeInfoDumper( 4931): Skipping invisible child: android.view.accessibility.AccessibilityNodeInfo@294ba; boundsInParent: Rect(0, 0 - 1080, 0); boundsInScreen: Rect(0, 0 - 1080, 0); boundsInWindow: Rect(0, 0 - 1080, 0); packageName: com.buffago.app; className: android.widget.LinearLayout; text: null; error: null; maxTextLength: -1; stateDescription: null; contentDescription: null; tooltipText: null; containerTitle: null; viewIdResName: null; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; granularScrollingSupported: false; importantForAccessibility: false; visible: false; actions: [AccessibilityAction: ACTION_SELECT - null, AccessibilityAction: ACTION_CLEAR_SELECTION - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_SHOW_ON_SCREEN - null]; isTextSelectable: false
+I/AccessibilityNodeInfoDumper( 4931): Skipping invisible child: android.view.accessibility.AccessibilityNodeInfo@290f9; boundsInParent: Rect(0, 0 - 1080, 0); boundsInScreen: Rect(0, 0 - 1080, 0); boundsInWindow: Rect(0, 0 - 1080, 0); packageName: com.buffago.app; className: android.view.ViewGroup; text: null; error: null; maxTextLength: -1; stateDescription: null; contentDescription: null; tooltipText: null; containerTitle: null; viewIdResName: null; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; granularScrollingSupported: false; importantForAccessibility: false; visible: false; actions: [AccessibilityAction: ACTION_SELECT - null, AccessibilityAction: ACTION_CLEAR_SELECTION - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_SHOW_ON_SCREEN - null]; isTextSelectable: false
+D/TileServices( 1072): Couldn't find tile for ComponentInfo{com.google.android.apps.wellbeing/com.google.android.apps.wellbeing.focusmode.quicksettings.FocusModeTileService}(0)
+D/IpClient/wlan0( 1148): interfaceLinkStateChanged: ifindex 16 down
+W/AccessibilityNodeInfoDumper( 4931): Fetch time: 168ms
+V/AccessibilityManagerService(  817): onUserStateChangedLocked for userId: 0, forceUpdate: false
+V/AccessibilityUserState(  817): updateShortcutTargets: type:accessibility_shortcut_target_service, current:{}, new:{}
+V/AccessibilityUserState(  817): updateShortcutTargets: type:accessibility_button_targets, current:{}, new:{}
+V/AccessibilityUserState(  817): updateShortcutTargets: type:accessibility_gesture_targets, current:{}, new:{}
+V/AccessibilityUserState(  817): updateShortcutTargets: type:accessibility_qs_targets, current:{}, new:{}
+V/AccessibilityUserState(  817): updateShortcutTargets: type:accessibility_key_gesture_targets, current:{}, new:{}
+W/MagnificationConnectionManager(  817): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+D/AccessibilityManagerService(  817): restoreCurrentUserForTestAutomationIfNeededLocked(): ignoring because device doesn't support visible background users
+I/AiAiEcho( 1627): Settings changed for uri: content://settings/secure/accessibility_enabled
+I/AiAiEcho( 1627): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1627): EchoTargets: 
+I/AiAiEcho( 1627): Filtered by AiAi flag check: 
+I/AiAiEcho( 1627): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/AiAiEcho( 1627): #remoteViewsTwiddler: feature disabled.
+D/AndroidRuntime( 4931): Shutting down VM
+I/AiAiEcho( 1627): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1627): EchoTargets: 
+I/AiAiEcho( 1627): Filtered by AiAi flag check: 
+I/AiAiEcho( 1627): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/wificond(  724): Regulatory domain changed to country: 00 on wiphy_index: 1
+I/wificond(  724): UpdateBandInfo
+D/WifiNl80211Manager(  817): OnRegDomainChanged 00
+D/WifiNative(  817): onCountryCodeChanged: 00
+I/WifiCountryCode(  817): Receive onDriverCountryCodeChanged 00
+W/libbinder.IPCThreadState( 4931): call to talkWithDriver in joinThreadPool returned error: -9 (Bad file descriptor), FD: -1
+W/libbinder.IPCThreadState( 4931): call to talkWithDriver in joinThreadPool returned error: -9 (Bad file descriptor), FD: -1
+W/libbinder.IPCThreadState( 4931): call to talkWithDriver in joinThreadPool returned error: -9 (Bad file descriptor), FD: -1
+I/wpa_supplicant( 1052): wlan0: CTRL-EVENT-DISCONNECTED bssid=00:13:10:85:fe:01 reason=4 locally_generated=1
+I/AiAiEcho( 1627): #remoteViewsTwiddler: feature disabled.
+I/wificond(  724): 2.4Ghz frequencies: 2412 2417 2422 2427 2432 2437 2442 2447 2452 2457 2462 2467 2472 2484
+I/wificond(  724): 5Ghz non-DFS frequencies:
+I/wificond(  724): 5Ghz DFS frequencies: 5180 5200 5220 5240 5260 5280 5300 5320 5500 5520 5540 5560 5580 5600 5620 5640 5660 5680 5700 5745 5765 5785 5805 5825
+I/wificond(  724): 6Ghz frequencies:
+I/wificond(  724): 60Ghz frequencies:
+I/AiAiEcho( 1627): #postPredictionTargets: Sending updates to UISurface home with targets# 0 (types=[])
+I/AiAiEcho( 1627): #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+D/BatterySaverPolicy(  817): accessibility changed to false, updating policy.
+I/alsv    ( 2153): NGA disabled due to not being eligible.
+I/wpa_supplicant( 1052): assoc key_mgmt 0x4 network key_mgmt 0x4
+W/SsPagerDots( 1072): Total number of pages invalid: 0. Assuming 1 page.
+E/WifiStaIfaceAidlImpl(  817): stopRssiMonitoring failed with service-specific exception: android.os.ServiceSpecificException:  (code 5)
+E/WifiStaIfaceAidlImpl(  817): setRoamingState failed with service-specific exception: android.os.ServiceSpecificException:  (code 4)
+W/ContextImpl(  817): Calling a method in the system process without a qualified user: android.app.ContextImpl.sendStickyBroadcast:1758 com.android.server.wifi.ClientModeImpl.sendNetworkChangeBroadcast:3171 com.android.server.wifi.ClientModeImpl.lambda$sendNetworkChangeBroadcastWithCurrentState$14:3148 com.android.server.wifi.ClientModeImpl.$r8$lambda$mtuS9ulugUkTxNA_sDDnAioo66w:0 com.android.server.wifi.ClientModeImpl$$ExternalSyntheticLambda13.send:0 
+D/ConnectivityService(  817): [100 WIFI] EVENT_NETWORK_INFO_CHANGED, going from CONNECTED to DISCONNECTED
+D/ConnectivityService(  817): [100 WIFI] disconnected, was satisfying 75
+D/WifiClientModeImpl[36835:wlan0](  817): ClientModeImpl: Leaving Connected state
+D/WifiCountryCode(  817): evaluateAllCmmStateAndApplyIfAllReady: {ConcreteClientModeManager{id=36227 iface=wlan0 role=ROLE_CLIENT_PRIMARY}=true}
+D/SupplicantStaIfaceHalAidlImpl(  817): Remove fallback ssids to avoid endless loop
+I/WifiClientModeImpl[36835:wlan0](  817): disconnectedstate enter
+E/WifiScoringParams(  817): Invalid frequency(-1), using 5G as default rssi array
+D/WifiNetworkAgent(  817): NetworkAgent: NetworkAgent channel lost
+W/ScanResultUtil(  817): Empty or null ScanResult list
+W/WifiService(  817): Attempt to retrieve WifiConfiguration with invalid scanResult List
+W/ScanResultUtil(  817): Empty or null ScanResult list
+E/WifiService(  817): Attempt to retrieve passpoint with invalid scanResult List
+W/ScanResultUtil(  817): Empty or null ScanResult list
+W/WifiService(  817): Attempt to retrieve OsuProviders with invalid scanResult List
+W/AlarmManager( 1148): Unrecognized alarm listener com.android.networkstack.android.net.ip.IpClientLinkObserver$Dhcp6PdPreferredPrefixAlarmListener@b6a0731
+D/DhcpClient( 1148): doQuit
+E/WifiStaIfaceAidlImpl(  817): setDtimMultiplier failed with service-specific exception: android.os.ServiceSpecificException:  (code 4)
+D/UpstreamNetworkMonitor( 1148): Lost default Internet network: 100
+I/GnssNetworkConnectivityHandler(  817): Network connection lost. Available networks count: 1
+I/GnssNetworkConnectivityHandler(  817): updateNetworkState, state=CLOSED, connected=false, network=100, capabilityFlags=3, availableNetworkCount: 1
+D/ONSProfileActivator( 1217): Internet connection lost
+D/SatelliteController( 1217): EVENT_WIFI_CONNECTIVITY_STATE_CHANGED: mIsWifiConnected=false
+E/SatelliteController( 1217): registerForSatelliteCommunicationAccessStateChanged: SatelliteManager is null
+D/SatelliteController( 1217): isCarrierRoamingNtnEligible: satellite access is not allowed
+D/SatelliteController( 1217): evaluateCarrierRoamingNtnEligibilityChange: isCarrierRoamingNtnEligible=false
+D/SatelliteController( 1217): getSelectedSatelliteSubId: subId=-1
+D/SatelliteController( 1217): notifyNtnEligibility: phoneId=0 currentNtnEligibility=false
+I/bpgl    ( 2153): #onLost()
+D/DhcpClient( 1148): DHCP Packet Handler stopped
+D/DhcpClient( 1148): onQuitting
+I/Finsky:background( 3093): [64] IQ: Internet connection lost.
+E/unknown:ReconnectingWebSocket( 4199): Error occurred, shutting down websocket connection: Websocket exception
+E/unknown:ReconnectingWebSocket( 4199): java.net.SocketException: Software caused connection abort
+E/unknown:ReconnectingWebSocket( 4199): 	at java.net.SocketInputStream.socketRead0(Native Method)
+E/unknown:ReconnectingWebSocket( 4199): 	at java.net.SocketInputStream.socketRead(SocketInputStream.java:118)
+E/unknown:ReconnectingWebSocket( 4199): 	at java.net.SocketInputStream.read(SocketInputStream.java:173)
+E/unknown:ReconnectingWebSocket( 4199): 	at java.net.SocketInputStream.read(SocketInputStream.java:143)
+E/unknown:ReconnectingWebSocket( 4199): 	at okio.InputStreamSource.read(JvmOkio.kt:93)
+E/unknown:ReconnectingWebSocket( 4199): 	at okio.AsyncTimeout$source$1.read(AsyncTimeout.kt:153)
+E/unknown:ReconnectingWebSocket( 4199): 	at okio.RealBufferedSource.request(RealBufferedSource.kt:211)
+E/unknown:ReconnectingWebSocket( 4199): 	at okio.RealBufferedSource.require(RealBufferedSource.kt:204)
+E/unknown:ReconnectingWebSocket( 4199): 	at okio.RealBufferedSource.readByte(RealBufferedSource.kt:214)
+E/unknown:ReconnectingWebSocket( 4199): 	at okhttp3.internal.ws.WebSocketReader.readHeader(WebSocketReader.kt:119)
+E/unknown:ReconnectingWebSocket( 4199): 	at okhttp3.internal.ws.WebSocketReader.processNextFrame(WebSocketReader.kt:102)
+E/unknown:ReconnectingWebSocket( 4199): 	at okhttp3.internal.ws.RealWebSocket.loopReader(RealWebSocket.kt:293)
+E/unknown:ReconnectingWebSocket( 4199): 	at okhttp3.internal.ws.RealWebSocket$connect$1.onResponse(RealWebSocket.kt:195)
+E/unknown:ReconnectingWebSocket( 4199): 	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:519)
+E/unknown:ReconnectingWebSocket( 4199): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1154)
+E/unknown:ReconnectingWebSocket( 4199): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:652)
+E/unknown:ReconnectingWebSocket( 4199): 	at java.lang.Thread.run(Thread.java:1563)
+I/BugleRcsEngine( 1630): Connected state: [2], networkType: [WIFI] [CONTEXT thread_id=55 ]
+D/SatelliteController( 1217): handleCmdUpdateNtnSignalStrengthReporting: ignore request, satellite is disabled
+V/NativeCrypto( 1414): Read error: ssl=0x75f79fc0b918: I/O error during system call, Software caused connection abort
+I/BugleRcsEngine( 1630): handleMessage processing message:[NOTIFY_UPTIME_IGNORE_STATE_CHANGED] with [non-null]:RcsEngineImpl reference [CONTEXT log_prefix="RcsEngineImpl[DUAL_REG]:[1fc5a37b-0a9e]>Handler" thread_id=63 ]
+V/NativeCrypto( 1414): Read error: ssl=0x75f79fc05a98: I/O error during system call, Software caused connection abort
+W/unknown:ReconnectingWebSocket( 4199): Couldn't connect to "ws://10.0.2.2:8081/message?device=sdk_gphone64_x86_64%20-%2016%20-%20API%2036&app=com.buffago.app&clientid=DevLauncherBridgelessDevSupportManager", will silently retry
+W/resolv  (  577): SSL_connect ssl error =5, mark 0xf0064: Software caused connection abort
+W/resolv  (  577): TLS Handshake failed
+W/resolv  (  577): query failed
+W/resolv  (  577): validateDnsTlsServer returned 0 for {10.0.2.3/}
+W/resolv  (  577): Validation failed
+W/AlarmManager( 1148): Unrecognized alarm listener com.android.networkstack.android.net.ip.IpClientLinkObserver$Dhcp6PdPreferredPrefixAlarmListener@b6a0731
+D/WM-NetworkStateTracker( 4700): Network connection lost
+D/WM-NetworkStateTracker( 5022): Network connection lost
+D/NetworkStatsObservers(  817): Registering observer for RequestInfo from pid/uid:817/1000(android) for DataUsageRequest [ requestId=8, networkTemplate=NetworkTemplate: matchRule=MOBILE, matchSubscriberIds=[310260...], matchWifiNetworkKeys=[], metered=YES, defaultNetwork=NO, thresholdInBytes=4833651 ] accessLevel:3
+W/AlarmManager( 1217): Unrecognized alarm listener com.android.internal.telephony.data.AutoDataSwitchController$$ExternalSyntheticLambda1@baf44e3
+D/NetworkStatsObservers(  817): Unregistering RequestInfo from pid/uid:817/1000(android) for DataUsageRequest [ requestId=7, networkTemplate=NetworkTemplate: matchRule=MOBILE, matchSubscriberIds=[310260...], matchWifiNetworkKeys=[], metered=YES, defaultNetwork=NO, thresholdInBytes=4834263 ] accessLevel:3
+I/NearbyPresence( 1414): (REDACTED) NetworkMonitorImpl onLost %s
+I/NearbyMediums( 1414): WifiLanConnectivityInfo is changed, should notify.
+D/ConnectivityService(  817): Sending DISCONNECTED broadcast for type 1 [100 WIFI] isDefaultNetwork=true
+I/NearbyMediums( 1414): [WifiNetworkV2] networkCallback doLost netId:100 wifiStatusChangedCallbacks.size:0
+D/BackgroundInstallControlService(  817): Package event received: 0
+I/NearbyPresence( 1414): (REDACTED) %s: removing devices: %s
+I/NearbyPresence( 1414): (REDACTED) %s verified [==] new request %s equals to the old request
+I/NearbyPresence( 1414): (REDACTED) %s verified [==] new request %s equals to the old request
+I/NearbyPresence( 1414): (REDACTED) %s verified [==] new request %s equals to the old request
+I/NearbyPresence( 1414): (REDACTED) %s verified [==] new request %s equals to the old request
+D/BackgroundInstallControlService(  817): Package event received: 0
+W/ContextImpl(  817): Calling a method in the system process without a qualified user: android.app.ContextImpl.sendStickyBroadcast:1758 android.net.connectivity.com.android.server.ConnectivityService.sendStickyBroadcast:4326 android.net.connectivity.com.android.server.ConnectivityService.sendLegacyNetworkBroadcast:13076 android.net.connectivity.com.android.server.ConnectivityService$LegacyTypeTracker.remove:1398 android.net.connectivity.com.android.server.ConnectivityService$LegacyTypeTracker.remove:1415 
+V/NativeCrypto( 1414): SSL shutdown failed: ssl=0x75f79fc0b918: I/O error during system call, Broken pipe
+D/ConnectivityService(  817): Switching to new default network for: uid/pid:1000/817 activeRequest: 1 callbackRequest: 1 [NetworkRequest [ REQUEST id=1, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED RequestorUid: 1000 RequestorPkg: android UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647 isUidTracked: false declaredMethods: NONE using NetworkAgentInfo{network{101}  handle{437197393933}  ni{MOBILE[LTE] CONNECTED extra: epc.tmobile.com} created=2026-07-24T20:48:59.561Z Score(Policies : TRANSPORT_PRIMARY&EVER_EVALUATED&EVER_VALIDATED&IS_VALIDATED ; KeepConnected : 0)  created 74258 firstValidated 77781 lastValidated 77781  lp{{InterfaceName: eth0 LinkAddresses: [ 10.0.2.15/24 ] DnsAddresses: [ /10.0.2.3 ] Domains: null MTU: 1500 TcpBufferSizes: 2097152,6291456,16777216,512000,2097152,8388608 Routes: [ 0.0.0.0/0 -> 10.0.2.2 eth0 mtu 1500,10.0.2.0/24 -> 0.0.0.0 eth0 mtu 0 ]}}  nc{[ Transports: CELLULAR Capabilities: MMS&SUPL&DUN&FOTA&IMS&CBS&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&VALIDATED&NOT_ROAMING&FOREGROUND&NOT_CONGESTED&NOT_SUSPENDED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED LinkUpBandwidth>=15000Kbps LinkDnBandwidth>=30000Kbps Specifier: <TelephonyNetworkSpecifier [mSubId = 1]> SubscriptionIds: {1} UnderlyingNetworks: Null]}  factorySerialNumber=5}
+I/BugleRcsEngine( 1630): No RCS Configuration was found in Bugle for simID: redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="ProvisioningEngineDataRetriever" thread_id=63 ]
+W/WakeLock( 1414): GCM_HB_ALARM release without a matched acquire! [CONTEXT service_id=259 ]
+W/WakeLock( 1414): GCM_HB_ALARM counter does not exist
+W/kesx    ( 1414): [{0}] Failed to resolve name. status={1}
+V/NativeCrypto( 1414): Write error: ssl=0x75f79fc05a98: I/O error during system call, Broken pipe
+V/NativeCrypto( 1414): SSL shutdown failed: ssl=0x75f79fc05a98: I/O error during system call, Success
+E/WifiChipAidlImpl(  817): getUsableChannels failed with service-specific exception: android.os.ServiceSpecificException:  (code 4)
+I/CastDatabase( 1414): Saving the database
+I/NearbyMediums( 1414): (REDACTED) Querying wifi usable channels failed with exception
+I/NearbyMediums( 1414): java.lang.UnsupportedOperationException
+I/NearbyMediums( 1414): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3384)
+I/NearbyMediums( 1414): 	at android.os.Parcel.createException(Parcel.java:3356)
+I/NearbyMediums( 1414): 	at android.os.Parcel.readException(Parcel.java:3339)
+I/NearbyMediums( 1414): 	at android.os.Parcel.readException(Parcel.java:3281)
+I/NearbyMediums( 1414): 	at android.net.wifi.IWifiManager$Stub$Proxy.getUsableChannels(IWifiManager.java:6652)
+I/NearbyMediums( 1414): 	at android.net.wifi.WifiManager.getUsableChannels(WifiManager.java:11835)
+I/NearbyMediums( 1414): 	at dtgj.z(:com.google.android.gms@262634038@26.26.34 (260800-945364269):21)
+I/NearbyMediums( 1414): 	at dtgj.v(:com.google.android.gms@262634038@26.26.34 (260800-945364269):16)
+I/NearbyMediums( 1414): 	at dtgj.q(:com.google.android.gms@262634038@26.26.34 (260800-945364269):24)
+I/NearbyMediums( 1414): 	at dtzm.run(:com.google.android.gms@262634038@26.26.34 (260800-945364269):9)
+I/NearbyMediums( 1414): 	at blvu.c(:com.google.android.gms@262634038@26.26.34 (260800-945364269):50)
+I/NearbyMediums( 1414): 	at blvu.run(:com.google.android.gms@262634038@26.26.34 (260800-945364269):71)
+I/NearbyMediums( 1414): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1154)
+I/NearbyMediums( 1414): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:652)
+I/NearbyMediums( 1414): 	at bmbo.run(:com.google.android.gms@262634038@26.26.34 (260800-945364269):8)
+I/NearbyMediums( 1414): 	at java.lang.Thread.run(Thread.java:1563)
+I/NearbyMediums( 1414): Caused by: android.os.RemoteException: Remote stack trace:
+I/NearbyMediums( 1414): 	at com.android.server.wifi.WifiServiceImpl.getUsableChannels(WifiServiceImpl.java:8395)
+I/NearbyMediums( 1414): 	at android.net.wifi.IWifiManager$Stub.onTransact(IWifiManager.java:3308)
+I/NearbyMediums( 1414): 	at android.os.Binder.execTransactInternal(Binder.java:1478)
+I/NearbyMediums( 1414): 	at android.os.Binder.execTransact(Binder.java:1418)
+I/NearbyMediums( 1414): 
+I/NearbyMediums( 1414): [DeviceCapabilities] Skip refreshing cached wifi channels because it is not supported (refreshCacheWifiChannelsRightAfterNetworkCallbackInvoked:true isWifiGetUsableChannelsSupported:false)
+I/SQLiteCastStore( 1414): [CastNetworkInfo] saved: 0, skipped: 0, [CastDeviceInfo]: saved 0, skipped 0, [ProbedNetworks]: saved 0, skipped: 0, [ProbedSocketAddress]: saved 0, skipped: 0, [Network-Device pairs]: saved: 0
+D/ConnectivityService(  817): Switching to new default network for: uid/pid:1000/817 activeRequest: 13 callbackRequest: 13 [NetworkRequest [ TRACK_DEFAULT id=13, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uids: <{10146-10146, 10158-10158}> RequestorUid: 1000 RequestorPkg: android UnderlyingNetworks: Null] ], NetworkRequest [ REQUEST id=14, [ Transports: SATELLITE Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&NOT_VCN_MANAGED Uids: <{10146-10146, 10158-10158}> UnderlyingNetworks: Null] ]] callback flags: 0 order: 40 isUidTracked: false declaredMethods: NONE using NetworkAgentInfo{network{101}  handle{437197393933}  ni{MOBILE[LTE] CONNECTED extra: epc.tmobile.com} created=2026-07-24T20:48:59.561Z Score(Policies : TRANSPORT_PRIMARY&EVER_EVALUATED&EVER_VALIDATED&IS_VALIDATED ; KeepConnected : 0)  created 74258 firstValidated 77781 lastValidated 77781  lp{{InterfaceName: eth0 LinkAddresses: [ 10.0.2.15/24 ] DnsAddresses: [ /10.0.2.3 ] Domains: null MTU: 1500 TcpBufferSizes: 2097152,6291456,16777216,512000,2097152,8388608 Routes: [ 0.0.0.0/0 -> 10.0.2.2 eth0 mtu 1500,10.0.2.0/24 -> 0.0.0.0 eth0 mtu 0 ]}}  nc{[ Transports: CELLULAR Capabilities: MMS&SUPL&DUN&FOTA&IMS&CBS&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&VALIDATED&NOT_ROAMING&FOREGROUND&NOT_CONGESTED&NOT_SUSPENDED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED LinkUpBandwidth>=15000Kbps LinkDnBandwidth>=30000Kbps Specifier: <TelephonyNetworkSpecifier [mSubId = 1]> SubscriptionIds: {1} UnderlyingNetworks: Null]}  factorySerialNumber=5}
+D/ConnectivityService(  817): Switching to new default network for: uid/pid:1000/817 activeRequest: 11 callbackRequest: 11 [NetworkRequest [ TRACK_DEFAULT id=11, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10145 RequestorUid: 1000 RequestorPkg: android UnderlyingNetworks: Null] ], NetworkRequest [ REQUEST id=12, [ Transports: SATELLITE Capabilities: INTERNET&TRUSTED&NOT_VPN&NOT_VCN_MANAGED Uid: 10145 UnderlyingNetworks: Null] ]] callback flags: 0 order: 40 isUidTracked: false declaredMethods: NONE using NetworkAgentInfo{network{101}  handle{437197393933}  ni{MOBILE[LTE] CONNECTED extra: epc.tmobile.com} created=2026-07-24T20:48:59.561Z Score(Policies : TRANSPORT_PRIMARY&EVER_EVALUATED&EVER_VALIDATED&IS_VALIDATED ; KeepConnected : 0)  created 74258 firstValidated 77781 lastValidated 77781  lp{{InterfaceName: eth0 LinkAddresses: [ 10.0.2.15/24 ] DnsAddresses: [ /10.0.2.3 ] Domains: null MTU: 1500 TcpBufferSizes: 2097152,6291456,16777216,512000,2097152,8388608 Routes: [ 0.0.0.0/0 -> 10.0.2.2 eth0 mtu 1500,10.0.2.0/24 -> 0.0.0.0 eth0 mtu 0 ]}}  nc{[ Transports: CELLULAR Capabilities: MMS&SUPL&DUN&FOTA&IMS&CBS&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&VALIDATED&NOT_ROAMING&FOREGROUND&NOT_CONGESTED&NOT_SUSPENDED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED LinkUpBandwidth>=15000Kbps LinkDnBandwidth>=30000Kbps Specifier: <TelephonyNetworkSpecifier [mSubId = 1]> SubscriptionIds: {1} UnderlyingNetworks: Null]}  factorySerialNumber=5}
+W/WakeLock( 1414): GCM_CONN_ALARM release without a matched acquire! [CONTEXT service_id=259 ]
+W/WakeLock( 1414): GCM_CONN_ALARM counter does not exist
+D/WM-NetworkStateTracker( 5022): Network capabilities changed: [ Transports: CELLULAR Capabilities: MMS&SUPL&DUN&FOTA&IMS&CBS&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&VALIDATED&NOT_ROAMING&FOREGROUND&NOT_CONGESTED&NOT_SUSPENDED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED LinkUpBandwidth>=15000Kbps LinkDnBandwidth>=30000Kbps Specifier: <TelephonyNetworkSpecifier [mSubId = 1]> SubscriptionIds: {1} UnderlyingNetworks: Null]
+D/NetworkTimeUpdateService(  817): New default network 101; checking time.
+I/Finsky:background( 3093): [48] IQ: start evaluating install requests.
+I/Finsky:background( 3093): [48] IQ: no jobs active. Skipping
+D/WM-NetworkStateTracker( 4700): Network capabilities changed: [ Transports: CELLULAR Capabilities: MMS&SUPL&DUN&FOTA&IMS&CBS&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&VALIDATED&NOT_ROAMING&FOREGROUND&NOT_CONGESTED&NOT_SUSPENDED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED LinkUpBandwidth>=15000Kbps LinkDnBandwidth>=30000Kbps Specifier: <TelephonyNetworkSpecifier [mSubId = 1]> SubscriptionIds: {1} UnderlyingNetworks: Null]
+D/NetworkStatsObservers(  817): Registering observer for RequestInfo from pid/uid:817/1000(android) for DataUsageRequest [ requestId=9, networkTemplate=NetworkTemplate: matchRule=MOBILE, matchSubscriberIds=[310260...], matchWifiNetworkKeys=[], metered=YES, defaultNetwork=NO, thresholdInBytes=4833340 ] accessLevel:3
+D/NetworkStatsObservers(  817): Unregistering RequestInfo from pid/uid:817/1000(android) for DataUsageRequest [ requestId=8, networkTemplate=NetworkTemplate: matchRule=MOBILE, matchSubscriberIds=[310260...], matchWifiNetworkKeys=[], metered=YES, defaultNetwork=NO, thresholdInBytes=4833651 ] accessLevel:3
+D/UpstreamNetworkMonitor( 1148): New default Internet network: 101
+D/ConnectivityService(  817): Sending CONNECTED broadcast for type 0 [101 CELLULAR] isDefaultNetwork=true
+I/bpgl    ( 2153): #onAvailable()
+W/ContextImpl(  817): Calling a method in the system process without a qualified user: android.app.ContextImpl.sendStickyBroadcast:1758 android.net.connectivity.com.android.server.ConnectivityService.sendStickyBroadcast:4326 android.net.connectivity.com.android.server.ConnectivityService.sendGeneralBroadcast:4296 android.net.connectivity.com.android.server.ConnectivityService.sendConnectedBroadcast:4269 android.net.connectivity.com.android.server.ConnectivityService.sendLegacyNetworkBroadcast:13048 
+I/m.android.phone( 1217): IncrementDisableThreadFlip blocked for 13.166ms
+I/BugleRcsEngine( 1630): handleMessage processing message:[NOTIFY_UPTIME_IGNORE_STATE_CHANGED] with [non-null]:RcsEngineImpl reference [CONTEXT log_prefix="RcsEngineImpl[DUAL_REG]:[1fc5a37b-0a9e]>Handler" thread_id=63 ]
+I/BugleRcsEngine( 1630): Connected state: [1], networkType: [MOBILE] [CONTEXT thread_id=55 ]
+I/NearbyMediums( 1414): WifiNetwork defaultNetworkCallback onAvailable netId:101
+D/ConnectivityService(  817): NetReassign [13 : null → 101, 88 : null → 101, 62 : null → 101, 99 : null → 101, 148 : null → 101, 55 : null → 101, 44 : null → 101, 130 : null → 101, 173 : null → 101, 25 : null → 101, 33 : null → 101, 39 : null → 101, 138 : null → 101, 200 : null → 101, 31 : null → 101, 191 : null → 101, 40 : null → 101, 83 : null → 101, 128 : null → 101, 155 : null → 101, 48 : null → 101, 177 : null → 101, 50 : null → 101, 23 : null → 101, 11 : null → 101, 197 : null → 101, 73 : null → 101, 165 : null → 101, 57 : null → 101, 64 : null → 101, 6 : null → 101, 70 : null → 101, 95 : null → 101, 52 : null → 101, 80 : null → 101, 123 : null → 101, 41 : null → 101, 35 : null → 101, 29 : null → 101, 27 : null → 101, 150 : null → 101, 37 : null → 101, 140 : null → 101, 75 : null → 101, 180 : null → 101, 77 : null → 101, 109 : null → 101, 20 : null → 101, 117 : null → 101, 1 : null → 101, 107 : null → 101] [c 1] [a 282] [i 30]
+I/BugleRcsEngine( 1630): Connected state: [1], networkType: [MOBILE] [CONTEXT thread_id=55 ]
+I/Finsky:background( 3093): [48] IQ: 0 scheduled install statuses found to proceed. 
+W/resolv  (  577): resolv_stats_set_addrs: Network 100 not found for PROTO_DOT
+W/resolv  (  577): resolv_stats_set_addrs: Network 100 not found for PROTO_DOH
+I/TrafficStats( 1414): tagSocketFd(-1, 1031, -1) failed with errno-9
+I/NearbySharing( 1414): Network state changed: NetworkState(isRestricted=false, isOnline=true, isCongested=false, isMetered=true, isWifiConnected=false)
+I/BugleRcsEngine( 1630): No RCS Configuration was found in Bugle for simID: redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="ProvisioningEngineDataRetriever" thread_id=63 ]
+I/BugleRcsEngine( 1630): handleMessage processing message:[NOTIFY_UPTIME_IGNORE_STATE_CHANGED] with [non-null]:RcsEngineImpl reference [CONTEXT log_prefix="RcsEngineImpl[DUAL_REG]:[1fc5a37b-0a9e]>Handler" thread_id=63 ]
+I/BugleRcsEngine( 1630): No RCS Configuration was found in Bugle for simID: redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="ProvisioningEngineDataRetriever" thread_id=63 ]
+I/DeviceStatusMonitor( 1493): DeviceStatusMonitor.handleBroadcast():123 onReceive() : Action = android.net.conn.CONNECTIVITY_CHANGE
+I/BugleDataModel( 4700): ActionExecutorImpl: ACTION_EXECUTE_QUEUED_FixupMessageStatusOnStartupAction
+I/BugleDataModel( 4700): ActionExecutorImpl: ACTION_EXECUTE_QUEUED_ProcessPendingMessagesAction
+W/JobInfo (  817): Job 'com.google.android.settings.intelligence/.modules.routines.impl.RoutinesJobIntentService#1728' has a deadline with no functional constraints. The deadline won't improve job execution latency. Consider removing the deadline.
+I/DeviceStatusMonitor( 1493): DeviceStatusMonitor.notifyIfNetworkChanged():180 notifyIfNetworkChanged: newState = METERED, airplaneModeOn = false, notifyAnyway = false
+I/BugleDataModel( 4700): ExecuteActionRunnable: running action FixupMessageStatusOnStartupAction
+I/NetworkInfoNotification( 1493): NetworkInfoNotification$Listener.onReceive():107 onNetworkAvailable: networkState = METERED, isAirplaneModeOn = false
+E/NotificationCenter( 1493): NotificationCenter.registerListenerInternal():378 Listener ldf@ef61655 is already registered for notification class lcu
+I/NetworkInfoNotification( 1493): NetworkInfoNotification$Listener.onReceive():107 onNetworkAvailable: networkState = METERED, isAirplaneModeOn = false

@@ -1,0 +1,5 @@
+# Product Copywriter — 59/100, 42% CI/SP
+
+Strengths: distinctive voice, Wingdex, mascot, reward moment, local premise. Risks: noun pile-up, opaque Buffaverse, Crawl ambiguity, Mission/Streak overlap, XP unexplained, Passport metaphor, Title/Badge duplication, referral qualification, locked/error wording. Simplify: labels, stacked reward names, early tutorials. Clarify: Wingdex, Crawl, Buffaverse. Hide: qualification/referral/status until needed. Emphasize: rate, discover, earn. First screen/journey: Welcome / first rating. Confusing: Buffaverse / progression vocabulary. Strongest/weakest: brand voice / terminology system. Abandon/uninstall: cannot parse labels / feels branded over useful. Recommend/reopen: good wing find / a clear prompt. Pre-beta: contextual plain-language companion copy. Post-beta: terminology comprehension test.
+
+More game less Yelp: yes in tone. Coherent: only with a glossary-free journey. Too early: yes. Buffaverse distracts until defined. Systems need a shared sentence. Mascot useful when it explains. Five-second/rating/invite/reopen unproven. Stop: inventing new nouns. Exact alternatives are in `copy-advice.md`.

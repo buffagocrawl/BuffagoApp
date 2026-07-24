@@ -1,0 +1,5 @@
+# Mobile Product Designer — 63/100, 50% CI/EV/SP
+
+Five strengths: rating, search, safe tabs, mascot feedback, feature flags. Ten risks: Home hierarchy, five tabs, early jargon, card density, modal burden, status duplication, map/list choice, back context, text scale, unknown load states. Simplify: Home cards, Journey taxonomy, early game labels. Clarify: first CTA, Wingdex, Buffaverse. Hide: referrals, social, Buffaverse. Emphasize: discovery, rating, receipt. First screen/journey: Home / find-rate. Confusing term/feature: Journey / Buffaverse. Strongest/weakest: rating / Home. Abandon/uninstall: choice overload / clutter. Recommend/reopen: fast nearby find / one relevant task. Pre-beta: screen-by-screen hierarchy correction. Post-beta: progressive-disclosure prototype test.
+
+More game less Yelp: intent yes. Coherent: partial. Too early: yes. Buffaverse: later unlock. Systems: consolidate visual containers. Mascot: useful contextual cue. Five-second Home: no proof. Unaided rating: probable, unproved. Invite/reopen: unproved. Stop: adding surfaces. Screen rule: one primary action, supporting status below fold, reusable cards, predictable sheet/back behavior.

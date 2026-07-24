@@ -1,0 +1,274 @@
+{
+  "contractVersion": "1.0",
+  "runId": "app-experience-confidence-20260724",
+  "status": "FAILED",
+  "startedAt": "2026-07-24T20:47:29+00:00",
+  "finishedAt": "2026-07-24T20:51:48+00:00",
+  "requestedSuite": "exploratory",
+  "suite": "exploratory",
+  "environment": "production-readonly",
+  "device": {
+    "platform": "android",
+    "deviceId": "emulator-5554"
+  },
+  "detectedStartupState": "CLEAN_ONBOARDING",
+  "startupStateCandidates": [
+    "CLEAN_ONBOARDING"
+  ],
+  "startupStateValidation": "FAILED",
+  "universalAssertionResult": "FAILED",
+  "stateSpecificAssertionResult": "INSUFFICIENT_EVIDENCE",
+  "universalAssertions": [
+    {
+      "assertion": "App launches",
+      "status": "PASSED"
+    },
+    {
+      "assertion": "app.root appears",
+      "status": "PASSED"
+    },
+    {
+      "assertion": "No fatal runtime error",
+      "status": "PASSED"
+    },
+    {
+      "assertion": "Exactly one valid startup state",
+      "status": "PASSED"
+    }
+  ],
+  "stateSpecificAssertions": [
+    {
+      "assertion": "onboarding.root and app.root remain visible",
+      "status": "PASSED"
+    },
+    {
+      "assertion": "Onboarding navigation controls are discoverable",
+      "status": "PASSED"
+    },
+    {
+      "assertion": "Safe onboarding forward/back interaction succeeds",
+      "status": "PASSED"
+    }
+  ],
+  "skippedAssertions": [
+    {
+      "assertion": "auth.screen is visible",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Sign-in controls render",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Available primary navigation renders",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Each visited authenticated surface renders",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Authenticated primary navigation",
+      "status": "NOT_APPLICABLE"
+    }
+  ],
+  "skipReason": "Assertions for startup states other than CLEAN_ONBOARDING are not applicable",
+  "summary": {
+    "acceptanceCriteriaCovered": [],
+    "artifactCount": 24
+  },
+  "runtime": {
+    "adbStart": {
+      "status": "STARTED",
+      "warnings": []
+    },
+    "emulatorStart": {
+      "status": "STARTED",
+      "avd": "Medium_Phone_API_36.1",
+      "pid": 17392,
+      "arguments": [
+        "-no-snapshot-load",
+        "-port",
+        "5554"
+      ]
+    },
+    "adbRecovery": {
+      "status": "RECOVERED",
+      "states": [
+        "missing",
+        "missing",
+        "missing",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "device"
+      ],
+      "reconnect": true,
+      "adbRestart": true
+    },
+    "emulatorBoot": {
+      "status": "BOOTED"
+    },
+    "package": {
+      "status": "INSTALLED",
+      "package": "com.buffago.app"
+    },
+    "metroStart": {
+      "status": "STARTED",
+      "pid": 29040,
+      "log": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\cayenne\\app-experience-confidence-20260724\\logs\\metro.log"
+    },
+    "bundlePrewarm": {
+      "status": "PREWARMED",
+      "entry": "node_modules/expo-router/entry.bundle"
+    },
+    "devClientConnection": {
+      "status": "CONNECTED",
+      "url": "exp+buffago://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081",
+      "reverse": "tcp:8081",
+      "pid": "4199",
+      "selector": "app.root",
+      "launcherForeground": false,
+      "fatalError": false
+    },
+    "maestro": {
+      "status": "FAILED",
+      "returnCode": 1
+    }
+  },
+  "cleanup": {
+    "status": "PASSED",
+    "ownedPids": [
+      17392,
+      29040
+    ],
+    "cleanedPids": [
+      29040,
+      17392
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "exploratory",
+      "title": "exploratory",
+      "status": "FAILED",
+      "durationMs": 0,
+      "preconditions": [
+        "Android emulator"
+      ],
+      "steps": [],
+      "assertions": [
+        "App launches",
+        "app.root appears",
+        "No fatal runtime error",
+        "Exactly one valid startup state",
+        "Detected startup state passes its required assertions"
+      ],
+      "detectedStartupState": "CLEAN_ONBOARDING",
+      "stateSpecificAssertions": [
+        {
+          "assertion": "onboarding.root and app.root remain visible",
+          "status": "PASSED"
+        },
+        {
+          "assertion": "Onboarding navigation controls are discoverable",
+          "status": "PASSED"
+        },
+        {
+          "assertion": "Safe onboarding forward/back interaction succeeds",
+          "status": "PASSED"
+        }
+      ],
+      "skippedAssertions": [
+        {
+          "assertion": "auth.screen is visible",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Sign-in controls render",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Available primary navigation renders",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Each visited authenticated surface renders",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Authenticated primary navigation",
+          "status": "NOT_APPLICABLE"
+        }
+      ],
+      "skipReason": "Assertions for startup states other than CLEAN_ONBOARDING are not applicable",
+      "screenshots": [
+        "screenshots/final.png",
+        "screenshots/maestro-01-step-012-assertCondition-nav.home.png",
+        "screenshots/startup.png"
+      ],
+      "hierarchy": "hierarchies/final.xml",
+      "logs": [
+        "logs/logcat.txt",
+        "logs/metro.log",
+        "maestro/raw-output.log"
+      ],
+      "failureCategory": "TEST_DEFECT",
+      "failureMessage": "Maestro smoke suite failed",
+      "retryCount": 0
+    }
+  ],
+  "failures": [
+    {
+      "failureCategory": "TEST_DEFECT",
+      "failureMessage": "Maestro smoke suite failed"
+    }
+  ],
+  "artifacts": [
+    "environment.json",
+    "prerequisite-check.json",
+    "request.json",
+    "safety-check.json",
+    "hierarchies/final.xml",
+    "hierarchies/startup.xml",
+    "logs/adb-start.log",
+    "logs/emulator.stderr.log",
+    "logs/emulator.stdout.log",
+    "logs/logcat.txt",
+    "logs/metro.log",
+    "maestro/junit.xml",
+    "maestro/raw-output.log",
+    "runtime/lifecycle.json",
+    "runtime/processes.json",
+    "screenshots/final.png",
+    "screenshots/maestro-01-step-012-assertCondition-nav.home.png",
+    "screenshots/startup.png",
+    "maestro/artifacts/2026-07-24_165052/Cayenne initial accessibility evidence/commands.json",
+    "maestro/artifacts/2026-07-24_165052/Cayenne initial accessibility evidence/manifest.json",
+    "maestro/artifacts/2026-07-24_165052/Cayenne initial accessibility evidence/logs/device-logcat.txt",
+    "maestro/artifacts/2026-07-24_165052/Cayenne initial accessibility evidence/logs/maestro.log",
+    "maestro/artifacts/2026-07-24_165052/Cayenne initial accessibility evidence/screen-hierarchy/step-012-assertCondition-nav.home.json",
+    "maestro/artifacts/2026-07-24_165052/Cayenne initial accessibility evidence/screenshots/step-012-assertCondition-nav.home.png"
+  ],
+  "safety": {
+    "environment": "production-readonly",
+    "productionDetected": true,
+    "mutationRequested": false,
+    "mutationAllowed": false,
+    "decision": "ALLOW",
+    "reasons": []
+  },
+  "redaction": {
+    "validated": true,
+    "status": "PASSED"
+  },
+  "limitations": []
+}

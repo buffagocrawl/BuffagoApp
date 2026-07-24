@@ -1,0 +1,3 @@
+# Accessibility advice
+
+Evidence: CI plus prior Android EV; not an assistive-technology audit. Strengths: safe-area tab sizing, accessibility labels/test IDs, keyboard-aware sign-in, reduced-motion utilities. Risks: verify 44×44 touch targets beyond sampled controls; dynamic type wrapping/clipping in dense cards; contrast on orange/disabled/over-image content; focus order and labels for custom Pressables/modals; screen-reader announcement of rewards/errors; reduced-motion suppression of celebration effects. Before internal beta: run Android TalkBack and largest-text smoke on Home, Wingdex, rating, auth and modal flows. Acceptance: every actionable control is named/operable and no core text clips at large text.

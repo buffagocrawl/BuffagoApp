@@ -1,0 +1,5 @@
+# Skeptical first-time user — 52/100, 35% CI/SP
+
+Strengths: clear food topic, local utility, ratings, mascot, possible reward. Risks: why sign up, what is Wingdex, state setup, location request, many tabs, unfamiliar words, no immediate restaurant proof, Buffaverse, social emptiness, referral ask. Simplify: onboarding, Home, game terms. Clarify: what I get today, rating payoff, privacy. Hide: Buffaverse/referrals/leaderboards. Emphasize: nearby wings and fast opinion. First screen/journey: Welcome / first-time. Confusing: Buffaverse / Passport. Strongest/weakest: rating idea / feature stack. Abandon/uninstall: work before value / unexplained app. Recommend/reopen: reliable nearby find / an easy recommendation. Pre-beta: prove value before teaching meta-systems. Post-beta: browse-before-account test.
+
+More game less Yelp: maybe, but I first need usefulness. Coherent: no. Too early: yes. Buffaverse: distraction. Systems: no. Mascot: nice, not a reason. Five-second Home: uncertain. Rating unaided: likely. Invite/reopen: not yet. Stop: assuming I care about progression before I care about wings.

@@ -1,0 +1,5 @@
+# Community and social strategist — 55/100, 35% CI/SP
+
+Strengths: state identity, Crawls, local rankings, friends, shareable ratings. Risks: empty feeds, leaderboard discouragement, weak local density, referral before value, unclear friend loop, privacy, spam, stale events, Buffaverse fragmentation, no community metrics. Simplify: social destinations, invite flow, public status. Clarify: who sees ratings, why join Crawl, state identity. Hide: empty leaderboard/friends/referrals. Emphasize: local discoveries and small-group Crawls. First screen/journey: Social / night-out. Confusing: Buffaverse / referral qualification. Strongest/weakest: Crawls / density dependence. Abandon/uninstall: empty community / spammy asks. Recommend/reopen: friends’ nearby activity / a local event. Pre-beta: dignified empty states. Post-beta: density and invite-loop test.
+
+More game less Yelp: good social-game potential. Coherent: not yet. Too early: yes. Buffaverse distracts from local community. Systems need shared local identity. Mascot can make empty states warm. Five-second Home/rating/invite/reopen unproven. Stop: making leaderboards central before local critical mass.

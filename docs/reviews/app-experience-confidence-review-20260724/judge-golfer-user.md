@@ -1,0 +1,5 @@
+# Casual golfer user independent review — 57/100, 40% CI/SP
+
+Strengths: local search, obvious ratings, social Crawl idea, reward, large tabs. Risks: too much reading, too many destinations, small/dense cards, setup, jargon, interruptions, uncertain back recovery, map choice, social emptiness, complex progress. Simplify: Home, rating options, game systems. Clarify: Crawl, Mission, XP. Hide: Buffaverse/referrals/titles. Emphasize: nearby wings, one large action, saved progress. First screen/journey: Home / social night out. Confusing: Buffaverse / Passport. Strongest/weakest: finding wings / progression. Abandon/uninstall: cannot do it quickly / clutter. Recommend/reopen: convenient restaurant lookup / next nearby spot. Pre-beta: large plain next action. Post-beta: one-handed interrupted task.
+
+More game less Yelp? Yes, but too much game vocabulary. Coherent? No. Concepts early? Yes. Buffaverse distracts. Systems need explanation later. Mascot useful for success, not navigation. Five-second Home uncertain; rating likely needs test; invite/reopen unproven. Stop: making casual users learn a meta-game to rate wings.

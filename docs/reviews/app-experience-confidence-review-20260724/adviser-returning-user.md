@@ -1,0 +1,5 @@
+# Returning casual user — 57/100, 38% CI/SP
+
+Strengths: next-best-action intent, streak, saved progress, local discovery, Crawls. Risks: Home doesn’t prove what changed, competing cards, stale notification, unclear unfinished progress, forgotten terms, status overload, irrelevant mission, empty social, Buffaverse, no actual return data. Simplify: returning Home, daily surfaces, system labels. Clarify: today’s action, streak state, mission value. Hide: advanced status, referral, empty social. Emphasize: nearby action, continuation, clear reward. First screen/journey: Home / returning. Confusing: Journey / Buffaverse. Strongest/weakest: potential next action / hierarchy. Abandon/uninstall: relearning / useless notification. Recommend/reopen: relevant nearby spot / visible unfinished goal. Pre-beta: one “Today” action. Post-beta: notification destination test.
+
+More game less Yelp: yes. Coherent: partial. Too early: yes for inactive user. Buffaverse: later. Systems: need recap not taxonomy. Mascot useful for context. Five-second Home: no proof. Rating likely. Invite/reopen: unproven. Stop: treating every return as a progression lesson.

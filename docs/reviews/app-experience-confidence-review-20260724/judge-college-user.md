@@ -1,0 +1,5 @@
+# College user independent review — 58/100, 40% CI/SP
+
+Strengths: wings are social; mascot is fun; rating rewards; Crawls; potential shareability. Risks: reads like homework, too many names, sign-up friction, unclear Buffaverse, low friend density, referral awkwardness, card overload, generic progress, unknown speed, unclear “what now.” Simplify: tabs, missions, reward language. Clarify: Wingdex, Crawl, Buffaverse. Hide: referrals, titles, empty leaderboard. Emphasize: nearby spots, quick hot take, shareable result. First screen/journey: Welcome / night-out find-and-rate. Confusing: Buffaverse / Passport. Strongest/weakest: wing rating / Buffaverse. Abandon/uninstall: setup / app feels try-hard. Recommend/reopen: friends’ wing finds / a quick nearby recommendation. Pre-beta: make first rating feel fast and shareable. Post-beta: test share artifact.
+
+More game less Yelp? Yes, sometimes too game-y. Coherent? Not yet. Too early? Definitely. Buffaverse distracts. Systems feel separate. Mascot useful if not everywhere. Five-second Home uncertain; rating likely; invite/reopen only after friends/value. Stop: announcing every game feature upfront.

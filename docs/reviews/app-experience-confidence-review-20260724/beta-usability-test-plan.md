@@ -1,0 +1,3 @@
+# Beta usability test plan
+
+Recruit 10+ external people across college/casual-night-out users. Tasks: explain Buffago from launch; find a nearby wing spot; rate it; find today’s next action; explain XP/streak/Passport; recover from cancelled auth/no location/empty search; decide whether to join a Crawl/invite a friend; explain Buffaverse. Measure completion, time, wrong turns, five-second recall, task confidence, D1/D7 return and notification destination. Interviews ask what each term means, what felt like work, what would reopen the app, and what they would remove. Instrument first-rating funnel, Home CTA choice, referral exposure/conversion, notification open→task completion, and unlock exposure. Do not claim retention until cohort data exists.
