@@ -16,7 +16,7 @@ import {
   TextInput,
   HelperText,
 } from 'react-native-paper';
-import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from '../../lib/platformMap';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../../lib/supabase.js';
 import { useLocationCtx } from '../../providers/LocationProvider';

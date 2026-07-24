@@ -42,7 +42,7 @@ import FeedbackState from '../../../components/ui/FeedbackState';
 import { supabase } from '../../../lib/supabase.js';
 import { trackEvent } from '../../../lib/analytics';
 import { useLocationCtx } from '../../../providers/LocationProvider';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from '../../../lib/platformMap';
 
 const WINGDEX_HINT_DISMISSED_KEY = 'buffago:wingdex_hint_dismissed';
 const HOME_NEXT_SPOT_KEY = 'buffago:homeNextSpot';
