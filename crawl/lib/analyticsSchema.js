@@ -54,6 +54,16 @@ export const ANALYTICS_EVENTS = Object.freeze({
   REFERRAL_REWARD_FAILED: 'referral_reward_failed',
   REFERRAL_BADGE_UNLOCKED: 'referral_badge_unlocked',
   REFERRAL_PROMPT_CLICKED: 'referral_prompt_clicked',
+  BUFFAVERSE_CARD_VIEWED: 'buffaverse_card_viewed',
+  BUFFAVERSE_OPENED: 'buffaverse_opened',
+  BUFFAVERSE_OBJECTIVE_VIEWED: 'buffaverse_objective_viewed',
+  BUFFAVERSE_OBJECTIVE_SELECTED: 'buffaverse_objective_selected',
+  BUFFAVERSE_MILESTONE_VIEWED: 'buffaverse_milestone_viewed',
+  BUFFAVERSE_LEVEL_PROGRESS_VIEWED: 'buffaverse_level_progress_viewed',
+  BUFFAVERSE_ACHIEVEMENT_SHARE_STARTED: 'buffaverse_achievement_share_started',
+  BUFFAVERSE_ACHIEVEMENT_SHARE_COMPLETED: 'buffaverse_achievement_share_completed',
+  BUFFAVERSE_CELEBRATION_SHOWN: 'buffaverse_celebration_shown',
+  BUFFAVERSE_LOAD_FAILED: 'buffaverse_load_failed',
 });
 
 const BLOCKED_KEY = /(token|secret|password|authorization|cookie|email|phone|error_message|access_key|refresh)/i;
