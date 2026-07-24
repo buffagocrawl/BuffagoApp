@@ -70,3 +70,9 @@ Supabase migrations, RLS, RPCs, and Edge Functions are established patterns. No 
 - Old `user_engagement_preferences` reminder toggles default true and describe in-app readiness; new push categories must not inherit those opt-ins.
 - Both `crawl/app/home/index.jsx` and `crawl/app/(tabs)/home/index.jsx` contain substantial home implementations.
 - The worktree contained extensive pre-existing uncommitted engagement/social/mascot changes. They were preserved.
+
+## Current-schema release reassessment — 2026-07-24
+
+Active branch: `workstream/daily-engagement-current-schema`, from `561caca49474390b69e3734d0bad43b02861a727`. Frozen candidate `b39be7580a80637f64471e1407e52a4139f069c2` remains historical evidence and was not rewritten.
+
+The release now uses Buffago Current Supported Schema Contract v1: 29 generated checks, read-only fail-fast preflight, forward-only reconciliation, and behavior-only `limited_time_events` compatibility. Daily action receipts, streaks, XP claims, timezone pinning, notification privacy/outbox logic, deep links, and proximity selection are present. Staging dispatch is executable; physical provider evidence and production approval remain withheld.

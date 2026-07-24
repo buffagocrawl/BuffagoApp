@@ -32,6 +32,8 @@ module.exports = ({ config }) => ({
     infoPlist: {
       NSLocationWhenInUseUsageDescription:
         "BuffaGo uses your location to verify you’re at a wing stop so you can rate wings and progress through crawls.",
+      NSLocationAlwaysAndWhenInUseUsageDescription:
+        "BuffaGo uses background location only for the next active crawl stop you choose, so it can remind you when you are nearby.",
       LSApplicationQueriesSchemes: ["fb", "fbauth2"],
       ITSAppUsesNonExemptEncryption: false,
     },
@@ -43,7 +45,7 @@ module.exports = ({ config }) => ({
 
     // Fine, but note: Expo Location will add what it needs.
     // Keeping explicit permission is OK.
-    permissions: ["ACCESS_FINE_LOCATION"],
+    permissions: ["ACCESS_FINE_LOCATION", "ACCESS_BACKGROUND_LOCATION", "POST_NOTIFICATIONS"],
 
     adaptiveIcon: {
       foregroundImage: "./assets/adaptive-icon.png",
@@ -88,6 +90,14 @@ module.exports = ({ config }) => ({
     "expo-router",
     "expo-font",
     "expo-location",
+    [
+      "expo-notifications",
+      {
+        icon: "./assets/icon.png",
+        color: "#FFFBE9",
+        sounds: [],
+      },
+    ],
     "expo-web-browser",
     [
       "expo-splash-screen",

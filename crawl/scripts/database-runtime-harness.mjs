@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const manifest = JSON.parse(fs.readFileSync(path.join(root, 'supabase/contracts/buffago-baseline-v1.json'), 'utf8'));
+const suites = ['migration validation','RLS and authorization abuse','RPC behavior','real concurrency exactly-once','notification suppression','partial-state recovery','schema fingerprint equivalence'];
+const result = { status: manifest.status === 'blocked' ? 'blocked' : 'not-run', generated_at: new Date().toISOString(), suites, reason: 'The committed Platform Baseline v1 is fail-closed because authoritative pre-engagement definitions are missing. No production connection is attempted.', required_next_dependency: 'Recover and review the exact shared-object definitions, then replace the guarded baseline with an approved schema-only pack.' };
+console.log(JSON.stringify(result, null, 2));
+if (process.env.BUFFAGO_RUNTIME_RESULT) fs.writeFileSync(process.env.BUFFAGO_RUNTIME_RESULT, JSON.stringify(result, null, 2) + '\n');
+process.exitCode = 2;

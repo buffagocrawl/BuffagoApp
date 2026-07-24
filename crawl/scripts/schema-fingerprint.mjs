@@ -1,0 +1,13 @@
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+import { spawnSync } from 'node:child_process';
+const db = process.env.BUFFAGO_DATABASE_URL;
+if (!db) throw new Error('Set BUFFAGO_DATABASE_URL; production URLs are not permitted by this command contract.');
+const query = `select jsonb_build_object('tables',coalesce((select jsonb_agg(jsonb_build_object('schema',table_schema,'name',table_name,'columns',(select jsonb_agg(jsonb_build_object('name',column_name,'type',udt_name,'nullable',is_nullable) order by ordinal_position) from information_schema.columns c where c.table_schema= t.table_schema and c.table_name=t.table_name)) order by table_schema,table_name) from information_schema.tables t where table_schema='public' and table_type='BASE TABLE'),'[]'::jsonb),'functions',coalesce((select jsonb_agg(jsonb_build_object('identity',p.oid::regprocedure::text,'definition',pg_get_functiondef(p.oid)) order by p.oid::regprocedure::text) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public'),'[]'::jsonb))::text;`;
+const result = spawnSync(process.env.PSQL || 'psql', [db, '--tuples-only', '--no-align', '--set', 'ON_ERROR_STOP=1', '--command', query], { encoding: 'utf8' });
+if (result.status !== 0) throw new Error(result.stderr || 'psql fingerprint query failed');
+const normalized = result.stdout.trim();
+const fingerprint = crypto.createHash('sha256').update(normalized).digest('hex');
+const output = { generated_at: new Date().toISOString(), fingerprint, note: 'Excludes Supabase-managed schemas, rows, volatile identifiers, and timestamps.', normalized_schema_json: JSON.parse(normalized) };
+if (process.env.BUFFAGO_FINGERPRINT_OUT) fs.writeFileSync(process.env.BUFFAGO_FINGERPRINT_OUT, JSON.stringify(output, null, 2) + '\n');
+console.log(JSON.stringify({ fingerprint }));

@@ -37,3 +37,9 @@ Capture device model, OS, app version, token/install IDs (redacted), timestamps,
 - Database uses Strategy B. Run crawl/scripts/apply-engagement-migrations.ps1 -DatabaseUrl <url>; the read-only baseline preflight must pass before any delta migration.
 - Web is supported. Native maps remain native-only; web uses the explicit fallback and does not claim background proximity support.
 - Physical iOS/Android and provider validation is still a human approval prerequisite and is not claimed by this artifact.
+
+## Current-schema rollout plan
+
+Run current-schema preflight, then reconciliation, then post-migration verification. Historical engagement migrations remain ordered dependencies and are never marked applied by reconciliation. Keep all flags disabled by default; roll out settings, server/UI engagement, internal accounts, streak risk, friend rating, foreground proximity, background geofencing, and comeback only in that order. Use internal allowlist, 5/25/50/100 canaries, emergency server disablement, delivery/open/suppression/disable/error monitoring, and 24 hours per stage.
+
+Rollback disables flags and dispatcher scheduling, cancels queued rows without deleting audit history, and stops geofences on client sync. It does not drop shared tables, delete preferences/history, revert data migrations, or edit the migration ledger.
