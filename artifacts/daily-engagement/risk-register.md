@@ -13,3 +13,5 @@
 | Medium | Two streak concepts confuse users | Copy calls this “daily wing streak”; weekly crawl streak retained | UX consolidation remains recommended |
 | Medium | Build-time and remote flags diverge | Both default off; server gates delivery | Flag administration/ownership runbook required |
 | Low | Reinstall creates another installation | Multi-device supported; token uniqueness; last seen/invalidation | Stale row cleanup job required |
+| Critical | Historical baseline provenance is unresolved | Hosted ledger and live catalog were checked read-only; exact SQL and pre-deployment snapshot are required before correction | `20260620000000` is `UNKNOWN/BLOCKING`; no rerun, ledger repair, or rollback permitted |
+| High | Unattributed users/coin trigger state may differ from the missing baseline | Treat live `public.users`, grants, RLS, policies, trigger, and reward objects as evidence only; require an exact forward diff | Current hosted state is observed, but baseline attribution remains unproven |

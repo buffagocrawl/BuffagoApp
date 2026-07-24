@@ -15,6 +15,10 @@
     "test:growth": "node --test --experimental-default-type=module ./tests/auth/growth-loops.test.js",
     "test:rls": "node --test --experimental-default-type=module ./tests/database/*.test.js",
     "migration:integrity": "node ./scripts/check-migration-integrity.mjs",
+    "database:contract": "node ./scripts/generate-baseline-contract.mjs",
+    "database:current-contract": "node ./scripts/generate-current-schema-contract.mjs",
+    "database:harness": "node ./scripts/database-runtime-harness.mjs",
+    "database:fingerprint": "node ./scripts/schema-fingerprint.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -43,6 +47,7 @@
     "expo-linear-gradient": "~15.0.8",
     "expo-linking": "~8.0.12",
     "expo-location": "~19.0.8",
+    "expo-notifications": "0.32.17",
     "expo-router": "~6.0.24",
     "expo-splash-screen": "~31.0.13",
     "expo-status-bar": "~3.0.9",

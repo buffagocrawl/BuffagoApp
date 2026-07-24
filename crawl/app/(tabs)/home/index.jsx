@@ -41,6 +41,7 @@ import CoinRewardModal from '../../../components/CoinRewardModal';
 import { useLocationCtx } from '../../../providers/LocationProvider';
 import { fetchRandomFunFact } from '../../../utils/funFacts';
 import { nyDateString } from '../../../utils/nyDate';
+import LegendaryHero from '../../../components/buffaverse/LegendaryHero';
 
 const SEARCH_RADIUS_M = 160934; // 100 miles
 const MS_5_MIN = 30 * 1000;
@@ -2952,6 +2953,8 @@ export default function Home() {
               </Pressable>
             </View>
           </View>
+
+          <LegendaryHero />
 
           {/* Signed-in: Level row */}
           {isSignedIn ? (

@@ -15,6 +15,16 @@ Physical iOS/Android push, deep-link, provider, and real-world proximity evidenc
 After approval, enable notification settings internally, then daily engagement UI, then 5%/25%/50%/100% stages with at least 24 hours per stage. Push categories and background geofencing follow separately. Rollback disables flags, stops the dispatcher, cancels queued rows without deleting audit history, and stops registered geofences on client sync. Do not drop data migrations during rollback.
 
 User-visible change: eligible meaningful activity can show daily missions, streak reminders, friend-rating and crawl-proximity notifications when enabled; web shows a clear mobile-only limitation for maps/proximity. No daily-open reward is added.
+
+## Current approval packet delta — 2026-07-24
+
+- Final SHA and ordered commit range: pending final validation commit; branch `workstream/daily-engagement-current-schema` starts from `561caca49474390b69e3734d0bad43b02861a727`.
+- Contract: Current Supported Schema Contract v1, SHA-256 `fe2af053e41c78ed27919292d4168a87d990a3f4637ca5dcb30703bac0a1d891`.
+- Risk acceptance recorded; no database-foundation gate pass claimed.
+- `limited_time_events`: preserve compatible definition, compatibility-create only when absent in supported non-production, fail closed when incompatible.
+- Preflight/reconciliation static checks passed; live target results pending.
+- Notifications and dispatcher package present; provider/device tests pending, iOS blocked, Android not run.
+- Exact approval requested: approve staging deployment/non-production validation only; production remains withheld until live preflight, reconciliation, panel, provider, and device evidence pass.
 ## Immutable candidate metadata
 
 - Candidate code commit: 7937e76c6e9bab3f28c9e3d2479e029c458ee7fa
@@ -33,3 +43,11 @@ User-visible change: eligible meaningful activity can show daily missions, strea
 Final candidate: `b39be7580a80637f64471e1407e52a4139f069c2` from base `0cdfc7f`.
 
 The candidate is clean in an isolated worktree. TypeScript, 68/68 JavaScript tests, 41/41 focused daily-engagement tests, all three exports, lint (0 errors), and migration-integrity passed. Strategy B preflight correctly stopped on the available database because the required baseline was not provisioned; no database runtime pass is claimed. Physical-device and provider validation remain blocked. Latest valid panel score remains 93.125. Production approval remains withheld.
+
+## Database recovery update — 2026-07-23
+
+One disposable local Supabase replay passed preflight, both target migrations,
+replay, and the existing schema/RLS/RPC/outbox checks. The recovered snapshot
+was already post-engagement and is not an authoritative baseline. A second clean
+environment and the full executable runtime matrix were not proven. No
+production mutation occurred and no candidate commit was created.

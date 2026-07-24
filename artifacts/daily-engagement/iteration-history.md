@@ -1,5 +1,14 @@
 # Iteration History
 
+## Current-schema compatibility iteration — 2026-07-24
+
+- Accepted the product-owner decision to stop historical baseline reconstruction.
+- Created the dedicated branch from the current integration point without rewriting frozen history.
+- Added the generated 29-check current supported schema contract and fail-fast preflight.
+- Added forward reconciliation and behavior-only `limited_time_events` resolution.
+- Added staging dispatcher and Expo native notification/background-location configuration.
+- Remaining: live staging preflight/reconciliation, provider/device evidence, panel reassessment, and human approval.
+
 ## Baseline
 
 Score 49.9. Missing push pipeline, exploitable timezone context, no delivery-time authorization, no deep links, no proximity controls.
@@ -40,3 +49,14 @@ Loop 1 does not pass because full typecheck, deployed migration/RLS validation, 
 - Added no score iteration and did not rerun the panel score.
 - Clean isolated validation passed for TypeScript, 68 JavaScript tests, exports, lint errors, and migration integrity.
 - Database runtime validation remains blocked by the missing Strategy B baseline; production approval remains withheld.
+
+## 2026-07-23 — database-baseline recovery
+
+- Read-only linked Supabase inspection succeeded for `vhfxnizaxdanmvmouuaf`.
+- A prior live schema snapshot restored into disposable PostgreSQL; it already
+  contained engagement objects, so it remains replay evidence only.
+- Preflight, both target migrations, replay, and existing SQL schema/RLS/RPC/
+  outbox checks passed. A clean pre-engagement baseline, second environment,
+  and full runtime matrix remain unproven.
+- No candidate files, notification behavior, panel score, or production state
+  changed. Approval remains withheld.
