@@ -2,7 +2,7 @@
 
 Decision: **Strategy B, declared prerequisite baseline**.
 
-The repository does not contain a complete root migration history. The release SQL is a delta pack under `crawl/supabase/migrations/deployed`; an empty PostgreSQL/Supabase database fails at the first profile alteration because `public.users` is absent. The baseline is provisioned outside this pack and must exist before the delta pack is applied.
+The repository does not contain a complete BuffaGo-from-empty migration history. The release SQL is a delta pack under `crawl/supabase/migrations`; an empty PostgreSQL/Supabase database fails at the first profile alteration because `public.users` is absent. The baseline is provisioned outside this pack and must exist before the delta pack is applied.
 
 `public.users` is the BuffaGo-owned profile/progression table. It is not a view and is not an identity replacement. Its `user_id` is the application profile key; authoritative identity and ownership checks remain against `auth.users` and `auth.uid()`. Engagement privacy fields and XP live on the profile table, so changing these references to `auth.users` would cross the intended data boundary.
 
