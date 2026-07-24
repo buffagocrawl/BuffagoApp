@@ -29,7 +29,7 @@
     "@tanstack/react-query": "^5.90.2",
     "babel-preset-expo": "~54.0.10",
     "dayjs": "^1.11.18",
-    "expo": "~54.0.35",
+    "expo": "~54.0.36",
     "expo-auth-session": "~7.0.11",
     "expo-blur": "~15.0.8",
     "expo-clipboard": "~8.0.8",

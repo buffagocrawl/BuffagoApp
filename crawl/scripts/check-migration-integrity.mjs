@@ -33,7 +33,7 @@ function parseManifest() {
   for (const line of readFileSync(manifestPath, 'utf8').split(/\r?\n/)) {
     const columns = line.split('|').map((column) => column.trim());
     if (columns.length >= 7 && migrationPattern.test(columns[1]) && /^[a-f0-9]{64}$/.test(columns[6])) {
-      entries.set(columns[1], columns[6]);
+      entries.set(columns[1], { hash: columns[6], environment: columns[2], status: columns[3] });
     }
   }
   return entries;
@@ -55,8 +55,12 @@ export function inspect({ ledgerFile } = {}) {
   for (const item of [...rootFiles, ...archiveTimestamped]) byVersion.set(item.version, [...(byVersion.get(item.version) || []), item]);
   const duplicates = [...byVersion.entries()].filter(([, items]) => items.length > 1);
   const manifest = parseManifest();
-  const checksumMismatches = rootFiles.filter((item) => manifest.has(item.name) && manifest.get(item.name) !== item.hash);
+  const checksumMismatches = rootFiles.filter((item) => manifest.has(item.name) && manifest.get(item.name).hash !== item.hash);
   const unmanifested = rootFiles.filter((item) => !manifest.has(item.name));
+  const rootNames = new Set(rootFiles.map((item) => item.name));
+  const manifestedMissingRoot = [...manifest.entries()]
+    .filter(([name, entry]) => entry.environment === 'production' && !rootNames.has(name))
+    .map(([name]) => name);
   const ledgerMissingRoot = parseLedger(ledgerFile).filter((version) => !new Set(rootFiles.map((item) => item.version)).has(version));
   const failures = [];
   if (archiveTimestamped.length) failures.push('timestamped migrations exist below an archive/deployed directory');
@@ -64,8 +68,9 @@ export function inspect({ ledgerFile } = {}) {
   if (invalidRoot.length) failures.push('root SQL filenames do not follow migration conventions');
   if (checksumMismatches.length) failures.push('an existing migration checksum differs from the deployment manifest');
   if (unmanifested.length) failures.push('root migrations are missing from the deployment manifest');
+  if (manifestedMissingRoot.length) failures.push('a production migration is recorded in the manifest but has no canonical root file');
   if (ledgerMissingRoot.length) failures.push('an applied ledger version has no corresponding root migration');
-  return { rootFiles, archiveTimestamped, invalidRoot, duplicates, checksumMismatches, unmanifested, ledgerMissingRoot, failures,
+  return { rootFiles, archiveTimestamped, invalidRoot, duplicates, checksumMismatches, unmanifested, manifestedMissingRoot, ledgerMissingRoot, failures,
     legacyArchives: allSql.filter((path) => basename(path) === 'deployed-archive.sql') };
 }
 
@@ -77,6 +82,7 @@ function printReport(report) {
   if (report.invalidRoot.length) console.error(`Invalid filenames: ${report.invalidRoot.map((path) => basename(path)).join(', ')}`);
   if (report.checksumMismatches.length) console.error(`Checksum mismatches: ${report.checksumMismatches.map((item) => item.name).join(', ')}`);
   if (report.unmanifested.length) console.error(`Unmanifested migrations: ${report.unmanifested.map((item) => item.name).join(', ')}`);
+  if (report.manifestedMissingRoot.length) console.error(`Manifested production migrations missing root files: ${report.manifestedMissingRoot.join(', ')}`);
   if (report.ledgerMissingRoot.length) console.error(`Ledger versions missing root files: ${report.ledgerMissingRoot.join(', ')}`);
   if (report.failures.length) { console.error(`Migration integrity FAILED: ${report.failures.join('; ')}`); return 1; }
   console.log('Migration integrity PASSED.');

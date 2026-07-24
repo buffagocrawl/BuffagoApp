@@ -41,6 +41,8 @@ import CoinRewardModal from '../../../components/CoinRewardModal';
 import { useLocationCtx } from '../../../providers/LocationProvider';
 import { fetchRandomFunFact } from '../../../utils/funFacts';
 import { nyDateString } from '../../../utils/nyDate';
+import { useLegendaryFeed } from '../../../hooks/useLegendaryFeed';
+import { LegendaryHomeHero } from '../../../components/buffaverse/LegendarySurfaces';
 
 const SEARCH_RADIUS_M = 160934; // 100 miles
 const MS_5_MIN = 30 * 1000;
@@ -328,6 +330,8 @@ export default function Home() {
   const { colors, dark } = useTheme();
   const router = useRouter();
   const { coords, status, refreshPosition } = useLocationCtx();
+  const { events: legendaryEvents } = useLegendaryFeed({ limit: 3 });
+  const primaryLegendary = legendaryEvents[0] || null;
 
   // Coins (Battle completion reward)
   const [coinRewardOpen, setCoinRewardOpen] = useState(false);
@@ -2952,6 +2956,24 @@ export default function Home() {
               </Pressable>
             </View>
           </View>
+
+          <LegendaryHomeHero
+            event={primaryLegendary}
+            onOpenMission={() => openRestaurantPeek(primaryLegendary?.restaurantId)}
+            onRate={() => {
+              trackEvent({
+                eventName: 'legendary_cta_clicked',
+                screen: 'home',
+                userId: session?.user?.id ?? null,
+                destinationId: primaryLegendary?.restaurantId ?? null,
+                metadata: {
+                  event_instance_id: primaryLegendary?.eventInstanceId ?? null,
+                  cta_name: 'rate_wings_to_finish',
+                },
+              });
+              router.push('/(tabs)/ratings');
+            }}
+          />
 
           {/* Signed-in: Level row */}
           {isSignedIn ? (
