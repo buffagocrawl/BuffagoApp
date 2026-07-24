@@ -1,0 +1,13 @@
+
+> crawl@1.0.0 web
+> expo start --web --localhost --port 8081
+
+Starting project at C:\Users\Brand\repo\BuffagoApp-phase2-approval\crawl
+Starting Metro Bundler
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓▓░░░░ 80.5% ( 934/1059)
+Web Bundled 7313ms node_modules\expo-router\entry.js (1670 modules)
+Web node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 99.9% (1670/1670)
+ LOG  [web] Logs will appear in the browser console
