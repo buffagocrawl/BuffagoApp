@@ -3,7 +3,7 @@
 | Check | Result | Evidence |
 |---|---|---|
 | Repository secret/public-config scan | PASS | 345 tracked files after index remediation |
-| Staged-diff scan before staging | NOT APPLICABLE | no staged files at that point |
+| Staged-diff scan | PASS | 2 safeguard files in the CI commit; final staged report diff also passed |
 | TypeScript | PASS | `tsc --noEmit` |
 | ESLint | PASS | 0 errors; 104 pre-existing warnings |
 | Auth tests | PASS | 14/14 |
@@ -26,10 +26,10 @@
 
 ## Totals
 
-- PASS: 13
+- PASS: 14
 - FAIL: 1 (superseded by a clean-cache PASS, retained as incident evidence)
 - BLOCKED: 5
-- NOT APPLICABLE: 2
+- NOT APPLICABLE: 1
 
 The compromised value was not intentionally supplied to validation. One initial
 lint invocation allowed Expo to load the ignored development environment while
