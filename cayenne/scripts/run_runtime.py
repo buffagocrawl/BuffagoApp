@@ -50,7 +50,10 @@ def main():
     credential_secrets = ()
     try:
         if a.suite == "auth":
-            credentials = load_cayenne_credentials(env, root=ROOT)
+            # Credentials deliberately come from the process environment or the
+            # ignored root-level local file only. Do not allow the app's dotenv
+            # configuration to become an authentication credential source.
+            credentials = load_cayenne_credentials(root=ROOT)
             credential_secrets = (credentials.email, credentials.password)
     except CredentialsUnavailable:
         limitations.append("CAYENNE_AUTH_BLOCKED")

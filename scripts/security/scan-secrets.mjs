@@ -95,7 +95,10 @@ for (const path of trackedPaths()) {
     for (const match of text.matchAll(defaultPassword)) {
       findings.push({ type: "Default Cayenne password in script", path, line: text.slice(0, match.index).split("\n").length, fingerprint: "redacted" });
     }
-    const passwordArgument = /(?:--password\b|-Password\b)/i;
+    // A hyphen within a placeholder such as "your-password" is not a command
+    // argument. Require an argument boundary and a following value/assignment.
+    const passwordArgument =
+      /(?:^|[\s,[(])["']?(?:--password|-password)["']?(?=\s|=|,|\)|\])/im;
     if (passwordArgument.test(text)) {
       findings.push({ type: "Password command-line argument in script", path, line: 1, fingerprint: "redacted" });
     }

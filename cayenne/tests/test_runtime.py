@@ -113,6 +113,11 @@ def test_auth_runner_keeps_maestro_artifacts_temporary_and_does_not_capture_pass
     assert 'credential_secrets' in runner
     assert 'if a.suite != "auth":\n                try:' in runner
 
+def test_auth_runner_loads_credentials_only_from_process_environment_or_local_file():
+    runner = (ROOT / 'cayenne' / 'scripts' / 'run_runtime.py').read_text(encoding='utf-8')
+    assert 'load_cayenne_credentials(root=ROOT)' in runner
+    assert 'load_cayenne_credentials(env, root=ROOT)' not in runner
+
 def test_auth_failure_messages_are_sanitized_and_actionable():
     code, message = auth_failure('Invalid login credentials for a user')
     assert code == 'INVALID_CREDENTIALS'
