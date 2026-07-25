@@ -63,9 +63,21 @@ const publicConfigPath =
   /(?:app\.config\.[cm]?[jt]s|app\.json|eas\.json|[/\\](?:app|src|components|lib|utils|config)[/\\].*\.[cm]?[jt]sx?)$/i;
 const generatedExpoPath =
   /^(?:crawl\/output\/|output\/buffaverse-web-correction\/)/;
+const localCayenneCredentialPath = /(^|\/)\.env\.cayenne(?:\..+)?\.local$/i;
+const cayenneArtifactPath = /^artifacts\/cayenne\//;
+const authMaestroFlowPath = /^cayenne\/flows\/auth\//;
+const scriptPath = /^(?:scripts|cayenne\/scripts)\//;
 
 const findings = [];
 for (const path of trackedPaths()) {
+  if (localCayenneCredentialPath.test(path)) {
+    findings.push({
+      type: "Tracked Cayenne local credential file",
+      path,
+      line: 1,
+      fingerprint: "local-cayenne-credential-file",
+    });
+  }
   if (generatedExpoPath.test(path)) {
     findings.push({
       type: "Tracked generated Expo export",
@@ -77,6 +89,34 @@ for (const path of trackedPaths()) {
 
   const text = contentFor(path);
   if (text == null) continue;
+
+  if (scriptPath.test(path) && path !== "scripts/security/scan-secrets.mjs") {
+    const defaultPassword = /(?:^|\n).*CAYENNE_TEST_PASSWORD\s*=\s*["'][^"']+/g;
+    for (const match of text.matchAll(defaultPassword)) {
+      findings.push({ type: "Default Cayenne password in script", path, line: text.slice(0, match.index).split("\n").length, fingerprint: "redacted" });
+    }
+    // A hyphen within a placeholder such as "your-password" is not a command
+    // argument. Require an argument boundary and a following value/assignment.
+    const passwordArgument =
+      /(?:^|[\s,[(])["']?(?:--password|-password)["']?(?=\s|=|,|\)|\])/im;
+    if (passwordArgument.test(text)) {
+      findings.push({ type: "Password command-line argument in script", path, line: 1, fingerprint: "redacted" });
+    }
+  }
+
+  if (authMaestroFlowPath.test(path)) {
+    const passwordInput = /id:\s*auth\.password\.input[\s\S]{0,200}?inputText:\s*(.+)/.exec(text);
+    if (!passwordInput || passwordInput[1].trim() !== "${CAYENNE_TEST_PASSWORD}") {
+      findings.push({ type: "Literal password in Cayenne Maestro flow", path, line: 1, fingerprint: "redacted" });
+    }
+  }
+
+  if (cayenneArtifactPath.test(path)) {
+    const evidenceSecret = /(?:password|access_token|refresh_token|authorization)\s*["']?\s*[:=]\s*["']?(?:Bearer\s+)?[A-Za-z0-9._~-]{16,}/i;
+    if (evidenceSecret.test(text)) {
+      findings.push({ type: "Potential credential/session material in Cayenne evidence", path, line: 1, fingerprint: "redacted" });
+    }
+  }
 
   for (const [type, regex] of detectors) {
     regex.lastIndex = 0;

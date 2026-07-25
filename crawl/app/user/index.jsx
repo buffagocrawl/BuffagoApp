@@ -101,6 +101,7 @@ export default function UserSettings() {
 
   // Username state
   const [userRowLoading, setUserRowLoading] = useState(false);
+  const [userRowLoaded, setUserRowLoaded] = useState(false);
   const [username, setUsername] = useState(null);
   const [socialOptOut, setSocialOptOut] = useState(false);
   const [socialOptOutSaving, setSocialOptOutSaving] = useState(false);
@@ -253,10 +254,11 @@ export default function UserSettings() {
       if (!user) return;
 
       setUserRowLoading(true);
+      setUserRowLoaded(false);
 
       const { data: row, error } = await supabase
         .from('users')
-        .select('username, social_opt_out')
+        .select('user_id, username, social_opt_out')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -266,6 +268,9 @@ export default function UserSettings() {
       setUsername(u);
       setUsernameDraft(u ?? '');
       setSocialOptOut(Boolean(row?.social_opt_out));
+      // A successful empty response is not proof of an RLS-backed profile read.
+      // Keep the verification marker absent until the user's actual row is present.
+      setUserRowLoaded(Boolean(row?.user_id));
 
       if (!socialOptOutViewedRef.current) {
         const currentValue = Boolean(row?.social_opt_out);
@@ -1020,7 +1025,8 @@ export default function UserSettings() {
   const prettyUsername = username ? `@${username}` : userRowLoading ? 'Loading…' : 'No username set';
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+    <SafeAreaView testID="profile.root" style={{ flex: 1, backgroundColor: colors.background }}>
+      {session && userRowLoaded ? <View testID="profile.rls-read-marker" accessible={false} /> : null}
       <Appbar.Header elevated={false} style={{ backgroundColor: 'transparent' }}>
         <Appbar.BackAction
           onPress={() => {
@@ -1221,6 +1227,7 @@ export default function UserSettings() {
         {/* Auth buttons */}
         {session ? (
           <Button
+            testID="profile.signout.button"
             mode="outlined"
             style={{ borderRadius: 12 }}
             onPress={async () => {

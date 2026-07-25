@@ -1,9 +1,12 @@
 import json
+import os
+import subprocess
 from pathlib import Path
 import sys
 import pytest
 sys.path.insert(0, str(Path(__file__).parents[1] / 'scripts'))
-from cayenne_runtime import detect_startup_state, disposition, redact, safety, smoke_assertion_metadata, validate_selectors
+from cayenne_runtime import auth_failure, detect_startup_state, disposition, redact, safety, smoke_assertion_metadata, validate_selectors, write_json
+from credentials import AUTH_BLOCKED, CredentialsUnavailable, LOCAL_IGNORED_FILE, PROCESS_ENV, load_cayenne_credentials
 import android_lifecycle as al
 from android_lifecycle import AndroidLifecycle, RuntimeFailure
 
@@ -16,6 +19,111 @@ def test_unknown_environment_fails_closed():
 def test_redaction_removes_secrets_and_email():
     r=redact({'password':'secret','message':'Bearer abcdefghijklmnopqrstuvwxyz.12345678 user@example.com'})
     assert 'secret' not in json.dumps(r) and 'user@example.com' not in json.dumps(r)
+
+def test_missing_cayenne_credentials_fail_closed_without_values(tmp_path):
+    with pytest.raises(CredentialsUnavailable) as caught:
+        load_cayenne_credentials({}, root=tmp_path)
+    assert str(caught.value) == AUTH_BLOCKED
+    assert 'CAYENNE_TEST_PASSWORD' not in str(caught.value)
+
+def test_password_never_appears_in_errors_or_redacted_logger_output(tmp_path):
+    password = 'synthetic-password-for-security-test'
+    with pytest.raises(CredentialsUnavailable) as caught:
+        load_cayenne_credentials({'CAYENNE_TEST_EMAIL': 'example', 'CAYENNE_TEST_PASSWORD': password}, root=tmp_path)
+    assert password not in str(caught.value)
+    assert password not in redact(f'authentication failed: {password}', secrets=(password,))
+
+def test_credential_loader_keeps_password_unmodified_and_is_not_json_serializable():
+    password = ' fake password with spaces '
+    credentials = load_cayenne_credentials({'CAYENNE_TEST_EMAIL': ' qa@example.test ', 'CAYENNE_TEST_PASSWORD': password})
+    assert credentials.email == 'qa@example.test'
+    assert credentials.password == password
+    with pytest.raises(TypeError):
+        json.dumps(credentials)
+    assert password not in repr(credentials)
+    assert credentials.source == PROCESS_ENV
+
+def test_credential_loader_uses_ignored_local_file_only_when_process_pair_is_unavailable(tmp_path):
+    local = tmp_path / '.env.cayenne.local'
+    local.write_text('# local only\nCAYENNE_TEST_EMAIL= qa@example.test \nCAYENNE_TEST_PASSWORD=secret=with=equals\n', encoding='utf-8')
+    credentials = load_cayenne_credentials({}, root=tmp_path)
+    assert credentials.email == 'qa@example.test'
+    assert credentials.password == 'secret=with=equals'
+    assert credentials.source == LOCAL_IGNORED_FILE
+    process = load_cayenne_credentials({'CAYENNE_TEST_EMAIL': 'process@example.test', 'CAYENNE_TEST_PASSWORD': 'process-secret'}, root=tmp_path)
+    assert process.source == PROCESS_ENV
+
+def test_local_credential_loader_rejects_empty_and_placeholder_values(tmp_path):
+    (tmp_path / '.env.cayenne.local').write_text('CAYENNE_TEST_EMAIL=example\nCAYENNE_TEST_PASSWORD=\n', encoding='utf-8')
+    with pytest.raises(CredentialsUnavailable) as caught:
+        load_cayenne_credentials({}, root=tmp_path)
+    assert str(caught.value) == AUTH_BLOCKED
+
+def test_cayenne_example_contains_no_password_value():
+    example = (ROOT / '.env.cayenne.example').read_text(encoding='utf-8')
+    assert 'CAYENNE_TEST_PASSWORD=\n' in example
+    assert 'CAYENNE_QA_USER_PASSWORD' not in example
+
+def test_local_cayenne_secret_file_is_ignored_and_untracked(tmp_path):
+    local_secret = ROOT / '.env.cayenne.local'
+    result = subprocess.run(['git', 'check-ignore', '-v', str(local_secret)], cwd=ROOT, text=True, capture_output=True, check=False)
+    assert result.returncode == 0
+    tracked = subprocess.run(['git', 'ls-files', '--error-unmatch', '.env.cayenne.local'], cwd=ROOT, text=True, capture_output=True, check=False)
+    assert tracked.returncode != 0
+
+def test_launcher_uses_no_password_argument_or_environment_dump_and_restores_scope():
+    launcher = (ROOT / 'scripts' / 'run-cayenne-auth.ps1').read_text(encoding='utf-8')
+    assert 'CAYENNE_TEST_PASSWORD' in launcher
+    assert 'Get-ChildItem Env:' not in launcher
+    assert 'ArgumentList' not in launcher
+    assert 'finally' in launcher and 'Remove-Item Env:CAYENNE_TEST_PASSWORD' in launcher
+    assert '.env.cayenne.local' in launcher
+
+def test_mobile_application_does_not_import_harness_credential_loader():
+    for path in (ROOT / 'crawl').rglob('*'):
+        if path.is_file() and 'node_modules' not in path.parts and path.suffix in {'.js', '.jsx', '.ts', '.tsx'}:
+            assert 'cayenne.scripts.credentials' not in path.read_text(encoding='utf-8', errors='ignore')
+
+def test_maestro_auth_flow_uses_runtime_variables_and_has_no_credential_screenshot():
+    flow = (ROOT / 'cayenne' / 'flows' / 'auth' / 'cayenne-secure-auth.yaml').read_text(encoding='utf-8')
+    assert '${CAYENNE_TEST_EMAIL}' in flow and '${CAYENNE_TEST_PASSWORD}' in flow
+    assert 'takeScreenshot' not in flow
+    assert 'CAYENNE_QA_USER_' not in flow
+
+def test_artifact_redaction_removes_tokens_sessions_and_authorization_values(tmp_path):
+    password = 'synthetic-password-for-artifact-test'
+    payload = {
+        'password': password,
+        'Authorization': 'Bearer abcdefghijklmnopqrstuvwxyz.12345678',
+        'access_token': 'access-value',
+        'refresh_token': 'refresh-value',
+        'session': {'user': 'synthetic-user'},
+        'message': password,
+    }
+    target = tmp_path / 'evidence.json'
+    write_json(target, redact(payload, secrets=(password,)))
+    text = target.read_text(encoding='utf-8')
+    for value in (password, 'access-value', 'refresh-value', 'synthetic-user', 'Bearer'):
+        assert value not in text
+
+def test_auth_runner_keeps_maestro_artifacts_temporary_and_does_not_capture_password_screen():
+    runner = (ROOT / 'cayenne' / 'scripts' / 'run_runtime.py').read_text(encoding='utf-8')
+    assert 'TemporaryDirectory(prefix="cayenne-maestro-")' in runner
+    assert 'if a.suite != "auth"' in runner
+    assert 'credential_secrets' in runner
+    assert 'if a.suite != "auth":\n                try:' in runner
+
+def test_auth_runner_loads_credentials_only_from_process_environment_or_local_file():
+    runner = (ROOT / 'cayenne' / 'scripts' / 'run_runtime.py').read_text(encoding='utf-8')
+    assert 'load_cayenne_credentials(root=ROOT)' in runner
+    assert 'load_cayenne_credentials(env, root=ROOT)' not in runner
+
+def test_auth_failure_messages_are_sanitized_and_actionable():
+    code, message = auth_failure('Invalid login credentials for a user')
+    assert code == 'INVALID_CREDENTIALS'
+    assert 'user' not in message.lower()
+    assert auth_failure('network request failed')[0] == 'NETWORK_OR_TIMEOUT'
+    assert auth_failure('profile.rls-read-marker missing')[0] == 'PROFILE_RLS_DENIAL'
 def test_selectors_are_unique_and_known():
     result=validate_selectors(ROOT,ROOT/'cayenne'/'flows')
     assert result['duplicateIds'] is False and result['unknownReferences']==[]

@@ -1,0 +1,55 @@
+{
+  "adbStart": {
+    "status": "STARTED",
+    "warnings": []
+  },
+  "emulatorStart": {
+    "status": "STARTED",
+    "avd": "Medium_Phone_API_36.1",
+    "pid": 10316,
+    "arguments": [
+      "-no-snapshot-load",
+      "-port",
+      "5554"
+    ]
+  },
+  "adbRecovery": {
+    "status": "RECOVERED",
+    "states": [
+      "missing",
+      "missing",
+      "missing",
+      "offline",
+      "offline",
+      "offline",
+      "offline",
+      "offline",
+      "offline",
+      "offline",
+      "offline",
+      "device"
+    ],
+    "reconnect": true,
+    "adbRestart": true
+  },
+  "emulatorBoot": {
+    "status": "BOOTED"
+  },
+  "package": {
+    "status": "INSTALLED",
+    "package": "com.buffago.app"
+  },
+  "metroStart": {
+    "status": "STARTED",
+    "pid": 26896,
+    "log": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\cayenne\\runs\\20260724T211225-1c6ab8cc\\logs\\metro.log"
+  },
+  "bundlePrewarm": {
+    "status": "PREWARMED",
+    "entry": "node_modules/expo-router/entry.bundle"
+  },
+  "failure": {
+    "category": "DEV_CLIENT_CONNECTION_FAILURE",
+    "message": "adb reverse failed: adb.exe: device 'emulator-5554' not found"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "adbStart": {
+    "status": "STARTED",
+    "warnings": []
+  },
+  "emulatorStart": {
+    "status": "ALREADY_RUNNING",
+    "avd": "Medium_Phone_API_36.1"
+  },
+  "adbRecovery": {
+    "status": "CONNECTED",
+    "states": [
+      "device"
+    ],
+    "reconnect": false,
+    "adbRestart": false
+  },
+  "emulatorBoot": {
+    "status": "BOOTED"
+  },
+  "package": {
+    "status": "INSTALLED",
+    "package": "com.buffago.app"
+  },
+  "metroStart": {
+    "status": "STARTED",
+    "pid": 3172,
+    "log": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\cayenne\\runs\\20260724T192429-59a125a0\\logs\\metro.log"
+  },
+  "bundlePrewarm": {
+    "status": "PREWARMED",
+    "entry": "node_modules/expo-router/entry.bundle"
+  },
+  "devClientConnection": {
+    "status": "CONNECTED",
+    "url": "exp+buffago://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081",
+    "reverse": "tcp:8081",
+    "pid": "4807",
+    "selector": "app.root",
+    "launcherForeground": false,
+    "fatalError": false
+  },
+  "maestro": {
+    "status": "PASSED",
+    "returnCode": 0
+  }
+}

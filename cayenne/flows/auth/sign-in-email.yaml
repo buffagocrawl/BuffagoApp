@@ -5,10 +5,9 @@ tags: [auth, qa-only]
 - tapOn: "Sign In"
 - tapOn:
     id: auth.email.input
-- inputText: ${CAYENNE_QA_USER_EMAIL}
+- inputText: ${CAYENNE_TEST_EMAIL}
 - tapOn:
     id: auth.password.input
-- inputText: ${CAYENNE_QA_USER_PASSWORD}
+- inputText: ${CAYENNE_TEST_PASSWORD}
 - tapOn:
     id: auth.signin.button
-- takeScreenshot: auth-signed-in

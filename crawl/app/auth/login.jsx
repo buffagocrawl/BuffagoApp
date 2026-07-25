@@ -23,6 +23,7 @@ import {
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase.js';
+import { withPasswordAuthTimeout } from '../../lib/passwordAuthTimeout';
 import { dbg } from '../../lib/debugLog';
 import {
   clearOAuthFlowState,
@@ -420,7 +421,9 @@ export default function EmailAuthScreen() {
     setBusy(true);
     try {
       await trackEvent({ eventName: 'auth_started', screen: 'auth/login', metadata: { auth_method: 'password' } });
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await withPasswordAuthTimeout(
+        supabase.auth.signInWithPassword({ email, password })
+      );
       if (error) throw error;
 
       const user = data?.user || data?.session?.user || null;
@@ -647,7 +650,7 @@ export default function EmailAuthScreen() {
                 Forgot password?
               </Button>
 
-              {busy ? <ActivityIndicator style={{ marginTop: 8 }} /> : null}
+              {busy ? <ActivityIndicator testID="auth.loading" style={{ marginTop: 8 }} /> : null}
 
               <Button mode="text" onPress={() => router.back()} style={{ marginTop: 6 }}>
                 Cancel
@@ -655,7 +658,7 @@ export default function EmailAuthScreen() {
             </Card.Content>
           </Card>
 
-          <Snackbar visible={snack.open} onDismiss={() => setSnack({ open: false, msg: '' })} duration={3000}>
+          <Snackbar testID="auth.error" visible={snack.open} onDismiss={() => setSnack({ open: false, msg: '' })} duration={3000}>
             {snack.msg}
           </Snackbar>
         </ScrollView>

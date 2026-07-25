@@ -1,9 +1,10 @@
 from __future__ import annotations
-import argparse, json, os, shutil, subprocess, sys
+import argparse, json, os, shutil, subprocess, sys, tempfile
 from datetime import datetime, timezone
 from pathlib import Path
-from cayenne_runtime import detect_startup_state, disposition, redact, safety, smoke_assertion_metadata, write_json
+from cayenne_runtime import auth_failure, detect_startup_state, disposition, redact, safety, smoke_assertion_metadata, write_json
 from android_lifecycle import AndroidLifecycle, RuntimeFailure
+from credentials import AUTH_BLOCKED, CredentialsUnavailable, load_cayenne_credentials
 
 ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "com.buffago.app"
@@ -32,21 +33,36 @@ def main():
     run_id=a.run_id or datetime.now().strftime("%Y%m%dT%H%M%S")+"-"+os.urandom(4).hex(); out=(a.output_directory or ROOT/"artifacts"/"cayenne"/"runs"/run_id).resolve(); out.mkdir(parents=True,exist_ok=True)
     for d in ("screenshots","videos","hierarchies","logs","maestro","failures","serrano"): (out/d).mkdir(exist_ok=True)
     env=load_env(ROOT/"crawl"/".env.development"); env.update({k:v for k,v in os.environ.items() if k.startswith("CAYENNE_") or k.startswith("EXPO_PUBLIC_")})
-    readonly_suites={"smoke-auto","smoke-clean","smoke-authenticated","accessibility","exploratory"}
+    readonly_suites={"smoke-auto","smoke-clean","smoke-authenticated","accessibility","exploratory","auth"}
     mutation=a.suite not in readonly_suites; allow=str(env.get("CAYENNE_ALLOW_MUTATION", "false")).lower()=="true"
     safe=safety(a.environment,mutation,allow,env.get("EXPO_PUBLIC_SUPABASE_URL", ""),env)
-    write_json(out/"safety-check.json",safe); write_json(out/"environment.json",{"environment":a.environment,"productionDetected":safe["productionDetected"],"configured":{"supabaseUrl":bool(env.get("EXPO_PUBLIC_SUPABASE_URL")),"supabaseAnonKey":bool(env.get("EXPO_PUBLIC_SUPABASE_ANON_KEY")),"qaUser":bool(env.get("CAYENNE_QA_USER_EMAIL"))}})
+    write_json(out/"safety-check.json",safe); write_json(out/"environment.json",{"environment":a.environment,"productionDetected":safe["productionDetected"],"configured":{"supabaseUrl":bool(env.get("EXPO_PUBLIC_SUPABASE_URL")),"supabaseAnonKey":bool(env.get("EXPO_PUBLIC_SUPABASE_ANON_KEY")),"cayenneCredentialVariablesPresent":bool(env.get("CAYENNE_TEST_EMAIL") and env.get("CAYENNE_TEST_PASSWORD"))}})
     prereq={"java":bool(tool("java")),"maestro":bool(tool("maestro")),"deviceId":a.device_id,"package":"com.buffago.app"}; write_json(out/"prerequisite-check.json",prereq)
     started=iso(); limitations=[]; failures=[]; flow_status="INCONCLUSIVE"; output=""; startup={"detectedStartupState":None,"startupStateCandidates":[],"valid":False,"reason":"NOT_INSPECTED","selectorsPresent":[]}
     lifecycle=None; runtime_report={}; cleanup={"status":"NOT_REQUIRED","ownedPids":[],"cleanedPids":[]}
     acceptance=["App launches","app.root appears","No fatal runtime error","Exactly one valid startup state","Detected startup state passes its required assertions"]
     if a.suite=="smoke-authenticated": acceptance.append("Authenticated navigation passes")
+    if a.suite=="auth": acceptance.extend(["Cayenne account signs in", "Session restores after relaunch", "RLS-backed profile read succeeds", "Logout returns to sign-in"])
     request={"contractVersion":"1.0","runId":run_id,"requestedBy":"serrano" if a.serrano_review else "owner","requestedSuite":requested_suite,"suite":a.suite,"environment":a.environment,"mutationAllowed":safe["mutationAllowed"],"device":{"platform":"android","deviceId":a.device_id},"evidenceRequirements":["screenshot","hierarchy","logcat","maestro-junit"],"acceptanceCriteria":acceptance}
     write_json(out/"request.json",request)
     preprovisioned=str(env.get("CAYENNE_PREPROVISIONED_SAFE_AUTH","false")).lower()=="true"
-    qa_credentials=bool(env.get("CAYENNE_QA_USER_EMAIL") and env.get("CAYENNE_QA_USER_PASSWORD"))
+    credentials = None
+    credential_secrets = ()
+    try:
+        if a.suite == "auth":
+            # Credentials deliberately come from the process environment or the
+            # ignored root-level local file only. Do not allow the app's dotenv
+            # configuration to become an authentication credential source.
+            credentials = load_cayenne_credentials(root=ROOT)
+            credential_secrets = (credentials.email, credentials.password)
+    except CredentialsUnavailable:
+        limitations.append("CAYENNE_AUTH_BLOCKED")
+        failures.append({"failureCategory":"FIXTURE_BLOCKER","failureMessage":AUTH_BLOCKED})
+    qa_credentials=credentials is not None
     safe_auth_available=a.environment in {"qa","local-mock"} and (preprovisioned or qa_credentials)
-    if a.suite=="smoke-authenticated" and not safe_auth_available:
+    if a.suite=="auth" and credentials is None:
+        flow_status="BLOCKED"
+    elif a.suite=="smoke-authenticated" and not safe_auth_available:
         flow_status="BLOCKED"; failures.append({"failureCategory":"FIXTURE_BLOCKER","failureMessage":"smoke-authenticated requires QA/local-mock credentials or a pre-provisioned safe authentication state"}); limitations.append("SAFE_AUTHENTICATION_STATE_UNAVAILABLE")
     elif safe["decision"]!="ALLOW" and mutation: flow_status="BLOCKED"; failures.append({"failureCategory":"SECURITY_BOUNDARY","failureMessage":"Mutating suite blocked by runtime safety policy"}); limitations.append("PRODUCTION_MUTATION_DENIED")
     elif a.dry_run: limitations.append("DRY_RUN_NO_RUNTIME_EXECUTION")
@@ -66,8 +82,8 @@ def main():
             if a.reset_app:
                 lifecycle._adb("-s",a.device_id,"shell","pm","clear",PACKAGE)
                 runtime_report["devClientConnection"]=lifecycle.connect_dev_client()
-            _,initial_hier=lifecycle._adb("-s",a.device_id,"exec-out","uiautomator","dump","/dev/tty")
-            (out/"hierarchies"/"startup.xml").write_text(redact(initial_hier,redact_emails=False),encoding="utf-8")
+            _,initial_hier=lifecycle.dump_hierarchy()
+            (out/"hierarchies"/"startup.xml").write_text(redact(initial_hier, secrets=credential_secrets),encoding="utf-8")
             startup=detect_startup_state(initial_hier)
             try:
                 initial_shot=subprocess.run([str(lifecycle.adb),"-s",a.device_id,"exec-out","screencap","-p"],cwd=ROOT,capture_output=True,timeout=30,check=False)
@@ -78,23 +94,32 @@ def main():
                 "smoke-auto": ROOT/"cayenne"/"flows"/"smoke"/"smoke-auto.yaml",
                 "smoke-clean": ROOT/"cayenne"/"flows"/"smoke"/"smoke-clean.yaml",
                 "smoke-authenticated": ROOT/"cayenne"/"flows"/"smoke"/"smoke-authenticated.yaml",
+                "auth": ROOT/"cayenne"/"flows"/"auth"/"cayenne-secure-auth.yaml",
             }
             flow=smoke_flows.get(a.suite,ROOT/"cayenne"/"flows"/"accessibility"/"primary-controls.yaml")
             maestro=tool("maestro") or "maestro"
-            rc,output=run_cmd([maestro,"--device",a.device_id,"test",str(flow),"--format","junit","--output",str(out/"maestro"/"junit.xml"),"--test-output-dir",str(out/"maestro"/"artifacts")],ROOT,timeout=300)
+            # Maestro may create failure screenshots automatically.  Keep them in a
+            # temporary directory and never persist them for the credentialed suite.
+            with tempfile.TemporaryDirectory(prefix="cayenne-maestro-") as maestro_output:
+                rc,output=run_cmd([maestro,"--device",a.device_id,"test",str(flow),"--format","junit","--output",str(out/"maestro"/"junit.xml"),"--test-output-dir",maestro_output],ROOT,timeout=300)
+                if a.suite != "auth":
+                    for index,path in enumerate(Path(maestro_output).rglob("*.png"),start=1):
+                        shutil.copy2(path,out/"screenshots"/f"maestro-{index:02d}-{path.name}")
             runtime_report["maestro"]={"status":"PASSED" if rc==0 else "FAILED","returnCode":rc}
-            (out/"maestro"/"raw-output.log").write_text(redact(output,redact_emails=False),encoding="utf-8")
-            _,hier=lifecycle._adb("-s",a.device_id,"exec-out","uiautomator","dump","/dev/tty"); (out/"hierarchies"/"final.xml").write_text(redact(hier,redact_emails=False),encoding="utf-8")
+            junit = out/"maestro"/"junit.xml"
+            if junit.exists():
+                junit.write_text(redact(junit.read_text(encoding="utf-8", errors="replace"), secrets=credential_secrets),encoding="utf-8")
+            (out/"maestro"/"raw-output.log").write_text(redact(output, secrets=credential_secrets),encoding="utf-8")
+            _,hier=lifecycle.dump_hierarchy(); (out/"hierarchies"/"final.xml").write_text(redact(hier, secrets=credential_secrets),encoding="utf-8")
             if not startup["valid"]:
                 startup=detect_startup_state(hier)
-            _,log=lifecycle._adb("-s",a.device_id,"logcat","-d","-v","brief","-t","500"); (out/"logs"/"logcat.txt").write_text(redact(log,redact_emails=False),encoding="utf-8")
-            try:
-                shot=subprocess.run([str(lifecycle.adb),"-s",a.device_id,"exec-out","screencap","-p"],cwd=ROOT,capture_output=True,timeout=30,check=False)
-                (out/"screenshots"/"final.png").write_bytes(shot.stdout)
-            except Exception as exc:
-                limitations.append("SCREENSHOT_CAPTURE_FAILED:"+type(exc).__name__)
-            for index,path in enumerate((out/"maestro"/"artifacts").rglob("*.png"),start=1):
-                shutil.copy2(path,out/"screenshots"/f"maestro-{index:02d}-{path.name}")
+            _,log=lifecycle._adb("-s",a.device_id,"logcat","-d","-v","brief","-t","500"); (out/"logs"/"logcat.txt").write_text(redact(log, secrets=credential_secrets),encoding="utf-8")
+            if a.suite != "auth":
+                try:
+                    shot=subprocess.run([str(lifecycle.adb),"-s",a.device_id,"exec-out","screencap","-p"],cwd=ROOT,capture_output=True,timeout=30,check=False)
+                    (out/"screenshots"/"final.png").write_bytes(shot.stdout)
+                except Exception as exc:
+                    limitations.append("SCREENSHOT_CAPTURE_FAILED:"+type(exc).__name__)
             expected_ok=(a.suite!="smoke-clean" or startup.get("detectedStartupState")=="CLEAN_ONBOARDING") and (a.suite!="smoke-authenticated" or startup.get("detectedStartupState")=="AUTHENTICATED")
             if rc==0 and startup["valid"] and expected_ok:
                 flow_status="PASSED"
@@ -106,7 +131,12 @@ def main():
                 else:
                     flow_status="FAILED"; failures.append({"failureCategory":"TEST_DEFECT","failureMessage":f"{a.suite} did not start in its required state"})
             else:
-                flow_status="FAILED"; failures.append({"failureCategory":"APP_DEFECT" if "fatal" in output.lower() or "exception" in output.lower() else "TEST_DEFECT","failureMessage":"Maestro smoke suite failed"})
+                flow_status="FAILED"
+                if a.suite == "auth":
+                    failure_code, failure_message = auth_failure(output + "\n" + hier)
+                    failures.append({"failureCategory":"APP_DEFECT" if failure_code not in {"INVALID_CREDENTIALS", "NETWORK_OR_TIMEOUT"} else "FIXTURE_BLOCKER","failureCode":failure_code,"failureMessage":failure_message})
+                else:
+                    failures.append({"failureCategory":"APP_DEFECT" if "fatal" in output.lower() or "exception" in output.lower() else "TEST_DEFECT","failureMessage":"Maestro smoke suite failed"})
         except RuntimeFailure as exc:
             flow_status="BLOCKED"
             runtime_report["failure"]={"category":exc.category,"message":str(exc)}
@@ -120,7 +150,9 @@ def main():
     universal_result="PASSED" if all(item["status"]=="PASSED" for item in assertion_meta["universalAssertions"]) and flow_status=="PASSED" else "FAILED"
     state_result="PASSED" if startup.get("valid") and flow_status=="PASSED" else "INSUFFICIENT_EVIDENCE"
     finished=iso(); artifacts=[str(p.relative_to(out)).replace("\\","/") for p in out.rglob("*") if p.is_file() and p.name not in {"result.json","combined-review.md"}]
-    result={"contractVersion":"1.0","runId":run_id,"status":flow_status,"startedAt":started,"finishedAt":finished,"requestedSuite":requested_suite,"suite":a.suite,"environment":a.environment,"device":{"platform":"android","deviceId":a.device_id},"detectedStartupState":startup.get("detectedStartupState"),"startupStateCandidates":startup.get("startupStateCandidates",[]),"startupStateValidation":"PASSED" if startup.get("valid") and flow_status=="PASSED" else "FAILED","universalAssertionResult":universal_result,"stateSpecificAssertionResult":state_result,**assertion_meta,"summary":{"acceptanceCriteriaCovered":request["acceptanceCriteria"] if flow_status=="PASSED" else [],"artifactCount":len(artifacts)},"runtime":runtime_report,"cleanup":cleanup,"flows":[{"flowId":a.suite,"title":a.suite,"status":flow_status,"durationMs":0,"preconditions":["Android emulator"],"steps":[],"assertions":request["acceptanceCriteria"],"detectedStartupState":startup.get("detectedStartupState"),"stateSpecificAssertions":assertion_meta["stateSpecificAssertions"],"skippedAssertions":assertion_meta["skippedAssertions"],"skipReason":assertion_meta["skipReason"],"screenshots":[str(p.relative_to(out)).replace("\\","/") for p in (out/"screenshots").glob("*.png")],"hierarchy":"hierarchies/final.xml","logs":["logs/logcat.txt","logs/metro.log","maestro/raw-output.log"],"failureCategory":failures[0]["failureCategory"] if failures else None,"failureMessage":failures[0]["failureMessage"] if failures else None,"retryCount":0}],"failures":failures,"artifacts":artifacts,"safety":safe,"redaction":{"validated":True,"status":"PASSED"},"limitations":limitations}
+    auth_status = "PASSED" if flow_status == "PASSED" else "BLOCKED" if flow_status == "BLOCKED" else "FAILED" if a.suite == "auth" else "NOT_RUN"
+    credential_source = credentials.source if credentials is not None else "MISSING"
+    result={"contractVersion":"1.0","runId":run_id,"status":flow_status,"startedAt":started,"finishedAt":finished,"requestedSuite":requested_suite,"suite":a.suite,"environment":a.environment,"device":{"platform":"android","deviceId":a.device_id},"detectedStartupState":startup.get("detectedStartupState"),"startupStateCandidates":startup.get("startupStateCandidates",[]),"startupStateValidation":"PASSED" if startup.get("valid") and flow_status=="PASSED" else "FAILED","universalAssertionResult":universal_result,"stateSpecificAssertionResult":state_result,**assertion_meta,"authentication":{"credentialSource":credential_source,"credentialsAvailable":credentials is not None,"login":auth_status,"sessionRestoration":auth_status,"protectedNavigation":auth_status,"logout":auth_status,"profileLoad":auth_status,"rlsBackedRead":auth_status},"summary":{"acceptanceCriteriaCovered":request["acceptanceCriteria"] if flow_status=="PASSED" else [],"artifactCount":len(artifacts)},"runtime":runtime_report,"cleanup":cleanup,"flows":[{"flowId":a.suite,"title":a.suite,"status":flow_status,"durationMs":0,"preconditions":["Android emulator"],"steps":[],"assertions":request["acceptanceCriteria"],"detectedStartupState":startup.get("detectedStartupState"),"stateSpecificAssertions":assertion_meta["stateSpecificAssertions"],"skippedAssertions":assertion_meta["skippedAssertions"],"skipReason":assertion_meta["skipReason"],"screenshots":[str(p.relative_to(out)).replace("\\","/") for p in (out/"screenshots").glob("*.png")],"hierarchy":"hierarchies/final.xml","logs":["logs/logcat.txt","logs/metro.log","maestro/raw-output.log"],"failureCategory":failures[0]["failureCategory"] if failures else None,"failureMessage":failures[0]["failureMessage"] if failures else None,"retryCount":0}],"failures":failures,"artifacts":artifacts,"safety":safe,"redaction":{"validated":True,"status":"PASSED"},"limitations":limitations}
     write_json(out/"result.json",result); write_json(out/"fixture-report.json",{"status":"NOT_REQUIRED" if not mutation else "BLOCKED_EXTERNAL_QA_CREDENTIALS","runId":run_id,"namespace":f"cayenne:{run_id}","cleanup":"retained" if a.keep_fixture_data else "not-run"})
     review=disposition(result,request) if a.serrano_review else None
     if review:

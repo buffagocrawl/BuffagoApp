@@ -1,0 +1,8 @@
+{
+  "environment": "qa",
+  "productionDetected": true,
+  "mutationRequested": false,
+  "mutationAllowed": false,
+  "decision": "ALLOW",
+  "reasons": []
+}
