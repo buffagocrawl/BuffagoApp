@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 FAILURE_CATEGORIES = {"APP_DEFECT","TEST_DEFECT","ENVIRONMENT_BLOCKER","FIXTURE_BLOCKER","EXTERNAL_PROVIDER_BLOCKER","DEVICE_BLOCKER","BUILD_FAILURE","TIMEOUT","SELECTOR_MISSING","PERMISSION_BLOCKER","DATA_MISMATCH","SECURITY_BOUNDARY","INCONCLUSIVE"}
-SECRET_KEY = re.compile(r"(?i)(password|token|secret|authorization|cookie|api[_-]?key|service[_-]?role|anon[_-]?key|refresh|session|storage[_-]?state|auth[_-]?state)")
+SECRET_KEY = re.compile(r"(?i)^(?:password|token|secret|authorization|cookie|api[_-]?key|service[_-]?role|anon[_-]?key|access_token|refresh(?:_token)?|session|storage[_-]?state|auth[_-]?state)$")
 SECRET_VALUE = re.compile(r"(?i)(bearer\s+)?[A-Za-z0-9_\-]{24,}\.[A-Za-z0-9_\-]{8,}\.?[A-Za-z0-9_\-]*")
 EMAIL = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.I)
 STARTUP_SELECTORS = {

@@ -1,0 +1,631 @@
+--------- beginning of main
+D/SafetySourceDataValidat(  816): No cert check requested for package com.google.android.permissioncontroller
+D/Zygote  (  582): Forked child process 5052
+--------- beginning of system
+I/ActivityManager(  816): Start proc 5052:com.android.externalstorage/u0a104 for content provider {com.android.externalstorage/com.android.externalstorage.ExternalStorageProvider}
+W/ActivityManager(  816): Slow operation: 57ms so far, now at startProcess: starting to update pids map
+W/ActivityManager(  816): Slow operation: 58ms so far, now at startProcess: done updating pids map
+D/nativeloader( 5012): InitLlndkLibrariesProduct: libEGL.so:libGLESv1_CM.so:libGLESv2.so:libGLESv3.so:libRS.so:libandroid_net.so:libapexsupport.so:libavf.so:libbinder_ndk.so:libc.so:libcgrouprc.so:libclang_rt.asan-x86_64-android.so:libcom.android.tethering.connectivity_native.so:libdl.so:libft2.so:liblog.so:libm.so:libmediandk.so:libnativewindow.so:libneuralnetworks.so:libselinux.so:libsync.so:libvendorsupport.so:libvndksupport.so:libvulkan.so
+D/nativeloader( 5012): Configuring product-clns-10 for unbundled product apk /product/priv-app/Velvet/Velvet.apk. target_sdk_version=36, uses_libraries=, library_path=/product/priv-app/Velvet/lib/x86_64:/product/priv-app/Velvet/Velvet.apk!/lib/x86_64:/product/lib64:/system/product/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.googlequicksearchbox:/product/lib64:/system/product/lib64
+D/nativeloader( 5012): InitVndkspLibrariesProduct: VNDK is deprecated with product
+E/ashmem  ( 4976): Pinning is deprecated since Android Q. Please use trim or other methods.
+I/Zygote  ( 5052): Process 5052 created for com.android.externalstorage
+I/externalstorage( 5052): Using CollectorTypeCMC GC.
+D/DocumentsApplication( 4976): OverlayManager.setEnabled() result: true
+V/GrammaticalInflectionUtils(  816): AttributionSource: android.content.AttributionSource@d321a76b does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+I/Icing   ( 1781): doRemovePackageData dev.mobile.maestro.test
+W/SQLiteLog( 1781): (28) double-quoted string literal: "dev.mobile.maestro.test"
+W/externalstorage( 5052): Unexpected CPU variant for x86: x86_64.
+W/externalstorage( 5052): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+V/GraphicsEnvironment( 4997): Currently set values for:
+V/GraphicsEnvironment( 4997):   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment( 4997):   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment( 4997): com.google.android.dialer is not listed in per-application setting
+V/GraphicsEnvironment( 4997): ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+V/GraphicsEnvironment( 4997): com.google.android.dialer is not listed in ANGLE allowlist or settings, returning default
+V/GraphicsEnvironment( 4997): Neither updatable production driver nor prerelease driver is supported.
+D/nativeloader( 4946): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+D/AndroidRuntime( 4946): Calling main entry com.android.commands.uiautomator.Launcher
+D/nativeloader( 5052): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+D/Zygote  (  582): Forked child process 5068
+W/ActivityManager(  816): Slow operation: 53ms so far, now at startProcess: returned from zygote!
+D/nativeloader( 5010): InitLlndkLibrariesProduct: libEGL.so:libGLESv1_CM.so:libGLESv2.so:libGLESv3.so:libRS.so:libandroid_net.so:libapexsupport.so:libavf.so:libbinder_ndk.so:libc.so:libcgrouprc.so:libclang_rt.asan-x86_64-android.so:libcom.android.tethering.connectivity_native.so:libdl.so:libft2.so:liblog.so:libm.so:libmediandk.so:libnativewindow.so:libneuralnetworks.so:libselinux.so:libsync.so:libvendorsupport.so:libvndksupport.so:libvulkan.so
+D/PersistedStoragePackageUninstalledReceiver( 3565): Received android.intent.action.PACKAGE_FULLY_REMOVED for dev.mobile.maestro.test for u0
+D/nativeloader( 5010): Configuring product-clns-9 for unbundled product apk /product/app/Photos/Photos.apk. target_sdk_version=35, uses_libraries=, library_path=/product/app/Photos/lib/x86_64:/product/app/Photos/Photos.apk!/lib/x86_64:/product/lib64:/system/product/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.apps.photos:/product/lib64:/system/product/lib64
+W/ActivityManager(  816): Slow operation: 71ms so far, now at startProcess: done updating battery stats
+W/ActivityManager(  816): Slow operation: 71ms so far, now at startProcess: building log message
+I/ActivityManager(  816): Start proc 5068:com.google.android.rkpdapp/u0a191 for broadcast {com.google.android.rkpdapp/com.android.rkpdapp.PackageRemovalReceiver}
+D/nativeloader( 5010): InitVndkspLibrariesProduct: VNDK is deprecated with product
+I/Zygote  ( 5068): Process 5068 created for com.google.android.rkpdapp
+I/android.rkpdapp( 5068): Using CollectorTypeCMC GC.
+W/ActivityManager(  816): Slow operation: 71ms so far, now at startProcess: starting to update pids map
+W/ActivityManager(  816): Slow operation: 80ms so far, now at startProcess: done updating pids map
+W/android.rkpdapp( 5068): Unexpected CPU variant for x86: x86_64.
+W/android.rkpdapp( 5068): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+V/GraphicsEnvironment( 5012): Currently set values for:
+V/GraphicsEnvironment( 5012):   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment( 5012):   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment( 5012): com.google.android.googlequicksearchbox is not listed in per-application setting
+I/AconfigPackage( 4946): android.media.swcodec.flags is mapped to com.android.media.swcodec
+V/GraphicsEnvironment( 5012): ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+V/GraphicsEnvironment( 5012): com.google.android.googlequicksearchbox is not listed in ANGLE allowlist or settings, returning default
+V/GraphicsEnvironment( 5012): Neither updatable production driver nor prerelease driver is supported.
+I/AconfigPackage( 4946): com.android.permission.flags is mapped to com.android.permission
+I/AconfigPackage( 4946): com.android.permissioncontroller.flags is mapped to com.android.permission
+I/AconfigPackage( 4946): com.android.icu is mapped to com.android.i18n
+D/nativeloader( 5068): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+I/AconfigPackage( 4946): com.android.appsearch.flags is mapped to com.android.appsearch
+I/AconfigPackage( 4946): android.uprobestats.mainline.flags is mapped to com.android.uprobestats
+D/nativeloader( 5052): Configuring clns-shared-9 for other apk /system/priv-app/ExternalStorageProvider/ExternalStorageProvider.apk. target_sdk_version=36, uses_libraries=, library_path=/system/priv-app/ExternalStorageProvider/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.android.externalstorage:/system/priv-app/ExternalStorageProvider:/system/lib64:/system_ext/lib64
+I/AconfigPackage( 4946): com.android.crashrecovery.flags is mapped to com.android.crashrecovery
+D/CompatChangeReporter( 5010): Compat change id reported: 202956589; UID 10161; state: ENABLED
+I/AconfigPackage( 4946): android.provider.flags is mapped to com.android.configinfrastructure
+I/AconfigPackage( 4946): com.android.server.deviceconfig is mapped to com.android.configinfrastructure
+I/AconfigPackage( 4946): com.android.compos.flags is mapped to com.android.compos
+I/AconfigPackage( 4946): com.android.art.flags is mapped to com.android.art
+I/AconfigPackage( 4946): com.android.art.rw.flags is mapped to com.android.art
+I/AconfigPackage( 4946): com.android.libcore is mapped to com.android.art
+V/GraphicsEnvironment( 5052): Currently set values for:
+V/GraphicsEnvironment( 5052):   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment( 5052):   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment( 5052): com.android.externalstorage is not listed in per-application setting
+V/GraphicsEnvironment( 5052): ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+V/GraphicsEnvironment( 5052): com.android.externalstorage is not listed in ANGLE allowlist or settings, returning default
+V/GraphicsEnvironment( 5052): Neither updatable production driver nor prerelease driver is supported.
+I/AconfigPackage( 4946): com.android.telephony.flags is mapped to com.android.telephonycore
+I/AconfigPackage( 4946): com.android.media.extractor.flags is mapped to com.android.media
+I/AconfigPackage( 4946): com.android.media.mainline.flags is mapped to com.android.media
+I/MultiDex( 4997): VM with version 2.1.0 has multidex support
+I/HalDevMgr(  816): bestIfaceCreationProposal is null, requestIface=STA, existingIface=[name=wlan0 type=STA]
+I/MultiDex( 4997): Installing application
+I/AconfigPackage( 4946): com.android.wifi.flags is mapped to com.android.wifi
+I/MultiDex( 4997): VM has multidex support, MultiDex support library is disabled.
+I/AconfigPackage( 4946): com.android.org.conscrypt.flags is mapped to com.android.conscrypt
+I/AconfigPackage( 4946): com.android.org.conscrypt.net.flags is mapped to com.android.conscrypt
+I/AconfigPackage( 4946): com.android.healthfitness.flags is mapped to com.android.healthfitness
+I/AconfigPackage( 4946): com.android.ipsec.flags is mapped to com.android.ipsec
+V/GraphicsEnvironment( 5010): Currently set values for:
+V/GraphicsEnvironment( 5010):   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment( 5010):   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment( 5010): com.google.android.apps.photos is not listed in per-application setting
+V/GraphicsEnvironment( 5010): ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+V/GraphicsEnvironment( 5010): com.google.android.apps.photos is not listed in ANGLE allowlist or settings, returning default
+V/GraphicsEnvironment( 5010): Neither updatable production driver nor prerelease driver is supported.
+I/AconfigPackage( 4946): com.android.nfc.module.flags is mapped to com.android.nfcservices
+E/ashmem  ( 5052): Pinning is deprecated since Android Q. Please use trim or other methods.
+I/AconfigPackage( 4946): com.android.adservices.ondevicepersonalization.flags is mapped to com.android.ondevicepersonalization
+I/AconfigPackage( 4946): com.android.adbd.flags is mapped to com.android.adbd
+D/ExternalStorage( 5052): After updating volumes, found 2 active roots
+I/AconfigPackage( 4946): com.android.bluetooth.flags is mapped to com.android.bt
+I/AtlasPixelTipsContentPr( 4997): enter
+D/nativeloader( 5068): Configuring clns-shared-9 for other apk /apex/com.android.rkpd/priv-app/rkpdapp.google@361040400/rkpdapp.google.apk. target_sdk_version=36, uses_libraries=, library_path=/apex/com.android.rkpd/priv-app/rkpdapp.google@361040400/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.rkpdapp:/apex/com.android.rkpd/priv-app/rkpdapp.google@361040400:/system/lib64:/system_ext/lib64
+I/AconfigPackage( 4946): com.android.devicelock.flags is mapped to com.android.devicelock
+D/nativeloader( 5068): InitApexLibraries:
+D/nativeloader( 5068):   com_android_adservices: libhpke_jni.so:libtflite_support_classifiers_native.so
+D/nativeloader( 5068):   com_android_appsearch: libappsearchservice.so:libicing_anywhere.so
+D/nativeloader( 5068):   com_android_art: libartservice.so
+D/nativeloader( 5068):   com_android_bt: libbluetooth_jni.so
+D/nativeloader( 5068):   com_android_conscrypt: libjavacrypto.so
+D/nativeloader( 5068):   com_android_mediaprovider: libpdfclient.so
+D/nativeloader( 5068):   com_android_nfcservices: libnfc_nci_jni.so
+D/nativeloader( 5068):   com_android_ondevicepersonalization: libfcp_cpp_dep_jni.so:libfcp_hpke_jni.so
+D/nativeloader( 5068):   com_android_os_statsd: libstats_jni.so
+D/nativeloader( 5068):   com_android_tethering: libandroid_net_connectivity_com_android_net_module_util_jni.so:libandroid_net_connectivity_com_android_net_module_util_jni_CommonConnectivityJni.so:libframework-connectivity-jni.so:libframework-connectivity-tiramisu-jni.so:libmainlinecronet.140.0.7259.0.so:libservice-connectivity.so:libservice-thread-jni.so:stable_cronet_libcrypto.so:stable_cronet_libssl.so
+D/nativeloader( 5068):   com_android_uwb: libuwb_uci_jni_rust.so
+D/nativeloader( 5068):   com_android_virt: libvirtualizationservice_jni.so:libvirtualmachine_jni.so
+D/nativeloader( 5068):   com_android_wifi: lib
+I/AconfigPackage( 4946): android.os.profiling is mapped to com.android.profiling
+I/AconfigPackage( 4946): android.os.profiling.anomaly.flags is mapped to com.android.profiling
+I/AconfigPackage( 4946): com.android.os.statsd.flags is mapped to com.android.os.statsd
+I/AconfigPackage( 4946): com.android.rkpd.flags is mapped to com.android.rkpd
+E/ashmem  ( 4997): Pinning is deprecated since Android Q. Please use trim or other methods.
+I/AconfigPackage( 4946): com.android.cellbroadcastreceiver.flags is mapped to com.android.cellbroadcast
+I/AconfigPackage( 4946): com.android.adservices.flags is mapped to com.android.adservices
+I/AconfigPackage( 4946): com.android.sdksandbox.flags is mapped to com.android.adservices
+I/RevelioTipsContentProvi( 4997): enter
+I/TidepodsRevelioTipsCont( 4997): enter
+I/AconfigPackage( 4946): com.android.uwb.flags is mapped to com.android.uwb
+I/AconfigPackage( 4946): com.android.ranging.flags is mapped to com.android.uwb
+I/AconfigPackage( 4946): android.graphics.pdf.flags is mapped to com.android.mediaprovider
+I/AconfigPackage( 4946): com.android.providers.media.flags is mapped to com.android.mediaprovider
+I/AconfigPackage( 4946): android.graphics.pdf.flags.readonly is mapped to com.android.mediaprovider
+I/AconfigPackage( 4946): com.android.net.ct.flags is mapped to com.android.tethering
+I/AconfigPackage( 4946): com.android.tethering.mainline.beta is mapped to com.android.tethering
+I/AconfigPackage( 4946): com.android.net.flags is mapped to com.android.tethering
+I/AconfigPackage( 4946): com.android.nearby.flags is mapped to com.android.tethering
+I/AconfigPackage( 4946): android.net.vcn is mapped to com.android.tethering
+I/AconfigPackage( 4946): com.android.tethering.beta.test is mapped to com.android.tethering
+I/AconfigPackage( 4946): android.net.http is mapped to com.android.tethering
+I/AconfigPackage( 4946): com.android.net.thread.flags is mapped to com.android.tethering
+V/GraphicsEnvironment( 5068): Currently set values for:
+V/GraphicsEnvironment( 5068):   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment( 5068):   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment( 5068): com.google.android.rkpdapp is not listed in per-application setting
+V/GraphicsEnvironment( 5068): ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+V/GraphicsEnvironment( 5068): com.google.android.rkpdapp is not listed in ANGLE allowlist or settings, returning default
+V/GraphicsEnvironment( 5068): Neither updatable production driver nor prerelease driver is supported.
+I/AconfigPackage( 4946): com.android.system.virtualmachine.flags is mapped to com.android.virt
+E/FeatureFlagsImplExport( 4946): android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package android.xr cannot be found on the device
+D/WM-WrkMgrInitializer( 5068): Initializing WorkManager with default configuration.
+D/UiAutomationConnection( 4946): Created on user UserHandle{0}
+I/UiAutomation( 4946): Initialized for user 0 on display 0
+W/UiAutomation( 4946): Created with deprecatead constructor, assumes DEFAULT_DISPLAY
+D/WM-PackageManagerHelper( 5068): Skipping component enablement for androidx.work.impl.background.systemjob.SystemJobService
+D/WM-Schedulers( 5068): Created SystemJobScheduler and enabled SystemJobService
+D/WM-ForceStopRunnable( 5068): The default process name was not specified.
+D/WM-ForceStopRunnable( 5068): Performing cleanup operations.
+D/AccessibilityManagerService(  816): changeCurrentUserForTestAutomationIfNeededLocked(0): ignoring because device doesn't support visible background users
+I/UiAutomationManager(  816): Registering UiTestAutomationService (id=com.android.server.accessibility/UiAutomation, flags=0x0) when called by user 0
+V/AccessibilityManagerService(  816): onUserStateChangedLocked for userId: 0, forceUpdate: false
+V/AccessibilityUserState(  816): updateShortcutTargets: type:accessibility_shortcut_target_service, current:{}, new:{}
+V/AccessibilityUserState(  816): updateShortcutTargets: type:accessibility_button_targets, current:{}, new:{}
+V/AccessibilityUserState(  816): updateShortcutTargets: type:accessibility_gesture_targets, current:{}, new:{}
+V/AccessibilityUserState(  816): updateShortcutTargets: type:accessibility_qs_targets, current:{}, new:{}
+V/AccessibilityUserState(  816): updateShortcutTargets: type:accessibility_key_gesture_targets, current:{}, new:{}
+W/MagnificationConnectionManager(  816): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+E/ashmem  ( 5068): Pinning is deprecated since Android Q. Please use trim or other methods.
+I/AiAiEcho( 1631): Settings changed for uri: content://settings/secure/accessibility_enabled
+D/BatterySaverPolicy(  816): accessibility changed to true, updating policy.
+I/AiAiEcho( 1631): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1631): EchoTargets: 
+I/AiAiEcho( 1631): Filtered by AiAi flag check: 
+I/AiAiEcho( 1631): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/AiAiEcho( 1631): #remoteViewsTwiddler: feature disabled.
+V/GrammaticalInflectionUtils(  816): AttributionSource: android.content.AttributionSource@3cf730c3 does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+I/AiAiEcho( 1631): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1631): EchoTargets: 
+I/AiAiEcho( 1631): Filtered by AiAi flag check: 
+I/AiAiEcho( 1631): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/AiAiEcho( 1631): #remoteViewsTwiddler: feature disabled.
+V/AccessibilityManagerService(  816): onUserStateChangedLocked for userId: 0, forceUpdate: false
+I/AiAiEcho( 1631): #postPredictionTargets: Sending updates to UISurface home with targets# 0 (types=[])
+V/AccessibilityUserState(  816): updateShortcutTargets: type:accessibility_shortcut_target_service, current:{}, new:{}
+V/AccessibilityUserState(  816): updateShortcutTargets: type:accessibility_button_targets, current:{}, new:{}
+V/AccessibilityUserState(  816): updateShortcutTargets: type:accessibility_gesture_targets, current:{}, new:{}
+V/AccessibilityUserState(  816): updateShortcutTargets: type:accessibility_qs_targets, current:{}, new:{}
+V/AccessibilityUserState(  816): updateShortcutTargets: type:accessibility_key_gesture_targets, current:{}, new:{}
+W/MagnificationConnectionManager(  816): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+I/RkpdBroadcast( 5068): Caught package_removed intent, waking up.
+I/RkpdBroadcast( 5068): Caught package_removed intent, waking up.
+D/WM-SystemJobScheduler( 5068): Reconciling jobs
+D/Zygote  (  582): Forked child process 5090
+I/AiAiEcho( 1631): #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+I/RkpdBroadcast( 5068): Deleted associated keys for uid: 10220
+I/RkpdBroadcast( 5068): Deleted associated keys for uid: 10219
+I/ActivityManager(  816): Start proc 5090:android.process.media/u0a103 for broadcast {com.android.providers.downloads/com.android.providers.downloads.DownloadReceiver}
+I/AiAiEcho( 1631): Settings changed for uri: content://settings/secure/accessibility_enabled
+I/AiAiEcho( 1631): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1631): EchoTargets: 
+I/AiAiEcho( 1631): Filtered by AiAi flag check: 
+I/AiAiEcho( 1631): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/AiAiEcho( 1631): #remoteViewsTwiddler: feature disabled.
+D/AccessibilitySourceService( 3565): enabled a11y services count 0
+D/AccessibilitySourceService( 3565): a11y source sending 0 issue to sc
+I/AiAiEcho( 1631): Predicting[0]:  [CONTEXT sampling_count=5 ]
+D/SafetySourceDataValidat(  816): No cert check requested for package com.google.android.permissioncontroller
+D/WM-ForceStopRunnable( 5068): Found unfinished work, scheduling it.
+I/AiAiEcho( 1631): EchoTargets: 
+I/AiAiEcho( 1631): Filtered by AiAi flag check: 
+I/AiAiEcho( 1631): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/AiAiEcho( 1631): #remoteViewsTwiddler: feature disabled.
+I/AiAiEcho( 1631): #postPredictionTargets: Sending updates to UISurface home with targets# 0 (types=[])
+I/AiAiEcho( 1631): #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+W/JobInfo ( 5068): Requested important-while-foreground flag for job58 is ignored and takes no effect
+D/WM-SystemJobScheduler( 5068): Scheduling work ID 3265cf40-ef9c-48d2-a851-42752321ccbcJob ID 58
+I/Zygote  ( 5090): Process 5090 created for android.process.media
+I/d.process.media( 5090): Using CollectorTypeCMC GC.
+W/d.process.media( 5090): Unexpected CPU variant for x86: x86_64.
+W/d.process.media( 5090): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+D/WM-GreedyScheduler( 5068): Starting tracking for 3265cf40-ef9c-48d2-a851-42752321ccbc
+W/SsPagerDots( 1076): Total number of pages invalid: 0. Assuming 1 page.
+D/AccessibilityManagerService(  816): .getAccessibilityShortcutTargets {shortcutType=32, userId=0}
+W/SsPagerDots( 1076): Total number of pages invalid: 0. Assuming 1 page.
+D/WM-ConstraintTracker( 5068): BatteryChargingTracker: initial state = false
+D/WM-BrdcstRcvrCnstrntTrc( 5068): BatteryChargingTracker: registering receiver
+D/WM-ConstraintTracker( 5068): BatteryNotLowTracker: initial state = true
+D/WM-BrdcstRcvrCnstrntTrc( 5068): BatteryNotLowTracker: registering receiver
+D/nativeloader( 5090): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+D/WM-ConstraintTracker( 5068): NetworkStateTracker24: initial state = NetworkState(isConnected=true, isValidated=true, isMetered=false, isNotRoaming=true)
+D/WM-NetworkStateTracker( 5068): Registering network callback
+D/ConnectivityService(  816): requestNetwork for uid/pid:10191/5068 activeRequest: null callbackRequest: 187 [NetworkRequest [ REQUEST id=188, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10191 RequestorUid: 10191 RequestorPkg: com.google.android.rkpdapp UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647 isUidTracked: false declaredMethods: AVAIL|LOST|NC
+D/WM-PackageManagerHelper( 5068): Skipping component enablement for androidx.work.impl.background.systemalarm.RescheduleReceiver
+I/DialerBaseApplication( 4997): onCreate
+D/WM-GreedyScheduler( 5068): Constraints not met: Cancelling work ID WorkGenerationalId(workSpecId=3265cf40-ef9c-48d2-a851-42752321ccbc, generation=0)
+D/ConnectivityService(  816): NetReassign [188 : null → 100] [c 8] [a 5] [i 2]
+D/nativeloader( 5090): Configuring clns-shared-9 for other apk /system/priv-app/DownloadProvider/DownloadProvider.apk. target_sdk_version=36, uses_libraries=, library_path=/system/priv-app/DownloadProvider/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.android.providers.downloads:/system/priv-app/DownloadProvider:/system/lib64:/system_ext/lib64
+D/WM-NetworkStateTracker( 5068): Network capabilities changed: [ Transports: WIFI Capabilities: NOT_METERED&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&VALIDATED&NOT_ROAMING&FOREGROUND&NOT_CONGESTED&NOT_SUSPENDED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED LinkUpBandwidth>=12000Kbps LinkDnBandwidth>=30000Kbps TransportInfo: <SSID: <unknown ssid>, BSSID: 02:00:00:00:00:00, MAC: 02:00:00:00:00:00, IP: /10.0.2.16, Security type: 0, Supplicant state: COMPLETED, Wi-Fi standard: legacy, RSSI: -50, Link speed: 11Mbps, Tx Link speed: 11Mbps, Max Supported Tx Link speed: 11Mbps, Rx Link speed: 2Mbps, Max Supported Rx Link speed: 11Mbps, Frequency: 2447MHz, Net ID: -1, Metered hint: false, score: 83, isUsable: true, CarrierMerged: false, SubscriptionId: -1, IsPrimary: -1, Trusted: true, Restricted: false, Ephemeral: false, OEM paid: false, OEM private: false, OSU AP: false, FQDN: <none>, Provider friendly name: <none>, Requesting package name: <none><none>MLO Information: , Is TID-To-Link negotiation supported by the AP: false, AP MLD Address: <none>, AP MLO Link Id: <none>, AP MLO Affiliated links: <none>, Vendor Data: <none>> SignalStrength: -50 UnderlyingNetworks: Null]
+D/WifiNetworkFactory(  816): got request NetworkRequest [ REQUEST id=188, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10191 RequestorUid: 10191 RequestorPkg: com.google.android.rkpdapp UnderlyingNetworks: Null] ]
+I/MultiDex( 5012): VM with version 2.1.0 has multidex support
+D/UntrustedWifiNetworkFactory(  816): got request NetworkRequest [ REQUEST id=188, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10191 RequestorUid: 10191 RequestorPkg: com.google.android.rkpdapp UnderlyingNetworks: Null] ]
+D/OemPaidWifiNetworkFactory(  816): got request NetworkRequest [ REQUEST id=188, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10191 RequestorUid: 10191 RequestorPkg: com.google.android.rkpdapp UnderlyingNetworks: Null] ]
+D/MultiInternetWifiNetworkFactory(  816): got request NetworkRequest [ REQUEST id=188, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10191 RequestorUid: 10191 RequestorPkg: com.google.android.rkpdapp UnderlyingNetworks: Null] ]
+I/MultiDex( 5012): Installing application
+I/MultiDex( 5012): VM has multidex support, MultiDex support library is disabled.
+V/GraphicsEnvironment( 5090): Currently set values for:
+V/GraphicsEnvironment( 5090):   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment( 5090):   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment( 5090): com.android.providers.downloads is not listed in per-application setting
+V/GraphicsEnvironment( 5090): ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+V/GraphicsEnvironment( 5090): com.android.providers.downloads is not listed in ANGLE allowlist or settings, returning default
+V/GraphicsEnvironment( 5090): Neither updatable production driver nor prerelease driver is supported.
+D/nativeloader( 5090): Configuring clns-shared-10 for other apk /system/priv-app/MtpService/MtpService.apk. target_sdk_version=36, uses_libraries=, library_path=/system/priv-app/MtpService/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.android.mtp:/system/priv-app/MtpService:/system/lib64:/system_ext/lib64
+E/ashmem  ( 5090): Pinning is deprecated since Android Q. Please use trim or other methods.
+D/ProcessLifecycleG3( 5012): androidx.startup is not available, initializing using ProcessLifecycleOwnerInitializer instead.
+I/ysm     ( 4997): SslGuard completed installation.
+D/nativeloader( 5010): Load /product/app/Photos/Photos.apk!/lib/x86_64/libnative_crash_handler_jni.so using class loader ns product-clns-9 (caller=/product/app/Photos/Photos.apk!classes2.dex): ok
+I/DialerGmsFlagCommitter( 4997): com.android.dialer.phenotype.GmsFlagCommitter.commit:52 flags committing
+I/DialerInternalSemanticEventLoggerImpl( 4997): com.android.dialer.cui.impl.<redacted>:147 CUI event: APP_ON_CREATE; uniqueCallId: null
+D/nativeloader( 5090): Configuring clns-shared-11 for other apk /system/priv-app/MediaProviderLegacy/MediaProviderLegacy.apk. target_sdk_version=36, uses_libraries=, library_path=/system/priv-app/MediaProviderLegacy/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.android.providers.media:/system/priv-app/MediaProviderLegacy:/system/lib64:/system_ext/lib64
+I/DialerLocaleProvider( 4997): com.android.dialer.callrecording.impl.localeprovider.LocaleProvider.getNetworkCountryMatchesSimCountryInternal:192 NetworkCountryCode: US, SimCountryIso: US
+I/DialerLegacyCountryDetector( 4997): com.android.dialer.location.LegacyCountryDetector.getCurrentPhysicalCountryIso:143 returning Redacted-2-chars
+I/DialerLocaleProvider( 4997): com.android.dialer.callrecording.impl.localeprovider.LocaleProvider.getSupportedLocaleFromCountryCode:203 checking whether country US is supported by builtInAudio for start/end audio
+I/DialerLocaleProvider( 4997): com.android.dialer.callrecording.impl.localeprovider.LocaleProvider.getSupportedLocaleFromCountryCode:214 country US not supported by builtInAudio
+I/DialerLegacyCountryDetector( 4997): com.android.dialer.location.LegacyCountryDetector.getCurrentPhysicalCountryIso:143 returning Redacted-2-chars
+I/DialerTtsLocaleProvider( 4997): com.android.dialer.audio.audioinjector.localeprovider.TtsLocaleProvider$Companion.getSupportedLocaleFromCountryCode:78 checking whether country US is supported by TTS for start/end audio
+I/DialerTtsLocaleProvider( 4997): com.android.dialer.audio.audioinjector.localeprovider.TtsLocaleProvider$Companion.getSupportedLocaleFromCountryCode:89 country US not supported by TTS
+I/DialerCanRecord( 4997): com.android.dialer.callrecording.impl.canrecord.CanRecord.canRecordCall:82 Call recording is disabled in the current country
+I/DialerCallRecordingStartupListener( 4997): com.android.dialer.callrecording.startup.<redacted>:71 not prewarming TTS
+V/GrammaticalInflectionUtils(  816): AttributionSource: android.content.AttributionSource@fc15f653 does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+D/Zygote  (  582): Forked child process 5126
+I/ActivityManager(  816): Start proc 5126:com.google.android.adservices.api/u0a215 for broadcast {com.google.android.adservices.api/com.android.adservices.service.common.PackageChangedReceiver}
+I/Zygote  ( 5126): Process 5126 created for com.google.android.adservices.api
+I/.adservices.api( 5126): Using CollectorTypeCMC GC.
+W/.adservices.api( 5126): Unexpected CPU variant for x86: x86_64.
+W/.adservices.api( 5126): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+D/nativeloader( 5126): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+I/DialerLoggingTelephonyCache( 4997): com.google.android.dialershared.telephony.LoggingTelephonyCache.setUpNetworkMemoize:97 getNetworkOperatorName
+I/DialerLoggingTelephonyCache( 4997): com.google.android.dialershared.telephony.LoggingTelephonyCache.setUpNetworkMemoize:106 getNetworkCountryIso
+I/DialerLoggingTelephonyCache( 4997): com.google.android.dialershared.telephony.LoggingTelephonyCache.setUpNetworkMemoize:115 getNetworkOperator
+I/DialerShortcutsJobScheduler( 4997): com.android.dialer.shortcuts.ShortcutsJobScheduler.schedule:55 schedule
+I/DialerSharpieScamDetectionConfigProvider( 4997): com.android.dialer.sharpie.impl.scamdetection.config.<redacted>:46 Providing config: [SharpieConfig(modelConfig=BertHades, allowedRegionCode=[US])]
+I/DialerMainActivityStartupMonitor( 4997): com.android.dialer.startup.mainactivitystartup.<redacted>$lambda$0:32 mainActivityCreated: false
+D/ApplicationLoaders( 5126): Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+D/ApplicationLoaders( 5126): Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar
+E/ActivityThread( 4997): Failed to find provider info for androidx.car.app.connection
+W/JobServiceContext(  816): Sending onNetworkChanged for a job that isn't started. JobStatus{3087d55 androidx.work.systemjobscheduler:u0a137/286 #TikTokWorker#com.android.dialer.voicemail.service.impl.VvmTaskWorker#@<redacted-email>/androidx.work.impl.background.systemjob.SystemJobService u=0 s=10137 TIME=-6s545ms:none NET READY}
+I/DialerInternalSemanticEventLoggerImpl( 4997): com.android.dialer.cui.impl.<redacted>:147 CUI event: APP_ON_CREATE_RUNNABLE_COMPLETED_BEFORE_MAIN_ACTIVITY_CREATED; uniqueCallId: null
+I/DialerShortcutsJobScheduler( 4997): com.android.dialer.shortcuts.ShortcutsJobScheduler.scheduleJobInternal:82 job already scheduled.
+I/DialerLoggingTelephonyCache( 4997): com.google.android.dialershared.telephony.LoggingTelephonyCache.setUpNetworkMemoize:139 getSimCarrierIdName
+I/DialerLoggingTelephonyCache( 4997): com.google.android.dialershared.telephony.LoggingTelephonyCache.setUpNetworkMemoize:148 getSimCountryIso
+D/nativeloader( 5126): Configuring clns-shared-9 for other apk /apex/com.android.adservices/priv-app/AdServicesApkGoogle@361040400/AdServicesApkGoogle.apk. target_sdk_version=36, uses_libraries=, library_path=/apex/com.android.adservices/priv-app/AdServicesApkGoogle@361040400/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.adservices.api:/apex/com.android.adservices/priv-app/AdServicesApkGoogle@361040400:/system/lib64:/system_ext/lib64
+D/FileUtils(  816): Rounded bytes from 2061062144 to 4000000000
+D/nativeloader( 5126): InitApexLibraries:
+D/nativeloader( 5126):   com_android_adservices: libhpke_jni.so:libtflite_support_classifiers_native.so
+D/nativeloader( 5126):   com_android_appsearch: libappsearchservice.so:libicing_anywhere.so
+D/nativeloader( 5126):   com_android_art: libartservice.so
+D/nativeloader( 5126):   com_android_bt: libbluetooth_jni.so
+D/nativeloader( 5126):   com_android_conscrypt: libjavacrypto.so
+D/nativeloader( 5126):   com_android_mediaprovider: libpdfclient.so
+D/nativeloader( 5126):   com_android_nfcservices: libnfc_nci_jni.so
+D/nativeloader( 5126):   com_android_ondevicepersonalization: libfcp_cpp_dep_jni.so:libfcp_hpke_jni.so
+D/nativeloader( 5126):   com_android_os_statsd: libstats_jni.so
+D/nativeloader( 5126):   com_android_tethering: libandroid_net_connectivity_com_android_net_module_util_jni.so:libandroid_net_connectivity_com_android_net_module_util_jni_CommonConnectivityJni.so:libframework-connectivity-jni.so:libframework-connectivity-tiramisu-jni.so:libmainlinecronet.140.0.7259.0.so:libservice-connectivity.so:libservice-thread-jni.so:stable_cronet_libcrypto.so:stable_cronet_libssl.so
+D/nativeloader( 5126):   com_android_uwb: libuwb_uci_jni_rust.so
+D/nativeloader( 5126):   com_android_virt: libvirtualizationservice_jni.so:libvirtualmachine_jni.so
+D/nativeloader( 5126):   com_android_wifi: lib
+I/DialerInternalSemanticEventLoggerImpl( 4997): com.android.dialer.cui.impl.<redacted>:233 Cancelled logging CUI AppStartToMainActivity to GIL due to cancelEvent
+D/CompatChangeReporter( 5010): Compat change id reported: 311402873; UID 10161; state: ENABLED
+D/CompatChangeReporter( 5010): Compat change id reported: 323349338; UID 10161; state: ENABLED
+W/JobInfo ( 5010): Job 'com.google.android.apps.photos/com.google.android.libraries.social.async.BackgroundTaskJobService#1043' has a deadline with no functional constraints. The deadline won't improve job execution latency. Consider removing the deadline.
+D/ConnectivityService(  816): requestNetwork for uid/pid:10161/5010 activeRequest: null callbackRequest: 189 [NetworkRequest [ REQUEST id=190, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10161 RequestorUid: 10161 RequestorPkg: com.google.android.apps.photos UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647 isUidTracked: false declaredMethods: AVAIL|LOST
+D/ConnectivityService(  816): NetReassign [190 : null → 100] [c 1] [a 1] [i 8]
+E/ashmem  ( 5010): Pinning is deprecated since Android Q. Please use trim or other methods.
+D/WifiNetworkFactory(  816): got request NetworkRequest [ REQUEST id=190, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10161 RequestorUid: 10161 RequestorPkg: com.google.android.apps.photos UnderlyingNetworks: Null] ]
+D/UntrustedWifiNetworkFactory(  816): got request NetworkRequest [ REQUEST id=190, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10161 RequestorUid: 10161 RequestorPkg: com.google.android.apps.photos UnderlyingNetworks: Null] ]
+D/OemPaidWifiNetworkFactory(  816): got request NetworkRequest [ REQUEST id=190, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10161 RequestorUid: 10161 RequestorPkg: com.google.android.apps.photos UnderlyingNetworks: Null] ]
+D/MultiInternetWifiNetworkFactory(  816): got request NetworkRequest [ REQUEST id=190, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10161 RequestorUid: 10161 RequestorPkg: com.google.android.apps.photos UnderlyingNetworks: Null] ]
+I/DialerDefaultProcessValidator( 4997): com.google.apps.tiktok.contrib.work.impl.DefaultProcessValidator.validateAsynchronouslyAndMaybeCrash:68 Validating WorkManager process
+D/WM-PackageManagerHelper( 4997): Skipping component enablement for androidx.work.impl.background.systemjob.SystemJobService
+D/WM-Schedulers( 4997): Created SystemJobScheduler and enabled SystemJobService
+D/WM-ForceStopRunnable( 4997): The default process name was not specified.
+D/WM-ForceStopRunnable( 4997): Performing cleanup operations.
+I/DialerDefaultProcessValidator( 4997): com.google.apps.tiktok.contrib.work.impl.DefaultProcessValidator.validateInternal:97 Processes: NONE, true, com.google.android.dialer, com.google.android.dialer
+W/CarApp.Conn( 4997): Null response from content provider when checking connection to the car, treating as disconnected
+I/DialerFlags( 4997): com.android.dialer.phenotype.Flags.registerDialerMendelConfigPackage:152 phenotype register status: true
+D/WM-SystemJobService( 4997): onStartJob for WorkGenerationalId(workSpecId=c929643a-eb2e-4aea-ba94-beed95d2f2de, generation=0)
+I/DialerFlags( 4997): com.android.dialer.phenotype.Flags$1.onSuccess:128 finished with result: true
+I/DialerAndroidAutoStatusLookupImpl( 4997): com.android.dialer.androidautostatuslookup.impl.<redacted>:133 liveData timeout exception.
+I/DialerAndroidAutoStatusLookupImpl( 4997): com.android.dialer.androidautostatuslookup.impl.<redacted>:97 Android Auto connected in 0 mode [CONTEXT ratelimit_period="1 MINUTES" ]
+I/DialerAndroidAutoEnabledFn( 4997): com.android.dialer.androidauto.impl.AndroidAutoEnabledFn.isEnabled:23 enabled by flag [CONTEXT ratelimit_period="1 MINUTES" ]
+I/DialerLogcatLoggingBindings( 4997): com.android.dialer.logging.logcat.LogcatLoggingBindings.logImpression:47 Impression: APP_LAUNCHED
+I/DialerLogcatLoggingBindings( 4997): com.android.dialer.logging.logcat.LogcatLoggingBindings.logImpression:54 Impression: CALL_SCREEN_INIT_AT_STARTUP
+I/DialerDobbyEnabledFn( 4997): com.android.dialer.dobby.enabledfn.DobbyEnabledFn.isEnabled:23 disabled by flag [CONTEXT ratelimit_period="1 MINUTES" ]
+I/DialerDialerCarAppServiceStateUpdater( 4997): com.android.dialer.androidauto.impl.carservice.DialerCarAppServiceStateUpdater$updateCarAppServiceState$1.invokeSuspend:69 CarAppService enabled state: desiredValue: false, protoStoreValue: false
+I/DialerDialerCarAppServiceStateUpdater( 4997): com.android.dialer.androidauto.impl.carservice.DialerCarAppServiceStateUpdater$updateCarAppServiceState$1.invokeSuspend:82 Skipping CarAppService PackageManager state update
+I/DialerDarpaComponentEnabledStateUpdater( 4997): com.android.dialer.darpa.impl.DarpaComponentEnabledStateUpdater$update$2.invokeSuspend:38 update FEATURE_CALLER_ID_AND_SPAM:1
+I/DialerDarpaComponentEnabledStateUpdater( 4997): com.android.dialer.darpa.impl.DarpaComponentEnabledStateUpdater$update$2.invokeSuspend:38 update FEATURE_SPAM_BLOCKING:1
+I/DialerDarpaComponentEnabledStateUpdater( 4997): com.android.dialer.darpa.impl.DarpaComponentEnabledStateUpdater$update$2.invokeSuspend:38 update FEATURE_DOBBY:2
+I/DialerLoggingConsentCheckerImpl( 4997): com.google.android.dialershared.logging.consent.impl.<redacted>:72 timer stop with success, timer present: false
+V/GraphicsEnvironment( 5126): Currently set values for:
+I/DialerDarpaPhenotypeFlagsCommitSucceededListener( 4997): com.android.dialer.darpa.impl.DarpaPhenotypeFlagsCommitSucceededListener$onFlagsCommittedSuccessfully$2.onSuccess:30 update component enabled states successfully
+V/GraphicsEnvironment( 5126):   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment( 5126):   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment( 5126): com.google.android.adservices.api is not listed in per-application setting
+V/GraphicsEnvironment( 5126): ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+V/GraphicsEnvironment( 5126): com.google.android.adservices.api is not listed in ANGLE allowlist or settings, returning default
+V/GraphicsEnvironment( 5126): Neither updatable production driver nor prerelease driver is supported.
+I/DialerLoggingConsentCheckerImpl( 4997): com.google.android.dialershared.logging.consent.impl.<redacted>:72 timer stop with success, timer present: false
+D/WM-Processor( 4997): fjl: processing WorkGenerationalId(workSpecId=c929643a-eb2e-4aea-ba94-beed95d2f2de, generation=0)
+D/WM-WorkerWrapper( 4997): Starting work for com.google.apps.tiktok.contrib.work.TikTokListenableWorker
+I/DialerSingletonScopedExternalsLogging( 4997): com.google.android.dialershared.externals.logging.<redacted>:75 event: TIKTOK_WORK_EXECUTION_MONITOR_ON_WORK_STARTED, function parameters: [c929643a-eb2e-4aea-ba94-beed95d2f2de,com.android.dialer.voicemail.service.impl.VvmTaskWorker], return value: <empty>
+I/DialerVvmTaskWorkerDelegate( 4997): com.android.dialer.voicemail.service.impl.scheduler.VvmTaskWorker$VvmTaskWorkerDelegate.executeVvmJob:191 Beginning execution of job ID: 4
+I/DialerSingletonScopedExternalsLogging( 4997): com.google.android.dialershared.externals.logging.<redacted>:66 event: VVM_TASK_WORKER_EXECUTE_VVM_JOB, function parameters: [4], return value: <empty> [CONTEXT enable_persistent_logger=true ]
+D/TileServices( 1076): Couldn't find tile for ComponentInfo{com.google.android.apps.wellbeing/com.google.android.apps.wellbeing.focusmode.quicksettings.FocusModeTileService}(0)
+D/WM-PackageManagerHelper( 4997): Skipping component enablement for androidx.work.impl.background.systemalarm.RescheduleReceiver
+I/ApplicationContextProvider( 5126): onCreate(): setting application context from android.app.Application@e654cce
+I/adservices-shared( 5126): set(): set singleton context as android.app.Application@e654cce
+I/DialerVvmCarrierIdentifierImpl( 4997): com.android.dialer.voicemail.service.impl.carriermapping.<redacted>:101 Looking up carrier name for phone account handle: 1 [CONTEXT ratelimit_period="1 MINUTES" ]
+D/CompatChangeReporter(  816): Compat change id reported: 311208629; UID 10161; state: ENABLED
+I/DialerVvmCarrierIdentifierImpl( 4997): com.android.dialer.voicemail.service.impl.carriermapping.<redacted>:123 found carrier name: VVM_CARRIER_TMO_US [CONTEXT enable_persistent_logger=true ]
+I/DialerRestVoicemailEnabledFn( 4997): com.android.dialer.voicemail.service.impl.vvmclients.rest.RestVoicemailEnabledFn.isEnabled:67 device is supported, enabling. [CONTEXT ratelimit_period="1 MINUTES" ]
+I/DialerVoicemailModule( 4997): com.android.voicemail.impl.VoicemailModule.provideVoicemailClient:66 Providing stub due to flag
+D/nativeloader( 5012): Load /product/priv-app/Velvet/Velvet.apk!/lib/x86_64/libnative_crash_handler_jni.so using class loader ns product-clns-10 (caller=/product/priv-app/Velvet/Velvet.apk!classes2.dex): ok
+D/BackgroundInstallControlService(  816): Package event received: 0
+E/ashmem  ( 5126): Pinning is deprecated since Android Q. Please use trim or other methods.
+I/drfg    ( 5012): Initializing GMS Compliance Client Library...
+I/drfg    ( 5012): Checking for device compliance...
+I/drfg    ( 5012): Completed library init.
+D/BackgroundInstallControlService(  816): Package event received: 0
+D/BackgroundInstallControlService(  816): Package event received: 0
+I/AccessibilityNodeInfoDumper( 4946): Skipping invisible child: android.view.accessibility.AccessibilityNodeInfo@2d887; boundsInParent: Rect(0, 0 - 1080, 0); boundsInScreen: Rect(0, 0 - 1080, 0); boundsInWindow: Rect(0, 0 - 1080, 0); packageName: com.buffago.app; className: android.widget.LinearLayout; text: null; error: null; maxTextLength: -1; stateDescription: null; contentDescription: null; tooltipText: null; containerTitle: null; viewIdResName: null; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; granularScrollingSupported: false; importantForAccessibility: false; visible: false; actions: [AccessibilityAction: ACTION_SELECT - null, AccessibilityAction: ACTION_CLEAR_SELECTION - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_SHOW_ON_SCREEN - null]; isTextSelectable: false
+I/AccessibilityNodeInfoDumper( 4946): Skipping invisible child: android.view.accessibility.AccessibilityNodeInfo@2d4c6; boundsInParent: Rect(0, 0 - 1080, 0); boundsInScreen: Rect(0, 0 - 1080, 0); boundsInWindow: Rect(0, 0 - 1080, 0); packageName: com.buffago.app; className: android.view.ViewGroup; text: null; error: null; maxTextLength: -1; stateDescription: null; contentDescription: null; tooltipText: null; containerTitle: null; viewIdResName: null; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; granularScrollingSupported: false; importantForAccessibility: false; visible: false; actions: [AccessibilityAction: ACTION_SELECT - null, AccessibilityAction: ACTION_CLEAR_SELECTION - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_SHOW_ON_SCREEN - null]; isTextSelectable: false
+I/adservices( 5126): Setting AdServicesManager static context as android.app.Application@e654cce
+D/DesktopExperienceFlags( 4997): Toggle override initialized to: false
+D/TileServices( 1076): Couldn't find tile for ComponentInfo{com.google.android.apps.wellbeing/com.google.android.apps.wellbeing.focusmode.quicksettings.FocusModeTileService}(0)
+D/OomAdjuster(  816): Not killing cached processes
+I/adpn    ( 5012): (REDACTED) Event Bus thread starting with TID %d
+I/AccessibilityNodeInfoDumper( 4946): Skipping invisible child: android.view.accessibility.AccessibilityNodeInfo@2a7ba; boundsInParent: Rect(0, 0 - 277, 57); boundsInScreen: Rect(95, 804 - 372, 861); boundsInWindow: Rect(95, 804 - 372, 861); packageName: com.buffago.app; className: android.widget.TextView; text: Username; error: null; maxTextLength: -1; stateDescription: null; contentDescription: null; tooltipText: null; containerTitle: null; viewIdResName: text-input-outlined-label-active; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; granularScrollingSupported: false; importantForAccessibility: true; visible: false; actions: [AccessibilityAction: ACTION_SELECT - null, AccessibilityAction: ACTION_CLEAR_SELECTION - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_NEXT_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_SET_SELECTION - null, AccessibilityAction: ACTION_SHOW_ON_SCREEN - null]; isTextSelectable: false
+I/AccessibilityNodeInfoDumper( 4946): Skipping invisible child: android.view.accessibility.AccessibilityNodeInfo@2a3f9; boundsInParent: Rect(0, 0 - 236, 58); boundsInScreen: Rect(116, 806 - 352, 864); boundsInWindow: Rect(116, 806 - 352, 864); packageName: com.buffago.app; className: android.widget.TextView; text: null; error: null; maxTextLength: -1; stateDescription: null; contentDescription: null; tooltipText: null; containerTitle: null; viewIdResName: text-input-outlined-label-background; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; granularScrollingSupported: false; importantForAccessibility: true; visible: false; actions: [AccessibilityAction: ACTION_SELECT - null, AccessibilityAction: ACTION_CLEAR_SELECTION - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_SHOW_ON_SCREEN - null]; isTextSelectable: false
+I/DialerVvmExecutorImpl( 4997): com.android.dialer.voicemail.service.impl.scheduler.VvmExecutorImpl.execute:250 Beginning VVM action: ACTIVATE with retryCount: 3 for ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, 1, UserHandle{0} [CONTEXT enable_persistent_logger=true ]
+I/AccessibilityNodeInfoDumper( 4946): Skipping invisible child: android.view.accessibility.AccessibilityNodeInfo@25163; boundsInParent: Rect(0, 0 - 891, 127); boundsInScreen: Rect(95, 927 - 986, 1054); boundsInWindow: Rect(95, 927 - 986, 1054); packageName: com.buffago.app; className: android.widget.TextView; text: Username must be 3 to 20 characters and use only letters, numbers, underscore.; error: null; maxTextLength: -1; stateDescription: null; contentDescription: null; tooltipText: null; containerTitle: null; viewIdResName: null; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; granularScrollingSupported: false; importantForAccessibility: true; visible: false; actions: [AccessibilityAction: ACTION_SELECT - null, AccessibilityAction: ACTION_CLEAR_SELECTION - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_NEXT_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_SET_SELECTION - null, AccessibilityAction: ACTION_SHOW_ON_SCREEN - null]; isTextSelectable: false
+I/AccessibilityNodeInfoDumper( 4946): Skipping invisible child: android.view.accessibility.AccessibilityNodeInfo@2ba7f; boundsInParent: Rect(0, 0 - 190, 57); boundsInScreen: Rect(103, 1086 - 245, 1123); boundsInWindow: Rect(103, 1086 - 245, 1123); packageName: com.buffago.app; className: android.widget.TextView; text: Email; error: null; maxTextLength: -1; stateDescription: null; contentDescription: null; tooltipText: null; containerTitle: null; viewIdResName: auth.email.input-label-active; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; granularScrollingSupported: false; importantForAccessibility: true; visible: false; actions: [AccessibilityAction: ACTION_SELECT - null, AccessibilityAction: ACTION_CLEAR_SELECTION - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_NEXT_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_SET_SELECTION - null, AccessibilityAction: ACTION_SHOW_ON_SCREEN - null]; isTextSelectable: false
+E/DialerRestVvmCarrierService( 4997): com.android.dialer.voicemail.service.impl.vvmclients.rest.RestVvmCarrierService.getMsisdn:420 Retrieved phone number in an unexpected format: +15551234567 [CONTEXT disable_client_error_logging=true ]
+E/DialerRestVvmCarrierService( 4997): abmo: MEDIUM
+E/DialerRestVvmCarrierService( 4997): 	at a.dg(PG:15)
+E/DialerRestVvmCarrierService( 4997): 	at rbn.apply(PG:99)
+E/DialerRestVvmCarrierService( 4997): 	at aarq.apply(PG:13)
+E/DialerRestVvmCarrierService( 4997): 	at abzd.d(PG:3)
+E/DialerRestVvmCarrierService( 4997): 	at abze.run(PG:38)
+E/DialerRestVvmCarrierService( 4997): 	at vxo.run(PG:7)
+E/DialerRestVvmCarrierService( 4997): 	at absv.run(PG:44)
+E/DialerRestVvmCarrierService( 4997): 	at vxh.run(PG:305)
+E/DialerRestVvmCarrierService( 4997): 	at svb.run(PG:269)
+E/DialerRestVvmCarrierService( 4997): 	at java.lang.Thread.run(Thread.java:1563)
+E/DialerRestVvmCarrierService( 4997): 	at vyq.run(PG:61)
+I/DialerLogcatLoggingBindings( 4997): com.android.dialer.logging.logcat.LogcatLoggingBindings.logImpression:54 Impression: ANDROID_API_UNEXPECTED_PHONE_NUMBER_FORMAT
+I/DialerVvmActivation( 4997): com.android.dialer.voicemail.service.impl.vvmclients.rest.VvmActivation.activate:73 activate
+I/DialerLoggingConsentCheckerImpl( 4997): com.google.android.dialershared.logging.consent.impl.<redacted>:72 timer stop with success, timer present: false
+W/DialerGbaCredentialProvider( 4997): com.android.dialer.voicemail.service.impl.vvmclients.rest.GbaCredentialProvider$1.onAuthenticationFailure:93 GBA failed with reason: 1 [CONTEXT disable_client_error_logging=true ]
+I/DialerSingletonScopedExternalsLogging( 4997): com.google.android.dialershared.externals.logging.<redacted>:75 event: TELEPHONY_BOOTSTRAP_AUTHENTICATION_REQUEST, function parameters: [], return value: Default
+I/DialerVoicemailStatusDataServiceImpl( 4997): com.android.dialer.voicemailstatus.dataservice.impl.<redacted>:247 enter
+I/AccessibilityNodeInfoDumper( 4946): Skipping invisible child: android.view.accessibility.AccessibilityNodeInfo@2d105; boundsInParent: Rect(0, 0 - 275, 57); boundsInScreen: Rect(103, 1370 - 309, 1407); boundsInWindow: Rect(103, 1370 - 309, 1407); packageName: com.buffago.app; className: android.widget.TextView; text: Password; error: null; maxTextLength: -1; stateDescription: null; contentDescription: null; tooltipText: null; containerTitle: null; viewIdResName: auth.password.input-label-inactive; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; granularScrollingSupported: false; importantForAccessibility: true; visible: false; actions: [AccessibilityAction: ACTION_SELECT - null, AccessibilityAction: ACTION_CLEAR_SELECTION - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_NEXT_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_SET_SELECTION - null, AccessibilityAction: ACTION_SHOW_ON_SCREEN - null]; isTextSelectable: false
+I/DialerVoicemailStatusDataMigration( 4997): com.android.dialer.voicemailstatus.dataservice.impl.VoicemailStatusDataMigration.migrate:67 enter
+I/fitg    ( 5012): Validating WorkManager process
+D/WM-PackageManagerHelper( 5012): Skipping component enablement for androidx.work.impl.background.systemjob.SystemJobService
+D/WM-Schedulers( 5012): Created SystemJobScheduler and enabled SystemJobService
+D/BackgroundInstallControlService(  816): Package event received: 0
+D/BackgroundInstallControlService(  816): Package event received: 0
+D/BoundBrokerSvc( 1781): onBind: Intent { act=com.google.android.mobstore.service.START xflg=0x4 pkg=com.google.android.gms }
+D/BoundBrokerSvc( 1781): Loading bound service for intent: Intent { act=com.google.android.mobstore.service.START xflg=0x4 pkg=com.google.android.gms }
+I/RemoteVvmTaskManager( 1206): getRemotePackage: found package null
+I/AccessibilityNodeInfoDumper( 4946): Skipping invisible child: android.view.accessibility.AccessibilityNodeInfo@2732c; boundsInParent: Rect(0, 0 - 891, 74); boundsInScreen: Rect(95, 1548 - 986, 1517); boundsInWindow: Rect(95, 1548 - 986, 1517); packageName: com.buffago.app; className: android.widget.TextView; text: Minimum 6 characters.; error: null; maxTextLength: -1; stateDescription: null; contentDescription: null; tooltipText: null; containerTitle: null; viewIdResName: null; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; granularScrollingSupported: false; importantForAccessibility: true; visible: false; actions: [AccessibilityAction: ACTION_SELECT - null, AccessibilityAction: ACTION_CLEAR_SELECTION - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_NEXT_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_SET_SELECTION - null, AccessibilityAction: ACTION_SHOW_ON_SCREEN - null]; isTextSelectable: false
+V/GrammaticalInflectionUtils(  816): AttributionSource: android.content.AttributionSource@3105446a does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+I/fitg    ( 5012): (REDACTED) Processes: %s, %s, %s, %s
+D/WM-ForceStopRunnable( 5012): Is default app process = true
+I/adcw    ( 5012): Getting accounts.
+D/BackgroundInstallControlService(  816): Package event received: 0
+D/WM-ForceStopRunnable( 5012): Performing cleanup operations.
+D/Zygote  (  582): Forked child process 5188
+I/ActivityManager(  816): Start proc 5188:android.process.acore/u0a96 for content provider {com.android.providers.contacts/com.android.providers.contacts.VoicemailContentProvider}
+E/ashmem  ( 5012): Pinning is deprecated since Android Q. Please use trim or other methods.
+I/Zygote  ( 5188): Process 5188 created for android.process.acore
+I/d.process.acore( 5188): Using CollectorTypeCMC GC.
+W/d.process.acore( 5188): Unexpected CPU variant for x86: x86_64.
+W/d.process.acore( 5188): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+D/nativeloader( 5012): Load /product/priv-app/Velvet/Velvet.apk!/lib/x86_64/libmappedcountercacheversionjni.so using class loader ns product-clns-10 (caller=/product/priv-app/Velvet/Velvet.apk!classes2.dex): ok
+W/AccessibilityNodeInfoDumper( 4946): Fetch time: 387ms
+D/nativeloader( 5188): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+V/AccessibilityManagerService(  816): onUserStateChangedLocked for userId: 0, forceUpdate: false
+V/AccessibilityUserState(  816): updateShortcutTargets: type:accessibility_shortcut_target_service, current:{}, new:{}
+V/AccessibilityUserState(  816): updateShortcutTargets: type:accessibility_button_targets, current:{}, new:{}
+V/AccessibilityUserState(  816): updateShortcutTargets: type:accessibility_gesture_targets, current:{}, new:{}
+V/AccessibilityUserState(  816): updateShortcutTargets: type:accessibility_qs_targets, current:{}, new:{}
+V/AccessibilityUserState(  816): updateShortcutTargets: type:accessibility_key_gesture_targets, current:{}, new:{}
+W/MagnificationConnectionManager(  816): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+D/AccessibilityManagerService(  816): restoreCurrentUserForTestAutomationIfNeededLocked(): ignoring because device doesn't support visible background users
+D/BatterySaverPolicy(  816): accessibility changed to false, updating policy.
+D/WM-SystemJobScheduler( 5012): Reconciling jobs
+I/drfg    ( 5012): (REDACTED) Device Compliance Fetch time taken = %sms
+I/drfg    ( 5012): Device is compliant!
+I/AiAiEcho( 1631): Settings changed for uri: content://settings/secure/accessibility_enabled
+W/libbinder.IPCThreadState( 4946): call to talkWithDriver in joinThreadPool returned error: -9 (Bad file descriptor), FD: -1
+D/AndroidRuntime( 4946): Shutting down VM
+W/libbinder.IPCThreadState( 4946): call to talkWithDriver in joinThreadPool returned error: -9 (Bad file descriptor), FD: -1
+W/libbinder.IPCThreadState( 4946): call to talkWithDriver in joinThreadPool returned error: -9 (Bad file descriptor), FD: -1
+I/AiAiEcho( 1631): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1631): EchoTargets: 
+I/AiAiEcho( 1631): Filtered by AiAi flag check: 
+I/AiAiEcho( 1631): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/AiAiEcho( 1631): #remoteViewsTwiddler: feature disabled.
+I/AiAiEcho( 1631): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1631): EchoTargets: 
+I/AiAiEcho( 1631): Filtered by AiAi flag check: 
+I/AiAiEcho( 1631): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/AiAiEcho( 1631): #remoteViewsTwiddler: feature disabled.
+I/AiAiEcho( 1631): #postPredictionTargets: Sending updates to UISurface home with targets# 0 (types=[])
+I/AiAiEcho( 1631): #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+W/libbinder.IPCThreadState( 4946): call to talkWithDriver in joinThreadPool returned error: -9 (Bad file descriptor), FD: -1
+W/SsPagerDots( 1076): Total number of pages invalid: 0. Assuming 1 page.
+I/drfg    ( 5012): Invoking "compliant" action...
+W/ParceledListSlice(  816): Element #4 is 20384 bytes.
+I/aids    ( 5012): (REDACTED) Util.isLowRamDevice: %b, canUsePreemptibleAudioSource: %b
+D/nativeloader( 5188): Configuring clns-shared-9 for other apk /system/priv-app/ContactsProvider/ContactsProvider.apk. target_sdk_version=36, uses_libraries=, library_path=/system/priv-app/ContactsProvider/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.android.providers.contacts:/system/priv-app/ContactsProvider:/system/lib64:/system_ext/lib64
+D/WM-ForceStopRunnable( 5012): Found unfinished work, scheduling it.
+V/GraphicsEnvironment( 5188): Currently set values for:
+V/GraphicsEnvironment( 5188):   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment( 5188):   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment( 5188): com.android.providers.contacts is not listed in per-application setting
+V/GraphicsEnvironment( 5188): ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+V/GraphicsEnvironment( 5188): com.android.providers.contacts is not listed in ANGLE allowlist or settings, returning default
+V/GraphicsEnvironment( 5188): Neither updatable production driver nor prerelease driver is supported.
+D/WM-SystemJobScheduler( 5012): Scheduling work ID d9b4f7cd-8dba-4847-9d61-720c2abc0d2fJob ID 46
+D/WM-SystemJobScheduler( 5012): Scheduling work ID a49d7172-cfc4-4116-bcb7-82ffd6712a72Job ID 4
+D/BoundBrokerSvc( 1781): onBind: Intent { act=com.google.android.gms.audit.service.START xflg=0x4 pkg=com.google.android.gms }
+D/BoundBrokerSvc( 1781): Loading bound service for intent: Intent { act=com.google.android.gms.audit.service.START xflg=0x4 pkg=com.google.android.gms }
+D/nativeloader( 5188): Configuring clns-shared-10 for other apk /system/priv-app/UserDictionaryProvider/UserDictionaryProvider.apk. target_sdk_version=36, uses_libraries=, library_path=/system/priv-app/UserDictionaryProvider/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.android.providers.userdictionary:/system/priv-app/UserDictionaryProvider:/system/lib64:/system_ext/lib64
+D/WM-SystemJobScheduler( 5012): Scheduling work ID aa19c573-6d90-40e1-8d72-c4c10d477144Job ID 52
+D/nativeloader( 5188): Configuring clns-shared-11 for other apk /system/priv-app/BlockedNumberProvider/BlockedNumberProvider.apk. target_sdk_version=36, uses_libraries=, library_path=/system/priv-app/BlockedNumberProvider/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user_de/0/com.android.providers.blockednumber:/system/priv-app/BlockedNumberProvider:/system/lib64:/system_ext/lib64
+I/ContactsPerf( 5188): <redacted> start
+D/StrictMode( 5012): StrictMode policy violation: android.os.strictmode.DiskReadViolation
+D/StrictMode( 5012): 	at android.os.StrictMode$AndroidBlockGuardPolicy.onReadFromDisk(StrictMode.java:1766)
+D/StrictMode( 5012): 	at libcore.io.BlockGuardOs.access(BlockGuardOs.java:74)
+D/StrictMode( 5012): 	at libcore.io.ForwardingOs.access(ForwardingOs.java:129)
+D/StrictMode( 5012): 	at android.app.AndroidForwardingOs.access(AndroidForwardingOs.java:111)
+D/StrictMode( 5012): 	at java.io.UnixFileSystem.checkAccess(UnixFileSystem.java:337)
+D/StrictMode( 5012): 	at java.io.File.exists(File.java:829)
+D/StrictMode( 5012): 	at android.app.ContextImpl.ensurePrivateDirExists(ContextImpl.java:851)
+D/StrictMode( 5012): 	at android.app.ContextImpl.ensurePrivateDirExists(ContextImpl.java:840)
+D/StrictMode( 5012): 	at android.app.ContextImpl.getPreferencesDir(ContextImpl.java:792)
+D/StrictMode( 5012): 	at android.app.ContextImpl.getSharedPreferencesPath(ContextImpl.java:1029)
+D/StrictMode( 5012): 	at android.app.ContextImpl.getSharedPreferences(ContextImpl.java:632)
+D/StrictMode( 5012): 	at android.content.ContextWrapper.getSharedPreferences(ContextWrapper.java:223)
+D/StrictMode( 5012): 	at ahrp.e(PG:11)
+D/StrictMode( 5012): 	at ahrp.j(PG:3)
+D/StrictMode( 5012): 	at ahrp.i(PG:19)
+D/StrictMode( 5012): 	at aowk.a(PG:3)
+D/StrictMode( 5012): 	at svw.E(PG:2669)
+D/StrictMode( 5012): 	at svw.a(PG:123)
+D/StrictMode( 5012): 	at ghue.d(PG:10)
+D/StrictMode( 5012): 	at ghue.a(PG:7)
+D/StrictMode( 5012): 	at sph.d(PG:7)
+D/StrictMode( 5012): 	at sph.a(PG:1728)
+D/StrictMode( 5012): 	at adry.a(PG:15)
+D/StrictMode( 5012): 	at dshp.a(PG:9)
+D/StrictMode( 5012): 	at fumk.a(PG:3)
+D/StrictMode( 5012): 	at fuln.run(PG:19)
+D/StrictMode( 5012): 	at fumm.run(PG:5)
+D/StrictMode( 5012): 	at domk.run(PG:5)
+D/StrictMode( 5012): 	at fszp.run(PG:44)
+D/StrictMode( 5012): 	at domb.run(PG:42)
+D/StrictMode( 5012): 	at java.lang.Thread.run(Thread.java:1563)
+D/StrictMode( 5012): 	at dono.run(PG:62)
+D/WM-PackageManagerHelper( 5012): Skipping component enablement for androidx.work.impl.background.systemalarm.RescheduleReceiver
+D/StrictMode( 5012): StrictMode policy violation: android.os.strictmode.DiskReadViolation
+D/StrictMode( 5012): 	at android.os.StrictMode$AndroidBlockGuardPolicy.onReadFromDisk(StrictMode.java:1766)
+D/StrictMode( 5012): 	at android.app.SharedPreferencesImpl.awaitLoadedLocked(SharedPreferencesImpl.java:283)
+D/StrictMode( 5012): 	at android.app.SharedPreferencesImpl.getBoolean(SharedPreferencesImpl.java:352)
+D/StrictMode( 5012): 	at ahrp.j(PG:7)
+D/StrictMode( 5012): 	at ahrp.i(PG:19)
+D/StrictMode( 5012): 	at aowk.a(PG:3)
+D/StrictMode( 5012): 	at svw.E(PG:2669)
+D/StrictMode( 5012): 	at svw.a(PG:123)
+D/StrictMode( 5012): 	at ghue.d(PG:10)
+D/StrictMode( 5012): 	at ghue.a(PG:7)
+D/StrictMode( 5012): 	at sph.d(PG:7)
+D/StrictMode( 5012): 	at sph.a(PG:1728)
+D/StrictMode( 5012): 	at adry.a(PG:15)
+D/StrictMode( 5012): 	at dshp.a(PG:9)
+D/StrictMode( 5012): 	at fumk.a(PG:3)
+D/StrictMode( 5012): 	at fuln.run(PG:19)
+D/StrictMode( 5012): 	at fumm.run(PG:5)
+D/StrictMode( 5012): 	at domk.run(PG:5)
+D/StrictMode( 5012): 	at fszp.run(PG:44)
+D/StrictMode( 5012): 	at domb.run(PG:42)
+D/StrictMode( 5012): 	at java.lang.Thread.run(Thread.java:1563)
+D/StrictMode( 5012): 	at dono.run(PG:62)
+I/ContactsPerf( 5188): <redacted> finish
+E/ashmem  ( 5188): Pinning is deprecated since Android Q. Please use trim or other methods.
+D/nativeloader( 5188): Configuring clns-shared-12 for other apk /system/priv-app/E2eeContactKeysProvider/E2eeContactKeysProvider.apk. target_sdk_version=36, uses_libraries=, library_path=/system/priv-app/E2eeContactKeysProvider/lib/x86_64:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.android.providers.contactkeys:/system/priv-app/E2eeContactKeysProvider:/system/lib64:/system_ext/lib64
+I/PhoneAccountHandleMigrationUtils_CallLogDatabaseHelper( 5188): updatePhoneAccountHandleMigrationPendingStatus false
+I/PhoneAccountHandleMigrationUtils_CallLogDatabaseHelper( 5188): updatePhoneAccountHandleMigrationPendingStatus false
+I/CallLogProvider( 5188): syncEntriesFrom: fromUserId=0, srcIsShadow=true, forAllUsers=false; previousTimeStamp=0, newTimeStamp=0, entries=0
+D/CountryDetector(  816): The first listener is added
+I/ContactsDatabaseHelper( 5188): updateUseStrictPhoneNumberComparison: US
+I/CallLogProvider( 5188): delete uid/pid=10096/5188, uri=content://call_log_shadow/calls, numChanged=0
+I/ContactsDatabaseHelper( 5188): updateUseStrictPhoneNumberComparison: US
+I/CallLogProvider( 5188): Syncing call composer pics -- source user=0, isShadow=true, forAllUser=false
+I/CallLogProvider( 5188): Fetching list of Uris to sync
+I/CallLogProvider( 5188): Will sync following Uris:[]
+I/CallLogProvider( 5188): Syncing call composer pics -- got []
+D/ContactsDatabaseHelper( 5188): WAL enabled for contacts2.db: true
+I/PhoneAccountHandleMigrationUtils_ContactsDatabaseHelper( 5188): updatePhoneAccountHandleMigrationPendingStatus false
+W/chli    ( 5012): No value provided for the places model index flag.
+W/chli    ( 5012): No value provided for the places model index flag.
+I/DialerVoicemailStatusDataMigration( 4997): com.android.dialer.voicemailstatus.dataservice.impl.VoicemailStatusDataMigration.migrate:81 no package status to migrate
+I/aiea    ( 5012): getLocaleToModelSpecsMap
+I/aiea    ( 5012): Fetching latest config from MDD...
+I/aiea    ( 5012): (REDACTED) Found map of size: %d
+I/DialerVoicemailStatusDataMigration( 4997): com.android.dialer.voicemailstatus.dataservice.impl.VoicemailStatusDataMigration.cleanup:93 enter
+I/alpi    ( 5012): (REDACTED) Initializing MicroDataManager InitializeType-%d, isForced-%b, isActivePhoneEnrollment-%b isActiveGoogleHomeEnrollment-%b
+I/aiea    ( 5012): getLocaleToModelSpecsMap
+I/aiea    ( 5012): Fetching latest config from MDD...
+I/aiea    ( 5012): (REDACTED) Found map of size: %d
+I/aifu    ( 5012): (REDACTED) Location for model with model type: %s and locale: %s, is : %s
+I/aiga    ( 5012): (REDACTED) #getHotwordModel [locale: %s, modelType: %s]
+I/DialerSingletonScopedExternalsLogging( 4997): com.google.android.dialershared.externals.logging.<redacted>:75 event: CONTENT_RESOLVER_DELETE, function parameters: [com.android.voicemail,content://com.android.voicemail/status,(source_package = ?)], return value: <empty>
+I/ContactLocale( 5188): AddressBook Labels [[en_US]]: […, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, Α, Β, Γ, Δ, Ε, Ζ, Η, Θ, Ι, Κ, Λ, Μ, Ν, Ξ, Ο, Π, Ρ, Σ, Τ, Υ, Φ, Χ, Ψ, Ω, …, А, Б, В, Г, Д, Ђ, Е, Є, Ж, З, И, І, Й, Ј, К, Л, Љ, М, Н, Њ, О, П, Р, С, Т, Ћ, У, Ф, Х, Ц, Ч, Џ, Ш, Щ, Ю, Я, …, א, ב, ג, ד, ה, ו, ז, ח, ט, י, כ, ל, מ, נ, ס, ע, פ, צ, ק, ר, ש, ת, …, ا, ب, ت, ث, ج, ح, خ, د, ذ, ر, ز, س, ش, ص, ض, ط, ظ, ع, غ, ف, ق, ك, ل, م, ن, ه, و, ي, …, ก, ข, ฃ, ค, ฅ, ฆ, ง, จ, ฉ, ช, ซ, ฌ, ญ, ฎ, ฏ, ฐ, ฑ, ฒ, ณ, ด, ต, ถ, ท, ธ, น, บ, ป, ผ, ฝ, พ, ฟ, ภ, ม, ย, ร, ฤ, ล, ฦ, ว, ศ, ษ, ส, ห, ฬ, อ, ฮ, …, ㄱ, ㄴ, ㄷ, ㄹ, ㅁ, ㅂ, ㅅ, ㅇ, ㅈ, ㅊ, ㅋ, ㅌ, ㅍ, ㅎ, …, あ, か, さ, た, な, は, ま, や, ら, わ, #, …]
+W/adoq    ( 5012): Abort, client detached.
+D/ContactsDatabaseHelper( 5188): WAL enabled for profile.db: false
+I/DialerSingletonScopedExternalsLogging( 4997): com.google.android.dialershared.externals.logging.<redacted>:75 event: CONTENT_RESOLVER_DELETE, function parameters: [com.android.voicemail,content://com.android.voicemail/status,(source_package = ?)], return value: 0
+I/aiga    ( 5012): (REDACTED) #getHotwordModelFromMobstore [mobstoreUri: %s]
+D/DesktopExperienceFlags( 5188): Toggle override initialized to: false
+V/ContactsProvider( 5188): 0 Dangling Contacts have been cleaned up.
+I/aifu    ( 5012): (REDACTED) MicroDataManager InitializationTask. googleHotwordData is null: true, hotwordModel is null: %b , sourceLocationOfCurrentHotwordModel %s
+I/aiea    ( 5012): getLocaleToModelSpecsMap
+I/aiea    ( 5012): Fetching latest config from MDD...
+I/aiea    ( 5012): (REDACTED) Found map of size: %d
+W/AlarmManager( 1164): Unrecognized alarm listener com.android.networkstack.android.net.ip.IpClientLinkObserver$Dhcp6PdPreferredPrefixAlarmListener@367b297
+D/ApfFilter( 1164): (wlan0): Ignoring RA RA fe80::2 -> ff02::1 1800s fec0::/64 86400s/14400s  which matches RA fe80::2 -> ff02::1 1800s fec0::/64 86400s/14400s 
+I/NetworkScheduler.Stats( 1373): (REDACTED) Task %s/%s started execution. cause:%s exec_start_elapsed_seconds: %s
+W/Settings( 4997): Setting airplane_mode_on has moved from android.provider.Settings.System to android.provider.Settings.Global, returning read-only value.
+I/DialerVoicemailStatusDataServiceImpl( 4997): com.android.dialer.voicemailstatus.dataservice.impl.<redacted>:261 merged status: # rup@f832498a
+I/DialerInternalSemanticEventLoggerImpl( 4997): com.android.dialer.cui.impl.<redacted>:298 CUI error: VVM_ACTIVATION_FAILED; uniqueCallId: null
+I/DialerLogcatLoggingBindings( 4997): com.android.dialer.logging.logcat.LogcatLoggingBindings.logImpression:54 Impression: VVM_CLIENT_ERROR_LOGGED
+E/DialerVvmExecutorImpl( 4997): com.android.dialer.voicemail.service.impl.scheduler.VvmExecutorImpl.executeWorkOnCarrierService:420 Exception during vvm work for ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, 1, UserHandle{0} [CONTEXT enable_persistent_logger=true ]
+E/DialerVvmExecutorImpl( 4997): qyn: VVM failure reason: 2
+E/DialerVvmExecutorImpl( 4997): 	at rgd.onAuthenticationFailure(PG:93)
+E/DialerVvmExecutorImpl( 4997): 	at android.telephony.TelephonyManager$19.lambda$onAuthenticationFailure$1(TelephonyManager.java:18076)
+E/DialerVvmExecutorImpl( 4997): 	at android.telephony.TelephonyManager$19$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+E/DialerVvmExecutorImpl( 4997): 	at vxo.run(PG:7)
+E/DialerVvmExecutorImpl( 4997): 	at absv.run(PG:44)
+E/DialerVvmExecutorImpl( 4997): 	at vxh.run(PG:305)
+E/DialerVvmExecutorImpl( 4997): 	at svb.run(PG:269)
+E/DialerVvmExecutorImpl( 4997): 	at java.lang.Thread.run(Thread.java:1563)
+E/DialerVvmExecutorImpl( 4997): 	at vyq.run(PG:61)
+I/NetworkScheduler.Stats( 1373): (REDACTED) Task %s/%s finished executing. cause:%s result: %s elapsed_millis: %s uptime_millis: %s exec_start_elapsed_seconds: %s
+W/DialerVvmExecutorImpl( 4997): com.android.dialer.voicemail.service.impl.scheduler.VvmExecutorImpl.execute:315 Recoverable VVM error: [GeneralFailureReason: UNSPECIFIED, RestFailureReason: GBA_AUTHENTICATION_FAILURE_FEATURE_NOT_SUPPORTED, OmtpFailureReason: OMTP_UNSPECIFIED] for ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, 1, UserHandle{0}
+W/DialerVvmExecutorImpl( 4997): qyn: VVM failure reason: 2
+W/DialerVvmExecutorImpl( 4997): 	at rgd.onAuthenticationFailure(PG:93)
+W/DialerVvmExecutorImpl( 4997): 	at android.telephony.TelephonyManager$19.lambda$onAuthenticationFailure$1(TelephonyManager.java:18076)
+W/DialerVvmExecutorImpl( 4997): 	at android.telephony.TelephonyManager$19$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+W/DialerVvmExecutorImpl( 4997): 	at vxo.run(PG:7)
+W/DialerVvmExecutorImpl( 4997): 	at absv.run(PG:44)
+W/DialerVvmExecutorImpl( 4997): 	at vxh.run(PG:305)
+W/DialerVvmExecutorImpl( 4997): 	at svb.run(PG:269)
+W/DialerVvmExecutorImpl( 4997): 	at java.lang.Thread.run(Thread.java:1563)
+W/DialerVvmExecutorImpl( 4997): 	at vyq.run(PG:61)
+I/DialerVoicemailStatusDataServiceImpl( 4997): com.android.dialer.voicemailstatus.dataservice.impl.<redacted>:247 enter
+I/DialerLoggingConsentCheckerImpl( 4997): com.google.android.dialershared.logging.consent.impl.<redacted>:72 timer stop with success, timer present: false
+I/DialerVoicemailStatusDataServiceImpl( 4997): com.android.dialer.voicemailstatus.dataservice.impl.<redacted>:380 Existing error is lower priority and thus overridden, Existing error: REST_FAILURE_REASON.GBA_AUTHENTICATION_FAILURE_FEATURE_NOT_SUPPORTED, New error: REST_FAILURE_REASON.GBA_AUTHENTICATION_FAILURE_FEATURE_NOT_SUPPORTED
+W/.android.dialer( 4997): userfaultfd: MOVE ioctl seems unsupported: Connection timed out
+I/TapAndPay( 1373): deviceSupportsHce has detected emulator [CONTEXT service_id=79 ]
+I/NetworkScheduler.Stats( 1373): (REDACTED) Task %s/%s started execution. cause:%s exec_start_elapsed_seconds: %s
+I/TapAndPay( 1373): NfcAdapter is null while obtaining CardEmulation instance. [CONTEXT service_id=79 ]
+I/alsv    ( 5012): NGA disabled due to not being eligible.
+I/alsv    ( 5012): (REDACTED) Nga state changed to %s
+I/alsv    ( 5012): (REDACTED) isTngActive=%s
+I/NetworkScheduler.Stats( 1373): (REDACTED) Task %s/%s finished executing. cause:%s result: %s elapsed_millis: %s uptime_millis: %s exec_start_elapsed_seconds: %s
+I/NetworkScheduler.Stats( 1373): (REDACTED) Task %s/%s started execution. cause:%s exec_start_elapsed_seconds: %s
+I/NetworkScheduler.Stats( 1373): (REDACTED) Task %s/%s finished executing. cause:%s result: %s elapsed_millis: %s uptime_millis: %s exec_start_elapsed_seconds: %s
+I/azyz    ( 5012): (REDACTED) Set Assistant Enabled to %s
+I/TapAndPay( 1373): Sending QUICK_ACCESS_WALLET_STATE_CHANGED broadcast to wallet app. [CONTEXT service_id=79 ]
+I/azyt    ( 5012): Set Assistant eligibility status
+W/Settings( 4997): Setting airplane_mode_on has moved from android.provider.Settings.System to android.provider.Settings.Global, returning read-only value.
+I/DialerVoicemailStatusDataServiceImpl( 4997): com.android.dialer.voicemailstatus.dataservice.impl.<redacted>:261 merged status: # rup@f832498a
+I/DialerVvmExecutorImpl( 4997): com.android.dialer.voicemail.service.impl.scheduler.VvmExecutorImpl.executeWork:215 VvmResult is: # qyh@1db0ddb for ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, 1, UserHandle{0}
+I/DialerSingletonScopedExternalsLogging( 4997): com.google.android.dialershared.externals.logging.<redacted>:75 event: TIKTOK_WORK_EXECUTION_MONITOR_ON_WORK_FINISHED, function parameters: [c929643a-eb2e-4aea-ba94-beed95d2f2de,com.android.dialer.voicemail.service.impl.VvmTaskWorker], return value: Failure
+I/DialerLoggingConsentCheckerImpl( 4997): com.google.android.dialershared.logging.consent.impl.<redacted>:72 timer stop with success, timer present: false
+I/WM-WorkerWrapper( 4997): Worker result FAILURE for Work [ id=c929643a-eb2e-4aea-ba94-beed95d2f2de, tags={ com.google.apps.tiktok.contrib.work.TikTokListenableWorker,1,ACTIVATE,TikTokWorker#com.android.dialer.voicemail.service.impl.VvmTaskWorker } ]
+D/WM-Processor( 4997): fjl c929643a-eb2e-4aea-ba94-beed95d2f2de executed; reschedule = false
+D/WM-SystemJobService( 4997): c929643a-eb2e-4aea-ba94-beed95d2f2de executed on JobScheduler
+D/WM-GreedyScheduler( 4997): Cancelling work ID c929643a-eb2e-4aea-ba94-beed95d2f2de

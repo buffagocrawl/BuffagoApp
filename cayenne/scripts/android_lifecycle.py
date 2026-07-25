@@ -239,6 +239,47 @@ class AndroidLifecycle:
             raise RuntimeFailure("DEV_CLIENT_CONNECTION_FAILURE", f"{PACKAGE} is not installed on {self.device}")
         return {"status": "INSTALLED", "package": PACKAGE}
 
+    def force_stop(self):
+        rc, output = self._adb("-s", self.device, "shell", "am", "force-stop", PACKAGE)
+        return {"status": "PASSED" if rc == 0 else "FAILED", "command": "am force-stop", "output": output.strip()[:200]}
+
+    def clear_app_data(self):
+        rc, output = self._adb("-s", self.device, "shell", "pm", "clear", PACKAGE)
+        return {"status": "PASSED" if rc == 0 and "Success" in output else "FAILED", "command": "pm clear", "output": output.strip()[:200]}
+
+    def screen_unlocked(self):
+        _, output = self._adb("-s", self.device, "shell", "dumpsys", "window", "policy")
+        return "isStatusBarKeyguard=true" not in output and "showing=true" not in output.lower()
+
+    def launch_auth_route(self):
+        """Open the app's existing auth route only after dev-client bundle readiness."""
+        rc, output = self._adb(
+            "-s", self.device, "shell", "am", "start", "-W", "-a", "android.intent.action.VIEW",
+            "-d", "buffago://auth/login", "-p", PACKAGE, timeout=30,
+        )
+        return {"status": "STARTED" if rc == 0 and "Error:" not in output else "FAILED", "command": "auth-deep-link"}
+
+    def wait_for_hierarchy(self, predicate, attempts=20, interval=1):
+        last = ""
+        for _ in range(attempts):
+            _, last = self.dump_hierarchy()
+            if predicate(last):
+                return True, last
+            self.sleep(interval)
+        return False, last
+
+    def dismiss_safe_overlay(self, hierarchy):
+        """Dismiss one explicitly recognised non-destructive Android prompt."""
+        safe_labels = ("While using the app", "Only this time", "Allow", "Not now", "No thanks", "Continue")
+        for label in safe_labels:
+            match = re.search(rf'(?:text|content-desc)="{re.escape(label)}"[^>]*bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"', hierarchy or "", re.I)
+            if not match:
+                continue
+            x1, y1, x2, y2 = map(int, match.groups())
+            rc, _ = self._adb("-s", self.device, "shell", "input", "tap", str((x1+x2)//2), str((y1+y2)//2))
+            return {"dismissed": rc == 0, "label": label}
+        return {"dismissed": False, "label": None}
+
     def _metro_ready(self):
         try:
             with urllib.request.urlopen("http://127.0.0.1:8081/status", timeout=2) as response:

@@ -28,6 +28,7 @@ import {
 import { useSocialBadges } from '../../../hooks/useSocialBadges';
 import FriendsPanel from '../../../components/FriendsPanel';
 import FeedbackState from '../../../components/ui/FeedbackState';
+import { ENABLE_EMPTY_FEED_LAUNCHPAD, ENABLE_SHARE_INVITE_LOOP } from '../../../config/features';
 
 const ADMIN_ID = '23898359-306a-4dd3-91f0-da66da19ccfc';
 const TOKEN_SRC = require('../../../assets/Buffago-token.png');
@@ -1237,15 +1238,42 @@ export default function Leaderboards() {
 
   const showNewAppEmpty = feedScope === 'state' && !feedLoading && !feedError && (feedRows?.length || 0) === 0;
 
+  const selectEmptyFeedCta = useCallback((cta, pathname) => {
+    const correlationId = `empty-feed-${Date.now()}`;
+    trackEvent({
+      eventName: 'empty_feed_cta_selected',
+      screen: 'leaderboards',
+      userId: viewerId ?? null,
+      metadata: { cta, feature_flag_key: 'empty_feed_launchpad', correlation_id: correlationId },
+    });
+    try {
+      router.push(pathname);
+      trackEvent({
+        eventName: 'destination_route_opened',
+        screen: 'leaderboards',
+        userId: viewerId ?? null,
+        metadata: { destination: cta, outcome: 'opened', feature_flag_key: 'empty_feed_launchpad', correlation_id: correlationId },
+      });
+    } catch {
+      trackEvent({
+        eventName: 'destination_route_opened',
+        screen: 'leaderboards',
+        userId: viewerId ?? null,
+        metadata: { destination: cta, outcome: 'failed', feature_flag_key: 'empty_feed_launchpad', correlation_id: correlationId },
+      });
+    }
+  }, [router, viewerId]);
+
   useEffect(() => {
     if (!showNewAppEmpty) return;
     trackEvent({
-      eventName: 'empty_state_shown',
+      eventName: 'empty_feed_viewed',
       screen: 'leaderboards',
       userId: viewerId ?? null,
       stateId: stateId ?? null,
       metadata: {
         state: 'social_feed_empty',
+        feature_flag_key: 'empty_feed_launchpad',
         mode,
         scope: feedScope,
       },
@@ -1314,9 +1342,26 @@ export default function Leaderboards() {
                     {'\n\n'}
                     Be the first to make it pop: get out, rate some wings… and tell your friends.
                   </Text>
-                  <Button mode="contained" onPress={() => fetchFeedPage({ reset: true })} style={{ borderRadius: 14 }}>
-                    Refresh
-                  </Button>
+                  {ENABLE_EMPTY_FEED_LAUNCHPAD ? (
+                    <>
+                      <Button mode="contained" onPress={() => selectEmptyFeedCta('browse_wingdex', '/(tabs)/ratings')} style={{ borderRadius: 14 }}>
+                        Browse Wingdex
+                      </Button>
+                      <Button mode="contained-tonal" onPress={() => selectEmptyFeedCta('rate_nearby_spot', '/(tabs)/home')} style={{ borderRadius: 14 }}>
+                        Rate a nearby spot
+                      </Button>
+                      {ENABLE_SHARE_INVITE_LOOP && viewerId ? (
+                        <Button mode="text" onPress={() => selectEmptyFeedCta('invite', '/referrals')}>
+                          Invite friends
+                        </Button>
+                      ) : null}
+                      <Button mode="text" onPress={() => fetchFeedPage({ reset: true })}>Refresh</Button>
+                    </>
+                  ) : (
+                    <Button mode="contained" onPress={() => fetchFeedPage({ reset: true })} style={{ borderRadius: 14 }}>
+                      Refresh
+                    </Button>
+                  )}
                 </Card.Content>
               </Card>
             ) : null}

@@ -1,0 +1,9 @@
+{
+  "status": "PASSED_IN_LATEST_STAGED_RUNS",
+  "device": "emulator-5554",
+  "package": "com.buffago.app",
+  "metro": "prewarmed before launch",
+  "screenUnlocked": true,
+  "appDataControl": "adb shell pm clear com.buffago.app",
+  "notes": "Readiness does not imply stable Expo route delivery after a clean launch."
+}

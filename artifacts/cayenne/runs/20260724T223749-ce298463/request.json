@@ -1,0 +1,30 @@
+{
+  "contractVersion": "1.0",
+  "runId": "20260724T223749-ce298463",
+  "requestedBy": "owner",
+  "requestedSuite": "auth",
+  "suite": "auth",
+  "environment": "qa",
+  "mutationAllowed": false,
+  "device": {
+    "platform": "android",
+    "deviceId": "emulator-5554"
+  },
+  "evidenceRequirements": [
+    "screenshot",
+    "hierarchy",
+    "logcat",
+    "maestro-junit"
+  ],
+  "acceptanceCriteria": [
+    "App launches",
+    "app.root appears",
+    "No fatal runtime error",
+    "Exactly one valid startup state",
+    "Detected startup state passes its required assertions",
+    "Cayenne account signs in",
+    "Session restores after relaunch",
+    "RLS-backed profile read succeeds",
+    "Logout returns to sign-in"
+  ]
+}

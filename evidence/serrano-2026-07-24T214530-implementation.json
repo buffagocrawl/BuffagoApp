@@ -1,0 +1,24 @@
+{
+  "run_id": "2026-07-24T214530",
+  "phase": "implementation",
+  "commands": [
+    "npm.cmd run test:analytics",
+    "npm.cmd run typecheck",
+    "git -C crawl diff --check"
+  ],
+  "changed_files": [
+    "crawl/config/features.ts",
+    "crawl/app/(tabs)/leaderboards/index.jsx",
+    "crawl/app/_layout.tsx",
+    "crawl/lib/analytics.js",
+    "crawl/lib/analyticsSchema.js",
+    "crawl/lib/errorRecovery.js",
+    "crawl/tests/analytics/serrano-event-contract.test.js"
+  ],
+  "validation": {
+    "analytics_tests": "passed",
+    "typecheck": "passed",
+    "authenticated_e2e": "not_run: no authenticated runtime evidence or execution path supplied",
+    "report_provenance": "not_implemented: no report-layer ranking or strategy consumer was identified in supplied evidence"
+  }
+}

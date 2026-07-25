@@ -17,6 +17,7 @@ import {
   PaperProvider,
   Text,
   ProgressBar,
+  Button,
 } from 'react-native-paper';
 import {
   ThemeProvider as NavThemeProvider,
@@ -40,6 +41,7 @@ import { installAppLifecycleTracking, rotateAnalyticsSession, trackEvent, trackS
 import { useOnboardingGate } from '../hooks/useOnboardingGate';
 import OnboardingFlow from '../components/OnboardingFlow';
 import ReferralAttributionBridge from '../components/ReferralAttributionBridge';
+import { ROOT_RETRY_LIMIT, ROOT_RETRY_SESSION_KEY, canRetryInSession, nextRetryCount } from '../lib/errorRecovery';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -139,9 +141,11 @@ function AppBootSplash() {
 function AppStatusScreen({
   title,
   message,
+  children,
 }: {
   title: string;
   message: string;
+  children?: React.ReactNode;
 }) {
   const paperTheme = usePaperTheme();
 
@@ -161,17 +165,18 @@ function AppStatusScreen({
         {title}
       </Text>
       <Text style={{ opacity: 0.8, textAlign: 'center', lineHeight: 21 }}>{message}</Text>
+      {children ? <View style={{ marginTop: 20, width: '100%', gap: 10 }}>{children}</View> : null}
     </View>
   );
 }
 
 class RootErrorBoundary extends React.Component<
   { children: React.ReactNode },
-  { error: Error | null }
+  { error: Error | null; retryCount: number; recoveryKey: number }
 > {
   constructor(props: { children: React.ReactNode }) {
     super(props);
-    this.state = { error: null };
+    this.state = { error: null, retryCount: 0, recoveryKey: 0 };
   }
 
   static getDerivedStateFromError(error: Error) {
@@ -188,7 +193,34 @@ class RootErrorBoundary extends React.Component<
       },
       'app'
     );
+    trackEvent({
+      eventName: 'error_boundary_viewed',
+      screen: 'app_root',
+      metadata: { boundary: 'root' },
+    });
   }
+
+  componentDidMount() {
+    AsyncStorage.getItem(ROOT_RETRY_SESSION_KEY).then((value) => {
+      this.setState({ retryCount: Number(value || 0) || 0 });
+    }).catch(() => {});
+  }
+
+  retry = async () => {
+    if (!canRetryInSession(this.state.retryCount)) {
+      await trackEvent({ eventName: 'error_retry_suppressed', screen: 'app_root', metadata: { boundary: 'root', retry_limit: ROOT_RETRY_LIMIT } });
+      return;
+    }
+    const retryCount = nextRetryCount(this.state.retryCount);
+    await AsyncStorage.setItem(ROOT_RETRY_SESSION_KEY, String(retryCount));
+    await trackEvent({ eventName: 'error_retry_selected', screen: 'app_root', metadata: { boundary: 'root', retry_count: retryCount } });
+    this.setState((current) => ({ error: null, retryCount, recoveryKey: current.recoveryKey + 1 }));
+  };
+
+  signOut = async () => {
+    await trackEvent({ eventName: 'error_fallback_selected', screen: 'app_root', metadata: { boundary: 'root', fallback: 'sign_out' } });
+    await import('../lib/supabase').then(({ supabase }) => supabase.auth.signOut()).catch(() => {});
+  };
 
   render() {
     if (this.state.error) {
@@ -197,14 +229,19 @@ class RootErrorBoundary extends React.Component<
           <PaperProvider>
             <AppStatusScreen
               title="BuffaGo hit a startup error"
-              message="Restart the app or sign out after the next launch. The error was logged."
-            />
+              message="The error was logged. You can try again, or sign out and start fresh."
+            >
+              <Button mode="contained" disabled={!canRetryInSession(this.state.retryCount)} onPress={this.retry}>
+                {canRetryInSession(this.state.retryCount) ? 'Try again' : 'Retry unavailable'}
+              </Button>
+              <Button mode="outlined" onPress={this.signOut}>Sign out</Button>
+            </AppStatusScreen>
           </PaperProvider>
         </ThemeProvider>
       );
     }
 
-    return this.props.children;
+    return <View key={this.state.recoveryKey} style={{ flex: 1 }}>{this.props.children}</View>;
   }
 }
 

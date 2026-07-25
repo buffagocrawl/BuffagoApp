@@ -1,0 +1,329 @@
+{
+  "contractVersion": "1.0",
+  "runId": "20260724T230849-7212c02e",
+  "status": "BLOCKED",
+  "startedAt": "2026-07-25T03:08:49+00:00",
+  "finishedAt": "2026-07-25T03:13:31+00:00",
+  "requestedSuite": "auth",
+  "suite": "auth",
+  "environment": "qa",
+  "launchPolicy": "CLEAR_APP_DATA",
+  "device": {
+    "platform": "android",
+    "deviceId": "emulator-5554"
+  },
+  "detectedStartupState": null,
+  "startupStateCandidates": [],
+  "startupStateValidation": "FAILED",
+  "universalAssertionResult": "FAILED",
+  "stateSpecificAssertionResult": "INSUFFICIENT_EVIDENCE",
+  "universalAssertions": [
+    {
+      "assertion": "App launches",
+      "status": "PASSED"
+    },
+    {
+      "assertion": "app.root appears",
+      "status": "PASSED"
+    },
+    {
+      "assertion": "No fatal runtime error",
+      "status": "PASSED"
+    },
+    {
+      "assertion": "Exactly one valid startup state",
+      "status": "FAILED"
+    }
+  ],
+  "stateSpecificAssertions": [],
+  "skippedAssertions": [
+    {
+      "assertion": "onboarding.root and app.root remain visible",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Onboarding navigation controls are discoverable",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Safe onboarding forward/back interaction succeeds",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "auth.screen is visible",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Sign-in controls render",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Available primary navigation renders",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Each visited authenticated surface renders",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Authenticated primary navigation",
+      "status": "NOT_APPLICABLE"
+    }
+  ],
+  "skipReason": "Assertions for startup states other than an unambiguous detected state are not applicable",
+  "authentication": {
+    "credentialSource": "ignored_local_file",
+    "credentialsAvailable": true,
+    "login": "BLOCKED",
+    "sessionRestoration": "BLOCKED",
+    "protectedNavigation": "BLOCKED",
+    "logout": "BLOCKED",
+    "profileLoad": "BLOCKED",
+    "rlsBackedRead": "BLOCKED"
+  },
+  "summary": {
+    "acceptanceCriteriaCovered": [],
+    "artifactCount": 13
+  },
+  "runtime": {
+    "adbStart": {
+      "status": "STARTED",
+      "warnings": []
+    },
+    "emulatorStart": {
+      "status": "STARTED",
+      "avd": "Medium_Phone_API_36.1",
+      "pid": 10568,
+      "arguments": [
+        "-no-snapshot-load",
+        "-port",
+        "5554"
+      ]
+    },
+    "adbRecovery": {
+      "status": "RECOVERED",
+      "states": [
+        "missing",
+        "missing",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "device"
+      ],
+      "reconnect": true,
+      "adbRestart": true
+    },
+    "emulatorBoot": {
+      "status": "BOOTED"
+    },
+    "package": {
+      "status": "INSTALLED",
+      "package": "com.buffago.app"
+    },
+    "launchPolicy": {
+      "policy": "CLEAR_APP_DATA"
+    },
+    "appDataControl": {
+      "status": "PASSED",
+      "command": "pm clear",
+      "output": "Success"
+    },
+    "metroStart": {
+      "status": "STARTED",
+      "pid": 17804,
+      "log": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\cayenne\\runs\\20260724T230849-7212c02e\\logs\\metro.log"
+    },
+    "bundlePrewarm": {
+      "status": "PREWARMED",
+      "entry": "node_modules/expo-router/entry.bundle"
+    },
+    "devClientConnection": {
+      "status": "CONNECTED",
+      "url": "exp+buffago://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081",
+      "reverse": "tcp:8081",
+      "pid": "4103",
+      "selector": "app.root",
+      "launcherForeground": false,
+      "fatalError": false
+    },
+    "devClientConnectionAfterClear": {
+      "status": "CONNECTED",
+      "url": "exp+buffago://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081",
+      "reverse": "tcp:8081",
+      "pid": "4250",
+      "selector": "app.root",
+      "launcherForeground": false,
+      "fatalError": false
+    },
+    "failure": {
+      "category": "DEV_CLIENT_CONNECTION_FAILURE",
+      "message": "Authentication controls were not simultaneously ready; credentials were not entered."
+    }
+  },
+  "stageResults": [
+    {
+      "stage": "environment_readiness",
+      "status": "PASSED",
+      "package": "com.buffago.app",
+      "device": "emulator-5554",
+      "screenUnlocked": true,
+      "appDataControl": "pm clear supported"
+    },
+    {
+      "stage": "controlled_app_launch",
+      "status": "PASSED",
+      "policy": "CLEAR_APP_DATA",
+      "firstDetectedState": null,
+      "overlay": null
+    },
+    {
+      "stage": "auth_route",
+      "status": "STARTED",
+      "command": "auth-deep-link"
+    },
+    {
+      "stage": "authentication_screen_readiness",
+      "status": "FAILED",
+      "state": "AUTH_SCREEN_INCOMPLETE",
+      "requiredSelectors": [
+        "auth.email.input",
+        "auth.password.input",
+        "auth.screen",
+        "auth.signin.button"
+      ],
+      "missingSelectors": [
+        "auth.email.input",
+        "auth.password.input",
+        "auth.screen",
+        "auth.signin.button"
+      ],
+      "overlay": "NATIVE_PERMISSION_DIALOG",
+      "keyboardVisible": false
+    }
+  ],
+  "cleanup": {
+    "status": "PASSED",
+    "ownedPids": [
+      10568,
+      17804
+    ],
+    "cleanedPids": [
+      17804,
+      10568
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "auth",
+      "title": "auth",
+      "status": "BLOCKED",
+      "durationMs": 0,
+      "preconditions": [
+        "Android emulator"
+      ],
+      "steps": [],
+      "assertions": [
+        "App launches",
+        "app.root appears",
+        "No fatal runtime error",
+        "Exactly one valid startup state",
+        "Detected startup state passes its required assertions",
+        "Cayenne account signs in",
+        "Session restores after relaunch",
+        "RLS-backed profile read succeeds",
+        "Logout returns to sign-in"
+      ],
+      "detectedStartupState": null,
+      "stateSpecificAssertions": [],
+      "skippedAssertions": [
+        {
+          "assertion": "onboarding.root and app.root remain visible",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Onboarding navigation controls are discoverable",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Safe onboarding forward/back interaction succeeds",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "auth.screen is visible",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Sign-in controls render",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Available primary navigation renders",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Each visited authenticated surface renders",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Authenticated primary navigation",
+          "status": "NOT_APPLICABLE"
+        }
+      ],
+      "skipReason": "Assertions for startup states other than an unambiguous detected state are not applicable",
+      "screenshots": [],
+      "hierarchy": "hierarchies/final.xml",
+      "logs": [
+        "logs/logcat.txt",
+        "logs/metro.log",
+        "maestro/raw-output.log"
+      ],
+      "failureCategory": "ENVIRONMENT_BLOCKER",
+      "failureMessage": "Authentication controls were not simultaneously ready; credentials were not entered.",
+      "retryCount": 0
+    }
+  ],
+  "failures": [
+    {
+      "failureCategory": "ENVIRONMENT_BLOCKER",
+      "runtimeCategory": "DEV_CLIENT_CONNECTION_FAILURE",
+      "failureMessage": "Authentication controls were not simultaneously ready; credentials were not entered."
+    }
+  ],
+  "artifacts": [
+    "environment.json",
+    "prerequisite-check.json",
+    "request.json",
+    "safety-check.json",
+    "stage-results.json",
+    "hierarchies/auth-ready.xml",
+    "hierarchies/startup.xml",
+    "logs/adb-start.log",
+    "logs/emulator.stderr.log",
+    "logs/emulator.stdout.log",
+    "logs/metro.log",
+    "runtime/lifecycle.json",
+    "runtime/processes.json"
+  ],
+  "safety": {
+    "environment": "qa",
+    "productionDetected": true,
+    "mutationRequested": false,
+    "mutationAllowed": false,
+    "decision": "ALLOW",
+    "reasons": []
+  },
+  "redaction": {
+    "validated": true,
+    "status": "PASSED"
+  },
+  "limitations": [
+    "DEV_CLIENT_CONNECTION_FAILURE"
+  ]
+}

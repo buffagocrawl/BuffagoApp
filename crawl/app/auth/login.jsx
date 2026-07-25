@@ -48,6 +48,15 @@ const ONBOARDING_SEED_RATING_KEY = 'buffago:onboarding:seed_rating';
 const ONBOARDING_DEST_SUGGESTION_KEY = 'buffago:onboarding:dest_suggestion';
 
 const USERNAME_REGEX = /^[a-zA-Z0-9_]{3,20}$/;
+const CAYENNE_E2E_DIAGNOSTICS = process.env.EXPO_PUBLIC_CAYENNE_E2E === 'true';
+
+// These diagnostics are deliberately value-free: they establish the auth
+// lifecycle in a local E2E artifact without recording identities, tokens, or
+// backend payloads. They are compiled only for the local E2E build.
+const cayenneAuthStage = (stage, category) => {
+  if (!CAYENNE_E2E_DIAGNOSTICS) return;
+  console.info('[cayenne-auth-stage]', stage, Date.now(), category || '');
+};
 
 // Same helper Ratings screen uses
 const deriveStateCode = (address) => {
@@ -347,8 +356,11 @@ export default function EmailAuthScreen() {
     if (!user?.id) return;
 
     try {
+      cayenneAuthStage('auth_profile_bootstrap_started');
       await upsertProfileFromAuth(user);
+      cayenneAuthStage('auth_profile_bootstrap_succeeded');
     } catch (e) {
+      cayenneAuthStage('auth_profile_bootstrap_failed', sanitizeAuthError(e)?.code || 'unknown');
       console.warn('afterAuthSuccess profile upsert skipped', e?.message || e);
     }
 
@@ -416,21 +428,34 @@ export default function EmailAuthScreen() {
   };
 
   const onSignIn = async () => {
-    if (!emailValid || !pwdValid) return;
+    cayenneAuthStage('auth_ui_submit_received');
+    if (!emailValid || !pwdValid) {
+      cayenneAuthStage('auth_client_validation_failed');
+      return;
+    }
 
     setBusy(true);
+    const submittedAt = Date.now();
     try {
+      cayenneAuthStage('auth_client_validation_passed');
       await trackEvent({ eventName: 'auth_started', screen: 'auth/login', metadata: { auth_method: 'password' } });
+      console.info('[cayenne-auth] submit_started', { method: 'password' });
+      cayenneAuthStage('auth_request_started');
       const { data, error } = await withPasswordAuthTimeout(
         supabase.auth.signInWithPassword({ email, password })
       );
       if (error) throw error;
+      cayenneAuthStage('auth_request_succeeded');
 
       const user = data?.user || data?.session?.user || null;
       if (user?.id) await afterAuthSuccess(user);
 
+      console.info('[cayenne-auth] submit_completed', { outcome: 'session_received', duration_ms: Date.now() - submittedAt });
+      cayenneAuthStage('auth_navigation_started');
       router.replace('/(tabs)/home');
     } catch (e) {
+      cayenneAuthStage('auth_request_failed_safe_category', sanitizeAuthError(e)?.code || 'unknown');
+      console.info('[cayenne-auth] submit_completed', { outcome: 'error', duration_ms: Date.now() - submittedAt, category: sanitizeAuthError(e)?.code || 'unknown' });
       show(e?.message || 'Sign-in failed');
     } finally {
       setBusy(false);
@@ -585,8 +610,8 @@ export default function EmailAuthScreen() {
                 value={mode}
                 onValueChange={setMode}
                 buttons={[
-                  { value: 'signup', label: 'Sign Up' },
-                  { value: 'signin', label: 'Sign In' },
+                  { value: 'signup', label: 'Sign Up', testID: 'auth.mode.signup' },
+                  { value: 'signin', label: 'Sign In', testID: 'auth.mode.signin' },
                 ]}
                 density="medium"
                 style={{ marginTop: 4 }}
@@ -629,6 +654,8 @@ export default function EmailAuthScreen() {
                 onChangeText={setPassword}
                 mode="outlined"
                 secureTextEntry={!showPwd}
+                returnKeyType="done"
+                onSubmitEditing={onSignIn}
                 right={<TextInput.Icon icon={showPwd ? 'eye-off' : 'eye'} onPress={() => setShowPwd((s) => !s)} />}
                 style={styles.input}
               />
@@ -636,21 +663,24 @@ export default function EmailAuthScreen() {
                 Minimum 6 characters.
               </HelperText>
 
-              <Button
-                testID="auth.signin.button"
-                mode="contained"
-                onPress={mode === 'signin' ? onSignIn : onSignUp}
-                disabled={!canSubmit || busy}
-                style={styles.primaryBtn}
-              >
-                {busy ? 'Please wait…' : mode === 'signin' ? 'Sign In' : 'Create Account'}
-              </Button>
+              <View testID="auth.signin.button">
+                <Button
+                  mode="contained"
+                  accessibilityLabel="Sign In"
+                  testID="auth.signin.native-action"
+                  onPress={mode === 'signin' ? onSignIn : onSignUp}
+                  disabled={!canSubmit || busy}
+                  style={styles.primaryBtn}
+                >
+                  {busy ? 'Please wait…' : mode === 'signin' ? 'Sign In' : 'Create Account'}
+                </Button>
+              </View>
 
               <Button mode="text" onPress={onForgot} disabled={busy} style={{ marginTop: 2 }}>
                 Forgot password?
               </Button>
 
-              {busy ? <ActivityIndicator testID="auth.loading" style={{ marginTop: 8 }} /> : null}
+              {busy ? <View testID="auth.loading"><ActivityIndicator style={{ marginTop: 8 }} /></View> : null}
 
               <Button mode="text" onPress={() => router.back()} style={{ marginTop: 6 }}>
                 Cancel

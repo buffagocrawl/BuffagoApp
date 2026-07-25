@@ -12,9 +12,14 @@ from pathlib import Path
 
 AUTH_BLOCKED = "CAYENNE_AUTH_BLOCKED: Required Cayenne authentication credentials are unavailable."
 _PLACEHOLDERS = {"", "changeme", "change-me", "example", "password", "your-password", "<password>"}
-PROCESS_ENV = "PROCESS_ENV"
-LOCAL_IGNORED_FILE = "LOCAL_IGNORED_FILE"
-MISSING = "MISSING"
+INHERITED_ENVIRONMENT = "inherited_environment"
+IGNORED_LOCAL_FILE = "ignored_local_file"
+UNAVAILABLE = "unavailable"
+# Backward-compatible imports for the harness tests and integrations.
+PROCESS_ENV = INHERITED_ENVIRONMENT
+LOCAL_IGNORED_FILE = IGNORED_LOCAL_FILE
+MISSING = UNAVAILABLE
+LOCAL_CREDENTIAL_PATHS = (Path(".env.cayenne.local"), Path(".secrets/cayenne.local.env"))
 
 
 class CredentialsUnavailable(RuntimeError):
@@ -32,7 +37,14 @@ class CayenneCredentials:
 
 
 def _valid(email: str, password: str | None) -> bool:
-    return bool(email and password is not None and email.lower() not in _PLACEHOLDERS and password.lower() not in _PLACEHOLDERS)
+    return bool(email and password is not None and email.strip() and password.strip() and email.strip().lower() not in _PLACEHOLDERS and password.strip().lower() not in _PLACEHOLDERS)
+
+
+def _unquote(value: str) -> str:
+    value = value.strip()
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in {"'", '"'}:
+        return value[1:-1]
+    return value
 
 
 def _parse_local_file(path: Path) -> dict[str, str]:
@@ -47,7 +59,7 @@ def _parse_local_file(path: Path) -> dict[str, str]:
             continue
         key, value = line.split("=", 1)
         if key.strip() in {"CAYENNE_TEST_EMAIL", "CAYENNE_TEST_PASSWORD"}:
-            values[key.strip()] = value
+            values[key.strip()] = _unquote(value)
     return values
 
 
@@ -59,14 +71,18 @@ def load_cayenne_credentials(
     password = environment.get("CAYENNE_TEST_PASSWORD")
     # Password is intentionally not stripped or otherwise transformed.
     if _valid(email, password):
+        # The PowerShell launcher sets this non-secret provenance marker after
+        # safely loading an ignored file.  Do not treat arbitrary values as
+        # authoritative and never inspect or log the credential values.
         declared_source = environment.get("CAYENNE_CREDENTIAL_SOURCE")
-        source = declared_source if declared_source in {PROCESS_ENV, LOCAL_IGNORED_FILE} else PROCESS_ENV
+        source = declared_source if declared_source in {INHERITED_ENVIRONMENT, IGNORED_LOCAL_FILE} else INHERITED_ENVIRONMENT
         return CayenneCredentials(email=email, password=password, source=source)
 
     repository_root = root or Path(__file__).resolve().parents[2]
-    local = _parse_local_file(repository_root / ".env.cayenne.local")
-    email = (local.get("CAYENNE_TEST_EMAIL") or "").strip()
-    password = local.get("CAYENNE_TEST_PASSWORD")
-    if _valid(email, password):
-        return CayenneCredentials(email=email, password=password, source=LOCAL_IGNORED_FILE)
+    for relative_path in LOCAL_CREDENTIAL_PATHS:
+        local = _parse_local_file(repository_root / relative_path)
+        email = (local.get("CAYENNE_TEST_EMAIL") or "").strip()
+        password = local.get("CAYENNE_TEST_PASSWORD")
+        if _valid(email, password):
+            return CayenneCredentials(email=email, password=password, source=IGNORED_LOCAL_FILE)
     raise CredentialsUnavailable(AUTH_BLOCKED)

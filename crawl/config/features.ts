@@ -25,6 +25,13 @@ export const ENABLE_SHARE_INVITE_LOOP = parseBooleanFlag(
   true
 );
 
+// The Social Feed launchpad is opt-in so it can be rolled back independently
+// of the feed itself.
+export const ENABLE_EMPTY_FEED_LAUNCHPAD = parseBooleanFlag(
+  process.env.EXPO_PUBLIC_ENABLE_EMPTY_FEED_LAUNCHPAD,
+  false
+);
+
 export const ENABLE_RESTAURANT_OWNER_LOOP = parseBooleanFlag(
   process.env.EXPO_PUBLIC_ENABLE_RESTAURANT_OWNER_LOOP,
   true

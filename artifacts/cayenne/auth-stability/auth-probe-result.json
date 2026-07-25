@@ -1,0 +1,5 @@
+{
+  "result": "PROBE_UNAVAILABLE",
+  "reason": "No approved local E2E-only probe implementation exists yet. The staged UI harness did not reach a safely confirmed submit in the final two cycles, so no backend conclusion is warranted.",
+  "secretsLogged": false
+}

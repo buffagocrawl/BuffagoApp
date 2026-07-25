@@ -1,0 +1,45 @@
+{
+  "runId": "20260724T230849-7212c02e",
+  "launchPolicy": "CLEAR_APP_DATA",
+  "stages": [
+    {
+      "stage": "environment_readiness",
+      "status": "PASSED",
+      "package": "com.buffago.app",
+      "device": "emulator-5554",
+      "screenUnlocked": true,
+      "appDataControl": "pm clear supported"
+    },
+    {
+      "stage": "controlled_app_launch",
+      "status": "PASSED",
+      "policy": "CLEAR_APP_DATA",
+      "firstDetectedState": null,
+      "overlay": null
+    },
+    {
+      "stage": "auth_route",
+      "status": "STARTED",
+      "command": "auth-deep-link"
+    },
+    {
+      "stage": "authentication_screen_readiness",
+      "status": "FAILED",
+      "state": "AUTH_SCREEN_INCOMPLETE",
+      "requiredSelectors": [
+        "auth.email.input",
+        "auth.password.input",
+        "auth.screen",
+        "auth.signin.button"
+      ],
+      "missingSelectors": [
+        "auth.email.input",
+        "auth.password.input",
+        "auth.screen",
+        "auth.signin.button"
+      ],
+      "overlay": "NATIVE_PERMISSION_DIALOG",
+      "keyboardVisible": false
+    }
+  ]
+}

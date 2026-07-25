@@ -1,0 +1,7 @@
+{
+  "runs": [
+    {"runId":"20260724T230249-2e241335","policy":"CLEAR_APP_DATA","readiness":"PASSED","authScreen":"PASSED","terminal":"AUTH_TIMEOUT"},
+    {"runId":"20260724T230849-7212c02e","policy":"CLEAR_APP_DATA","readiness":"PASSED","authScreen":"BLOCKED_NATIVE_PERMISSION_DIALOG","terminal":"NOT_ATTEMPTED"},
+    {"runId":"20260724T231428-275cb84f","policy":"CLEAR_APP_DATA","readiness":"PASSED","authScreen":"BLOCKED_AUTH_ROUTE_NOT_RENDERED","terminal":"NOT_ATTEMPTED"}
+  ]
+}

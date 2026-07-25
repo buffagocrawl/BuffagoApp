@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuites>
+  <testsuite name="Test Suite" device="Medium_Phone_API_36.1" tests="1" failures="1" time="42.0">
+    <testcase id="Cayenne secure account authentication lifecycle" name="Cayenne secure account authentication lifecycle" classname="Cayenne secure account authentication lifecycle" file="cayenne\flows\auth\cayenne-secure-auth.yaml" time="42.0" status="ERROR">
+      <properties>
+        <property name="tags" value="auth, qa-only, secure-evidence"/>
+      </properties>
+      <failure>Assertion is false: id: auth.screen is visible</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -19,6 +19,11 @@ Agents/Serrano/runs/*
 Agents/Serrano/.venv/
 
 # Cayenne local QA credentials and generated authentication state.
+.secrets/
+*.local.env
+.env.local
+.env.cayenne.local
+cayenne.local.env
 .env.cayenne
 .env.cayenne.local
 .env.cayenne.*.local

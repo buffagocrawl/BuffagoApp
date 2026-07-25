@@ -1,0 +1,9 @@
+{
+  "environment": "qa",
+  "productionDetected": true,
+  "configured": {
+    "supabaseUrl": true,
+    "supabaseAnonKey": true,
+    "cayenneCredentialVariablesPresent": true
+  }
+}

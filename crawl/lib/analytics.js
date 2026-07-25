@@ -3,7 +3,7 @@ import Constants from 'expo-constants';
 import * as Crypto from 'expo-crypto';
 import { AppState, Platform } from 'react-native';
 import { supabase } from './supabase';
-import { sanitizeAnalyticsMetadata } from './analyticsSchema';
+import { buildSerranoEventMetadata, sanitizeAnalyticsMetadata } from './analyticsSchema';
 const onboardingStepSix = require('./onboardingStepSix');
 
 const ANON_ID_KEY = 'buffago:analytics:anonymous_id';
@@ -105,11 +105,12 @@ export async function trackEvent(options = {}) {
 
     await AsyncStorage.setItem(LAST_ACTIVE_KEY, String(Date.now()));
 
-    let nextMetadata = compactMetadata({
+    let nextMetadata = buildSerranoEventMetadata({
       screen_name: screen,
+      surface: screen,
+      route: screen,
       app_version: appVersion(),
       platform: Platform.OS,
-      timestamp: new Date().toISOString(),
       ...metadata,
     });
 
