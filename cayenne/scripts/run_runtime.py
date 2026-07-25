@@ -150,8 +150,21 @@ def main():
     universal_result="PASSED" if all(item["status"]=="PASSED" for item in assertion_meta["universalAssertions"]) and flow_status=="PASSED" else "FAILED"
     state_result="PASSED" if startup.get("valid") and flow_status=="PASSED" else "INSUFFICIENT_EVIDENCE"
     finished=iso(); artifacts=[str(p.relative_to(out)).replace("\\","/") for p in out.rglob("*") if p.is_file() and p.name not in {"result.json","combined-review.md"}]
-    auth_status = "PASSED" if flow_status == "PASSED" else "BLOCKED" if flow_status == "BLOCKED" else "FAILED" if a.suite == "auth" else "NOT_RUN"
     credential_source = credentials.source if credentials is not None else "MISSING"
+    # A successful signed-out smoke flow does not establish any authenticated
+    # behavior. Keep the evidence boundary fail-closed when secure credentials
+    # are unavailable to this run.
+    auth_status = (
+        "BLOCKED"
+        if credentials is None
+        else "PASSED"
+        if flow_status == "PASSED"
+        else "BLOCKED"
+        if flow_status == "BLOCKED"
+        else "FAILED"
+        if a.suite == "auth"
+        else "NOT_RUN"
+    )
     result={"contractVersion":"1.0","runId":run_id,"status":flow_status,"startedAt":started,"finishedAt":finished,"requestedSuite":requested_suite,"suite":a.suite,"environment":a.environment,"device":{"platform":"android","deviceId":a.device_id},"detectedStartupState":startup.get("detectedStartupState"),"startupStateCandidates":startup.get("startupStateCandidates",[]),"startupStateValidation":"PASSED" if startup.get("valid") and flow_status=="PASSED" else "FAILED","universalAssertionResult":universal_result,"stateSpecificAssertionResult":state_result,**assertion_meta,"authentication":{"credentialSource":credential_source,"credentialsAvailable":credentials is not None,"login":auth_status,"sessionRestoration":auth_status,"protectedNavigation":auth_status,"logout":auth_status,"profileLoad":auth_status,"rlsBackedRead":auth_status},"summary":{"acceptanceCriteriaCovered":request["acceptanceCriteria"] if flow_status=="PASSED" else [],"artifactCount":len(artifacts)},"runtime":runtime_report,"cleanup":cleanup,"flows":[{"flowId":a.suite,"title":a.suite,"status":flow_status,"durationMs":0,"preconditions":["Android emulator"],"steps":[],"assertions":request["acceptanceCriteria"],"detectedStartupState":startup.get("detectedStartupState"),"stateSpecificAssertions":assertion_meta["stateSpecificAssertions"],"skippedAssertions":assertion_meta["skippedAssertions"],"skipReason":assertion_meta["skipReason"],"screenshots":[str(p.relative_to(out)).replace("\\","/") for p in (out/"screenshots").glob("*.png")],"hierarchy":"hierarchies/final.xml","logs":["logs/logcat.txt","logs/metro.log","maestro/raw-output.log"],"failureCategory":failures[0]["failureCategory"] if failures else None,"failureMessage":failures[0]["failureMessage"] if failures else None,"retryCount":0}],"failures":failures,"artifacts":artifacts,"safety":safe,"redaction":{"validated":True,"status":"PASSED"},"limitations":limitations}
     write_json(out/"result.json",result); write_json(out/"fixture-report.json",{"status":"NOT_REQUIRED" if not mutation else "BLOCKED_EXTERNAL_QA_CREDENTIALS","runId":run_id,"namespace":f"cayenne:{run_id}","cleanup":"retained" if a.keep_fixture_data else "not-run"})
     review=disposition(result,request) if a.serrano_review else None
