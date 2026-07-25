@@ -5,7 +5,7 @@
     "permission.location.request": "permission.location.request", "permission.location.continue": "permission.location.continue",
     "permission.notification.request": "permission.notification.request", "permission.notification.continue": "permission.notification.continue",
     "auth.screen": "auth.screen", "auth.email.input": "auth.email.input", "auth.password.input": "auth.password.input",
-    "auth.signin.button": "auth.signin.button", "auth.google.button": "auth.google.button", "auth.facebook.button": "auth.facebook.button",
+    "auth.signin.button": "auth.signin.button", "auth.signin.native-action": "auth.signin.native-action", "auth.google.button": "auth.google.button", "auth.facebook.button": "auth.facebook.button",
     "auth.error": "auth.error", "auth.loading": "auth.loading", "auth.signed-in-marker": "auth.signed-in-marker",
     "profile.root": "profile.root", "profile.rls-read-marker": "profile.rls-read-marker", "profile.signout.button": "profile.signout.button",
     "onboarding.root": "onboarding.root", "onboarding.next": "onboarding.next", "onboarding.back": "onboarding.back", "onboarding.skip": "onboarding.skip", "onboarding.complete": "onboarding.complete",

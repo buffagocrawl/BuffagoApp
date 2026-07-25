@@ -6,6 +6,7 @@ import sys
 import pytest
 sys.path.insert(0, str(Path(__file__).parents[1] / 'scripts'))
 from cayenne_runtime import auth_failure, detect_startup_state, disposition, redact, safety, smoke_assertion_metadata, validate_selectors, write_json
+from auth_stability import classify_auth_screen, classify_overlay, classify_terminal
 from credentials import AUTH_BLOCKED, CredentialsUnavailable, LOCAL_IGNORED_FILE, PROCESS_ENV, load_cayenne_credentials
 import android_lifecycle as al
 from android_lifecycle import AndroidLifecycle, RuntimeFailure
@@ -53,6 +54,39 @@ def test_credential_loader_uses_ignored_local_file_only_when_process_pair_is_una
     process = load_cayenne_credentials({'CAYENNE_TEST_EMAIL': 'process@example.test', 'CAYENNE_TEST_PASSWORD': 'process-secret'}, root=tmp_path)
     assert process.source == PROCESS_ENV
 
+def test_credential_loader_preserves_safe_launcher_provenance_without_exposing_values(tmp_path):
+    credentials = load_cayenne_credentials({
+        'CAYENNE_TEST_EMAIL': 'process@example.test',
+        'CAYENNE_TEST_PASSWORD': 'synthetic-password',
+        'CAYENNE_CREDENTIAL_SOURCE': LOCAL_IGNORED_FILE,
+    }, root=tmp_path)
+    assert credentials.source == LOCAL_IGNORED_FILE
+
+def test_credential_loader_accepts_comments_blank_lines_and_quoted_values(tmp_path):
+    local = tmp_path / '.env.cayenne.local'
+    local.write_text("\n# local only\n CAYENNE_TEST_EMAIL = ' qa@example.test ' \nCAYENNE_TEST_PASSWORD=\" password with spaces \"\n", encoding='utf-8')
+    credentials = load_cayenne_credentials({}, root=tmp_path)
+    assert credentials.email == 'qa@example.test'
+    assert credentials.password == ' password with spaces '
+    assert credentials.source == LOCAL_IGNORED_FILE
+
+@pytest.mark.parametrize('content', [
+    'CAYENNE_TEST_PASSWORD=present\n',
+    'CAYENNE_TEST_EMAIL=qa@example.test\n',
+    'CAYENNE_TEST_EMAIL=\nCAYENNE_TEST_PASSWORD=present\n',
+    'CAYENNE_TEST_EMAIL=qa@example.test\nCAYENNE_TEST_PASSWORD=\n',
+])
+def test_local_credential_loader_fails_closed_for_missing_email_or_password(tmp_path, content):
+    (tmp_path / '.env.cayenne.local').write_text(content, encoding='utf-8')
+    with pytest.raises(CredentialsUnavailable, match='Required Cayenne authentication credentials are unavailable'):
+        load_cayenne_credentials({}, root=tmp_path)
+
+def test_preferred_secrets_location_is_supported_when_legacy_file_is_absent(tmp_path):
+    local = tmp_path / '.secrets' / 'cayenne.local.env'
+    local.parent.mkdir()
+    local.write_text('CAYENNE_TEST_EMAIL=qa@example.test\nCAYENNE_TEST_PASSWORD=secret\n', encoding='utf-8')
+    assert load_cayenne_credentials({}, root=tmp_path).source == LOCAL_IGNORED_FILE
+
 def test_local_credential_loader_rejects_empty_and_placeholder_values(tmp_path):
     (tmp_path / '.env.cayenne.local').write_text('CAYENNE_TEST_EMAIL=example\nCAYENNE_TEST_PASSWORD=\n', encoding='utf-8')
     with pytest.raises(CredentialsUnavailable) as caught:
@@ -65,11 +99,11 @@ def test_cayenne_example_contains_no_password_value():
     assert 'CAYENNE_QA_USER_PASSWORD' not in example
 
 def test_local_cayenne_secret_file_is_ignored_and_untracked(tmp_path):
-    local_secret = ROOT / '.env.cayenne.local'
-    result = subprocess.run(['git', 'check-ignore', '-v', str(local_secret)], cwd=ROOT, text=True, capture_output=True, check=False)
-    assert result.returncode == 0
-    tracked = subprocess.run(['git', 'ls-files', '--error-unmatch', '.env.cayenne.local'], cwd=ROOT, text=True, capture_output=True, check=False)
-    assert tracked.returncode != 0
+    for local_path in ('.env.cayenne.local', '.secrets/cayenne.local.env', '.env.local', '.env.cayenne.local', 'cayenne.local.env'):
+        result = subprocess.run(['git', 'check-ignore', '-v', local_path], cwd=ROOT, text=True, capture_output=True, check=False)
+        assert result.returncode == 0
+        tracked = subprocess.run(['git', 'ls-files', '--error-unmatch', local_path], cwd=ROOT, text=True, capture_output=True, check=False)
+        assert tracked.returncode != 0
 
 def test_launcher_uses_no_password_argument_or_environment_dump_and_restores_scope():
     launcher = (ROOT / 'scripts' / 'run-cayenne-auth.ps1').read_text(encoding='utf-8')
@@ -78,6 +112,7 @@ def test_launcher_uses_no_password_argument_or_environment_dump_and_restores_sco
     assert 'ArgumentList' not in launcher
     assert 'finally' in launcher and 'Remove-Item Env:CAYENNE_TEST_PASSWORD' in launcher
     assert '.env.cayenne.local' in launcher
+    assert 'inherited_environment' in launcher and 'ignored_local_file' in launcher and 'unavailable' in launcher
 
 def test_mobile_application_does_not_import_harness_credential_loader():
     for path in (ROOT / 'crawl').rglob('*'):
@@ -89,6 +124,37 @@ def test_maestro_auth_flow_uses_runtime_variables_and_has_no_credential_screensh
     assert '${CAYENNE_TEST_EMAIL}' in flow and '${CAYENNE_TEST_PASSWORD}' in flow
     assert 'takeScreenshot' not in flow
     assert 'CAYENNE_QA_USER_' not in flow
+    assert 'tapOn: "Sign In"' in flow
+
+def test_primary_auth_action_and_loading_state_have_stable_native_selectors():
+    screen = (ROOT / 'crawl' / 'app' / 'auth' / 'login.jsx').read_text(encoding='utf-8')
+    assert '<View testID="auth.signin.button">' in screen
+    assert '<View testID="auth.loading">' in screen
+    assert 'testID="auth.signin.native-action"' in screen
+    assert 'onSubmitEditing={onSignIn}' in screen
+
+def test_known_overlay_detection_is_specific_and_safe():
+    assert classify_overlay('This is the developer menu. It gives you access') == 'EXPO_DEVELOPER_MENU'
+    assert classify_overlay('While using the app') == 'NATIVE_PERMISSION_DIALOG'
+    assert classify_overlay('<node resource-id="auth.screen" />') is None
+
+def test_auth_screen_readiness_requires_all_unique_controls():
+    ready = classify_auth_screen(hierarchy('auth.screen', 'auth.email.input', 'auth.password.input', 'auth.signin.button'))
+    assert ready['state'] == 'AUTH_SCREEN_READY' and ready['missingSelectors'] == []
+    assert classify_auth_screen(hierarchy('auth.screen', 'auth.email.input'))['state'] == 'AUTH_SCREEN_INCOMPLETE'
+
+def test_auth_terminal_classification_is_bounded():
+    assert classify_terminal(hierarchy('auth.signed-in-marker')) == 'AUTHENTICATED_APP_SHELL'
+    assert classify_terminal('', 'Invalid login credentials') == 'INVALID_CREDENTIALS'
+    assert classify_terminal('', 'network request failed') == 'NETWORK_ERROR'
+    assert classify_terminal(hierarchy('auth.error')) == 'UNKNOWN_AUTH_FAILURE'
+    assert classify_terminal('') == 'AUTH_TIMEOUT'
+
+def test_runtime_has_explicit_launch_policy_and_auth_readiness_gate():
+    runner = (ROOT / 'cayenne' / 'scripts' / 'run_runtime.py').read_text(encoding='utf-8')
+    assert '--launch-policy' in runner
+    assert 'CLEAR_APP_DATA' in runner and 'CLEAR_SESSION_ONLY' in runner
+    assert 'Authentication controls were not simultaneously ready; credentials were not entered.' in runner
 
 def test_artifact_redaction_removes_tokens_sessions_and_authorization_values(tmp_path):
     password = 'synthetic-password-for-artifact-test'
@@ -106,6 +172,12 @@ def test_artifact_redaction_removes_tokens_sessions_and_authorization_values(tmp
     for value in (password, 'access-value', 'refresh-value', 'synthetic-user', 'Bearer'):
         assert value not in text
 
+def test_redaction_preserves_nonsecret_auth_coverage_statuses():
+    report = redact({'sessionRestoration': 'PASSED', 'login': 'FAILED', 'session': 'private-state'})
+    assert report['sessionRestoration'] == 'PASSED'
+    assert report['login'] == 'FAILED'
+    assert report['session'] == '<redacted>'
+
 def test_auth_runner_keeps_maestro_artifacts_temporary_and_does_not_capture_password_screen():
     runner = (ROOT / 'cayenne' / 'scripts' / 'run_runtime.py').read_text(encoding='utf-8')
     assert 'TemporaryDirectory(prefix="cayenne-maestro-")' in runner
@@ -117,6 +189,13 @@ def test_auth_runner_loads_credentials_only_from_process_environment_or_local_fi
     runner = (ROOT / 'cayenne' / 'scripts' / 'run_runtime.py').read_text(encoding='utf-8')
     assert 'load_cayenne_credentials(root=ROOT)' in runner
     assert 'load_cayenne_credentials(env, root=ROOT)' not in runner
+    assert 'maestro_env.update({"CAYENNE_TEST_EMAIL": credentials.email, "CAYENNE_TEST_PASSWORD": credentials.password})' in runner
+
+def test_auth_coverage_is_not_marked_passed_merely_because_the_app_launches():
+    runner = (ROOT / 'cayenne' / 'scripts' / 'run_runtime.py').read_text(encoding='utf-8')
+    assert 'else "NOT_RUN"' in runner
+    assert 'if flow_status == "PASSED"' in runner
+    assert 'if a.suite == "auth"' in runner
 
 def test_auth_failure_messages_are_sanitized_and_actionable():
     code, message = auth_failure('Invalid login credentials for a user')

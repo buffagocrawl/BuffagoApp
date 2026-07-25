@@ -419,8 +419,10 @@ export default function EmailAuthScreen() {
     if (!emailValid || !pwdValid) return;
 
     setBusy(true);
+    const submittedAt = Date.now();
     try {
       await trackEvent({ eventName: 'auth_started', screen: 'auth/login', metadata: { auth_method: 'password' } });
+      console.info('[cayenne-auth] submit_started', { method: 'password' });
       const { data, error } = await withPasswordAuthTimeout(
         supabase.auth.signInWithPassword({ email, password })
       );
@@ -429,8 +431,10 @@ export default function EmailAuthScreen() {
       const user = data?.user || data?.session?.user || null;
       if (user?.id) await afterAuthSuccess(user);
 
+      console.info('[cayenne-auth] submit_completed', { outcome: 'session_received', duration_ms: Date.now() - submittedAt });
       router.replace('/(tabs)/home');
     } catch (e) {
+      console.info('[cayenne-auth] submit_completed', { outcome: 'error', duration_ms: Date.now() - submittedAt, category: sanitizeAuthError(e)?.code || 'unknown' });
       show(e?.message || 'Sign-in failed');
     } finally {
       setBusy(false);
@@ -629,6 +633,8 @@ export default function EmailAuthScreen() {
                 onChangeText={setPassword}
                 mode="outlined"
                 secureTextEntry={!showPwd}
+                returnKeyType="done"
+                onSubmitEditing={onSignIn}
                 right={<TextInput.Icon icon={showPwd ? 'eye-off' : 'eye'} onPress={() => setShowPwd((s) => !s)} />}
                 style={styles.input}
               />
@@ -636,21 +642,24 @@ export default function EmailAuthScreen() {
                 Minimum 6 characters.
               </HelperText>
 
-              <Button
-                testID="auth.signin.button"
-                mode="contained"
-                onPress={mode === 'signin' ? onSignIn : onSignUp}
-                disabled={!canSubmit || busy}
-                style={styles.primaryBtn}
-              >
-                {busy ? 'Please wait…' : mode === 'signin' ? 'Sign In' : 'Create Account'}
-              </Button>
+              <View testID="auth.signin.button">
+                <Button
+                  mode="contained"
+                  accessibilityLabel="Sign In"
+                  testID="auth.signin.native-action"
+                  onPress={mode === 'signin' ? onSignIn : onSignUp}
+                  disabled={!canSubmit || busy}
+                  style={styles.primaryBtn}
+                >
+                  {busy ? 'Please wait…' : mode === 'signin' ? 'Sign In' : 'Create Account'}
+                </Button>
+              </View>
 
               <Button mode="text" onPress={onForgot} disabled={busy} style={{ marginTop: 2 }}>
                 Forgot password?
               </Button>
 
-              {busy ? <ActivityIndicator testID="auth.loading" style={{ marginTop: 8 }} /> : null}
+              {busy ? <View testID="auth.loading"><ActivityIndicator style={{ marginTop: 8 }} /></View> : null}
 
               <Button mode="text" onPress={() => router.back()} style={{ marginTop: 6 }}>
                 Cancel
