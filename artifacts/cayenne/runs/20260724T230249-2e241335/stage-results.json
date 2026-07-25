@@ -1,0 +1,46 @@
+{
+  "runId": "20260724T230249-2e241335",
+  "launchPolicy": "CLEAR_APP_DATA",
+  "stages": [
+    {
+      "stage": "environment_readiness",
+      "status": "PASSED",
+      "package": "com.buffago.app",
+      "device": "emulator-5554",
+      "screenUnlocked": true,
+      "appDataControl": "pm clear supported"
+    },
+    {
+      "stage": "controlled_app_launch",
+      "status": "PASSED",
+      "policy": "CLEAR_APP_DATA",
+      "firstDetectedState": "CLEAN_ONBOARDING",
+      "overlay": null
+    },
+    {
+      "stage": "auth_route",
+      "status": "STARTED",
+      "command": "auth-deep-link"
+    },
+    {
+      "stage": "authentication_screen_readiness",
+      "status": "PASSED",
+      "state": "AUTH_SCREEN_READY",
+      "requiredSelectors": [
+        "auth.email.input",
+        "auth.password.input",
+        "auth.screen",
+        "auth.signin.button"
+      ],
+      "missingSelectors": [],
+      "overlay": null,
+      "keyboardVisible": false
+    },
+    {
+      "stage": "terminal_auth_state",
+      "status": "FAILED",
+      "classification": "AUTH_TIMEOUT",
+      "maestroReturnCode": 1
+    }
+  ]
+}

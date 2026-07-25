@@ -1,0 +1,10 @@
+{
+  "disposition": "APPROVE",
+  "confirmedDefects": [],
+  "testDefects": [],
+  "environmentBlockers": [],
+  "missingEvidence": [],
+  "requiredRemediation": [],
+  "rerunSuites": [],
+  "releaseImpact": "NONE"
+}

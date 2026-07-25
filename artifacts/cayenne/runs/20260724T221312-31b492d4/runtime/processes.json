@@ -1,0 +1,21 @@
+{
+  "owner": "cayenne",
+  "runDirectory": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\cayenne\\runs\\20260724T221312-31b492d4",
+  "processes": [
+    {
+      "role": "emulator",
+      "pid": 29500,
+      "executable": "C:\\Users\\Brand\\AppData\\Local\\Android\\Sdk\\emulator\\emulator.exe",
+      "started_at": 1784945613.3115053,
+      "log": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\cayenne\\runs\\20260724T221312-31b492d4\\logs\\emulator.stdout.log"
+    },
+    {
+      "role": "metro",
+      "pid": 21496,
+      "executable": "C:\\Windows\\System32\\cmd.exe",
+      "started_at": 1784945665.0257294,
+      "log": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\cayenne\\runs\\20260724T221312-31b492d4\\logs\\metro.log"
+    }
+  ],
+  "cleaned": true
+}

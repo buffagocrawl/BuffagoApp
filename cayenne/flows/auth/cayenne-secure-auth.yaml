@@ -15,7 +15,8 @@ tags: [auth, qa-only, secure-evidence]
 - assertVisible:
     id: auth.screen
 # This selects the segmented auth mode; the native submit action is targeted below.
-- tapOn: "Sign In"
+- tapOn:
+    id: auth.mode.signin
 - tapOn:
     id: auth.email.input
 - inputText: ${CAYENNE_TEST_EMAIL}

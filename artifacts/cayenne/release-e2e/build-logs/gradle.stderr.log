@@ -1,0 +1,29 @@
+The NODE_ENV environment variable is required but was not specified. Ensure the project is bundled with Expo CLI or NODE_ENV is set. Using only .env.local and .env
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':expo-modules-core:configureCMakeRelWithDebInfo[x86]'.
+> Unable to delete directory 'C:\Users\Brand\repo\BuffagoApp\crawl\node_modules\expo-modules-core\android\build\intermediates\cxx\RelWithDebInfo\726l5738\logs\x86'
+    Failed to delete some children. This might happen because a process has files open or has its working directory set in the target directory.
+    - C:\Users\Brand\repo\BuffagoApp\crawl\node_modules\expo-modules-core\android\build\intermediates\cxx\RelWithDebInfo\726l5738\logs\x86\configure_stderr.txt
+    - C:\Users\Brand\repo\BuffagoApp\crawl\node_modules\expo-modules-core\android\build\intermediates\cxx\RelWithDebInfo\726l5738\logs\x86\configure_stdout.txt
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 5m 51s
+CAYENNE_RELEASE_E2E_BUILD_FAILED: Gradle exited 1.
+At C:\Users\Brand\repo\BuffagoApp\scripts\cayenne\build-release-e2e.ps1:29 char:30
++ ... DE -ne 0) { throw "CAYENNE_RELEASE_E2E_BUILD_FAILED: Gradle exited $L ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (CAYENNE_RELEASE...radle exited 1.:String) [], RuntimeException
+    + FullyQualifiedErrorId : CAYENNE_RELEASE_E2E_BUILD_FAILED: Gradle exited 1.
+ 

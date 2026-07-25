@@ -124,12 +124,13 @@ def test_maestro_auth_flow_uses_runtime_variables_and_has_no_credential_screensh
     assert '${CAYENNE_TEST_EMAIL}' in flow and '${CAYENNE_TEST_PASSWORD}' in flow
     assert 'takeScreenshot' not in flow
     assert 'CAYENNE_QA_USER_' not in flow
-    assert 'tapOn: "Sign In"' in flow
+    assert 'id: auth.mode.signin' in flow
 
 def test_primary_auth_action_and_loading_state_have_stable_native_selectors():
     screen = (ROOT / 'crawl' / 'app' / 'auth' / 'login.jsx').read_text(encoding='utf-8')
     assert '<View testID="auth.signin.button">' in screen
     assert '<View testID="auth.loading">' in screen
+    assert "testID: 'auth.mode.signin'" in screen
     assert 'testID="auth.signin.native-action"' in screen
     assert 'onSubmitEditing={onSignIn}' in screen
 

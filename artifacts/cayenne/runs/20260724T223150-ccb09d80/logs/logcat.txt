@@ -1,0 +1,527 @@
+--------- beginning of system
+V/Configuration(  810): Updating configuration, locales updated from [] to [en_US]
+V/Configuration(  810): Updating configuration, locales updated from [] to [en_US]
+V/Configuration(  810): Updating configuration, locales updated from [] to [en_US]
+V/Configuration(  810): Updating configuration, locales updated from [] to [en_US]
+V/Configuration(  810): Updating configuration, locales updated from [] to [en_US]
+V/Configuration(  810): Updating configuration, locales updated from [] to [en_US]
+V/Configuration(  810): Updating configuration, locales updated from [] to [en_US]
+V/Configuration(  810): Updating configuration, locales updated from [] to [en_US]
+V/Configuration(  810): Updating configuration, locales updated from [] to [en_US]
+V/Configuration(  810): Updating configuration, locales updated from [] to [en_US]
+--------- beginning of main
+V/SafetySourceDataValidat(  810): Package: com.android.vending has expected signature
+V/SafetySourceDataValidat(  810): Package: com.android.vending has expected signature
+D/ActivityManager(  810): sync unfroze 2111 com.google.android.apps.wellbeing for 3
+I/FuseDaemon( 1589): WaitForGcToComplete blocked ProfileSaver on Background for 206.316ms
+W/system_server(  810): Suspending all threads took: 8.563ms
+I/Finsky  ( 2103): [2] akad - Received: android.intent.action.PACKAGE_REMOVED, [MYj7VLvKPEmotMuBErnMuc0J5AsMppGVZopwnzfDGWY]
+E/ashmem  ( 1234): Pinning is deprecated since Android Q. Please use trim or other methods.
+I/Finsky  ( 2103): [139] [ContentSync] finished, scheduled=false
+I/Finsky  ( 2103): [2] Do not start WearSupportService due to Wear service optimization
+I/Finsky  ( 2103): [2] Clearing split related stale data.
+I/Finsky  ( 2103): [142] Asset module storage cleared for package dev.mobile.maestro.test.
+W/JobInfo ( 1589): Requested important-while-foreground flag for job203 is ignored and takes no effect
+D/WM-SystemJobScheduler( 1589): Scheduling work ID c91d1d48-6363-4525-a9cc-6b089774ac09Job ID 203
+I/Finsky  ( 2103): [47] WM::SCH: Logging work initialize for 37-87
+I/system_server(  810): Background young concurrent mark compact GC freed 17MB AllocSpace bytes, 25(1380KB) LOS objects, 40% free, 34MB/58MB, paused 50.379ms,27.739ms total 983.897ms
+I/Finsky:background( 2636): [2] ajzt - Received: android.intent.action.PACKAGE_REMOVED, [MYj7VLvKPEmotMuBErnMuc0J5AsMppGVZopwnzfDGWY]
+D/AndroidRuntime( 4900): >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+I/Finsky:background( 2636): [2] Package no longer installed: dev.mobile.maestro.test
+I/Finsky:background( 2636): [2] Package no longer installed: dev.mobile.maestro.test
+I/Finsky:background( 2636): [2] ajzt - Received: android.intent.action.PACKAGE_FULLY_REMOVED, [MYj7VLvKPEmotMuBErnMuc0J5AsMppGVZopwnzfDGWY]
+I/Finsky:background( 2636): [2] Package no longer installed: dev.mobile.maestro.test
+I/Finsky:background( 2636): [2] ajzt - Deduping intent android.intent.action.PACKAGE_FULLY_REMOVED
+I/Finsky:background( 2636): [62] RECEIVER_PACKAGE_MONITOR_BACKGROUND#logWorkEndAndFinishGoAsync: SUCCESS
+I/Finsky:background( 2636): [50] IQ:PSL: skipping onPackageRemoved(replacing=false) for untracked package=dev.mobile.maestro.test
+D/ActivityManager(  810): sync unfroze 3360 com.google.android.permissioncontroller for 3
+W/AppInstallOperation( 1548): FDL Migration::InstallIntentOperation by FDL Module [CONTEXT service_id=77 ]
+I/AndroidRuntime( 4900): Using default boot image
+I/AndroidRuntime( 4900): Leaving lock profiling enabled
+D/BackgroundInstallControlService(  810): Package event received: 0
+I/app_process( 4900): Using CollectorTypeCMC GC.
+I/Finsky  ( 2103): [2] akad - Received: android.intent.action.PACKAGE_FULLY_REMOVED, [MYj7VLvKPEmotMuBErnMuc0J5AsMppGVZopwnzfDGWY]
+I/Finsky  ( 2103): [2] akad - Deduping intent android.intent.action.PACKAGE_FULLY_REMOVED
+I/Finsky  ( 2103): [42] RECEIVER_PACKAGE_MONITOR#logWorkEndAndFinishGoAsync: SUCCESS
+W/Looper  (  810): Slow dispatch took 113ms android.ui app=system_server main=false group=TOP_APP h=com.android.server.am.ActivityManagerService$UiHandler c=com.android.server.am.UidObserverController$$ExternalSyntheticLambda0@a05d0db m=0
+I/AppBackupStateCleanupIO( 1548): Backup state cleanup on uninstall is disabled. [CONTEXT service_id=229 ]
+I/Finsky:background( 2636): [96] Frosting DB delete succeeded: true
+I/Finsky  ( 2103): [43] SCH: Received scheduling request: Id: 37-88, Constraints: [{ L: 0, D: 0, C: CHARGING_NONE, I: IDLE_NONE, N: NET_NONE, B: BATTERY_ANY }]
+I/Blockstore( 1548): (REDACTED) [DataStoreImpl] Clearing all the restore credential for %s packages
+I/Finsky:background( 2636): [96] Frosting DB delete succeeded: false
+I/Finsky:background( 2636): [96] Frosting DB delete succeeded: false
+W/Blockstore( 1548): [DataStoreImpl] Does not contain gms package key space. [CONTEXT service_id=258 ]
+I/FraudProtectUtils( 1548): Not in testing population, skipping local test bank apps. [CONTEXT service_id=469 ]
+I/FraudProtectUtils( 1548): (REDACTED) Latest bank app list size: %d, %s isBankApp: false
+I/PackageInstallIntentOp( 1548): (REDACTED) Package %s is not a bank app. Skipping updates.
+I/Blockstore( 1548): (REDACTED) [PackageIntentOperation] Deleted restore credential for package %s is successful: %s
+I/Blockstore( 1548): (REDACTED) [DataStoreImpl] Clearing all the Blockstore Data for package %s
+I/Blockstore( 1548): (REDACTED) [DataStoreImpl] Clearing all the Blockstore Data for %s packages
+D/WM-GreedyScheduler( 1589): Ignoring {WorkSpec: 155a203c-f6a6-459c-a05f-3a73a6be52fa}. Requires device idle.
+D/WM-GreedyScheduler( 1589): Ignoring {WorkSpec: d9766b5b-ce60-4b07-8dd5-72c3a19386f0}. Requires device idle.
+D/WM-GreedyScheduler( 1589): Ignoring {WorkSpec: b39e17b1-d750-4757-9eb6-7309341619b0}. Requires device idle.
+D/WM-GreedyScheduler( 1589): Ignoring {WorkSpec: ce5ec8a2-3bd6-453a-bbfd-4f5c60f2bf92}. Requires device idle.
+D/WM-GreedyScheduler( 1589): Starting work for c91d1d48-6363-4525-a9cc-6b089774ac09
+I/Blockstore( 1548): (REDACTED) [DataStoreImpl] Allow listed package: %s
+I/Blockstore( 1548): (REDACTED) [DataStoreImpl] Allow listed package: %s
+I/Blockstore( 1548): (REDACTED) [DataStoreImpl] Allow listed package: %s
+I/Blockstore( 1548): (REDACTED) [DataStoreImpl] Allow listed package: %s
+I/Blockstore( 1548): (REDACTED) [DataStoreImpl] Allow listed package: %s
+I/Blockstore( 1548): (REDACTED) [DataStoreImpl] Removing Blockstore data for packages %s
+W/AppInstallOperation( 1548): FDL Migration::InstallIntentOperation by FDL Module [CONTEXT service_id=77 ]
+D/WM-Processor( 1589): Processor: processing WorkGenerationalId(workSpecId=c91d1d48-6363-4525-a9cc-6b089774ac09, generation=0)
+W/ActivityManager(  810): Unable to start service Intent { xflg=0x4 cmp=com.google.android.gms/rod } U=0: not found
+I/Finsky  ( 2103): [58] SCH: Scheduling phonesky job Id: 37-87, CT: 1784946982716, Constraints: [{ L: 0, D: 0, C: CHARGING_NONE, I: IDLE_NONE, N: NET_NONE, B: BATTERY_ANY }, { L: 0, D: 0, C: CHARGING_NONE, I: IDLE_NONE, N: NET_NONE, B: BATTERY_ANY }]
+D/BoundBrokerSvc( 1385): onRebind: Intent { act=com.google.android.gms.auth.aang.events.services.START dat=chimera-action:/... xflg=0x4 cmp=com.google.android.gms/.chimera.PersistentApiService }
+D/WM-WorkerWrapper( 1589): Starting work for com.android.providers.media.MediaServiceV2
+I/MediaServiceV2( 1589): Work initiated for action [ android.intent.action.PACKAGE_FULLY_REMOVED ]
+D/WM-SystemJobService( 1589): onStartJob for WorkGenerationalId(workSpecId=c91d1d48-6363-4525-a9cc-6b089774ac09, generation=0)
+I/Finsky  ( 2103): [49] WM::SCH: Logging work initialize for 37-88
+I/ProximityAuth( 1385): [RecentAppsMediator] Package removed: (user=UserHandle{0}) dev.mobile.maestro
+D/WM-Processor( 1589): Work WorkGenerationalId(workSpecId=c91d1d48-6363-4525-a9cc-6b089774ac09, generation=0) is already enqueued for processing
+D/MediaProvider( 1589): Deleted 0 Android/media items belonging to dev.mobile.maestro on /data/user/0/com.google.android.providers.media.module/databases/external.db
+V/SafetySourceDataValidat(  810): Package: com.android.vending has expected signature
+V/SafetySourceDataValidat(  810): Package: com.android.vending has expected signature
+I/Finsky  ( 2103): [55] SCH: Scheduling 1 system job(s)
+I/Finsky  ( 2103): [55] SCH: Scheduling expedited system job 9197
+I/FuseDaemon( 1589): Successfully deleted rows in leveldb for owner_id:  and ownerPackageIdentifier: dev.mobile.maestro::0
+I/Icing   ( 1548): doRemovePackageData dev.mobile.maestro
+W/RWIPackageIntentOps( 1548): Registries cleared for package: dev.mobile.maestro
+D/MediaGrants( 1589): Removed 0 media_grants for 0 user for [dev.mobile.maestro]. Reason: Package orphaned
+I/MediaServiceV2( 1589): Work ended for action [ android.intent.action.PACKAGE_FULLY_REMOVED ]
+I/Finsky:background( 2636): [51] RECEIVER_ENGAGE_PACKAGE_CHANGED#logWorkEndAndFinishGoAsync: SUCCESS
+I/WM-WorkerWrapper( 1589): Worker result SUCCESS for Work [ id=c91d1d48-6363-4525-a9cc-6b089774ac09, tags={ com.android.providers.media.MediaServiceV2 } ]
+D/SafetySourceDataValidat(  810): No cert check requested for package com.google.android.permissioncontroller
+W/libbinder.Binder(  810): Binder transaction to android.os.IRemoteCallback code 1 took 1026ms. Data bytes: 71504 Reply bytes: 0 Flags: 17
+D/nativeloader( 4900): InitDefaultPublicLibraries for_preload=1: libandroid.so:libaaudio.so:libamidi.so:libbinder_ndk.so:libc.so:libcamera2ndk.so:libdl.so:libEGL.so:libGLESv1_CM.so:libGLESv2.so:libGLESv3.so:libicu.so:libicui18n.so:libicuuc.so:libjnigraphics.so:liblog.so:libmediandk.so:libm.so:libnativehelper.so:libnativewindow.so:libOpenMAXAL.so:libOpenSLES.so:libRS.so:libstdc++.so:libsync.so:libvulkan.so:libwebviewchromium_plat_support.so:libz.so
+I/WM-WorkerWrapper( 1589): Setting status to enqueued for a0dda261-9c0e-4a49-bffc-7a91c9099e04
+E/AtomicFile(  810): Failed to rename /data/system/cachequota.xml.new to /data/system/cachequota.xml
+W/libbinder.Binder(  810): Binder transaction to android.os.IRemoteCallback code 1 took 1008ms. Data bytes: 71504 Reply bytes: 0 Flags: 17
+D/WM-Processor( 1589): Processor c91d1d48-6363-4525-a9cc-6b089774ac09 executed; reschedule = false
+D/WM-SystemJobService( 1589): c91d1d48-6363-4525-a9cc-6b089774ac09 executed on JobScheduler
+D/nativeloader( 4900): Load libicu_jni.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+D/app_process( 4900): u_setTimeZoneFilesDirectory("/apex/com.android.tzdata/etc/tz/versioned/9/icu") succeeded. 
+D/app_process( 4900): I18n APEX ICU file found: /apex/com.android.i18n/etc/icu/icudt76l.dat
+D/nativeloader( 4900): Load libjavacore.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+D/nativeloader( 4900): Load libopenjdk.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+I/lowmemorykiller(  275): Kill 'com.google.android.projection.gearhead:car' (3468), uid 10133, oom_score_adj 975 to free 66808kB rss, 37032kB swap; reason: low watermark is breached
+I/app_process( 4900): Priority-to-niceness mapping: 19, 16, 13, 10, 0, -2, -4, -5, -6, -8
+W/app_process( 4900): Unexpected CPU variant for x86: x86_64.
+W/app_process( 4900): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+E/lowmemorykiller(  275): process_mrelease 3468 failed: No such process
+W/app_process( 4900): ClassLoaderContext shared library size mismatch. Expected=2, found=0 (PCL[]{PCL[/system/framework/android.test.base.jar*3940810275]#PCL[/system/framework/android.test.mock.jar*2487254073]} | PCL[])
+W/app_process( 4900): ClassLoaderContext classpath size mismatch. expected=0, found=1 (PCL[]{PCL[/system/framework/android.test.runner.jar*3420963098]{PCL[/system/framework/android.test.base.jar*3940810275]#PCL[/system/framework/android.test.mock.jar*2487254073]}#PCL[/system/framework/android.test.base.jar*3940810275]} | PCL[/system/framework/android.test.runner.jar*3420963098])
+I/Zygote  (  575): Process 3468 exited due to signal 9 (Killed)
+I/adbd    (  664): Remote process closed the socket (on MSG_PEEK)
+W/SQLiteLog( 1548): (28) double-quoted string literal: "dev.mobile.maestro"
+I/ActivityManager(  810): Process com.google.android.projection.gearhead:car (pid 3468) has died: cch  +75 CEM 
+I/libprocessgroup(  810): Removed cgroup /sys/fs/cgroup/apps/uid_10133/pid_3468
+D/PersistedStoragePackageUninstalledReceiver( 3360): Received android.intent.action.PACKAGE_FULLY_REMOVED for dev.mobile.maestro for u0
+I/HalDevMgr(  810): bestIfaceCreationProposal is null, requestIface=STA, existingIface=[name=wlan0 type=STA]
+I/Finsky  ( 2103): [55] SCH: Scheduling phonesky job Id: 37-88, CT: 1784946983711, Constraints: [{ L: 0, D: 0, C: CHARGING_NONE, I: IDLE_NONE, N: NET_NONE, B: BATTERY_ANY }, { L: 0, D: 0, C: CHARGING_NONE, I: IDLE_NONE, N: NET_NONE, B: BATTERY_ANY }]
+I/Finsky  ( 2103): [54] SCH: Scheduling 0 system job(s)
+I/Blockstore( 1548): (REDACTED) [DataStoreImpl] Clearing all the restore credential for %s packages
+W/Blockstore( 1548): [DataStoreImpl] Does not contain gms package key space. [CONTEXT service_id=258 ]
+I/Blockstore( 1548): (REDACTED) [PackageIntentOperation] Deleted restore credential for package %s is successful: %s
+I/AppBackupStateCleanupIO( 1548): Backup state cleanup on uninstall is disabled. [CONTEXT service_id=229 ]
+D/BoundBrokerSvc( 1385): onRebind: Intent { act=com.google.android.gms.libs.gmscorelogger.service.START dat=chimera-action:/... xflg=0x4 cmp=com.google.android.gms/.chimera.PersistentDirectBootAwareApiService }
+I/Blockstore( 1548): (REDACTED) [DataStoreImpl] Clearing all the Blockstore Data for package %s
+I/Blockstore( 1548): (REDACTED) [DataStoreImpl] Clearing all the Blockstore Data for %s packages
+I/Blockstore( 1548): (REDACTED) [DataStoreImpl] Allow listed package: %s
+I/Blockstore( 1548): (REDACTED) [DataStoreImpl] Allow listed package: %s
+I/Blockstore( 1548): (REDACTED) [DataStoreImpl] Allow listed package: %s
+I/Blockstore( 1548): (REDACTED) [DataStoreImpl] Allow listed package: %s
+I/Blockstore( 1548): (REDACTED) [DataStoreImpl] Allow listed package: %s
+I/Blockstore( 1548): (REDACTED) [DataStoreImpl] Removing Blockstore data for packages %s
+I/Finsky:background( 2636): [2] Memory trim requested to level 40
+I/FraudProtectUtils( 1548): Not in testing population, skipping local test bank apps. [CONTEXT service_id=469 ]
+D/LauncherAppsService(  810): onPackageRemoved: triggering onPackageRemoved for user=UserHandle{0}, packageName=dev.mobile.maestro
+D/LauncherAppsService(  810): onPackageRemoved: triggering onPackageRemoved for user=UserHandle{0}, packageName=dev.mobile.maestro
+D/LauncherAppsService(  810): onPackageRemoved: triggering onPackageRemoved for user=UserHandle{0}, packageName=dev.mobile.maestro
+I/FraudProtectUtils( 1548): (REDACTED) Latest bank app list size: %d, %s isBankApp: false
+I/PackageInstallIntentOp( 1548): (REDACTED) Package %s is not a bank app. Skipping updates.
+D/nativeloader( 4900): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+D/AndroidRuntime( 4900): Calling main entry com.android.commands.uiautomator.Launcher
+D/LauncherAppsCallbackImpl( 1215): onPackageRemoved triggered for packageName=dev.mobile.maestro, user=UserHandle{0}
+I/PackageUpdatedTask( 1215): Package updated: mOp=REMOVE packages=[dev.mobile.maestro], user=UserHandle{0}
+D/ActivityManager(  810): sync unfroze 3113 com.google.android.rkpdapp for 3
+I/PackageUpdatedTask( 1215): REMOVE: removing package=dev.mobile.maestro
+I/AconfigPackage( 4900): android.media.swcodec.flags is mapped to com.android.media.swcodec
+I/AconfigPackage( 4900): com.android.permission.flags is mapped to com.android.permission
+I/AconfigPackage( 4900): com.android.permissioncontroller.flags is mapped to com.android.permission
+I/AconfigPackage( 4900): com.android.icu is mapped to com.android.i18n
+I/AconfigPackage( 4900): com.android.appsearch.flags is mapped to com.android.appsearch
+I/PackageUpdatedTask( 1215): OP_REMOVE: removing packages=[dev.mobile.maestro]
+D/ActivityManager(  810): sync unfroze 1935 android.process.media for 3
+I/AconfigPackage( 4900): android.uprobestats.mainline.flags is mapped to com.android.uprobestats
+I/AconfigPackage( 4900): com.android.crashrecovery.flags is mapped to com.android.crashrecovery
+I/AconfigPackage( 4900): android.provider.flags is mapped to com.android.configinfrastructure
+I/AconfigPackage( 4900): com.android.server.deviceconfig is mapped to com.android.configinfrastructure
+I/AconfigPackage( 4900): com.android.compos.flags is mapped to com.android.compos
+I/AconfigPackage( 4900): com.android.art.flags is mapped to com.android.art
+W/RWIPackageIntentOps( 1548): Registries cleared for package: dev.mobile.maestro.test
+I/AconfigPackage( 4900): com.android.art.rw.flags is mapped to com.android.art
+I/AconfigPackage( 4900): com.android.libcore is mapped to com.android.art
+I/AconfigPackage( 4900): com.android.telephony.flags is mapped to com.android.telephonycore
+I/AconfigPackage( 4900): com.android.media.extractor.flags is mapped to com.android.media
+I/AconfigPackage( 4900): com.android.media.mainline.flags is mapped to com.android.media
+I/AconfigPackage( 4900): com.android.wifi.flags is mapped to com.android.wifi
+I/AconfigPackage( 4900): com.android.org.conscrypt.flags is mapped to com.android.conscrypt
+I/AconfigPackage( 4900): com.android.org.conscrypt.net.flags is mapped to com.android.conscrypt
+I/AconfigPackage( 4900): com.android.healthfitness.flags is mapped to com.android.healthfitness
+I/lowmemorykiller(  275): Kill 'com.google.android.ondevicepersonalization.services' (3342), uid 10211, oom_score_adj 975 to free 64244kB rss, 36448kB swap; reason: low watermark is breached
+I/AconfigPackage( 4900): com.android.ipsec.flags is mapped to com.android.ipsec
+D/ModelWriter( 1215): removing items from db . Reason: [removed because the corresponding package or component is removed. mOp=3 removedPackages=[dev.mobile.maestro] removedComponents=[]]
+D/BackgroundInstallControlService(  810): Package event received: 0
+I/AconfigPackage( 4900): com.android.nfc.module.flags is mapped to com.android.nfcservices
+I/AiAiEcho( 1611): AppFetcherImplV2 onPackageRemoved dev.mobile.maestro.
+I/AconfigPackage( 4900): com.android.adservices.ondevicepersonalization.flags is mapped to com.android.ondevicepersonalization
+I/RkpdBroadcast( 3113): Caught package_removed intent, waking up.
+I/AconfigPackage( 4900): com.android.adbd.flags is mapped to com.android.adbd
+W/Looper  (  810): Slow dispatch took 124ms android.ui app=system_server main=false group=TOP_APP h=com.android.server.am.ActivityManagerService$UiHandler c=com.android.server.am.UidObserverController$$ExternalSyntheticLambda0@a05d0db m=0
+I/AconfigPackage( 4900): com.android.bluetooth.flags is mapped to com.android.bt
+I/AconfigPackage( 4900): com.android.devicelock.flags is mapped to com.android.devicelock
+I/AconfigPackage( 4900): android.os.profiling is mapped to com.android.profiling
+I/AconfigPackage( 4900): android.os.profiling.anomaly.flags is mapped to com.android.profiling
+I/AconfigPackage( 4900): com.android.os.statsd.flags is mapped to com.android.os.statsd
+I/RkpdBroadcast( 3113): Deleted associated keys for uid: 10219
+I/lowmemorykiller(  275): Kill 'com.google.android.photopicker' (3585), uid 10203, oom_score_adj 975 to free 65564kB rss, 36796kB swap; reason: low watermark is breached
+I/AconfigPackage( 4900): com.android.rkpd.flags is mapped to com.android.rkpd
+I/AconfigPackage( 4900): com.android.cellbroadcastreceiver.flags is mapped to com.android.cellbroadcast
+I/AconfigPackage( 4900): com.android.adservices.flags is mapped to com.android.adservices
+I/AconfigPackage( 4900): com.android.sdksandbox.flags is mapped to com.android.adservices
+I/AconfigPackage( 4900): com.android.uwb.flags is mapped to com.android.uwb
+I/AconfigPackage( 4900): com.android.ranging.flags is mapped to com.android.uwb
+I/AconfigPackage( 4900): android.graphics.pdf.flags is mapped to com.android.mediaprovider
+I/AconfigPackage( 4900): com.android.providers.media.flags is mapped to com.android.mediaprovider
+I/AconfigPackage( 4900): android.graphics.pdf.flags.readonly is mapped to com.android.mediaprovider
+I/AconfigPackage( 4900): com.android.net.ct.flags is mapped to com.android.tethering
+I/AconfigPackage( 4900): com.android.tethering.mainline.beta is mapped to com.android.tethering
+I/AconfigPackage( 4900): com.android.net.flags is mapped to com.android.tethering
+I/AconfigPackage( 4900): com.android.nearby.flags is mapped to com.android.tethering
+I/AconfigPackage( 4900): android.net.vcn is mapped to com.android.tethering
+I/AconfigPackage( 4900): com.android.tethering.beta.test is mapped to com.android.tethering
+I/AconfigPackage( 4900): android.net.http is mapped to com.android.tethering
+I/AconfigPackage( 4900): com.android.net.thread.flags is mapped to com.android.tethering
+D/BackgroundInstallControlService(  810): Package event received: 0
+I/AconfigPackage( 4900): com.android.system.virtualmachine.flags is mapped to com.android.virt
+E/FeatureFlagsImplExport( 4900): android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package android.xr cannot be found on the device
+I/Zygote  (  575): Process 3342 exited due to signal 9 (Killed)
+D/UiAutomationConnection( 4900): Created on user UserHandle{0}
+I/UiAutomation( 4900): Initialized for user 0 on display 0
+W/UiAutomation( 4900): Created with deprecatead constructor, assumes DEFAULT_DISPLAY
+D/AccessibilityManagerService(  810): changeCurrentUserForTestAutomationIfNeededLocked(0): ignoring because device doesn't support visible background users
+I/UiAutomationManager(  810): Registering UiTestAutomationService (id=com.android.server.accessibility/UiAutomation, flags=0x0) when called by user 0
+V/AccessibilityManagerService(  810): onUserStateChangedLocked for userId: 0, forceUpdate: false
+V/AccessibilityUserState(  810): updateShortcutTargets: type:accessibility_shortcut_target_service, current:{}, new:{}
+V/AccessibilityUserState(  810): updateShortcutTargets: type:accessibility_button_targets, current:{}, new:{}
+V/AccessibilityUserState(  810): updateShortcutTargets: type:accessibility_gesture_targets, current:{}, new:{}
+V/AccessibilityUserState(  810): updateShortcutTargets: type:accessibility_qs_targets, current:{}, new:{}
+V/AccessibilityUserState(  810): updateShortcutTargets: type:accessibility_key_gesture_targets, current:{}, new:{}
+W/MagnificationConnectionManager(  810): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+I/Icing   ( 1548): doRemovePackageData dev.mobile.maestro.test
+I/Zygote  (  575): Process 3585 exited due to signal 9 (Killed)
+W/SQLiteLog( 1548): (28) double-quoted string literal: "dev.mobile.maestro.test"
+I/AiAiEcho( 1611): Settings changed for uri: content://settings/secure/accessibility_enabled
+I/AiAiEcho( 1611): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1611): EchoTargets: 
+I/AiAiEcho( 1611): Filtered by AiAi flag check: 
+I/AiAiEcho( 1611): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/AiAiEcho( 1611): #remoteViewsTwiddler: feature disabled.
+I/AiAiEcho( 1611): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1611): EchoTargets: 
+I/AiAiEcho( 1611): Filtered by AiAi flag check: 
+I/AiAiEcho( 1611): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/AiAiEcho( 1611): #remoteViewsTwiddler: feature disabled.
+I/AiAiEcho( 1611): [pnb-agg] Reload pnb aggregation on events deleted
+I/AiAiEcho( 1611): [pnb-agg] pnb aggregation disabled.
+I/AiAiEcho( 1611): #postPredictionTargets: Sending updates to UISurface home with targets# 0 (types=[])
+I/AiAiEcho( 1611): #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+I/ActivityManager(  810): Process com.google.android.ondevicepersonalization.services (pid 3342) has died: cch  +75 CEM 
+I/libprocessgroup(  810): Removed cgroup /sys/fs/cgroup/apps/uid_10211/pid_3342
+W/SsPagerDots( 1063): Total number of pages invalid: 0. Assuming 1 page.
+I/libprocessgroup(  810): Removed cgroup /sys/fs/cgroup/apps/uid_10203/pid_3585
+I/ActivityManager(  810): Process com.google.android.photopicker (pid 3585) has died: cch  +75 CEM 
+W/libbinder.Binder(  810): Binder transaction to android.os.IRemoteCallback code 1 took 2054ms. Data bytes: 71504 Reply bytes: 0 Flags: 17
+D/BoundBrokerSvc( 1548): onBind: Intent { act=com.google.android.gms.feedback.internal.IFeedbackService dat=chimera-action:/... xflg=0x4 cmp=com.google.android.gms/.chimera.GmsBoundBrokerService }
+D/BoundBrokerSvc( 1548): Loading bound service for intent: Intent { act=com.google.android.gms.feedback.internal.IFeedbackService dat=chimera-action:/... xflg=0x4 cmp=com.google.android.gms/.chimera.GmsBoundBrokerService }
+D/ActivityManager(  810): sync unfroze 4011 com.google.android.dialer for 6
+I/ProximityAuth( 1385): [RecentAppsMediator] Package removed: (user=UserHandle{0}) dev.mobile.maestro.test
+D/WM-DelayedWorkTracker( 4011): Scheduling work 133880f0-f64e-4bda-892b-0063d7385802
+D/WM-GreedyScheduler( 4011): Starting tracking for 133880f0-f64e-4bda-892b-0063d7385802
+W/ParceledListSlice(  810): Element #26 is 20616 bytes.
+W/ParceledListSlice(  810): Element #27 is 20252 bytes.
+W/ParceledListSlice(  810): Element #28 is 20528 bytes.
+W/ParceledListSlice(  810): Element #29 is 20348 bytes.
+W/ParceledListSlice(  810): Element #30 is 20384 bytes.
+D/SafetySourceDataValidat(  810): No cert check requested for package com.google.android.permissioncontroller
+W/libbinder.Binder(  810): Binder transaction to android.app.job.IJobCallback code 7 took 1241ms. Data bytes: 84 Reply bytes: 4 Flags: 18
+W/libbinder.Binder(  810): Binder transaction to android.app.job.IJobScheduler code 8 took 1258ms. Data bytes: 148 Reply bytes: 3676 Flags: 18
+I/Fitness ( 1385): (REDACTED) FitCleanupIntentOperation received Intent %s
+D/WM-GreedyScheduler( 1589): Cancelling work ID c91d1d48-6363-4525-a9cc-6b089774ac09
+W/Looper  (  810): Slow dispatch took 838ms main app=system_server main=true group=FOREGROUND h=android.app.ActivityThread$H c=android.app.LoadedApk$ServiceDispatcher$RunConnection@7c20bb0 m=0
+I/Finsky  ( 2103): [2] SCH: job service start with id 9197.
+W/Looper  (  810): Slow delivery took 727ms main app=system_server main=true group=FOREGROUND h=com.android.server.alarm.AlarmManagerService$AlarmHandler c=android.app.ActivityManager$2$$ExternalSyntheticLambda0@2dac1ae m=0
+W/JobInfo ( 1589): Requested important-while-foreground flag for job204 is ignored and takes no effect
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+D/WM-SystemJobScheduler( 1589): Scheduling work ID a0dda261-9c0e-4a49-bffc-7a91c9099e04Job ID 204
+I/RkpdBroadcast( 3113): Caught package_removed intent, waking up.
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+I/RkpdBroadcast( 3113): Deleted associated keys for uid: 10220
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+V/AccessibilityManagerService(  810): onUserStateChangedLocked for userId: 0, forceUpdate: false
+V/AccessibilityUserState(  810): updateShortcutTargets: type:accessibility_shortcut_target_service, current:{}, new:{}
+V/AccessibilityUserState(  810): updateShortcutTargets: type:accessibility_button_targets, current:{}, new:{}
+V/AccessibilityUserState(  810): updateShortcutTargets: type:accessibility_gesture_targets, current:{}, new:{}
+V/AccessibilityUserState(  810): updateShortcutTargets: type:accessibility_qs_targets, current:{}, new:{}
+V/AccessibilityUserState(  810): updateShortcutTargets: type:accessibility_key_gesture_targets, current:{}, new:{}
+W/MagnificationConnectionManager(  810): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+I/Finsky  ( 2103): [139] SCH: Satisfied jobs for 9197 are: 37-87, 37-88
+I/Fitness ( 1385): (REDACTED) FitCleanupIntentOperation received Intent %s
+I/AiAiEcho( 1611): Settings changed for uri: content://settings/secure/accessibility_enabled
+W/JobServiceContext(  810): Sending onNetworkChanged for a job that isn't started. JobStatus{1078d33 androidx.work.systemjobscheduler:u0a137/269 #TikTokWorker#com.android.dialer.voicemail.service.impl.VvmTaskWorker#@<redacted-email>/androidx.work.impl.background.systemjob.SystemJobService u=0 s=10137 TIME=-28s182ms:none NET READY}
+I/Finsky  ( 2103): [151] SCH: Job 37-87 starting
+I/Finsky  ( 2103): [151] SCH: Job 37-88 starting
+I/AiAiEcho( 1611): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1611): EchoTargets: 
+I/AiAiEcho( 1611): Filtered by AiAi flag check: 
+I/AiAiEcho( 1611): [CONTEXT ratelimit_period="10 SECONDS" ]
+D/OomAdjuster(  810): Not killing cached processes
+I/Finsky  ( 2103): [2] WM::SCH: Logging work start for 37-87
+I/Finsky  ( 2103): [2] Received an install/uninstall event for package dev.mobile.maestro
+I/Finsky  ( 2103): [2] SCH: jobFinished: 37-87. TimeElapsed: 46ms.
+I/Finsky  ( 2103): [2] WM::SCH: Logging work end for 37-87
+I/Finsky  ( 2103): [58] Not an active Cubes user. Ignoring package install/uninstall event.
+W/ProcessStats(  810): Tracking association SourceState{ef67e37 system/1000 ImpBg #2197} whose proc state 6 is better than process ProcessState{77407c0 com.google.android.dialer/10137 pkg=com.google.android.dialer} proc state 14 (40 skipped)
+I/Finsky  ( 2103): [2] WM::SCH: Logging work start for 37-88
+I/Finsky  ( 2103): [2] Received an install/uninstall event for package dev.mobile.maestro.test
+I/AiAiEcho( 1611): #remoteViewsTwiddler: feature disabled.
+I/Finsky  ( 2103): [2] SCH: jobFinished: 37-88. TimeElapsed: 6ms.
+I/Finsky  ( 2103): [54] Not an active Cubes user. Ignoring package install/uninstall event.
+I/Finsky  ( 2103): [2] WM::SCH: Logging work end for 37-88
+I/AiAiEcho( 1611): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1611): EchoTargets: 
+I/AiAiEcho( 1611): Filtered by AiAi flag check: 
+I/AiAiEcho( 1611): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/AiAiEcho( 1611): #remoteViewsTwiddler: feature disabled.
+D/WellbeingModel( 1215): Changes in apps: intent = [Intent { act=android.intent.action.PACKAGE_REMOVED dat=package: flg=0x4000010 (has extras) }]
+I/AiAiEcho( 1611): #postPredictionTargets: Sending updates to UISurface home with targets# 0 (types=[])
+D/WellbeingModel( 1215): Changes in apps: intent = [Intent { act=android.intent.action.PACKAGE_REMOVED dat=package: flg=0x4000010 (has extras) }]
+I/AiAiEcho( 1611): #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+D/WM-ConstraintTracker( 4011): fmt: initial state = NetworkState(isConnected=true, isValidated=true, isMetered=false, isNotRoaming=true)
+D/WM-NetworkStateTracker( 4011): Registering network callback
+I/fhtg    ( 1591): (REDACTED) O received %s
+I/Finsky  ( 2103): [56] SCH: Scheduling phonesky job Id: 26-1414141414, CT: 1784907894237, Constraints: [{ L: 43199984, D: 44099984, C: CHARGING_NONE, I: IDLE_NONE, N: NET_NONE, B: BATTERY_ANY }]
+D/ConnectivityService(  810): requestNetwork for uid/pid:10137/4011 activeRequest: null callbackRequest: 179 [NetworkRequest [ REQUEST id=180, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10137 RequestorUid: 10137 RequestorPkg: com.google.android.dialer UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647 isUidTracked: false declaredMethods: AVAIL|LOST|NC
+I/Finsky  ( 2103): [54] SCH: Scheduling 1 system job(s)
+W/JobInfo ( 2103): Job 'com.android.vending/com.google.android.finsky.scheduler.process.mainimpl.PhoneskyJobServiceMain#9202' has a deadline with no functional constraints. The deadline won't improve job execution latency. Consider removing the deadline.
+I/Finsky  ( 2103): [54] SCH: Scheduling system job Id: 9202, L: 4108236, D: 5008236, C: false, I: false, N: 0
+D/PersistedStoragePackageUninstalledReceiver( 3360): Received android.intent.action.PACKAGE_FULLY_REMOVED for dev.mobile.maestro.test for u0
+W/SsPagerDots( 1063): Total number of pages invalid: 0. Assuming 1 page.
+D/ActivityManager(  810): sync unfroze 4456 com.google.android.adservices.api for 3
+W/JobInfo (  810): Job 'com.android.vending/com.google.android.finsky.scheduler.process.mainimpl.PhoneskyJobServiceMain#9202' has a deadline with no functional constraints. The deadline won't improve job execution latency. Consider removing the deadline.
+D/WM-GreedyScheduler( 4011): Constraints met: Scheduling work ID WorkGenerationalId(workSpecId=133880f0-f64e-4bda-892b-0063d7385802, generation=0)
+D/BackgroundInstallControlService(  810): Package event received: 0
+D/ConnectivityService(  810): NetReassign [180 : null → 100] [c 51] [a 29] [i 3]
+D/WifiNetworkFactory(  810): got request NetworkRequest [ REQUEST id=180, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10137 RequestorUid: 10137 RequestorPkg: com.google.android.dialer UnderlyingNetworks: Null] ]
+D/WM-NetworkStateTracker( 4011): Network capabilities changed: [ Transports: WIFI Capabilities: NOT_METERED&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&VALIDATED&NOT_ROAMING&FOREGROUND&NOT_CONGESTED&NOT_SUSPENDED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED LinkUpBandwidth>=12000Kbps LinkDnBandwidth>=30000Kbps TransportInfo: <SSID: <unknown ssid>, BSSID: 02:00:00:00:00:00, MAC: 02:00:00:00:00:00, IP: /10.0.2.16, Security type: 0, Supplicant state: COMPLETED, Wi-Fi standard: legacy, RSSI: -50, Link speed: 1Mbps, Tx Link speed: 1Mbps, Max Supported Tx Link speed: 11Mbps, Rx Link speed: 2Mbps, Max Supported Rx Link speed: 11Mbps, Frequency: 2447MHz, Net ID: -1, Metered hint: false, score: 83, isUsable: true, CarrierMerged: false, SubscriptionId: -1, IsPrimary: -1, Trusted: true, Restricted: false, Ephemeral: false, OEM paid: false, OEM private: false, OSU AP: false, FQDN: <none>, Provider friendly name: <none>, Requesting package name: <none><none>MLO Information: , Is TID-To-Link negotiation supported by the AP: false, AP MLD Address: <none>, AP MLO Link Id: <none>, AP MLO Affiliated links: <none>, Vendor Data: <none>> SignalStrength: -50 UnderlyingNetworks: Null]
+D/UntrustedWifiNetworkFactory(  810): got request NetworkRequest [ REQUEST id=180, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10137 RequestorUid: 10137 RequestorPkg: com.google.android.dialer UnderlyingNetworks: Null] ]
+D/OemPaidWifiNetworkFactory(  810): got request NetworkRequest [ REQUEST id=180, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10137 RequestorUid: 10137 RequestorPkg: com.google.android.dialer UnderlyingNetworks: Null] ]
+D/MultiInternetWifiNetworkFactory(  810): got request NetworkRequest [ REQUEST id=180, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10137 RequestorUid: 10137 RequestorPkg: com.google.android.dialer UnderlyingNetworks: Null] ]
+W/Looper  (  810): Slow dispatch took 291ms main app=system_server main=true group=FOREGROUND h=android.app.ActivityThread$H c=android.app.LoadedApk$ServiceDispatcher$RunConnection@2030ac3 m=0
+I/Finsky  ( 2103): [2] SCH: job service start with id 9190.
+D/WM-SystemJobService( 4011): onStartJob for WorkGenerationalId(workSpecId=133880f0-f64e-4bda-892b-0063d7385802, generation=0)
+D/WM-GreedyScheduler( 1589): Ignoring {WorkSpec: 155a203c-f6a6-459c-a05f-3a73a6be52fa}. Requires device idle.
+D/WM-GreedyScheduler( 1589): Ignoring {WorkSpec: d9766b5b-ce60-4b07-8dd5-72c3a19386f0}. Requires device idle.
+I/Finsky  ( 2103): [139] SCH: Satisfied jobs for 9190 are: 12-1
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+I/Finsky  ( 2103): [151] SCH: Job 12-1 starting
+D/WM-GreedyScheduler( 1589): Ignoring {WorkSpec: b39e17b1-d750-4757-9eb6-7309341619b0}. Requires device idle.
+D/WM-GreedyScheduler( 1589): Ignoring {WorkSpec: ce5ec8a2-3bd6-453a-bbfd-4f5c60f2bf92}. Requires device idle.
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+D/WM-GreedyScheduler( 1589): Starting work for a0dda261-9c0e-4a49-bffc-7a91c9099e04
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+I/Finsky  ( 2103): [2] WM::SCH: Logging work start for 12-1
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+I/Finsky  ( 2103): [2] [ContentSync] job started
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+D/WM-Processor( 1589): Processor: processing WorkGenerationalId(workSpecId=a0dda261-9c0e-4a49-bffc-7a91c9099e04, generation=0)
+D/AccessibilitySourceService( 3360): enabled a11y services count 0
+D/AccessibilitySourceService( 3360): a11y source sending 0 issue to sc
+D/SafetySourceDataValidat(  810): No cert check requested for package com.google.android.permissioncontroller
+D/WM-SystemJobService( 1589): onStartJob for WorkGenerationalId(workSpecId=a0dda261-9c0e-4a49-bffc-7a91c9099e04, generation=0)
+D/BatterySaverPolicy(  810): accessibility changed to true, updating policy.
+D/WM-Processor( 4011): fjl: processing WorkGenerationalId(workSpecId=133880f0-f64e-4bda-892b-0063d7385802, generation=0)
+D/AccessibilityManagerService(  810): .getAccessibilityShortcutTargets {shortcutType=32, userId=0}
+D/WM-Processor( 4011): Work WorkGenerationalId(workSpecId=133880f0-f64e-4bda-892b-0063d7385802, generation=0) is already enqueued for processing
+I/Finsky  ( 2103): [151] SCH: job service finished with id 9197.
+I/fhtg    ( 1591): (REDACTED) O received %s
+I/lowmemorykiller(  275): Kill 'com.google.android.accessibility.switchaccess' (3717), uid 10168, oom_score_adj 965 to free 69912kB rss, 43100kB swap; reason: low watermark is breached
+D/WM-WorkerWrapper( 1589): Starting work for com.android.providers.media.MediaServiceV2
+W/Looper  (  810): Drained
+I/MediaServiceV2( 1589): Work initiated for action [ android.intent.action.PACKAGE_FULLY_REMOVED ]
+D/WM-Processor( 1589): Work WorkGenerationalId(workSpecId=a0dda261-9c0e-4a49-bffc-7a91c9099e04, generation=0) is already enqueued for processing
+D/MediaProvider( 1589): Deleted 0 Android/media items belonging to dev.mobile.maestro.test on /data/user/0/com.google.android.providers.media.module/databases/external.db
+I/FuseDaemon( 1589): Successfully deleted rows in leveldb for owner_id:  and ownerPackageIdentifier: dev.mobile.maestro.test::0
+D/MediaGrants( 1589): Removed 0 media_grants for 0 user for [dev.mobile.maestro.test]. Reason: Package orphaned
+I/MediaServiceV2( 1589): Work ended for action [ android.intent.action.PACKAGE_FULLY_REMOVED ]
+D/ActivityManager(  810): sync unfroze 2029 com.google.android.googlequicksearchbox:search for 6
+D/BackgroundInstallControlService(  810): Package event received: 0
+D/BackgroundInstallControlService(  810): Package event received: 0
+D/WM-WorkerWrapper( 4011): Starting work for com.google.apps.tiktok.contrib.work.TikTokListenableWorker
+I/alsv    ( 2029): NGA disabled due to not being eligible.
+I/DialerVvmTaskWorkerDelegate( 4011): com.android.dialer.voicemail.service.impl.scheduler.VvmTaskWorker$VvmTaskWorkerDelegate.executeVvmJob:191 Beginning execution of job ID: 5
+I/DialerSingletonScopedExternalsLogging( 4011): com.google.android.dialershared.externals.logging.<redacted>:75 event: TIKTOK_WORK_EXECUTION_MONITOR_ON_WORK_STARTED, function parameters: [133880f0-f64e-4bda-892b-0063d7385802,com.android.dialer.voicemail.service.impl.VvmTaskWorker], return value: <empty>
+I/DialerSingletonScopedExternalsLogging( 4011): com.google.android.dialershared.externals.logging.<redacted>:66 event: VVM_TASK_WORKER_EXECUTE_VVM_JOB, function parameters: [5], return value: <empty> [CONTEXT enable_persistent_logger=true ]
+I/VirtualizationService( 4973): virtualizationservice::maintenance: Failed to find a Secretkeeper instance; skipping secret management
+I/libbinder.AidlLazyServiceRegistrar( 4973): Registering service android.system.virtualizationservice
+I/VirtualizationService( 4973): virtualizationservice: Registered Binder service android.system.virtualizationservice.
+I/libbinder.AidlLazyServiceRegistrar( 4973): Registering service android.system.virtualizationmaintenance
+I/DialerVvmCarrierIdentifierImpl( 4011): com.android.dialer.voicemail.service.impl.carriermapping.<redacted>:101 Looking up carrier name for phone account handle: 1 [CONTEXT ratelimit_period="1 MINUTES" skipped=7 ]
+I/ActivityManager(  810): Process com.google.android.accessibility.switchaccess (pid 3717) has died: cch  +65 CEM 
+I/DialerRestVoicemailEnabledFn( 4011): com.android.dialer.voicemail.service.impl.vvmclients.rest.RestVoicemailEnabledFn.isEnabled:67 device is supported, enabling. [CONTEXT ratelimit_period="1 MINUTES" skipped=47 ]
+I/VirtualizationService( 4973): virtualizationservice: Registered Binder service android.system.virtualizationmaintenance.
+I/libbinder.AidlLazyServiceRegistrar( 4973): Process has 1 (of 2 available) client(s) in use after notification android.system.virtualizationmaintenance has clients: 1
+I/WM-WorkerWrapper( 1589): Worker result SUCCESS for Work [ id=a0dda261-9c0e-4a49-bffc-7a91c9099e04, tags={ com.android.providers.media.MediaServiceV2 } ]
+I/libprocessgroup(  810): Removed cgroup /sys/fs/cgroup/apps/uid_10168/pid_3717
+I/Zygote  (  575): Process 3717 exited due to signal 9 (Killed)
+I/VirtualizationService( 4973): virtualizationservice::aidl: ignoring packageRemoved(user_id=0, app_id=10219)
+D/WM-Processor( 1589): Processor a0dda261-9c0e-4a49-bffc-7a91c9099e04 executed; reschedule = false
+D/WM-SystemJobService( 1589): a0dda261-9c0e-4a49-bffc-7a91c9099e04 executed on JobScheduler
+I/alsv    ( 2029): NGA disabled due to not being eligible.
+D/WM-GreedyScheduler( 1589): Cancelling work ID a0dda261-9c0e-4a49-bffc-7a91c9099e04
+D/WM-GreedyScheduler( 1589): Ignoring {WorkSpec: 155a203c-f6a6-459c-a05f-3a73a6be52fa}. Requires device idle.
+D/WM-GreedyScheduler( 1589): Ignoring {WorkSpec: d9766b5b-ce60-4b07-8dd5-72c3a19386f0}. Requires device idle.
+D/WM-GreedyScheduler( 1589): Ignoring {WorkSpec: b39e17b1-d750-4757-9eb6-7309341619b0}. Requires device idle.
+D/WM-GreedyScheduler( 1589): Ignoring {WorkSpec: ce5ec8a2-3bd6-453a-bbfd-4f5c60f2bf92}. Requires device idle.
+I/AiAiEcho( 1611): EchoSearch: WidgetFetcherImpl is initialized with [34] widgets [reason=package removed for userId: 0]
+I/.android.dialer( 4011): Waiting for a blocking GC ProfileSaver
+I/DialerVvmExecutorImpl( 4011): com.android.dialer.voicemail.service.impl.scheduler.VvmExecutorImpl.execute:250 Beginning VVM action: SYNC with retryCount: 2 for ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, 1, UserHandle{0} [CONTEXT enable_persistent_logger=true ]
+E/DialerRestVvmCarrierService( 4011): com.android.dialer.voicemail.service.impl.vvmclients.rest.RestVvmCarrierService.getMsisdn:420 Retrieved phone number in an unexpected format: +15551234567 [CONTEXT disable_client_error_logging=true ]
+E/DialerRestVvmCarrierService( 4011): abmo: MEDIUM
+E/DialerRestVvmCarrierService( 4011): 	at a.dg(PG:15)
+E/DialerRestVvmCarrierService( 4011): 	at rbn.apply(PG:99)
+E/DialerRestVvmCarrierService( 4011): 	at aarq.apply(PG:13)
+E/DialerRestVvmCarrierService( 4011): 	at abzd.d(PG:3)
+E/DialerRestVvmCarrierService( 4011): 	at abze.run(PG:38)
+E/DialerRestVvmCarrierService( 4011): 	at vxo.run(PG:7)
+E/DialerRestVvmCarrierService( 4011): 	at absv.run(PG:44)
+E/DialerRestVvmCarrierService( 4011): 	at vxh.run(PG:305)
+E/DialerRestVvmCarrierService( 4011): 	at svb.run(PG:269)
+E/DialerRestVvmCarrierService( 4011): 	at java.lang.Thread.run(Thread.java:1563)
+E/DialerRestVvmCarrierService( 4011): 	at vyq.run(PG:61)
+D/LauncherAppsService(  810): onPackageRemoved: triggering onPackageRemoved for user=UserHandle{0}, packageName=dev.mobile.maestro.test
+D/LauncherAppsService(  810): onPackageRemoved: triggering onPackageRemoved for user=UserHandle{0}, packageName=dev.mobile.maestro.test
+D/LauncherAppsService(  810): onPackageRemoved: triggering onPackageRemoved for user=UserHandle{0}, packageName=dev.mobile.maestro.test
+D/LauncherAppsCallbackImpl( 1215): onPackageRemoved triggered for packageName=dev.mobile.maestro.test, user=UserHandle{0}
+I/PackageUpdatedTask( 1215): Package updated: mOp=REMOVE packages=[dev.mobile.maestro.test], user=UserHandle{0}
+I/PackageUpdatedTask( 1215): REMOVE: removing package=dev.mobile.maestro.test
+I/PackageUpdatedTask( 1215): OP_REMOVE: removing packages=[dev.mobile.maestro.test]
+D/ModelWriter( 1215): removing items from db . Reason: [removed because the corresponding package or component is removed. mOp=3 removedPackages=[dev.mobile.maestro.test] removedComponents=[]]
+I/AiAiEcho( 1611): AppFetcherImplV2 onPackageRemoved dev.mobile.maestro.test.
+I/DialerAndroidAutoStatusLookupImpl( 4011): com.android.dialer.androidautostatuslookup.impl.<redacted>:97 Android Auto connected in 0 mode [CONTEXT ratelimit_period="1 MINUTES" skipped=6 ]
+I/DialerLogcatLoggingBindings( 4011): com.android.dialer.logging.logcat.LogcatLoggingBindings.logImpression:54 Impression: ANDROID_API_UNEXPECTED_PHONE_NUMBER_FORMAT
+I/DialerLogcatLoggingBindings( 4011): com.android.dialer.logging.logcat.LogcatLoggingBindings.logImpression:47 Impression: VVM_SYNC_STARTED
+I/android.vending( 2103): ThreadFlipBegin blocked for 5.450ms
+I/.android.dialer( 4011): WaitForGcToComplete blocked ProfileSaver on Background for 160.548ms
+W/adoq    ( 2029): Abort, client detached.
+D/BackgroundInstallControlService(  810): Package event received: 0
+D/BackgroundInstallControlService(  810): Package event received: 0
+I/android.vending( 2103): IncrementDisableThreadFlip blocked for 22.440ms
+I/DialerLoggingConsentCheckerImpl( 4011): com.google.android.dialershared.logging.consent.impl.<redacted>:72 timer stop with success, timer present: false
+I/DialerLoggingConsentCheckerImpl( 4011): com.google.android.dialershared.logging.consent.impl.<redacted>:72 timer stop with success, timer present: false
+I/VirtualizationService( 4973): virtualizationservice::aidl: ignoring packageRemoved(user_id=0, app_id=10220)
+I/DialerSingletonScopedExternalsLogging( 4011): com.google.android.dialershared.externals.logging.<redacted>:75 event: TELEPHONY_BOOTSTRAP_AUTHENTICATION_REQUEST, function parameters: [], return value: Default
+W/DialerGbaCredentialProvider( 4011): com.android.dialer.voicemail.service.impl.vvmclients.rest.GbaCredentialProvider$1.onAuthenticationFailure:93 GBA failed with reason: 1 [CONTEXT disable_client_error_logging=true ]
+W/AccessibilityNodeInfoDumper( 4900): Fetch time: 43ms
+W/DialerVvmExecutorImpl( 4011): com.android.dialer.voicemail.service.impl.scheduler.VvmExecutorImpl.executeWorkOnCarrierService:459 Could not complete vvm work with action: SYNC. Error: [GeneralFailureReason: UNSPECIFIED, RestFailureReason: GBA_AUTHENTICATION_FAILURE_FEATURE_NOT_SUPPORTED, OmtpFailureReason: OMTP_UNSPECIFIED] for ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, 1, UserHandle{0} [CONTEXT disable_client_error_logging=true enable_persistent_logger=true ]
+I/DialerVvmExecutorImpl( 4011): com.android.dialer.voicemail.service.impl.scheduler.VvmExecutorImpl.executeWork:215 VvmResult is: # qyh@1db0ddb for ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, 1, UserHandle{0}
+I/DialerLoggingConsentCheckerImpl( 4011): com.google.android.dialershared.logging.consent.impl.<redacted>:72 timer stop with success, timer present: false
+V/AccessibilityManagerService(  810): onUserStateChangedLocked for userId: 0, forceUpdate: false
+W/ParceledListSlice(  810): Element #26 is 20616 bytes.
+W/ParceledListSlice(  810): Element #27 is 20252 bytes.
+W/ParceledListSlice(  810): Element #28 is 20528 bytes.
+W/ParceledListSlice(  810): Element #29 is 20348 bytes.
+W/ParceledListSlice(  810): Element #30 is 20384 bytes.
+V/AccessibilityUserState(  810): updateShortcutTargets: type:accessibility_shortcut_target_service, current:{}, new:{}
+V/AccessibilityUserState(  810): updateShortcutTargets: type:accessibility_button_targets, current:{}, new:{}
+V/AccessibilityUserState(  810): updateShortcutTargets: type:accessibility_gesture_targets, current:{}, new:{}
+V/AccessibilityUserState(  810): updateShortcutTargets: type:accessibility_qs_targets, current:{}, new:{}
+V/AccessibilityUserState(  810): updateShortcutTargets: type:accessibility_key_gesture_targets, current:{}, new:{}
+W/MagnificationConnectionManager(  810): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+I/AiAiEcho( 1611): EchoSearch: WidgetFetcherImpl is initialized with [34] widgets [reason=package removed for userId: 0]
+D/ActivityManager(  810): sync unfroze 4440 android.process.acore for 7
+I/AiAiEcho( 1611): Settings changed for uri: content://settings/secure/accessibility_enabled
+I/DialerSingletonScopedExternalsLogging( 4011): com.google.android.dialershared.externals.logging.<redacted>:75 event: TIKTOK_WORK_EXECUTION_MONITOR_ON_WORK_FINISHED, function parameters: [133880f0-f64e-4bda-892b-0063d7385802,com.android.dialer.voicemail.service.impl.VvmTaskWorker], return value: Retry
+W/d.process.acore( 4440): Suspending all threads took: 6.408ms
+D/AccessibilityManagerService(  810): restoreCurrentUserForTestAutomationIfNeededLocked(): ignoring because device doesn't support visible background users
+I/DialerLoggingConsentCheckerImpl( 4011): com.google.android.dialershared.logging.consent.impl.<redacted>:72 timer stop with success, timer present: false
+I/WM-WorkerWrapper( 4011): Worker result RETRY for Work [ id=133880f0-f64e-4bda-892b-0063d7385802, tags={ com.google.apps.tiktok.contrib.work.TikTokListenableWorker,1,SYNC,TikTokWorker#com.android.dialer.voicemail.service.impl.VvmTaskWorker } ]
+W/android.vending( 2103): Suspending all threads took: 8.085ms
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+D/WM-Processor( 4011): fjl 133880f0-f64e-4bda-892b-0063d7385802 executed; reschedule = true
+D/WM-GreedyScheduler( 4011): Stopping tracking for WorkGenerationalId(workSpecId=133880f0-f64e-4bda-892b-0063d7385802, generation=0)
+D/WM-SystemJobService( 4011): 133880f0-f64e-4bda-892b-0063d7385802 executed on JobScheduler
+W/ContentProviderHelper(  810): Slow operation: 62ms so far, now at getContentProviderImpl: after updateOomAdj
+W/ContentProviderHelper(  810): Slow operation: 64ms so far, now at getContentProviderImpl: done!
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+W/libbinder.IPCThreadState( 4900): call to talkWithDriver in joinThreadPool returned error: -9 (Bad file descriptor), FD: -1
+W/libbinder.IPCThreadState( 4900): call to talkWithDriver in joinThreadPool returned error: -9 (Bad file descriptor), FD: -1
+D/AndroidRuntime( 4900): Shutting down VM
+I/Finsky  ( 2103): [154] App states replicator found 5 unowned apps
+I/alsv    ( 2029): NGA disabled due to not being eligible.
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+W/libbinder.IPCThreadState(  810): Sending oneway calls to frozen process.
+D/BatterySaverPolicy(  810): accessibility changed to false, updating policy.
+I/AiAiEcho( 1611): [pnb-agg] Reload pnb aggregation on events deleted
+I/AiAiEcho( 1611): [pnb-agg] pnb aggregation disabled.
+I/AiAiEcho( 1611): Predicting[0]:  [CONTEXT sampling_count=5 ]
+D/WM-GreedyScheduler( 4011): Cancelling work ID 133880f0-f64e-4bda-892b-0063d7385802
+I/AiAiEcho( 1611): EchoTargets: 
+I/AiAiEcho( 1611): Filtered by AiAi flag check: 
+I/AiAiEcho( 1611): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/AiAiEcho( 1611): #remoteViewsTwiddler: feature disabled.
+I/AiAiEcho( 1611): Predicting[0]:  [CONTEXT sampling_count=5 ]
+I/AiAiEcho( 1611): EchoTargets: 
+I/AiAiEcho( 1611): Filtered by AiAi flag check: 
+I/AiAiEcho( 1611): [CONTEXT ratelimit_period="10 SECONDS" ]
+I/AiAiEcho( 1611): #remoteViewsTwiddler: feature disabled.
+I/AiAiEcho( 1611): #postPredictionTargets: Sending updates to UISurface home with targets# 0 (types=[])
+D/WM-SystemJobScheduler( 4011): Scheduling work ID 133880f0-f64e-4bda-892b-0063d7385802Job ID 270
+I/Finsky  ( 2103): [55] Completed 0 account content syncs with 0 successful.
+I/Finsky  ( 2103): [2] [ContentSync] Installation state replication succeeded.
+I/Finsky  ( 2103): [2] SCH: jobFinished: 12-1. TimeElapsed: 964ms.
+I/Finsky  ( 2103): [2] WM::SCH: Logging work end for 12-1
+I/AiAiEcho( 1611): #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+W/SsPagerDots( 1063): Total number of pages invalid: 0. Assuming 1 page.
+D/WM-GreedyScheduler( 4011): Ignoring {WorkSpec: 37a56bb7-ffa2-406e-9926-1ff2e0a2bc2d}. Requires device idle.
+D/WM-GreedyScheduler( 4011): Ignoring {WorkSpec: 8e611044-f571-4c93-aecb-e9d9cb1dbe2a}. Requires device idle.
+D/WM-GreedyScheduler( 4011): Ignoring {WorkSpec: a2a54084-543e-406c-bdd5-db2c67397164}. Requires device idle.
+D/WM-GreedyScheduler( 4011): Ignoring {WorkSpec: df2b7267-08c6-4dab-aec0-d0d4fcf23308}. Requires device idle.
+D/WM-GreedyScheduler( 4011): Ignoring {WorkSpec: f5861d21-bf7d-468a-9f78-43dd15bb74fb}. Requires device idle.
+D/WM-GreedyScheduler( 4011): Ignoring {WorkSpec: 8d432338-6ef3-496d-9254-0dc785bd0405}. Requires device idle.
+D/WM-GreedyScheduler( 4011): Ignoring {WorkSpec: 595848cd-ee5a-467e-b3f8-d2884b7aea14}. Requires device idle.
+D/WM-GreedyScheduler( 4011): Ignoring {WorkSpec: 8fe97d6b-82bb-4083-9fe0-71abdd235559}. Requires device idle.
+D/WM-GreedyScheduler( 4011): Starting tracking for f7c4dcb8-678b-4e79-96d6-af84290d58a1
+D/WM-NetworkStateTracker( 4011): Unregistering network callback
+I/Finsky  ( 2103): [55] SCH: Scheduling phonesky job Id: 1-1337, CT: 1784946011888, Constraints: [{ L: 43155140, D: 86355140, C: CHARGING_NONE, I: IDLE_NONE, N: NET_ANY, B: BATTERY_ANY }]
+I/Finsky  ( 2103): [55] SCH: Scheduling phonesky job Id: 10-4, CT: 1784946011661, Constraints: [{ L: 1200000, D: 86400000, C: CHARGING_NONE, I: IDLE_NONE, N: NET_ANY, B: BATTERY_ANY }]
+I/Finsky  ( 2103): [54] SCH: Scheduling 1 system job(s)
+I/Finsky  ( 2103): [54] SCH: Scheduling system job Id: 9203, L: 224527, D: 85379894, C: false, I: false, N: 1
+I/Finsky  ( 2103): [151] SCH: job service finished with id 9190.
+I/Finsky  ( 2103): [2] Memory trim requested to level 40
+I/Finsky  ( 2103): [2] Flushing in-memory image cache
+D/TileServices( 1063): Couldn't find tile for ComponentInfo{com.google.android.apps.wellbeing/com.google.android.apps.wellbeing.focusmode.quicksettings.FocusModeTileService}(0)
+D/SatelliteController( 1212): iisInCarrierRoamingNbIotNtn: satellite is disabled
+D/SatelliteController( 1212): getCarrierRoamingNtnConnectType: Falling back to global carrier config connect type: 0
+D/TileServices( 1063): Couldn't find tile for ComponentInfo{com.google.android.apps.wellbeing/com.google.android.apps.wellbeing.focusmode.quicksettings.FocusModeTileService}(0)
+I/HalDevMgr(  810): bestIfaceCreationProposal is null, requestIface=STA, existingIface=[name=wlan0 type=STA]

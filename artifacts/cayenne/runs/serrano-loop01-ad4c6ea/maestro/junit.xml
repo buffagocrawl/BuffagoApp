@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuites>
+  <testsuite name="Test Suite" device="Medium_Phone_API_36.1" tests="1" failures="0" time="38.0">
+    <testcase id="Buffago startup-state-aware smoke suite" name="Buffago startup-state-aware smoke suite" classname="Buffago startup-state-aware smoke suite" file="cayenne\flows\smoke\smoke-auto.yaml" time="38.0" status="SUCCESS">
+      <properties>
+        <property name="tags" value="smoke, non-mutating, auto"/>
+      </properties>
+    </testcase>
+  </testsuite>
+</testsuites>
