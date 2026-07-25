@@ -4,37 +4,45 @@
 .idea/
 .vs/
 
-# OS cruft
-.DS_Store
-Thumbs.db
-
-# Expo local state
+# Local dependencies and Expo state. EAS must install Linux dependencies from
+# package-lock.json rather than receive a Windows node_modules tree.
+node_modules/
 .expo/
 .expo-shared/
 
-# Builds & caches
+# Native build outputs and caches (keep the Android project sources).
+.gradle/
+android/.gradle/
+android/build/
+android/app/build/
+android/.cxx/
+android/app/.cxx/
+**/.cxx/
+
+# Generated output and test artifacts
 dist/
 build/
-android/
-ios/
+web-build/
+artifacts/
+test-results/
+screenshots/
+coverage/
+*.log
+*.tsbuildinfo
 .tmp/
-.tmp/**
 .pytest_cache/
-.pytest_cache/**
 __pycache__/
 **/__pycache__/
 
-# Node
-node_modules/
-
-# Env files
+# Local environment and platform state
+local.properties
 .env
 .env.*
-../Agents
-../Agents/**
-../.tmp
-../.tmp/**
-**/.pytest_cache
-**/__pycache__
-Agents/
-Agents/**
+!.env.example
+*.env
+*.env.*
+!.env.example
+
+# OS cruft
+.DS_Store
+Thumbs.db

@@ -1,12 +1,30 @@
+# This repository contains the Expo app in crawl/.  EAS currently stages from
+# this Git root, so these root-relative rules are the effective archive guard.
+.git/
 Agents/
-Agents/**
+.agents/
+.worktrees/
+.vs/
 .tmp/
-.tmp/**
+tmp/
+artifacts/
+evidence/
+output/
 **/.pytest_cache/
-**/.pytest_cache/**
 **/__pycache__/
-**/__pycache__/**
-# Local Python and pytest artifacts
-/tmp/
-**/pytest-*
-**/.pytest_cache/
+**/node_modules/
+**/.expo/
+**/.expo-shared/
+**/.gradle/
+**/.cxx/
+**/build/
+**/dist/
+**/web-build/
+**/coverage/
+**/test-results/
+**/screenshots/
+*.log
+**/local.properties
+**/.env
+**/.env.*
+!**/.env.example
