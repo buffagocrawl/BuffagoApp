@@ -66,7 +66,7 @@ export const ANALYTICS_EVENTS = Object.freeze({
   BUFFAVERSE_LOAD_FAILED: 'buffaverse_load_failed',
 });
 
-const BLOCKED_KEY = /(token|secret|password|authorization|cookie|email|phone|error_message|access_key|refresh)/i;
+const BLOCKED_KEY = /(token|secret|password|authorization|cookie|email|phone|error_message|access_key|refresh|latitude|longitude|location|address|rating_content|rating_detail)/i;
 const ALLOWED_SCALAR = new Set(['string', 'number', 'boolean']);
 
 export function sanitizeAnalyticsMetadata(input = {}) {
@@ -78,4 +78,19 @@ export function sanitizeAnalyticsMetadata(input = {}) {
     else if (typeof value === 'boolean') safe[key] = value;
   }
   return safe;
+}
+
+export const SERRANO_EVENT_VERSION = 1;
+
+export function buildSerranoEventMetadata(input = {}) {
+  return sanitizeAnalyticsMetadata({
+    event_version: SERRANO_EVENT_VERSION,
+    occurred_at: new Date().toISOString(),
+    environment: process.env.EXPO_PUBLIC_APP_ENV || 'unknown',
+    feature_flag_key: null,
+    experiment_id: null,
+    variant: null,
+    correlation_id: null,
+    ...input,
+  });
 }
