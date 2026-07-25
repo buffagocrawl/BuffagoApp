@@ -16,7 +16,8 @@ if str(SERRANO_DIR) not in sys.path:
 
 from serrano.cli import find_repo_root, format_state_summary, main  # noqa: E402
 from serrano.orchestrator import SerranoOrchestrator, load_configuration  # noqa: E402
-from serrano.schemas import final_plan_schema, worker_output_schema  # noqa: E402
+from serrano.schemas import caio_output_schema, final_plan_schema, worker_output_schema  # noqa: E402
+from serrano.review_panel import CAIO_DIMENSIONS, PANEL_REVIEWERS, build_panel_report, panel_reviewer_count, validate_caio_payload  # noqa: E402
 from serrano.confidence import (  # noqa: E402
     APP_EXPERIENCE_CATEGORIES,
     RELEASE_CATEGORIES,
@@ -71,6 +72,50 @@ def test_generated_schemas_use_strict_nested_objects() -> None:
     assert plan_schema["properties"]["chosen_initiatives"]["items"]["additionalProperties"] is False
     assert plan_schema["properties"]["rejected_initiatives"]["items"]["additionalProperties"] is False
     assert plan_schema["properties"]["prioritization_scores"]["items"]["additionalProperties"] is False
+
+
+def _caio_payload(*, blocked: bool = False) -> dict[str, object]:
+    return {"role": "chief_ai_officer", "summary": "review", "dimension_scores": [{"dimension": item, "score": 80, "evidence_references": ["test"]} for item in CAIO_DIMENSIONS], "overall_score": 80, "evidence_coverage_percentage": 90, "confidence_level": "high", "release_recommendation": "DO NOT RELEASE" if blocked else "RELEASE WITH REMEDIATION", "top_strengths": [], "top_concerns": [], "confirmed_defects": [], "suspected_risks": [], "blocked_validations": [], "required_remediation": [], "findings": [{"title": "confirmed defect", "evidence_status": "CONFIRMED", "evidence_reference": "test", "why": "test", "severity": "critical", "recommended_remediation": "fix", "release_blocking": blocked}] if blocked else [{"title": "noncritical slop", "evidence_status": "SUSPECTED", "evidence_reference": "test", "why": "specific duplication", "severity": "low", "recommended_remediation": "deduplicate", "release_blocking": False}], "source_references": ["test"]}
+
+
+def test_caio_is_unique_canonical_panel_member_and_schema_validates() -> None:
+    identifiers = [reviewer.identifier for reviewer in PANEL_REVIEWERS]
+    assert "chief_ai_officer" in identifiers
+    assert len(identifiers) == len(set(identifiers)) == panel_reviewer_count()
+    assert caio_output_schema()["additionalProperties"] is False
+    validate_caio_payload(_caio_payload())
+
+
+def test_documentation_and_runtime_panel_membership_agree() -> None:
+    readme = (SERRANO_DIR / "README.md").read_text(encoding="utf-8")
+    assert all(reviewer.name in readme for reviewer in PANEL_REVIEWERS)
+
+
+def test_caio_prompt_requires_evidence_and_anti_slop_review() -> None:
+    prompt = (SERRANO_DIR / "prompts" / "chief_ai_officer.md").read_text(encoding="utf-8")
+    for required in ("AI-slop", "CONFIRMED", "BLOCKED", "prompt injection", "DO NOT RELEASE", "exact reference"):
+        assert required in prompt
+
+
+def test_panel_aggregation_includes_caio_and_current_missing_caio_is_incomplete() -> None:
+    generic = {"panel_review": {"overall_score": 60, "evidence_coverage_percentage": 50}}
+    results = {reviewer.identifier: (generic if reviewer.identifier != "chief_ai_officer" else _caio_payload()) for reviewer in PANEL_REVIEWERS}
+    report = build_panel_report(results)
+    assert report["complete"] and report["completed_reviewer_count"] == panel_reviewer_count()
+    assert report["overall_score"] == 62.5
+    results.pop("chief_ai_officer")
+    assert not build_panel_report(results)["complete"]
+
+
+def test_historical_panel_without_caio_remains_readable_and_blocking_overrides_score() -> None:
+    historical = build_panel_report({"growth_analyst": {"panel_review": {"overall_score": 90, "evidence_coverage_percentage": 80}}}, historical=True)
+    assert historical["complete"] and historical["expected_reviewer_count"] == 1
+    assert build_panel_report({"chief_ai_officer": _caio_payload(blocked=True)})["disposition"] == "DO NOT RELEASE"
+
+
+def test_noncritical_caio_slop_finding_does_not_release_block() -> None:
+    report = build_panel_report({"chief_ai_officer": _caio_payload()})
+    assert report["disposition"] == "INCOMPLETE"
 
 
 def test_resume_skips_completed_workers() -> None:
@@ -147,6 +192,9 @@ def test_worker_artifacts_include_json_and_markdown() -> None:
     assert (worker_dir / "growth_analyst.json").exists()
     assert (worker_dir / "growth_analyst.md").exists()
     assert (worker_dir / "product_manager_final.md").exists()
+    assert (worker_dir / "chief_ai_officer.json").exists()
+    assert (worker_dir / "chief_ai_officer.md").exists()
+    assert (worker_dir.parent / "artifacts" / "panel-review.json").exists()
 
 
 def test_evidence_manifest_redacts_secret_values_but_keeps_presence(monkeypatch: pytest.MonkeyPatch) -> None:

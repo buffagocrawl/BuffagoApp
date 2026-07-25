@@ -35,9 +35,11 @@ from .schemas import (
     WAVE_2,
     WAVE_3,
     WorkerSpec,
+    caio_output_schema,
     final_plan_schema,
     worker_output_schema,
 )
+from .review_panel import PANEL_REVIEWERS, validate_caio_payload, write_panel_artifacts
 from .supabase_metrics import SupabaseMetricsCollector
 from .validators import ValidationError, load_json, validate_final_plan, validate_worker_payload, write_markdown_report
 
@@ -114,8 +116,9 @@ class SerranoOrchestrator:
         self._run_wave(paths, state, logger, list(WAVE_2), "wave_2", self._synthesis_context(paths, [SYNTHESIS_1.name]))
         self._run_single(paths, state, logger, SYNTHESIS_2, self._synthesis_context(paths, [SYNTHESIS_1.name, "ceo_strategy_review", "cto_feasibility_review", "caio_data_review"]))
         self._run_wave(paths, state, logger, list(WAVE_3), "wave_3", self._synthesis_context(paths, [SYNTHESIS_2.name]))
-        self._run_single(paths, state, logger, FINAL_PLAN, self._synthesis_context(paths, [SYNTHESIS_2.name, "ceo_final_review", "cfo_business_review", "caio_feedback_loop_review"]))
+        self._run_single(paths, state, logger, FINAL_PLAN, self._synthesis_context(paths, [SYNTHESIS_2.name, "ceo_final_review", "cfo_business_review", "caio_feedback_loop_review", "chief_ai_officer"]))
         self._materialize_final_plan(paths, state, logger)
+        self._materialize_panel_artifacts(paths, state)
         self._materialize_confidence_artifacts(paths, state)
         state["status"] = "awaiting_approval"
         state["current_phase"] = "final_product_plan"
@@ -171,6 +174,7 @@ class SerranoOrchestrator:
             raise RuntimeError("Release notes cannot be generated before validation.")
         if "security_report.md" not in state.get("artifacts", {}):
             raise RuntimeError("Release notes cannot be generated before security review.")
+        self._require_panel_release_clearance(paths)
         logger = initialize_logger(paths.log_path)
         self._run_single(paths, state, logger, RELEASE_NOTES, self._post_build_context(paths))
         self._materialize_release_outputs(paths, state)
@@ -318,7 +322,7 @@ class SerranoOrchestrator:
             role_name=spec.name,
             prompt_text=prompt_text,
             input_payload=input_payload,
-            schema=final_plan_schema() if spec.name == FINAL_PLAN.name else worker_output_schema(spec.name),
+            schema=final_plan_schema() if spec.name == FINAL_PLAN.name else (caio_output_schema() if spec.name == "chief_ai_officer" else worker_output_schema(spec.name)),
             output_json_path=paths.worker_dir / f"{spec.name}.json",
             mode=spec.mode,
             timeout_seconds=self.config.worker_timeout_seconds,
@@ -328,6 +332,9 @@ class SerranoOrchestrator:
         result = runner.execute(request)
         if spec.name == FINAL_PLAN.name:
             validate_final_plan(result.payload)
+        elif spec.name == "chief_ai_officer":
+            validate_caio_payload(result.payload)
+            self._write_caio_markdown(result.payload, paths.worker_dir / f"{spec.name}.md")
         else:
             validate_worker_payload(result.payload, spec.name)
             write_markdown_report(result.payload, paths.worker_dir / f"{spec.name}.md", title=spec.name.replace("_", " ").title())
@@ -413,6 +420,29 @@ class SerranoOrchestrator:
             log_event(logger, "approval_invalidated", reason="plan_hash_changed")
         RunStateStore(paths).save(state)
 
+    @staticmethod
+    def _write_caio_markdown(payload: dict[str, Any], output_path: Path) -> None:
+        lines = ["# Chief AI Officer Review", "", payload["summary"], "", f"Overall CAIO score: **{payload['overall_score']:.1f}/100**", f"Evidence coverage: **{payload['evidence_coverage_percentage']:.1f}%**", f"Confidence: **{payload['confidence_level']}**", f"Release recommendation: **{payload['release_recommendation']}**", "", "## Dimension scores"]
+        lines.extend(f"- {item['dimension']}: {item['score']:.1f}/100 ({', '.join(item['evidence_references']) or 'no evidence reference'})" for item in payload["dimension_scores"])
+        for title, key in (("Top strengths", "top_strengths"), ("Top concerns", "top_concerns"), ("Confirmed defects", "confirmed_defects"), ("Suspected risks", "suspected_risks"), ("Blocked validations", "blocked_validations"), ("Required remediation", "required_remediation")):
+            values = [f"- {value}" for value in payload[key]] or ["- None recorded."]
+            lines.extend(["", f"## {title}", *values])
+        lines.extend(["", "## Findings"])
+        for finding in payload["findings"]:
+            lines.extend([f"### {finding['title']}", f"- Status: {finding['evidence_status']}", f"- Evidence: {finding['evidence_reference']}", f"- Why: {finding['why']}", f"- Severity: {finding['severity']}", f"- Remediation: {finding['recommended_remediation']}", f"- Release blocking: {finding['release_blocking']}"])
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    def _materialize_panel_artifacts(self, paths: RunPaths, state: dict[str, Any]) -> None:
+        results: dict[str, dict[str, Any]] = {}
+        for reviewer in PANEL_REVIEWERS:
+            worker_path = paths.worker_dir / f"{reviewer.worker_name}.json"
+            if worker_path.exists():
+                results[reviewer.identifier] = load_json(worker_path)
+        artifacts = write_panel_artifacts(results, paths.artifact_dir)
+        state["panel"] = {"expected_reviewer_count": len(PANEL_REVIEWERS), "completed_reviewer_count": len(results), "complete": len(results) == len(PANEL_REVIEWERS)}
+        state["artifacts"].update({name: str(path) for name, path in artifacts.items()})
+        RunStateStore(paths).save(state)
+
     def _materialize_confidence_artifacts(self, paths: RunPaths, state: dict[str, Any]) -> None:
         """Create independent report cards before a review has scored evidence.
 
@@ -443,6 +473,18 @@ class SerranoOrchestrator:
         current_hash = hashlib.sha256(plan_path.read_bytes()).hexdigest()
         if state.get("approved_plan_hash") != current_hash:
             raise RuntimeError("The plan changed after approval and requires reapproval.")
+
+    @staticmethod
+    def _require_panel_release_clearance(paths: RunPaths) -> None:
+        """A failed or missing current-panel result cannot become a release artifact."""
+        panel_path = paths.artifact_dir / "panel-review.json"
+        if not panel_path.exists():
+            raise RuntimeError("Release notes cannot be generated before the product review panel report.")
+        panel = load_json(panel_path)
+        if not panel.get("complete"):
+            raise RuntimeError("Release notes cannot be generated while the product review panel is incomplete.")
+        if panel.get("disposition") == "DO NOT RELEASE":
+            raise RuntimeError("Release notes cannot be generated after a confirmed CAIO DO NOT RELEASE disposition.")
 
     def _run_validation(self, paths: RunPaths, state: dict[str, Any], logger) -> None:
         implementation_payload = load_json(paths.worker_dir / f"{IMPLEMENTATION.name}.json")

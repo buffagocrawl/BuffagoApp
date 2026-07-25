@@ -28,6 +28,7 @@ def validate_worker_payload(payload: dict[str, Any], role: str) -> None:
             "risks",
             "confidence",
             "source_references",
+            "panel_review",
         ),
     )
     if payload["role"] != role:
@@ -39,6 +40,11 @@ def validate_worker_payload(payload: dict[str, Any], role: str) -> None:
             recommendation,
             ("id", "title", "problem", "recommendation", "expected_impact", "effort", "risk", "confidence", "metric", "source_references"),
         )
+    panel_review = payload["panel_review"]
+    require_keys(panel_review, ("overall_score", "evidence_coverage_percentage", "confidence_level", "release_recommendation"))
+    for key in ("overall_score", "evidence_coverage_percentage"):
+        if not isinstance(panel_review[key], (int, float)) or not 0 <= panel_review[key] <= 100:
+            raise ValidationError(f"panel_review.{key} must be 0-100")
 
 
 def validate_final_plan(payload: dict[str, Any]) -> None:
@@ -105,4 +111,3 @@ def write_markdown_report(payload: dict[str, Any], output_path: Path, *, title: 
 
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
-

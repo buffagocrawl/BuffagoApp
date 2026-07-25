@@ -119,6 +119,18 @@ class CodexRunner:
                 "rollback": ["Remove new instrumentation paths if validation fails."],
                 "approval_status": "awaiting_approval",
             }
+        if request.role_name == "chief_ai_officer":
+            dimensions = ("AI Architecture and Wiring", "Prompt and Agent Quality", "Reliability and Determinism", "AI Safety and Guardrails", "Security and Privacy", "Cost and Operational Efficiency", "Maintainability", "Product and User Value", "Evidence Quality", "AI-Slop Resistance")
+            return {
+                "role": "chief_ai_officer", "summary": "Dry-run CAIO review; no live provider, device, or Supabase validation was attempted.",
+                "dimension_scores": [{"dimension": dimension, "score": 60, "evidence_references": ["evidence/evidence_manifest.json"]} for dimension in dimensions],
+                "overall_score": 60, "evidence_coverage_percentage": 20, "confidence_level": "low", "release_recommendation": "NEEDS EVIDENCE",
+                "top_strengths": ["Structured Serrano worker schemas are available."], "top_concerns": ["Dry-run cannot verify live AI providers or runtime boundaries."],
+                "confirmed_defects": [], "suspected_risks": [], "blocked_validations": ["No live provider, device, or Supabase validation was attempted."],
+                "required_remediation": ["Run bounded live validation before making AI operational claims."],
+                "findings": [{"title": "Live validation unavailable", "evidence_status": "BLOCKED", "evidence_reference": "SERRANO_DRY_RUN=true", "why": "Dry-run uses deterministic mock outputs.", "severity": "medium", "recommended_remediation": "Run an approved bounded integration check.", "release_blocking": False}],
+                "source_references": ["evidence/evidence_manifest.json"],
+            }
         if request.role_name == "release_notes":
             return {
                 "role": request.role_name,
@@ -130,6 +142,7 @@ class CodexRunner:
                 "risks": ["Release claims must be validated against implementation artifacts."],
                 "confidence": "medium",
                 "source_references": ["artifacts/validation_report.md"],
+                "panel_review": {"overall_score": 60, "evidence_coverage_percentage": 20, "confidence_level": "low", "release_recommendation": "NEEDS EVIDENCE"},
             }
         return {
             "role": request.role_name,
@@ -141,4 +154,5 @@ class CodexRunner:
             "risks": ["Dry-run outputs are placeholders, not leadership decisions."],
             "confidence": "medium",
             "source_references": ["evidence/evidence_manifest.json"],
+            "panel_review": {"overall_score": 60, "evidence_coverage_percentage": 20, "confidence_level": "low", "release_recommendation": "NEEDS EVIDENCE"},
         }

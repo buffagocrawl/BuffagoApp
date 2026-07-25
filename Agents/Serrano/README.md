@@ -27,7 +27,7 @@ flowchart TD
     C --> D[PM Synthesis 1]
     D --> E[Wave 2: CEO + CTO + CAIO]
     E --> F[PM Synthesis 2]
-    F --> G[Wave 3: CEO Final + CFO + CAIO Feedback]
+    F --> G[Wave 3: CEO Final + CFO + CAIO Feedback + Chief AI Officer]
     G --> H[PM Final Plan]
     H --> I{Approved?}
     I -->|No| J[Await Approval]
@@ -166,6 +166,8 @@ Important outputs include:
 - `artifacts/implementation_brief.md`
 - `artifacts/measurement_plan.md`
 - `artifacts/risk_register.md`
+- `artifacts/panel-review.json`
+- `artifacts/panel-review.md`
 - `state/run_state.json`
 
 Repository-level historical review evidence is kept separately under `evidence/` so the repository root remains reserved for primary project files. New Serrano run evidence continues to live under `Agents/Serrano/runs/<run-id>/evidence/`.
@@ -181,6 +183,35 @@ Worker outputs are stored in:
 - failed workers are recorded without destroying the whole run
 - resumptions continue from the last incomplete phase
 - synthesis steps record failed reviewers as confidence reductions
+
+## Product Review Panel and CAIO
+
+`serrano.review_panel.PANEL_REVIEWERS` is the canonical registry for executable
+panel membership; counts and completion checks are derived from it. The full
+discovery workflow runs the dedicated `chief_ai_officer` reviewer by default,
+in addition to the existing CAIO data and feedback-loop workers. Individual
+workers remain runnable through Serrano's normal resumable worker execution.
+The current executable panel is Growth Analyst, Marketing Analyst, Customer
+Advocate, CEO, CTO, CEO Final Review, CFO, and Chief AI Officer.
+
+The CAIO complements—not replaces—the CTO and security reviewers. It scores AI
+Architecture and Wiring, Prompt and Agent Quality, Reliability and
+Determinism, AI Safety and Guardrails, Security and Privacy, Cost and
+Operational Efficiency, Maintainability, Product and User Value, Evidence
+Quality, and AI-Slop Resistance. Every finding carries an evidence status
+(`CONFIRMED`, `INFERRED`, `SUSPECTED`, `BLOCKED`, or `NOT_APPLICABLE`) and an
+exact reference, severity, and remediation.
+
+The CAIO recommends `DO NOT RELEASE` only with confirmed evidence for an
+exposed secret, unvalidated AI-controlled state change, fabricated evidence,
+an unwired claimed integration, meaningful prompt injection, sensitive-data
+provider leakage, approval despite failed/incomplete review, a critical AI
+defect, or an unmaintainable implementation without a safe fallback.
+Noncritical AI-slop findings lower the CAIO score and require remediation; they
+do not automatically block release. Missing CAIO output makes a newly
+generated panel report incomplete. Historical artifacts remain readable by
+declaring them historical, so they are not retroactively required to contain a
+CAIO result.
 
 ## Cost Controls
 
