@@ -1,0 +1,256 @@
+{
+  "contractVersion": "1.0",
+  "runId": "20260724T211225-1c6ab8cc",
+  "status": "BLOCKED",
+  "startedAt": "2026-07-25T01:12:25+00:00",
+  "finishedAt": "2026-07-25T01:14:33+00:00",
+  "requestedSuite": "auth",
+  "suite": "auth",
+  "environment": "qa",
+  "device": {
+    "platform": "android",
+    "deviceId": "emulator-5554"
+  },
+  "detectedStartupState": null,
+  "startupStateCandidates": [],
+  "startupStateValidation": "FAILED",
+  "universalAssertionResult": "FAILED",
+  "stateSpecificAssertionResult": "INSUFFICIENT_EVIDENCE",
+  "universalAssertions": [
+    {
+      "assertion": "App launches",
+      "status": "PASSED"
+    },
+    {
+      "assertion": "app.root appears",
+      "status": "PASSED"
+    },
+    {
+      "assertion": "No fatal runtime error",
+      "status": "PASSED"
+    },
+    {
+      "assertion": "Exactly one valid startup state",
+      "status": "FAILED"
+    }
+  ],
+  "stateSpecificAssertions": [],
+  "skippedAssertions": [
+    {
+      "assertion": "onboarding.root and app.root remain visible",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Onboarding navigation controls are discoverable",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Safe onboarding forward/back interaction succeeds",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "auth.screen is visible",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Sign-in controls render",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Available primary navigation renders",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Each visited authenticated surface renders",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Authenticated primary navigation",
+      "status": "NOT_APPLICABLE"
+    }
+  ],
+  "skipReason": "Assertions for startup states other than an unambiguous detected state are not applicable",
+  "authentication": {
+    "credentialSource": "LOCAL_IGNORED_FILE",
+    "credentialsAvailable": true,
+    "login": "BLOCKED",
+    "sessionRestoration": "<redacted>",
+    "protectedNavigation": "BLOCKED",
+    "logout": "BLOCKED",
+    "profileLoad": "BLOCKED",
+    "rlsBackedRead": "BLOCKED"
+  },
+  "summary": {
+    "acceptanceCriteriaCovered": [],
+    "artifactCount": 10
+  },
+  "runtime": {
+    "adbStart": {
+      "status": "STARTED",
+      "warnings": []
+    },
+    "emulatorStart": {
+      "status": "STARTED",
+      "avd": "Medium_Phone_API_36.1",
+      "pid": 10316,
+      "arguments": [
+        "-no-snapshot-load",
+        "-port",
+        "5554"
+      ]
+    },
+    "adbRecovery": {
+      "status": "RECOVERED",
+      "states": [
+        "missing",
+        "missing",
+        "missing",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "device"
+      ],
+      "reconnect": true,
+      "adbRestart": true
+    },
+    "emulatorBoot": {
+      "status": "BOOTED"
+    },
+    "package": {
+      "status": "INSTALLED",
+      "package": "com.buffago.app"
+    },
+    "metroStart": {
+      "status": "STARTED",
+      "pid": 26896,
+      "log": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\cayenne\\runs\\20260724T211225-1c6ab8cc\\logs\\metro.log"
+    },
+    "bundlePrewarm": {
+      "status": "PREWARMED",
+      "entry": "node_modules/expo-router/entry.bundle"
+    },
+    "failure": {
+      "category": "DEV_CLIENT_CONNECTION_FAILURE",
+      "message": "adb reverse failed: adb.exe: device 'emulator-5554' not found"
+    }
+  },
+  "cleanup": {
+    "status": "PASSED",
+    "ownedPids": [
+      10316,
+      26896
+    ],
+    "cleanedPids": [
+      26896
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "auth",
+      "title": "auth",
+      "status": "BLOCKED",
+      "durationMs": 0,
+      "preconditions": [
+        "Android emulator"
+      ],
+      "steps": [],
+      "assertions": [
+        "App launches",
+        "app.root appears",
+        "No fatal runtime error",
+        "Exactly one valid startup state",
+        "Detected startup state passes its required assertions",
+        "Cayenne account signs in",
+        "Session restores after relaunch",
+        "RLS-backed profile read succeeds",
+        "Logout returns to sign-in"
+      ],
+      "detectedStartupState": null,
+      "stateSpecificAssertions": [],
+      "skippedAssertions": [
+        {
+          "assertion": "onboarding.root and app.root remain visible",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Onboarding navigation controls are discoverable",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Safe onboarding forward/back interaction succeeds",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "auth.screen is visible",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Sign-in controls render",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Available primary navigation renders",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Each visited authenticated surface renders",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Authenticated primary navigation",
+          "status": "NOT_APPLICABLE"
+        }
+      ],
+      "skipReason": "Assertions for startup states other than an unambiguous detected state are not applicable",
+      "screenshots": [],
+      "hierarchy": "hierarchies/final.xml",
+      "logs": [
+        "logs/logcat.txt",
+        "logs/metro.log",
+        "maestro/raw-output.log"
+      ],
+      "failureCategory": "ENVIRONMENT_BLOCKER",
+      "failureMessage": "adb reverse failed: adb.exe: device 'emulator-5554' not found",
+      "retryCount": 0
+    }
+  ],
+  "failures": [
+    {
+      "failureCategory": "ENVIRONMENT_BLOCKER",
+      "runtimeCategory": "DEV_CLIENT_CONNECTION_FAILURE",
+      "failureMessage": "adb reverse failed: adb.exe: device 'emulator-5554' not found"
+    }
+  ],
+  "artifacts": [
+    "environment.json",
+    "prerequisite-check.json",
+    "request.json",
+    "safety-check.json",
+    "logs/adb-start.log",
+    "logs/emulator.stderr.log",
+    "logs/emulator.stdout.log",
+    "logs/metro.log",
+    "runtime/lifecycle.json",
+    "runtime/processes.json"
+  ],
+  "safety": {
+    "environment": "qa",
+    "productionDetected": true,
+    "mutationRequested": false,
+    "mutationAllowed": false,
+    "decision": "ALLOW",
+    "reasons": []
+  },
+  "redaction": {
+    "validated": true,
+    "status": "PASSED"
+  },
+  "limitations": [
+    "DEV_CLIENT_CONNECTION_FAILURE"
+  ]
+}

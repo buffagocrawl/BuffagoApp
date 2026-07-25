@@ -18,6 +18,18 @@ Agents/Serrano/runs/*
 !Agents/Serrano/runs/.gitkeep
 Agents/Serrano/.venv/
 
+# Cayenne local QA credentials and generated authentication state.
+.env.cayenne
+.env.cayenne.local
+.env.cayenne.*.local
+.cayenne.env
+.cayenne.env.local
+!.env.cayenne.example
+artifacts/cayenne/secrets/
+artifacts/cayenne/**/auth-state.json
+artifacts/cayenne/**/session.json
+artifacts/cayenne/**/storage-state.json
+
 # Generated Expo exports are deployment/CI artifacts, not source.
 /crawl/output/
 /output/buffaverse-web-correction/

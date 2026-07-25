@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 FAILURE_CATEGORIES = {"APP_DEFECT","TEST_DEFECT","ENVIRONMENT_BLOCKER","FIXTURE_BLOCKER","EXTERNAL_PROVIDER_BLOCKER","DEVICE_BLOCKER","BUILD_FAILURE","TIMEOUT","SELECTOR_MISSING","PERMISSION_BLOCKER","DATA_MISMATCH","SECURITY_BOUNDARY","INCONCLUSIVE"}
-SECRET_KEY = re.compile(r"(?i)(password|token|secret|authorization|cookie|api[_-]?key|service[_-]?role|anon[_-]?key|refresh)")
+SECRET_KEY = re.compile(r"(?i)(password|token|secret|authorization|cookie|api[_-]?key|service[_-]?role|anon[_-]?key|refresh|session|storage[_-]?state|auth[_-]?state)")
 SECRET_VALUE = re.compile(r"(?i)(bearer\s+)?[A-Za-z0-9_\-]{24,}\.[A-Za-z0-9_\-]{8,}\.?[A-Za-z0-9_\-]*")
 EMAIL = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.I)
 STARTUP_SELECTORS = {
@@ -14,11 +14,24 @@ STARTUP_SELECTORS = {
     "AUTHENTICATED": {"auth.signed-in-marker", "nav.home", "nav.crawl", "nav.wingdex", "nav.leaderboard", "nav.profile"},
 }
 
-def redact(value, *, redact_emails=True):
+def auth_failure(text):
+    value=(text or "").lower()
+    if "invalid login credentials" in value or "invalid credentials" in value: return "INVALID_CREDENTIALS", "Authentication failed for the configured Cayenne test account: invalid credentials."
+    if "email not confirmed" in value or "confirm your email" in value: return "EMAIL_CONFIRMATION_REQUIRED", "Authentication failed for the configured Cayenne test account: email confirmation is required."
+    if "network" in value or "failed to fetch" in value or "timeout" in value: return "NETWORK_OR_TIMEOUT", "Authentication could not complete within the bounded auth window. Check network availability and service health."
+    if "profile.rls-read-marker" in value: return "PROFILE_RLS_DENIAL", "Authentication succeeded but the expected profile RLS-backed read did not complete."
+    if "onboarding" in value: return "ONBOARDING_INCOMPLETE", "Authentication succeeded but onboarding was unexpectedly incomplete."
+    return "AUTHENTICATION_FAILED", "Authentication lifecycle test failed; inspect sanitized runtime diagnostics."
+
+def redact(value, *, redact_emails=True, secrets=()):
     if isinstance(value, dict):
-        return {k: "<redacted>" if SECRET_KEY.search(str(k)) else redact(v, redact_emails=redact_emails) for k,v in value.items()}
-    if isinstance(value, list): return [redact(v, redact_emails=redact_emails) for v in value]
+        return {k: "<redacted>" if SECRET_KEY.search(str(k)) else redact(v, redact_emails=redact_emails, secrets=secrets) for k,v in value.items()}
+    if isinstance(value, list): return [redact(v, redact_emails=redact_emails, secrets=secrets) for v in value]
     if isinstance(value, str):
+        # Exact runtime credentials are removed before any artifact is written.
+        for secret in secrets:
+            if secret:
+                value = value.replace(secret, "<redacted>")
         value = SECRET_VALUE.sub("<redacted>", value)
         return EMAIL.sub("<redacted-email>", value) if redact_emails else value
     return value

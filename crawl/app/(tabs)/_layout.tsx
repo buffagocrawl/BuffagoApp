@@ -1,5 +1,6 @@
 ﻿    import React, { useEffect, useState } from 'react';
     import { Tabs } from 'expo-router';
+    import { View } from 'react-native';
     import { useTheme } from 'react-native-paper';
     import { MaterialCommunityIcons } from '@expo/vector-icons';
     import { supabase } from '../../lib/supabase.js';
@@ -50,6 +51,7 @@
       const safeBottom = Math.max(insets.bottom, 10);
 
       return (
+        <View testID={signedIn ? 'auth.signed-in-marker' : undefined} style={{ flex: 1 }}>
         <Tabs
           screenOptions={{
             headerShown: false,
@@ -156,5 +158,6 @@
             }}
           />
         </Tabs>
+        </View>
       );
     }

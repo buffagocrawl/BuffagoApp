@@ -1,0 +1,14 @@
+{
+  "owner": "cayenne",
+  "runDirectory": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\cayenne\\runs\\20260724T192429-59a125a0",
+  "processes": [
+    {
+      "role": "metro",
+      "pid": 3172,
+      "executable": "C:\\Windows\\System32\\cmd.exe",
+      "started_at": 1784935481.5343976,
+      "log": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\cayenne\\runs\\20260724T192429-59a125a0\\logs\\metro.log"
+    }
+  ],
+  "cleaned": true
+}

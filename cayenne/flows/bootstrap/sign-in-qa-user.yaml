@@ -6,5 +6,5 @@ tags: [bootstrap, qa-only, mutating]
 - runFlow:
     file: ../auth/sign-in-email.yaml
     env:
-      CAYENNE_QA_USER_EMAIL: ${CAYENNE_QA_USER_EMAIL}
-      CAYENNE_QA_USER_PASSWORD: ${CAYENNE_QA_USER_PASSWORD}
+      CAYENNE_TEST_EMAIL: ${CAYENNE_TEST_EMAIL}
+      CAYENNE_TEST_PASSWORD: ${CAYENNE_TEST_PASSWORD}

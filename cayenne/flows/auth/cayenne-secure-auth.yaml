@@ -1,0 +1,52 @@
+appId: com.buffago.app
+name: Cayenne secure account authentication lifecycle
+tags: [auth, qa-only, secure-evidence]
+---
+# No screenshots or hierarchy captures are allowed while credential fields are populated.
+- runFlow: ../bootstrap/handle-permissions.yaml
+- runFlow:
+    when:
+      visible:
+        id: onboarding.skip
+    commands:
+      - tapOn:
+          id: onboarding.skip
+- assertVisible:
+    id: auth.screen
+- tapOn: "Sign In"
+- tapOn:
+    id: auth.email.input
+- inputText: ${CAYENNE_TEST_EMAIL}
+- tapOn:
+    id: auth.password.input
+- inputText: ${CAYENNE_TEST_PASSWORD}
+- tapOn:
+    id: auth.signin.button
+- extendedWaitUntil:
+    visible:
+      id: auth.signed-in-marker
+    timeout: 20000
+- tapOn:
+    id: nav.home
+- openLink: buffago://user
+- assertVisible:
+    id: profile.root
+- assertVisible:
+    id: profile.rls-read-marker
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: auth.signed-in-marker
+    timeout: 15000
+- tapOn:
+    id: nav.home
+- openLink: buffago://user
+- tapOn:
+    id: profile.signout.button
+- extendedWaitUntil:
+    visible:
+      id: auth.screen
+    timeout: 10000
+- assertNotVisible:
+    id: profile.root

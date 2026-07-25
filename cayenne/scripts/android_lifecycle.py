@@ -109,6 +109,14 @@ class AndroidLifecycle:
     def _adb(self, *args, timeout=30):
         return self._run([self.adb, *args], timeout=timeout)
 
+    def dump_hierarchy(self):
+        """Return a bounded UI hierarchy without relying on /dev/tty output."""
+        remote = "/sdcard/cayenne-window.xml"
+        rc, output = self._adb("-s", self.device, "shell", "uiautomator", "dump", remote, timeout=30)
+        if rc != 0:
+            return rc, output
+        return self._adb("-s", self.device, "exec-out", "cat", remote, timeout=30)
+
     def _persist(self):
         self.manifest.write_text(
             json.dumps({"owner": "cayenne", "runDirectory": str(self.run_dir), "processes": [asdict(p) for p in self.owned]}, indent=2) + "\n",
