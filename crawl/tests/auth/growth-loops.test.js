@@ -43,17 +43,23 @@ test('weekly mission metadata centralizes action, reset, and truthful reward cop
   assert.match(summary.reward.detail, /does not currently grant XP/i);
 });
 
-test('share artifact includes score, location, and crawl when available', () => {
+test('share artifact clearly identifies the restaurant and its location', () => {
   const artifact = buildShareArtifact({
     restaurantName: 'Anchor Bar',
-    score: 92,
+    address: '1047 Main St',
     city: 'Buffalo',
     stateCode: 'NY',
-    crawlTitle: 'Downtown Heat Check',
   });
 
   assert.match(artifact.title, /Anchor Bar/);
-  assert.match(artifact.message, /92\/100/);
-  assert.match(artifact.message, /Buffalo, NY/);
-  assert.match(artifact.message, /Downtown Heat Check/);
+  assert.match(artifact.message, /^Check out Anchor Bar on BuffaGo!/);
+  assert.match(artifact.message, /1047 Main St/);
+});
+
+test('share artifact includes a deep link when one is available and has a concise fallback without one', () => {
+  const linked = buildShareArtifact({ restaurantName: 'Anchor Bar', deepLink: 'buffago://restaurants/anchor-bar' });
+  const fallback = buildShareArtifact({ restaurantName: "Mario's Pizzeria & Ristorante" });
+
+  assert.match(linked.message, /buffago:\/\/restaurants\/anchor-bar/);
+  assert.equal(fallback.message, "Check out Mario's Pizzeria & Ristorante on BuffaGo!");
 });

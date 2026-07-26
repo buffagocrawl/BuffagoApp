@@ -73,26 +73,24 @@ export function buildWeeklyMissionSummary({
 
 export function buildShareArtifact({
   restaurantName,
-  score = null,
+  address = null,
   city = null,
   stateCode = null,
-  crawlTitle = null,
+  deepLink = null,
 } = {}) {
   const safeRestaurant = String(restaurantName || 'this wing spot').trim();
-  const safeScore = Number(score);
+  const safeAddress = String(address || '').trim();
   const location = [city, stateCode].filter(Boolean).join(', ');
-  const scoreText = Number.isFinite(safeScore) ? `${safeScore.toFixed(0)}/100` : null;
-
-  const headline = scoreText
-    ? `I just rated ${safeRestaurant} ${scoreText} on BuffaGo.`
-    : `I just found ${safeRestaurant} on BuffaGo.`;
-
-  const detail = location ? `Location: ${location}.` : null;
-  const crawl = crawlTitle ? `Crawl: ${crawlTitle}.` : null;
+  const safeDeepLink = String(deepLink || '').trim();
+  const detail = safeAddress || location;
 
   return {
     title: `BuffaGo: ${safeRestaurant}`,
-    message: [headline, detail, crawl, 'Track your wing crawl on BuffaGo.']
+    message: [
+      `Check out ${safeRestaurant} on BuffaGo!`,
+      detail ? `Location: ${detail}` : null,
+      safeDeepLink || null,
+    ]
       .filter(Boolean)
       .join('\n'),
   };

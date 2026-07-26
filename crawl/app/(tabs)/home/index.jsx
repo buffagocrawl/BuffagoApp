@@ -30,7 +30,6 @@ import {
 import { loadWeeklyMission } from '../../../lib/weeklyMission';
 import {
   ENABLE_GROWTH_MISSIONS,
-  ENABLE_SHARE_INVITE_LOOP,
   ENABLE_BUFFAVERSE_HOME,
   ENABLE_BUFFAVERSE,
 } from '../../../config/features';
@@ -296,22 +295,27 @@ function StatLine({ label, done, onPress, rightText, prefix }) {
   );
 }
 
-function HeroActionPill({ title, icon, onPress, fullWidth = false }) {
+function QuickAction({ testID, title, detail, icon, onPress, accessibilityLabel }) {
   return (
     <Pressable
+      testID={testID}
       accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel || title}
+      accessibilityHint={detail || undefined}
       onPress={onPress}
       style={({ pressed }) => [
-        styles.heroActionPress,
-        fullWidth && styles.heroActionFullWidth,
+        styles.quickActionPress,
         pressed && { transform: [{ scale: 0.99 }] },
       ]}
     >
-      <View style={styles.heroActionInner}>
-        {!!icon && <Text style={styles.heroActionIcon} maxFontSizeMultiplier={1.25}>{icon}</Text>}
-        <Text style={styles.heroActionText} numberOfLines={2} ellipsizeMode="tail" maxFontSizeMultiplier={1.35}>
-          {title}
-        </Text>
+      <View style={styles.quickActionInner}>
+        <Text style={styles.quickActionIcon}>{icon}</Text>
+        <View style={styles.quickActionCopy}>
+          <Text style={styles.quickActionTitle} numberOfLines={2} ellipsizeMode="tail">
+            {title}
+          </Text>
+          {detail ? <Text style={styles.quickActionDetail} numberOfLines={2}>{detail}</Text> : null}
+        </View>
       </View>
     </Pressable>
   );
@@ -348,7 +352,6 @@ export default function Home() {
 
   const [loading, setLoading] = useState(true);
   const [nearest, setNearest] = useState(null);
-  const [selectedRoute, setSelectedRoute] = useState(null);
 
   const [session, setSession] = useState(null);
   const isSignedIn = !!session?.user?.id;
@@ -389,10 +392,6 @@ export default function Home() {
   const [battleOptions, setBattleOptions] = useState([]); // active rows
   const [battleVotes, setBattleVotes] = useState({}); // saved map
   const [draftBattle, setDraftBattle] = useState({}); // working map
-
-  const battleTotal = battleOptions?.length ?? 0;
-  const battleAnswered = Object.values(battleVotes || {}).filter((v) => v === 1 || v === 2).length;
-  const battleComplete = battleTotal > 0 && battleAnswered === battleTotal;
 
   // Level Title Picker
   const [titlePickerOpen, setTitlePickerOpen] = useState(false);
@@ -996,11 +995,9 @@ export default function Home() {
       const parsed = raw ? JSON.parse(raw) : null;
       const sel = parsed ? await hydrateSelectedRouteFromDb(parsed) : null;
 
-      setSelectedRoute(sel);
       await computePreferred(sel);
     } catch (e) {
       console.warn('reloadPreferredFromStorage failed', e?.message || e);
-      setSelectedRoute(null);
       await computePreferred(null);
     }
   }, [computePreferred]);
@@ -1133,7 +1130,6 @@ export default function Home() {
                   },
                 };
                 await AsyncStorage.setItem('buffago:selectedRoute', JSON.stringify(patched));
-                setSelectedRoute(patched);
               }
             } catch (e) {
               console.warn('selectedRoute patch failed:', e?.message || e);
@@ -2289,13 +2285,15 @@ export default function Home() {
   homeRated?.destinationId === closest?.id && !!homeRated?.within24h;
 
   const shareClosestSpot = useCallback(async () => {
-    if (!ENABLE_SHARE_INVITE_LOOP || !closest?.id) return;
+    if (!closest?.id) {
+      Alert.alert('No wing spot to share yet', 'Choose a recommended restaurant first, then you can share it with a friend.');
+      return;
+    }
 
     const artifact = buildShareArtifact({
       restaurantName: closest.name,
-      score: homeRated?.score,
+      address: closest.address,
       city: closest.city,
-      crawlTitle: selectedRoute?.title ?? nearest?.routeTitle ?? null,
     });
 
     await trackEvent({
@@ -2336,12 +2334,10 @@ export default function Home() {
       });
     }
   }, [
+    closest?.address,
     closest?.city,
     closest?.id,
     closest?.name,
-    homeRated?.score,
-    nearest?.routeTitle,
-    selectedRoute?.title,
     session?.user?.id,
   ]);
 
@@ -3083,30 +3079,32 @@ export default function Home() {
             </Pressable>
           ) : null}
 
-          {/* Hero Actions */}
-          <View style={styles.heroActionsRow}>
-            {battleTotal > 0 && !battleComplete ? (
-              <HeroActionPill
-                title={`Sauce Duel ${battleAnswered}/${battleTotal}`}
+          {/* Separate rows keep all actions visible on narrow screens and large font sizes. */}
+          <View style={styles.quickActions}>
+            <View style={styles.quickActionsTopRow}>
+              <QuickAction
+                testID="quick-action-wing-duel"
+                title="Wing Duel"
                 icon="⚔️"
+                accessibilityLabel="Wing Duel, open Wing Battle"
                 onPress={() => setBattleDialogOpen(true)}
               />
-            ) : null}
-
-            <HeroActionPill
-              title="Wing Facts"
-              icon="🍗"
-              onPress={openWingFacts}
-              fullWidth={!(battleTotal > 0 && !battleComplete) && !ENABLE_SHARE_INVITE_LOOP}
-            />
-            {ENABLE_SHARE_INVITE_LOOP ? (
-              <HeroActionPill
-                title="Share spot"
-                icon="Share"
-                onPress={shareClosestSpot}
-                fullWidth={!(battleTotal > 0 && !battleComplete)}
+              <QuickAction
+                testID="quick-action-wing-facts"
+                title="Wing Facts"
+                icon="🍗"
+                accessibilityLabel="Wing Facts, open a wing fact"
+                onPress={openWingFacts}
               />
-            ) : null}
+            </View>
+            <QuickAction
+              testID="quick-action-share-wing-spot"
+              title="Share a Wing Spot"
+              detail="Send this restaurant to a friend"
+              icon="↗"
+              accessibilityLabel="Share a Wing Spot"
+              onPress={shareClosestSpot}
+            />
           </View>
         </ScrollView>
 
@@ -3631,7 +3629,7 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  scroll: { padding: 16, paddingBottom: 10, gap: 10 },
+  scroll: { padding: 16, paddingBottom: 32, gap: 10 },
 
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   leftArea: { width: 36, alignItems: 'flex-start', justifyContent: 'center' },
@@ -3699,31 +3697,30 @@ const styles = StyleSheet.create({
   wingdexFill: { position: 'absolute', top: 0, bottom: 0, opacity: 0.35 },
   wingdexContent: { alignItems: 'center' },
 
-  heroActionsRow: {
+  quickActions: {
     marginTop: 6,
-    flexDirection: 'row',
     gap: 10,
-    alignItems: 'stretch',
-    justifyContent: 'center',
     width: '100%',
   },
-  heroActionPress: { flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 0, minHeight: 52 },
-  heroActionFullWidth: { flexBasis: '100%' },
-  heroActionInner: {
-    minHeight: 52,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
+  quickActionsTopRow: { flexDirection: 'row', alignItems: 'stretch', gap: 10, width: '100%' },
+  quickActionPress: { flex: 1, minWidth: 0, minHeight: 56 },
+  quickActionInner: {
+    minHeight: 56,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.18)',
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    alignItems: 'center',
+    borderColor: 'rgba(255,122,24,0.30)',
+    backgroundColor: 'rgba(255,255,255,0.035)',
+    alignItems: 'flex-start',
     justifyContent: 'center',
     flexDirection: 'row',
-    gap: 6,
+    gap: 10,
   },
-  heroActionIcon: { fontSize: 16, opacity: 0.9, flexShrink: 0 },
-  heroActionText: { flexShrink: 1, minWidth: 0, fontSize: 14, lineHeight: 17, textAlign: 'center', fontWeight: '900', letterSpacing: 0.3, color: 'rgba(255,255,255,0.92)' },
+  quickActionIcon: { fontSize: 18, lineHeight: 22, flexShrink: 0 },
+  quickActionCopy: { flex: 1, minWidth: 0 },
+  quickActionTitle: { fontSize: 14, lineHeight: 18, fontWeight: '900', letterSpacing: 0.2, color: 'rgba(255,255,255,0.96)' },
+  quickActionDetail: { marginTop: 2, fontSize: 12, lineHeight: 16, color: 'rgba(255,255,255,0.68)' },
 
   xpRow: { width: '100%', flexDirection: 'row', alignItems: 'center', gap: 10 },
   dailyPill: {
