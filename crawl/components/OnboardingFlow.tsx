@@ -1,6 +1,6 @@
 // components/OnboardingFlow.tsx
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { Image, Platform, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -1181,15 +1181,18 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
   return (
     <SafeAreaView
       testID="onboarding.root"
-      edges={['top', 'left', 'right']}
+      edges={['top', 'bottom', 'left', 'right']}
       style={[
         styles.wrap,
         {
           backgroundColor: colors.background,
-          paddingBottom: step === 7 ? 0 : insets.bottom + 12,
         },
       ]}
     >
+      <KeyboardAvoidingView
+        style={styles.flexFill}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
       {step !== 0 && step !== 3 ? (
         <View style={{ paddingTop: 6, flexDirection: 'row', alignItems: 'center' }}>
           <Pressable testID="onboarding.back" onPress={goBack} hitSlop={12} style={{ paddingVertical: 8, paddingHorizontal: 8 }}>
@@ -1199,7 +1202,11 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
       ) : null}
 
       {step === 0 ? (
-        <View style={styles.center}>
+        <ScrollView
+          style={styles.flexFill}
+          contentContainerStyle={styles.centerScrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
           <Image source={require('../assets/wing-user.png')} style={styles.host} resizeMode="contain" />
 
           <Text style={styles.title}>Welcome to BuffaGo</Text>
@@ -1239,7 +1246,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
               Sign in to skip
             </Text>
           </Pressable>
-        </View>
+        </ScrollView>
       ) : null}
 
       {step === 1 ? (
@@ -1247,7 +1254,12 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
           <Text style={styles.title}>Wing Profile</Text>
           <Text style={styles.body}>Tap an option. Tap again to clear.</Text>
 
-          <ScrollView style={{ marginTop: 10 }} contentContainerStyle={{ paddingBottom: 18 }}>
+          <ScrollView
+            style={{ flex: 1, marginTop: 10 }}
+            contentContainerStyle={{ paddingBottom: 18 }}
+            keyboardShouldPersistTaps="handled"
+            nestedScrollEnabled
+          >
             <PrefTwoSide
               title="Flats or Drums"
               value={prefs.wing_piece}
@@ -1296,7 +1308,11 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
       ) : null}
 
       {step === 2 ? (
-        <View style={styles.screen}>
+        <ScrollView
+          style={styles.flexFill}
+          contentContainerStyle={styles.screenScrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
           <Text style={styles.title}>Rate your first wings!</Text>
           <Text style={styles.body}>Then tap a wing spot you’ve been to.</Text>
 
@@ -1318,7 +1334,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
                     <ActivityIndicator />
                   </View>
                 ) : (
-                  <ScrollView style={{ maxHeight: 240 }}>
+                  <ScrollView style={{ maxHeight: 240 }} nestedScrollEnabled>
                     {(filteredStates || []).map((s) => {
                       const name = (s.state_name || '').trim() || 'State';
                       const code = (s.state_code || '').trim();
@@ -1416,7 +1432,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
                 <ActivityIndicator />
               </View>
             ) : (
-              <ScrollView style={{ maxHeight: 320 }}>
+              <ScrollView style={{ maxHeight: 320 }} nestedScrollEnabled>
                 {(filteredDests || []).map((d) => {
                   const title = (d.name || '').trim() || 'Wing Spot';
                   const sub = (d.address ? `${d.city ? ' · ' : ''}${d.address}` : '');
@@ -1515,7 +1531,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
               setPickedDest(null);
             }}
           />
-        </View>
+        </ScrollView>
       ) : null}
 
       {step === 3 ? (
@@ -1585,7 +1601,11 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
       ) : null}
 
       {step === 4 ? (
-        <View style={styles.center}>
+        <ScrollView
+          style={styles.flexFill}
+          contentContainerStyle={styles.centerScrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
           <Image source={require('../assets/wing-user.png')} style={styles.host} resizeMode="contain" />
 
           <Text style={styles.title}>Quick rating complete</Text>
@@ -1652,11 +1672,15 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
           </Button>
 
           <ProgressDots step={step} total={TOTAL_STEPS} />
-        </View>
+        </ScrollView>
       ) : null}
 
       {step === 5 ? (
-        <View style={styles.center}>
+        <ScrollView
+          style={styles.flexFill}
+          contentContainerStyle={styles.centerScrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
           <Text style={styles.title}>A Crawl is a wing quest</Text>
           <Text style={styles.body}>Three to five stops. One journey. You earn XP as you go.</Text>
 
@@ -1729,11 +1753,15 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
           </Button>
 
           <ProgressDots step={step} total={TOTAL_STEPS} />
-        </View>
+        </ScrollView>
       ) : null}
 
       {step === 6 ? (
-        <View style={styles.center}>
+        <ScrollView
+          style={styles.flexFill}
+          contentContainerStyle={styles.centerScrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
           <Image source={require('../assets/wing-user.png')} style={styles.host} resizeMode="contain" />
 
           <Text style={styles.title}>{stepSixCopy.title}</Text>
@@ -1830,7 +1858,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
           </Button>
 
           <ProgressDots step={step} total={TOTAL_STEPS} />
-        </View>
+        </ScrollView>
       ) : null}
 
       {step === 7 ? (
@@ -1881,7 +1909,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
             style={[
               styles.finalStepFooter,
               {
-                paddingBottom: insets.bottom + 16,
+                paddingBottom: 16,
               },
             ]}
           >
@@ -1918,17 +1946,14 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
           </View>
         </View>
       ) : null}
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles: any = {
   wrap: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    right: 0,
-    bottom: 0,
+    flex: 1,
     zIndex: 9999,
     elevation: 50,
     padding: 22,
@@ -1944,9 +1969,21 @@ const styles: any = {
   },
   screen: {
     flex: 1,
+    minHeight: 0,
     paddingTop: 10,
     alignItems: 'stretch',
     justifyContent: 'flex-start',
+  },
+  centerScrollContent: {
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+  },
+  screenScrollContent: {
+    flexGrow: 1,
+    paddingTop: 10,
+    paddingBottom: 18,
   },
   finalStepContent: {
     flexGrow: 1,
