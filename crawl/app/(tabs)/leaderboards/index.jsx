@@ -13,7 +13,7 @@ import {
   Avatar,
   useTheme,
 } from 'react-native-paper';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 import { supabase } from '../../../lib/supabase.js';
@@ -349,6 +349,7 @@ export default function Leaderboards() {
   const textColor = theme.colors.onSurface;
   const surface = theme.colors.surface;
   const router = useRouter();
+  const params = useLocalSearchParams();
 
   const goToJourney = useCallback(
     (userId, sourceSurface = 'leaderboard') => {
@@ -371,6 +372,11 @@ export default function Leaderboards() {
   // Top-level mode tabs
   const [mode, setMode] = useState('feed'); // 'feed' | 'leaderboards' | 'friends'
   const socialBadges = useSocialBadges();
+
+  // Home's Send to Friend handoff should land in the existing Friends experience.
+  useEffect(() => {
+    if (params.sendDestinationId) setMode('friends');
+  }, [params.sendDestinationId]);
 
   // Social scope (default state)
   const [feedScope, setFeedScope] = useState('state'); // 'state' | 'all' | 'friends'

@@ -10,7 +10,6 @@ import {
   Pressable,
   DeviceEventEmitter,
   Linking,
-  Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Button, useTheme, Dialog, Portal, Avatar, TextInput } from 'react-native-paper';
@@ -24,9 +23,6 @@ import WelcomeWizard from '../../../components/WelcomeWizard';
 import DestinationPickerWizard from '../../../components/DestinationPickerWizard';
 import RatingWizardDialog from '../../../components/RatingWizardDialog';
 import { trackEvent } from '../../../lib/analytics';
-import {
-  buildShareArtifact,
-} from '../../../lib/growthLoops';
 import { loadWeeklyMission } from '../../../lib/weeklyMission';
 import {
   ENABLE_GROWTH_MISSIONS,
@@ -454,6 +450,7 @@ export default function Home() {
   const missionRequestRef = useRef(0);
   const [missionDialogOpen, setMissionDialogOpen] = useState(false);
   const [missionTab, setMissionTab] = useState('active');
+  const [sendToFriendOpen, setSendToFriendOpen] = useState(false);
 
   const openWelcomeWizard = useCallback(() => {
     setWelcomeOpen(true);
@@ -2284,62 +2281,20 @@ export default function Home() {
   const alreadyRatedThis =
   homeRated?.destinationId === closest?.id && !!homeRated?.within24h;
 
-  const shareClosestSpot = useCallback(async () => {
+  const openSendToFriend = useCallback(async () => {
     if (!closest?.id) {
-      Alert.alert('No wing spot to share yet', 'Choose a recommended restaurant first, then you can share it with a friend.');
       return;
     }
 
-    const artifact = buildShareArtifact({
-      restaurantName: closest.name,
-      address: closest.address,
-      city: closest.city,
-    });
-
-    await trackEvent({
-      eventName: 'share_sheet_opened',
-      screen: 'home',
-      userId: session?.user?.id ?? null,
-      destinationId: closest.id,
-      metadata: { content_type: 'restaurant', source: 'home_next_place' },
-    });
     await trackEvent({
       eventName: 'feature_entry',
       screen: 'home',
       userId: session?.user?.id ?? null,
       destinationId: closest.id,
-      metadata: { feature_name: 'share_invite_loop', source: 'home_next_place' },
+      metadata: { feature_name: 'send_restaurant_to_friend', source: 'home_next_place' },
     });
-
-    try {
-      await Share.share(artifact);
-      await trackEvent({
-        eventName: 'share_completed',
-        screen: 'home',
-        userId: session?.user?.id ?? null,
-        destinationId: closest.id,
-        metadata: { content_type: 'restaurant', source: 'home_next_place' },
-      });
-    } catch (error) {
-      await trackEvent({
-        eventName: 'share_failed',
-        screen: 'home',
-        userId: session?.user?.id ?? null,
-        destinationId: closest.id,
-        metadata: {
-          content_type: 'restaurant',
-          source: 'home_next_place',
-          error_message: error?.message || String(error),
-        },
-      });
-    }
-  }, [
-    closest?.address,
-    closest?.city,
-    closest?.id,
-    closest?.name,
-    session?.user?.id,
-  ]);
+    setSendToFriendOpen(true);
+  }, [closest?.id, session?.user?.id]);
 
   // ---------- open wizard from Home ----------
   const openHomeRatingWizard = useCallback(async () => {
@@ -2779,10 +2734,10 @@ export default function Home() {
     await trackEvent({ eventName: 'mission_next_action_selected', screen: 'home', userId: session?.user?.id ?? null, metadata: { source: 'weekly_mission_dialog', action_key: mission.key } });
     setMissionDialogOpen(false);
     if (mission.key === 'ratings') { openHomeRatingWizard(); return; }
-    if (mission.key === 'share') { shareClosestSpot(); return; }
+    if (mission.key === 'share') { openSendToFriend(); return; }
     if (mission.key === 'invite') { setWingmanOpen(true); return; }
     if (mission.key === 'crawl') router.push('/(tabs)/journey');
-  }, [openHomeRatingWizard, router, session?.user?.id, shareClosestSpot]);
+  }, [openHomeRatingWizard, openSendToFriend, router, session?.user?.id]);
 
   const changeMissionTab = useCallback(async (nextTab) => {
     setMissionTab(nextTab);
@@ -2979,6 +2934,17 @@ export default function Home() {
                 </Text>
 
                 <View style={styles.addressRow}>
+                  <Pressable
+                    testID="send-to-friend-button"
+                    accessibilityRole="button"
+                    accessibilityLabel={`Send ${closest.name || 'this restaurant'} to a friend`}
+                    accessibilityHint="Opens BuffaGo's Send to Friend flow"
+                    onPress={openSendToFriend}
+                    style={({ pressed }) => [styles.restaurantIconButton, pressed && styles.restaurantIconButtonPressed]}
+                  >
+                    <Avatar.Icon size={44} icon="account-multiple-outline" />
+                  </Pressable>
+
                   <View style={{ flex: 1 }}>
                     <Text style={styles.closestAddr} numberOfLines={2}>
                       {(closest.address || '').trim()}
@@ -2988,10 +2954,11 @@ export default function Home() {
 
                   <Pressable
                     accessibilityRole="button"
+                    accessibilityLabel={`Directions to ${closest.name || 'this restaurant'}`}
                     onPress={openDirections}
-                    style={({ pressed }) => [styles.directionsBtn, pressed && { transform: [{ scale: 0.98 }] }]}
+                    style={({ pressed }) => [styles.restaurantIconButton, pressed && styles.restaurantIconButtonPressed]}
                   >
-                    <Avatar.Icon size={28} icon="navigation-variant-outline" />
+                    <Avatar.Icon size={44} icon="navigation-variant-outline" />
                   </Pressable>
                 </View>
 
@@ -3079,7 +3046,7 @@ export default function Home() {
             </Pressable>
           ) : null}
 
-          {/* Separate rows keep all actions visible on narrow screens and large font sizes. */}
+          {/* Exactly two secondary actions; the restaurant share action lives in Your Next Place. */}
           <View style={styles.quickActions}>
             <View style={styles.quickActionsTopRow}>
               <QuickAction
@@ -3097,14 +3064,6 @@ export default function Home() {
                 onPress={openWingFacts}
               />
             </View>
-            <QuickAction
-              testID="quick-action-share-wing-spot"
-              title="Share a Wing Spot"
-              detail="Send this restaurant to a friend"
-              icon="↗"
-              accessibilityLabel="Share a Wing Spot"
-              onPress={shareClosestSpot}
-            />
           </View>
         </ScrollView>
 
@@ -3560,6 +3519,43 @@ export default function Home() {
           </Dialog>
         </Portal>
 
+        {/* BuffaGo social handoff for the currently recommended restaurant. */}
+        <Portal>
+          <Dialog visible={sendToFriendOpen} onDismiss={() => setSendToFriendOpen(false)} style={styles.sendToFriendDialog}>
+            <Dialog.Title style={styles.sendToFriendTitle}>Send to Friend</Dialog.Title>
+            <Dialog.Content>
+              <Text style={styles.sendToFriendBody}>
+                Send <Text style={styles.sendToFriendRestaurantName}>{closest?.name || 'this restaurant'}</Text> to one of your Wing Friends.
+              </Text>
+              {(closest?.address || closest?.city) ? (
+                <Text style={styles.sendToFriendAddress}>
+                  {(closest?.address || '').trim()}{closest?.city ? `${closest?.address ? ', ' : ''}${closest.city}` : ''}
+                </Text>
+              ) : null}
+            </Dialog.Content>
+            <Dialog.Actions style={{ justifyContent: 'space-between' }}>
+              <Button onPress={() => setSendToFriendOpen(false)}>Cancel</Button>
+              <Button
+                mode="contained"
+                onPress={() => {
+                  setSendToFriendOpen(false);
+                  router.push({
+                    pathname: '/(tabs)/leaderboards',
+                    params: {
+                      sendDestinationId: closest?.id || '',
+                      sendRestaurantName: closest?.name || '',
+                      sendRestaurantAddress: closest?.address || '',
+                      sendRestaurantCity: closest?.city || '',
+                    },
+                  });
+                }}
+              >
+                Choose Friend
+              </Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+
         {/* Destination Picker Wizard */}
         <DestinationPickerWizard
           visible={destinationWizardOpen}
@@ -3757,7 +3753,8 @@ const styles = StyleSheet.create({
   closestName: { fontSize: 18, fontWeight: '900', textAlign: 'center', color: 'rgba(255,255,255,0.95)' },
   addressRow: { marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 10 },
   closestAddr: { opacity: 0.8, textAlign: 'center' },
-  directionsBtn: { borderRadius: 999, alignSelf: 'flex-start' },
+  restaurantIconButton: { width: 44, height: 44, borderRadius: 22, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  restaurantIconButtonPressed: { transform: [{ scale: 0.96 }], opacity: 0.9 },
   distanceText: { marginTop: 10, opacity: 0.75, fontSize: 12, textAlign: 'center', fontWeight: '800' },
   rateBtn: { borderRadius: 14 },
   searchBtn: { borderRadius: 14 },
@@ -3798,4 +3795,9 @@ const styles = StyleSheet.create({
   factDialog: { alignSelf: 'center', width: '92%', maxWidth: 520, borderRadius: 18 },
   factTitle: { textAlign: 'center', letterSpacing: 1, fontWeight: '900' },
   factBody: { textAlign: 'center', lineHeight: 20, opacity: 0.9 },
+  sendToFriendDialog: { alignSelf: 'center', width: '92%', maxWidth: 520, borderRadius: 18 },
+  sendToFriendTitle: { textAlign: 'center', fontWeight: '900' },
+  sendToFriendBody: { textAlign: 'center', lineHeight: 22 },
+  sendToFriendRestaurantName: { fontWeight: '900' },
+  sendToFriendAddress: { marginTop: 8, textAlign: 'center', opacity: 0.72 },
 });
