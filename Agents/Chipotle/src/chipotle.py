@@ -51,7 +51,7 @@ class Rest:
     def __init__(self, url: str, key: str, timeout: int = 20): self.url=url.rstrip("/"); self.key=key; self.timeout=timeout
     def get(self, path: str, params: dict[str,str]) -> tuple[list[dict[str,Any]], str | None]:
         query = urlencode(params, safe="(),.*")
-        req = Request(f"{self.url}/{path}?{query}", headers={"apikey":self.key,"Authorization":f"Bearer {self.key}","Accept":"application/json"}, method="GET")
+        req = Request(f"{self.url}/{path}?{query}", headers={"apikey":self.key,"Authorization":f"Bearer {self.key}","Accept":"application/json","Prefer":"count=exact"}, method="GET")
         for attempt in range(3):
             try:
                 with urlopen(req, timeout=self.timeout) as response:
