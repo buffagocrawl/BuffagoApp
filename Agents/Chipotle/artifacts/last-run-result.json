@@ -1,9 +1,15 @@
 {
-  "endedAt": "2026-07-26T18:51:46.417016Z",
-  "errorCategory": "git_wrong_branch",
-  "gitCommitStatus": "not_started",
-  "gitPushStatus": "not_started",
-  "runId": "6eac3338-e9d2-4ec7-a554-11608c2e417c",
-  "startedAt": "2026-07-26T18:51:43.819472Z",
-  "success": false
+  "collection": "partial",
+  "endedAt": "2026-07-26T19:01:23.627807Z",
+  "gitCommitStatus": "committed",
+  "gitPushStatus": "pushed",
+  "reportDate": "2026-07-25",
+  "reportPaths": [
+    "C:\\Users\\Brand\\repo\\BuffagoApp\\Agents\\Chipotle\\Results\\2026-07-25-buffago-daily-metrics.md",
+    "C:\\Users\\Brand\\repo\\BuffagoApp\\Agents\\Chipotle\\Results\\2026-07-25-buffago-daily-metrics.json",
+    "C:\\Users\\Brand\\repo\\Agents\\Buffago\\Daily Output\\2026-07-25-chipotle-buffago-daily-metrics.md"
+  ],
+  "runId": "7e740c0d-585b-4429-a414-4a926191325c",
+  "startedAt": "2026-07-26T19:01:15.358676Z",
+  "success": true
 }

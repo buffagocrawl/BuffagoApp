@@ -49,6 +49,9 @@ artifacts/cayenne/**/auth-state.json
 artifacts/cayenne/**/session.json
 artifacts/cayenne/**/storage-state.json
 
+# Chipotle
+Agents/Chipotle/artifacts/last-run-result.json
+
 # Generated Expo exports are deployment/CI artifacts, not source.
 /crawl/output/
 /output/buffaverse-web-correction/
