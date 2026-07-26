@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
@@ -36,6 +36,14 @@ def config() -> dict[str, str]:
     required = ["CHIPOTLE_SUPABASE_URL", "CHIPOTLE_SUPABASE_SERVICE_ROLE_KEY"]
     missing = [name for name in required if not env.get(name, "").strip()]
     if missing: raise ChipotleError("credential_missing:" + ",".join(missing))
+    # A dashboard URL is not a PostgREST base URL. Normalize the historical
+    # dashboard/project/<ref> setting to the project's HTTPS API endpoint.
+    parsed = urlparse(env["CHIPOTLE_SUPABASE_URL"])
+    match = re.fullmatch(r"/dashboard/project/([a-z0-9]+)", parsed.path.rstrip("/"))
+    if parsed.netloc == "supabase.com" and match:
+        env["CHIPOTLE_SUPABASE_URL"] = f"https://{match.group(1)}.supabase.co"
+    elif not (parsed.scheme == "https" and parsed.netloc.endswith(".supabase.co") and parsed.path.rstrip("/") == ""):
+        raise ChipotleError("supabase_url_invalid_or_not_project_api")
     return env
 
 def completed_windows(now: datetime, tz_name: str, date: str | None = None) -> Windows:
@@ -49,7 +57,7 @@ def iso(dt: datetime) -> str: return dt.isoformat().replace("+00:00", "Z")
 
 class Rest:
     def __init__(self, url: str, key: str, timeout: int = 20): self.url=url.rstrip("/"); self.key=key; self.timeout=timeout
-    def get(self, path: str, params: dict[str,str]) -> tuple[list[dict[str,Any]], str | None]:
+    def get(self, path: str, params: dict[str,str] | list[tuple[str,str]]) -> tuple[list[dict[str,Any]], str | None]:
         query = urlencode(params, safe="(),.*")
         req = Request(f"{self.url}/{path}?{query}", headers={"apikey":self.key,"Authorization":f"Bearer {self.key}","Accept":"application/json","Prefer":"count=exact"}, method="GET")
         for attempt in range(3):
@@ -63,7 +71,9 @@ class Rest:
                 if attempt < 2: time.sleep(0.4*(attempt+1)); continue
                 raise ChipotleError("supabase_unreachable")
     def count(self, table:str, column:str, start:datetime, end:datetime) -> int:
-        _, cr = self.get(f"rest/v1/{table}", {"select":"id", column:f"gte.{iso(start)}", f"{column}.lt":iso(end), "limit":"1"})
+        # Read one timestamp only and discard it; Content-Range carries the count.
+        # This works for relations without an `id` column and never reads identity data.
+        _, cr = self.get(f"rest/v1/{table}", [("select",column), (column,f"gte.{iso(start)}"), (column,f"lt.{iso(end)}"), ("limit","1")])
         if not cr or "/" not in cr: raise ChipotleError("count_unavailable")
         return int(cr.rsplit("/",1)[1])
     def rows(self, table:str, fields:str, column:str, start:datetime, end:datetime, limit:int=10000) -> list[dict[str,Any]]:
@@ -74,6 +84,17 @@ def safe_collect(rest: Rest, table:str, timestamp:str, windows:Windows) -> dict[
     try:
         return {"availability":"available","yesterday":rest.count(table,timestamp,windows.day_start,windows.day_end),"previousDay":rest.count(table,timestamp,windows.prev_start,windows.day_start),"trailing7":rest.count(table,timestamp,windows.week_start,windows.day_end),"trailing30":rest.count(table,timestamp,windows.month_start,windows.day_end)}
     except ChipotleError as exc: return {"availability":"unavailable","reason":str(exc)}
+
+def safe_dau(rest: Rest, windows: Windows) -> dict[str, Any]:
+    """Use the live privacy-safe daily aggregate; no user or session IDs are read."""
+    try:
+        def day(date: str) -> int:
+            rows, _ = rest.get("rest/v1/analytics_daily_active_users", {"select":"event_date,active_identities", "event_date":f"eq.{date}", "limit":"1"})
+            return int(rows[0]["active_identities"]) if rows else 0
+        previous = (windows.day_start-timedelta(days=1)).astimezone(ZoneInfo(windows.timezone)).date().isoformat()
+        return {"availability":"available", "yesterday":day(windows.report_date), "previousDay":day(previous), "source":"analytics_daily_active_users.active_identities"}
+    except (ChipotleError, KeyError, TypeError, ValueError) as exc:
+        return {"availability":"unavailable","reason":str(exc) if isinstance(exc, ChipotleError) else "aggregate_source_invalid"}
 
 def jalapeno_health(windows:Windows, thresholds:dict[str,Any]) -> dict[str,Any]:
     data = ROOT / "Agents" / "Jalapeno" / "data"; candidates = list(data.glob("latest_*.json")) if data.exists() else []
@@ -96,7 +117,10 @@ def collect(rest:Rest, w:Windows, thresholds:dict[str,Any]) -> dict[str,Any]:
     }
     # Auth admin endpoint is intentionally excluded from normal runs: a dedicated limited analytics key is preferred.
     metrics["registered_users"]={"availability":"unavailable","reason":"auth_users_requires_explicit_safe_aggregate_source"}
-    for name in ("dau","wau","mau","retention_d1","retention_d7","retention_d30","missions","referrals","state_passport","error_telemetry","auth_failures","performance_percentiles"):
+    metrics["dau"] = safe_dau(rest, w)
+    # Daily aggregates do not contain stable identities, so WAU/MAU and retention
+    # cannot be deduplicated or cohort-calculated truthfully from this source.
+    for name in ("wau","mau","retention_d1","retention_d7","retention_d30","missions","referrals","state_passport","error_telemetry","auth_failures","performance_percentiles"):
         metrics[name]={"availability":"unavailable","reason":"no_authoritative_privacy_safe_event_or_aggregate_source_detected"}
     return {"metrics":metrics,"jalapeno":jalapeno_health(w,thresholds)}
 
@@ -109,7 +133,7 @@ def render(data:dict[str,Any], w:Windows, git_sha:str) -> str:
     m=data["metrics"]; lines=[f"# Buffago Daily Metrics — {w.report_date}","","## Executive Summary",""]
     available=[k for k,v in m.items() if v.get("availability")=="available"]; unavailable=[k for k,v in m.items() if v.get("availability")!="available"]
     lines += [f"- **Data collection:** {len(available)} aggregate sources available; {len(unavailable)} metrics are honestly unavailable.",f"- **Jalapeno:** {data['jalapeno']['status']}.","- **Immediate action:** Monitor unless a source is partial, stale, or unavailable.","","## Daily Scorecard","","| Metric | Yesterday | Previous day | Change | Trailing 7 days | Status |","|---|---:|---:|---:|---:|---|"]
-    for key in ("ratings_created","crawls_created","crawls_completed","badges_awarded","onboarding_events","wing_battle_votes","xp_claims","jalapeno_runs","jalapeno_errors"):
+    for key in ("ratings_created","crawls_created","crawls_completed","badges_awarded","onboarding_events","wing_battle_votes","xp_claims","jalapeno_runs","jalapeno_errors","dau"):
         x=m[key]; lines.append(f"| {key.replace('_',' ').title()} | {value(x,'yesterday')} | {value(x,'previousDay')} | {change(x)} | {value(x,'trailing7')} | {'Healthy' if x.get('availability')=='available' else 'Unavailable'} |")
     lines += ["","## Users and Retention","","Retention, active-user ratios, and onboarding completion require a privacy-safe authoritative activity and auth aggregate source. Partial cohorts are not estimated.","","## Ratings and Core Engagement","",f"Ratings created is sourced from `destination_ratings.created_at`: {value(m['ratings_created'],'yesterday')} yesterday.","","## Crawls, Missions, XP, and Rewards","",f"Crawls created/completed use `crawls.start_time` / `crawls.end_time`; badges use `user_badges.earned_at`; daily XP activity uses `daily_xp_claims.claimed_at`.","","## Reliability and Authentication","","No authoritative application error, session, authentication-failure, or timing telemetry was detected; this is **Unavailable**, not zero errors.","","## Jalapeno Health","",f"Status: **{data['jalapeno']['status']}**. {data['jalapeno'].get('reason','')} Artifact: {data['jalapeno'].get('artifact','—')}.","","## Significant Changes","","Changes are shown as counts; no anomaly claim is made without sufficient denominators and history.","","## Recommended Actions","","1. **This Week — Analytics:** add approved aggregate activity/error views to enable retention and reliability metrics.","2. **Monitor — Jalapeno:** investigate if its local artifact exceeds the configured freshness window.","","## Data Quality and Missing Metrics","",f"Unavailable: {', '.join(unavailable)}. See `docs/metric-source-map.md` for required sources.","","## Run Metadata","",f"- Execution timestamp: {iso(datetime.now(timezone.utc))}",f"- Reporting timezone: {w.timezone}",f"- Reporting window: {iso(w.day_start)} to {iso(w.day_end)} (end exclusive)",f"- Chipotle Git commit: {git_sha}","- Data-source status: aggregate REST GET collection; no writes performed."]
     return "\n".join(lines)+"\n"

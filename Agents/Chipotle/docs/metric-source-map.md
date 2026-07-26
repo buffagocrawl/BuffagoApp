@@ -12,11 +12,18 @@ All timestamps are transformed from the completed `America/New_York` calendar da
 | Wing Battle activity | Count votes | `user_wing_battle_votes.created_at` | Implemented | Aggregate only; participation rate needs active-user denominator. |
 | Jalapeno runs/errors | Counts by run/error creation | `jalapeno_runs.started_at`, `jalapeno_errors.created_at` | Implemented if tables are accessible | Only counts; raw error messages are never read. |
 | Jalapeno freshness | Age of newest safe local `data/latest_*.json` artifact | `Agents/Jalapeno/data/latest_*.json` modified time | Implemented | Read-only adapter; does not claim a run outcome from artifact freshness alone. |
-| Registered/new users, provider mix, deletions | Auth account aggregates | `auth.users` / provider metadata | Unavailable | Needs a dedicated privacy-safe aggregate RPC/view. Admin user enumeration is deliberately not used. |
-| DAU/WAU/MAU, returning/first active, streaks, retention | Cohorts based on an authoritative activity event | No complete tracked activity-event aggregate | Unavailable | Never infer from ratings alone; D1/D7/D30 exclude incomplete cohorts. |
-| Missions, Passport, referrals, social | Aggregate event counts | No confirmed authoritative tracked source | Unavailable | Requires source-map update before implementation. |
+| DAU | Daily distinct activity identities | `analytics_daily_active_users.active_identities` / `event_date` | Implemented | The live view returns grouped counts only; a missing date row is authoritative zero activity for that date. |
+| Registered/new users, provider mix, deletions | Auth account aggregates | `auth.users` / provider metadata | Unavailable | No existing safe aggregate RPC/view was exposed. Admin user enumeration and the public profile table are deliberately not used as substitutes. |
+| WAU/MAU, returning/first active, retention | Unique rolling/cohort activity identities | `analytics_daily_active_users` is insufficient | Unavailable | The live view has no stable identity, so cross-day deduplication and D1/D7/D30 cannot be calculated. |
+| Missions, Passport, referrals, social | Aggregate event counts | Mission/referral relations exist, but no approved Chipotle definition | Unavailable | A source is not adopted until the metric definition and privacy boundary are approved. |
 | Errors, auth failures, performance percentiles, release signals | Sanitized telemetry aggregates | No confirmed authoritative telemetry view | Unavailable | `debug_logs` and raw operational payloads are intentionally excluded for privacy. |
 
 ## Detected Jalapeno integration
 
 Jalapeno is a Python Instagram content agent at `Agents/Jalapeno`. Its migrations and code identify `jalapeno_runs`, `jalapeno_posts`, `jalapeno_post_metrics`, and `jalapeno_errors`; its safe local `data/latest_*.json` snapshots are parsed only for artifact freshness. Chipotle does not call or alter Jalapeno.
+
+## 2026-07-26 production reconciliation
+
+The configured value was a Supabase Dashboard URL (`https://supabase.com/dashboard/project/<ref>`), not a REST base URL. Chipotle now normalizes that exact dashboard form to `https://<ref>.supabase.co`; the project reference is `vhfxnizaxdanmvmouuaf`, which matches the production app's deployed Supabase callback and function URLs. Therefore all prior `supabase_http_404` results were incorrect REST routes, not missing or unexposed relations.
+
+Live OpenAPI inspection confirms that every implemented source above is exposed in the `public` REST schema and that the timestamp columns match the source map. It also exposes the aggregate views `analytics_daily_active_users`, `analytics_crawl_funnel_daily`, `analytics_rating_funnel_daily`, and `referral_reporting_daily`. The analytics views are live-schema drift: they are present in the live public schema but their creation SQL is not represented by a checked-in migration. `referral_reporting_daily` is represented by `20260724033000_referral_system_v1.sql`.

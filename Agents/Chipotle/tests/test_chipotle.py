@@ -1,6 +1,7 @@
 import json, os, sys, tempfile, unittest
 from datetime import datetime, timezone
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
 import chipotle
@@ -13,12 +14,20 @@ class ChipotleTests(unittest.TestCase):
         original=dict(os.environ)
         try:
             os.environ.pop("CHIPOTLE_SUPABASE_URL",None); os.environ.pop("CHIPOTLE_SUPABASE_SERVICE_ROLE_KEY",None)
-            with self.assertRaises(chipotle.ChipotleError): chipotle.config()
+            with patch.object(chipotle, "load_env", return_value={}):
+                with self.assertRaises(chipotle.ChipotleError): chipotle.config()
         finally: os.environ.clear(); os.environ.update(original)
     def test_completed_day_dst_and_filename(self):
         now=datetime(2026,3,9,10,tzinfo=timezone.utc); w=chipotle.completed_windows(now,"America/New_York")
         self.assertEqual(w.report_date,"2026-03-08"); self.assertEqual((w.day_end-w.day_start).total_seconds(),23*3600)
         self.assertEqual(f"{w.report_date}-buffago-daily-metrics.md","2026-03-08-buffago-daily-metrics.md")
+    def test_dashboard_url_normalizes_to_project_api(self):
+        original=dict(os.environ)
+        try:
+            os.environ["CHIPOTLE_SUPABASE_URL"]="https://supabase.com/dashboard/project/abc123"
+            os.environ["CHIPOTLE_SUPABASE_SERVICE_ROLE_KEY"]="test"
+            self.assertEqual(chipotle.config()["CHIPOTLE_SUPABASE_URL"],"https://abc123.supabase.co")
+        finally: os.environ.clear(); os.environ.update(original)
     def test_secret_scanner_positive_and_negative(self):
         with tempfile.TemporaryDirectory() as d:
             safe=Path(d)/"safe.md"; safe.write_text("Aggregate count: 4\n")
