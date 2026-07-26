@@ -14,24 +14,28 @@ export function buildWeeklyMissionSummary({
     {
       key: 'ratings',
       label: 'Rate 2 wing spots',
+      actionLabel: 'Rate a wing spot',
       current: Math.min(clampInteger(ratingsThisWeek), 2),
       target: 2,
     },
     {
       key: 'share',
       label: 'Share 1 BuffaGo moment',
+      actionLabel: 'Share a BuffaGo moment',
       current: Math.min(clampInteger(sharesThisWeek), 1),
       target: 1,
     },
     {
       key: 'invite',
       label: 'Invite 1 wing friend',
+      actionLabel: 'Invite a friend',
       current: Math.min(clampInteger(invitesThisWeek), 1),
       target: 1,
     },
     {
       key: 'crawl',
       label: 'Visit 3 crawl stops',
+      actionLabel: 'Start a crawl',
       current: Math.min(clampInteger(crawlStopsVisited), 3),
       target: 3,
     },
@@ -56,6 +60,14 @@ export function buildWeeklyMissionSummary({
         : nextMission
         ? `Next up: ${nextMission.label}`
         : 'Keep your streak alive',
+    // This Home loop is a progress guide only. It is intentionally separate from
+    // the server-authoritative retention missions and their XP reward receipts.
+    reward: {
+      kind: 'none',
+      title: 'No separate reward yet',
+      detail: 'Completing these Home activities does not currently grant XP, coins, or a badge.',
+    },
+    resetCopy: 'Resets Monday at 12:00 AM in your device time zone. Partial progress does not carry over.',
   };
 }
 
@@ -83,39 +95,5 @@ export function buildShareArtifact({
     message: [headline, detail, crawl, 'Track your wing crawl on BuffaGo.']
       .filter(Boolean)
       .join('\n'),
-  };
-}
-
-export function buildRestaurantOwnerSnapshot({
-  restaurantName,
-  ratingCount = 0,
-  averageScore = null,
-} = {}) {
-  const safeRestaurant = String(restaurantName || 'This restaurant').trim() || 'This restaurant';
-  const safeCount = clampInteger(ratingCount);
-  const safeAverage =
-    averageScore == null || averageScore === ''
-      ? null
-      : Number(averageScore);
-
-  return {
-    title: `Own ${safeRestaurant}?`,
-    subtitle:
-      safeCount > 0
-        ? 'Claim your BuffaGo profile to understand how guests talk about your wings.'
-        : 'Claim your BuffaGo profile early so guests can find verified details.',
-    metrics: [
-      {
-        key: 'ratings',
-        label: 'Ratings logged',
-        value: String(safeCount),
-      },
-      {
-        key: 'score',
-        label: 'Average BuffaGo score',
-        value: Number.isFinite(safeAverage) ? `${safeAverage.toFixed(1)}/100` : 'No score yet',
-      },
-    ],
-    ctaLabel: 'Claim or enroll',
   };
 }

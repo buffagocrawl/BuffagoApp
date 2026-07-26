@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
-  buildRestaurantOwnerSnapshot,
   buildShareArtifact,
   buildWeeklyMissionSummary,
 } from '../../lib/growthLoops.js';
@@ -36,6 +35,14 @@ test('weekly mission summary caps progress at the mission target', () => {
   assert.equal(summary.items[3].current, 3);
 });
 
+test('weekly mission metadata centralizes action, reset, and truthful reward copy', () => {
+  const summary = buildWeeklyMissionSummary();
+  assert.equal(summary.nextMission.actionLabel, 'Rate a wing spot');
+  assert.match(summary.resetCopy, /Monday/);
+  assert.equal(summary.reward.kind, 'none');
+  assert.match(summary.reward.detail, /does not currently grant XP/i);
+});
+
 test('share artifact includes score, location, and crawl when available', () => {
   const artifact = buildShareArtifact({
     restaurantName: 'Anchor Bar',
@@ -49,17 +56,4 @@ test('share artifact includes score, location, and crawl when available', () => 
   assert.match(artifact.message, /92\/100/);
   assert.match(artifact.message, /Buffalo, NY/);
   assert.match(artifact.message, /Downtown Heat Check/);
-});
-
-test('restaurant owner snapshot stays transparent when no metrics exist yet', () => {
-  const snapshot = buildRestaurantOwnerSnapshot({
-    restaurantName: 'Wing Lab',
-    ratingCount: 0,
-    averageScore: null,
-  });
-
-  assert.match(snapshot.title, /Wing Lab/);
-  assert.equal(snapshot.metrics[0].value, '0');
-  assert.equal(snapshot.metrics[1].value, 'No score yet');
-  assert.equal(snapshot.ctaLabel, 'Claim or enroll');
 });
