@@ -1,0 +1,107 @@
+{
+  "generatedAt": "2026-07-26T19:01:17.411539Z",
+  "jalapeno": {
+    "ageHours": 140.7,
+    "artifact": "latest_external_context.json",
+    "artifactTimestamp": "2026-07-20T22:19:10.494523Z",
+    "reason": "local_artifact_freshness",
+    "status": "Investigate"
+  },
+  "metrics": {
+    "auth_failures": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+    },
+    "badges_awarded": {
+      "availability": "unavailable",
+      "reason": "supabase_http_404"
+    },
+    "crawls_completed": {
+      "availability": "unavailable",
+      "reason": "supabase_http_404"
+    },
+    "crawls_created": {
+      "availability": "unavailable",
+      "reason": "supabase_http_404"
+    },
+    "dau": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+    },
+    "error_telemetry": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+    },
+    "jalapeno_errors": {
+      "availability": "unavailable",
+      "reason": "supabase_http_404"
+    },
+    "jalapeno_runs": {
+      "availability": "unavailable",
+      "reason": "supabase_http_404"
+    },
+    "mau": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+    },
+    "missions": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+    },
+    "onboarding_events": {
+      "availability": "unavailable",
+      "reason": "supabase_http_404"
+    },
+    "performance_percentiles": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+    },
+    "ratings_created": {
+      "availability": "unavailable",
+      "reason": "supabase_http_404"
+    },
+    "referrals": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+    },
+    "registered_users": {
+      "availability": "unavailable",
+      "reason": "auth_users_requires_explicit_safe_aggregate_source"
+    },
+    "retention_d1": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+    },
+    "retention_d30": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+    },
+    "retention_d7": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+    },
+    "state_passport": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+    },
+    "wau": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+    },
+    "wing_battle_votes": {
+      "availability": "unavailable",
+      "reason": "supabase_http_404"
+    },
+    "xp_claims": {
+      "availability": "unavailable",
+      "reason": "supabase_http_404"
+    }
+  },
+  "reportDate": "2026-07-25",
+  "schemaVersion": 1,
+  "windows": {
+    "dayEnd": "2026-07-26T04:00:00Z",
+    "dayStart": "2026-07-25T04:00:00Z",
+    "timezone": "America/New_York"
+  }
+}
