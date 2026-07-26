@@ -129,7 +129,8 @@ def git(args:list[str]) -> subprocess.CompletedProcess[str]: return subprocess.r
 def git_safe_commit(files:list[Path], date:str, env:dict[str,str], dry:bool) -> dict[str,str]:
     if dry:return {"commit":"skipped_dry_run","push":"skipped_dry_run"}
     branch=env.get("CHIPOTLE_GIT_BRANCH") or git(["branch","--show-current"]).stdout.strip(); remote=env.get("CHIPOTLE_GIT_REMOTE","origin")
-    if git(["rev-parse","--show-toplevel"]).stdout.strip()!=str(ROOT) or git(["rev-parse","-q","--verify","MERGE_HEAD"]).returncode==0: raise ChipotleError("git_unsafe_state")
+    git_root = Path(git(["rev-parse","--show-toplevel"]).stdout.strip()).resolve()
+    if git_root != ROOT.resolve() or git(["rev-parse","-q","--verify","MERGE_HEAD"]).returncode==0: raise ChipotleError("git_unsafe_state")
     if git(["branch","--show-current"]).stdout.strip()!=branch: raise ChipotleError("git_wrong_branch")
     if git(["fetch",remote,branch]).returncode: raise ChipotleError("git_fetch_failed")
     counts=git(["rev-list","--left-right","--count",f"{branch}...{remote}/{branch}"])

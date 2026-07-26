@@ -1,9 +1,9 @@
 {
-  "endedAt": "2026-07-26T18:33:57.650936Z",
-  "errorCategory": "credential_missing:CHIPOTLE_SUPABASE_URL,CHIPOTLE_SUPABASE_SERVICE_ROLE_KEY",
+  "endedAt": "2026-07-26T18:51:46.417016Z",
+  "errorCategory": "git_wrong_branch",
   "gitCommitStatus": "not_started",
   "gitPushStatus": "not_started",
-  "runId": "4fb1063b-576e-4c37-9656-e6178c943be4",
-  "startedAt": "2026-07-26T18:33:57.650936Z",
+  "runId": "6eac3338-e9d2-4ec7-a554-11608c2e417c",
+  "startedAt": "2026-07-26T18:51:43.819472Z",
   "success": false
 }
