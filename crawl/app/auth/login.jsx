@@ -1,5 +1,5 @@
 ﻿// app/auth/login.jsx
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Pressable,
@@ -23,7 +23,10 @@ import {
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase.js';
-import { withPasswordAuthTimeout } from '../../lib/passwordAuthTimeout';
+import {
+  getPasswordSignInErrorMessage,
+  runPasswordSignInAttempt,
+} from '../../lib/passwordSignInFlow';
 import { dbg } from '../../lib/debugLog';
 import {
   clearOAuthFlowState,
@@ -56,6 +59,11 @@ const CAYENNE_E2E_DIAGNOSTICS = process.env.EXPO_PUBLIC_CAYENNE_E2E === 'true';
 const cayenneAuthStage = (stage, category) => {
   if (!CAYENNE_E2E_DIAGNOSTICS) return;
   console.info('[cayenne-auth-stage]', stage, Date.now(), category || '');
+};
+
+const passwordAuthDiagnostic = (stage) => {
+  if (__DEV__) console.info('[password-auth]', stage);
+  cayenneAuthStage(stage);
 };
 
 // Same helper Ratings screen uses
@@ -115,6 +123,18 @@ export default function EmailAuthScreen() {
   const [activeSocialProvider, setActiveSocialProvider] = useState(null);
   const [showPwd, setShowPwd] = useState(false);
   const [snack, setSnack] = useState({ open: false, msg: '' });
+  const mountedRef = useRef(true);
+  const attemptRef = useRef(0);
+  const busyRef = useRef(false);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      attemptRef.current += 1;
+      busyRef.current = false;
+    };
+  }, []);
 
   const show = (msg) => setSnack({ open: true, msg: String(msg || '') });
 
@@ -353,15 +373,13 @@ export default function EmailAuthScreen() {
   };
 
   const afterAuthSuccess = async (user) => {
-    if (!user?.id) return;
+    if (!user?.id) throw new Error('Missing authenticated user.');
 
     try {
-      cayenneAuthStage('auth_profile_bootstrap_started');
       await upsertProfileFromAuth(user);
-      cayenneAuthStage('auth_profile_bootstrap_succeeded');
     } catch (e) {
-      cayenneAuthStage('auth_profile_bootstrap_failed', sanitizeAuthError(e)?.code || 'unknown');
       console.warn('afterAuthSuccess profile upsert skipped', e?.message || e);
+      throw e;
     }
 
     await applyOnboardingDestinationSuggestionIfAny(user.id);
@@ -428,38 +446,57 @@ export default function EmailAuthScreen() {
   };
 
   const onSignIn = async () => {
-    cayenneAuthStage('auth_ui_submit_received');
+    passwordAuthDiagnostic('submit_started');
     if (!emailValid || !pwdValid) {
       cayenneAuthStage('auth_client_validation_failed');
       return;
     }
 
+    if (busyRef.current) return;
+    const attemptId = attemptRef.current + 1;
+    attemptRef.current = attemptId;
+    const isCurrent = () => mountedRef.current && attemptRef.current === attemptId;
+
+    busyRef.current = true;
     setBusy(true);
     const submittedAt = Date.now();
     try {
       cayenneAuthStage('auth_client_validation_passed');
-      await trackEvent({ eventName: 'auth_started', screen: 'auth/login', metadata: { auth_method: 'password' } });
-      console.info('[cayenne-auth] submit_started', { method: 'password' });
-      cayenneAuthStage('auth_request_started');
-      const { data, error } = await withPasswordAuthTimeout(
-        supabase.auth.signInWithPassword({ email, password })
-      );
-      if (error) throw error;
-      cayenneAuthStage('auth_request_succeeded');
+      // Analytics must never hold the visible authentication operation open.
+      void trackEvent({ eventName: 'auth_started', screen: 'auth/login', metadata: { auth_method: 'password' } }).catch(() => {});
+      const { user } = await runPasswordSignInAttempt({
+        signIn: () => supabase.auth.signInWithPassword({ email, password }),
+        bootstrapProfile: afterAuthSuccess,
+        isCurrent,
+        onPhase: passwordAuthDiagnostic,
+      });
+      if (!isCurrent() || !user?.id) return;
 
-      const user = data?.user || data?.session?.user || null;
-      if (user?.id) await afterAuthSuccess(user);
-
+      passwordAuthDiagnostic('navigation_requested');
       console.info('[cayenne-auth] submit_completed', { outcome: 'session_received', duration_ms: Date.now() - submittedAt });
-      cayenneAuthStage('auth_navigation_started');
       router.replace('/(tabs)/home');
     } catch (e) {
-      cayenneAuthStage('auth_request_failed_safe_category', sanitizeAuthError(e)?.code || 'unknown');
-      console.info('[cayenne-auth] submit_completed', { outcome: 'error', duration_ms: Date.now() - submittedAt, category: sanitizeAuthError(e)?.code || 'unknown' });
-      show(e?.message || 'Sign-in failed');
+      if (!isCurrent()) return;
+      if (e?.code === 'PASSWORD_AUTH_TIMEOUT') passwordAuthDiagnostic('attempt_timed_out');
+      console.info('[cayenne-auth] submit_completed', { outcome: 'error', duration_ms: Date.now() - submittedAt });
+      show(getPasswordSignInErrorMessage(e));
     } finally {
-      setBusy(false);
+      if (isCurrent()) {
+        busyRef.current = false;
+        setBusy(false);
+        passwordAuthDiagnostic('loading_cleanup_completed');
+      }
     }
+  };
+
+  const cancelPasswordAttempt = () => {
+    if (busyRef.current) {
+      attemptRef.current += 1;
+      busyRef.current = false;
+      if (mountedRef.current) setBusy(false);
+      passwordAuthDiagnostic('attempt_cancelled');
+    }
+    router.back();
   };
 
   const onSignUp = async () => {
@@ -561,7 +598,7 @@ export default function EmailAuthScreen() {
   return (
     <View testID="auth.screen" style={[styles.screen, { backgroundColor: screenBg }]}>
       <View style={styles.topBar}>
-        <Pressable onPress={() => router.back()} hitSlop={12} style={styles.backBtn}>
+        <Pressable onPress={cancelPasswordAttempt} hitSlop={12} style={styles.backBtn}>
           <MaterialCommunityIcons name="arrow-left" size={26} color={headerIconColor} />
         </Pressable>
         <View style={{ flex: 1 }} />
@@ -655,7 +692,7 @@ export default function EmailAuthScreen() {
                 mode="outlined"
                 secureTextEntry={!showPwd}
                 returnKeyType="done"
-                onSubmitEditing={onSignIn}
+                onSubmitEditing={mode === 'signin' ? onSignIn : onSignUp}
                 right={<TextInput.Icon icon={showPwd ? 'eye-off' : 'eye'} onPress={() => setShowPwd((s) => !s)} />}
                 style={styles.input}
               />
@@ -682,7 +719,7 @@ export default function EmailAuthScreen() {
 
               {busy ? <View testID="auth.loading"><ActivityIndicator style={{ marginTop: 8 }} /></View> : null}
 
-              <Button mode="text" onPress={() => router.back()} style={{ marginTop: 6 }}>
+              <Button mode="text" onPress={cancelPasswordAttempt} style={{ marginTop: 6 }}>
                 Cancel
               </Button>
             </Card.Content>
