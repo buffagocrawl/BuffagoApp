@@ -1,0 +1,16 @@
+{
+  "facts": {
+    "revenue": {
+      "value": null,
+      "verified_at": null,
+      "confidence": "high",
+      "notes": "Copy this structure to Buffago/metrics/manual-business-facts.json; only enter verified aggregate facts."
+    },
+    "restaurant_partnerships": {
+      "value": null,
+      "verified_at": null,
+      "confidence": "high",
+      "notes": "Do not include names, contacts, emails, or per-person records."
+    }
+  }
+}

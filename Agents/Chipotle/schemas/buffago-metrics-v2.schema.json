@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Buffago metrics contract",
+  "type": "object",
+  "required": ["schema_version", "metadata", "audience", "activation", "retention", "engagement_and_community", "growth", "product_health", "business_viability", "operational_maturity", "trends"],
+  "properties": {
+    "schema_version": {"const": "2.0.0"},
+    "metadata": {"type": "object", "required": ["reporting_date", "collection_status", "meaningful_event_allowlist", "completeness_percentage"]},
+    "audience": {"type": "object"}, "activation": {"type": "object"}, "retention": {"type": "object"},
+    "engagement_and_community": {"type": "object"}, "growth": {"type": "object"}, "product_health": {"type": "object"},
+    "business_viability": {"type": "object"}, "operational_maturity": {"type": "object"}, "trends": {"type": "object"}
+  }
+}

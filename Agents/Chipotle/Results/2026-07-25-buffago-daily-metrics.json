@@ -1,20 +1,20 @@
 {
-  "generatedAt": "2026-07-26T19:23:55.261900Z",
+  "generatedAt": "2026-07-26T22:50:10.871926Z",
   "jalapeno": {
-    "ageHours": 141.1,
+    "age_hours": 144.5,
     "artifact": "latest_external_context.json",
-    "artifactTimestamp": "2026-07-20T22:19:10.494523Z",
-    "reason": "local_artifact_freshness",
-    "status": "Investigate"
+    "status": "stale",
+    "timestamp": "2026-07-20T22:19:10.494523Z"
   },
   "metrics": {
     "auth_failures": {
       "availability": "unavailable",
-      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
     },
     "badges_awarded": {
       "availability": "available",
       "previousDay": 0,
+      "source": "public.user_badges.earned_at",
       "trailing30": 2,
       "trailing7": 1,
       "yesterday": 1
@@ -22,30 +22,35 @@
     "crawls_completed": {
       "availability": "available",
       "previousDay": 0,
-      "trailing30": 1,
+      "source": "public.crawls.end_time",
+      "trailing30": 0,
       "trailing7": 0,
       "yesterday": 0
     },
     "crawls_created": {
       "availability": "available",
       "previousDay": 0,
-      "trailing30": 3,
+      "source": "public.crawls.start_time",
+      "trailing30": 2,
       "trailing7": 1,
       "yesterday": 1
     },
     "dau": {
       "availability": "available",
       "previousDay": 7,
-      "source": "analytics_daily_active_users.active_identities",
+      "source": "public.analytics_daily_active_users.active_identities",
+      "trailing30": 65,
+      "trailing7": 34,
       "yesterday": 22
     },
     "error_telemetry": {
       "availability": "unavailable",
-      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
     },
     "jalapeno_errors": {
       "availability": "available",
       "previousDay": 0,
+      "source": "public.jalapeno_errors.created_at",
       "trailing30": 31,
       "trailing7": 2,
       "yesterday": 0
@@ -53,67 +58,71 @@
     "jalapeno_runs": {
       "availability": "available",
       "previousDay": 1,
-      "trailing30": 96,
+      "source": "public.jalapeno_runs.started_at",
+      "trailing30": 95,
       "trailing7": 8,
       "yesterday": 1
     },
     "mau": {
       "availability": "unavailable",
-      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
     },
     "missions": {
       "availability": "unavailable",
-      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
     },
     "onboarding_events": {
       "availability": "available",
       "previousDay": 0,
+      "source": "public.onboarding_analytics.started_at",
       "trailing30": 0,
       "trailing7": 0,
       "yesterday": 0
     },
     "performance_percentiles": {
       "availability": "unavailable",
-      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
     },
     "ratings_created": {
       "availability": "available",
       "previousDay": 0,
-      "trailing30": 3,
+      "source": "public.destination_ratings.created_at",
+      "trailing30": 2,
       "trailing7": 1,
       "yesterday": 1
     },
     "referrals": {
       "availability": "unavailable",
-      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
     },
     "registered_users": {
       "availability": "unavailable",
-      "reason": "auth_users_requires_explicit_safe_aggregate_source"
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
     },
     "retention_d1": {
       "availability": "unavailable",
-      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
     },
     "retention_d30": {
       "availability": "unavailable",
-      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
     },
     "retention_d7": {
       "availability": "unavailable",
-      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
     },
     "state_passport": {
       "availability": "unavailable",
-      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
     },
     "wau": {
       "availability": "unavailable",
-      "reason": "no_authoritative_privacy_safe_event_or_aggregate_source_detected"
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
     },
     "wing_battle_votes": {
       "availability": "available",
       "previousDay": 0,
+      "source": "public.user_wing_battle_votes.created_at",
       "trailing30": 0,
       "trailing7": 0,
       "yesterday": 0
@@ -121,7 +130,8 @@
     "xp_claims": {
       "availability": "available",
       "previousDay": 0,
-      "trailing30": 2,
+      "source": "public.daily_xp_claims.claimed_at",
+      "trailing30": 1,
       "trailing7": 1,
       "yesterday": 0
     }
