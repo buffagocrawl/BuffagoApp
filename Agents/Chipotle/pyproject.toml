@@ -1,0 +1,8 @@
+[project]
+name = "chipotle"
+version = "1.0.0"
+requires-python = ">=3.11"
+description = "Read-only Buffago daily analytics agent"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

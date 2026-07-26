@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "jalapenoExpectedFreshnessHours": 30,
+  "minimumPercentageDenominator": 10,
+  "dormantUserDays": 30,
+  "changeWatchPercent": 30,
+  "notes": "Statuses are operational guardrails, not anomaly detection. Missing telemetry is Unavailable."
+}
