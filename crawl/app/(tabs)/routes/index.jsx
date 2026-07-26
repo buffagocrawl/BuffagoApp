@@ -23,6 +23,7 @@ import { useLocationCtx } from '../../../providers/LocationProvider';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
 import { getWalkingPath } from '../../../utils/walkRoute';
+import { createMapPreviewOpenGate, prepareMapPreview } from '../../../utils/mapPreview';
 import { createSoloCrawl } from '../../../utils/crawls';
 import { fetchRandomFunFact } from '../../../utils/funFacts';
 import RoutesWelcomeWizard from '../../../components/RoutesWelcomeWizard';
@@ -146,6 +147,10 @@ export default function RoutesIndex() {
 
   // ---------------- prevents double-taps ----------------
   const [selectingRoute, setSelectingRoute] = useState(false);
+  const mapPreviewOpenGateRef = useRef(null);
+  if (!mapPreviewOpenGateRef.current) mapPreviewOpenGateRef.current = createMapPreviewOpenGate();
+  const mapPreviewRequestRef = useRef(0);
+  const [mapPreviewUnavailable, setMapPreviewUnavailable] = useState(false);
 
   // palette
   const themed = useMemo(() => {
@@ -188,6 +193,7 @@ export default function RoutesIndex() {
   const [openMap, setOpenMap] = useState(false);
   const [mapCoords, setMapCoords] = useState([]);
   const [mapPath, setMapPath] = useState([]);
+  const [mapReady, setMapReady] = useState(false);
   const mapRef = useRef(null);
   const [previewKey, setPreviewKey] = useState(0);
 
@@ -621,30 +627,23 @@ export default function RoutesIndex() {
   }, [filtered.length, loading, selectedStatus, selectedTag?.label, session?.user?.id]);
 
   // map preview
-  const buildMapPreview = useCallback(async (routeItem) => {
-    if (!routeItem?.stops?.length) {
-      setMapCoords([]);
-      setMapPath([]);
-      return;
-    }
-
-    const coordsList = routeItem.stops
-      .filter((s) => s?.lat != null && s?.lng != null)
-      .map((s) => ({ latitude: Number(s.lat), longitude: Number(s.lng) }));
-
-    setMapCoords(coordsList);
-
-    try {
-      const path = await getWalkingPath(coordsList);
-      setMapPath(Array.isArray(path) && path.length ? path : []);
-    } catch (e) {
-      console.warn('getWalkingPath failed:', e?.message || e);
-      setMapPath([]);
-    }
-  }, []);
-
   const openMapDialog = useCallback(
-    async (item) => {
+    (item) => {
+      if (!mapPreviewOpenGateRef.current.tryAcquire()) return;
+
+      const preview = prepareMapPreview(item?.stops);
+      const requestId = mapPreviewRequestRef.current + 1;
+      mapPreviewRequestRef.current = requestId;
+
+      if (__DEV__) {
+        console.info('[MapPreview]', {
+          routeId: item?.id ?? null,
+          totalStops: preview.totalStops,
+          validCoordinateStops: preview.coordinates.length,
+          outcome: preview.failureCategory ?? 'opened',
+        });
+      }
+
       trackEvent({
         eventName: 'map_opened',
         screen: 'routes',
@@ -656,27 +655,46 @@ export default function RoutesIndex() {
           city: item?.city ?? null,
         },
       });
-      setOpenMap(false);
-      setMapCoords([]);
+      setMapCoords(preview.coordinates);
       setMapPath([]);
-      requestAnimationFrame(async () => {
-        setPreviewKey((k) => k + 1);
-        await buildMapPreview(item);
-        setOpenMap(true);
+      setMapReady(false);
+      setMapPreviewUnavailable(Boolean(preview.failureCategory));
+      setPreviewKey((k) => k + 1);
+      setOpenMap(true);
+      requestAnimationFrame(() => {
+        mapPreviewOpenGateRef.current.release();
       });
+
+      if (!preview.canRenderPolyline) return;
+
+      getWalkingPath(preview.coordinates)
+        .then((path) => {
+          if (mapPreviewRequestRef.current !== requestId) return;
+          const safePath = prepareMapPreview(path).coordinates;
+          setMapPath(safePath.length >= 2 ? safePath : []);
+        })
+        .catch((error) => {
+          if (mapPreviewRequestRef.current !== requestId) return;
+          console.warn('getWalkingPath failed:', error?.message || error);
+          setMapPath([]);
+        });
     },
-    [buildMapPreview, session?.user?.id]
+    [session?.user?.id]
   );
 
-  const fitPreviewMap = () => {
+  const fitPreviewMap = useCallback(() => {
     const coordsToFit = mapPath.length >= 2 ? mapPath : mapCoords;
-    if (mapRef.current && coordsToFit.length >= 2) {
+    if (mapReady && mapRef.current && coordsToFit.length >= 2 && coordsToFit.every((coordinate) => Number.isFinite(coordinate.latitude) && Number.isFinite(coordinate.longitude))) {
       mapRef.current.fitToCoordinates(coordsToFit, {
         edgePadding: { top: 60, right: 60, bottom: 60, left: 60 },
         animated: false,
       });
     }
-  };
+  }, [mapCoords, mapPath, mapReady]);
+
+  useEffect(() => {
+    if (openMap && mapReady) fitPreviewMap();
+  }, [fitPreviewMap, mapReady, openMap]);
 
   // start or resume crawl
   const startOrResumeCrawlFromList = useCallback(
@@ -1424,7 +1442,7 @@ export default function RoutesIndex() {
 
       {/* Map preview dialog */}
       <Portal>
-        <Dialog visible={openMap} onDismiss={() => setOpenMap(false)} style={styles.dialog}>
+        <Dialog visible={openMap} onDismiss={() => { mapPreviewRequestRef.current += 1; setMapReady(false); setOpenMap(false); }} style={styles.dialog}>
           <Dialog.Title style={{ textAlign: 'center' }}>
             {active?.title ? `${active.title} • Map preview` : 'Map preview'}
           </Dialog.Title>
@@ -1432,6 +1450,10 @@ export default function RoutesIndex() {
             {!active ? (
               <View style={{ alignItems: 'center', paddingVertical: 12 }}>
                 <ActivityIndicator />
+              </View>
+            ) : mapPreviewUnavailable ? (
+              <View style={{ alignItems: 'center', paddingVertical: 20 }}>
+                <Text style={{ textAlign: 'center' }}>Map preview is unavailable because this route does not have enough valid location data.</Text>
               </View>
             ) : (
               <View style={{ height: 360, borderRadius: 12, overflow: 'hidden' }}>
@@ -1441,8 +1463,7 @@ export default function RoutesIndex() {
                   style={{ flex: 1 }}
                   provider={PROVIDER_GOOGLE}
                   showsUserLocation={status === 'granted'}
-                  onMapReady={fitPreviewMap}
-                  onLayout={fitPreviewMap}
+                  onMapReady={() => setMapReady(true)}
                 >
                   {mapPath.length >= 2 ? (
                     <Polyline
@@ -1467,19 +1488,16 @@ export default function RoutesIndex() {
                     )
                   )}
 
-                  {active?.stops
-                    ?.filter((s) => s?.lat != null && s?.lng != null)
-                    ?.map((s, idx) => {
-                      const latitude = Number(s.lat);
-                      const longitude = Number(s.lng);
+                  {prepareMapPreview(active?.stops).coordinateStops
+                    .map(({ stop: s, coordinate: { latitude, longitude }, stopIndex }) => {
                       return (
                         <Marker
-                          key={s.id || `${latitude}-${longitude}-${idx}`}
+                          key={s.id || `${latitude}-${longitude}-${stopIndex}`}
                           coordinate={{ latitude, longitude }}
-                          title={`${idx + 1}. ${s.name}`}
+                          title={`${stopIndex + 1}. ${s.name}`}
                           description={s.address}
                         >
-                          <OrderBadge n={idx + 1} />
+                          <OrderBadge n={stopIndex + 1} />
                         </Marker>
                       );
                     })}
@@ -1488,7 +1506,7 @@ export default function RoutesIndex() {
             )}
           </Dialog.Content>
           <Dialog.Actions style={{ justifyContent: 'space-between' }}>
-            <Button onPress={() => setOpenMap(false)}>Close</Button>
+            <Button onPress={() => { mapPreviewRequestRef.current += 1; setMapReady(false); setOpenMap(false); }}>Close</Button>
             <Button
               mode="contained"
               loading={selectingRoute}
