@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createMapPreviewOpenGate, normalizeMapCoordinate, prepareMapPreview } from '../utils/mapPreview.js';
+import { buildMapPreviewRegion, createMapPreviewOpenGate, normalizeMapCoordinate, prepareMapPreview } from '../utils/mapPreview.js';
 
 test('normalizes valid numeric and numeric-string map coordinates', () => {
   assert.deepEqual(normalizeMapCoordinate({ lat: '42.8864', lng: -78.8784 }), {
@@ -70,4 +70,12 @@ test('the preview press gate prevents duplicate presentation until the first pre
   assert.equal(gate.tryAcquire(), false);
   gate.release();
   assert.equal(gate.tryAcquire(), true);
+});
+
+test('builds a finite initial region only from valid map coordinates', () => {
+  assert.deepEqual(buildMapPreviewRegion([{ latitude: 42.8, longitude: -78.8 }]), {
+    latitude: 42.8, longitude: -78.8, latitudeDelta: 0.015, longitudeDelta: 0.015,
+  });
+  assert.equal(buildMapPreviewRegion([]), null);
+  assert.equal(buildMapPreviewRegion([{ latitude: null, longitude: -78.8 }]), null);
 });

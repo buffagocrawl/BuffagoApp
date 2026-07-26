@@ -38,8 +38,6 @@ import {
   OAUTH_RETURN_URL_KEY,
 } from '../lib/facebookOAuth';
 import { installAppLifecycleTracking, rotateAnalyticsSession, trackEvent, trackScreenViewed } from '../lib/analytics';
-import { useOnboardingGate } from '../hooks/useOnboardingGate';
-import OnboardingFlow from '../components/OnboardingFlow';
 import ReferralAttributionBridge from '../components/ReferralAttributionBridge';
 import { ROOT_RETRY_LIMIT, ROOT_RETRY_SESSION_KEY, canRetryInSession, nextRetryCount } from '../lib/errorRecovery';
 
@@ -268,14 +266,6 @@ function AppShell() {
   const [startupTimedOut, setStartupTimedOut] = useState(false);
   const startupLoggedRef = useRef(false);
 
-  // Onboarding gate
-  const { loading: onboardingLoading, shouldShowIntro, markIntroSeen } = useOnboardingGate();
-  const [onboardingOpen, setOnboardingOpen] = useState(false);
-
-  useEffect(() => {
-    if (!onboardingLoading && shouldShowIntro) setOnboardingOpen(true);
-  }, [onboardingLoading, shouldShowIntro]);
-
   useEffect(() => {
     let alive = true;
     const t = setTimeout(() => {
@@ -435,8 +425,6 @@ function AppShell() {
     },
   };
 
-  const hideOnboardingOverlay = pathname === '/onboarding/crawl-preview'; 
-
   return (
     <View
       testID="app.root"
@@ -449,22 +437,6 @@ function AppShell() {
           <StatusBar style="light" />
           <XpToastProvider>
             <ReferralAttributionBridge />
-            {/* Full screen onboarding overlay */}
-            {onboardingOpen && !hideOnboardingOverlay ? (
-              <OnboardingFlow
-                onComplete={async () => {
-                  await trackEvent({
-                    eventName: 'onboarding_completed',
-                    screen: 'onboarding',
-                    userId: user?.id ?? null,
-                    metadata: { source: 'root_overlay' },
-                  });
-                  await markIntroSeen();
-                  setOnboardingOpen(false);
-                }}
-              />
-            ) : null}
-
             <Stack
               initialRouteName="(tabs)"
               screenOptions={{
@@ -474,6 +446,7 @@ function AppShell() {
             >
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="crawl/[id]" options={{ headerShown: false }} />
+              <Stack.Screen name="onboarding" options={{ headerShown: false }} />
               <Stack.Screen name="onboarding/crawl-preview" options={{ headerShown: false }} />
               <Stack.Screen
                 name="auth/login"

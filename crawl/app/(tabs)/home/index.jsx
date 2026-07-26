@@ -26,8 +26,8 @@ import RatingWizardDialog from '../../../components/RatingWizardDialog';
 import { trackEvent } from '../../../lib/analytics';
 import {
   buildShareArtifact,
-  buildWeeklyMissionSummary,
 } from '../../../lib/growthLoops';
+import { loadWeeklyMission } from '../../../lib/weeklyMission';
 import {
   ENABLE_GROWTH_MISSIONS,
   ENABLE_SHARE_INVITE_LOOP,
@@ -53,16 +53,6 @@ const HOME_NEXT_SPOT_EVENT = 'buffago:home_next_spot_selected';
 
 const BUFFAGO_ORANGE = '#FF7A18';
 const clamp01 = (n) => Math.max(0, Math.min(1, Number(n) || 0));
-const startOfWeekIso = () => {
-  const current = new Date();
-  const day = current.getDay();
-  const diff = current.getDate() - day + (day === 0 ? -6 : 1);
-  const next = new Date(current);
-  next.setHours(0, 0, 0, 0);
-  next.setDate(diff);
-  return next.toISOString();
-};
-
 const fmt2 = (n) => {
   if (n === null || n === undefined) return '—';
   const num = Number(n);
@@ -313,13 +303,13 @@ function HeroActionPill({ title, icon, onPress, fullWidth = false }) {
       onPress={onPress}
       style={({ pressed }) => [
         styles.heroActionPress,
-        fullWidth && { flex: 1 },
+        fullWidth && styles.heroActionFullWidth,
         pressed && { transform: [{ scale: 0.99 }] },
       ]}
     >
       <View style={styles.heroActionInner}>
-        {!!icon && <Text style={styles.heroActionIcon}>{icon}</Text>}
-        <Text style={styles.heroActionText} numberOfLines={1}>
+        {!!icon && <Text style={styles.heroActionIcon} maxFontSizeMultiplier={1.25}>{icon}</Text>}
+        <Text style={styles.heroActionText} numberOfLines={2} ellipsizeMode="tail" maxFontSizeMultiplier={1.35}>
           {title}
         </Text>
       </View>
@@ -462,6 +452,7 @@ export default function Home() {
   const [missionSummary, setMissionSummary] = useState(null);
   const [missionLoading, setMissionLoading] = useState(ENABLE_GROWTH_MISSIONS);
   const [missionError, setMissionError] = useState(false);
+  const missionRequestRef = useRef(0);
   const [missionDialogOpen, setMissionDialogOpen] = useState(false);
   const [missionTab, setMissionTab] = useState('active');
 
@@ -473,42 +464,23 @@ export default function Home() {
     if (!ENABLE_GROWTH_MISSIONS) return;
     if (!session?.user?.id) { setMissionSummary(null); setMissionLoading(false); return; }
 
-    const weekStart = startOfWeekIso();
+    const requestId = missionRequestRef.current + 1;
+    missionRequestRef.current = requestId;
     setMissionLoading(true);
     setMissionError(false);
     try {
-      const [ratingsRes, sharesRes, invitesRes] = await Promise.all([
-        supabase
-          .from('destination_ratings')
-          .select('destination_id', { count: 'exact', head: true })
-          .eq('user_id', session.user.id)
-          .gte('created_at', weekStart),
-        supabase
-          .from('user_events')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', session.user.id)
-          .eq('event_name', 'share_completed')
-          .gte('occurred_at', weekStart),
-        supabase
-          .from('user_events')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', session.user.id)
-          .in('event_name', ['invite_sent', 'friend_request_sent'])
-          .gte('occurred_at', weekStart),
-      ]);
+      const summary = await loadWeeklyMission(supabase);
+      if (missionRequestRef.current !== requestId) return;
+      setMissionSummary(summary);
+    } catch (error) {
+      if (missionRequestRef.current !== requestId) return;
+      console.warn('[weekly-mission] load_failed', { category: error?.category || 'backend_unavailable' });
+      setMissionSummary(null);
+      setMissionError(true);
+    } finally { if (missionRequestRef.current === requestId) setMissionLoading(false); }
+  }, [session?.user?.id]);
 
-      if (ratingsRes.error || sharesRes.error || invitesRes.error) throw new Error('mission_progress_unavailable');
-      setMissionSummary(
-        buildWeeklyMissionSummary({
-          ratingsThisWeek: ratingsRes.count ?? 0,
-          sharesThisWeek: sharesRes.count ?? 0,
-          invitesThisWeek: invitesRes.count ?? 0,
-          crawlStopsVisited: Math.max(activeCrawl?.visitedCount ?? 0, ratingsRes.count ?? 0),
-        })
-      );
-    } catch { setMissionSummary(null); setMissionError(true); }
-    finally { setMissionLoading(false); }
-  }, [activeCrawl?.visitedCount, session?.user?.id]);
+  useEffect(() => () => { missionRequestRef.current += 1; }, []);
 
   const onboardingRedirectedRef = useRef(false);
   useEffect(() => {
@@ -3635,7 +3607,7 @@ export default function Home() {
 
         <WeeklyMissionDialog
           visible={missionDialogOpen}
-          onDismiss={() => setMissionDialogOpen(false)}
+          onDismiss={() => { missionRequestRef.current += 1; setMissionDialogOpen(false); setMissionError(false); setMissionLoading(false); }}
           summary={missionSummary}
           loading={missionLoading}
           error={missionError}
@@ -3731,13 +3703,16 @@ const styles = StyleSheet.create({
     marginTop: 6,
     flexDirection: 'row',
     gap: 10,
-    alignItems: 'center',
+    alignItems: 'stretch',
     justifyContent: 'center',
     width: '100%',
   },
-  heroActionPress: { flex: 1 },
+  heroActionPress: { flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 0, minHeight: 52 },
+  heroActionFullWidth: { flexBasis: '100%' },
   heroActionInner: {
-    height: 44,
+    minHeight: 52,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.18)',
@@ -3745,10 +3720,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    gap: 8,
+    gap: 6,
   },
-  heroActionIcon: { fontSize: 16, opacity: 0.9 },
-  heroActionText: { fontSize: 14, fontWeight: '900', letterSpacing: 0.6, color: 'rgba(255,255,255,0.92)' },
+  heroActionIcon: { fontSize: 16, opacity: 0.9, flexShrink: 0 },
+  heroActionText: { flexShrink: 1, minWidth: 0, fontSize: 14, lineHeight: 17, textAlign: 'center', fontWeight: '900', letterSpacing: 0.3, color: 'rgba(255,255,255,0.92)' },
 
   xpRow: { width: '100%', flexDirection: 'row', alignItems: 'center', gap: 10 },
   dailyPill: {

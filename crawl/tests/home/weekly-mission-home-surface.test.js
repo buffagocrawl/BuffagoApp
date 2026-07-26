@@ -9,6 +9,8 @@ test('Home keeps missions compact and has no restaurant-owner surface or request
   assert.match(home, /testID="weekly-mission-entry"/);
   assert.doesNotMatch(home, /Restaurant tools|Claim or enroll|analytics_agent_restaurant_summary|restaurant_owner_claim/);
   assert.doesNotMatch(home, /missionSummary\.items\.map/);
+  assert.match(home, /loadWeeklyMission/);
+  assert.match(home, /missionRequestRef/);
 });
 
 test('mission dialog exposes focused tabs and all recoverable display states', () => {
@@ -17,4 +19,6 @@ test('mission dialog exposes focused tabs and all recoverable display states', (
   }
   assert.match(dialog, /ScrollView/);
   assert.match(dialog, /onAction\(next\)/);
+  assert.match(dialog, /flexWrap: 'wrap'/);
+  assert.match(dialog, /numberOfLines=\{2\}/);
 });
