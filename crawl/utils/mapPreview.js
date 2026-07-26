@@ -37,6 +37,27 @@ export function prepareMapPreview(stops) {
   };
 }
 
+export function buildMapPreviewRegion(coordinates) {
+  const safeCoordinates = Array.isArray(coordinates)
+    ? coordinates.filter((coordinate) => normalizeMapCoordinate(coordinate))
+    : [];
+  if (!safeCoordinates.length) return null;
+
+  const latitudes = safeCoordinates.map((coordinate) => coordinate.latitude);
+  const longitudes = safeCoordinates.map((coordinate) => coordinate.longitude);
+  const minLatitude = Math.min(...latitudes);
+  const maxLatitude = Math.max(...latitudes);
+  const minLongitude = Math.min(...longitudes);
+  const maxLongitude = Math.max(...longitudes);
+
+  return {
+    latitude: (minLatitude + maxLatitude) / 2,
+    longitude: (minLongitude + maxLongitude) / 2,
+    latitudeDelta: Math.max((maxLatitude - minLatitude) * 1.5, 0.015),
+    longitudeDelta: Math.max((maxLongitude - minLongitude) * 1.5, 0.015),
+  };
+}
+
 export function createMapPreviewOpenGate() {
   let opening = false;
   return {

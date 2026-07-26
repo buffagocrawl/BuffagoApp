@@ -16,7 +16,7 @@ import {
   TextInput,
   HelperText,
 } from 'react-native-paper';
-import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from '../../../lib/platformMap';
+import MapView, { Marker, PROVIDER_GOOGLE } from '../../../lib/platformMap';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../../../lib/supabase.js';
 import { useLocationCtx } from '../../../providers/LocationProvider';
@@ -24,6 +24,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
 import { getWalkingPath } from '../../../utils/walkRoute';
 import { createMapPreviewOpenGate, prepareMapPreview } from '../../../utils/mapPreview';
+import RouteMapPreview from '../../../components/RouteMapPreview';
 import { createSoloCrawl } from '../../../utils/crawls';
 import { fetchRandomFunFact } from '../../../utils/funFacts';
 import RoutesWelcomeWizard from '../../../components/RoutesWelcomeWizard';
@@ -56,15 +57,6 @@ const fmtDateTime = (iso) => {
   if (Number.isNaN(d.getTime())) return '';
   return d.toLocaleString();
 };
-
-/* ---------------- small UI bits ---------------- */
-function OrderBadge({ n }) {
-  return (
-    <View style={styles.badge}>
-      <Text style={styles.badgeText}>{n}</Text>
-    </View>
-  );
-}
 
 /* ---------------- main ---------------- */
 export default function RoutesIndex() {
@@ -1456,53 +1448,7 @@ export default function RoutesIndex() {
                 <Text style={{ textAlign: 'center' }}>Map preview is unavailable because this route does not have enough valid location data.</Text>
               </View>
             ) : (
-              <View style={{ height: 360, borderRadius: 12, overflow: 'hidden' }}>
-                <MapView
-                  key={`preview-${previewKey}-${active?.id || 'none'}`}
-                  ref={mapRef}
-                  style={{ flex: 1 }}
-                  provider={PROVIDER_GOOGLE}
-                  showsUserLocation={status === 'granted'}
-                  onMapReady={() => setMapReady(true)}
-                >
-                  {mapPath.length >= 2 ? (
-                    <Polyline
-                      coordinates={mapPath}
-                      strokeWidth={5}
-                      strokeColor="#FF6F00"
-                      lineDashPattern={[10, 7]}
-                      lineCap="round"
-                      lineJoin="round"
-                    />
-                  ) : (
-                    mapCoords.length >= 2 && (
-                      <Polyline
-                        coordinates={mapCoords}
-                        strokeWidth={5}
-                        strokeColor="#FF6F00"
-                        lineDashPattern={[10, 7]}
-                        lineCap="round"
-                        lineJoin="round"
-                        geodesic
-                      />
-                    )
-                  )}
-
-                  {prepareMapPreview(active?.stops).coordinateStops
-                    .map(({ stop: s, coordinate: { latitude, longitude }, stopIndex }) => {
-                      return (
-                        <Marker
-                          key={s.id || `${latitude}-${longitude}-${stopIndex}`}
-                          coordinate={{ latitude, longitude }}
-                          title={`${stopIndex + 1}. ${s.name}`}
-                          description={s.address}
-                        >
-                          <OrderBadge n={stopIndex + 1} />
-                        </Marker>
-                      );
-                    })}
-                </MapView>
-              </View>
+              <RouteMapPreview stops={active?.stops} path={mapPath.length >= 2 ? mapPath : mapCoords} mapRef={mapRef} previewKey={`${previewKey}-${active?.id || 'none'}`} onMapReady={() => setMapReady(true)} />
             )}
           </Dialog.Content>
           <Dialog.Actions style={{ justifyContent: 'space-between' }}>
