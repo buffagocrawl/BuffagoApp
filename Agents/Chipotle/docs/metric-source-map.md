@@ -1,5 +1,26 @@
 # Chipotle metric-to-source map
 
+## Contract v2 definitions
+
+All reporting windows are completed `America/New_York` calendar days converted to UTC, with an exclusive end. Sources use bounded Supabase REST `GET` requests and aggregate counts only. No user ID, email, token, session trail, or raw payload may reach a report.
+
+| Area | Definition / safe source | Current state |
+|---|---|---|
+| Any-activity DAU | `analytics_daily_active_users.active_identities` for the completed day | Calculated. It is not treated as meaningful usage. |
+| Meaningful DAU/WAU/MAU | Distinct users completing a rating, crawl, Wing Duel vote, or XP action. The allowlist is emitted in metadata. | Unavailable: no identity-safe rolling aggregate. |
+| Activation | Onboarding completion plus first meaningful action. Completion rate and time-to-activation require a safe joined aggregate. | Onboarding starts calculated; activation otherwise unavailable. |
+| Retention | D1/D7/D30 cohort users returning with a meaningful action divided by the original cohort size. | Unavailable: safe cohort aggregate not present. Future immature windows must be `cohort_not_mature`, with null value. |
+| Engagement | Counts of ratings, crawl starts/completions, badges, Wing Duel votes, and XP claims from the public timestamped relations. | Calculated when source query succeeds. Unique users, locations, shares, referrals, and repeat contributors need aggregates. |
+| Product health | Auth/core action outcomes, errors, crashes, incidents, backend failures, releases. | Unavailable pending sanitized telemetry views; no telemetry does not mean zero errors. |
+| Business viability | Verified manual aggregate facts in `Buffago/metrics/manual-business-facts.json`. | Read-only and `manually_verified`; missing facts stay null. |
+| Operational maturity | Collection coverage, freshness, scheduling evidence, and instrumentation gaps. | Calculated factual evidence only; no score. |
+
+Confidence is high for a successful authoritative aggregate query, medium for an authoritative aggregate whose definition has a known limitation (for example daily identities that cannot be deduplicated across days), and none for unavailable or failed sources. Completeness is usable contract records divided by total contract records. Trends never divide by a zero baseline and only claim a complete window when the input window exists.
+
+To add instrumentation, first add a privacy-safe aggregate view/RPC with no identifiers or raw payloads. Document its table/RPC, timestamp, denominator, cohort size, timezone semantics, and failure behavior here; then add the collector, fixture tests, and contract field. Do not substitute a product table containing user identifiers for an approved aggregate.
+
+Apache should consume `Buffago/metrics/latest.json` for the most recent evidence and at least eight `daily/*.json` snapshots for its Sunday review. It should interpret statuses and gaps, and remains the owner of any score or action selection.
+
 All timestamps are transformed from the completed `America/New_York` calendar day to UTC. Queries are GET-only, aggregate-only counts; no user identifiers or raw payloads enter a report.
 
 | Metric group / metric | Definition and calculation | Authoritative source / timestamp | Availability | Privacy and limitations |
