@@ -20,5 +20,19 @@ test('mission dialog exposes focused tabs and all recoverable display states', (
   assert.match(dialog, /ScrollView/);
   assert.match(dialog, /onAction\(next\)/);
   assert.match(dialog, /flexWrap: 'wrap'/);
-  assert.match(dialog, /numberOfLines=\{2\}/);
+  assert.match(dialog, /scroll: \{ paddingBottom: 16 \}/);
+});
+
+test('Active mission makes the assigned title, description, progress, and friendly reset copy the focus', () => {
+  assert.match(dialog, /item\.label/);
+  assert.match(dialog, /item\.detail/);
+  assert.match(dialog, /Progress: \{item\.current\} \/ \{item\.target\}/);
+  assert.match(dialog, /Reward: \{summary\.reward\.title\}/);
+  assert.doesNotMatch(dialog, /goals complete/);
+});
+
+test('collapsed mission card identifies the assigned mission and its exact progress', () => {
+  assert.match(home, /missionSummary\.mission\.label/);
+  assert.match(home, /missionSummary\.mission\.current\} of \{missionSummary\.mission\.target\} complete/);
+  assert.match(home, /missionEntryMission/);
 });

@@ -24,6 +24,7 @@ import DestinationPickerWizard from '../../../components/DestinationPickerWizard
 import RatingWizardDialog from '../../../components/RatingWizardDialog';
 import { trackEvent } from '../../../lib/analytics';
 import { loadWeeklyMission } from '../../../lib/weeklyMission';
+import { currentWingDuelCompletion } from '../../../lib/home/monthlyWingDuel';
 import {
   ENABLE_GROWTH_MISSIONS,
   ENABLE_BUFFAVERSE_HOME,
@@ -291,32 +292,6 @@ function StatLine({ label, done, onPress, rightText, prefix }) {
   );
 }
 
-function QuickAction({ testID, title, detail, icon, onPress, accessibilityLabel }) {
-  return (
-    <Pressable
-      testID={testID}
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel || title}
-      accessibilityHint={detail || undefined}
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.quickActionPress,
-        pressed && { transform: [{ scale: 0.99 }] },
-      ]}
-    >
-      <View style={styles.quickActionInner}>
-        <Text style={styles.quickActionIcon}>{icon}</Text>
-        <View style={styles.quickActionCopy}>
-          <Text style={styles.quickActionTitle} numberOfLines={2} ellipsizeMode="tail">
-            {title}
-          </Text>
-          {detail ? <Text style={styles.quickActionDetail} numberOfLines={2}>{detail}</Text> : null}
-        </View>
-      </View>
-    </Pressable>
-  );
-}
-
 export default function Home() {
   const { colors, dark } = useTheme();
   const router = useRouter();
@@ -388,6 +363,7 @@ export default function Home() {
   const [battleOptions, setBattleOptions] = useState([]); // active rows
   const [battleVotes, setBattleVotes] = useState({}); // saved map
   const [draftBattle, setDraftBattle] = useState({}); // working map
+  const [wingDuelStatus, setWingDuelStatus] = useState('loading');
 
   // Level Title Picker
   const [titlePickerOpen, setTitlePickerOpen] = useState(false);
@@ -1609,10 +1585,12 @@ export default function Home() {
       setBattleOptions([]);
       setBattleVotes({});
       setDraftBattle({});
+      setWingDuelStatus('incomplete');
       return;
     }
 
     setBattleLoading(true);
+    setWingDuelStatus('loading');
     try {
       const { data: options, error: optErr } = await supabase
         .from('wing_battle_options_active')
@@ -1646,11 +1624,13 @@ export default function Home() {
 
       setBattleVotes(map);
       setDraftBattle(map);
+      setWingDuelStatus(currentWingDuelCompletion(rows, map) ? 'completed' : 'incomplete');
     } catch (e) {
       console.warn('loadBattle failed:', e?.message || e);
       setBattleOptions([]);
       setBattleVotes({});
       setDraftBattle({});
+      setWingDuelStatus('error');
     } finally {
       setBattleLoading(false);
     }
@@ -1704,6 +1684,7 @@ export default function Home() {
         return v === 1 || v === 2;
       }).length;
       const completeAfter = battleIds.length > 0 && answeredAfter === battleIds.length;
+      setWingDuelStatus(completeAfter ? 'completed' : 'incomplete');
 
       await trackEvent({
         eventName: completeAfter ? 'wing_battle_completed' : 'wing_battle_vote_submitted',
@@ -1743,15 +1724,12 @@ export default function Home() {
     awardBattleCoins,
   ]);
 
-  useEffect(() => {
-    if (isSignedIn && session?.user?.id) {
+  useFocusEffect(
+    useCallback(() => {
       loadBattle();
-    } else {
-      setBattleOptions([]);
-      setBattleVotes({});
-      setDraftBattle({});
-    }
-  }, [isSignedIn, session?.user?.id, loadBattle]);
+      return undefined;
+    }, [loadBattle])
+  );
 
   /**
    * Stats dialog
@@ -2733,11 +2711,10 @@ export default function Home() {
     if (!mission) return;
     await trackEvent({ eventName: 'mission_next_action_selected', screen: 'home', userId: session?.user?.id ?? null, metadata: { source: 'weekly_mission_dialog', action_key: mission.key } });
     setMissionDialogOpen(false);
-    if (mission.key === 'ratings') { openHomeRatingWizard(); return; }
-    if (mission.key === 'share') { openSendToFriend(); return; }
-    if (mission.key === 'invite') { setWingmanOpen(true); return; }
+    if (mission.key === 'ratings' || mission.key === 'wingdex') { router.push('/(tabs)/ratings'); return; }
+    if (mission.key === 'referrals') { router.push('/referrals'); return; }
     if (mission.key === 'crawl') router.push('/(tabs)/journey');
-  }, [openHomeRatingWizard, openSendToFriend, router, session?.user?.id]);
+  }, [router, session?.user?.id]);
 
   const changeMissionTab = useCallback(async (nextTab) => {
     setMissionTab(nextTab);
@@ -2940,9 +2917,10 @@ export default function Home() {
                     accessibilityLabel={`Send ${closest.name || 'this restaurant'} to a friend`}
                     accessibilityHint="Opens BuffaGo's Send to Friend flow"
                     onPress={openSendToFriend}
+                    hitSlop={4}
                     style={({ pressed }) => [styles.restaurantIconButton, pressed && styles.restaurantIconButtonPressed]}
                   >
-                    <Avatar.Icon size={44} icon="account-multiple-outline" />
+                    <Avatar.Icon size={36} icon="account-multiple-outline" />
                   </Pressable>
 
                   <View style={{ flex: 1 }}>
@@ -2953,12 +2931,14 @@ export default function Home() {
                   </View>
 
                   <Pressable
+                    testID="directions-button"
                     accessibilityRole="button"
                     accessibilityLabel={`Directions to ${closest.name || 'this restaurant'}`}
                     onPress={openDirections}
+                    hitSlop={4}
                     style={({ pressed }) => [styles.restaurantIconButton, pressed && styles.restaurantIconButtonPressed]}
                   >
-                    <Avatar.Icon size={44} icon="navigation-variant-outline" />
+                    <Avatar.Icon size={36} icon="navigation-variant-outline" />
                   </Pressable>
                 </View>
 
@@ -2974,7 +2954,7 @@ export default function Home() {
                   <Button
                     mode="contained"
                     style={[styles.rateBtn, { flex: 1 }]}
-                    contentStyle={{ height: 44 }}
+                    contentStyle={{ height: 40 }}
                     uppercase={false}
                     onPress={openHomeRatingWizard}
                     loading={homeRateSaving}
@@ -2988,7 +2968,7 @@ export default function Home() {
                   <Button
                     mode="outlined"
                     style={[styles.searchBtn, { flex: 1 }]}
-                    contentStyle={{ height: 44 }}
+                    contentStyle={{ height: 40 }}
                     uppercase={false}
                     onPress={() => {
                       setSearchOpen(false);
@@ -3032,7 +3012,7 @@ export default function Home() {
             <Pressable
               testID="weekly-mission-entry"
               accessibilityRole="button"
-              accessibilityLabel={missionLoading ? 'Weekly mission loading' : missionSummary ? `Weekly mission, ${missionSummary.completedCount} of ${missionSummary.totalCount} complete` : 'View weekly missions'}
+              accessibilityLabel={missionLoading ? 'Weekly mission loading' : missionSummary ? `Weekly mission, ${missionSummary.mission.label}, ${missionSummary.mission.current} of ${missionSummary.mission.target} complete` : 'View weekly missions'}
               style={styles.missionEntry}
               onPress={async () => {
                 setMissionDialogOpen(true);
@@ -3041,30 +3021,12 @@ export default function Home() {
               }}
             >
               <Text style={styles.missionEntryIcon}>🏆</Text>
-              <View style={styles.missionEntryCopy}><Text style={styles.missionEntryTitle}>Weekly Mission</Text><Text style={styles.missionEntryDetail}>{missionLoading ? 'Loading mission…' : missionSummary ? `${missionSummary.completedCount} of ${missionSummary.totalCount} goals complete` : 'View Missions'}</Text></View>
+              <View style={styles.missionEntryCopy}><Text style={styles.missionEntryTitle}>Weekly Mission</Text><Text style={styles.missionEntryMission}>{missionLoading ? 'Loading mission…' : missionSummary?.mission?.label || 'Mission details are temporarily unavailable.'}</Text>{missionSummary ? <Text style={styles.missionEntryDetail}>{missionSummary.mission.current} of {missionSummary.mission.target} complete</Text> : null}</View>
               <Text style={styles.missionEntryChevron}>›</Text>
             </Pressable>
           ) : null}
 
-          {/* Exactly two secondary actions; the restaurant share action lives in Your Next Place. */}
-          <View style={styles.quickActions}>
-            <View style={styles.quickActionsTopRow}>
-              <QuickAction
-                testID="quick-action-wing-duel"
-                title="Wing Duel"
-                icon="⚔️"
-                accessibilityLabel="Wing Duel, open Wing Battle"
-                onPress={() => setBattleDialogOpen(true)}
-              />
-              <QuickAction
-                testID="quick-action-wing-facts"
-                title="Wing Facts"
-                icon="🍗"
-                accessibilityLabel="Wing Facts, open a wing fact"
-                onPress={openWingFacts}
-              />
-            </View>
-          </View>
+          <Pressable testID="quick-action-wing-facts" accessibilityRole="button" accessibilityLabel="Wing Facts, open a wing fact" onPress={openWingFacts} style={({ pressed }) => [styles.wingFactsAction, pressed && { opacity: 0.82 }]}><Text style={styles.wingFactsIcon}>🍗</Text><Text style={styles.wingFactsLabel}>Wing Facts</Text></Pressable>
         </ScrollView>
 
         {/* Home Rating Wizard */}
@@ -3625,18 +3587,18 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  scroll: { padding: 16, paddingBottom: 32, gap: 10 },
+  scroll: { padding: 12, paddingBottom: 16, gap: 8 },
 
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   leftArea: { width: 36, alignItems: 'flex-start', justifyContent: 'center' },
   rightCluster: { width: 46, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 8 },
   iconScale: { transform: [{ scale: 0.75 }], minWidth: 36, minHeight: 36, alignItems: 'center', justifyContent: 'center' },
-  logo: { flex: 1, height: 60, alignSelf: 'center' },
+  logo: { flex: 1, height: 50, alignSelf: 'center' },
   avatarBtn: { borderRadius: 999 },
 
   levelRow: {
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 9,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
@@ -3644,11 +3606,11 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   levelHeaderRow: { width: '100%', flexDirection: 'row', alignItems: 'baseline', flexWrap: 'nowrap', gap: 10 },
-  levelLine: { fontSize: 22, fontWeight: '900', letterSpacing: 0.4, color: 'rgba(255,255,255,0.95)' },
+  levelLine: { fontSize: 20, fontWeight: '900', letterSpacing: 0.4, color: 'rgba(255,255,255,0.95)' },
   titlePressable: { width: '100%' },
   titleHint: { marginTop: 2, fontSize: 11, opacity: 0.6 },
 
-  levelSub: { marginTop: 8, fontSize: 11, opacity: 0.6, textAlign: 'center' },
+  levelSub: { marginTop: 5, fontSize: 11, opacity: 0.6, textAlign: 'center' },
 
   xpOuter: { width: '100%', marginTop: 2 },
   xpVisual: { width: '100%', height: 16, justifyContent: 'center' },
@@ -3677,7 +3639,7 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     justifyContent: 'space-between',
     paddingHorizontal: 6,
-    paddingVertical: 10,
+    paddingVertical: 7,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
@@ -3689,34 +3651,13 @@ const styles = StyleSheet.create({
   hudValue: { fontSize: 18, fontWeight: '900', marginTop: 2 },
   hudDivider: { width: 1, opacity: 0.25, backgroundColor: '#fff' },
 
-  wingdexWrap: { width: '100%', borderRadius: 12, overflow: 'hidden', paddingVertical: 8, paddingHorizontal: 6, position: 'relative' },
+  wingdexWrap: { width: '100%', borderRadius: 12, overflow: 'hidden', paddingVertical: 5, paddingHorizontal: 6, position: 'relative' },
   wingdexFill: { position: 'absolute', top: 0, bottom: 0, opacity: 0.35 },
   wingdexContent: { alignItems: 'center' },
 
-  quickActions: {
-    marginTop: 6,
-    gap: 10,
-    width: '100%',
-  },
-  quickActionsTopRow: { flexDirection: 'row', alignItems: 'stretch', gap: 10, width: '100%' },
-  quickActionPress: { flex: 1, minWidth: 0, minHeight: 56 },
-  quickActionInner: {
-    minHeight: 56,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255,122,24,0.30)',
-    backgroundColor: 'rgba(255,255,255,0.035)',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    gap: 10,
-  },
-  quickActionIcon: { fontSize: 18, lineHeight: 22, flexShrink: 0 },
-  quickActionCopy: { flex: 1, minWidth: 0 },
-  quickActionTitle: { fontSize: 14, lineHeight: 18, fontWeight: '900', letterSpacing: 0.2, color: 'rgba(255,255,255,0.96)' },
-  quickActionDetail: { marginTop: 2, fontSize: 12, lineHeight: 16, color: 'rgba(255,255,255,0.68)' },
+  wingFactsAction: { minHeight: 52, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,122,24,0.30)', backgroundColor: 'rgba(255,255,255,0.035)', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  wingFactsIcon: { fontSize: 17, lineHeight: 22 },
+  wingFactsLabel: { fontSize: 14, lineHeight: 18, fontWeight: '900', color: 'rgba(255,255,255,0.96)' },
 
   xpRow: { width: '100%', flexDirection: 'row', alignItems: 'center', gap: 10 },
   dailyPill: {
@@ -3741,19 +3682,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.10)',
     backgroundColor: 'rgba(255,255,255,0.03)',
-    padding: 14,
+    padding: 12,
   },
-  missionEntry: { minHeight: 58, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,122,24,0.35)', backgroundColor: 'rgba(255,122,24,0.10)', paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', gap: 10 },
-  missionEntryIcon: { fontSize: 23 },
+  missionEntry: { minHeight: 64, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,122,24,0.35)', backgroundColor: 'rgba(255,122,24,0.10)', paddingHorizontal: 12, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  missionEntryIcon: { fontSize: 20 },
   missionEntryCopy: { flex: 1 },
   missionEntryTitle: { fontSize: 16, fontWeight: '900', color: 'rgba(255,255,255,0.96)' },
+  missionEntryMission: { marginTop: 1, fontSize: 14, lineHeight: 18, fontWeight: '800', color: 'rgba(255,255,255,0.92)' },
   missionEntryDetail: { marginTop: 2, fontSize: 13, opacity: 0.76 },
   missionEntryChevron: { color: '#FFB36F', fontSize: 30, lineHeight: 30 },
   closestHeader: { fontSize: 11, opacity: 0.75, letterSpacing: 1, textAlign: 'center', marginBottom: 6 },
   closestName: { fontSize: 18, fontWeight: '900', textAlign: 'center', color: 'rgba(255,255,255,0.95)' },
   addressRow: { marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 10 },
   closestAddr: { opacity: 0.8, textAlign: 'center' },
-  restaurantIconButton: { width: 44, height: 44, borderRadius: 22, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  restaurantIconButton: { width: 40, height: 40, borderRadius: 20, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   restaurantIconButtonPressed: { transform: [{ scale: 0.96 }], opacity: 0.9 },
   distanceText: { marginTop: 10, opacity: 0.75, fontSize: 12, textAlign: 'center', fontWeight: '800' },
   rateBtn: { borderRadius: 14 },
