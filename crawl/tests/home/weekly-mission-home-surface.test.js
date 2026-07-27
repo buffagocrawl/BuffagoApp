@@ -36,3 +36,16 @@ test('collapsed mission card identifies the assigned mission and its exact progr
   assert.match(home, /missionSummary\.mission\.current\} of \{missionSummary\.mission\.target\} complete/);
   assert.match(home, /missionEntryMission/);
 });
+
+test('Home clears the measured tab bar so Wing Facts remains reachable on compact Android screens', () => {
+  assert.match(home, /useBottomTabBarHeight/);
+  assert.match(home, /contentContainerStyle=\{\[styles\.scroll, \{ paddingBottom: tabBarHeight \+ 12 \}\]\}/);
+  assert.match(home, /wingFactsAction: \{ minHeight: 52/);
+  assert.match(home, /scroll: \{ paddingHorizontal: 12, paddingTop: 10, gap: 6 \}/);
+});
+
+test('Rewards keeps the existing explanation and adds wrapping-safe prestige context', () => {
+  assert.match(dialog, /summary\.reward\.detail/);
+  assert.match(dialog, /Build your prestige on the weekly challenge leaderboards\. More rewards are coming\./);
+  assert.match(dialog, /prestige: \{ lineHeight: 21, opacity: 0\.8 \}/);
+});

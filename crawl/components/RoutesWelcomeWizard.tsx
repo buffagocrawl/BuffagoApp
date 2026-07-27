@@ -42,12 +42,12 @@ export default function RoutesWelcomeWizard({
         title: '🔍 Explore a Route',
         body: (
           <Text style={{ textAlign: 'center', fontSize: 16, lineHeight: 22 }}>
-            Tap any route to open its description. From here you can preview the map and see the
-            stops before you pick it. Yellow highlighted routes are ones you started. Green highlighted routes are ones you completed, but you can do these again!
+            Tap any route to open its description and review the stops before you pick it. Yellow
+            highlighted routes are ones you started. Green highlighted routes are ones you completed,
+            but you can do these again!
           </Text>
         ),
-        bullets: ['Open details', 'Preview map', 'Review stops'],
-        primaryCta: { label: 'Try a Map Preview', onPress: () => {} },
+        bullets: ['Open details', 'Review stops'],
       },
       {
         title: '✅ Set Your Home Start',

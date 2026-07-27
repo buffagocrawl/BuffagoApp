@@ -11,6 +11,7 @@ import { supabase } from '../../../lib/supabase.js';
 import { trackEvent } from '../../../lib/analytics';
 import FriendProfileActions from '../../../components/FriendProfileActions';
 import ScreenHeader from '../../../components/ScreenHeader';
+import WeeklyChallengeStats from '../../../components/WeeklyChallengeStats';
 
 /* ---------------- helpers ---------------- */
 
@@ -974,6 +975,12 @@ export default function HistoryIndex() {
                 </View>
               </TouchableOpacity>
             </View>
+
+            <WeeklyChallengeStats
+              client={supabase}
+              userId={viewUserId}
+              isPublic={!isViewingSelf}
+            />
 
             <View style={styles.metricsRow}>
               <View

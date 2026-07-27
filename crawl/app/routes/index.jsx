@@ -16,12 +16,11 @@ import {
   TextInput,
   HelperText,
 } from 'react-native-paper';
-import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from '../../lib/platformMap';
+import MapView, { Marker, PROVIDER_GOOGLE } from '../../lib/platformMap';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../../lib/supabase.js';
 import { useLocationCtx } from '../../providers/LocationProvider';
 import { useRouter } from 'expo-router';
-import { getWalkingPath } from '../../utils/walkRoute';
 import RoutesWelcomeWizard from '../../components/RoutesWelcomeWizard';
 
 const SEARCH_RADIUS_M = 160934; // 100 miles
@@ -51,15 +50,6 @@ const fmtDateTime = (iso) => {
   if (Number.isNaN(d.getTime())) return '';
   return d.toLocaleString();
 };
-
-/* ---------------- small UI bits ---------------- */
-function OrderBadge({ n }) {
-  return (
-    <View style={styles.badge}>
-      <Text style={styles.badgeText}>{n}</Text>
-    </View>
-  );
-}
 
 /* ---------------- main ---------------- */
 export default function RoutesIndex() {
@@ -112,12 +102,6 @@ export default function RoutesIndex() {
   // Dialogs / active route
   const [openDetails, setOpenDetails] = useState(false);
   const [active, setActive] = useState(null);
-
-  const [openMap, setOpenMap] = useState(false);
-  const [mapCoords, setMapCoords] = useState([]); // fallback straight segments
-  const [mapPath, setMapPath] = useState([]); // walking polyline
-  const mapRef = useRef(null);
-  const [previewKey, setPreviewKey] = useState(0);
 
   // 🍗 Fun-fact loader state
   const FUN_FACTS = useRef([
@@ -471,51 +455,6 @@ export default function RoutesIndex() {
     return list;
   }, [routesRaw, selectedTag, selectedStatus, activeProgressByRoute, hasCompleted]);
 
-  /* ---------- map helpers (single route preview) ---------- */
-  const buildMapPreview = useCallback(async (routeItem) => {
-    if (!routeItem?.stops?.length) {
-      setMapCoords([]);
-      setMapPath([]);
-      return;
-    }
-    const coordsList = routeItem.stops
-      .filter((s) => s?.lat != null && s?.lng != null)
-      .map((s) => ({ latitude: Number(s.lat), longitude: Number(s.lng) }));
-
-    setMapCoords(coordsList);
-    try {
-      const path = await getWalkingPath(coordsList);
-      setMapPath(Array.isArray(path) && path.length ? path : []);
-    } catch (e) {
-      console.warn('getWalkingPath failed:', e?.message || e);
-      setMapPath([]);
-    }
-  }, []);
-
-  const openMapDialog = useCallback(
-    async (item) => {
-      setOpenMap(false);
-      setMapCoords([]);
-      setMapPath([]);
-      requestAnimationFrame(async () => {
-        setPreviewKey((k) => k + 1);
-        await buildMapPreview(item);
-        setOpenMap(true);
-      });
-    },
-    [buildMapPreview]
-  );
-
-  const fitPreviewMap = () => {
-    const coordsToFit = mapPath.length >= 2 ? mapPath : mapCoords;
-    if (mapRef.current && coordsToFit.length >= 2) {
-      mapRef.current.fitToCoordinates(coordsToFit, {
-        edgePadding: { top: 60, right: 60, bottom: 60, left: 60 },
-        animated: false,
-      });
-    }
-  };
-
   /* ---------- ✅ SELECT ROUTE (NO NAV TO /routes/[id]) ---------- */
   const saveSelectedRouteFromList = useCallback(
     async (routeItem) => {
@@ -551,7 +490,6 @@ export default function RoutesIndex() {
         await AsyncStorage.setItem('buffago:selectedRoute', JSON.stringify(payload));
 
         // close dialogs & clear timers to avoid any second modal flashes
-        setOpenMap(false);
         setOpenDetails(false);
         setOpenHistory(false);
         setActive(null);
@@ -1040,16 +978,6 @@ export default function RoutesIndex() {
           </Dialog.Content>
           <Dialog.Actions style={{ gap: 8 }}>
             <Button
-              mode="outlined"
-              disabled={!active || selectingRoute}
-              onPress={() => {
-                if (!active) return;
-                openMapDialog(active);
-              }}
-            >
-              Map preview
-            </Button>
-            <Button
               mode="contained"
               loading={selectingRoute}
               disabled={!active || selectingRoute}
@@ -1129,86 +1057,6 @@ export default function RoutesIndex() {
 
           <Dialog.Actions>
             <Button onPress={() => setOpenHistory(false)}>Close</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
-
-      {/* Map preview dialog (single route) */}
-      <Portal>
-        <Dialog visible={openMap} onDismiss={() => setOpenMap(false)} style={styles.dialog}>
-          <Dialog.Title style={{ textAlign: 'center' }}>{active?.title ? `${active.title} • Map preview` : 'Map preview'}</Dialog.Title>
-          <Dialog.Content>
-            {!active ? (
-              <View style={{ alignItems: 'center', paddingVertical: 12 }}>
-                <ActivityIndicator />
-              </View>
-            ) : (
-              <View style={{ height: 360, borderRadius: 12, overflow: 'hidden' }}>
-                <MapView
-                  key={`preview-${previewKey}-${active?.id || 'none'}`}
-                  ref={mapRef}
-                  style={{ flex: 1 }}
-                  provider={PROVIDER_GOOGLE}
-                  showsUserLocation={status === 'granted'}
-                  onMapReady={fitPreviewMap}
-                  onLayout={fitPreviewMap}
-                >
-                  {mapPath.length >= 2 ? (
-                    <Polyline
-                      coordinates={mapPath}
-                      strokeWidth={5}
-                      strokeColor="#FF6F00"
-                      lineDashPattern={[10, 7]}
-                      lineCap="round"
-                      lineJoin="round"
-                    />
-                  ) : (
-                    mapCoords.length >= 2 && (
-                      <Polyline
-                        coordinates={mapCoords}
-                        strokeWidth={5}
-                        strokeColor="#FF6F00"
-                        lineDashPattern={[10, 7]}
-                        lineCap="round"
-                        lineJoin="round"
-                        geodesic
-                      />
-                    )
-                  )}
-
-                  {active?.stops
-                    ?.filter((s) => s?.lat != null && s?.lng != null)
-                    ?.map((s, idx) => {
-                      const latitude = Number(s.lat);
-                      const longitude = Number(s.lng);
-                      return (
-                        <Marker
-                          key={s.id || `${latitude}-${longitude}-${idx}`}
-                          coordinate={{ latitude, longitude }}
-                          title={`${idx + 1}. ${s.name}`}
-                          description={s.address}
-                        >
-                          <OrderBadge n={idx + 1} />
-                        </Marker>
-                      );
-                    })}
-                </MapView>
-              </View>
-            )}
-          </Dialog.Content>
-          <Dialog.Actions style={{ justifyContent: 'space-between' }}>
-            <Button onPress={() => setOpenMap(false)}>Close</Button>
-            <Button
-              mode="contained"
-              loading={selectingRoute}
-              disabled={!active || selectingRoute}
-              onPress={() => {
-                if (!active) return;
-                saveSelectedRouteFromList(active);
-              }}
-            >
-              Select this route
-            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>

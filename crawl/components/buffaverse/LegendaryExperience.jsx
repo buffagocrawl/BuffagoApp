@@ -67,7 +67,7 @@ export function LegendaryExperience({ fixture, reducedMotion = false }) {
         </Card>
       )}
 
-      <View style={styles.mapPanel} accessible accessibilityLabel="Legendary marker map preview">
+      <View style={styles.mapPanel} accessible accessibilityLabel="Legendary marker map">
         <View style={styles.mapHeader}><Text accessibilityRole="header" style={styles.sectionTitle}>Find the glow</Text><Text style={styles.mapMeta}>Markers use shape + text, not color alone.</Text></View>
         <View style={styles.mapSurface}><View style={styles.roadOne} /><View style={styles.roadTwo} /><LegendaryMarker selected={selected} cluster={event.status === 'clustered'} onPress={() => setSelected(true)} />{selected && <View style={styles.callout}><Text style={styles.calloutTitle}>{event.restaurantName}</Text><Text style={styles.calloutBody}>{timeLabel(event.minutesRemaining)} · {event.reason}</Text><Button compact mode="contained" onPress={() => Alert.alert('Open mission', 'The mission is already visible above.')} style={styles.calloutButton}>Open mission</Button></View>}</View>
         <View style={styles.legend}><Text style={styles.legendGlyph}>✦</Text><Text>Legendary stop</Text><Text style={styles.legendCluster}>✦3</Text><Text>cluster</Text></View>

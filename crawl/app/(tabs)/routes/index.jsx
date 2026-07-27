@@ -22,9 +22,6 @@ import { supabase } from '../../../lib/supabase.js';
 import { useLocationCtx } from '../../../providers/LocationProvider';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
-import { getWalkingPath } from '../../../utils/walkRoute';
-import { createMapPreviewOpenGate, prepareMapPreview } from '../../../utils/mapPreview';
-import RouteMapPreview from '../../../components/RouteMapPreview';
 import { createSoloCrawl } from '../../../utils/crawls';
 import { fetchRandomFunFact } from '../../../utils/funFacts';
 import RoutesWelcomeWizard from '../../../components/RoutesWelcomeWizard';
@@ -139,10 +136,6 @@ export default function RoutesIndex() {
 
   // ---------------- prevents double-taps ----------------
   const [selectingRoute, setSelectingRoute] = useState(false);
-  const mapPreviewOpenGateRef = useRef(null);
-  if (!mapPreviewOpenGateRef.current) mapPreviewOpenGateRef.current = createMapPreviewOpenGate();
-  const mapPreviewRequestRef = useRef(0);
-  const [mapPreviewUnavailable, setMapPreviewUnavailable] = useState(false);
 
   // palette
   const themed = useMemo(() => {
@@ -182,12 +175,6 @@ export default function RoutesIndex() {
 
   const actionLabel = active && activeProgressByRoute?.[active.id] ? 'Resume Crawl' : 'Begin Crawl';
 
-  const [openMap, setOpenMap] = useState(false);
-  const [mapCoords, setMapCoords] = useState([]);
-  const [mapPath, setMapPath] = useState([]);
-  const [mapReady, setMapReady] = useState(false);
-  const mapRef = useRef(null);
-  const [previewKey, setPreviewKey] = useState(0);
 
   // fun-fact loader
   const FUN_FACTS = useRef([
@@ -618,76 +605,6 @@ export default function RoutesIndex() {
     });
   }, [filtered.length, loading, selectedStatus, selectedTag?.label, session?.user?.id]);
 
-  // map preview
-  const openMapDialog = useCallback(
-    (item) => {
-      if (!mapPreviewOpenGateRef.current.tryAcquire()) return;
-
-      const preview = prepareMapPreview(item?.stops);
-      const requestId = mapPreviewRequestRef.current + 1;
-      mapPreviewRequestRef.current = requestId;
-
-      if (__DEV__) {
-        console.info('[MapPreview]', {
-          routeId: item?.id ?? null,
-          totalStops: preview.totalStops,
-          validCoordinateStops: preview.coordinates.length,
-          outcome: preview.failureCategory ?? 'opened',
-        });
-      }
-
-      trackEvent({
-        eventName: 'map_opened',
-        screen: 'routes',
-        userId: session?.user?.id ?? null,
-        routeId: item?.id ?? null,
-        metadata: {
-          source: 'route_preview',
-          stop_count: item?.stops?.length ?? 0,
-          city: item?.city ?? null,
-        },
-      });
-      setMapCoords(preview.coordinates);
-      setMapPath([]);
-      setMapReady(false);
-      setMapPreviewUnavailable(Boolean(preview.failureCategory));
-      setPreviewKey((k) => k + 1);
-      setOpenMap(true);
-      requestAnimationFrame(() => {
-        mapPreviewOpenGateRef.current.release();
-      });
-
-      if (!preview.canRenderPolyline) return;
-
-      getWalkingPath(preview.coordinates)
-        .then((path) => {
-          if (mapPreviewRequestRef.current !== requestId) return;
-          const safePath = prepareMapPreview(path).coordinates;
-          setMapPath(safePath.length >= 2 ? safePath : []);
-        })
-        .catch((error) => {
-          if (mapPreviewRequestRef.current !== requestId) return;
-          console.warn('getWalkingPath failed:', error?.message || error);
-          setMapPath([]);
-        });
-    },
-    [session?.user?.id]
-  );
-
-  const fitPreviewMap = useCallback(() => {
-    const coordsToFit = mapPath.length >= 2 ? mapPath : mapCoords;
-    if (mapReady && mapRef.current && coordsToFit.length >= 2 && coordsToFit.every((coordinate) => Number.isFinite(coordinate.latitude) && Number.isFinite(coordinate.longitude))) {
-      mapRef.current.fitToCoordinates(coordsToFit, {
-        edgePadding: { top: 60, right: 60, bottom: 60, left: 60 },
-        animated: false,
-      });
-    }
-  }, [mapCoords, mapPath, mapReady]);
-
-  useEffect(() => {
-    if (openMap && mapReady) fitPreviewMap();
-  }, [fitPreviewMap, mapReady, openMap]);
-
   // start or resume crawl
   const startOrResumeCrawlFromList = useCallback(
     async (routeItem) => {
@@ -736,7 +653,6 @@ export default function RoutesIndex() {
 
         await AsyncStorage.setItem('buffago:selectedRoute', JSON.stringify(payload));
 
-        setOpenMap(false);
         setOpenDetails(false);
         setOpenHistory(false);
         setActive(null);
@@ -1339,16 +1255,6 @@ export default function RoutesIndex() {
           </Dialog.Content>
           <Dialog.Actions style={{ gap: 8 }}>
             <Button
-              mode="outlined"
-              disabled={!active || selectingRoute}
-              onPress={() => {
-                if (!active) return;
-                openMapDialog(active);
-              }}
-            >
-              Map preview
-            </Button>
-            <Button
               mode="contained"
               loading={selectingRoute}
               disabled={!active || selectingRoute}
@@ -1428,42 +1334,6 @@ export default function RoutesIndex() {
 
           <Dialog.Actions>
             <Button onPress={() => setOpenHistory(false)}>Close</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
-
-      {/* Map preview dialog */}
-      <Portal>
-        <Dialog visible={openMap} onDismiss={() => { mapPreviewRequestRef.current += 1; setMapReady(false); setOpenMap(false); }} style={styles.dialog}>
-          <Dialog.Title style={{ textAlign: 'center' }}>
-            {active?.title ? `${active.title} • Map preview` : 'Map preview'}
-          </Dialog.Title>
-          <Dialog.Content>
-            {!active ? (
-              <View style={{ alignItems: 'center', paddingVertical: 12 }}>
-                <ActivityIndicator />
-              </View>
-            ) : mapPreviewUnavailable ? (
-              <View style={{ alignItems: 'center', paddingVertical: 20 }}>
-                <Text style={{ textAlign: 'center' }}>Map preview is unavailable because this route does not have enough valid location data.</Text>
-              </View>
-            ) : (
-              <RouteMapPreview stops={active?.stops} path={mapPath.length >= 2 ? mapPath : mapCoords} mapRef={mapRef} previewKey={`${previewKey}-${active?.id || 'none'}`} onMapReady={() => setMapReady(true)} />
-            )}
-          </Dialog.Content>
-          <Dialog.Actions style={{ justifyContent: 'space-between' }}>
-            <Button onPress={() => { mapPreviewRequestRef.current += 1; setMapReady(false); setOpenMap(false); }}>Close</Button>
-            <Button
-              mode="contained"
-              loading={selectingRoute}
-              disabled={!active || selectingRoute}
-              onPress={() => {
-                if (!active) return;
-                startOrResumeCrawlFromList(active);
-              }}
-            >
-              {actionLabel}
-            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>

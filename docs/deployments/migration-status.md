@@ -26,6 +26,9 @@ remote deployment; verify the remote migration ledger before applying them.
 | 20260724140000_buffaverse_phase2_notification_boundary.sql | candidate | not applied here | manifest recorded | current main | 0aca58df0460e41df7e7e61c6f0e5ced605288b430bb4ba9ca20e19aec11cbfb |
 | 20260724141000_buffaverse_phase2_local_geography_fix.sql | candidate | not applied here | manifest recorded | current main | 9f2febb1296328ea2387740d65a78369791ab70bce3e6d9d239de6346bf04f5a |
 | 20260724150000_buffaverse_phase3_restaurant_boss_battles.sql | candidate | not applied here | manifest recorded | current main | 1c25a62924c85d098cfa781600fc5814340203b318fbf2a36782729c1102b1f2 |
+| 20260726100000_weekly_mission_dashboard_details.sql | candidate | not applied here | manifest recorded | current workspace | 95626c52d2f5683e98adfbf4cb2e9759aa9ec081041f2030c4b254d5a065e1ea |
+| 20260726110000_challenge_leaderboard_and_profile_stats.sql | candidate | not applied here | manifest recorded | challenge leaderboard feature | 721a1d45180cdde0282e3b059d10c1ea36189ff2dfd911872ec3b78f885daadc |
+| 20260726120000_challenge_leaderboard_tiebreak.sql | candidate | not applied here | manifest recorded | challenge leaderboard tie-break correction | 8b7d9b888b549c19a24d52ef6c446eb4ea6aa295a356f8f2afe1ff8e2b47f135 |
 
 
 The exact deployment order is: Strategy B baseline preflight, the retention

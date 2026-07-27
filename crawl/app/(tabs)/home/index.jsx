@@ -12,6 +12,7 @@ import {
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Text, Button, useTheme, Dialog, Portal, Avatar, TextInput } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -293,6 +294,7 @@ function StatLine({ label, done, onPress, rightText, prefix }) {
 }
 
 export default function Home() {
+  const tabBarHeight = useBottomTabBarHeight();
   const { colors, dark } = useTheme();
   const router = useRouter();
   const { coords, status, refreshPosition } = useLocationCtx();
@@ -2747,7 +2749,10 @@ export default function Home() {
   return (
     <LocationGate>
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={[styles.scroll, { paddingBottom: tabBarHeight + 12 }]}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Header */}
           <View style={styles.headerRow}>
             <Pressable
@@ -2902,10 +2907,6 @@ export default function Home() {
               </View>
             ) : closest ? (
               <>
-                <Text style={styles.closestHeader} numberOfLines={1}>
-                  Your Next Place!
-                </Text>
-
                 <Text style={styles.closestName} numberOfLines={2}>
                   {closest.name || 'Wing Spot'}
                 </Text>
@@ -3587,7 +3588,9 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  scroll: { padding: 12, paddingBottom: 16, gap: 8 },
+  // The tab bar height comes from navigation, so the final card can scroll fully
+  // above every Android/iOS tab bar and its safe-area inset.
+  scroll: { paddingHorizontal: 12, paddingTop: 10, gap: 6 },
 
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   leftArea: { width: 36, alignItems: 'flex-start', justifyContent: 'center' },
@@ -3682,7 +3685,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.10)',
     backgroundColor: 'rgba(255,255,255,0.03)',
-    padding: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
   missionEntry: { minHeight: 64, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,122,24,0.35)', backgroundColor: 'rgba(255,122,24,0.10)', paddingHorizontal: 12, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 8 },
   missionEntryIcon: { fontSize: 20 },
@@ -3691,7 +3695,6 @@ const styles = StyleSheet.create({
   missionEntryMission: { marginTop: 1, fontSize: 14, lineHeight: 18, fontWeight: '800', color: 'rgba(255,255,255,0.92)' },
   missionEntryDetail: { marginTop: 2, fontSize: 13, opacity: 0.76 },
   missionEntryChevron: { color: '#FFB36F', fontSize: 30, lineHeight: 30 },
-  closestHeader: { fontSize: 11, opacity: 0.75, letterSpacing: 1, textAlign: 'center', marginBottom: 6 },
   closestName: { fontSize: 18, fontWeight: '900', textAlign: 'center', color: 'rgba(255,255,255,0.95)' },
   addressRow: { marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 10 },
   closestAddr: { opacity: 0.8, textAlign: 'center' },

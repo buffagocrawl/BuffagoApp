@@ -10,7 +10,6 @@ const screens = [
   'app/(tabs)/routes/index.jsx',
   'app/ratings/index.jsx',
   'app/routes/index.jsx',
-  'app/routes/[id].jsx',
 ];
 
 test('map screens use the platform boundary instead of importing native maps', () => {

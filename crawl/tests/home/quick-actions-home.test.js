@@ -27,7 +27,8 @@ test('Wing Facts retains its existing Home experience', () => {
   assert.match(home, /accessibilityLabel="Wing Facts, open a wing fact"[\s\S]*onPress=\{openWingFacts\}/);
 });
 
-test('Send to Friend is inside Your Next Place and never uses the native share sheet', () => {
+test('Send to Friend is inside the restaurant card and never uses the native share sheet', () => {
+  assert.doesNotMatch(home, /Your Next Place!/);
   assert.match(home, /testID="send-to-friend-button"/);
   assert.match(home, /testID="directions-button"/);
   assert.match(home, /hitSlop=\{4\}/);

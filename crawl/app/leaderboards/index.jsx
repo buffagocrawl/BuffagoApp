@@ -17,6 +17,7 @@ import {
 import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase.js';
 import { filterSociallyVisibleRows } from '../../lib/socialVisibility';
+import ChallengeLeaderboard from '../../components/ChallengeLeaderboard';
 
 const ADMIN_ID = '23898359-306a-4dd3-91f0-da66da19ccfc';
 const LEVEL_XP_STEP = 100; // 1 level per 100 XP
@@ -1012,6 +1013,11 @@ export default function Leaderboards() {
           </Card>
         ) : (
           <>
+            <ChallengeLeaderboard
+              client={supabase}
+              onUserPress={handleViewUserJourney}
+              onSignIn={() => router.push('/auth/login')}
+            />
             <LeaderCard
               title="Highest Level"
               items={lbHighestLevel}
