@@ -33,8 +33,6 @@ module.exports = ({ config }) => ({
     infoPlist: {
       NSLocationWhenInUseUsageDescription:
         "BuffaGo uses your location to verify you’re at a wing stop so you can rate wings and progress through crawls.",
-      NSLocationAlwaysAndWhenInUseUsageDescription:
-        "BuffaGo uses background location only for the next active crawl stop you choose, so it can remind you when you are nearby.",
       LSApplicationQueriesSchemes: ["fb", "fbauth2"],
       ITSAppUsesNonExemptEncryption: false,
     },
@@ -42,11 +40,10 @@ module.exports = ({ config }) => ({
 
   android: {
     package: "com.buffago.app",
-    versionCode: 5,
+    versionCode: 6,
 
-    // Fine, but note: Expo Location will add what it needs.
-    // Keeping explicit permission is OK.
-    permissions: ["ACCESS_FINE_LOCATION", "ACCESS_BACKGROUND_LOCATION", "POST_NOTIFICATIONS"],
+    permissions: ["ACCESS_FINE_LOCATION", "POST_NOTIFICATIONS"],
+    blockedPermissions: ["android.permission.ACCESS_BACKGROUND_LOCATION"],
 
     adaptiveIcon: {
       foregroundImage: "./assets/adaptive-icon.png",
@@ -97,7 +94,14 @@ module.exports = ({ config }) => ({
   plugins: [
     "expo-router",
     "expo-font",
-    "expo-location",
+    [
+      "expo-location",
+      {
+        isAndroidBackgroundLocationEnabled: false,
+        isAndroidForegroundServiceEnabled: false,
+        isIosBackgroundLocationEnabled: false,
+      },
+    ],
     [
       "expo-notifications",
       {
