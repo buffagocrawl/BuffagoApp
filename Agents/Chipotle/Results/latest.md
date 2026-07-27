@@ -10,7 +10,7 @@ Growth acquisition and activation completion are unavailable pending identity-sa
 
 ## Engagement and geography
 
-- Ratings created: **0**; crawls created: **0**; Wing Duel votes: **0**.
+- Ratings created: **1**; crawls created: **0**; Wing Duel votes: **0**.
 - Geographic and market-density data: unavailable pending aggregate views.
 
 ## Retention and product health

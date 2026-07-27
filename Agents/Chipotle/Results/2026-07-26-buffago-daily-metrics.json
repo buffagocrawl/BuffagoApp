@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-07-26T23:11:03.989461Z",
+  "generatedAt": "2026-07-27T10:00:08.953667Z",
   "jalapeno": {
-    "age_hours": 144.9,
+    "age_hours": 155.7,
     "artifact": "latest_external_context.json",
     "status": "stale",
     "timestamp": "2026-07-20T22:19:10.494523Z"
@@ -87,9 +87,9 @@
       "availability": "available",
       "previousDay": 1,
       "source": "public.destination_ratings.created_at",
-      "trailing30": 2,
-      "trailing7": 1,
-      "yesterday": 0
+      "trailing30": 3,
+      "trailing7": 2,
+      "yesterday": 1
     },
     "referrals": {
       "availability": "unavailable",
@@ -131,9 +131,9 @@
       "availability": "available",
       "previousDay": 0,
       "source": "public.daily_xp_claims.claimed_at",
-      "trailing30": 1,
-      "trailing7": 1,
-      "yesterday": 0
+      "trailing30": 2,
+      "trailing7": 2,
+      "yesterday": 1
     }
   },
   "reportDate": "2026-07-26",
