@@ -147,6 +147,9 @@ test('account deletion pseudonymizes owners and emits a service-only private-obj
   assert.match(securitySql, /update public\.rating_verification_receipts/);
   assert.match(securitySql, /update public\.wing_creator_reward_events/);
   assert.match(securitySql, /update public\.wing_creator_badge_events/);
+  assert.match(securitySql, /update public\.social_community_visit_intents/);
+  assert.match(securitySql, /update public\.social_community_reward_events/);
+  assert.match(securitySql, /update public\.wing_notification_receipts/);
   assert.match(
     securitySql,
     /grant execute on function public\.prepare_wing_account_media_cleanup\(uuid, uuid\)\s+to service_role/,
@@ -154,5 +157,20 @@ test('account deletion pseudonymizes owners and emits a service-only private-obj
   assert.doesNotMatch(
     securitySql,
     /grant execute on function public\.prepare_wing_account_media_cleanup\(uuid, uuid\)\s+to authenticated/,
+  );
+});
+
+test('server enforces staged prompt and media-type feature flags', () => {
+  assert.match(securitySql, /wing_feature_enabled_for_user/);
+  assert.match(securitySql, /wing_shot_prompt_disabled/);
+  assert.match(securitySql, /wing_shot_photo_upload_disabled/);
+  assert.match(securitySql, /wing_shot_video_upload_disabled/);
+  assert.match(
+    securitySql,
+    /hashtextextended\(auth\.uid\(\)::text \|\| ':' \|\| flag\.flag_key/,
+  );
+  assert.match(
+    securitySql,
+    /revoke all on function public\.wing_feature_enabled_for_user\(text\)[\s\S]*from public, anon, authenticated/,
   );
 });

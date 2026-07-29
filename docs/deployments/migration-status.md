@@ -31,9 +31,21 @@ remote deployment; verify the remote migration ledger before applying them.
 | 20260726120000_challenge_leaderboard_tiebreak.sql | candidate | not applied here | manifest recorded | challenge leaderboard tie-break correction | 8b7d9b888b549c19a24d52ef6c446eb4ea6aa295a356f8f2afe1ff8e2b47f135 |
 | 20260729120000_wing_shots_core.sql | candidate | not applied here | isolated local schema/runtime validated | Wing Shots database wave | 60a82c0031934d92df11551d0b7b01318357ae5a61462b5497c1c1f692f7d04e |
 | 20260729120500_wing_shots_rating_provenance.sql | candidate | not applied here | isolated local schema/runtime validated | Wing Shots database wave | 891838dc9d3b1b6a9dc637c3918bfb6f93d4d40bce63caa2dd8c3b2d88450bb5 |
-| 20260729121000_wing_shots_security_rpc.sql | candidate | not applied here | isolated local RLS/runtime validated | Wing Shots database wave | 8bce53086328941d3b0db853b231a2867ddcbc29cb66ff52d0d0d93c00bc87cd |
+| 20260729121000_wing_shots_security_rpc.sql | candidate | not applied here | isolated local RLS/runtime validated | Wing Shots database wave | 0aa4bc0cc75a3bbcfc6c640dd2aa966b65ee2a7c092f7a3fdef167262c6080a9 |
 | 20260729122000_wing_shots_creator_rewards.sql | candidate | not applied here | isolated local idempotency/runtime validated | Wing Shots database wave | 6f8fe2f0669957fca64019c7e0c18fc0a37a234f4ae08fbb0025cb7829f979ea |
 | 20260729123000_wing_shots_feature_flags.sql | candidate | not applied here | source-contract validated | Wing Shots database wave | 5b072e5e4d78b3e529216fe333bb1db578392d628bf38db0de6e6b50f81c220f |
+| 20260729124000_wing_shots_moderation_selection.sql | candidate | not applied here | isolated local schema/runtime validated | Wing Shots moderation and selection | c4737df9e24328d97a42d32a59b532803c4aec2b6fe76a25ac52a3c4bd2b17b0 |
+| 20260729125000_wing_shots_social_community.sql | candidate | not applied here | isolated local idempotency/runtime validated | Wing Shots social community | 350c0734721ca60171a4d61d6fd65351801a0d1564775880938eb7ec632eb325 |
+| 20260729126000_wing_shots_notifications.sql | candidate | not applied here | source-contract validated | Wing Shots notifications | c1074cd6c7cdaaa3c146beb8af85a6c81bc9c0b85457d5cc94ad46c76949814c |
+| 20260729127000_wing_shots_home_rating.sql | candidate | not applied here | isolated local transaction validated | Wing Shots Home rating integration | a25bbe5730b83b3bc2deaaaff620d489086590bcabd64fd3099f2844c39a9d5a |
+| 20260729128000_wing_shots_admin_review_surface.sql | candidate | not applied here | isolated local RLS/runtime validated | Wing Shots admin review | aea7f5d9eee3c7fe2ac4ea25d154d53cb14a007b2ad51ceadedda33b4eb6a6c3 |
+| 20260729129000_verified_progression_xp.sql | candidate | not applied here | source-contract validated | Verified progression repair | 8c18e51b839ab31f7b4aa624ca883f879735484771ac422c07461a36fb158cdc |
+| 20260729130000_wing_shots_publishing_rpc.sql | candidate | not applied here | isolated local idempotency/runtime validated | Wing Shots platform publishing | 7cb9c0db0f7277d99f5dba7465de8c42e4af1b82a96be3a628fb977d35a5e3c9 |
+| 20260729132000_wing_creator_surfaces.sql | candidate | not applied here | isolated local RLS/runtime validated | Wing Creator profile and leaderboard | c14f309aa392e4c63c6237ead2e2f1c0b774ebb50b5a2e556e4bb523997be5c7 |
+| 20260729133000_wing_processing_worker_contract.sql | candidate | not applied here | isolated local worker/runtime validated | Wing Shots processing worker | 1f8f009d9853db56abf36c86226750657838b5911ae616ed88290cd316f0de05 |
+| 20260729134000_wing_generation_worker_contract.sql | candidate | not applied here | source and Docker media validated | Wing Shots branded generation | 2ce7d8b4ca9e20a048aba0bf306f5264b6915c16a6f65f1be608b4dc00071845 |
+| 20260729135000_retire_legacy_jalapeno_media.sql | candidate | not applied here | source-contract validated | Legacy Jalapeno retirement | 2b8ee7169e1279264e6a0140899d5bcb1e12ff1de4c7c698dd54d37eae52f5cc |
+| 20260729136000_wing_upload_retry_after_expiry.sql | candidate | not applied here | isolated local transaction validated | Safe abandoned-upload retry | e5d311705d1661ee1c3c73146bc4ee3aea59366be102c5aff834000d9d8ce278 |
 | 20260729153000_serrano_trust_repair.sql | candidate | not applied here | source-contract and client integration validated | Serrano trust repair checkpoint | d2d8e3d4d0dcc9a2ad49475d06babdea267c35926dd446da85265396c002c9c7 |
 
 

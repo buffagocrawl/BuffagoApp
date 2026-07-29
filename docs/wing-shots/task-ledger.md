@@ -3,6 +3,21 @@
 Status values: `DONE`, `IN_PROGRESS`, `READY`, `BLOCKED`, `PLANNED`.
 Review gates: G1 architecture/schema; G2 rating/onboarding UX; G3 storage/security; G4 moderation; G5 scheduling; G6 social publishing; G7 progression; G8 profile/history; G9 notifications; G10 integrated experience.
 
+## Integrated delivery update — 2026-07-29
+
+| ID | Owner | Dependencies | Files delivered | Status | Commit | Tests/evidence | Review outcome | Remaining risk |
+|---|---|---|---|---|---|---|---|---|
+| WS-03–07 | Lead + schema/security | discovery | `120000`–`123000`, `121000` | DONE | pending integration | isolated schema/RLS/runtime, migration integrity | G1/G3 contract accepted | target database baseline preflight |
+| WS-08–11 | Mobile/UX | provenance + flags | rating routes, `components/wingShots`, onboarding | DONE | pending integration | 30 mobile/rating/social contracts, typecheck/lint | G2 code review ready | authenticated device fixture |
+| WS-12–16 | Creator/social | rewards | Creator UI, `125000`, `132000` | DONE | pending integration | owner/other-user RLS, idempotency contracts | G7/G8 ready | truthful visit, not follower verification |
+| WS-17–18 | Notifications/admin | roles + flags | `126000`, `128000`, admin queue/Edge preview | DONE | pending integration | reviewer denial/preview replay runtime, 5 UI contracts | G4/G9 ready | production push dispatcher |
+| WS-19–24 | Processing/moderation | private storage | worker, `124000`, `133000`, `136000` | DONE | pending integration | 30 Python, Docker muted-video proof, isolated worker runtime | G3/G4 ready | production moderation provider |
+| WS-25–30 | Jalapeño/publishing | approved worker output | `130000`, `134000`, `135000`, nightly workflow | DONE | pending integration | 73 Python, 36 scheduler contracts, independent lease tests | G5/G6 code ready | Meta/GitHub provider validation |
+| WS-31–36 | Analytics/privacy/test | all slices | allowlist, deletion boundary, test suites | DONE | pending integration | 122 Wing Shots tests; 50 RLS; 24 auth; 5 analytics | G10 evidence in progress | Expo dependency audit |
+| WS-37 | Cayenne runtime | deployable dev client + QA fixture | selectors and fixture-aware flows | BLOCKED | — | contracts/selectors pass; Android evidence captured | no false pass | installed dev client ANR before `app.root`; safe auth fixture unavailable |
+| WS-38–41 | Serrano/release | integrated diff/evidence | Serrano runs/evidence | IN_PROGRESS | — | discovery and security workers exercised | discovery score not release-valid (brief-only evidence) | code-aware final score pending Serrano runtime limitation |
+| WS-42 | Lead integrator | all | branch, manifest, commits, final evidence | IN_PROGRESS | — | full suite in progress | not release-ready until commits/review complete | provider/runtime/audit blockers |
+
 | ID | Owner | Dependencies | Expected files | Status | Commit | Tests | Review outcome | Unresolved risks |
 |---|---|---|---|---|---|---|---|---|
 | WS-01 | Product architect | — | `docs/wing-shots/*` | DONE | `efc37a5`, `0886c5c` | contract/threat audit | Serrano brief approved; integrated scoring pending | Contract drift remains a release audit item |

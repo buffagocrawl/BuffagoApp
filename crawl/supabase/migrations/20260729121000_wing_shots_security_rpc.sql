@@ -165,6 +165,32 @@ as $$
     );
 $$;
 
+create or replace function public.wing_feature_enabled_for_user(p_flag_key text)
+returns boolean
+language sql
+stable
+security definer
+set search_path = pg_catalog, public
+as $$
+  select auth.uid() is not null
+    and exists (
+      select 1
+        from public.engagement_feature_flags flag
+       where flag.flag_key = p_flag_key
+         and flag.enabled
+         and (
+           flag.rollout_percent = 100
+           or mod(
+             mod(
+               hashtextextended(auth.uid()::text || ':' || flag.flag_key, 0),
+               100
+             ) + 100,
+             100
+           ) < flag.rollout_percent
+         )
+    );
+$$;
+
 create or replace function public.wing_can_upload_reserved_original(p_object_name text)
 returns boolean
 language sql
@@ -370,6 +396,17 @@ begin
   end if;
   if p_user_caption is not null and char_length(p_user_caption) > 500 then
     raise exception 'caption_too_long';
+  end if;
+  if not public.wing_feature_enabled_for_user('wing_shot_prompt') then
+    raise exception 'wing_shot_prompt_disabled' using errcode = '42501';
+  end if;
+  if p_media_type = 'photo'
+     and not public.wing_feature_enabled_for_user('wing_shot_photo_upload') then
+    raise exception 'wing_shot_photo_upload_disabled' using errcode = '42501';
+  end if;
+  if p_media_type = 'video'
+     and not public.wing_feature_enabled_for_user('wing_shot_video_upload') then
+    raise exception 'wing_shot_video_upload_disabled' using errcode = '42501';
   end if;
 
   select *
@@ -917,6 +954,25 @@ begin
          user_id = null
    where user_id = p_user_id;
 
+  update public.social_community_visit_intents
+     set status = case when status = 'initiated' then 'cancelled' else status end,
+         owner_pseudonym_id = v_pseudonym_id,
+         owner_deleted_at = now(),
+         user_id = null
+   where user_id = p_user_id;
+
+  update public.social_community_reward_events
+     set owner_pseudonym_id = v_pseudonym_id,
+         owner_deleted_at = now(),
+         user_id = null
+   where user_id = p_user_id;
+
+  update public.wing_notification_receipts
+     set owner_pseudonym_id = v_pseudonym_id,
+         owner_deleted_at = now(),
+         user_id = null
+   where user_id = p_user_id;
+
   update public.wing_submission_upload_intents
      set status = case when status = 'reserved' then 'cancelled' else status end,
          updated_at = now()
@@ -1018,6 +1074,8 @@ with check (
 );
 
 revoke all on function public.wing_has_app_role(text) from public, anon, authenticated;
+revoke all on function public.wing_feature_enabled_for_user(text)
+from public, anon, authenticated;
 revoke all on function public.wing_apply_owner_pseudonymization()
 from public, anon, authenticated;
 revoke all on function public.wing_can_upload_reserved_original(text)

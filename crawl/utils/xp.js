@@ -80,26 +80,18 @@ export async function grantXp(amount, reason = '', toast, options = {}) {
       ...options.metadata,
     };
 
-    const { data: awarded, error: awardErr } = await supabase.rpc('award_xp', {
-      p_amount: xpAmount,
+    const { data: awarded, error: awardErr } = await supabase.rpc('claim_verified_progression_xp', {
       p_source: source,
-      p_reason: reason || source,
-      p_user_id: user.id,
-      p_idempotency_key: options.idempotencyKey ?? null,
       p_destination_id: options.destinationId ?? null,
       p_crawl_id: options.crawlId ?? null,
       p_route_id: options.routeId ?? null,
-      p_badge_id: options.badgeId ?? null,
-      p_battle_id: options.battleId ?? null,
-      p_challenge_id: options.challengeId ?? null,
-      p_referral_id: options.referralId ?? null,
       p_metadata: metadata,
     });
 
     if (!awardErr) {
       const row = unwrapRpc(awarded);
       if (!row?.awarded) return null;
-      try { toast?.show?.(xpAmount, reason); } catch {}
+      try { toast?.show?.(Number(row.amount || xpAmount), row.reason || reason); } catch {}
       return Number(row?.xp_after ?? 0);
     }
 
