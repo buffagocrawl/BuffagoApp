@@ -144,10 +144,21 @@ function rpcError(code, stage, error) {
       { stage },
     );
   }
-  if (serverCode.includes('rating_not_found')) {
+  const eligibilityMessages = {
+    rating_not_found: 'That rating could not be found. Your rating is still saved.',
+    rating_not_owned: 'That rating belongs to another account.',
+    buffacoin_rating: 'Buffacoin ratings cannot be used for Wing Shots.',
+    destination_mismatch: 'That rating is for a different restaurant.',
+    onboarding_rating: 'Onboarding ratings cannot be used for Wing Shots.',
+    in_person_not_verified: 'That rating could not be verified as an in-person visit.',
+  };
+  const eligibilityCode = Object.keys(eligibilityMessages).find((value) =>
+    serverCode.includes(value),
+  );
+  if (eligibilityCode) {
     return new WingShotClientError(
-      'rating_not_found',
-      'That rating could not be linked to this restaurant.',
+      eligibilityCode,
+      eligibilityMessages[eligibilityCode],
       { stage },
     );
   }

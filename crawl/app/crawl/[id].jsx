@@ -200,7 +200,7 @@ function DialogHeaderArrow({ title, onBack }) {
 }
 
 /* ------------------ Report visuals -------------------------- */
-function ReportRow({ name, yours, avg, delta }) {
+function ReportRow({ name, yours, avg, delta, metrics = [] }) {
   const theme = useTheme();
   const isDark = !!theme.dark;
   const better = delta > 0;
@@ -225,6 +225,15 @@ function ReportRow({ name, yours, avg, delta }) {
         <Text style={styles.reportSub}>
           You: {fmt2(yours)} • Avg: {fmt2(avg)}
         </Text>
+        {metrics.length ? (
+          <View style={styles.reportMetricGrid}>
+            {metrics.map((metric) => (
+              <Text key={metric.label} style={styles.reportMetricText}>
+                {metric.label}: {fmt2(metric.yours)}/{fmt2(metric.avg)}
+              </Text>
+            ))}
+          </View>
+        ) : null}
       </View>
 
       <View style={[styles.pill, { backgroundColor: bg }]}>
@@ -1429,6 +1438,10 @@ export default function CrawlScreen() {
           `
           destination_id,
           weight_score,
+          crispiness,
+          sauce,
+          meat,
+          overall,
           destinations!destination_ratings_destination_id_fkey ( name )
         `
         )
@@ -1452,20 +1465,32 @@ export default function CrawlScreen() {
 
       const { data: allRatings, error: eAll } = await supabase
         .from('destination_ratings')
-        .select('destination_id, weight_score')
+        .select('destination_id, weight_score, crispiness, sauce, meat, overall')
         .in('destination_id', destIds);
 
       if (eAll) throw eAll;
 
       const sums = new Map();
       const counts = new Map();
+      const metricKeys = ['crispiness', 'sauce', 'meat', 'overall'];
+      const metricSums = new Map();
+      const metricCounts = new Map();
 
       for (const row of allRatings || []) {
         const id = row.destination_id;
         const val = Number(row.weight_score ?? 0);
-        if (!Number.isFinite(val)) continue;
-        sums.set(id, (sums.get(id) ?? 0) + val);
-        counts.set(id, (counts.get(id) ?? 0) + 1);
+        if (Number.isFinite(val)) {
+          sums.set(id, (sums.get(id) ?? 0) + val);
+          counts.set(id, (counts.get(id) ?? 0) + 1);
+        }
+
+        for (const key of metricKeys) {
+          const metricValue = Number(row[key]);
+          if (!Number.isFinite(metricValue)) continue;
+          const sumKey = `${id}:${key}`;
+          metricSums.set(sumKey, (metricSums.get(sumKey) ?? 0) + metricValue);
+          metricCounts.set(sumKey, (metricCounts.get(sumKey) ?? 0) + 1);
+        }
       }
 
       const rows = mineUnique.map((r) => {
@@ -1474,8 +1499,25 @@ export default function CrawlScreen() {
         const total = sums.get(r.destination_id) ?? 0;
         const cnt = counts.get(r.destination_id) ?? 0;
         const avg = cnt > 0 ? total / cnt : 0;
+        const metricLabels = {
+          crispiness: 'Crisp',
+          sauce: 'Sauce',
+          meat: 'Chicken',
+          overall: 'Experience',
+        };
+        const metrics = metricKeys.map((key) => {
+          const sumKey = `${r.destination_id}:${key}`;
+          const metricCount = metricCounts.get(sumKey) ?? 0;
+          const metricAvg = metricCount > 0 ? metricSums.get(sumKey) / metricCount : null;
+          const yoursValue = Number(r[key]);
+          return {
+            label: metricLabels[key],
+            yours: Number.isFinite(yoursValue) ? yoursValue : null,
+            avg: metricAvg,
+          };
+        });
 
-        return { id: r.destination_id, name, yours, avg, delta: yours - avg };
+        return { id: r.destination_id, name, yours, avg, delta: yours - avg, metrics };
       });
 
       rows.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
@@ -2234,12 +2276,12 @@ export default function CrawlScreen() {
               ) : (
                 <>
                   <Text style={{ textAlign: 'center', marginBottom: 8, opacity: 0.75 }}>
-                    Tap a spot to drill down • Green = higher than avg • Red = lower
+                    Your rating / place average · Tap a spot to see the full comparison
                   </Text>
                   <Divider style={{ marginBottom: 8 }} />
                   {reportRows.map((r, idx) => (
                     <Pressable key={`${r.id}-${idx}`} onPress={() => openDetail(r.id, r.name)} style={{ borderRadius: 12 }}>
-                      <ReportRow name={r.name} yours={r.yours} avg={r.avg} delta={r.delta} />
+                      <ReportRow name={r.name} yours={r.yours} avg={r.avg} delta={r.delta} metrics={r.metrics} />
                     </Pressable>
                   ))}
                 </>
@@ -2633,6 +2675,17 @@ const styles = StyleSheet.create({
   reportSub: {
     opacity: 0.7,
     marginTop: 2,
+  },
+  reportMetricGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    columnGap: 10,
+    rowGap: 2,
+    marginTop: 5,
+  },
+  reportMetricText: {
+    fontSize: 12,
+    opacity: 0.78,
   },
   pill: {
     paddingHorizontal: 10,

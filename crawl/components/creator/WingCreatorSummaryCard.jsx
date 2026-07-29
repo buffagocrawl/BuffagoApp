@@ -165,16 +165,6 @@ export default function WingCreatorSummaryCard({ refreshKey = 0 }) {
         )}
 
         <Button
-          testID="creator.add-wing-shot"
-          mode="contained-tonal"
-          icon="camera-plus"
-          onPress={() => router.push('/profile/wing-shots/submit?source=profile')}
-          accessibilityLabel="Add a Wing Shot"
-          contentStyle={styles.buttonContent}
-        >
-          Add a Wing Shot
-        </Button>
-        <Button
           testID="creator.open-history"
           mode="contained-tonal"
           icon="camera"

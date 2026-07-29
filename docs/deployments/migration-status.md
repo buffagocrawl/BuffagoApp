@@ -49,6 +49,7 @@ remote deployment; verify the remote migration ledger before applying them.
 | 20260729140000_wing_shots_unrestricted_sources.sql | candidate | not applied here | source-contract validated | Optional Wing Shots from ratings and independent entry points | 9afcbabc48edb4bf3103e5892d4bccc5e24cbba5bc234c16533ffb3de827ac66 |
 | 20260729150000_reconcile_wing_upload_rpc.sql | candidate | not applied here | source-contract validated | Wing Shot upload RPC contract reconciliation | 43572443020a2e400093de096bc4a7f17a6d3d20f0a068a2f0a40066b24c2fd2 |
 | 20260729153000_serrano_trust_repair.sql | candidate | not applied here | source-contract and client integration validated | Serrano trust repair checkpoint | d2d8e3d4d0dcc9a2ad49475d06babdea267c35926dd446da85265396c002c9c7 |
+| 20260729155000_wing_upload_rating_eligibility_repair.sql | candidate | not applied here | source-contract validated; remote ledger/schema out of sync | Wing Shot rating eligibility repair | 59b240ee30c567724bc18a84d2ae29c0c4d2b3c8a513d7a5c00640cf0f4e8c12 |
 
 
 The exact deployment order is: Strategy B baseline preflight, the retention
