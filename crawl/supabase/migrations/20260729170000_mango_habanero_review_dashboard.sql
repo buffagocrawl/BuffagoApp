@@ -117,7 +117,7 @@ begin
   if p_action not in ('approve','reject') or p_submission_id is null
     or char_length(coalesce(p_idempotency_key,'')) not between 8 and 200
     or p_correlation_id is null then raise exception 'invalid_review_request'; end if;
-  if p_action='reject' and nullif(trim(coalesce(p_reason_category,''))) is null
+  if p_action='reject' and nullif(trim(coalesce(p_reason_category,'')), '') is null
     then raise exception 'rejection_reason_required'; end if;
   perform pg_advisory_xact_lock(hashtextextended('mango-review:'||p_idempotency_key,0));
   select * into s from public.wing_media_submissions where id=p_submission_id for update;
