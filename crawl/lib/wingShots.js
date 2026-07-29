@@ -145,12 +145,11 @@ function rpcError(code, stage, error) {
     );
   }
   const eligibilityMessages = {
-    rating_not_found: 'That rating could not be found. Your rating is still saved.',
-    rating_not_owned: 'That rating belongs to another account.',
-    buffacoin_rating: 'Buffacoin ratings cannot be used for Wing Shots.',
-    destination_mismatch: 'That rating is for a different restaurant.',
-    onboarding_rating: 'Onboarding ratings cannot be used for Wing Shots.',
-    in_person_not_verified: 'That rating could not be verified as an in-person visit.',
+    rating_not_found: 'We could not use that rating for a Wing Shot. Please try again.',
+    rating_not_owned: 'We could not use that rating for a Wing Shot. Please try again.',
+    buffacoin_rating: 'Wing Shots are available after restaurant ratings.',
+    destination_mismatch: 'We could not use that restaurant rating for a Wing Shot. Please try again.',
+    incomplete_rating: 'Finish all rating scores before adding a Wing Shot.',
   };
   const eligibilityCode = Object.keys(eligibilityMessages).find((value) =>
     serverCode.includes(value),
