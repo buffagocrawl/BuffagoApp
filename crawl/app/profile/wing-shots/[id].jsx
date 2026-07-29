@@ -15,6 +15,7 @@ import {
   withdrawMyWingShot,
 } from '../../../lib/wingCreator';
 import { trackEvent } from '../../../lib/analytics';
+import { formatWingShotRejectionReason } from '../../../lib/wingShotCopy';
 
 function single(value) {
   return Array.isArray(value) ? value[0] : value;

@@ -21,7 +21,7 @@ test('owner detail is private, sanitized, and exposes only real posted HTTPS lin
   assert.doesNotMatch(returnedColumns, /reviewer_notes|storage_path|moderation_status/);
 });
 
-test('Creator leaderboard is server gated and keeps privacy filtering in authoritative RPC', () => {
+test('Creator leaderboard is server gated, private, and uses Reputation copy', () => {
   assert.match(migration, /wing_shot_creator_leaderboard/);
   assert.match(migration, /if not coalesce\(v_enabled, false\) then\s+return/);
   assert.match(migration, /revoke execute on function public\.get_wing_creator_leaderboard\(text, integer\)\s+from authenticated/);
@@ -38,9 +38,13 @@ test('history and detail include stable selectors and understandable states', ()
   }
   assert.match(history, /testID="creator\.history"/);
   assert.match(history, /'creator\.history\.first-item'/);
+  assert.match(history, /formatWingShotRejectionReason/);
+  assert.match(history, /<SubmissionStatusChip status=\{item\.display_status\} \/>/);
+  assert.match(history, /item\.display_status === 'Rejected'/);
+  assert.match(history, /Submitted \{formatDate\(item\.created_at\)\}/);
   assert.match(detail, /testID="creator\.detail\.withdraw"/);
   assert.match(detail, /testID="creator\.detail\.request-review"/);
-  assert.match(detail, /Your rating is still saved/);
+  assert.match(detail, /formatWingShotRejectionReason/);
 });
 
 test('unposted withdrawal and posted review are separate server-authoritative actions', () => {

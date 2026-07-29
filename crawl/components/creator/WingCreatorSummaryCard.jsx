@@ -175,7 +175,7 @@ export default function WingCreatorSummaryCard({ refreshKey = 0 }) {
           testID="creator.open-history"
           mode="contained-tonal"
           icon="camera"
-          onPress={() => router.push('/profile/wing-shots')}
+          onPress={() => router.push('/profile/wing-shots/history')}
           accessibilityLabel="Open your private Wing Shot history"
           contentStyle={styles.buttonContent}
         >
@@ -227,14 +227,14 @@ export default function WingCreatorSummaryCard({ refreshKey = 0 }) {
 }
 
 const styles = StyleSheet.create({
-  card: { borderRadius: 18, marginBottom: 16 },
-  content: { gap: 14 },
+  card: { borderRadius: 16, marginBottom: 12 },
+  content: { gap: 10, paddingVertical: 14 },
   heading: { flexDirection: 'row', alignItems: 'flex-start' },
   title: { fontWeight: '800' },
-  subtitle: { marginTop: 4, lineHeight: 20, opacity: 0.78 },
+  infoButton: { margin: -8, marginTop: -10, minWidth: 44, minHeight: 44 },
   loading: { minHeight: 76, justifyContent: 'center', alignItems: 'center' },
   error: { gap: 6, alignItems: 'flex-start' },
-  metrics: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  metrics: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   metric: { flexGrow: 1, flexBasis: 90, minWidth: 88 },
   metricValue: { fontWeight: '900' },
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
