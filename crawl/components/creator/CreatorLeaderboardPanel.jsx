@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { ActivityIndicator, Button, Card, SegmentedButtons, Text, useTheme } from 'react-native-paper';
+import { ActivityIndicator, Avatar, Button, Card, SegmentedButtons, Text, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import {
   loadCreatorLeaderboard,
@@ -72,10 +72,10 @@ export default function CreatorLeaderboardPanel({ active = true }) {
       <Card.Content style={styles.content}>
         <View>
           <Text variant="titleLarge" style={styles.title}>
-            Wing Creators
+            Creators
           </Text>
           <Text variant="bodyMedium" style={styles.subtitle}>
-            Ranked by approved Creator XP—not upload count.
+            Creator Reputation is earned from approved and featured Wing Shots.
           </Text>
         </View>
 
@@ -114,7 +114,7 @@ export default function CreatorLeaderboardPanel({ active = true }) {
           </View>
         ) : rows.length === 0 ? (
           <Text testID="creator.leaderboard.empty" style={styles.empty}>
-            No approved Creator XP in this period yet.
+            No Creator Reputation in this period yet.
           </Text>
         ) : (
           <View style={styles.rows}>
@@ -136,7 +136,7 @@ export default function CreatorLeaderboardPanel({ active = true }) {
                       opacity: pressed ? 0.72 : 1,
                     },
                   ]}
-                  accessibilityLabel={`Rank ${row.rank}, ${name}, ${row.creator_xp} Creator XP, ${row.approved_submissions} approved, ${row.featured_submissions} featured`}
+                  accessibilityLabel={`${row.is_current_user ? 'Your rank, ' : ''}Rank ${row.rank}, ${name}, ${row.creator_xp} Creator Reputation, ${row.approved_submissions} approved, ${row.featured_submissions} featured`}
                   accessibilityRole="button"
                   accessibilityHint="Opens this creator's public wing journey"
                   onPress={() =>
@@ -149,7 +149,9 @@ export default function CreatorLeaderboardPanel({ active = true }) {
                     })
                   }
                 >
-                  <Text
+                  <View style={styles.rowIdentity}>
+                    {row.avatar_url ? <Avatar.Image size={36} source={{ uri: row.avatar_url }} /> : <Avatar.Text size={36} label={name.slice(0, 1).toUpperCase()} />}
+                    <Text
                     variant="titleMedium"
                     style={[
                       styles.rowName,
@@ -157,9 +159,10 @@ export default function CreatorLeaderboardPanel({ active = true }) {
                         ? { color: theme.colors.onSecondaryContainer }
                         : null,
                     ]}
-                  >
-                    #{row.rank}  {name}
-                  </Text>
+                    >
+                      {row.is_current_user ? 'Your Rank · ' : ''}#{row.rank}  {name}
+                    </Text>
+                  </View>
                   <Text
                     variant="bodySmall"
                     style={[
@@ -169,7 +172,7 @@ export default function CreatorLeaderboardPanel({ active = true }) {
                         : null,
                     ]}
                   >
-                    {Number(row.creator_xp || 0)} Creator XP ·{' '}
+                    {Number(row.creator_xp || 0)} Reputation ·{' '}
                     {Number(row.approved_submissions || 0)} approved ·{' '}
                     {Number(row.featured_submissions || 0)} featured
                   </Text>
@@ -200,5 +203,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   rowName: { fontWeight: '750' },
+  rowIdentity: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   rowStats: { opacity: 0.74, marginTop: 2, lineHeight: 18 },
 });

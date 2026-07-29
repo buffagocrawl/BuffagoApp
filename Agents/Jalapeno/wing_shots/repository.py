@@ -21,6 +21,11 @@ class WingShotsRepository(Protocol):
         self, *, business_date: date, correlation_id: str
     ) -> dict[str, Any]: ...
 
+    def run_approved_queue_selection(
+        self, *, business_date: date, correlation_id: str,
+        submission_id: str | None = None
+    ) -> dict[str, Any]: ...
+
     def claim_platform_job(
         self,
         *,
@@ -36,6 +41,10 @@ class WingShotsRepository(Protocol):
         claim_token: str,
         idempotency_key: str,
         correlation_id: str,
+    ) -> dict[str, Any]: ...
+
+    def prepare_manual_publish(
+        self, *, submission_id: str, correlation_id: str
     ) -> dict[str, Any]: ...
 
 
@@ -83,8 +92,22 @@ class SupabaseRpcRepository:
                     "p_business_date": business_date.isoformat(),
                     "p_correlation_id": correlation_id,
                 },
-            ),
-            rpc="run_wing_nightly_selection",
+            ), rpc="run_wing_nightly_selection"
+        )
+
+    def run_approved_queue_selection(
+        self, *, business_date: date, correlation_id: str,
+        submission_id: str | None = None
+    ) -> dict[str, Any]:
+        return self._one(
+            self._rpc(
+                "run_wing_approved_queue_selection",
+                {
+                    "p_business_date": business_date.isoformat(),
+                    "p_correlation_id": correlation_id,
+                    "p_submission_id": submission_id,
+                },
+            ), rpc="run_wing_approved_queue_selection"
         )
 
     def recover_stale_platform_jobs(
@@ -141,6 +164,19 @@ class SupabaseRpcRepository:
                 },
             ),
             rpc="finish_wing_social_job",
+        )
+
+    def prepare_manual_publish(
+        self, *, submission_id: str, correlation_id: str
+    ) -> dict[str, Any]:
+        return self._one(
+            self._rpc(
+                "prepare_wing_manual_publish",
+                {
+                    "p_submission_id": submission_id,
+                    "p_correlation_id": correlation_id,
+                },
+            ), rpc="prepare_wing_manual_publish"
         )
 
 

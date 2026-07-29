@@ -5,6 +5,7 @@ import { ActivityIndicator, Button, Card, Text, useTheme } from 'react-native-pa
 import { useFocusEffect, useRouter } from 'expo-router';
 import ScreenHeader from '../../../components/ScreenHeader';
 import SubmissionStatusChip from '../../../components/creator/SubmissionStatusChip';
+import { formatWingShotRejectionReason } from '../../../lib/wingShotRejection';
 import WingCreatorSummaryCard from '../../../components/creator/WingCreatorSummaryCard';
 import { loadMyWingShotHistory } from '../../../lib/wingCreator';
 import { supabase } from '../../../lib/supabase';
@@ -187,7 +188,7 @@ export default function WingShotHistoryScreen() {
               </View>
               {item.display_status === 'Rejected' && item.rejection_category ? (
                 <Text variant="bodySmall" style={styles.rejection}>
-                  {item.rejection_category}
+                  {formatWingShotRejectionReason(item.rejection_category)}
                 </Text>
               ) : null}
             </Card.Content>

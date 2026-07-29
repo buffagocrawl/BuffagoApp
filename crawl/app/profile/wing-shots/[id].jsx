@@ -6,6 +6,7 @@ import { ActivityIndicator, Button, Card, Text, useTheme } from 'react-native-pa
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import ScreenHeader from '../../../components/ScreenHeader';
 import SubmissionStatusChip from '../../../components/creator/SubmissionStatusChip';
+import { formatWingShotRejectionReason } from '../../../lib/wingShotRejection';
 import {
   canWithdrawWingShot,
   loadMyWingShotDetail,
@@ -263,7 +264,7 @@ export default function WingShotDetailScreen() {
                 Not selected for the approval queue
               </Text>
               <Text style={styles.body}>
-                {detail.rejection_category || 'Not eligible for featuring'}
+                {formatWingShotRejectionReason(detail.rejection_category)}
               </Text>
               <Text style={[styles.body, styles.nextStep]}>
                 Your rating is still saved. You can submit a new Wing Shot after a future eligible

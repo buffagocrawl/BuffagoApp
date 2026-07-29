@@ -120,7 +120,7 @@ begin
   v_copy := case v_event_type
     when 'wing_shot_approved' then jsonb_build_object(
       'title', 'Wing Shot approved',
-      'body', 'Your Wing Shot was approved and earned Creator XP.',
+      'body', 'Your Wing Shot was approved and earned Creator Reputation.',
       'submission_id', v_submission.id
     )
     when 'wing_shot_rejected' then jsonb_build_object(

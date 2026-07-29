@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { ActivityIndicator, Button, Card, Chip, Text, useTheme } from 'react-native-paper';
+import { Modal, Pressable, ScrollView, View, StyleSheet } from 'react-native';
+import { ActivityIndicator, Button, Card, Chip, IconButton, Text, useTheme } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import {
@@ -25,6 +26,7 @@ export default function WingCreatorSummaryCard({ refreshKey = 0 }) {
     allTimeRank: null,
     leaderboardEnabled: false,
   });
+  const [infoVisible, setInfoVisible] = useState(false);
 
   const load = useCallback(async () => {
     setState((current) => ({ ...current, loading: true, error: null }));
@@ -66,6 +68,7 @@ export default function WingCreatorSummaryCard({ refreshKey = 0 }) {
 
   const stats = state.summary?.stats;
   const badges = state.summary?.badges || [];
+  const visibleBadges = badges.filter((badge) => badge.badge_code !== 'wing_shot_first');
 
   return (
     <Card
@@ -85,10 +88,16 @@ export default function WingCreatorSummaryCard({ refreshKey = 0 }) {
             <Text variant="titleLarge" style={styles.title}>
               Wing Creator
             </Text>
-            <Text variant="bodyMedium" style={styles.subtitle}>
-              Approved Wing Shots earn Creator XP. Featured shots earn an extra boost.
-            </Text>
           </View>
+          <IconButton
+            testID="creator.info"
+            icon="information-outline"
+            iconColor={theme.colors.primary}
+            size={21}
+            onPress={() => setInfoVisible(true)}
+            accessibilityLabel="How Wing Creator works"
+            accessibilityHint="Opens an explanation of Wing Creator, review statuses, and Creator Reputation."
+          />
         </View>
 
         {state.loading ? (
@@ -113,7 +122,7 @@ export default function WingCreatorSummaryCard({ refreshKey = 0 }) {
                 <Text variant="headlineSmall" style={styles.metricValue}>
                   {Number(stats?.creator_xp || 0).toLocaleString()}
                 </Text>
-                <Text variant="labelMedium">Creator XP</Text>
+                <Text variant="labelMedium">Creator Reputation</Text>
               </View>
               <View style={styles.metric}>
                 <Text variant="headlineSmall" style={styles.metricValue}>
@@ -143,9 +152,9 @@ export default function WingCreatorSummaryCard({ refreshKey = 0 }) {
               </Text>
             ) : null}
 
-            {badges.length ? (
+            {visibleBadges.length ? (
               <View testID="creator.profile-badges" style={styles.badges}>
-                {badges.slice(0, 4).map((badge) => (
+                {visibleBadges.slice(0, 4).map((badge) => (
                   <Chip
                     compact
                     key={badge.badge_code}
@@ -157,9 +166,7 @@ export default function WingCreatorSummaryCard({ refreshKey = 0 }) {
                 ))}
               </View>
             ) : (
-              <Text variant="bodySmall" style={styles.empty}>
-                Your first approved Wing Shot unlocks your first Creator badge.
-              </Text>
+              <Text variant="bodySmall" style={styles.empty}>Approved Wing Shots build your Creator Reputation.</Text>
             )}
           </>
         )}
@@ -175,6 +182,46 @@ export default function WingCreatorSummaryCard({ refreshKey = 0 }) {
           Wing Shot History
         </Button>
       </Card.Content>
+      <Modal
+        visible={infoVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setInfoVisible(false)}
+        accessibilityViewIsModal
+      >
+        <SafeAreaView style={styles.modalSafeArea}>
+          <Pressable style={styles.backdrop} onPress={() => setInfoVisible(false)} accessibilityLabel="Close Wing Creator explanation" />
+          <View style={[styles.modalCard, { backgroundColor: theme.colors.elevation?.level3 ?? theme.colors.surface }]}>
+            <ScrollView contentContainerStyle={styles.modalContent} showsVerticalScrollIndicator>
+              <Text variant="headlineSmall" style={styles.modalTitle}>Wing Creator</Text>
+              <Text style={styles.modalIntro}>Share short videos of the wings you rate and build your reputation as a BuffaGo creator.</Text>
+              <Text variant="titleMedium" style={styles.modalSection}>How it works</Text>
+              {[
+                ['1. Submit a Wing Shot', 'After an in-person rating, upload a short video showing the wings or your experience.'],
+                ['2. BuffaGo reviews it', 'Submissions are reviewed for quality, safety, and whether the wings are clearly visible.'],
+                ['3. Earn Creator Reputation', 'Approved Wing Shots increase your Creator Reputation.'],
+                ['4. Get featured', 'Exceptional Wing Shots may be featured on BuffaGo’s social channels and receive an additional reputation boost.'],
+              ].map(([title, body]) => (
+                <View key={title} style={styles.modalStep}>
+                  <Text variant="titleSmall" style={styles.modalStepTitle}>{title}</Text>
+                  <Text>{body}</Text>
+                </View>
+              ))}
+              <Text variant="titleMedium" style={styles.modalSection}>Statuses</Text>
+              {[
+                ['Processing', 'Your Wing Shot is being prepared or reviewed.'],
+                ['Approved', 'Your submission passed review and earned Creator Reputation.'],
+                ['Featured', 'Your Wing Shot was selected to represent BuffaGo and earned a bonus.'],
+                ['Rejected', 'The submission could not be used. We’ll show a friendly reason when one is available.'],
+              ].map(([title, body]) => (
+                <Text key={title} style={styles.statusLine}><Text style={styles.statusTitle}>{title}: </Text>{body}</Text>
+              ))}
+              <Text style={styles.modalFooter}>Creator Reputation is separate from your overall BuffaGo XP.</Text>
+              <Button mode="contained" onPress={() => setInfoVisible(false)} accessibilityLabel="Close Wing Creator explanation">Got It</Button>
+            </ScrollView>
+          </View>
+        </SafeAreaView>
+      </Modal>
     </Card>
   );
 }
@@ -193,4 +240,16 @@ const styles = StyleSheet.create({
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   empty: { opacity: 0.72, lineHeight: 18 },
   buttonContent: { minHeight: 48 },
+  modalSafeArea: { flex: 1, justifyContent: 'flex-end' },
+  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.62)' },
+  modalCard: { maxHeight: '88%', borderTopLeftRadius: 24, borderTopRightRadius: 24 },
+  modalContent: { padding: 22, gap: 12 },
+  modalTitle: { fontWeight: '900' },
+  modalIntro: { lineHeight: 21, opacity: 0.86 },
+  modalSection: { marginTop: 6, fontWeight: '800' },
+  modalStep: { gap: 3 },
+  modalStepTitle: { fontWeight: '800' },
+  statusLine: { lineHeight: 20 },
+  statusTitle: { fontWeight: '800' },
+  modalFooter: { marginTop: 6, lineHeight: 20, opacity: 0.82 },
 });

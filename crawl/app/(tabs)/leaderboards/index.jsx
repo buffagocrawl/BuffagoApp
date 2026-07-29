@@ -384,6 +384,7 @@ export default function Leaderboards() {
 
   // Leaderboards scope (default state + match order to social)
   const [lbScope, setLbScope] = useState('state'); // 'state' | 'all' | 'friends'
+  const [leaderboardCategory, setLeaderboardCategory] = useState('ratings'); // 'ratings' | 'creators'
 
   // Current state detection
   const [stateName, setStateName] = useState('Your State');
@@ -1422,24 +1423,39 @@ export default function Leaderboards() {
           <>
             <View style={styles.subHeaderWrap}>
               <TogglePills
-                value={lbScope}
-                onChange={(v) => setLbScope(v)}
+                value={leaderboardCategory}
+                onChange={setLeaderboardCategory}
                 options={[
-                  { label: stateId ? stateName : 'Your State', value: 'state', disabled: !stateId },
-                  { label: 'All', value: 'all' },
-                  { label: 'Friends', value: 'friends', disabled: !viewerId },
+                  { label: 'Ratings', value: 'ratings' },
+                  { label: 'Creators', value: 'creators' },
                 ]}
               />
 
-              {lbScope === 'state' && !stateId ? (
-                <Text style={{ color: textColor, opacity: 0.7, marginTop: 6, textAlign: 'center' }}>
-                  Turn on location to unlock state leaderboards.
-                </Text>
+              {leaderboardCategory === 'ratings' ? (
+                <>
+                  <TogglePills
+                    value={lbScope}
+                    onChange={(v) => setLbScope(v)}
+                    options={[
+                      { label: stateId ? stateName : 'Your State', value: 'state', disabled: !stateId },
+                      { label: 'All', value: 'all' },
+                      { label: 'Friends', value: 'friends', disabled: !viewerId },
+                    ]}
+                  />
+
+                  {lbScope === 'state' && !stateId ? (
+                    <Text style={{ color: textColor, opacity: 0.7, marginTop: 6, textAlign: 'center' }}>
+                      Turn on location to unlock state leaderboards.
+                    </Text>
+                  ) : null}
+                </>
               ) : null}
 
             </View>
 
-            {loading ||
+            {leaderboardCategory === 'creators' ? (
+              <CreatorLeaderboardPanel active={Boolean(viewerId)} />
+            ) : loading ||
             (lbScope === 'state' && stateRatingsLoading) ||
             (lbScope === 'friends' && friendRatingsLoading) ? (
               <View style={{ alignItems: 'center', padding: 24 }}>
@@ -1454,8 +1470,6 @@ export default function Leaderboards() {
               </Card>
             ) : (
               <>
-                <CreatorLeaderboardPanel active={Boolean(viewerId)} />
-
                 <LeaderCard
                   title={lbScope === 'state' ? 'Highest Level (Local Legends)' : 'Highest Level'}
                   items={lbHighestLevel}

@@ -55,6 +55,8 @@ export async function loadMyWingCreatorSummary(client = supabase) {
   if (statsError) throw rpcError(statsError, 'Could not load Creator stats.');
   if (badgesError) throw rpcError(badgesError, 'Could not load Creator badges.');
 
+  // creator_xp is the existing authoritative database field; the product
+  // intentionally presents it as the separate Creator Reputation score.
   return {
     stats: firstRow(statsData) || {
       approved_submissions: 0,
