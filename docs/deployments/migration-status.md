@@ -46,6 +46,8 @@ remote deployment; verify the remote migration ledger before applying them.
 | 20260729134000_wing_generation_worker_contract.sql | candidate | not applied here | source and Docker media validated | Wing Shots branded generation | 2ce7d8b4ca9e20a048aba0bf306f5264b6915c16a6f65f1be608b4dc00071845 |
 | 20260729135000_retire_legacy_jalapeno_media.sql | candidate | not applied here | source-contract validated | Legacy Jalapeno retirement | 2b8ee7169e1279264e6a0140899d5bcb1e12ff1de4c7c698dd54d37eae52f5cc |
 | 20260729136000_wing_upload_retry_after_expiry.sql | candidate | not applied here | isolated local transaction validated | Safe abandoned-upload retry | e5d311705d1661ee1c3c73146bc4ee3aea59366be102c5aff834000d9d8ce278 |
+| 20260729140000_wing_shots_unrestricted_sources.sql | candidate | not applied here | source-contract validated | Optional Wing Shots from ratings and independent entry points | 9afcbabc48edb4bf3103e5892d4bccc5e24cbba5bc234c16533ffb3de827ac66 |
+| 20260729150000_reconcile_wing_upload_rpc.sql | candidate | not applied here | source-contract validated | Wing Shot upload RPC contract reconciliation | 43572443020a2e400093de096bc4a7f17a6d3d20f0a068a2f0a40066b24c2fd2 |
 | 20260729153000_serrano_trust_repair.sql | candidate | not applied here | source-contract and client integration validated | Serrano trust repair checkpoint | d2d8e3d4d0dcc9a2ad49475d06babdea267c35926dd446da85265396c002c9c7 |
 
 

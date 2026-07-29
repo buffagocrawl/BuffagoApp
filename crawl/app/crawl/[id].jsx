@@ -1367,7 +1367,6 @@ export default function CrawlScreen() {
       setCelebrateScore(savedWeightScore);
       const shouldPromptWingShot = Boolean(
         ratingResult?.accepted
-        && ratingResult?.wing_shot_eligible
         && ratingResult?.rating_id
         && wingShotFlags.prompt
         && (wingShotFlags.photo || wingShotFlags.video)
@@ -1382,7 +1381,7 @@ export default function CrawlScreen() {
           userId,
           destinationId: activeDest.id,
           crawlId: crawl.crawl_id,
-          metadata: { eligibility_source: 'verified_in_person' },
+          metadata: { submission_source: 'rating' },
         });
       } else {
         setCelebrateVisible(true);
@@ -2187,6 +2186,8 @@ export default function CrawlScreen() {
             <WingShotFlow
               visible={wingShotVisible}
               eligibleRatingId={eligibleWingShotRatingId}
+              destinationId={activeDest?.id}
+              submissionSource="rating"
               allowPhoto={wingShotFlags.photo}
               allowVideo={wingShotFlags.video}
               analyticsContext={{

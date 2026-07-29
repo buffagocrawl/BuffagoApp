@@ -94,6 +94,23 @@ export default function WelcomeWizard({
         chips: ['Stats & history', 'Saved crawls', 'Resume later'],
       },
       {
+        title: '📸 Share Your Wing Shot',
+        body: (
+          <Text style={{ textAlign: 'center', fontSize: 16, lineHeight: 22 }}>
+            After you rate a restaurant, you may be invited to add a photo or video of your wings.
+            Follow BuffaGo on <Text style={{ fontWeight: '700' }}>Instagram</Text> and{' '}
+            <Text style={{ fontWeight: '700' }}>Facebook</Text> to see whether your rating or video
+            gets featured.
+          </Text>
+        ),
+        chips: ['Photos & videos', 'Community features', 'Follow BuffaGo'],
+        footer: (
+          <Text style={{ textAlign: 'center', fontSize: 13, opacity: 0.8, marginTop: 8 }}>
+            Features are reviewed before they are shared publicly.
+          </Text>
+        ),
+      },
+      {
         title: '🏁 Ready to Crawl?',
         body: (
           <Text style={{ textAlign: 'center', fontSize: 16, lineHeight: 22 }}>

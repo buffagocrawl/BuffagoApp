@@ -5,6 +5,7 @@ export type WingShotMediaKind = 'photo' | 'video';
 
 export type WingShotSelectedMedia = {
   uri: string;
+  fileName?: string;
   kind: WingShotMediaKind;
   mimeType: string;
   sizeBytes: number;
@@ -80,6 +81,7 @@ function selectedMediaFromAsset(
   }
   return {
     uri: asset.uri,
+    fileName: asset.fileName || undefined,
     kind,
     mimeType: mimeType.toLowerCase(),
     sizeBytes,

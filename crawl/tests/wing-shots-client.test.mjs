@@ -10,6 +10,7 @@ import {
 } from '../lib/wingShots.js';
 
 const ratingId = '10000000-0000-4000-a000-000000000001';
+const destinationId = '10000000-0000-4000-a000-000000000009';
 const media = {
   uri: 'private-device-uri',
   kind: 'photo',
@@ -61,6 +62,8 @@ function clientDouble({ reserveError = null, uploadError = null, finalizeError =
 function validInput(overrides = {}) {
   return {
     ratingId,
+    destinationId,
+    submissionSource: 'rating',
     media,
     consentAccepted: true,
     attributionPreference: 'anonymous',

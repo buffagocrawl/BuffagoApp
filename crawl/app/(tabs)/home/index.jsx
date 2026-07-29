@@ -20,8 +20,8 @@ import * as Crypto from 'expo-crypto';
 import * as Location from 'expo-location';
 import WingmanAddDialog from '../../../components/WingmanAddDialog';
 import FeedbackState from '../../../components/ui/FeedbackState';
-import { supabase } from '../../../lib/supabase.js';
 import WelcomeWizard from '../../../components/WelcomeWizard';
+import { supabase } from '../../../lib/supabase.js';
 import DestinationPickerWizard from '../../../components/DestinationPickerWizard';
 import RatingWizardDialog from '../../../components/RatingWizardDialog';
 import { WingShotFlow } from '../../../components/wingShots';
@@ -45,7 +45,12 @@ import { useLegendaryFeed } from '../../../hooks/useLegendaryFeed';
 import { LegendaryHomeHero } from '../../../components/buffaverse/LegendarySurfaces';
 import BuffaverseHomeCard from '../../../components/buffaverse/BuffaverseHomeCard';
 import WeeklyMissionDialog from '../../../components/home/WeeklyMissionDialog';
-import WingShotsPromoCard from '../../../components/wingShots/WingShotsPromoCard';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import {
+  getSocialCommunityConfig,
+  isSocialCommunityConfigured,
+  openConfiguredSocialDestination,
+} from '../../../lib/socialCommunity';
 
 const SEARCH_RADIUS_M = 160934; // 100 miles
 const MS_5_MIN = 30 * 1000;
@@ -442,7 +447,7 @@ export default function Home() {
 
   const openWelcomeWizard = useCallback(() => {
     setWelcomeOpen(true);
-  }, [session?.user?.id]);
+  }, []);
 
   const refreshMissionSummary = useCallback(async () => {
     if (!ENABLE_GROWTH_MISSIONS) return;
@@ -2472,7 +2477,7 @@ export default function Home() {
           ratingResult = data;
           crawlId = data?.crawl_id ?? crawlId;
         } else {
-          // Guest ratings remain supported but are never Wing Shot eligible.
+          // Guest ratings remain supported; Wing Shots still require authentication.
           const now = new Date().toISOString();
           const { error: crawlErr } = await supabase.from('crawls').insert({
             crawl_id: crawlId,
@@ -2566,7 +2571,6 @@ export default function Home() {
 
         const shouldPromptWingShot = Boolean(
           ratingResult?.accepted
-          && ratingResult?.wing_shot_eligible
           && ratingResult?.rating_id
           && wingShotFlags.prompt
           && (wingShotFlags.photo || wingShotFlags.video)
@@ -2582,7 +2586,7 @@ export default function Home() {
             userId: uid,
             destinationId: destId,
             crawlId,
-            metadata: { eligibility_source: 'verified_in_person' },
+            metadata: { submission_source: 'rating' },
           });
         } else {
           try {
@@ -2806,6 +2810,15 @@ export default function Home() {
     await trackEvent({ eventName: nextTab === 'rewards' ? 'mission_reward_viewed' : 'mission_tab_changed', screen: 'home', userId: session?.user?.id ?? null, metadata: { source: 'weekly_mission_dialog', tab: nextTab } });
   }, [session?.user?.id]);
 
+  const openSocialProfile = useCallback(async (platform) => {
+    try {
+      await openConfiguredSocialDestination(platform);
+    } catch (_error) {
+      const label = getSocialCommunityConfig(platform).label;
+      Alert.alert('Link unavailable', `We could not open BuffaGo's ${label} page. Please try again shortly.`);
+    }
+  }, []);
+
   if (onboardingLoading) {
     return (
       <LocationGate>
@@ -2838,32 +2851,69 @@ export default function Home() {
         >
           {/* Header */}
           <View style={styles.headerRow}>
-            <Pressable
-              accessibilityRole="button"
-              onPress={canShowWelcomeWizard ? openWelcomeWizard : undefined}
-              disabled={!canShowWelcomeWizard}
-              style={[
-                styles.leftArea,
-                !canShowWelcomeWizard && { opacity: 0.3 },
-              ]}
-            >
-              <View style={styles.iconScale}>
-                <Avatar.Icon size={30} icon="help-circle-outline" />
-              </View>
-            </Pressable>
+            <View style={styles.socialActions}>
+              {[
+                { platform: 'instagram', icon: 'instagram' },
+                { platform: 'facebook', icon: 'facebook' },
+              ].map(({ platform, icon }) => {
+                const config = getSocialCommunityConfig(platform);
+                const enabled = isSocialCommunityConfigured(platform);
+                return (
+                  <Pressable
+                    key={platform}
+                    accessibilityRole="link"
+                    accessibilityLabel={`Open BuffaGo on ${config.label}`}
+                    accessibilityState={{ disabled: !enabled }}
+                    disabled={!enabled}
+                    onPress={() => openSocialProfile(platform)}
+                    style={({ pressed }) => [
+                      styles.circleButton,
+                      !enabled && styles.socialButtonDisabled,
+                      pressed && enabled && styles.circleButtonPressed,
+                    ]}
+                    testID={`home-social-${platform}`}
+                    hitSlop={12}
+                  >
+                    <MaterialCommunityIcons name={icon} size={11} color={BUFFAGO_ORANGE} />
+                  </Pressable>
+                );
+              })}
+            </View>
 
-            <Image source={require('../../../assets/images/buffago-logo.png')} resizeMode="contain" style={styles.logo} />
+            <Image
+              source={require('../../../assets/images/buffago-logo.png')}
+              resizeMode="contain"
+              style={styles.logo}
+              pointerEvents="none"
+            />
 
             <View style={styles.rightCluster}>
               <Pressable
                 accessibilityRole="button"
+                accessibilityLabel="Open Help"
+                onPress={canShowWelcomeWizard ? openWelcomeWizard : undefined}
+                disabled={!canShowWelcomeWizard}
+                style={[styles.circleButton, !canShowWelcomeWizard && { opacity: 0.3 }]}
+                hitSlop={12}
+              >
+                <MaterialCommunityIcons name="help-circle-outline" size={11} color={BUFFAGO_ORANGE} />
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={isSignedIn ? 'Open profile' : 'Sign in'}
                 onPress={() => router.push(isSignedIn ? '/user' : '/auth/login')}
-                style={styles.avatarBtn}
+                style={styles.circleButton}
+                hitSlop={12}
               >
                 {isSignedIn && session?.user?.user_metadata?.avatar_url ? (
-                  <Avatar.Image size={30} source={{ uri: session.user.user_metadata.avatar_url }} />
+                  <Avatar.Image size={15} source={{ uri: session.user.user_metadata.avatar_url }} />
                 ) : (
-                  <Avatar.Icon size={30} icon={isSignedIn ? 'account-circle' : 'login'} />
+                  <Avatar.Icon
+                    size={15}
+                    icon={isSignedIn ? 'account-circle' : 'login'}
+                    color={BUFFAGO_ORANGE}
+                    style={styles.avatarIcon}
+                  />
                 )}
               </Pressable>
             </View>
@@ -2896,8 +2946,6 @@ export default function Home() {
               onPress={() => router.push('/(tabs)/journey')}
             />
           ) : null}
-
-          <WingShotsPromoCard userId={session?.user?.id ?? null} />
 
           {/* Signed-in: Level row */}
           {isSignedIn ? (
@@ -3143,6 +3191,8 @@ export default function Home() {
           <WingShotFlow
             visible={homeWingShotVisible}
             eligibleRatingId={homeWingShotRatingId}
+            destinationId={homeWingShotDestinationId}
+            submissionSource="rating"
             allowPhoto={wingShotFlags.photo}
             allowVideo={wingShotFlags.video}
             analyticsContext={{
@@ -3712,12 +3762,35 @@ const styles = StyleSheet.create({
   // above every Android/iOS tab bar and its safe-area inset.
   scroll: { paddingHorizontal: 12, paddingTop: 10, gap: 6 },
 
-  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  leftArea: { width: 36, alignItems: 'flex-start', justifyContent: 'center' },
-  rightCluster: { width: 46, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 8 },
-  iconScale: { transform: [{ scale: 0.75 }], minWidth: 36, minHeight: 36, alignItems: 'center', justifyContent: 'center' },
-  logo: { flex: 1, height: 50, alignSelf: 'center' },
-  avatarBtn: { borderRadius: 999 },
+  headerRow: { minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  socialActions: { width: 72, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  circleButton: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 122, 24, 0.72)',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.16,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  circleButtonPressed: { backgroundColor: 'rgba(255, 122, 24, 0.16)' },
+  socialButtonDisabled: { opacity: 0.35 },
+  rightCluster: { width: 56, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 8 },
+  logo: {
+    position: 'absolute',
+    left: '50%',
+    width: 225,
+    height: 62.5,
+    marginLeft: -112.5,
+    alignSelf: 'center',
+  },
+  avatarIcon: { backgroundColor: 'transparent' },
 
   levelRow: {
     paddingHorizontal: 10,

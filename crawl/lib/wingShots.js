@@ -52,8 +52,8 @@ export function validateWingShotMedia(media) {
     throw new WingShotClientError(
       'media_too_large',
       media.kind === 'photo'
-        ? 'That photo is too large. Choose one under 20 MB.'
-        : 'That video is too large. Choose one under 50 MB.',
+        ? 'That photo is too large. Choose one under 20 MiB.'
+        : 'That video is too large. Choose one under 50 MiB.',
     );
   }
   if (media.kind === 'video') {
@@ -80,8 +80,14 @@ export function validateWingShotMedia(media) {
 }
 
 export function validateWingShotSubmission(input) {
-  if (!input?.ratingId) {
-    throw new WingShotClientError('rating_required', 'An eligible rating is required.');
+  if (!input?.destinationId) {
+    throw new WingShotClientError('restaurant_required', 'Choose the restaurant for this Wing Shot.');
+  }
+  if (input.ratingId != null && typeof input.ratingId !== 'string') {
+    throw new WingShotClientError('invalid_rating', 'The selected rating could not be verified.');
+  }
+  if (!['rating', 'onboarding', 'buffacoin', 'profile', 'home_cta'].includes(input.submissionSource)) {
+    throw new WingShotClientError('invalid_submission_source', 'This Wing Shot entry point is not supported.');
   }
   validateWingShotMedia(input.media);
   if (input.consentAccepted !== true) {
@@ -131,15 +137,35 @@ function assertClient(client) {
 
 function rpcError(code, stage, error) {
   const serverCode = String(error?.message ?? error?.code ?? '');
-  if (serverCode.includes('eligible_rating_not_found')) {
+  if (serverCode.includes('invalid_media_size')) {
     return new WingShotClientError(
-      'rating_not_eligible',
-      'This rating is not eligible for a Wing Shot.',
+      'media_too_large',
+      'This media is too large. Choose a smaller file (photos under 20 MiB, videos under 50 MiB).',
+      { stage },
+    );
+  }
+  if (serverCode.includes('rating_not_found')) {
+    return new WingShotClientError(
+      'rating_not_found',
+      'That rating could not be linked to this restaurant.',
       { stage },
     );
   }
   return new WingShotClientError(code, 'We could not complete that step. Please try again.', {
     stage,
+  });
+}
+
+// TODO: Remove debug logging after Wing Shot upload issue is resolved.
+function logSupabaseError(error) {
+  console.error('[WingShot] Supabase error object:', error);
+  console.error('[WingShot] Supabase error details', {
+    message: error?.message,
+    details: error?.details,
+    hint: error?.hint,
+    code: error?.code,
+    status: error?.status,
+    statusCode: error?.statusCode,
   });
 }
 
@@ -182,11 +208,20 @@ export async function submitWingShot({
 }) {
   assertClient(client);
   validateWingShotSubmission(input);
+  // Keep upload diagnostics development-visible without logging local paths,
+  // filenames, user identifiers, tokens, or media contents.
+  console.log('[WingShot] Upload started', {
+    mediaType: input.media.kind,
+    mimeType: input.media.mimeType,
+    sizeBytes: input.media.sizeBytes,
+  });
   if (!session?.correlationId) {
     throw new WingShotClientError('session_required', 'Start a new upload session.');
   }
   const requestFingerprint = JSON.stringify([
-    input.ratingId,
+    input.ratingId ?? null,
+    input.destinationId,
+    input.submissionSource,
     input.media.kind,
     input.media.mimeType,
     input.media.sizeBytes,
@@ -211,6 +246,9 @@ export async function submitWingShot({
   if (!session.uploadCompleted) {
     try {
       body = await input.media.getUploadBody(signal);
+      console.log('[WingShot] Media prepared for upload', {
+        size: body?.byteLength ?? body?.size,
+      });
     } catch (error) {
       if (signal?.aborted) throwIfAborted(signal);
       throw new WingShotClientError(
@@ -224,18 +262,51 @@ export async function submitWingShot({
   onProgress(8);
 
   if (!session.reservation) {
-    const { data, error } = await client.rpc('reserve_wing_submission_upload', {
-      p_rating_id: input.ratingId,
-      p_media_type: input.media.kind,
-      p_expected_mime_type: input.media.mimeType,
-      p_expected_size_bytes: input.media.sizeBytes,
-      p_consent_version: WING_SHOT_CONSENT_VERSION,
-      p_attribution_preference: input.attributionPreference,
-      p_user_caption: input.caption?.trim() || null,
-      p_idempotency_key: session.reserveIdempotencyKey,
-      p_correlation_id: session.correlationId,
+    console.log('[WingShot] Reservation request', {
+      ratingId: input.ratingId ?? null,
+      destinationId: input.destinationId,
+      mediaType: input.media.kind,
+      mimeType: input.media.mimeType,
+      sizeBytes: input.media.sizeBytes,
+      submissionSource: input.submissionSource,
+    });
+    let reservationResult;
+    try {
+      reservationResult = await client.rpc('reserve_wing_submission_upload', {
+        p_rating_id: input.ratingId ?? null,
+        p_media_type: input.media.kind,
+        p_expected_mime_type: input.media.mimeType,
+        p_expected_size_bytes: input.media.sizeBytes,
+        p_consent_version: WING_SHOT_CONSENT_VERSION,
+        p_attribution_preference: input.attributionPreference,
+        p_user_caption: input.caption?.trim() || null,
+        p_idempotency_key: session.reserveIdempotencyKey,
+        p_correlation_id: session.correlationId,
+        p_destination_id: input.destinationId,
+        p_submission_source: input.submissionSource,
+      });
+    } catch (error) {
+      logSupabaseError(error);
+      throw error;
+    }
+    const { data, error } = reservationResult;
+    console.log('[WingShot] Reservation response', {
+      data: data
+        ? {
+            submissionId: data.submission_id,
+            bucket: data.bucket,
+            uploadPath: data.upload_path,
+            expiresAt: data.expires_at,
+          }
+        : null,
+      error: error ? { message: error.message, details: error.details, hint: error.hint, code: error.code, status: error.status, statusCode: error.statusCode } : null,
     });
     if (error || !data?.submission_id || !data?.bucket || !data?.upload_path) {
+      if (error) logSupabaseError(error);
+      console.warn(
+        '[WingShot] Upload blocked:',
+        error?.message ?? 'Eligibility response was incomplete.',
+      );
       throw rpcError('reservation_failed', 'reserve', error);
     }
     session.reservation = {
@@ -248,33 +319,65 @@ export async function submitWingShot({
   onProgress(20);
 
   if (!session.uploadCompleted) {
-    const { error } = await uploadTransport({
-      client,
-      bucket: session.reservation.bucket,
-      path: session.reservation.uploadPath,
-      body,
-      mimeType: input.media.mimeType,
-      signal,
-      onProgress: (value) => onProgress(Math.max(20, Math.min(85, value))),
-    });
+    console.log('[WingShot] Uploading to Supabase Storage...');
+    const storagePath = session.reservation.uploadPath;
+    let uploadResult;
+    try {
+      uploadResult = await uploadTransport({
+        client,
+        bucket: session.reservation.bucket,
+        path: storagePath,
+        body,
+        mimeType: input.media.mimeType,
+        signal,
+        onProgress: (value) => onProgress(Math.max(20, Math.min(85, value))),
+      });
+    } catch (error) {
+      console.error('[WingShot] Storage upload failed');
+      logSupabaseError(error);
+      throw error;
+    }
+    const { error } = uploadResult;
     if (error && !isExistingObjectError(error)) {
+      console.error('[WingShot] Storage upload failed');
+      logSupabaseError(error);
       throw new WingShotClientError('upload_failed', 'Upload interrupted. Try again.', {
         stage: 'upload',
       });
     }
+    console.log('[WingShot] Storage upload result', {
+      path: storagePath,
+      ok: !error || isExistingObjectError(error),
+      error: error ? { message: error.message, details: error.details, hint: error.hint, code: error.code, status: error.status, statusCode: error.statusCode } : null,
+    });
     session.uploadCompleted = true;
   }
   throwIfAborted(signal);
   onProgress(88);
 
-  const { data, error } = await client.rpc('finalize_wing_submission_upload', {
-    p_submission_id: session.reservation.submissionId,
-    p_idempotency_key: session.finalizeIdempotencyKey,
-    p_correlation_id: session.correlationId,
-  });
+  console.log('[WingShot] Creating database record...');
+  let finalizeResult;
+  try {
+    finalizeResult = await client.rpc('finalize_wing_submission_upload', {
+      p_submission_id: session.reservation.submissionId,
+      p_idempotency_key: session.finalizeIdempotencyKey,
+      p_correlation_id: session.correlationId,
+    });
+  } catch (error) {
+    console.error('[WingShot] Database insert failed');
+    logSupabaseError(error);
+    throw error;
+  }
+  const { data, error } = finalizeResult;
   if (error || !data?.submission_id || data?.status !== 'uploaded') {
+    console.error('[WingShot] Database insert failed');
+    if (error) logSupabaseError(error);
     throw rpcError('finalization_failed', 'finalize', error);
   }
+  console.log('[WingShot] Finalization result', {
+    submissionId: data.submission_id,
+    status: data.status,
+  });
   onProgress(100);
   return data;
 }

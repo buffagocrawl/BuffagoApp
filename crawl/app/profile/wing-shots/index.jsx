@@ -157,7 +157,7 @@ export default function WingShotHistoryScreen() {
                 No Wing Shots yet
               </Text>
               <Text style={styles.emptyBody}>
-                After an eligible in-person rating, you can optionally share a photo or short video.
+                You can optionally share a photo or short video from any restaurant.
               </Text>
             </View>
           )

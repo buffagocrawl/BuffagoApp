@@ -1815,11 +1815,16 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
               <View testID="onboarding-wing-shots-explainer">
                 <Text style={{ fontWeight: '900' }}>Wing Shots</Text>
                 <Text style={{ opacity: 0.82, lineHeight: 20, marginTop: 4 }}>
-                  Rate wings in person, then optionally upload a photo or short video. Approved submissions earn Creator XP and badges and may be featured on BuffaGo&apos;s Instagram and Facebook.
+                  Share a photo or short video of wings from any restaurant. Submissions are reviewed before approved creators earn XP, badges, and recognition.
                 </Text>
-                <Text style={{ opacity: 0.82, lineHeight: 20, marginTop: 4 }}>
-                  Check daily to see if your wings and rating made it!
-                </Text>
+                <Button
+                  mode="contained-tonal"
+                  onPress={() => router.push('/profile/wing-shots/submit?source=onboarding')}
+                  testID="onboarding-add-wing-shot"
+                  style={{ marginTop: 10 }}
+                >
+                  Add a Wing Shot (optional)
+                </Button>
               </View>
 
               <View>

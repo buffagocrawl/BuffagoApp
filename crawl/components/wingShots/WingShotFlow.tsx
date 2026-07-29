@@ -46,7 +46,9 @@ type Phase =
 
 type Props = {
   visible: boolean;
-  eligibleRatingId: string;
+  eligibleRatingId?: string | null;
+  destinationId: string;
+  submissionSource: 'rating' | 'onboarding' | 'buffacoin' | 'profile' | 'home_cta';
   onClose: () => void;
   onSubmitted?: (result: { submission_id: string; status: string }) => void;
   mediaAdapter?: WingShotMediaAdapter;
@@ -69,6 +71,22 @@ type Props = {
   };
 };
 
+// TODO: Remove debug logging after Wing Shot upload issue is resolved.
+function logWingShotError(error: unknown) {
+  console.error('[WingShot] Supabase/Upload error object:', error);
+  if (error && typeof error === 'object') {
+    const serverError = error as Record<string, unknown>;
+    console.error('[WingShot] Supabase/Upload error details', {
+      message: serverError.message,
+      details: serverError.details,
+      hint: serverError.hint,
+      code: serverError.code,
+      status: serverError.status,
+      statusCode: serverError.statusCode,
+    });
+  }
+}
+
 const ATTRIBUTION_OPTIONS: {
   value: Attribution;
   title: string;
@@ -86,6 +104,8 @@ const ATTRIBUTION_OPTIONS: {
 export function WingShotFlow({
   visible,
   eligibleRatingId,
+  destinationId,
+  submissionSource,
   onClose,
   onSubmitted,
   mediaAdapter = expoWingShotMediaAdapter,
@@ -136,6 +156,12 @@ export function WingShotFlow({
           'That media type is not enabled for Wing Shots.',
         );
       }
+      // TODO: Remove debug logging after Wing Shot upload issue is resolved.
+      console.log('[WingShot] Media selected', {
+        mediaType: selected.kind,
+        mimeType: selected.mimeType,
+        sizeBytes: selected.sizeBytes,
+      });
       validateWingShotMedia(selected);
       setMedia(selected);
       setConsentAccepted(false);
@@ -237,6 +263,15 @@ export function WingShotFlow({
     setErrorMessage('');
     setPhase('uploading');
     setProgress(0);
+    // TODO: Remove debug logging after Wing Shot upload issue is resolved.
+    console.log('[WingShot] Upload started');
+    console.log('[WingShot] Upload input', {
+      mediaType: media.kind,
+      mimeType: media.mimeType,
+      sizeBytes: media.sizeBytes,
+      consentAccepted,
+      attributionPreference: attribution,
+    });
     trackEvent({
       eventName: 'wing_shot_upload_started',
       screen: analyticsContext?.screen ?? 'wing_shot',
@@ -249,17 +284,22 @@ export function WingShotFlow({
       const result = await submitWingShot({
         client: supabaseClient,
         input: {
+          userId: analyticsContext?.userId,
           ratingId: eligibleRatingId,
           media,
           consentAccepted,
           attributionPreference: attribution,
           caption,
+          destinationId,
+          submissionSource,
         },
         session: sessionRef.current,
         signal: controller.signal,
         onProgress: setProgress,
         ...(uploadTransport ? { uploadTransport } : {}),
       });
+      // TODO: Remove debug logging after Wing Shot upload issue is resolved.
+      console.log('[WingShot] Upload complete');
       setPhase('success');
       trackEvent({
         eventName: 'wing_shot_upload_completed',
@@ -272,6 +312,13 @@ export function WingShotFlow({
       announce('Wing Shot submitted for review.');
       onSubmitted?.(result);
     } catch (error) {
+      // TODO: Remove debug logging after Wing Shot upload issue is resolved.
+      console.error('[WingShot] Upload failed');
+      logWingShotError(error);
+      if (error instanceof Error) {
+        console.error('[WingShot] Error message:', error.message);
+        console.error('[WingShot] Error stack:', error.stack);
+      }
       const message = wingShotUserMessage(error);
       trackEvent({
         eventName: 'wing_shot_upload_failed',
@@ -300,10 +347,12 @@ export function WingShotFlow({
     caption,
     consentAccepted,
     eligibleRatingId,
+    destinationId,
     networkAvailable,
     media,
     onSubmitted,
     supabaseClient,
+    submissionSource,
     uploadTransport,
   ]);
 
@@ -364,8 +413,9 @@ export function WingShotFlow({
             testID="wing-shot.scroll"
           >
             <Text style={styles.intro} allowFontScaling>
-              Upload a photo or short video for a chance to be featured on BuffaGo’s
-              Instagram and Facebook. Earn Creator XP when your submission is approved.
+              Share a photo or short video of wings from this restaurant. Every submission is reviewed;
+              only approved photos may be featured on BuffaGo’s Instagram and Facebook. Approved
+              creators earn XP, badges, and recognition.
             </Text>
 
             {!media ? (
@@ -569,7 +619,8 @@ export function WingShotFlow({
                     Wing Shot submitted
                   </Text>
                   <Text style={styles.successText} allowFontScaling>
-                    Jalapeño will review it. Approved submissions earn Creator XP.
+                    Your submission is now under review. Approved photos may be featured, and approved
+                    creators earn XP, badges, and recognition.
                   </Text>
                 </View>
               </View>

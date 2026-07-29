@@ -8,8 +8,9 @@ const PENDING_VISIT_KEY = 'buffago:social-community:pending-visit';
 export const SOCIAL_COMMUNITY_CONFIG = Object.freeze({
   instagram: {
     label: 'Instagram',
-    webUrl: process.env.EXPO_PUBLIC_BUFFAGO_INSTAGRAM_URL || '',
-    deepLink: process.env.EXPO_PUBLIC_BUFFAGO_INSTAGRAM_DEEP_LINK || '',
+    // Prefer the native profile route, then reliably fall back to the public profile.
+    deepLink: process.env.EXPO_PUBLIC_BUFFAGO_INSTAGRAM_DEEP_LINK || 'instagram://user?username=buffago',
+    webUrl: process.env.EXPO_PUBLIC_BUFFAGO_INSTAGRAM_URL || 'https://www.instagram.com/buffago/',
   },
   facebook: {
     label: 'Facebook',
@@ -30,6 +31,11 @@ export function getSocialCommunityConfig(platform) {
   const config = SOCIAL_COMMUNITY_CONFIG[platform];
   if (!config) throw new Error('unsupported_social_platform');
   return config;
+}
+
+export function isSocialCommunityConfigured(platform) {
+  const config = getSocialCommunityConfig(platform);
+  return Boolean(config.deepLink || config.webUrl);
 }
 
 export async function openConfiguredSocialDestination(platform) {
