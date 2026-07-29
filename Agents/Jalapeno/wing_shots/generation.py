@@ -110,6 +110,7 @@ class GenerationContext:
     would_order_again: bool | None
     attribution: str
     anonymous_attribution: bool
+    written_review: str | None = None
 
     @classmethod
     def from_payload(cls, payload: object) -> "GenerationContext":
@@ -151,6 +152,10 @@ class GenerationContext:
             ),
             attribution=str(payload["attribution"]),
             anonymous_attribution=bool(payload.get("anonymous_attribution")),
+            written_review=(
+                str(payload["written_review"])
+                if payload.get("written_review") else None
+            ),
         )
         context.validate()
         return context
@@ -373,18 +378,16 @@ class BrandedContentGenerator:
 
     @staticmethod
     def _attributes(context: GenerationContext) -> list[str]:
-        ranked = [
-            ("Crisp", context.crispiness),
+        dimensions = [
+            ("Overall", context.overall),
+            ("Crispiness", context.crispiness),
             ("Sauce", context.sauce),
-            ("Chicken", context.meat),
+            ("Meat", context.meat),
         ]
         return [
             f"{label} {value:g}"
-            for label, value in sorted(
-                (item for item in ranked if item[1] is not None),
-                key=lambda item: float(item[1] or 0),
-                reverse=True,
-            )[:2]
+            for label, value in dimensions
+            if value is not None
         ]
 
     def _copy(self, context: GenerationContext) -> tuple[str, str, str]:
@@ -403,16 +406,31 @@ class BrandedContentGenerator:
                 else f"Shared by {attribution}."
             )
         )[:1000]
-        instagram = (
-            f"{restaurant}{place} — {score} on BuffaGo.\n\n"
-            f"Wing Shot by {attribution}. "
-            "Rate wings in person, upload your Wing Shot, and check back daily.\n\n"
-            "#BuffaGo #WingShots #ChickenWings"
-        )[:2200]
+        dimensions = "\n".join(
+            f"{label}: {value:g}"
+            for label, value in (
+                ("Overall", context.overall),
+                ("Crispiness", context.crispiness),
+                ("Sauce", context.sauce),
+                ("Meat", context.meat),
+            ) if value is not None
+        )
+        review = _clean_text(
+            getattr(context, "written_review", None), maximum=500
+        )
+        review_line = f'\n\n"{review}"' if review else ""
+        canonical = (
+            "WING SHOT\n\n"
+            f"{attribution} took on {restaurant}{place}.\n\n"
+            "The verdict:\n"
+            f"{dimensions or score}{review_line}\n\n"
+            f"{restaurant}\n{location}\n\n"
+            "Rated on BuffaGo.\nMore game. Less Yelp.\n\n"
+            "#BuffaGo #WingShot #ChickenWings"
+        )
+        instagram = canonical[:2200]
         facebook = (
-            f"Community Wing Shot: {restaurant}{place}, rated {score} on BuffaGo. "
-            f"Shared by {attribution}.\n\n"
-            "Find your next wing stop and rate it on BuffaGo."
+            f"{canonical}\n\nFind your next wing stop and rate it on BuffaGo."
         )[:2200]
         return instagram, facebook, alt
 
@@ -453,6 +471,12 @@ class BrandedContentGenerator:
             fill=(15, 15, 15, 205),
         )
         layer.alpha_composite(logo, (margin, logo_y))
+        draw.text(
+            (margin, logo_y + logo.height + 18),
+            "WING SHOT",
+            font=_font(round(width * 0.035)),
+            fill=(255, 183, 113, 255),
+        )
 
         panel_height = round(height * 0.31)
         panel_top = height - panel_height
@@ -499,7 +523,7 @@ class BrandedContentGenerator:
         attribution = _clean_text(context.attribution, maximum=70)
         draw.text(
             (margin, height - round(panel_height * 0.13)),
-            f"{attribution}  •  Rated on BuffaGo  •  Get the app",
+            f"{attribution}  •  More game. Less Yelp.",
             font=_font(round(width * 0.021)),
             fill=(238, 238, 238, 255),
         )
@@ -610,9 +634,13 @@ class BrandedContentGenerator:
                 str(overlay_path.resolve()),
                 "-filter_complex",
                 (
-                    f"[0:v]scale={width}:{height}:force_original_aspect_ratio=increase,"
-                    f"crop={width}:{height},setsar=1[base];"
-                    "[base][1:v]overlay=0:0:shortest=1[v]"
+                    f"[0:v]split=2[bg][fg];"
+                    f"[bg]scale={width}:{height}:force_original_aspect_ratio=increase,"
+                    f"crop={width}:{height},boxblur=12:2,setsar=1[base];"
+                    f"[fg]scale={width}:{height}:force_original_aspect_ratio=decrease,"
+                    "setsar=1[subject];"
+                    "[base][subject]overlay=(W-w)/2:(H-h)/2:shortest=1[video];"
+                    "[video][1:v]overlay=0:0:shortest=1[v]"
                 ),
                 "-map",
                 "[v]",

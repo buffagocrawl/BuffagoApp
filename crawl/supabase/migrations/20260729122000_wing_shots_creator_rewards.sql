@@ -614,8 +614,8 @@ begin
     v_event_kind, v_amount, v_ledger_id, v_transition.id,
     p_idempotency_key,
     case
-      when p_reward_kind = 'approval' then 'Approved Wing Shot Creator XP'
-      else 'Featured Wing Shot Creator XP'
+      when p_reward_kind = 'approval' then 'Approved Wing Shot Creator Reputation'
+      else 'Featured Wing Shot Creator Reputation'
     end,
     jsonb_build_object(
       'economy_version', v_config.economy_version,

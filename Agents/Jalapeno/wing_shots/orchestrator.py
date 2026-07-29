@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from datetime import date, datetime, timezone
+import json
+import logging
 from typing import Callable, Mapping
 from uuid import uuid4
 
@@ -24,6 +26,7 @@ class NightlyConfig:
     worker_id: str = "jalapeno-wing-shots"
     lease_seconds: int = 600
     signed_url_seconds: int = 300
+    submission_id: str | None = None
 
 
 class WingShotsNightlyOrchestrator:
@@ -43,6 +46,7 @@ class WingShotsNightlyOrchestrator:
         signed_urls: SignedUrlProvider | None = None,
         config: NightlyConfig | None = None,
         clock: Callable[[], datetime] | None = None,
+        logger: logging.Logger | None = None,
     ) -> None:
         self.repository = repository
         self.publishers = dict(publishers)
@@ -50,6 +54,12 @@ class WingShotsNightlyOrchestrator:
         self.signed_urls = signed_urls
         self.config = config or NightlyConfig()
         self.clock = clock or (lambda: datetime.now(timezone.utc))
+        self.logger = logger or logging.getLogger(__name__)
+
+    def _event(self, event: str, **fields: object) -> None:
+        safe = {key: value for key, value in fields.items()
+                if key in {"run_id", "submission_id", "platform", "stage", "duration_seconds", "error_code"}}
+        self.logger.info(json.dumps({"event": event, **safe}, sort_keys=True))
 
     @staticmethod
     def _validate_job(job: SocialJob, platform: Platform) -> None:
@@ -128,13 +138,23 @@ class WingShotsNightlyOrchestrator:
     ) -> NightlyRunReceipt:
         active_correlation_id = correlation_id or str(uuid4())
         started_at = self.clock()
+        self._event("selection_started", stage="selection")
         recovery = self.repository.recover_stale_platform_jobs(
             correlation_id=active_correlation_id,
         )
-        selection = self.repository.run_nightly_selection(
-            business_date=business_date,
-            correlation_id=active_correlation_id,
-        )
+        if self.config.submission_id and hasattr(
+            self.repository, "run_approved_queue_selection"
+        ):
+            selection = self.repository.run_approved_queue_selection(
+                business_date=business_date,
+                correlation_id=active_correlation_id,
+                submission_id=self.config.submission_id,
+            )
+        else:
+            selection = self.repository.run_nightly_selection(
+                business_date=business_date,
+                correlation_id=active_correlation_id,
+            )
         selection_status = str(selection.get("status") or "").upper()
         receipt = NightlyRunReceipt(
             run_id=str(selection["receipt_id"]),
@@ -146,6 +166,7 @@ class WingShotsNightlyOrchestrator:
             stale_claims_recovered=int(recovery.get("recovered_count") or 0),
         )
         if selection_status == SKIPPED_NO_APPROVED_CONTENT:
+            self._event("no_eligible_submission", run_id=receipt.run_id, stage="selection")
             receipt.completed_at = self.clock()
             return receipt
         if selection_status == "ALREADY_RUNNING":
@@ -166,6 +187,8 @@ class WingShotsNightlyOrchestrator:
         if selection_status == "SELECTED" and selection.get("submission_id"):
             receipt.selected_submission_id = str(selection["submission_id"])
             receipt.candidate_count = 1
+            self._event("submission_claimed", run_id=receipt.run_id,
+                        submission_id=receipt.selected_submission_id, stage="selection")
         components = selection.get("score_components") if selection_status == "SELECTED" else None
         if isinstance(components, dict):
             receipt.score_components = {
@@ -211,6 +234,16 @@ class WingShotsNightlyOrchestrator:
                 receipt.failure_code = generation.error_code
                 receipt.completed_at = self.clock()
                 return receipt
+            if (
+                not self.config.dry_run
+                and generation.status == "READY_TO_POST"
+                and generation.submission_id
+                and hasattr(self.repository, "prepare_manual_publish")
+            ):
+                self.repository.prepare_manual_publish(
+                    submission_id=str(generation.submission_id),
+                    correlation_id=active_correlation_id,
+                )
 
         claimed_count = 0
         for platform in self.config.platforms:
@@ -245,6 +278,14 @@ class WingShotsNightlyOrchestrator:
                 safe_result = result.safe_receipt()
                 safe_result["settlement_status"] = result.database_receipt()["status"]
                 receipt.platform_results[platform.value] = safe_result
+                self._event(
+                    "instagram_published" if platform is Platform.INSTAGRAM and result.posted
+                    else "facebook_published" if result.posted
+                    else "platform_failed",
+                    run_id=receipt.run_id, submission_id=job.submission_id,
+                    platform=platform.value, stage="publishing",
+                    error_code=result.failure_code,
+                )
                 if bool(
                     settlement.get("reward_and_notification_settled_by_transition")
                 ):
@@ -297,4 +338,11 @@ class WingShotsNightlyOrchestrator:
             receipt.failure_code = "NO_PLATFORM_PUBLISHED"
             receipt.failure_reason = "No platform job reached a successful state"
         receipt.completed_at = self.clock()
+        self._event(
+            "submission_fully_posted" if receipt.status == "COMPLETED"
+            else "submission_partially_posted" if receipt.status == "PARTIALLY_COMPLETED"
+            else "claim_released",
+            run_id=receipt.run_id, submission_id=receipt.selected_submission_id,
+            stage="settlement",
+        )
         return receipt

@@ -40,6 +40,9 @@ export default function CreatorLeaderboardPanel({ active = true }) {
     <Card testID="creator.leaderboard" style={[styles.card, { backgroundColor: theme.colors.elevation?.level2 ?? theme.colors.surface }]}>
       <Card.Content style={styles.content}>
         <View>
+          <Text variant="titleLarge" style={styles.title}>
+            Creators
+          </Text>
           <Text variant="titleLarge" style={styles.title}>Creators</Text>
           <Text variant="bodyMedium" style={styles.subtitle}>
             Creator Reputation is earned from approved and featured Wing Shots.
@@ -59,7 +62,9 @@ export default function CreatorLeaderboardPanel({ active = true }) {
         ) : error ? (
           <View testID="creator.leaderboard.error" style={styles.error}><Text style={{ color: theme.colors.error }}>{error}</Text><Button onPress={load}>Retry</Button></View>
         ) : rows.length === 0 ? (
-          <Text testID="creator.leaderboard.empty" style={styles.empty}>No Creator Reputation yet. Be the first to share a Wing Shot.</Text>
+          <Text testID="creator.leaderboard.empty" style={styles.empty}>
+            No Creator Reputation in this period yet.
+          </Text>
         ) : (
           <View style={styles.rows}>
             {rows.map((row, index) => {
@@ -71,19 +76,49 @@ export default function CreatorLeaderboardPanel({ active = true }) {
                 <Pressable
                   key={row.user_id}
                   testID={index < 3 ? `creator.leaderboard.row.${index + 1}` : undefined}
+                  style={({ pressed }) => [
+                    styles.leaderRow,
+                    {
+                      backgroundColor: row.is_current_user
+                        ? theme.colors.secondaryContainer
+                        : 'transparent',
+                      opacity: pressed ? 0.72 : 1,
+                    },
+                  ]}
+                  accessibilityLabel={`${row.is_current_user ? 'Your rank, ' : ''}Rank ${row.rank}, ${name}, ${row.creator_xp} Creator Reputation, ${row.approved_submissions} approved, ${row.featured_submissions} featured`}
                   style={({ pressed }) => [styles.leaderRow, rowStyle, { opacity: pressed ? 0.72 : 1 }]}
                   accessibilityLabel={`Rank ${row.rank}, ${name}, ${row.creator_xp} Creator Reputation, ${row.approved_submissions} approved, ${row.featured_submissions} featured`}
                   accessibilityRole="button"
                   accessibilityHint="Opens this creator's public wing journey"
                   onPress={() => router.push({ pathname: '/profile/history', params: { userId: row.user_id, sourceSurface: 'creator_leaderboard' } })}
                 >
-                  {row.avatar_url ? <Avatar.Image size={38} source={{ uri: row.avatar_url }} /> : <Avatar.Text size={38} label={avatarLabel || '??'} />}
-                  <View style={styles.rowCopy}>
-                    <Text variant="titleMedium" style={[styles.rowName, textStyle]}>#{row.rank}  {name}</Text>
-                    <Text variant="bodySmall" style={[styles.rowStats, textStyle]}>
-                      {Number(row.creator_xp || 0)} Reputation · {Number(row.approved_submissions || 0)} approved · {Number(row.featured_submissions || 0)} featured
+                  <View style={styles.rowIdentity}>
+                    {row.avatar_url ? <Avatar.Image size={36} source={{ uri: row.avatar_url }} /> : <Avatar.Text size={36} label={name.slice(0, 1).toUpperCase()} />}
+                    <Text
+                    variant="titleMedium"
+                    style={[
+                      styles.rowName,
+                      row.is_current_user
+                        ? { color: theme.colors.onSecondaryContainer }
+                        : null,
+                    ]}
+                    >
+                      {row.is_current_user ? 'Your Rank · ' : ''}#{row.rank}  {name}
                     </Text>
                   </View>
+                  <Text
+                    variant="bodySmall"
+                    style={[
+                      styles.rowStats,
+                      row.is_current_user
+                        ? { color: theme.colors.onSecondaryContainer }
+                        : null,
+                    ]}
+                  >
+                    {Number(row.creator_xp || 0)} Reputation ·{' '}
+                    {Number(row.approved_submissions || 0)} approved ·{' '}
+                    {Number(row.featured_submissions || 0)} featured
+                  </Text>
                 </Pressable>
               );
             })}
@@ -106,5 +141,6 @@ const styles = StyleSheet.create({
   leaderRow: { minHeight: 64, paddingHorizontal: 12, paddingVertical: 9, borderRadius: 12, justifyContent: 'center', flexDirection: 'row', alignItems: 'center', gap: 10 },
   rowCopy: { flex: 1, minWidth: 0 },
   rowName: { fontWeight: '750' },
+  rowIdentity: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   rowStats: { opacity: 0.74, marginTop: 2, lineHeight: 18 },
 });

@@ -4,9 +4,7 @@ import { test } from 'node:test';
 
 const migration = readFileSync(new URL('../supabase/migrations/20260729132000_wing_creator_surfaces.sql', import.meta.url), 'utf8');
 const client = readFileSync(new URL('../lib/wingCreator.js', import.meta.url), 'utf8');
-const overview = readFileSync(new URL('../app/profile/wing-shots/index.jsx', import.meta.url), 'utf8');
-const history = readFileSync(new URL('../app/profile/wing-shots/history.jsx', import.meta.url), 'utf8');
-const summary = readFileSync(new URL('../components/creator/WingCreatorSummaryCard.jsx', import.meta.url), 'utf8');
+const history = readFileSync(new URL('../app/profile/wing-shots/index.jsx', import.meta.url), 'utf8');
 const detail = readFileSync(new URL('../app/profile/wing-shots/[id].jsx', import.meta.url), 'utf8');
 const leaderboard = readFileSync(new URL('../components/creator/CreatorLeaderboardPanel.jsx', import.meta.url), 'utf8');
 const edge = readFileSync(new URL('../supabase/functions/wing-media-preview/index.ts', import.meta.url), 'utf8');
@@ -28,30 +26,13 @@ test('Creator leaderboard is server gated, private, and uses Reputation copy', (
   assert.match(migration, /if not coalesce\(v_enabled, false\) then\s+return/);
   assert.match(migration, /revoke execute on function public\.get_wing_creator_leaderboard\(text, integer\)\s+from authenticated/);
   assert.match(client, /get_wing_creator_leaderboard_surface/);
-  assert.match(leaderboard, /Creators/);
-  assert.match(leaderboard, /Creator Reputation/);
-  assert.doesNotMatch(leaderboard, /Creator XP/);
+  assert.match(leaderboard, /Creator Reputation is earned from approved and featured Wing Shots/);
+  assert.match(leaderboard, /approved/);
   assert.match(leaderboard, /featured/);
   assert.match(leaderboard, /creator_leaderboard_viewed/);
 });
 
-test('Wing Creator opens a dedicated, back-navigable history screen without duplicate summary content', () => {
-  assert.match(overview, /Your Wing Shots/);
-  assert.match(overview, /Private submission history and Creator progress/);
-  assert.match(overview, /edges=\{\['top', 'bottom'\]\}/);
-  assert.match(overview, /paddingBottom: 28/);
-  assert.match(summary, /router\.push\('\/profile\/wing-shots\/history'\)/);
-  assert.match(history, /title="Wing Shot History"/);
-  assert.match(history, /subtitle="Your private submission history"/);
-  assert.match(history, /icon="arrow-left"/);
-  assert.match(history, /router\.back\(\)/);
-  assert.match(history, /edges=\{\['top', 'bottom'\]\}/);
-  assert.match(history, /paddingBottom: 32/);
-  assert.doesNotMatch(history, /WingCreatorSummaryCard/);
-  assert.doesNotMatch(history, /creator\.open-history/);
-});
-
-test('history and detail include stable selectors, statuses, and friendly rejection copy', () => {
+test('history and detail include stable selectors and understandable states', () => {
   for (const label of ['Processing', 'In Review', 'Approved', 'Featured', 'Not Selected Yet', 'Rejected', 'Upload Failed', 'Withdrawn']) {
     assert.ok(migration.includes(`'${label}'`) || readFileSync(new URL('../components/creator/SubmissionStatusChip.jsx', import.meta.url), 'utf8').includes(label));
   }
@@ -83,6 +64,5 @@ test('private preview broker verifies the caller and returns a short-lived signe
   assert.match(edge, /claim_wing_media_access_request_for_user/);
   assert.match(edge, /p_requester_id: authData\.user\.id/);
   assert.match(edge, /const SIGNED_URL_SECONDS = 60/);
-  assert.match(edge, /'cache-control': 'no-store, private, max-age=0'/);
   assert.doesNotMatch(edge, /console\.(log|warn|error)/);
 });

@@ -1,5 +1,5 @@
 -- Jalapeño selection contract: one active reviewer priority first, then a
--- random candidate across the full eligible approved pool. The claim and
+-- deterministic candidate across the full eligible approved pool. The claim and
 -- transition remain in the same transaction protected by the nightly lock.
 
 begin;
@@ -11,7 +11,7 @@ returns jsonb language plpgsql security definer set search_path=pg_catalog,publi
 as $$
 declare c public.wing_moderation_config%rowtype; r public.wing_nightly_run_receipts%rowtype;
   s public.wing_media_submissions%rowtype; receipt uuid; generation uuid;
-  n integer; mode text := 'random'; components jsonb; score numeric := 0;
+  n integer; mode text := 'oldest_approved'; components jsonb; score numeric := 0;
   had boolean := false; ig uuid:=gen_random_uuid(); fb uuid:=gen_random_uuid();
 begin
   if p_business_date is null or p_correlation_id is null then raise exception 'nightly_identity_required'; end if;
@@ -34,17 +34,18 @@ begin
     return jsonb_build_object('receipt_id',receipt,'status','SKIPPED_NO_APPROVED_CONTENT');
   end if;
   -- First preference is the database-enforced active priority. A stale row is
-  -- ignored by the eligibility predicate and cannot block the random branch.
+  -- ignored by the eligibility predicate and cannot block the oldest branch.
   select * into s from public.wing_media_submissions x where x.is_publish_priority and x.status='approved' and x.featured_at is null and x.processed_storage_path is not null
     and x.moderation_status in ('likely_acceptable','overridden') and x.wing_verification_status in ('likely_wings','overridden') and x.duplicate_group is null
     and not exists(select 1 from public.wing_submission_abuse_signals a where a.submission_id=x.id and a.severity in ('high','critical')) for update skip locked;
   if found then mode := 'priority'; else
     select * into s from public.wing_media_submissions x where x.status='approved' and x.featured_at is null and x.processed_storage_path is not null
       and x.moderation_status in ('likely_acceptable','overridden') and x.wing_verification_status in ('likely_wings','overridden') and x.duplicate_group is null
-      and not exists(select 1 from public.wing_submission_abuse_signals a where a.submission_id=x.id and a.severity in ('high','critical')) order by random() limit 1 for update skip locked;
+      and not exists(select 1 from public.wing_submission_abuse_signals a where a.submission_id=x.id and a.severity in ('high','critical'))
+      order by x.priority desc, x.approved_at asc nulls last, x.created_at asc, x.id limit 1 for update skip locked;
   end if;
   if not found then return jsonb_build_object('status','SKIPPED_NO_APPROVED_CONTENT','reason','claim_race'); end if;
-  components := jsonb_build_object('selection_mode',mode,'manual_priority',s.is_publish_priority,'random_fallback',mode='random');
+  components := jsonb_build_object('selection_mode',mode,'manual_priority',s.is_publish_priority,'ordering','priority,approved_at,created_at,id');
   if had then update public.wing_nightly_run_receipts set status='selected',selected_submission_id=s.id,candidate_count=n,score_components=components,dry_run=c.publishing_dry_run,completed_at=now(),correlation_id=p_correlation_id where id=r.id returning id into receipt;
   else insert into public.wing_nightly_run_receipts(business_date,status,selected_submission_id,candidate_count,score_components,dry_run,completed_at,correlation_id) values(p_business_date,'selected',s.id,n,components,c.publishing_dry_run,now(),p_correlation_id) returning id into receipt; end if;
   perform public.wing_transition_submission(s.id,'generation_pending','approved','scheduler',null,'nightly_selection','nightly:'||p_business_date::text,p_correlation_id,components);

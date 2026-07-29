@@ -38,11 +38,14 @@ def build_parser() -> argparse.ArgumentParser:
         description="Curate and publish one approved community Wing Shot."
     )
     parser.add_argument("--business-date", help="America/New_York date (YYYY-MM-DD)")
+    parser.add_argument("--mode", choices=("dry_run", "publish"), default="dry_run")
+    parser.add_argument("--live", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument(
-        "--live",
-        action="store_true",
-        help="Permit configured Meta calls; dry-run is the default",
+        "--platform", choices=("both", "instagram", "facebook"), default="both"
     )
+    parser.add_argument("--submission-id", help="Optional approved Queue UUID")
+    parser.add_argument("--skip-location-lookup", action="store_true")
+    parser.add_argument("--keep-processed-artifact", action="store_true")
     parser.add_argument(
         "--generation-only",
         action="store_true",
@@ -80,7 +83,12 @@ def _generation_worker(client: SupabaseClient) -> WingShotsGenerationWorker:
 
 def main() -> int:
     args = build_parser().parse_args()
-    dry_run = not args.live
+    dry_run = args.mode == "dry_run" and not args.live
+    platforms = {
+        "both": (Platform.INSTAGRAM, Platform.FACEBOOK),
+        "instagram": (Platform.INSTAGRAM,),
+        "facebook": (Platform.FACEBOOK,),
+    }[args.platform]
     client = SupabaseClient.from_env()
     if args.generation_only:
         outcome = _generation_worker(client).run_once()
@@ -141,7 +149,11 @@ def main() -> int:
         publishers=publishers,
         generation_worker=_generation_worker(client),
         signed_urls=SupabaseStorageSignedUrlProvider(client),
-        config=NightlyConfig(dry_run=dry_run),
+        config=NightlyConfig(
+            dry_run=dry_run,
+            platforms=platforms,
+            submission_id=args.submission_id,
+        ),
     )
     receipt = orchestrator.run(business_date=_business_date(args.business_date))
     print(json.dumps(receipt.safe_dict(), indent=2, sort_keys=True))

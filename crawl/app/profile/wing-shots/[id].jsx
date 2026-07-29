@@ -6,6 +6,7 @@ import { ActivityIndicator, Button, Card, Text, useTheme } from 'react-native-pa
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import ScreenHeader from '../../../components/ScreenHeader';
 import SubmissionStatusChip from '../../../components/creator/SubmissionStatusChip';
+import { formatWingShotRejectionReason } from '../../../lib/wingShotRejection';
 import {
   canWithdrawWingShot,
   loadMyWingShotDetail,

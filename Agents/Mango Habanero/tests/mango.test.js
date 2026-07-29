@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
 const migration = readFileSync(resolve(root, '..', '..', 'crawl', 'supabase', 'migrations', '20260729170000_mango_habanero_review_dashboard.sql'), 'utf8');
-const selection = readFileSync(resolve(root, '..', '..', 'crawl', 'supabase', 'migrations', '20260729171000_mango_habanero_jalapeno_priority_selection.sql'), 'utf8');
+const selection = readFileSync(resolve(root, '..', '..', 'crawl', 'supabase', 'migrations', '20260729172000_jalapeno_approved_queue_authority.sql'), 'utf8');
 
 describe('Mango Habanero contracts', () => {
   it('has the local launcher and required environment contract', () => {
@@ -19,8 +19,8 @@ describe('Mango Habanero contracts', () => {
     expect(migration).toContain('one_active_priority'); expect(migration).toContain('mango_clear_ineligible_priority');
     expect(migration).toContain("new.status <> 'approved'");
   });
-  it('selects priority before random fallback and claims with row locking', () => {
-    expect(selection).toContain('x.is_publish_priority'); expect(selection).toContain('order by random()'); expect(selection).toContain('for update skip locked');
+  it('selects Make Next then oldest approved content and claims with row locking', () => {
+    expect(selection).toContain('is_publish_priority desc'); expect(selection).toContain('approved_at asc nulls last, s.created_at asc, s.id'); expect(selection).toContain('for update skip locked'); expect(selection).not.toContain('order by random()');
   });
   it('keeps the service key out of frontend source and uses localhost only', () => {
     const source = readFileSync(resolve(root, 'src', 'main.jsx'), 'utf8'); const server = readFileSync(resolve(root, 'server', 'index.mjs'), 'utf8');
@@ -31,7 +31,7 @@ describe('Mango Habanero contracts', () => {
     const source = readFileSync(resolve(root, 'src', 'main.jsx'), 'utf8');
     expect(source).toContain("new Set(['uploaded', 'processing', 'in_review'])");
     expect(source).not.toContain("const readyForReview=item.status==='in_review'");
-    expect(source).toContain("tab==='pending'&&<><button className=\"approve\"");
+    expect(source).toContain("tab === 'pending' && <><button className=\"approve\"");
     expect(source).toContain("<button className=\"reject\" disabled={busy} onClick={reject}>Reject</button>");
   });
 });

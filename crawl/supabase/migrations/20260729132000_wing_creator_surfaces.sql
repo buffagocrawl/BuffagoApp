@@ -12,19 +12,33 @@ set search_path = pg_catalog
 as $$
   select case
     when p_reason is null then null
+    when lower(trim(p_reason)) = 'quality_unusable'
+      then 'The video quality was too low to use.'
+    when lower(trim(p_reason)) = 'too_dark'
+      then 'The video was too dark to clearly see the wings.'
+    when lower(trim(p_reason)) = 'blurry'
+      then 'The video was too blurry to clearly see the wings.'
+    when lower(trim(p_reason)) = 'unsafe_content'
+      then 'The video did not meet BuffaGo’s content guidelines.'
+    when lower(trim(p_reason)) = 'unrelated_content'
+      then 'The video did not clearly show the wings or restaurant experience.'
+    when lower(trim(p_reason)) = 'duplicate'
+      then 'This appears to be a duplicate submission.'
+    when lower(trim(p_reason)) = 'unsupported_media'
+      then 'This media format could not be processed.'
     when lower(p_reason) similar to '%(not[_ -]?wings|wrong[_ -]?content|unrelated)%'
-      then 'Does not clearly show wings'
+      then 'The video did not clearly show the wings or restaurant experience.'
     when lower(p_reason) similar to '%(quality|blurry|dark|unusable|malformed)%'
-      then 'Media quality'
+      then 'The video quality was too low to use.'
     when lower(p_reason) similar to '%(duplicate|reused|spam)%'
-      then 'Duplicate or repeated submission'
+      then 'This appears to be a duplicate submission.'
     when lower(p_reason) similar to '%(privacy|personal[_ -]?information|face|minor)%'
       then 'Privacy concern'
     when lower(p_reason) similar to '%(unsafe|nudity|graphic|weapon|hate|illegal|offensive)%'
       then 'Content safety'
     when lower(p_reason) similar to '%(copyright|permission|ownership)%'
       then 'Sharing rights'
-    else 'Not eligible for featuring'
+    else 'This Wing Shot did not meet the current submission guidelines.'
   end
 $$;
 
