@@ -14,6 +14,7 @@ import {
   withdrawMyWingShot,
 } from '../../../lib/wingCreator';
 import { trackEvent } from '../../../lib/analytics';
+import { formatWingShotRejectionReason } from '../../../lib/wingShotCopy';
 
 function single(value) {
   return Array.isArray(value) ? value[0] : value;
@@ -263,7 +264,7 @@ export default function WingShotDetailScreen() {
                 Not selected for the approval queue
               </Text>
               <Text style={styles.body}>
-                {detail.rejection_category || 'Not eligible for featuring'}
+                {formatWingShotRejectionReason(detail.rejection_category)}
               </Text>
               <Text style={[styles.body, styles.nextStep]}>
                 Your rating is still saved. You can submit a new Wing Shot after a future eligible

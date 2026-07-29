@@ -5,6 +5,7 @@ import { Text, useTheme } from 'react-native-paper';
 export default function ScreenHeader({
   title,
   subtitle = null,
+  leftContent = null,
   rightContent = null,
   contentStyle = null,
   titleStyle = null,
@@ -15,6 +16,7 @@ export default function ScreenHeader({
   return (
     <View style={[styles.header, { borderBottomColor: theme.colors.outlineVariant ?? theme.colors.outline }, contentStyle]}>
       <View style={styles.headerTopRow}>
+        {leftContent ? <View style={styles.leftContent}>{leftContent}</View> : null}
         <View style={styles.textBlock}>
           <Text variant="headlineSmall" style={[styles.title, titleStyle]}>
             {title}
@@ -57,5 +59,10 @@ const styles = StyleSheet.create({
   rightContent: {
     flexShrink: 0,
     alignSelf: 'flex-start',
+  },
+  leftContent: {
+    flexShrink: 0,
+    alignSelf: 'flex-start',
+    marginLeft: -8,
   },
 });

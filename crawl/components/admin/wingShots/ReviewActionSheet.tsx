@@ -42,7 +42,7 @@ export const REVIEW_ACTIONS: Record<WingReviewAction, ActionDefinition> = {
       { key: 'documented_override', label: 'Documented model override' },
     ],
     warning:
-      'Approval awards Creator XP. Use an override only after reviewing every visible safety flag.',
+      'Approval awards Creator Reputation. Use an override only after reviewing every visible safety flag.',
   },
   reject: {
     label: 'Reject',
