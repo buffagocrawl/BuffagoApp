@@ -45,7 +45,8 @@ begin
    where business_date = p_business_date
    for update;
   v_had_receipt := found;
-  if found and v_receipt.status <> 'running' then
+  -- Empty receipts are informational and must not suppress later eligible content.
+  if found and v_receipt.status not in ('running', 'skipped_no_approved_content') then
     return jsonb_build_object('receipt_id', v_receipt.id,
       'status', upper(v_receipt.status));
   end if;
@@ -74,6 +75,17 @@ begin
        select 1 from storage.objects o
         where o.bucket_id = 'wing-submissions'
           and o.name = s.original_storage_path
+     )
+     and exists (
+       select 1 from storage.objects o
+        where o.bucket_id = 'wing-submissions'
+          and o.name = s.thumbnail_storage_path
+     )
+     and exists (
+       select 1 from public.wing_processing_jobs j
+        where j.submission_id = s.id
+          and j.job_kind in ('photo_process', 'video_process')
+          and j.status = 'succeeded'
      )
      and (p_submission_id is null or s.id = p_submission_id)
      and not exists (
@@ -115,7 +127,14 @@ begin
      and s.duplicate_group is null
      and exists (select 1 from storage.objects o
                   where o.bucket_id = 'wing-submissions'
-                    and o.name = s.original_storage_path)
+                  and o.name = s.original_storage_path)
+     and exists (select 1 from storage.objects o
+                  where o.bucket_id = 'wing-submissions'
+                  and o.name = s.thumbnail_storage_path)
+     and exists (select 1 from public.wing_processing_jobs j
+                  where j.submission_id = s.id
+                    and j.job_kind in ('photo_process', 'video_process')
+                    and j.status = 'succeeded')
      and not exists (select 1 from public.wing_submission_abuse_signals a
                       where a.submission_id = s.id
                         and a.severity in ('high', 'critical'))

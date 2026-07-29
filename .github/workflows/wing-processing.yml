@@ -1,0 +1,37 @@
+name: Wing Shot private media processing
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/10 * * * *'
+
+concurrency:
+  group: wing-processing-worker
+  cancel-in-progress: false
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      WING_MODERATION_PROVIDER_MODE: manual-review
+      WING_PROCESSING_ENVIRONMENT: production
+      WING_PROCESSING_WORKER_ID: github-actions-wing-processor
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install --yes ffmpeg && ffmpeg -version && ffprobe -version
+      - name: Install requirements
+        working-directory: Agents/Jalapeno
+        run: python -m pip install --upgrade pip && pip install -r requirements.txt
+      - name: Validate worker configuration
+        working-directory: Agents/Jalapeno
+        run: python wing_processing_worker_main.py --validate-config
+      - name: Drain private processing queue
+        working-directory: Agents/Jalapeno
+        run: python wing_processing_worker_main.py --drain 25

@@ -31,7 +31,8 @@ describe('Mango Habanero contracts', () => {
     const source = readFileSync(resolve(root, 'src', 'main.jsx'), 'utf8');
     expect(source).toContain("new Set(['uploaded', 'processing', 'in_review'])");
     expect(source).not.toContain("const readyForReview=item.status==='in_review'");
-    expect(source).toContain("tab === 'pending' && <><button className=\"approve\"");
+    expect(source).toContain("tab === 'pending' && <><button className=\"approve\" disabled={busy || !readyForReview}");
+    expect(source).toContain("Processing media");
     expect(source).toContain("<button className=\"reject\" disabled={busy} onClick={reject}>Reject</button>");
   });
 });
