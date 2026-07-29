@@ -11,6 +11,8 @@ const client = readFileSync(new URL('../utils/xp.js', import.meta.url), 'utf8');
 test('client progression uses the evidence-backed RPC, not generic award_xp', () => {
   assert.match(client, /claim_verified_progression_xp/);
   assert.doesNotMatch(client, /rpc\('award_xp'/);
+  assert.doesNotMatch(client, /\.from\('users'\)\s*\.update\(/);
+  assert.match(client, /A missing or failed RPC is/);
 });
 
 test('rating XP requires a verified in-person non-BuffaCoin rating', () => {
