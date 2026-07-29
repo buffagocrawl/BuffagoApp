@@ -122,7 +122,21 @@ begin
   perform pg_advisory_xact_lock(hashtextextended('mango-review:'||p_idempotency_key,0));
   select * into s from public.wing_media_submissions where id=p_submission_id for update;
   if not found then raise exception 'wing_submission_not_found'; end if;
-  if s.status <> 'in_review' then raise exception 'submission_not_in_review'; end if;
+  -- Mango reviews the original upload. Move an upload/processing submission
+  -- into the review state as part of the same transaction; the processing job
+  -- remains an independent downstream record and does not gate moderation.
+  if s.status = 'uploaded' then
+    perform public.wing_transition_submission(
+      p_submission_id, 'processing', 'uploaded', 'reviewer', p_reviewer_id,
+      'mango_habanero_review_queue', 'mango:'||p_idempotency_key||':processing',
+      p_correlation_id, '{}'::jsonb);
+  end if;
+  if s.status in ('uploaded', 'processing') then
+    perform public.wing_transition_submission(
+      p_submission_id, 'in_review', 'processing', 'reviewer', p_reviewer_id,
+      'mango_habanero_review_queue', 'mango:'||p_idempotency_key||':in_review',
+      p_correlation_id, '{}'::jsonb);
+  end if;
   v_transition := public.wing_transition_submission(
     p_submission_id, case when p_action='approve' then 'approved' else 'rejected' end,
     'in_review', 'reviewer', p_reviewer_id, 'mango_habanero_review',

@@ -4,7 +4,11 @@ import './styles.css';
 
 const reasons = [['poor_media_quality','Poor media quality'],['inappropriate_content','Inappropriate content'],['not_related_to_rating','Not clearly related to the rating'],['duplicate_submission','Duplicate submission'],['copyright_or_ownership','Copyright or ownership concern'],['restaurant_or_attribution','Restaurant or attribution issue'],['other','Other']];
 const tabs = [['pending','Pending Review'],['approved','Approved Queue'],['rejected','Rejected'],['posted','Posted / History']];
-const statusForTab = (tab, item) => tab === 'pending' ? item.status === 'in_review' : tab === 'approved' ? item.status === 'approved' && !item.featured_at : tab === 'rejected' ? item.status === 'rejected' : item.status === 'posted' || item.featured_at;
+// Uploaded Wing Shots are valid queue entries before the processing worker
+// advances them to `in_review`. Keep them visible so an upload cannot appear
+// to vanish merely because its state has not advanced yet.
+const pendingStatuses = new Set(['uploaded', 'processing', 'in_review']);
+const statusForTab = (tab, item) => tab === 'pending' ? pendingStatuses.has(item.status) : tab === 'approved' ? item.status === 'approved' && !item.featured_at : tab === 'rejected' ? item.status === 'rejected' : item.status === 'posted' || item.featured_at;
 const formatDate = (value) => value ? new Date(value).toLocaleString() : '—';
 
 function App() {

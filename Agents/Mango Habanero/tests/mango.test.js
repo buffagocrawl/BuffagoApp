@@ -27,4 +27,11 @@ describe('Mango Habanero contracts', () => {
     expect(source).not.toContain('SUPABASE_SERVICE_ROLE_KEY'); expect(server).toContain("'127.0.0.1'");
     if (existsSync(resolve(root, 'dist', 'assets'))) for (const file of readdirSync(resolve(root, 'dist', 'assets'))) expect(readFileSync(resolve(root, 'dist', 'assets', file), 'utf8')).not.toContain('SUPABASE_SERVICE_ROLE_KEY');
   });
+  it('keeps uploaded and processing submissions visible in the pending queue', () => {
+    const source = readFileSync(resolve(root, 'src', 'main.jsx'), 'utf8');
+    expect(source).toContain("new Set(['uploaded', 'processing', 'in_review'])");
+    expect(source).not.toContain("const readyForReview=item.status==='in_review'");
+    expect(source).toContain("tab==='pending'&&<><button className=\"approve\"");
+    expect(source).toContain("<button className=\"reject\" disabled={busy} onClick={reject}>Reject</button>");
+  });
 });

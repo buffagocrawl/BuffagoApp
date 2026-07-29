@@ -110,9 +110,11 @@ export function WingShotFlow({
   const [attribution, setAttribution] = useState<Attribution | null>(null);
   const [caption, setCaption] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [uploadResult, setUploadResult] = useState<{ submission_id: string; status: string } | null>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
   const networkState = useNetworkState();
   const abortRef = useRef<AbortController | null>(null);
+  const phaseRef = useRef<Phase>('editing');
   const sessionRef = useRef(createWingShotUploadSession(Crypto.randomUUID));
   const progressBarRef = useRef(new Animated.Value(0));
   const progressController = useInterpolatedUploadProgress();
@@ -128,6 +130,43 @@ export function WingShotFlow({
     progressController.stop('canceled');
     progressBarRef.current.setValue(0);
   }, [progressController]);
+
+  const resetWingShotForm = useCallback(() => {
+    // An in-flight upload owns the draft until it settles. The successful
+    // server record is never touched by this client-side reset.
+    if (phaseRef.current === 'uploading' || phaseRef.current === 'cancelling') return false;
+    setMedia(null);
+    setConsentAccepted(false);
+    setAttribution(null);
+    setCaption('');
+    setErrorMessage('');
+    setUploadResult(null);
+    setPhase('editing');
+    resetUploadSession();
+    return true;
+  }, [resetUploadSession]);
+
+  const setPhaseSafely = useCallback((nextPhase: Phase) => {
+    phaseRef.current = nextPhase;
+    setPhase(nextPhase);
+  }, []);
+
+  const handleCompletedFlowClose = useCallback(() => {
+    if (phaseRef.current !== 'success') return;
+    resetWingShotForm();
+    onClose();
+  }, [onClose, resetWingShotForm]);
+
+  const closeFlow = useCallback(() => {
+    if (phaseRef.current === 'uploading' || phaseRef.current === 'cancelling') return;
+    // Closing an unfinished flow does not silently erase its draft. The
+    // completed flow has its own explicit Done button and cleanup path below.
+    onClose();
+  }, [onClose]);
+
+  useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
 
   useEffect(() => {
     let active = true;
@@ -163,7 +202,7 @@ export function WingShotFlow({
   const acceptMedia = useCallback(
     (selected: WingShotSelectedMedia | null) => {
       if (!selected) {
-        setPhase('editing');
+        setPhaseSafely('editing');
         return;
       }
       if (
@@ -179,11 +218,11 @@ export function WingShotFlow({
       setMedia(selected);
       setConsentAccepted(false);
       setErrorMessage('');
-      setPhase('editing');
+      setPhaseSafely('editing');
       resetUploadSession();
       announce(`${selected.kind === 'photo' ? 'Photo' : 'Video'} selected.`);
     },
-    [allowPhoto, allowVideo, announce, resetUploadSession],
+    [allowPhoto, allowVideo, announce, resetUploadSession, setPhaseSafely],
   );
 
   const chooseMedia = useCallback(
@@ -196,7 +235,7 @@ export function WingShotFlow({
         crawlId: analyticsContext?.crawlId ?? null,
         metadata: { source, requested_kind: source === 'library' ? 'user_choice' : source },
       });
-      setPhase('choosing');
+      setPhaseSafely('choosing');
       setErrorMessage('');
       try {
         if (source === 'photo') {
@@ -222,36 +261,36 @@ export function WingShotFlow({
       } catch (error) {
         const message = wingShotUserMessage(error);
         setErrorMessage(message);
-        setPhase('error');
+        setPhaseSafely('error');
         announce(message);
       }
     },
-    [acceptMedia, allowPhoto, allowVideo, analyticsContext, announce, mediaAdapter],
+    [acceptMedia, allowPhoto, allowVideo, analyticsContext, announce, mediaAdapter, setPhaseSafely],
   );
 
   const removeMedia = useCallback(() => {
     setMedia(null);
     setConsentAccepted(false);
     setErrorMessage('');
-    setPhase('editing');
+    setPhaseSafely('editing');
     resetUploadSession();
     announce('Selected media removed.');
-  }, [announce, resetUploadSession]);
+  }, [announce, resetUploadSession, setPhaseSafely]);
 
   const replaceMedia = useCallback(() => {
     setMedia(null);
     setConsentAccepted(false);
     setErrorMessage('');
-    setPhase('editing');
+    setPhaseSafely('editing');
     resetUploadSession();
     announce('Choose a replacement photo or video.');
-  }, [announce, resetUploadSession]);
+  }, [announce, resetUploadSession, setPhaseSafely]);
 
   const submit = useCallback(async () => {
     if (!networkAvailable) {
       const message = wingShotUserMessage({ code: 'offline' });
       setErrorMessage(message);
-      setPhase('error');
+      setPhaseSafely('error');
       announce(message);
       return;
     }
@@ -267,14 +306,14 @@ export function WingShotFlow({
     ) {
       const message = 'That media type is not enabled for Wing Shots.';
       setErrorMessage(message);
-      setPhase('error');
+      setPhaseSafely('error');
       announce(message);
       return;
     }
     const controller = new AbortController();
     abortRef.current = controller;
     setErrorMessage('');
-    setPhase('uploading');
+    setPhaseSafely('uploading');
     const operation = progressController.start();
     trackEvent({
       eventName: 'wing_shot_upload_started',
@@ -309,7 +348,8 @@ export function WingShotFlow({
       });
       if (!progressController.isCurrent(operation) || controller.signal.aborted) return;
       progressController.complete();
-      setPhase('success');
+      setUploadResult(result);
+      setPhaseSafely('success');
       trackEvent({
         eventName: 'wing_shot_upload_completed',
         screen: analyticsContext?.screen ?? 'wing_shot',
@@ -337,7 +377,7 @@ export function WingShotFlow({
         },
       });
       setErrorMessage(message);
-      setPhase(controller.signal.aborted ? 'cancelled' : 'error');
+      setPhaseSafely(controller.signal.aborted ? 'cancelled' : 'error');
       announce(message);
     } finally {
       if (abortRef.current === controller) abortRef.current = null;
@@ -359,6 +399,7 @@ export function WingShotFlow({
     submissionSource,
     uploadTransport,
     progressController,
+    setPhaseSafely,
   ]);
 
   const selectedKindEnabled =
@@ -378,14 +419,14 @@ export function WingShotFlow({
   const cancelUpload = useCallback(() => {
     abortRef.current?.abort();
     progressController.clearTimer();
-    setPhase('cancelling');
+    setPhaseSafely('cancelling');
     announce('Cancelling upload.');
-  }, [announce, progressController]);
+  }, [announce, progressController, setPhaseSafely]);
 
   return (
     <Modal
       animationType="none"
-      onRequestClose={disabled ? undefined : onClose}
+      onRequestClose={disabled ? undefined : closeFlow}
       presentationStyle="fullScreen"
       visible={visible}
       testID="wing-shot.flow"
@@ -408,7 +449,7 @@ export function WingShotFlow({
               accessibilityRole="button"
               accessibilityLabel="Not now, close Wing Shot"
               disabled={disabled}
-              onPress={onClose}
+              onPress={closeFlow}
               style={styles.closeButton}
               testID="wing-shot.not-now"
             >
@@ -639,7 +680,7 @@ export function WingShotFlow({
                     Wing Shot submitted
                   </Text>
                   <Text style={styles.successText} allowFontScaling>
-                    Your submission is now under review. Approved photos may be featured, and approved
+                    {uploadResult?.status === 'submitted_for_review' ? 'Your submission is now under review.' : 'Your submission was saved.'} Approved photos may be featured, and approved
                     creators earn XP, badges, and recognition.
                   </Text>
                 </View>
@@ -675,7 +716,7 @@ export function WingShotFlow({
             {phase === 'success' ? (
               <Pressable
                 accessibilityRole="button"
-                onPress={onClose}
+                onPress={handleCompletedFlowClose}
                 style={styles.submitButton}
                 testID="wing-shot.done"
               >
