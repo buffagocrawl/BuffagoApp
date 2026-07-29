@@ -20,6 +20,7 @@ import * as Haptics from 'expo-haptics';
 import { supabase } from '../../lib/supabase.js';
 import { trackEvent } from '../../lib/analytics';
 import RatingWizardDialog from '../../components/RatingWizardDialog';
+import RatingComparisonModal from '../../components/RatingComparisonModal';
 import { WingShotFlow } from '../../components/wingShots';
 import { useLocationCtx } from '../../providers/LocationProvider';
 import { useWingShotsFeatureFlags } from '../../hooks/useWingShotsFeatureFlags';
@@ -668,9 +669,9 @@ export default function CrawlScreen() {
   const [detailTitle, setDetailTitle] = useState('');
   const [detailRows, setDetailRows] = useState([]);
 
-  // celebration popup after rating
-  const [celebrateVisible, setCelebrateVisible] = useState(false);
-  const [celebrateScore, setCelebrateScore] = useState(null);
+  // Dedicated post-rating comparison (separate from restaurant detail/summary dialogs)
+  const [comparisonVisible, setComparisonVisible] = useState(false);
+  const [comparisonData, setComparisonData] = useState(null);
 
   // crawl completion coin popup
   const [crawlCoinOpen, setCrawlCoinOpen] = useState(false);
@@ -1218,6 +1219,46 @@ export default function CrawlScreen() {
           ? Number(wsRow[0].weight_score)
           : buffaScore;
 
+      // Build the immediate social payoff from the saved rating plus the current
+      // restaurant community. Keep this local to the post-submit flow so the
+      // existing restaurant detail modal remains unchanged.
+      try {
+        const [{ data: communityRows }, { data: historyRows }] = await Promise.all([
+          supabase
+            .from('destination_ratings')
+            .select('crispiness, sauce, meat, overall')
+            .eq('destination_id', activeDest.id),
+          userId
+            ? supabase.from('destination_ratings').select('crispiness, sauce, meat, overall').eq('user_id', userId).limit(250)
+            : Promise.resolve({ data: [] }),
+        ]);
+        const community = Array.isArray(communityRows) ? communityRows : [];
+        const history = Array.isArray(historyRows) ? historyRows : [];
+        const average = (key) => {
+          const values = community.map((row) => Number(row?.[key])).filter(Number.isFinite);
+          return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : Number(payload[key]);
+        };
+        const overallValues = community.map((row) => Number(row?.overall)).filter(Number.isFinite);
+        const lowerCount = overallValues.filter((value) => value < overall).length;
+        const percentile = overallValues.length ? (lowerCount / overallValues.length) * 100 : 50;
+        setComparisonData({
+          name: activeDest.name,
+          scores: { crispiness: crisp, sauce, meat, overall },
+          averages: { crispiness: average('crispiness'), sauce: average('sauce'), meat: average('meat'), overall: average('overall') },
+          history: [...history, { crispiness: crisp, sauce, meat, overall }],
+          percentile,
+        });
+      } catch (comparisonError) {
+        console.warn('[rating comparison] load failed', comparisonError?.message || comparisonError);
+        setComparisonData({
+          name: activeDest.name,
+          scores: { crispiness: crisp, sauce, meat, overall },
+          averages: { crispiness: crisp, sauce, meat, overall },
+          history: [{ crispiness: crisp, sauce, meat, overall }],
+          percentile: 50,
+        });
+      }
+
       setRatedDestIds((prev) => {
         const next = new Set(prev);
         next.add(activeDest.id);
@@ -1373,7 +1414,6 @@ export default function CrawlScreen() {
       if (awards.length) showAwards(awards);
 
       setRateVisible(false);
-      setCelebrateScore(savedWeightScore);
       const shouldPromptWingShot = Boolean(
         ratingResult?.accepted
         && ratingResult?.rating_id
@@ -1393,7 +1433,7 @@ export default function CrawlScreen() {
           metadata: { submission_source: 'rating' },
         });
       } else {
-        setCelebrateVisible(true);
+        setComparisonVisible(true);
       }
 
       loadPresenceAllSteps();
@@ -2253,7 +2293,7 @@ export default function CrawlScreen() {
                     metadata: { rating_remains_saved: true },
                   });
                 }
-                setCelebrateVisible(true);
+                setComparisonVisible(true);
               }}
             />
           ) : null}
@@ -2362,24 +2402,16 @@ export default function CrawlScreen() {
             </Dialog.Actions>
           </Dialog>
 
-          {/* Rating celebration popup */}
-          <Dialog
-            visible={celebrateVisible}
-            onDismiss={() => setCelebrateVisible(false)}
-            style={[styles.dialog, { backgroundColor: surface }]}
-          >
-            <DialogHeaderArrow title="Nice!" onBack={() => setCelebrateVisible(false)} />
-            <Dialog.Content style={{ alignItems: 'center', paddingVertical: 16 }}>
-              <Text style={{ fontSize: 40 }}>🎆🎉</Text>
-              <Text style={{ fontWeight: '900', fontSize: 22, marginTop: 8 }}>BuffaGo Score</Text>
-              <Text style={{ fontWeight: '900', fontSize: 36, marginTop: 4, color: '#FF6F00' }}>
-                {celebrateScore != null ? Number(celebrateScore).toFixed(0) : '—'}
-              </Text>
-              <Text style={{ marginTop: 8, opacity: 0.75, textAlign: 'center' }}>
-                Nice rating! This stop is now locked in for this crawl.
-              </Text>
-            </Dialog.Content>
-          </Dialog>
+          <RatingComparisonModal
+            visible={comparisonVisible}
+            data={comparisonData}
+            onDismiss={() => setComparisonVisible(false)}
+            onCommunityReviews={() => {
+              setComparisonVisible(false);
+              buildCrawlReport(crawl?.crawl_id);
+              setReportOpen(true);
+            }}
+          />
 
           {/* Already-rated summary dialog (kept as-is) */}
           <Dialog

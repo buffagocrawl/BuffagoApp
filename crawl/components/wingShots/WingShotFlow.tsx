@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Crypto from 'expo-crypto';
 import { useNetworkState } from 'expo-network';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AccessibilityInfo,
+  Animated,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -33,6 +34,7 @@ import {
   type WingShotMediaAdapter,
   type WingShotSelectedMedia,
 } from './mediaAdapter';
+import { useInterpolatedUploadProgress } from './useInterpolatedUploadProgress';
 
 type Attribution = 'username' | 'display_name' | 'anonymous';
 type Phase =
@@ -62,6 +64,8 @@ type Props = {
     path: string;
     body: unknown;
     mimeType: string;
+    signal?: AbortSignal;
+    onProgress?: (value: number) => void;
   }) => Promise<{ error: unknown }>;
   analyticsContext?: {
     screen: string;
@@ -70,22 +74,6 @@ type Props = {
     crawlId?: string | null;
   };
 };
-
-// TODO: Remove debug logging after Wing Shot upload issue is resolved.
-function logWingShotError(error: unknown) {
-  console.error('[WingShot] Supabase/Upload error object:', error);
-  if (error && typeof error === 'object') {
-    const serverError = error as Record<string, unknown>;
-    console.error('[WingShot] Supabase/Upload error details', {
-      message: serverError.message,
-      details: serverError.details,
-      hint: serverError.hint,
-      code: serverError.code,
-      status: serverError.status,
-      statusCode: serverError.statusCode,
-    });
-  }
-}
 
 const ATTRIBUTION_OPTIONS: {
   value: Attribution;
@@ -121,11 +109,13 @@ export function WingShotFlow({
   const [consentAccepted, setConsentAccepted] = useState(false);
   const [attribution, setAttribution] = useState<Attribution | null>(null);
   const [caption, setCaption] = useState('');
-  const [progress, setProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
+  const [reduceMotion, setReduceMotion] = useState(false);
   const networkState = useNetworkState();
   const abortRef = useRef<AbortController | null>(null);
   const sessionRef = useRef(createWingShotUploadSession(Crypto.randomUUID));
+  const progressBarRef = useRef(new Animated.Value(0));
+  const progressController = useInterpolatedUploadProgress();
   const disabled =
     phase === 'choosing' || phase === 'uploading' || phase === 'cancelling';
   const networkAvailable =
@@ -133,13 +123,42 @@ export function WingShotFlow({
     (networkState.isConnected !== false && networkState.isInternetReachable !== false);
 
   const resetUploadSession = useCallback(() => {
+    progressController.clearTimer();
     sessionRef.current = createWingShotUploadSession(Crypto.randomUUID);
-    setProgress(0);
+    progressController.stop('canceled');
+    progressBarRef.current.setValue(0);
+  }, [progressController]);
+
+  useEffect(() => {
+    let active = true;
+    AccessibilityInfo.isReduceMotionEnabled().then((enabled) => {
+      if (active) setReduceMotion(enabled);
+    });
+    return () => {
+      active = false;
+    };
   }, []);
+
+  useEffect(() => {
+    Animated.timing(progressBarRef.current, {
+      toValue: progressController.displayProgress,
+      duration: reduceMotion ? 0 : 220,
+      useNativeDriver: false,
+    }).start();
+  }, [progressController.displayProgress, reduceMotion]);
 
   const announce = useCallback((message: string) => {
     if (message) AccessibilityInfo.announceForAccessibility(message);
   }, []);
+
+  const lastAnnouncedStageRef = useRef(progressController.stage);
+  useEffect(() => {
+    if (lastAnnouncedStageRef.current === progressController.stage) return;
+    lastAnnouncedStageRef.current = progressController.stage;
+    if (progressController.stage === 'preparing') announce('Preparing your Wing Shot.');
+    if (progressController.stage === 'uploading') announce('Uploading your Wing Shot.');
+    if (progressController.stage === 'finalizing') announce('Finishing your submission.');
+  }, [announce, progressController.stage]);
 
   const acceptMedia = useCallback(
     (selected: WingShotSelectedMedia | null) => {
@@ -156,12 +175,6 @@ export function WingShotFlow({
           'That media type is not enabled for Wing Shots.',
         );
       }
-      // TODO: Remove debug logging after Wing Shot upload issue is resolved.
-      console.log('[WingShot] Media selected', {
-        mediaType: selected.kind,
-        mimeType: selected.mimeType,
-        sizeBytes: selected.sizeBytes,
-      });
       validateWingShotMedia(selected);
       setMedia(selected);
       setConsentAccepted(false);
@@ -262,16 +275,7 @@ export function WingShotFlow({
     abortRef.current = controller;
     setErrorMessage('');
     setPhase('uploading');
-    setProgress(0);
-    // TODO: Remove debug logging after Wing Shot upload issue is resolved.
-    console.log('[WingShot] Upload started');
-    console.log('[WingShot] Upload input', {
-      mediaType: media.kind,
-      mimeType: media.mimeType,
-      sizeBytes: media.sizeBytes,
-      consentAccepted,
-      attributionPreference: attribution,
-    });
+    const operation = progressController.start();
     trackEvent({
       eventName: 'wing_shot_upload_started',
       screen: analyticsContext?.screen ?? 'wing_shot',
@@ -295,11 +299,16 @@ export function WingShotFlow({
         },
         session: sessionRef.current,
         signal: controller.signal,
-        onProgress: setProgress,
+        onProgress: (value) => {
+          if (progressController.isCurrent(operation)) progressController.updateRealProgress(value);
+        },
+        onStage: (nextStage) => {
+          if (progressController.isCurrent(operation)) progressController.setStage(nextStage);
+        },
         ...(uploadTransport ? { uploadTransport } : {}),
       });
-      // TODO: Remove debug logging after Wing Shot upload issue is resolved.
-      console.log('[WingShot] Upload complete');
+      if (!progressController.isCurrent(operation) || controller.signal.aborted) return;
+      progressController.complete();
       setPhase('success');
       trackEvent({
         eventName: 'wing_shot_upload_completed',
@@ -312,13 +321,8 @@ export function WingShotFlow({
       announce('Wing Shot submitted for review.');
       onSubmitted?.(result);
     } catch (error) {
-      // TODO: Remove debug logging after Wing Shot upload issue is resolved.
-      console.error('[WingShot] Upload failed');
-      logWingShotError(error);
-      if (error instanceof Error) {
-        console.error('[WingShot] Error message:', error.message);
-        console.error('[WingShot] Error stack:', error.stack);
-      }
+      if (!progressController.isCurrent(operation)) return;
+      progressController.stop(controller.signal.aborted ? 'canceled' : 'failed');
       const message = wingShotUserMessage(error);
       trackEvent({
         eventName: 'wing_shot_upload_failed',
@@ -354,6 +358,7 @@ export function WingShotFlow({
     supabaseClient,
     submissionSource,
     uploadTransport,
+    progressController,
   ]);
 
   const selectedKindEnabled =
@@ -361,16 +366,21 @@ export function WingShotFlow({
   const canSubmit = Boolean(
     media && selectedKindEnabled && consentAccepted && attribution && !disabled,
   );
-  const safeProgress = Math.max(0, Math.min(100, progress));
+  const safeProgress = Math.max(0, Math.min(100, progressController.displayProgress));
   const progressLabel = useMemo(
-    () => `Uploading ${Math.round(safeProgress)} percent`,
-    [safeProgress],
+    () => {
+      if (progressController.stage === 'preparing') return 'Preparing your Wing Shot…';
+      if (progressController.stage === 'finalizing') return 'Finishing your submission…';
+      return `Uploading your Wing Shot — ${Math.round(safeProgress)}%`;
+    },
+    [progressController.stage, safeProgress],
   );
   const cancelUpload = useCallback(() => {
     abortRef.current?.abort();
+    progressController.clearTimer();
     setPhase('cancelling');
     announce('Cancelling upload.');
-  }, [announce]);
+  }, [announce, progressController]);
 
   return (
     <Modal
@@ -590,7 +600,17 @@ export function WingShotFlow({
                   {progressLabel}
                 </Text>
                 <View style={styles.progressTrack}>
-                  <View style={[styles.progressFill, { width: `${safeProgress}%` }]} />
+                  <Animated.View
+                    style={[
+                      styles.progressFill,
+                      {
+                        width: progressBarRef.current.interpolate({
+                          inputRange: [0, 100],
+                          outputRange: ['0%', '100%'],
+                        }),
+                      },
+                    ]}
+                  />
                 </View>
                 <Pressable
                   accessibilityRole="button"

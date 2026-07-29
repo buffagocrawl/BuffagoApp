@@ -52,12 +52,14 @@ test('consent is affirmative and attribution has no default', () => {
   assert.match(flow, /testID="wing-shot\.consent"/);
 });
 
-test('accessibility labels, live status, font scaling, and no motion animation are explicit', () => {
+test('accessibility labels, reduced-motion-aware animation, and live status are explicit', () => {
   assert.match(flow, /announceForAccessibility/);
   assert.match(flow, /accessibilityRole="progressbar"/);
   assert.match(flow, /accessibilityLiveRegion="assertive"/);
   assert.match(flow, /allowFontScaling/);
-  assert.doesNotMatch(flow, /\bAnimated\b|withTiming|withSpring/);
+  assert.match(flow, /AccessibilityInfo\.isReduceMotionEnabled/);
+  assert.match(flow, /Animated\.timing/);
+  assert.match(flow, /duration: reduceMotion \? 0 : 220/);
 });
 
 test('fallback adapter does not ask for permissions or invent media', () => {

@@ -117,7 +117,7 @@ function AdminMutedVideo({ uri }: { uri: string }) {
       <VideoView
         player={player}
         nativeControls
-        allowsFullscreen={false}
+        fullscreenOptions={{ enable: false }}
         contentFit="contain"
         style={styles.media}
         accessibilityLabel="Processed muted Wing Shot video submitted for review"

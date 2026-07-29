@@ -79,7 +79,7 @@ function MutedVideoPreview({ media }: { media: WingShotSelectedMedia }) {
     <View style={styles.videoContainer} testID="wing-shot.preview.video">
       <VideoView
         accessibilityLabel="Muted preview of your selected wing video"
-        allowsFullscreen={false}
+        fullscreenOptions={{ enable: false }}
         contentFit="contain"
         nativeControls
         player={player}

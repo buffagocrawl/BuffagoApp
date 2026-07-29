@@ -118,7 +118,7 @@ test('upload uses only the exact reserved bucket and path before finalizing', as
     'originals/30000000-0000-4000-a000-000000000003/20000000-0000-4000-a000-000000000002/source',
   );
   assert.equal(calls[1].options.upsert, false);
-  assert.equal(progress.at(-1), 100);
+  assert.equal(progress.at(-1), 95);
 });
 
 test('retry after finalization failure does not upload twice', async () => {
