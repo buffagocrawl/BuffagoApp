@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Crypto from 'expo-crypto';
 import Constants from 'expo-constants';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -17,6 +18,7 @@ import RatingWizardDialog from './RatingWizardDialog';
 import WingmanAddDialog from './WingmanAddDialog';
 import { supabase } from '../lib/supabase';
 import { getAnalyticsSessionId, getAnonymousId, trackEvent } from '../lib/analytics';
+import { createGuestRatingPreview, saveGuestRatingPreview } from '../lib/guestRatingPreview';
 import * as quickRating from '../lib/quickRating';
 import * as onboardingStepSix from '../lib/onboardingStepSix';
 
@@ -931,7 +933,24 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
         created_at: new Date().toISOString(),
       };
 
-      await AsyncStorage.setItem(ONBOARDING_SEED_RATING_KEY, JSON.stringify(seedPayload));
+      const preview = createGuestRatingPreview(seedPayload, Crypto.randomUUID());
+      await saveGuestRatingPreview(AsyncStorage, preview);
+      await AsyncStorage.setItem(
+        ONBOARDING_SEED_RATING_KEY,
+        JSON.stringify({ ...seedPayload, operation_id: preview.preview_id }),
+      );
+      await trackEvent({
+        eventName: 'guest_rating_preview_created',
+        screen: 'onboarding',
+        userId: null,
+        stateId: pickedState?.state_id ?? null,
+        destinationId: isPseudo ? null : destId,
+        metadata: {
+          event_id: Crypto.randomUUID(),
+          operation_token: preview.preview_id,
+          schema_version: preview.schema_version,
+        },
+      });
       await trackEvent({
         eventName: 'rating_completed',
         screen: 'onboarding',
@@ -1793,10 +1812,13 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
                 </Text>
               </View>
 
-              <View>
-                <Text style={{ fontWeight: '900' }}>Social Feed</Text>
+              <View testID="onboarding-wing-shots-explainer">
+                <Text style={{ fontWeight: '900' }}>Wing Shots</Text>
                 <Text style={{ opacity: 0.82, lineHeight: 20, marginTop: 4 }}>
-                  Share wing wins, crawl completions, and discover spots other people are hyped about.
+                  Rate wings in person, then optionally upload a photo or short video. Approved submissions earn Creator XP and badges and may be featured on BuffaGo&apos;s Instagram and Facebook.
+                </Text>
+                <Text style={{ opacity: 0.82, lineHeight: 20, marginTop: 4 }}>
+                  Check daily to see if your wings and rating made it!
                 </Text>
               </View>
 
@@ -1876,7 +1898,8 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
           >
             <Text style={styles.title}>Save your journey</Text>
             <Text style={styles.body}>
-              Create an account to keep XP, streaks, and your full Wingdex. Or continue as a guest.
+              This first rating is a preview saved on this device until server persistence is verified.
+              Create an account to keep XP, streaks, and your full Wingdex, or continue as a guest.
             </Text>
 
             <View style={{ height: 18 }} />
@@ -1930,10 +1953,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
               mode="outlined"
               onPress={async () => {
                 await trackOnboardingCompletePressed('guest');
-                try {
-                  await AsyncStorage.removeItem(ONBOARDING_SEED_RATING_KEY);
-                  await AsyncStorage.removeItem(ONBOARDING_DEST_SUGGESTION_KEY);
-                } catch {}
+                // Preserve the preview until explicit deletion or confirmed import.
 
                 await complete();
                 router.replace('/(tabs)/home');

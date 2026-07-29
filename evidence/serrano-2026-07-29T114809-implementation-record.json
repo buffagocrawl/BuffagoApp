@@ -1,0 +1,58 @@
+{
+  "run_id": "2026-07-29T114809",
+  "phase": "implementation",
+  "release_evidence_status": "not_verified",
+  "repository_provenance": {
+    "commit": "186a896c94d13cb0926eb00d41143740d5f8ca08",
+    "working_tree": "dirty",
+    "deployed_commit": null,
+    "verification": "missing"
+  },
+  "required_provenance": {
+    "migrations": {
+      "required": [
+        "crawl/supabase/migrations/20260729129000_verified_progression_xp.sql"
+      ],
+      "deployment_verification": "missing"
+    },
+    "authoritative_rpcs": {
+      "claim_verified_progression_xp": "repository migration present; production verification missing"
+    },
+    "feature_flags": "production flag state and version missing",
+    "analytics_contract": {
+      "repository_event_version": 1,
+      "production_contract_verification": "missing"
+    }
+  },
+  "event_quality": {
+    "production_collection_days_verified": 0,
+    "baseline_status": "not_declared",
+    "quarantine_status": "not verified",
+    "kpi_exclusion_status": "not verified"
+  },
+  "integrity_findings": [
+    "The current XP client invokes claim_verified_progression_xp before a local fallback path.",
+    "The repository analytics metadata builder includes event_version, occurred_at, and environment, but release_commit and feature_flag_version were not found in its common metadata.",
+    "The approved run evidence reports no Supabase credentials and unknown live telemetry availability."
+  ],
+  "unresolved_gaps": [
+    "No deployed commit, applied-migration list, production RPC inspection, or feature-flag state was supplied.",
+    "No evidence verifies fail-closed behavior outside local development.",
+    "No server-side validation or quarantine evidence was supplied for events missing common required properties.",
+    "No production-only KPI exclusion evidence or seven consecutive clean collection days was supplied."
+  ],
+  "commands": [
+    "node --test --experimental-default-type=module tests/analytics/serrano-event-contract.test.js tests/analytics/analytics-schema.test.js tests/wingShotsVerifiedProgression.test.mjs",
+    "git rev-parse HEAD",
+    "git status --short",
+    "git diff --check"
+  ],
+  "test_result": {
+    "passed": 10,
+    "failed": 0,
+    "scope": "existing analytics and verified progression contract tests"
+  },
+  "changed_files": [
+    "evidence/serrano-2026-07-29T114809-implementation-record.json"
+  ]
+}

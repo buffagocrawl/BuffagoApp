@@ -1,0 +1,605 @@
+--------- beginning of main
+I/Zygote  ( 4684): Process 4684 created for com.buffago.app
+I/com.buffago.app( 4684): Late-enabling -Xcheck:jni
+I/com.buffago.app( 4684): Using CollectorTypeCMC GC.
+W/com.buffago.app( 4684): Unexpected CPU variant for x86: x86_64.
+W/com.buffago.app( 4684): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+D/nativeloader( 4684): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+D/ApplicationLoaders( 4684): Returning zygote-cached class loader: /system/framework/org.apache.http.legacy.jar
+D/nativeloader( 4684): Configuring clns-9 for other apk /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/lib/x86_64:/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/com.buffago.app
+V/GraphicsEnvironment( 4684): Currently set values for:
+V/GraphicsEnvironment( 4684):   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment( 4684):   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment( 4684): com.buffago.app is not listed in per-application setting
+V/GraphicsEnvironment( 4684): ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+V/GraphicsEnvironment( 4684): com.buffago.app is not listed in ANGLE allowlist or settings, returning default
+V/GraphicsEnvironment( 4684): Neither updatable production driver nor prerelease driver is supported.
+W/FirebaseApp( 4684): Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.
+I/FirebaseInitProvider( 4684): FirebaseApp initialization unsuccessful
+D/WM-WrkMgrInitializer( 4684): Initializing WorkManager with default configuration.
+D/DesktopExperienceFlags( 4684): Toggle override initialized to: false
+E/ashmem  ( 4684): Pinning is deprecated since Android Q. Please use trim or other methods.
+W/SoLoader( 4684): Initializing SoLoader: 0
+W/SoLoader( 4684): Recording new base apk path: /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk
+W/SoLoader( 4684): Previously recorded 0 base apk paths.
+I/SoLoader( 4684): Preparing SO source: DirectorySoSource[root = /vendor/lib64 flags = 2]
+I/SoLoader( 4684): Preparing SO source: DirectorySoSource[root = /system/lib64 flags = 2]
+I/SoLoader( 4684): Preparing SO source: DirectApkSoSource[root = [/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!/lib/x86_64]]
+I/SoLoader( 4684): Preparing SO source: ApplicationSoSource[DirectorySoSource[root = /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/lib/x86_64 flags = 0]]
+I/SoLoader( 4684): init finish: 4 SO sources prepared
+W/SoLoader( 4684): SoLoader initialized: 8
+D/nativeloader( 4684): Load /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!/lib/x86_64/libc++_shared.so using class loader ns clns-9 (caller=/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!classes7.dex): ok
+D/nativeloader( 4684): Load /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!/lib/x86_64/libjsi.so using class loader ns clns-9 (caller=/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!classes7.dex): ok
+D/nativeloader( 4684): Load /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!/lib/x86_64/libfbjni.so using class loader ns clns-9 (caller=/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!classes7.dex): ok
+D/nativeloader( 4684): Load /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!/lib/x86_64/libreactnative.so using class loader ns clns-9 (caller=/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!classes7.dex): ok
+D/jni_lib_merge( 4684): Entering merged library JNI_OnLoad.
+D/jni_lib_merge( 4684): Preparing 12 pre-merged libs (including stub)
+D/jni_lib_merge( 4684): Preparing to register libfabricjni_so.  onload_func: 0x764a7a618550
+D/jni_lib_merge( 4684): Preparing to register libreact_devsupportjni_so.  onload_func: 0x764a7a805c30
+D/jni_lib_merge( 4684): Preparing to register libreact_featureflagsjni_so.  onload_func: 0x764a7a813780
+D/jni_lib_merge( 4684): Preparing to register libreact_newarchdefaults_so.  onload_func: 0x764a7a8781f0
+D/jni_lib_merge( 4684): Preparing to register libreactnativeblob_so.  onload_func: 0x764a7aa60400
+D/jni_lib_merge( 4684): Preparing to register libreactnativejni_so.  onload_func: 0x764a7aaaacb0
+D/jni_lib_merge( 4684): Preparing to register libreactnativejni_common_so.  onload_func: 0x764a7aabaab0
+D/jni_lib_merge( 4684): Preparing to register librninstance_so.  onload_func: 0x764a7ab00920
+D/jni_lib_merge( 4684): Preparing to register libturbomodulejsijni_so.  onload_func: 0x764a7ac1f6a0
+D/jni_lib_merge( 4684): Preparing to register libuimanagerjni_so.  onload_func: 0x764a7ac37920
+D/jni_lib_merge( 4684): Preparing to register libyoga_so.  onload_func: 0x764a7ac468b0
+D/jni_lib_merge( 4684): About to register 11 actual methods.
+D/nativeloader( 4684): Load /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!/lib/x86_64/libreact_codegen_rnscreens.so using class loader ns clns-9 (caller=/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!classes7.dex): ok
+D/jni_lib_merge( 4684): Entering merged library JNI_OnLoad.
+D/jni_lib_merge( 4684): Preparing 12 pre-merged libs (including stub)
+D/jni_lib_merge( 4684): Preparing to register libfabricjni_so.  onload_func: 0x764a7a618550
+D/jni_lib_merge( 4684): Preparing to register libreact_devsupportjni_so.  onload_func: 0x764a7a805c30
+D/jni_lib_merge( 4684): Preparing to register libreact_featureflagsjni_so.  onload_func: 0x764a7a813780
+D/jni_lib_merge( 4684): Preparing to register libreact_newarchdefaults_so.  onload_func: 0x764a7a8781f0
+D/jni_lib_merge( 4684): Preparing to register libreactnativeblob_so.  onload_func: 0x764a7aa60400
+D/jni_lib_merge( 4684): Preparing to register libreactnativejni_so.  onload_func: 0x764a7aaaacb0
+D/jni_lib_merge( 4684): Preparing to register libreactnativejni_common_so.  onload_func: 0x764a7aabaab0
+D/jni_lib_merge( 4684): Preparing to register librninstance_so.  onload_func: 0x764a7ab00920
+D/jni_lib_merge( 4684): Preparing to register libturbomodulejsijni_so.  onload_func: 0x764a7ac1f6a0
+D/jni_lib_merge( 4684): Preparing to register libuimanagerjni_so.  onload_func: 0x764a7ac37920
+D/jni_lib_merge( 4684): Preparing to register libyoga_so.  onload_func: 0x764a7ac468b0
+D/jni_lib_merge( 4684): About to register 11 actual methods.
+D/nativeloader( 4684): Load /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!/lib/x86_64/libreact_codegen_RNCSlider.so using class loader ns clns-9 (caller=/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!classes7.dex): ok
+D/nativeloader( 4684): Load /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!/lib/x86_64/libreact_codegen_rnsvg.so using class loader ns clns-9 (caller=/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!classes7.dex): ok
+D/jni_lib_merge( 4684): Entering merged library JNI_OnLoad.
+D/jni_lib_merge( 4684): Preparing 12 pre-merged libs (including stub)
+D/jni_lib_merge( 4684): Preparing to register libfabricjni_so.  onload_func: 0x764a7a618550
+D/jni_lib_merge( 4684): Preparing to register libreact_devsupportjni_so.  onload_func: 0x764a7a805c30
+D/jni_lib_merge( 4684): Preparing to register libreact_featureflagsjni_so.  onload_func: 0x764a7a813780
+D/jni_lib_merge( 4684): Preparing to register libreact_newarchdefaults_so.  onload_func: 0x764a7a8781f0
+D/jni_lib_merge( 4684): Preparing to register libreactnativeblob_so.  onload_func: 0x764a7aa60400
+D/jni_lib_merge( 4684): Preparing to register libreactnativejni_so.  onload_func: 0x764a7aaaacb0
+D/jni_lib_merge( 4684): Preparing to register libreactnativejni_common_so.  onload_func: 0x764a7aabaab0
+D/jni_lib_merge( 4684): Preparing to register librninstance_so.  onload_func: 0x764a7ab00920
+D/jni_lib_merge( 4684): Preparing to register libturbomodulejsijni_so.  onload_func: 0x764a7ac1f6a0
+D/jni_lib_merge( 4684): Preparing to register libuimanagerjni_so.  onload_func: 0x764a7ac37920
+D/jni_lib_merge( 4684): Preparing to register libyoga_so.  onload_func: 0x764a7ac468b0
+D/jni_lib_merge( 4684): About to register 11 actual methods.
+D/nativeloader( 4684): Load /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!/lib/x86_64/libreact_codegen_safeareacontext.so using class loader ns clns-9 (caller=/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!classes7.dex): ok
+D/nativeloader( 4684): Load /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!/lib/x86_64/libappmodules.so using class loader ns clns-9 (caller=/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!classes7.dex): ok
+I/TaskService( 4684): Handling intent with action 'android.intent.action.BOOT_COMPLETED'.
+I/Choreographer( 4684): Skipped 292 frames!  The application may be doing too much work on its main thread.
+--------- beginning of system
+I/DisplayManager( 4684): Choreographer implicitly registered for the refresh rate.
+I/GFXSTREAM( 4684): [eglDisplay.cpp(297)] Opening libGLESv1_CM_emulation.so
+I/GFXSTREAM( 4684): [eglDisplay.cpp(297)] Opening libGLESv2_emulation.so
+W/com.buffago.app( 4684): Verification of void com.facebook.react.ReactActivity.requestPermissions(java.lang.String[], int, com.facebook.react.modules.core.PermissionListener) took 162.350ms (36.96 bytecodes/s) (0B arena alloc)
+W/HWUI    ( 4684): Failed to choose config with EGL_SWAP_BEHAVIOR_PRESERVED, retrying without...
+W/HWUI    ( 4684): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+D/AppCompatDelegate( 4684): Checking for metadata for AppLocalesMetadataHolderService : Service not found
+D/CompatChangeReporter( 4684): Compat change id reported: 377864165; UID 10218; state: ENABLED
+D/DesktopModeFlags( 4684): Toggle override initialized to: OVERRIDE_UNSET
+I/com.buffago.app( 4684): hiddenapi: Accessing hidden method Landroid/view/ViewGroup;->makeOptionalFitsSystemWindows()V (runtime_flags=0, domain=platform, api=unsupported) from Landroidx/appcompat/widget/ViewUtils; (domain=app) using reflection: allowed
+I/com.buffago.app( 4684): hiddenapi: Accessing hidden field Ljava/lang/reflect/Field;->accessFlags:I (runtime_flags=0, domain=core-platform, api=unsupported) from Lexpo/modules/ReactActivityDelegateWrapper; (domain=app) using reflection: allowed
+I/ExpoDevMenu( 4684): Set new dev-menu delegate: class expo.modules.devmenu.DevMenuDefaultDelegate
+W/WindowOnBackDispatcher( 4684): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 4684): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+W/HWUI    ( 4684): Unknown dataspace 0
+D/ActivityThread( 4684): Package [com.google.android.apps.maps] reported as REPLACED, but missing application info. Assuming REMOVED.
+D/ActivityThread( 4684): Package [com.google.android.apps.maps] reported as REPLACED, but missing application info. Assuming REMOVED.
+D/VRI[MainActivity]( 4684): WindowInsets changed: 1080x2400 statusBars:[0,63,0,0] navigationBars:[0,0,0,63] mandatorySystemGestures:[0,63,0,84] 
+D/WindowOnBackDispatcher( 4684): setTopOnBackInvokedCallback (unwrapped): android.view.ViewRootImpl$$ExternalSyntheticLambda12@a592084
+W/com.buffago.app( 4684): Suspending all threads took: 21.473ms
+W/com.buffago.app( 4684): userfaultfd: MOVE ioctl seems unsupported: Try again
+I/com.buffago.app( 4684): Background concurrent mark compact GC freed 5575KB AllocSpace bytes, 26(1624KB) LOS objects, 49% free, 3808KB/7617KB, paused 116.151ms,79.654ms total 698.647ms
+W/com.buffago.app( 4684): Verification of expo.modules.manifests.core.Manifest expo.modules.manifests.core.Manifest$Companion.fromManifestJson(org.json.JSONObject) took 143.639ms (320.25 bytecodes/s) (0B arena alloc)
+I/Choreographer( 4684): Skipped 48 frames!  The application may be doing too much work on its main thread.
+I/HWUI    ( 4684): Davey! duration=1043ms; Flags=1, FrameTimelineVsyncId=60982, IntendedVsync=285751778222, Vsync=285851778218, InputEventId=0, HandleInputStart=285861825900, AnimationStart=285861895600, PerformTraversalsStart=285861974900, DrawStart=286650553100, FrameDeadline=285768444888, FrameStartTime=285857519300, FrameInterval=16666666, WorkloadTarget=16666666, SyncQueued=286654841300, SyncStart=286681575700, IssueDrawCommandsStart=286682166500, SwapBuffers=286740389700, FrameCompleted=286821552800, DequeueBufferDuration=62200, QueueBufferDuration=726600, GpuCompleted=286821552800, SwapBuffersCompleted=286807419300, DisplayPresentTime=0, CommandSubmissionCompleted=286740389700, 
+D/InsetsController( 4684): hide(ime())
+I/ImeTracker( 4684): com.buffago.app:3f7c6011: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+I/HWUI    ( 4684): Using FreeType backend (prop=Auto)
+I/ExpoDevMenu( 4684): Set new dev-menu delegate: class expo.modules.devmenu.DevMenuDefaultDelegate
+W/com.buffago.app( 4684): Verification of void com.facebook.react.devsupport.CxxInspectorPackagerConnection$DelegateImpl$connectWebSocket$webSocket$1.onOpen(okhttp3.WebSocket, okhttp3.Response) took 229.001ms (117.90 bytecodes/s) (0B arena alloc)
+I/Choreographer( 4684): Skipped 45 frames!  The application may be doing too much work on its main thread.
+I/HWUI    ( 4684): Davey! duration=772ms; Flags=0, FrameTimelineVsyncId=61213, IntendedVsync=287451778154, Vsync=288201778124, InputEventId=0, HandleInputStart=288209171900, AnimationStart=288209304400, PerformTraversalsStart=288212673700, DrawStart=288215973600, FrameDeadline=287535111484, FrameStartTime=288203805700, FrameInterval=16666666, WorkloadTarget=16666666, SyncQueued=288217309100, SyncStart=288217690400, IssueDrawCommandsStart=288218250100, SwapBuffers=288218765100, FrameCompleted=288224208800, DequeueBufferDuration=46000, QueueBufferDuration=2357800, GpuCompleted=288223960400, SwapBuffersCompleted=288224208800, DisplayPresentTime=0, CommandSubmissionCompleted=288218765100, 
+W/unknown:BridgelessReact( 4684): ReactHost{0}.startSurface(surfaceId = 0): Schedule
+W/unknown:BridgelessReact( 4684): ReactHost{0}.attachSurface(surfaceId = 0)
+W/unknown:BridgelessReact( 4684): ReactHost{0}.getOrCreateReactInstanceTask()
+W/unknown:BridgelessReact( 4684): ReactHost{0}.getOrCreateReactInstanceTask(): Start
+W/unknown:BridgelessReact( 4684): ReactHost{0}.getJSBundleLoader()
+W/unknown:BridgelessReact( 4684): ReactHost{0}.isMetroRunning()
+W/WindowOnBackDispatcher( 4684): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 4684): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+W/unknown:BridgelessReact( 4684): ReactHost{0}.onHostResume(activity)
+D/ProfileInstaller( 4684): Installing profile for com.buffago.app
+W/unknown:BridgelessReact( 4684): ReactHost{0}.isMetroRunning(): Async result = true
+W/unknown:BridgelessReact( 4684): ReactHost{0}.loadJSBundleFromMetro()
+W/com.buffago.app( 4684): Verification of void androidx.compose.ui.platform.AndroidComposeView.<init>(android.content.Context, kotlin.coroutines.CoroutineContext) took 169.435ms (6108.52 bytecodes/s) (0B arena alloc)
+I/com.buffago.app( 4684): hiddenapi: Accessing hidden method Landroid/os/SystemProperties;->addChangeCallback(Ljava/lang/Runnable;)V (runtime_flags=0, domain=platform, api=unsupported) from Landroidx/compose/ui/platform/AndroidComposeView$Companion; (domain=app) using reflection: allowed
+I/com.buffago.app( 4684): Compiler allocated 5200KB to compile void android.view.ViewRootImpl.performTraversals()
+I/com.buffago.app( 4684): Background young concurrent mark compact GC freed 2029KB AllocSpace bytes, 1(20KB) LOS objects, 27% free, 5556KB/7617KB, paused 16.606ms,12.498ms total 384.850ms
+D/VRI[MainActivity]( 4684): WindowInsets changed: 1080x2400 statusBars:[0,63,0,0] navigationBars:[0,0,0,63] mandatorySystemGestures:[0,63,0,84] 
+D/WindowOnBackDispatcher( 4684): setTopOnBackInvokedCallback (unwrapped): android.view.ViewRootImpl$$ExternalSyntheticLambda12@773a3a
+D/VRI[MainActivity]( 4684): visibilityChanged oldVisibility=true newVisibility=false
+I/HWUI    ( 4684): Davey! duration=8602ms; Flags=1, FrameTimelineVsyncId=61377, IntendedVsync=288851778098, Vsync=288885111430, InputEventId=0, HandleInputStart=288893207500, AnimationStart=288893255300, PerformTraversalsStart=288893397900, DrawStart=297393801200, FrameDeadline=288868444764, FrameStartTime=288893175900, FrameInterval=16666666, WorkloadTarget=16666666, SyncQueued=297435211900, SyncStart=297438032100, IssueDrawCommandsStart=297438371800, SwapBuffers=297440162000, FrameCompleted=297457532900, DequeueBufferDuration=455600, QueueBufferDuration=916700, GpuCompleted=297457532900, SwapBuffersCompleted=297446111500, DisplayPresentTime=9652139480, CommandSubmissionCompleted=297440162000, 
+I/Choreographer( 4684): Skipped 435 frames!  The application may be doing too much work on its main thread.
+D/WindowOnBackDispatcher( 4684): setTopOnBackInvokedCallback (unwrapped): android.view.ViewRootImpl$$ExternalSyntheticLambda12@7bfc586
+I/HWUI    ( 4684): Davey! duration=7648ms; Flags=1, FrameTimelineVsyncId=61443, IntendedVsync=290685111358, Vsync=297935111068, InputEventId=0, HandleInputStart=297938534500, AnimationStart=297938686400, PerformTraversalsStart=297949775100, DrawStart=298106647300, FrameDeadline=290701778024, FrameStartTime=297935859700, FrameInterval=16666666, WorkloadTarget=16666666, SyncQueued=298125807500, SyncStart=298137634700, IssueDrawCommandsStart=298137744800, SwapBuffers=298318470800, FrameCompleted=298345397700, DequeueBufferDuration=83700, QueueBufferDuration=867400, GpuCompleted=298345397700, SwapBuffersCompleted=298323575800, DisplayPresentTime=-70576418747760113, CommandSubmissionCompleted=298318470800, 
+D/WindowOnBackDispatcher( 4684): setTopOnBackInvokedCallback (unwrapped): null
+D/ViewRootImpl( 4684): Skipping stats log for color mode
+W/unknown:BridgelessReact( 4684): ReactHost{0}.raiseSoftException(onWindowFocusChange(hasFocus = "true")): Tried to access onWindowFocusChange while context is not ready
+E/unknown:ReactHost( 4684): Unhandled SoftException
+E/unknown:ReactHost( 4684): com.facebook.react.bridge.ReactNoCrashSoftException: raiseSoftException(onWindowFocusChange(hasFocus = "true")): Tried to access onWindowFocusChange while context is not ready
+E/unknown:ReactHost( 4684): 	at com.facebook.react.runtime.ReactHostImpl.raiseSoftException(ReactHostImpl.kt:787)
+E/unknown:ReactHost( 4684): 	at com.facebook.react.runtime.ReactHostImpl.raiseSoftException$default(ReactHostImpl.kt:779)
+E/unknown:ReactHost( 4684): 	at com.facebook.react.runtime.ReactHostImpl.onWindowFocusChange(ReactHostImpl.kt:589)
+E/unknown:ReactHost( 4684): 	at com.facebook.react.ReactDelegate.onWindowFocusChanged(ReactDelegate.kt:217)
+E/unknown:ReactHost( 4684): 	at com.facebook.react.ReactActivityDelegate.onWindowFocusChanged(ReactActivityDelegate.java:236)
+E/unknown:ReactHost( 4684): 	at expo.modules.ReactActivityDelegateWrapper$onWindowFocusChanged$1.invokeSuspend(ReactActivityDelegateWrapper.kt:353)
+E/unknown:ReactHost( 4684): 	at expo.modules.ReactActivityDelegateWrapper$onWindowFocusChanged$1.invoke(Unknown Source:8)
+E/unknown:ReactHost( 4684): 	at expo.modules.ReactActivityDelegateWrapper$onWindowFocusChanged$1.invoke(Unknown Source:4)
+E/unknown:ReactHost( 4684): 	at expo.modules.ReactActivityDelegateWrapper$launchLifecycleScopeWithLock$1.invokeSuspend(ReactActivityDelegateWrapper.kt:485)
+E/unknown:ReactHost( 4684): 	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+E/unknown:ReactHost( 4684): 	at kotlinx.coroutines.internal.DispatchedContinuationKt.resumeCancellableWith(DispatchedContinuation.kt:359)
+E/unknown:ReactHost( 4684): 	at kotlinx.coroutines.intrinsics.CancellableKt.startCoroutineCancellable(Cancellable.kt:26)
+E/unknown:ReactHost( 4684): 	at kotlinx.coroutines.CoroutineStart.invoke(CoroutineStart.kt:358)
+E/unknown:ReactHost( 4684): 	at kotlinx.coroutines.AbstractCoroutine.start(AbstractCoroutine.kt:124)
+E/unknown:ReactHost( 4684): 	at kotlinx.coroutines.BuildersKt__Builders_commonKt.launch(Builders.common.kt:52)
+E/unknown:ReactHost( 4684): 	at kotlinx.coroutines.BuildersKt.launch(Unknown Source:1)
+E/unknown:ReactHost( 4684): 	at kotlinx.coroutines.BuildersKt__Builders_commonKt.launch$default(Builders.common.kt:43)
+E/unknown:ReactHost( 4684): 	at kotlinx.coroutines.BuildersKt.launch$default(Unknown Source:1)
+E/unknown:ReactHost( 4684): 	at expo.modules.ReactActivityDelegateWrapper.launchLifecycleScopeWithLock(ReactActivityDelegateWrapper.kt:483)
+E/unknown:ReactHost( 4684): 	at expo.modules.ReactActivityDelegateWrapper.launchLifecycleScopeWithLock$default(ReactActivityDelegateWrapper.kt:479)
+E/unknown:ReactHost( 4684): 	at expo.modules.ReactActivityDelegateWrapper.onWindowFocusChanged(ReactActivityDelegateWrapper.kt:351)
+E/unknown:ReactHost( 4684): 	at com.facebook.react.ReactActivity.onWindowFocusChanged(ReactActivity.java:158)
+E/unknown:ReactHost( 4684): 	at androidx.appcompat.view.WindowCallbackWrapper.onWindowFocusChanged(WindowCallbackWrapper.java:124)
+E/unknown:ReactHost( 4684): 	at com.android.internal.policy.DecorView.onWindowFocusChanged(DecorView.java:1878)
+E/unknown:ReactHost( 4684): 	at android.view.View.dispatchWindowFocusChanged(View.java:17129)
+E/unknown:ReactHost( 4684): 	at android.view.ViewGroup.dispatchWindowFocusChanged(ViewGroup.java:1529)
+E/unknown:ReactHost( 4684): 	at android.view.ViewRootImpl.dispatchFocusEvent(ViewRootImpl.java:4963)
+E/unknown:ReactHost( 4684): 	at android.view.ViewRootImpl.handleWindowFocusChanged(ViewRootImpl.java:4867)
+E/unknown:ReactHost( 4684): 	at android.view.ViewRootImpl.-$$Nest$mhandleWindowFocusChanged(Unknown Source:0)
+E/unknown:ReactHost( 4684): 	at android.view.ViewRootImpl$ViewRootHandler.handleMessageImpl(ViewRootImpl.java:7119)
+E/unknown:ReactHost( 4684): 	at android.view.ViewRootImpl$ViewRootHandler.handleMessage(ViewRootImpl.java:7027)
+E/unknown:ReactHost( 4684): 	at android.os.Handler.dispatchMessage(Handler.java:132)
+E/unknown:ReactHost( 4684): 	at android.os.Looper.dispatchMessage(Looper.java:333)
+E/unknown:ReactHost( 4684): 	at android.os.Looper.loopOnce(Looper.java:263)
+E/unknown:ReactHost( 4684): 	at android.os.Looper.loop(Looper.java:367)
+E/unknown:ReactHost( 4684): 	at android.app.ActivityThread.main(ActivityThread.java:9227)
+E/unknown:ReactHost( 4684): 	at java.lang.reflect.Method.invoke(Native Method)
+E/unknown:ReactHost( 4684): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:566)
+E/unknown:ReactHost( 4684): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:929)
+I/Choreographer( 4684): Skipped 35 frames!  The application may be doing too much work on its main thread.
+D/InsetsController( 4684): hide(ime())
+I/ImeTracker( 4684): com.buffago.app:47b19fe6: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+I/com.buffago.app( 4684): Background concurrent mark compact GC freed 1248KB AllocSpace bytes, 0(0B) LOS objects, 49% free, 8192KB/16MB, paused 5.111ms,5.056ms total 120.164ms
+I/com.buffago.app( 4684): Background young concurrent mark compact GC freed 1580KB AllocSpace bytes, 0(0B) LOS objects, 13% free, 13MB/16MB, paused 7.105ms,5.572ms total 96.920ms
+I/com.buffago.app( 4684): Background concurrent mark compact GC freed 19KB AllocSpace bytes, 0(0B) LOS objects, 49% free, 16MB/33MB, paused 7.622ms,7.005ms total 138.187ms
+W/unknown:BridgelessReact( 4684): ReactHost{0}.loadJSBundleFromMetro(): Creating BundleLoader
+D/WindowOnBackDispatcher( 4684): setTopOnBackInvokedCallback (unwrapped): null
+W/unknown:BridgelessReact( 4684): ReactHost{0}.getOrCreateReactContext(): Creating BridgelessReactContext
+W/unknown:BridgelessReact( 4684): ReactHost{0}.getOrCreateReactInstanceTask(): Creating ReactInstance
+D/nativeloader( 4684): Load /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!/lib/x86_64/libhermes.so using class loader ns clns-9 (caller=/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!classes7.dex): ok
+D/nativeloader( 4684): Load /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!/lib/x86_64/libhermestooling.so using class loader ns clns-9 (caller=/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!classes7.dex): ok
+D/jni_lib_merge( 4684): Entering merged library JNI_OnLoad.
+D/jni_lib_merge( 4684): Preparing 4 pre-merged libs (including stub)
+D/jni_lib_merge( 4684): Preparing to register libhermes_executor_so.  onload_func: 0x764b85970ce0
+D/jni_lib_merge( 4684): Preparing to register libhermesinstancejni_so.  onload_func: 0x764b859a3700
+D/jni_lib_merge( 4684): Preparing to register libjsijniprofiler_so.  onload_func: 0x764b859a5470
+D/jni_lib_merge( 4684): About to register 3 actual methods.
+I/ExpoModulesCore( 4684): ✅ AppContext was initialized
+W/unknown:BridgelessReact( 4684): ReactHost{0}.getOrCreateReactInstanceTask(): Loading JS Bundle
+W/unknown:BridgelessReact( 4684): ReactHost{0}.getOrCreateReactInstanceTask(): Calling DevSupportManagerBase.onNewReactContextCreated(reactContext)
+W/unknown:ReactNative( 4684): Packager connection already open, nooping.
+W/unknown:BridgelessReact( 4684): ReactHost{0}.startSurface(surfaceId = 0): Execute
+W/unknown:BridgelessReact( 4684): ReactContext.onHostResume()
+W/unknown:BridgelessReact( 4684): ReactHost{0}.getOrCreateReactInstanceTask(): Executing ReactInstanceEventListeners
+I/ExpoDevMenu( 4684): Delegate's context was loaded.
+W/DevLauncher( 4684): java.lang.NoSuchFieldException: No field colorScheme in class Lcom/facebook/react/modules/appearance/AppearanceModule; (declaration of 'com.facebook.react.modules.appearance.AppearanceModule' appears in /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!classes7.dex)
+W/DevLauncher( 4684): 	at java.lang.Class.getDeclaredField(Native Method)
+W/DevLauncher( 4684): 	at expo.modules.devlauncher.helpers.DevLauncherReflectionExtensionsKt.setProtectedDeclaredField(DevLauncherReflectionExtensions.kt:21)
+W/DevLauncher( 4684): 	at expo.modules.devlauncher.helpers.DevLauncherReflectionExtensionsKt.setProtectedDeclaredField$default(DevLauncherReflectionExtensions.kt:20)
+W/DevLauncher( 4684): 	at expo.modules.devlauncher.launcher.loaders.DevLauncherExpoAppLoader.applyUserInterfaceStyle(DevLauncherExpoAppLoader.kt:62)
+W/DevLauncher( 4684): 	at expo.modules.devlauncher.launcher.loaders.DevLauncherExpoAppLoader.onReactContext(DevLauncherExpoAppLoader.kt:39)
+W/DevLauncher( 4684): 	at expo.modules.devlauncher.launcher.loaders.DevLauncherAppLoader$createOnDelegateWillBeCreatedListener$1$2.onReactContextInitialized(DevLauncherAppLoader.kt:57)
+W/DevLauncher( 4684): 	at com.facebook.react.runtime.ReactHostImpl.getOrCreateReactInstanceTask$lambda$41$lambda$39(ReactHostImpl.kt:993)
+W/DevLauncher( 4684): 	at com.facebook.react.runtime.ReactHostImpl.$r8$lambda$x6crt2XzJBIcgFXK71Tpn5zAwb8(Unknown Source:0)
+W/DevLauncher( 4684): 	at com.facebook.react.runtime.ReactHostImpl$$ExternalSyntheticLambda33.invoke(D8$$SyntheticClass:0)
+W/DevLauncher( 4684): 	at com.facebook.react.runtime.ReactHostImpl$sam$com_facebook_react_runtime_internal_bolts_Continuation$0.then(Unknown Source:2)
+W/DevLauncher( 4684): 	at com.facebook.react.runtime.internal.bolts.Task$Companion.completeImmediately$lambda$3(Task.kt:356)
+W/DevLauncher( 4684): 	at com.facebook.react.runtime.internal.bolts.Task$Companion.$r8$lambda$b7MTC0ufkn_2TjF4BGcNqGR9qK0(Unknown Source:0)
+W/DevLauncher( 4684): 	at com.facebook.react.runtime.internal.bolts.Task$Companion$$ExternalSyntheticLambda3.run(D8$$SyntheticClass:0)
+W/DevLauncher( 4684): 	at com.facebook.react.runtime.internal.bolts.Executors$ImmediateExecutor.execute(Executors.kt:41)
+W/DevLauncher( 4684): 	at com.facebook.react.runtime.internal.bolts.Task$Companion.completeImmediately(Task.kt:354)
+W/DevLauncher( 4684): 	at com.facebook.react.runtime.internal.bolts.Task$Companion.access$completeImmediately(Task.kt:250)
+W/DevLauncher( 4684): 	at com.facebook.react.runtime.internal.bolts.Task.continueWith(Task.kt:132)
+W/DevLauncher( 4684): 	at com.facebook.react.runtime.internal.bolts.Task.continueWith$default(Task.kt:117)
+W/DevLauncher( 4684): 	at com.facebook.react.runtime.internal.bolts.Task.onSuccess$lambda$12(Task.kt:174)
+W/DevLauncher( 4684): 	at com.facebook.react.runtime.internal.bolts.Task.$r8$lambda$l0wwo5AvbHxlwfI1R7CH_codxoo(Unknown Source:0)
+W/DevLauncher( 4684): 	at com.facebook.react.runtime.internal.bolts.Task$$ExternalSyntheticLambda2.then(D8$$SyntheticClass:0)
+W/DevLauncher( 4684): 	at com.facebook.react.runtime.internal.bolts.Task$Companion.completeAfterTask$lambda$5(Task.kt:390)
+W/DevLauncher( 4684): 	at com.facebook.react.runtime.internal.bolts.Task$Companion.$r8$lambda$IPpysnehFwANEiW061YzapkMdoE(Unknown Source:0)
+W/DevLauncher( 4684): 	at com.facebook.react.runtime.internal.bolts.Task$Companion$$ExternalSyntheticLambda4.run(D8$$SyntheticClass:0)
+W/DevLauncher( 4684): 	at android.os.Handler.handleCallback(Handler.java:1070)
+W/DevLauncher( 4684): 	at android.os.Handler.dispatchMessage(Handler.java:125)
+W/DevLauncher( 4684): 	at android.os.Looper.dispatchMessage(Looper.java:333)
+W/DevLauncher( 4684): 	at android.os.Looper.loopOnce(Looper.java:263)
+W/DevLauncher( 4684): 	at android.os.Looper.loop(Looper.java:367)
+W/DevLauncher( 4684): 	at android.app.ActivityThread.main(ActivityThread.java:9227)
+W/DevLauncher( 4684): 	at java.lang.reflect.Method.invoke(Native Method)
+W/DevLauncher( 4684): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:566)
+W/DevLauncher( 4684): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:929)
+W/WindowOnBackDispatcher( 4684): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 4684): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+D/WindowOnBackDispatcher( 4684): setTopOnBackInvokedCallback (unwrapped): android.view.ViewRootImpl$$ExternalSyntheticLambda12@154da73
+W/com.buffago.app( 4684): Cleared Reference was only reachable from finalizer (only reported once)
+I/com.buffago.app( 4684): NativeAlloc concurrent mark compact GC freed 18MB AllocSpace bytes, 10(528KB) LOS objects, 49% free, 7601KB/14MB, paused 18.630ms,14.725ms total 440.887ms
+I/WebViewFactory( 4684): Loading com.google.android.webview version 150.0.7871.181 (code 787118108)
+W/ResourcesManager( 4684): Found a null ResourcesImpl, skipped.
+W/ResourcesManager( 4684): Found a null ResourcesImpl, skipped.
+W/ResourcesManager( 4684): Found a null ResourcesImpl, skipped.
+W/ResourcesManager( 4684): Found a null ResourcesImpl, skipped.
+V/ResourcesManager( 4684): The following library key has been added: ResourcesKey{ mHash=c3f7a3e7 mResDir=null mSplitDirs=[] mOverlayDirs=[] mLibDirs=[/data/app/~~VJvepTEgOsfoJ57C3pFYEg==/com.google.android.webview-cXboXG23fdFy1uz-E6ZFrA==/base.apk,/system/framework/android.test.base.jar,/system_ext/framework/androidx.window.extensions.jar] mDisplayId=0 mOverrideConfig=v36 mCompatInfo={420dpi always-compat} mLoaders=[]}
+D/ApplicationLoaders( 4684): Returning zygote-cached class loader: /system/framework/android.test.base.jar
+D/ApplicationLoaders( 4684): Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+D/nativeloader( 4684): Configuring clns-10 for other apk /data/app/~~VJvepTEgOsfoJ57C3pFYEg==/com.google.android.webview-cXboXG23fdFy1uz-E6ZFrA==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~VJvepTEgOsfoJ57C3pFYEg==/com.google.android.webview-cXboXG23fdFy1uz-E6ZFrA==/lib/x86_64:/data/app/~~VJvepTEgOsfoJ57C3pFYEg==/com.google.android.webview-cXboXG23fdFy1uz-E6ZFrA==/base.apk!/lib/x86_64, permitted_path=/data:/mnt/expand
+D/nativeloader( 4684): Load /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!/lib/x86_64/libexpo-modules-core.so using class loader ns clns-9 (caller=/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!classes7.dex): ok
+I/cr_WVCFactoryProvider( 4684): version=150.0.7871.181 (787118108) minSdkVersion=29 multiprocess=true packageId=2 splits=<none>
+D/nativeloader( 4684): Load /data/app/~~VJvepTEgOsfoJ57C3pFYEg==/com.google.android.webview-cXboXG23fdFy1uz-E6ZFrA==/base.apk!/lib/x86_64/libwebviewchromium.so using class loader ns clns-10 (caller=/data/app/~~VJvepTEgOsfoJ57C3pFYEg==/com.google.android.webview-cXboXG23fdFy1uz-E6ZFrA==/base.apk): ok
+D/nativeloader( 4684): Load /system/lib64/libwebviewchromium_plat_support.so using class loader ns clns-10 (caller=/data/app/~~VJvepTEgOsfoJ57C3pFYEg==/com.google.android.webview-cXboXG23fdFy1uz-E6ZFrA==/base.apk): ok
+I/Choreographer( 4684): Skipped 164 frames!  The application may be doing too much work on its main thread.
+I/HWUI    ( 4684): Davey! duration=3132ms; Flags=1, FrameTimelineVsyncId=62857, IntendedVsync=342635109280, Vsync=343051775930, InputEventId=0, HandleInputStart=343062121800, AnimationStart=343062190200, PerformTraversalsStart=343181824600, DrawStart=345530483200, FrameDeadline=342651775946, FrameStartTime=343061194700, FrameInterval=16666666, WorkloadTarget=16666666, SyncQueued=345730426100, SyncStart=345758599600, IssueDrawCommandsStart=345778242600, SwapBuffers=345779235600, FrameCompleted=345795504900, DequeueBufferDuration=153700, QueueBufferDuration=8198900, GpuCompleted=345794749000, SwapBuffersCompleted=345795504900, DisplayPresentTime=0, CommandSubmissionCompleted=345779235600, 
+I/chromium( 4684): [0729/120730.396149:INFO:android_webview/browser/variations/variations_seed_loader.cc:67] Failed to open file for reading.: No such file or directory (2)
+I/chromium( 4684): [0729/120730.464820:INFO:android_webview/browser/variations/variations_seed_loader.cc:67] Failed to open file for reading.: No such file or directory (2)
+I/HWUI    ( 4684): Davey! duration=2951ms; Flags=0, FrameTimelineVsyncId=62871, IntendedVsync=343068442596, Vsync=345801775820, InputEventId=0, HandleInputStart=345811878300, AnimationStart=345811984900, PerformTraversalsStart=345907862500, DrawStart=345909592900, FrameDeadline=345818442486, FrameStartTime=345809651600, FrameInterval=16666666, WorkloadTarget=16666666, SyncQueued=345917195200, SyncStart=345918148300, IssueDrawCommandsStart=345918345600, SwapBuffers=346001348000, FrameCompleted=346020643900, DequeueBufferDuration=82800, QueueBufferDuration=1034800, GpuCompleted=346020643900, SwapBuffersCompleted=346010610900, DisplayPresentTime=0, CommandSubmissionCompleted=346001348000, 
+D/InsetsController( 4684): hide(ime())
+I/ImeTracker( 4684): com.buffago.app:75872077: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+I/cr_LibraryLoader( 4684): Successfully loaded native library
+I/cr_CachingUmaRecorder( 4684): Flushed 44 samples from 20 histograms, 0 samples were dropped.
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.rnmaps.maps.MapUrlTileManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.uimanager.LayoutShadowNode
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.swmansion.rnscreens.ScreenFooterManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.swmansion.rnscreens.gamma.tabs.TabScreenViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.rnmaps.maps.MapManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.swmansion.rnscreens.ScreenContainerViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.reactnativecommunity.slider.ReactSliderManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class expo.modules.kotlin.views.GroupViewManagerWrapper
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.swmansion.rnscreens.gamma.tabs.TabsHostViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.rnmaps.maps.MapMarkerManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.rnmaps.maps.MapLocalTileManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.swmansion.rnscreens.ModalScreenViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.rnmaps.maps.MapPolylineManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.rnmaps.maps.MapCircleManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.th3rdwave.safeareacontext.SafeAreaViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.th3rdwave.safeareacontext.SafeAreaViewShadowNode
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.swmansion.rnscreens.ScreenViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class expo.modules.kotlin.views.SimpleViewManagerWrapper
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.swmansion.rnscreens.ScreenStackViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.rnmaps.maps.MapCalloutManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.th3rdwave.safeareacontext.SafeAreaProviderManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.swmansion.rnscreens.SearchBarManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.rnmaps.maps.MapGradientPolylineManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.rnmaps.maps.MapHeatmapManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.rnmaps.maps.MapWMSTileManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.swmansion.rnscreens.ScreenStackHeaderConfigViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.swmansion.rnscreens.ScreenContentWrapperManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.rnmaps.maps.MapPolygonManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.swmansion.rnscreens.ScreenStackHeaderSubviewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.rnmaps.maps.MapOverlayManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$FeMergeManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.VirtualViewManager$RenderableShadowNode
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.safeareaview.ReactSafeAreaViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.safeareaview.ReactSafeAreaViewShadowNode
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$LinearGradientManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.progressbar.ReactProgressBarViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.progressbar.ProgressBarShadowNode
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$FeColorMatrixManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$SymbolManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$PatternManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.SvgViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.switchview.ReactSwitchManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.switchview.ReactSwitchShadowNode
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$UseViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$TSpanViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$FilterManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$MarkerManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.swmansion.gesturehandler.react.RNGestureHandlerButtonViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$ForeignObjectManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$GroupViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$TextViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$ImageViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$FeCompositeManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$RadialGradientManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.unimplementedview.ReactUnimplementedViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$FeOffsetManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$PathViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.drawer.ReactDrawerLayoutManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.textinput.ReactTextInputManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.textinput.ReactTextInputShadowNode
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$DefsViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.debuggingoverlay.DebuggingOverlayManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$FeGaussianBlurManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.scroll.ReactHorizontalScrollViewManager
+I/com.buffago.app( 4684): Background young concurrent mark compact GC freed 4845KB AllocSpace bytes, 5(236KB) LOS objects, 31% free, 10MB/14MB, paused 23.290ms,7.442ms total 191.981ms
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.text.ReactTextViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.text.ReactTextShadowNode
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.scroll.ReactHorizontalScrollContainerViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$ClipPathViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$FeBlendManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.view.ReactViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$CircleViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.modal.ReactModalHostManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$EllipseViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$LineViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.text.frescosupport.FrescoBasedReactTextInlineImageViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.text.frescosupport.FrescoBasedReactTextInlineImageShadowNode
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$FeFloodManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.image.ReactImageManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$MaskManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$RectViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.horcrux.svg.RenderableViewManager$TextPathViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.scroll.ReactScrollViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.text.ReactVirtualTextViewManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.text.ReactVirtualTextShadowNode
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.swiperefresh.SwipeRefreshLayoutManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.text.ReactRawTextManager
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.views.text.ReactRawTextShadowNode
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.swmansion.gesturehandler.react.RNGestureHandlerRootViewManager
+W/BridgelessReactContext( 4684): [WARNING] Bridgeless doesn't support CatalystInstance. Accessing an API that's not part of the new architecture is not encouraged usage.
+I/ExpoModulesCore( 4684): ✅ JSI interop was installed
+I/ExpoModulesCore( 4684): ✅ Constants were exported
+D/nativeloader( 4684): Load /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!/lib/x86_64/librnscreens.so using class loader ns clns-9 (caller=/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!classes2.dex): ok
+I/ReactNativeJS( 4684): Running "main" with {"rootTag":1,"initialProps":{},"fabric":true}
+E/ReactNativeJS( 4684): [Error: Cannot find native module 'ExpoNetwork'], { [Stack] name: 'Stack' }
+W/ReactNativeJS( 4684): 'Route "./(tabs)/home/index.jsx" is missing the required default export. Ensure a React component is exported as default.', { [Stack] name: 'Stack' }
+I/com.buffago.app( 4684): NativeAlloc concurrent mark compact GC freed 2204KB AllocSpace bytes, 6(188KB) LOS objects, 49% free, 11MB/23MB, paused 9.911ms,16.604ms total 184.883ms
+I/Choreographer( 4684): Skipped 51 frames!  The application may be doing too much work on its main thread.
+I/HWUI    ( 4684): Davey! duration=1358ms; Flags=0, FrameTimelineVsyncId=65533, IntendedVsync=352551775550, Vsync=352901775536, InputEventId=-39230287, HandleInputStart=352905725400, AnimationStart=352906006300, PerformTraversalsStart=353400314100, DrawStart=353400490100, FrameDeadline=352568442216, FrameStartTime=352903705800, FrameInterval=16666666, WorkloadTarget=16666666, SyncQueued=353770116300, SyncStart=353771562900, IssueDrawCommandsStart=353771924100, SwapBuffers=353907319000, FrameCompleted=353911870600, DequeueBufferDuration=190600, QueueBufferDuration=2052400, GpuCompleted=353911468100, SwapBuffersCompleted=353911870600, DisplayPresentTime=0, CommandSubmissionCompleted=353907319000, 
+D/nativeloader( 4684): Load /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!/lib/x86_64/libworklets.so using class loader ns clns-9 (caller=/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!classes7.dex): ok
+D/nativeloader( 4684): Load /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!/lib/x86_64/libreanimated.so using class loader ns clns-9 (caller=/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!classes7.dex): ok
+E/ReactNativeJS( 4684): [Error: Cannot find native module 'ExpoVideo'], { [Stack] name: 'Stack' }
+W/ReactNativeJS( 4684): 'Route "./admin/wing-shots/index.tsx" is missing the required default export. Ensure a React component is exported as default.', { [Stack] name: 'Stack' }
+E/ReactNativeJS( 4684): [Error: Cannot find native module 'ExpoNetwork'], { [Stack] name: 'Stack' }
+W/ReactNativeJS( 4684): 'Route "./crawl/[id].jsx" is missing the required default export. Ensure a React component is exported as default.', { [Stack] name: 'Stack' }
+W/com.buffago.app( 4684): Verification of android.graphics.Rect com.facebook.react.views.text.ReactTextViewAccessibilityDelegate.getBoundsInParent(com.facebook.react.views.text.ReactTextViewAccessibilityDelegate$AccessibilityLinks$AccessibleLink) took 107.430ms (2019.92 bytecodes/s) (0B arena alloc)
+W/com.buffago.app( 4684): Verification of void com.facebook.react.views.image.ReactImageView.maybeUpdateViewFromRequest(boolean) took 121.283ms (2539.50 bytecodes/s) (0B arena alloc)
+W/com.buffago.app( 4684): Verification of void com.facebook.drawee.drawable.ScalingUtils$ScaleType.<clinit>() took 476.489ms (94.44 bytecodes/s) (0B arena alloc)
+W/unknown:BridgelessReact( 4684): ReactHost{0}.startSurface(surfaceId = 0): Schedule
+W/unknown:BridgelessReact( 4684): ReactHost{0}.attachSurface(surfaceId = 0)
+W/unknown:BridgelessReact( 4684): ReactHost{0}.getOrCreateReactInstanceTask()
+W/unknown:BridgelessReact( 4684): ReactHost{0}.startSurface(surfaceId = 0): Execute
+D/WindowOnBackDispatcher( 4684): setTopOnBackInvokedCallback (unwrapped): android.view.ViewRootImpl$$ExternalSyntheticLambda12@afa6f0a
+W/unknown:ViewManagerPropertyUpdater( 4684): Could not find generated setter for class com.facebook.react.uimanager.RootViewManager
+D/InsetsController( 4684): hide(ime())
+I/ImeTracker( 4684): com.buffago.app:faeb7d5f: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+D/nativeloader( 4684): Load /data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!/lib/x86_64/libimagepipeline.so using class loader ns clns-9 (caller=/data/app/~~-LLxRo96blRtEXrhHRtIQQ==/com.buffago.app-Vpm8uluDGF3io_PuddhUBg==/base.apk!classes7.dex): ok
+I/ReactNativeJS( 4684): '[startup] app mounted', { pathname: '/' }
+I/ReactNativeJS( 4684): [auth] initial session load started
+I/com.buffago.app( 4684): NativeAlloc concurrent mark compact GC freed 6101KB AllocSpace bytes, 50(1500KB) LOS objects, 49% free, 14MB/28MB, paused 11.062ms,8.823ms total 385.772ms
+I/ReactNativeJS( 4684): '[auth] auth event', { event: 'INITIAL_SESSION', hasSession: false, userId: null }
+I/ReactNativeJS( 4684): '[auth] initial session load completed', { hasSession: false, userId: null, error: null }
+I/ReactNativeJS( 4684): '[startup] initial session hydration completed', { userId: null }
+I/com.buffago.app( 4684): hiddenapi: Accessing hidden field Landroid/widget/ScrollView;->mScroller:Landroid/widget/OverScroller; (runtime_flags=0, domain=platform, api=unsupported) from Lcom/facebook/react/views/scroll/ReactScrollView; (domain=app) using reflection: allowed
+I/Choreographer( 4684): Skipped 40 frames!  The application may be doing too much work on its main thread.
+I/HWUI    ( 4684): Davey! duration=1148ms; Flags=0, FrameTimelineVsyncId=69163, IntendedVsync=365918441682, Vsync=365918441682, InputEventId=0, HandleInputStart=365923541400, AnimationStart=365925565100, PerformTraversalsStart=366807035700, DrawStart=366809725800, FrameDeadline=365935108348, FrameStartTime=365923516100, FrameInterval=16666666, WorkloadTarget=16666666, SyncQueued=366929530300, SyncStart=366931267400, IssueDrawCommandsStart=366931894300, SwapBuffers=367061490100, FrameCompleted=367069163100, DequeueBufferDuration=142100, QueueBufferDuration=4171800, GpuCompleted=367067663700, SwapBuffersCompleted=367069163100, DisplayPresentTime=0, CommandSubmissionCompleted=367061490100, 
+I/HWUI    ( 4684): Davey! duration=789ms; Flags=0, FrameTimelineVsyncId=69170, IntendedVsync=366268441668, Vsync=366935108308, InputEventId=0, HandleInputStart=366950746800, AnimationStart=366950808000, PerformTraversalsStart=367027909800, DrawStart=367028800000, FrameDeadline=367085108302, FrameStartTime=366949007500, FrameInterval=16666666, WorkloadTarget=16666666, SyncQueued=367030966200, SyncStart=367070022000, IssueDrawCommandsStart=367070438900, SwapBuffers=367079633500, FrameCompleted=367096527000, DequeueBufferDuration=870400, QueueBufferDuration=6345700, GpuCompleted=367092137000, SwapBuffersCompleted=367096527000, DisplayPresentTime=0, CommandSubmissionCompleted=367079633500, 
+W/com.buffago.app( 4684): Verification of void okhttp3.internal.http2.Http2Stream$FramingSink.setFinished(boolean) took 102.993ms (29.13 bytecodes/s) (0B arena alloc)
+W/ReactNativeJS( 4684): '[Layout children]: No route named "crawl/[id]" exists in nested children:', [ 'index',
+W/ReactNativeJS( 4684):   'onboarding',
+W/ReactNativeJS( 4684):   'referrals',
+W/ReactNativeJS( 4684):   'reset',
+W/ReactNativeJS( 4684):   '(tabs)',
+W/ReactNativeJS( 4684):   'auth/callback',
+W/ReactNativeJS( 4684):   'auth/change-password',
+W/ReactNativeJS( 4684):   'auth/login',
+W/ReactNativeJS( 4684):   'auth/reset',
+W/ReactNativeJS( 4684):   'buffaverse/boss-battles',
+W/ReactNativeJS( 4684):   'buffaverse/showcase',
+W/ReactNativeJS( 4684):   'friends/add',
+W/ReactNativeJS( 4684):   'home/index',
+W/ReactNativeJS( 4684):   'leaderboards/index',
+W/ReactNativeJS( 4684):   'onboarding/crawl-preview',
+W/ReactNativeJS( 4684):   'profile/index',
+W/ReactNativeJS( 4684):   'profile/history/BadgesScreen',
+W/ReactNativeJS( 4684):   'profile/history/YearlyWingSummary',
+W/ReactNativeJS( 4684):   'profile/history/[id]',
+W/ReactNativeJS( 4684):   'profile/history/index',
+W/ReactNativeJS( 4684):   'profile/wing-shots/[id]',
+W/ReactNativeJS( 4684):   'profile/wing-shots/index',
+W/ReactNativeJS( 4684):   'r/[code]',
+W/ReactNativeJS( 4684):   'ratings/index',
+W/ReactNativeJS( 4684):   'routes/[id]',
+W/ReactNativeJS( 4684):   'routes/index',
+W/ReactNativeJS( 4684):   'user/index' ], { [Stack] name: 'Stack' }
+W/[RNScreens]( 4684): backTitleVisible prop is not available on Android
+W/[RNScreens]( 4684): backTitleFontFamily prop is not available on Android
+W/[RNScreens]( 4684): disableBackButtonMenu prop is not available on Android
+W/[RNScreens]( 4684): largeTitleFontFamily prop is not available on Android
+W/[RNScreens]( 4684): largeTitleFontWeight prop is not available on Android
+W/[RNScreens]( 4684): largeTitleHideShadow prop is not available on Android
+I/ReactNativeJS( 4684): '[startup] Splash initialization complete', { duration_ms: 13383,
+I/ReactNativeJS( 4684):   platform: 'android',
+I/ReactNativeJS( 4684):   ios_splash_asset: undefined }
+W/ReactNativeJS( 4684): '[Layout children]: No route named "crawl/[id]" exists in nested children:', [ 'index',
+W/ReactNativeJS( 4684):   'onboarding',
+W/ReactNativeJS( 4684):   'referrals',
+W/ReactNativeJS( 4684):   'reset',
+W/ReactNativeJS( 4684):   '(tabs)',
+W/ReactNativeJS( 4684):   'auth/callback',
+W/ReactNativeJS( 4684):   'auth/change-password',
+W/ReactNativeJS( 4684):   'auth/login',
+W/ReactNativeJS( 4684):   'auth/reset',
+W/ReactNativeJS( 4684):   'buffaverse/boss-battles',
+W/ReactNativeJS( 4684):   'buffaverse/showcase',
+W/ReactNativeJS( 4684):   'friends/add',
+W/ReactNativeJS( 4684):   'home/index',
+W/ReactNativeJS( 4684):   'leaderboards/index',
+W/ReactNativeJS( 4684):   'onboarding/crawl-preview',
+W/ReactNativeJS( 4684):   'profile/index',
+W/ReactNativeJS( 4684):   'profile/history/BadgesScreen',
+W/ReactNativeJS( 4684):   'profile/history/YearlyWingSummary',
+W/ReactNativeJS( 4684):   'profile/history/[id]',
+W/ReactNativeJS( 4684):   'profile/history/index',
+W/ReactNativeJS( 4684):   'profile/wing-shots/[id]',
+W/ReactNativeJS( 4684):   'profile/wing-shots/index',
+W/ReactNativeJS( 4684):   'r/[code]',
+W/ReactNativeJS( 4684):   'ratings/index',
+W/ReactNativeJS( 4684):   'routes/[id]',
+W/ReactNativeJS( 4684):   'routes/index',
+W/ReactNativeJS( 4684):   'user/index' ], { [Stack] name: 'Stack' }
+W/unknown:BridgelessReact( 4684): ReactHost{0}.onUserLeaveHint(activity)
+W/unknown:BridgelessReact( 4684): ReactHost{0}.onHostPause(activity)
+W/unknown:BridgelessReact( 4684): ReactContext.onHostPause()
+W/ReactNativeJS( 4684): '[Layout children]: No route named "crawl/[id]" exists in nested children:', [ 'index',
+W/ReactNativeJS( 4684):   'onboarding',
+W/ReactNativeJS( 4684):   'referrals',
+W/ReactNativeJS( 4684):   'reset',
+W/ReactNativeJS( 4684):   '(tabs)',
+W/ReactNativeJS( 4684):   'auth/callback',
+W/ReactNativeJS( 4684):   'auth/change-password',
+W/ReactNativeJS( 4684):   'auth/login',
+W/ReactNativeJS( 4684):   'auth/reset',
+W/ReactNativeJS( 4684):   'buffaverse/boss-battles',
+W/ReactNativeJS( 4684):   'buffaverse/showcase',
+W/ReactNativeJS( 4684):   'friends/add',
+W/ReactNativeJS( 4684):   'home/index',
+W/ReactNativeJS( 4684):   'leaderboards/index',
+W/ReactNativeJS( 4684):   'onboarding/crawl-preview',
+W/ReactNativeJS( 4684):   'profile/index',
+W/ReactNativeJS( 4684):   'profile/history/BadgesScreen',
+W/ReactNativeJS( 4684):   'profile/history/YearlyWingSummary',
+W/ReactNativeJS( 4684):   'profile/history/[id]',
+W/ReactNativeJS( 4684):   'profile/history/index',
+W/ReactNativeJS( 4684):   'profile/wing-shots/[id]',
+W/ReactNativeJS( 4684):   'profile/wing-shots/index',
+W/ReactNativeJS( 4684):   'r/[code]',
+W/ReactNativeJS( 4684):   'ratings/index',
+W/ReactNativeJS( 4684):   'routes/[id]',
+W/ReactNativeJS( 4684):   'routes/index',
+W/ReactNativeJS( 4684):   'user/index' ], { [Stack] name: 'Stack' }
+I/ReactNativeJS( 4684): '[startup] app mounted', { pathname: '/home' }
+W/unknown:ReactNative( 4684): StatusBarModule: Ignored status bar change, current activity is edge-to-edge.
+W/unknown:ReactNative( 4684): StatusBarModule: Ignored status bar change, current activity is edge-to-edge.
+W/ReactNativeJS( 4684): '[Layout children]: No route named "crawl/[id]" exists in nested children:', [ 'index',
+W/ReactNativeJS( 4684):   'onboarding',
+W/ReactNativeJS( 4684):   'referrals',
+W/ReactNativeJS( 4684):   'reset',
+W/ReactNativeJS( 4684):   '(tabs)',
+W/ReactNativeJS( 4684):   'auth/callback',
+W/ReactNativeJS( 4684):   'auth/change-password',
+W/ReactNativeJS( 4684):   'auth/login',
+W/ReactNativeJS( 4684):   'auth/reset',
+W/ReactNativeJS( 4684):   'buffaverse/boss-battles',
+W/ReactNativeJS( 4684):   'buffaverse/showcase',
+W/ReactNativeJS( 4684):   'friends/add',
+W/ReactNativeJS( 4684):   'home/index',
+W/ReactNativeJS( 4684):   'leaderboards/index',
+W/ReactNativeJS( 4684):   'onboarding/crawl-preview',
+W/ReactNativeJS( 4684):   'profile/index',
+W/ReactNativeJS( 4684):   'profile/history/BadgesScreen',
+W/ReactNativeJS( 4684):   'profile/history/YearlyWingSummary',
+W/ReactNativeJS( 4684):   'profile/history/[id]',
+W/ReactNativeJS( 4684):   'profile/history/index',
+W/ReactNativeJS( 4684):   'profile/wing-shots/[id]',
+W/ReactNativeJS( 4684):   'profile/wing-shots/index',
+W/ReactNativeJS( 4684):   'r/[code]',
+W/ReactNativeJS( 4684):   'ratings/index',
+W/ReactNativeJS( 4684):   'routes/[id]',
+W/ReactNativeJS( 4684):   'routes/index',
+W/ReactNativeJS( 4684):   'user/index' ], { [Stack] name: 'Stack' }
+I/ReactNativeJS( 4684): '[startup] app mounted', { pathname: '/onboarding' }
+W/unknown:ReactNative( 4684): StatusBarModule: Ignored status bar change, current activity is edge-to-edge.
+W/unknown:ReactNative( 4684): StatusBarModule: Ignored status bar change, current activity is edge-to-edge.
+E/ExpoNetworkInspector( 4684): Failed to send network request CDP event
+E/ExpoNetworkInspector( 4684): java.io.EOFException
+E/ExpoNetworkInspector( 4684): 	at okio.RealBufferedSource.require(RealBufferedSource.kt:204)
+E/ExpoNetworkInspector( 4684): 	at okio.GzipSource.consumeHeader(GzipSource.kt:102)
+E/ExpoNetworkInspector( 4684): 	at okio.GzipSource.read(GzipSource.kt:60)
+E/ExpoNetworkInspector( 4684): 	at okio.RealBufferedSource.request(RealBufferedSource.kt:211)
+E/ExpoNetworkInspector( 4684): 	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpInterceptorsKt.peekResponseBody(ExpoNetworkInspectOkHttpInterceptors.kt:117)
+E/ExpoNetworkInspector( 4684): 	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpInterceptorsKt.peekResponseBody$default(ExpoNetworkInspectOkHttpInterceptors.kt:99)
+E/ExpoNetworkInspector( 4684): 	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpNetworkInterceptor.intercept(ExpoNetworkInspectOkHttpInterceptors.kt:39)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+E/ExpoNetworkInspector( 4684): 	at com.facebook.react.modules.network.NetworkingModule$sendRequestInternal$$inlined$-addNetworkInterceptor$1.intercept(OkHttpClient.kt:1080)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+E/ExpoNetworkInspector( 4684): 	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpNetworkInterceptor.intercept(ExpoNetworkInspectOkHttpInterceptors.kt:27)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:34)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+E/ExpoNetworkInspector( 4684): 	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpAppInterceptor.intercept(ExpoNetworkInspectOkHttpInterceptors.kt:60)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+E/ExpoNetworkInspector( 4684): 	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpAppInterceptor.intercept(ExpoNetworkInspectOkHttpInterceptors.kt:60)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:517)
+E/ExpoNetworkInspector( 4684): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1154)
+E/ExpoNetworkInspector( 4684): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:652)
+E/ExpoNetworkInspector( 4684): 	at java.lang.Thread.run(Thread.java:1563)
+E/ExpoNetworkInspector( 4684): Failed to send network request CDP event
+E/ExpoNetworkInspector( 4684): java.io.EOFException
+E/ExpoNetworkInspector( 4684): 	at okio.RealBufferedSource.require(RealBufferedSource.kt:204)
+E/ExpoNetworkInspector( 4684): 	at okio.GzipSource.consumeHeader(GzipSource.kt:102)
+E/ExpoNetworkInspector( 4684): 	at okio.GzipSource.read(GzipSource.kt:60)
+E/ExpoNetworkInspector( 4684): 	at okio.RealBufferedSource.request(RealBufferedSource.kt:211)
+E/ExpoNetworkInspector( 4684): 	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpInterceptorsKt.peekResponseBody(ExpoNetworkInspectOkHttpInterceptors.kt:117)
+E/ExpoNetworkInspector( 4684): 	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpInterceptorsKt.peekResponseBody$default(ExpoNetworkInspectOkHttpInterceptors.kt:99)
+E/ExpoNetworkInspector( 4684): 	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpNetworkInterceptor.intercept(ExpoNetworkInspectOkHttpInterceptors.kt:39)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:34)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+E/ExpoNetworkInspector( 4684): 	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpAppInterceptor.intercept(ExpoNetworkInspectOkHttpInterceptors.kt:60)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+E/ExpoNetworkInspector( 4684): 	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpAppInterceptor.intercept(ExpoNetworkInspectOkHttpInterceptors.kt:60)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
+E/ExpoNetworkInspector( 4684): 	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:517)
+E/ExpoNetworkInspector( 4684): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1154)
+E/ExpoNetworkInspector( 4684): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:652)
+E/ExpoNetworkInspector( 4684): 	at java.lang.Thread.run(Thread.java:1563)
+W/unknown:BridgelessReact( 4684): ReactHost{0}.onHostResume(activity)
+W/unknown:BridgelessReact( 4684): ReactContext.onHostResume()
+W/[RNScreens]( 4684): backTitleVisible prop is not available on Android
+W/[RNScreens]( 4684): backTitleFontFamily prop is not available on Android
+W/[RNScreens]( 4684): disableBackButtonMenu prop is not available on Android
+W/[RNScreens]( 4684): largeTitleFontFamily prop is not available on Android
+W/[RNScreens]( 4684): largeTitleFontWeight prop is not available on Android
+W/[RNScreens]( 4684): largeTitleHideShadow prop is not available on Android
+W/com.buffago.app( 4684): Verification of boolean com.google.android.material.appbar.AppBarLayout$BaseBehavior.onLayoutChild(androidx.coordinatorlayout.widget.CoordinatorLayout, com.google.android.material.appbar.AppBarLayout, int) took 866.526ms (211.19 bytecodes/s) (0B arena alloc)
+W/com.buffago.app( 4684): Verification of kotlin.reflect.jvm.internal.impl.descriptors.ParameterDescriptor kotlin.reflect.jvm.internal.impl.descriptors.impl.AbstractReceiverParameterDescriptor.getOriginal() took 875.792ms (1.14 bytecodes/s) (0B arena alloc)
+W/[RNScreens]( 4684): backTitleVisible prop is not available on Android
+W/[RNScreens]( 4684): backTitleFontFamily prop is not available on Android
+W/[RNScreens]( 4684): disableBackButtonMenu prop is not available on Android
+W/[RNScreens]( 4684): largeTitleFontFamily prop is not available on Android
+W/[RNScreens]( 4684): largeTitleFontWeight prop is not available on Android
+W/[RNScreens]( 4684): largeTitleHideShadow prop is not available on Android
+I/Choreographer( 4684): Skipped 91 frames!  The application may be doing too much work on its main thread.
+I/HWUI    ( 4684): Davey! duration=1673ms; Flags=0, FrameTimelineVsyncId=70453, IntendedVsync=375151774646, Vsync=375185107978, InputEventId=0, HandleInputStart=375189928200, AnimationStart=375190209300, PerformTraversalsStart=376769573500, DrawStart=376795028200, FrameDeadline=375168441312, FrameStartTime=375189908300, FrameInterval=16666666, WorkloadTarget=16666666, SyncQueued=376804183000, SyncStart=376807165900, IssueDrawCommandsStart=376813346500, SwapBuffers=376817658700, FrameCompleted=376828505300, DequeueBufferDuration=58300, QueueBufferDuration=8709000, GpuCompleted=376827752900, SwapBuffersCompleted=376828505300, DisplayPresentTime=1117191225254809470, CommandSubmissionCompleted=376817658700, 
+I/HWUI    ( 4684): Davey! duration=1565ms; Flags=0, FrameTimelineVsyncId=70509, IntendedVsync=375318441306, Vsync=376835107912, InputEventId=0, HandleInputStart=376840435200, AnimationStart=376840501200, PerformTraversalsStart=376842299800, DrawStart=376842903600, FrameDeadline=376851774578, FrameStartTime=376839203700, FrameInterval=16666666, WorkloadTarget=16666666, SyncQueued=376861140900, SyncStart=376863046800, IssueDrawCommandsStart=376863516000, SwapBuffers=376870210400, FrameCompleted=376886174100, DequeueBufferDuration=1978200, QueueBufferDuration=4569600, GpuCompleted=376882045500, SwapBuffersCompleted=376886174100, DisplayPresentTime=1145339152429158370, CommandSubmissionCompleted=376870210400, 
+D/InsetsController( 4684): hide(ime())
+I/ImeTracker( 4684): com.buffago.app:5a413333: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+D/ActivityThread( 4684): Package [com.google.android.apps.messaging] reported as REPLACED, but missing application info. Assuming REMOVED.
+D/ActivityThread( 4684): Package [com.google.android.apps.messaging] reported as REPLACED, but missing application info. Assuming REMOVED.

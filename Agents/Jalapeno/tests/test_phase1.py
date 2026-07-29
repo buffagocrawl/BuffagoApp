@@ -150,7 +150,9 @@ def test_required_cli_modes_exist() -> None:
     assert parser.parse_args(["--dry-run"]).dry_run is True
     assert parser.parse_args(["--test"]).test is True
     assert parser.parse_args(["--production"]).production is True
-    assert parser.parse_args(["--production", "--content-type", "video"]).content_type == "video"
+    with pytest.raises(SystemExit) as exc:
+        parser.parse_args(["--production", "--content-type", "video"])
+    assert exc.value.code == 2
     assert parser.parse_args(["--growth-report"]).growth_report is True
     assert parser.parse_args(["--recommend-strategy"]).recommend_strategy is True
     assert parser.parse_args(["--apply-strategy"]).apply_strategy is True
@@ -313,23 +315,23 @@ def test_optional_post_type_reuses_production_validation() -> None:
         _normalize_optional_post_type("wings")
 
 
-def test_main_routes_production_flag_to_production_runner(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr("main.run_production", lambda *, content_type=None: 0)
+def test_main_rejects_retired_production_mode(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "main.run_production",
+        lambda *, content_type=None: pytest.fail(
+            "retired production runner must be unreachable"
+        ),
+    )
 
-    assert main(["--production"]) == 0
+    assert main(["--production"]) == 1
 
 
-def test_main_passes_content_type_to_production_runner(monkeypatch: pytest.MonkeyPatch) -> None:
-    captured: dict[str, str | None] = {}
-
-    def fake_run_production(*, content_type: str | None = None) -> int:
-        captured["content_type"] = content_type
-        return 0
-
-    monkeypatch.setattr("main.run_production", fake_run_production)
-
-    assert main(["--production", "--content-type", "video"]) == 0
-    assert captured["content_type"] == "video"
+def test_main_no_longer_accepts_fabricated_content_type_choices() -> None:
+    with pytest.raises(SystemExit) as exc:
+        main(["--production", "--content-type", "video"])
+    assert exc.value.code == 2
 
 
 class _BuffagoCadenceClient:

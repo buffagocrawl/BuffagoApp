@@ -12,6 +12,7 @@ import { trackEvent } from '../../../lib/analytics';
 import FriendProfileActions from '../../../components/FriendProfileActions';
 import ScreenHeader from '../../../components/ScreenHeader';
 import WeeklyChallengeStats from '../../../components/WeeklyChallengeStats';
+import WingCreatorSummaryCard from '../../../components/creator/WingCreatorSummaryCard';
 
 /* ---------------- helpers ---------------- */
 
@@ -975,6 +976,8 @@ export default function HistoryIndex() {
                 </View>
               </TouchableOpacity>
             </View>
+
+            {isViewingSelf ? <WingCreatorSummaryCard refreshKey={ratings.length} /> : null}
 
             <WeeklyChallengeStats
               client={supabase}

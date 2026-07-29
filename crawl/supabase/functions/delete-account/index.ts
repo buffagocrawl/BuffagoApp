@@ -34,7 +34,59 @@ serve(async (req) => {
     }
 
     const userId = userData.user.id;
+    const correlationId = crypto.randomUUID();
 
+    const { data: cleanup, error: prepareError } = await admin.rpc(
+      "prepare_wing_account_media_cleanup",
+      {
+        p_user_id: userId,
+        p_correlation_id: correlationId,
+      },
+    );
+    if (prepareError || !cleanup?.manifest_id) {
+      return new Response(
+        JSON.stringify({ ok: false, error: "Private media cleanup could not be prepared." }),
+        { status: 500 },
+      );
+    }
+
+    const objectPaths = Array.isArray(cleanup.object_paths)
+      ? cleanup.object_paths.filter((path: unknown): path is string =>
+        typeof path === "string" && path.length > 0
+      )
+      : [];
+
+    let objectsDeleted = true;
+    let cleanupFailure = "";
+    for (let index = 0; index < objectPaths.length; index += 100) {
+      const batch = objectPaths.slice(index, index + 100);
+      const { error: storageError } = await admin.storage
+        .from("wing-submissions")
+        .remove(batch);
+      if (storageError) {
+        objectsDeleted = false;
+        cleanupFailure = "private_storage_delete_failed";
+        break;
+      }
+    }
+
+    const { error: completionError } = await admin.rpc(
+      "complete_wing_account_media_cleanup",
+      {
+        p_manifest_id: cleanup.manifest_id,
+        p_objects_deleted: objectsDeleted,
+        p_failure_reason: objectsDeleted ? null : cleanupFailure,
+      },
+    );
+    if (!objectsDeleted || completionError) {
+      return new Response(
+        JSON.stringify({ ok: false, error: "Private media cleanup did not complete." }),
+        { status: 500 },
+      );
+    }
+
+    // Authentication is removed last. If storage cleanup fails, the user can
+    // retry and their private data is never orphaned behind a deleted identity.
     const { error: delErr } = await admin.auth.admin.deleteUser(userId);
     if (delErr) throw delErr;
 

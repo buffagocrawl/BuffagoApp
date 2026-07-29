@@ -79,17 +79,26 @@ SCHEDULE_TARGET_HOURS = {
     "buffago": 20,
     "video": 18,
 }
+LEGACY_CONTENT_RETIREMENT_MESSAGE = (
+    "Legacy AI-generated Jalapeno content is retired. "
+    "Use wing_shots_main.py for approved community Wing Shots."
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Jalapeno Instagram agent runner")
+    parser = argparse.ArgumentParser(
+        description=(
+            "Legacy Jalapeno reporting runner. AI content generation and "
+            "publishing are retired."
+        )
+    )
     mode_group = parser.add_mutually_exclusive_group(required=True)
-    mode_group.add_argument("--validate", action="store_true", help="Validate env, Supabase reads, snapshots, external context, AI bridge, content engine, and image pipeline")
-    mode_group.add_argument("--dry-run", action="store_true", help="Log the planned work without publishing")
-    mode_group.add_argument("--test", action="store_true", help="Run the fully simulated Phase 1 workflow")
-    mode_group.add_argument("--image-pipeline-live", action="store_true", help="Run only the live image pipeline upload and persistence flow")
-    mode_group.add_argument("--instagram-publish-live", action="store_true", help="Run only the live Instagram publishing flow")
-    mode_group.add_argument("--production", action="store_true", help="Run the live production publishing pipeline")
+    mode_group.add_argument("--validate", action="store_true", help="Retired legacy content validation mode")
+    mode_group.add_argument("--dry-run", action="store_true", help="Retired legacy content generation mode")
+    mode_group.add_argument("--test", action="store_true", help="Retired legacy content simulation mode")
+    mode_group.add_argument("--image-pipeline-live", action="store_true", help="Retired and hard-disabled")
+    mode_group.add_argument("--instagram-publish-live", action="store_true", help="Retired and hard-disabled")
+    mode_group.add_argument("--production", action="store_true", help="Retired and hard-disabled")
     mode_group.add_argument("--metrics", "--collect-metrics", action="store_true", help="Collect Instagram metrics for recent published posts")
     mode_group.add_argument("--daily-report", action="store_true", help="Generate and optionally email the Jalapeno daily report")
     mode_group.add_argument("--weekly-report", action="store_true", help="Generate and optionally email the Jalapeno weekly report")
@@ -106,11 +115,6 @@ def build_parser() -> argparse.ArgumentParser:
         "--skip-ai",
         action="store_true",
         help="Skip Phase 5 AI backend calls and use fallback content",
-    )
-    parser.add_argument(
-        "--content-type",
-        choices=sorted(PRODUCTION_POST_TYPE_MAP),
-        help="Select the production content path. Equivalent to POST_TYPE for GitHub Actions.",
     )
     parser.add_argument(
         "--metrics-backfill",
@@ -134,6 +138,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="Propose or apply repairs for bad stored Instagram media ids by matching recent IG media.",
     )
     return parser
+
+
+def _retired_content_mode(mode: str) -> None:
+    raise ConfigError(f"{mode}: {LEGACY_CONTENT_RETIREMENT_MESSAGE}")
 
 
 def _normalize_production_post_type(raw_value: str | None) -> str:
@@ -911,6 +919,7 @@ def run_caption_samples(count: int = 20) -> int:
 
 
 def run_image_pipeline_live() -> int:
+    _retired_content_mode("image-pipeline-live")
     print(f"Loading env file: {ENV_FILE}")
     env_loaded = load_env_file()
     print(f"Env loaded: {env_loaded}")
@@ -951,6 +960,7 @@ def run_image_pipeline_live() -> int:
 
 
 def run_instagram_publish_live() -> int:
+    _retired_content_mode("instagram-publish-live")
     print(f"Loading env file: {ENV_FILE}")
     env_loaded = load_env_file()
     print(f"Env loaded: {env_loaded}")
@@ -1120,6 +1130,7 @@ def run_recommend_strategy() -> int:
 
 
 def run_apply_strategy() -> int:
+    _retired_content_mode("apply-strategy")
     config, logger, client = _load_live_client_and_config("apply-strategy")
     rows = score_posts(client, logger=logger)
     recommendation = recommend_strategy_from_rows(rows, logger=logger)
@@ -1439,6 +1450,7 @@ def run_test_mode() -> int:
 
 
 def run_production(content_type: str | None = None) -> int:
+    _retired_content_mode("production")
     started_at = time.perf_counter()
     print(f"Loading env file: {ENV_FILE}")
     env_loaded = load_env_file()
@@ -2369,6 +2381,29 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     try:
+        if (
+            args.validate
+            or args.dry_run
+            or args.test
+            or args.image_pipeline_live
+            or args.instagram_publish_live
+            or args.production
+            or args.apply_strategy
+        ):
+            selected = next(
+                name
+                for name, active in (
+                    ("validate", args.validate),
+                    ("dry-run", args.dry_run),
+                    ("test", args.test),
+                    ("image-pipeline-live", args.image_pipeline_live),
+                    ("instagram-publish-live", args.instagram_publish_live),
+                    ("production", args.production),
+                    ("apply-strategy", args.apply_strategy),
+                )
+                if active
+            )
+            _retired_content_mode(selected)
         if args.validate:
             return run_validate(refresh_external_context=args.refresh_external_context, skip_ai=args.skip_ai)
         if args.dry_run:
@@ -2380,7 +2415,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.instagram_publish_live:
             return run_instagram_publish_live()
         if args.production:
-            return run_production(content_type=args.content_type)
+            return run_production()
         if args.metrics:
             return run_metrics(
                 backfill=args.metrics_backfill,

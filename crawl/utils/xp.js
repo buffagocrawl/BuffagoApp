@@ -41,27 +41,6 @@ function unwrapRpc(data) {
   return Array.isArray(data) ? data[0] : data;
 }
 
-function isMissingAwardRpc(error) {
-  const msg = String(error?.message || '').toLowerCase();
-  return error?.code === 'PGRST202' || msg.includes('could not find the function');
-}
-
-// Ensure the user has a row in "users"
-async function ensureUserRow(userId) {
-  const { data, error } = await supabase
-    .from('users')
-    .select('user_id')
-    .eq('user_id', userId)
-    .maybeSingle();
-  if (!error && data) return true;
-
-  // try insert (ignore conflict)
-  const { error: insErr } = await supabase
-    .from('users')
-    .upsert({ user_id: userId, xp: 0 }, { onConflict: 'user_id', ignoreDuplicates: true });
-  return !insErr;
-}
-
 /**
  * Grant XP to the signed-in user; returns new xp (number) or null on failure.
  * `toast` is optional; if provided should have a .show(amount, reason) function.
@@ -80,59 +59,25 @@ export async function grantXp(amount, reason = '', toast, options = {}) {
       ...options.metadata,
     };
 
-    const { data: awarded, error: awardErr } = await supabase.rpc('award_xp', {
-      p_amount: xpAmount,
+    const { data: awarded, error: awardErr } = await supabase.rpc('claim_verified_progression_xp', {
       p_source: source,
-      p_reason: reason || source,
-      p_user_id: user.id,
-      p_idempotency_key: options.idempotencyKey ?? null,
       p_destination_id: options.destinationId ?? null,
       p_crawl_id: options.crawlId ?? null,
       p_route_id: options.routeId ?? null,
-      p_badge_id: options.badgeId ?? null,
-      p_battle_id: options.battleId ?? null,
-      p_challenge_id: options.challengeId ?? null,
-      p_referral_id: options.referralId ?? null,
       p_metadata: metadata,
     });
 
     if (!awardErr) {
       const row = unwrapRpc(awarded);
       if (!row?.awarded) return null;
-      try { toast?.show?.(xpAmount, reason); } catch {}
+      try { toast?.show?.(Number(row.amount || xpAmount), row.reason || reason); } catch {}
       return Number(row?.xp_after ?? 0);
     }
 
-    if (!isMissingAwardRpc(awardErr)) {
-      console.warn('[XP] award_xp failed', awardErr?.message || awardErr);
-      return null;
-    }
-
-    // Fallback only for local/dev databases that have not run the XP ledger migration yet.
-    const ok = await ensureUserRow(user.id);
-    if (!ok) return null;
-
-    // read -> update (works with standard RLS "user can update own row")
-    const { data: cur, error: selErr } = await supabase
-      .from('users')
-      .select('xp')
-      .eq('user_id', user.id)
-      .single();
-    if (selErr) return null;
-
-    const nextXp = (Number(cur?.xp) || 0) + xpAmount;
-
-    const { data: upd, error: updErr } = await supabase
-      .from('users')
-      .update({ xp: nextXp })
-      .eq('user_id', user.id)
-      .select('xp')
-      .single();
-    if (updErr) return null;
-
-    // fire toast if provided
-    try { toast?.show?.(xpAmount, reason); } catch {}
-    return upd?.xp ?? nextXp;
+    // The server derives all amounts and evidence.  A missing or failed RPC is
+    // a deployment error, never authorization to mutate a user's XP directly.
+    console.warn('[XP] verified progression claim failed', awardErr?.message || awardErr);
+    return null;
   } catch (e) {
     console.warn('[XP] grant failed', e?.message || e);
     return null;

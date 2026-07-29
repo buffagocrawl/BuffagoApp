@@ -11,12 +11,6 @@ on:
         options:
           - growth-report
           - recommend-strategy
-          - apply-strategy
-      apply_strategy:
-        description: Allow active-strategy mutation for apply-strategy runs
-        required: true
-        type: boolean
-        default: false
   schedule:
     - cron: "0 15 * * 1"
 
@@ -63,14 +57,6 @@ jobs:
             recommend-strategy)
               command="python main.py --recommend-strategy"
               dry_run="true"
-              ;;
-            apply-strategy)
-              command="python main.py --apply-strategy"
-              if [[ "${{ inputs.apply_strategy }}" == "true" ]]; then
-                dry_run="false"
-              else
-                dry_run="true"
-              fi
               ;;
             *)
               echo "Unsupported action: ${action}" >&2

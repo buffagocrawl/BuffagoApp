@@ -1,0 +1,26 @@
+appId: com.buffago.app
+name: Wing Shot post-rating prompt contract
+tags: [wing-shots, authenticated, mutating, qa-fixture-required]
+---
+# The QA fixture must open this flow immediately after an eligible rating has
+# committed. Cayenne must never manufacture eligibility in the client.
+- assertVisible:
+    id: rating.success
+- assertVisible:
+    id: wing-shot.flow
+- assertVisible:
+    id: wing-shot.take-photo
+- assertVisible:
+    id: wing-shot.record-video
+- assertVisible:
+    id: wing-shot.choose-library
+- assertVisible:
+    id: wing-shot.not-now
+- takeScreenshot: wing-shot-eligible-prompt
+- tapOn:
+    id: wing-shot.not-now
+- assertNotVisible:
+    id: wing-shot.flow
+- assertVisible:
+    id: rating.success
+- takeScreenshot: wing-shot-skip-preserves-rating

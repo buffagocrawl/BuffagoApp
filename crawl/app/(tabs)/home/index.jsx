@@ -17,12 +17,14 @@ import { Text, Button, useTheme, Dialog, Portal, Avatar, TextInput } from 'react
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as Crypto from 'expo-crypto';
+import * as Location from 'expo-location';
 import WingmanAddDialog from '../../../components/WingmanAddDialog';
 import FeedbackState from '../../../components/ui/FeedbackState';
 import { supabase } from '../../../lib/supabase.js';
 import WelcomeWizard from '../../../components/WelcomeWizard';
 import DestinationPickerWizard from '../../../components/DestinationPickerWizard';
 import RatingWizardDialog from '../../../components/RatingWizardDialog';
+import { WingShotFlow } from '../../../components/wingShots';
 import { trackEvent } from '../../../lib/analytics';
 import { loadWeeklyMission } from '../../../lib/weeklyMission';
 import { currentWingDuelCompletion } from '../../../lib/home/monthlyWingDuel';
@@ -33,6 +35,7 @@ import {
 } from '../../../config/features';
 
 import { useOnboardingGate } from '../../../hooks/useOnboardingGate';
+import { useWingShotsFeatureFlags } from '../../../hooks/useWingShotsFeatureFlags';
 import LocationGate from '../../../components/LocationGate';
 import CoinRewardModal from '../../../components/CoinRewardModal';
 import { useLocationCtx } from '../../../providers/LocationProvider';
@@ -42,6 +45,7 @@ import { useLegendaryFeed } from '../../../hooks/useLegendaryFeed';
 import { LegendaryHomeHero } from '../../../components/buffaverse/LegendarySurfaces';
 import BuffaverseHomeCard from '../../../components/buffaverse/BuffaverseHomeCard';
 import WeeklyMissionDialog from '../../../components/home/WeeklyMissionDialog';
+import WingShotsPromoCard from '../../../components/wingShots/WingShotsPromoCard';
 
 const SEARCH_RADIUS_M = 160934; // 100 miles
 const MS_5_MIN = 30 * 1000;
@@ -328,6 +332,7 @@ export default function Home() {
 
   const [session, setSession] = useState(null);
   const isSignedIn = !!session?.user?.id;
+  const { flags: wingShotFlags } = useWingShotsFeatureFlags(isSignedIn);
 
   const [activeCrawl, setActiveCrawl] = useState(null);
   const [preloadedFact, setPreloadedFact] = useState('');
@@ -414,6 +419,11 @@ export default function Home() {
   const [homeRateSaving, setHomeRateSaving] = useState(false);
   const [homeRateDest, setHomeRateDest] = useState(null); // { id, name }
   const [homeTagOptions, setHomeTagOptions] = useState([]);
+  const homeRatingOperationRef = useRef(null);
+  const [homeWingShotVisible, setHomeWingShotVisible] = useState(false);
+  const [homeWingShotRatingId, setHomeWingShotRatingId] = useState(null);
+  const [homeWingShotDestinationId, setHomeWingShotDestinationId] = useState(null);
+  const [homeWingShotSubmitted, setHomeWingShotSubmitted] = useState(false);
 
   // ---------- NEW: Rated status for the current suggested restaurant ----------
   const [homeRated, setHomeRated] = useState({
@@ -2324,6 +2334,7 @@ export default function Home() {
     }
 
     setHomeRateDest({ id: closest.id, name: closest.name || 'Wing Spot' });
+    homeRatingOperationRef.current = Crypto.randomUUID();
     if (!homeTagOptions?.length) await loadHomeTagOptions();
     await trackEvent({
       eventName: 'rating_started',
@@ -2351,7 +2362,7 @@ export default function Home() {
 
       const destId = homeRateDest.id;
       const uid = session?.user?.id ?? null;
-      const crawlId = Crypto.randomUUID();
+      let crawlId = Crypto.randomUUID();
 
       const scores = payload?.scores || payload || {};
       const crispiness = Number(scores.crispiness ?? scores.crunch ?? scores.crunchFactor ?? scores.crunch_factor);
@@ -2419,40 +2430,78 @@ export default function Home() {
 
       setHomeRateSaving(true);
       try {
-        // 1) create a crawl row (required by FK and NOT NULL route_id)
-        const now = new Date().toISOString();
+        let ratingResult = null;
+        if (uid) {
+          let verifiedCoords = coords;
+          let verifiedAccuracy = null;
+          try {
+            const position = await Location.getCurrentPositionAsync({
+              accuracy: Location.Accuracy.High,
+              maximumAge: 1000,
+              timeout: 5000,
+            });
+            verifiedCoords = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            };
+            verifiedAccuracy = position.coords.accuracy ?? null;
+          } catch {
+            // The server still verifies the last foreground location. If it is
+            // absent or outside the radius, the rating fails closed.
+          }
+          const operationId = homeRatingOperationRef.current ?? Crypto.randomUUID();
+          homeRatingOperationRef.current = operationId;
+          const { data, error } = await supabase.rpc('submit_validated_restaurant_rating', {
+            p_operation_id: operationId,
+            p_destination_id: destId,
+            p_latitude: verifiedCoords?.latitude ?? null,
+            p_longitude: verifiedCoords?.longitude ?? null,
+            p_accuracy_m: verifiedAccuracy,
+            p_crispiness: Number.isFinite(crispiness) ? crispiness : null,
+            p_sauce: Number.isFinite(sauce) ? sauce : null,
+            p_meat: Number.isFinite(meat) ? meat : null,
+            p_overall: Number.isFinite(overall) ? overall : null,
+            p_wings_eaten: wingsEaten,
+            p_tag_id: tagId,
+            p_sauce_style: sauceStyle,
+            p_flavor_vibe: flavorVibe.length ? flavorVibe : null,
+            p_spice_level: spiceLevel,
+            p_would_order_again: wouldOrderAgain,
+          });
+          if (error) throw error;
+          ratingResult = data;
+          crawlId = data?.crawl_id ?? crawlId;
+        } else {
+          // Guest ratings remain supported but are never Wing Shot eligible.
+          const now = new Date().toISOString();
+          const { error: crawlErr } = await supabase.from('crawls').insert({
+            crawl_id: crawlId,
+            route_id: null,
+            is_solo: true,
+            user_id: null,
+            status: 'completed',
+            start_time: now,
+            end_time: now,
+          });
+          if (crawlErr) throw crawlErr;
 
-        const { error: crawlErr } = await supabase.from('crawls').insert({
-          crawl_id: crawlId,
-          route_id: null,
-          is_solo: true,
-          user_id: uid,
-          status: 'completed',
-          start_time: now,
-          end_time: now,
-        });
-
-        if (crawlErr) throw crawlErr;
-
-        // 2) insert rating referencing that crawl
-        const insertRow = {
-          crawl_id: crawlId,
-          destination_id: destId,
-          user_id: uid,
-          crispiness: Number.isFinite(crispiness) ? crispiness : null,
-          sauce: Number.isFinite(sauce) ? sauce : null,
-          meat: Number.isFinite(meat) ? meat : null,
-          overall: Number.isFinite(overall) ? overall : null,
-          tag_id: tagId,
-          wings_eaten: wingsEaten,
-          sauce_style: sauceStyle,
-          flavor_vibe: flavorVibe.length ? flavorVibe : null,
-          spice_level: spiceLevel,
-          would_order_again: wouldOrderAgain,
-        };
-
-        const { error: ratingErr } = await supabase.from('destination_ratings').insert(insertRow);
-        if (ratingErr) throw ratingErr;
+          const { error: ratingErr } = await supabase.from('destination_ratings').insert({
+            crawl_id: crawlId,
+            destination_id: destId,
+            user_id: null,
+            crispiness: Number.isFinite(crispiness) ? crispiness : null,
+            sauce: Number.isFinite(sauce) ? sauce : null,
+            meat: Number.isFinite(meat) ? meat : null,
+            overall: Number.isFinite(overall) ? overall : null,
+            tag_id: tagId,
+            wings_eaten: wingsEaten,
+            sauce_style: sauceStyle,
+            flavor_vibe: flavorVibe.length ? flavorVibe : null,
+            spice_level: spiceLevel,
+            would_order_again: wouldOrderAgain,
+          });
+          if (ratingErr) throw ratingErr;
+        }
 
         await trackEvent({
           eventName: 'rating_completed',
@@ -2515,9 +2564,31 @@ export default function Home() {
 
         if (session?.user?.id) await refreshHud();
 
-        try {
-          await openRestaurantPeek(destId);
-        } catch {}
+        const shouldPromptWingShot = Boolean(
+          ratingResult?.accepted
+          && ratingResult?.wing_shot_eligible
+          && ratingResult?.rating_id
+          && wingShotFlags.prompt
+          && (wingShotFlags.photo || wingShotFlags.video)
+        );
+        if (shouldPromptWingShot) {
+          setHomeWingShotRatingId(ratingResult.rating_id);
+          setHomeWingShotDestinationId(destId);
+          setHomeWingShotSubmitted(false);
+          setHomeWingShotVisible(true);
+          await trackEvent({
+            eventName: 'wing_shot_prompt_viewed',
+            screen: 'home',
+            userId: uid,
+            destinationId: destId,
+            crawlId,
+            metadata: { eligibility_source: 'verified_in_person' },
+          });
+        } else {
+          try {
+            await openRestaurantPeek(destId);
+          } catch {}
+        }
       } catch (e) {
         await trackEvent({
           eventName: 'rating_failed',
@@ -2544,7 +2615,19 @@ export default function Home() {
         setHomeRateSaving(false);
       }
     },
-    [homeRateDest?.id, session?.user?.id, refreshHud, openRestaurantPeek, saveGuestHomeRated, refreshHomeRatedForClosest]
+    [
+      homeRateDest?.id,
+      session?.user?.id,
+      coords?.latitude,
+      coords?.longitude,
+      wingShotFlags.prompt,
+      wingShotFlags.photo,
+      wingShotFlags.video,
+      refreshHud,
+      openRestaurantPeek,
+      saveGuestHomeRated,
+      refreshHomeRatedForClosest,
+    ]
   );
 
   const runSearch = useCallback(async (q) => {
@@ -2814,6 +2897,8 @@ export default function Home() {
             />
           ) : null}
 
+          <WingShotsPromoCard userId={session?.user?.id ?? null} />
+
           {/* Signed-in: Level row */}
           {isSignedIn ? (
             <View style={styles.levelRow}>
@@ -3053,6 +3138,41 @@ export default function Home() {
           loading={homeRateSaving}
           saving={homeRateSaving}
         />
+
+        {homeWingShotRatingId ? (
+          <WingShotFlow
+            visible={homeWingShotVisible}
+            eligibleRatingId={homeWingShotRatingId}
+            allowPhoto={wingShotFlags.photo}
+            allowVideo={wingShotFlags.video}
+            analyticsContext={{
+              screen: 'home',
+              userId: session?.user?.id ?? null,
+              destinationId: homeWingShotDestinationId,
+              crawlId: null,
+            }}
+            onSubmitted={async () => {
+              setHomeWingShotSubmitted(true);
+            }}
+            onClose={async () => {
+              setHomeWingShotVisible(false);
+              if (!homeWingShotSubmitted) {
+                await trackEvent({
+                  eventName: 'wing_shot_prompt_skipped',
+                  screen: 'home',
+                  userId: session?.user?.id ?? null,
+                  destinationId: homeWingShotDestinationId,
+                  metadata: { rating_remains_saved: true },
+                });
+              }
+              if (homeWingShotDestinationId) {
+                try {
+                  await openRestaurantPeek(homeWingShotDestinationId);
+                } catch {}
+              }
+            }}
+          />
+        ) : null}
 
         {/* Search dialog */}
         <Portal>

@@ -42,7 +42,12 @@ module.exports = ({ config }) => ({
     package: "com.buffago.app",
     versionCode: 6,
 
-    permissions: ["ACCESS_FINE_LOCATION", "POST_NOTIFICATIONS"],
+    permissions: [
+      "ACCESS_FINE_LOCATION",
+      "POST_NOTIFICATIONS",
+      "CAMERA",
+      "RECORD_AUDIO",
+    ],
     blockedPermissions: ["android.permission.ACCESS_BACKGROUND_LOCATION"],
 
     adaptiveIcon: {
@@ -110,6 +115,18 @@ module.exports = ({ config }) => ({
         sounds: [],
       },
     ],
+    [
+      "expo-image-picker",
+      {
+        photosPermission:
+          "Choose a Wing Shot to submit after an eligible in-person wing rating.",
+        cameraPermission:
+          "Take a Wing Shot to submit after an eligible in-person wing rating.",
+        microphonePermission:
+          "Record a short Wing Shot video. BuffaGo removes its audio during processing.",
+      },
+    ],
+    "expo-video",
     "expo-web-browser",
     [
       "expo-splash-screen",
