@@ -4,7 +4,7 @@ import { test } from 'node:test';
 
 const migration = readFileSync(new URL('../supabase/migrations/20260729132000_wing_creator_surfaces.sql', import.meta.url), 'utf8');
 const client = readFileSync(new URL('../lib/wingCreator.js', import.meta.url), 'utf8');
-const history = readFileSync(new URL('../app/profile/wing-shots/index.jsx', import.meta.url), 'utf8');
+const history = readFileSync(new URL('../app/profile/wing-shots/history.jsx', import.meta.url), 'utf8');
 const detail = readFileSync(new URL('../app/profile/wing-shots/[id].jsx', import.meta.url), 'utf8');
 const leaderboard = readFileSync(new URL('../components/creator/CreatorLeaderboardPanel.jsx', import.meta.url), 'utf8');
 const edge = readFileSync(new URL('../supabase/functions/wing-media-preview/index.ts', import.meta.url), 'utf8');

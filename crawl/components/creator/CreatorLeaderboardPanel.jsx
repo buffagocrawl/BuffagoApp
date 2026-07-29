@@ -43,7 +43,6 @@ export default function CreatorLeaderboardPanel({ active = true }) {
           <Text variant="titleLarge" style={styles.title}>
             Creators
           </Text>
-          <Text variant="titleLarge" style={styles.title}>Creators</Text>
           <Text variant="bodyMedium" style={styles.subtitle}>
             Creator Reputation is earned from approved and featured Wing Shots.
           </Text>
@@ -69,9 +68,6 @@ export default function CreatorLeaderboardPanel({ active = true }) {
           <View style={styles.rows}>
             {rows.map((row, index) => {
               const name = row.display_name || row.username || `Winglet_${String(row.user_id || '').slice(0, 6)}`;
-              const avatarLabel = name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase();
-              const rowStyle = row.is_current_user ? { backgroundColor: theme.colors.secondaryContainer } : null;
-              const textStyle = row.is_current_user ? { color: theme.colors.onSecondaryContainer } : null;
               return (
                 <Pressable
                   key={row.user_id}
@@ -86,8 +82,6 @@ export default function CreatorLeaderboardPanel({ active = true }) {
                     },
                   ]}
                   accessibilityLabel={`${row.is_current_user ? 'Your rank, ' : ''}Rank ${row.rank}, ${name}, ${row.creator_xp} Creator Reputation, ${row.approved_submissions} approved, ${row.featured_submissions} featured`}
-                  style={({ pressed }) => [styles.leaderRow, rowStyle, { opacity: pressed ? 0.72 : 1 }]}
-                  accessibilityLabel={`Rank ${row.rank}, ${name}, ${row.creator_xp} Creator Reputation, ${row.approved_submissions} approved, ${row.featured_submissions} featured`}
                   accessibilityRole="button"
                   accessibilityHint="Opens this creator's public wing journey"
                   onPress={() => router.push({ pathname: '/profile/history', params: { userId: row.user_id, sourceSurface: 'creator_leaderboard' } })}
