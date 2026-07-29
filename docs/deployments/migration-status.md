@@ -29,6 +29,12 @@ remote deployment; verify the remote migration ledger before applying them.
 | 20260726100000_weekly_mission_dashboard_details.sql | candidate | not applied here | manifest recorded | current workspace | 95626c52d2f5683e98adfbf4cb2e9759aa9ec081041f2030c4b254d5a065e1ea |
 | 20260726110000_challenge_leaderboard_and_profile_stats.sql | candidate | not applied here | manifest recorded | challenge leaderboard feature | 721a1d45180cdde0282e3b059d10c1ea36189ff2dfd911872ec3b78f885daadc |
 | 20260726120000_challenge_leaderboard_tiebreak.sql | candidate | not applied here | manifest recorded | challenge leaderboard tie-break correction | 8b7d9b888b549c19a24d52ef6c446eb4ea6aa295a356f8f2afe1ff8e2b47f135 |
+| 20260729120000_wing_shots_core.sql | candidate | not applied here | isolated local schema/runtime validated | Wing Shots database wave | 60a82c0031934d92df11551d0b7b01318357ae5a61462b5497c1c1f692f7d04e |
+| 20260729120500_wing_shots_rating_provenance.sql | candidate | not applied here | isolated local schema/runtime validated | Wing Shots database wave | 891838dc9d3b1b6a9dc637c3918bfb6f93d4d40bce63caa2dd8c3b2d88450bb5 |
+| 20260729121000_wing_shots_security_rpc.sql | candidate | not applied here | isolated local RLS/runtime validated | Wing Shots database wave | 8bce53086328941d3b0db853b231a2867ddcbc29cb66ff52d0d0d93c00bc87cd |
+| 20260729122000_wing_shots_creator_rewards.sql | candidate | not applied here | isolated local idempotency/runtime validated | Wing Shots database wave | 6f8fe2f0669957fca64019c7e0c18fc0a37a234f4ae08fbb0025cb7829f979ea |
+| 20260729123000_wing_shots_feature_flags.sql | candidate | not applied here | source-contract validated | Wing Shots database wave | 5b072e5e4d78b3e529216fe333bb1db578392d628bf38db0de6e6b50f81c220f |
+| 20260729153000_serrano_trust_repair.sql | candidate | not applied here | source-contract and client integration validated | Serrano trust repair checkpoint | d2d8e3d4d0dcc9a2ad49475d06babdea267c35926dd446da85265396c002c9c7 |
 
 
 The exact deployment order is: Strategy B baseline preflight, the retention

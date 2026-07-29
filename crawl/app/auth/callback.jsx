@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { View, ActivityIndicator, Text, Platform } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as Linking from 'expo-linking';
+import * as Crypto from 'expo-crypto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../../lib/supabase';
 import { dbg } from '../../lib/debugLog';
@@ -29,6 +30,7 @@ import {
 } from '../../lib/socialAccounts';
 import { Button, useTheme } from 'react-native-paper';
 import { resolveCallbackFallbackRoute, withCallbackTimeout } from '../../lib/authCallbackHelpers';
+import { submitBuffacoinRatingTransaction } from '../../lib/buffacoinRatingTransaction';
 
 // Onboarding keys (match OnboardingFlow)
 const ONBOARDING_SEED_RATING_KEY = 'buffago:onboarding:seed_rating';
@@ -257,7 +259,8 @@ const applyOnboardingSeedRatingIfAny = async (userId) => {
 
     let seed = null;
     try {
-      seed = JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      seed = parsed?.status === 'local_preview' ? parsed.payload : parsed;
     } catch {
       await AsyncStorage.removeItem(ONBOARDING_SEED_RATING_KEY);
       return;
@@ -285,34 +288,26 @@ const applyOnboardingSeedRatingIfAny = async (userId) => {
 
     await grantOnboardingSeedCoinIfNeeded(userId);
 
-    const { error: spendErr } = await supabase.rpc('buffacoins_spend_for_wingdex', {
-      p_destination_id: destinationId,
-      p_state_code: stateCode,
-    });
-
-    if (spendErr) return;
-
-    const { data: crawlId, error: crawlErr } = await supabase.rpc('buffacoins_get_or_create_token_crawl', {
-      p_state_code: stateCode,
-    });
-
-    if (crawlErr || !crawlId) return;
-
-    const insertPayload = {
-      crawl_id: crawlId,
-      destination_id: destinationId,
-      user_id: userId,
+    const operationId = seed?.operation_id || Crypto.randomUUID();
+    if (!seed?.operation_id) {
+      seed = { ...seed, operation_id: operationId };
+      await AsyncStorage.setItem(ONBOARDING_SEED_RATING_KEY, JSON.stringify(seed));
+    }
+    await submitBuffacoinRatingTransaction({
+      supabase,
+      operationId,
+      destinationId,
+      stateCode,
+      coinCost: 1,
+      rating: {
       crispiness: toScoreOrNull(seed?.crispiness),
       sauce: toScoreOrNull(seed?.sauce),
       meat: toScoreOrNull(seed?.meat),
       overall: toScoreOrNull(seed?.overall),
       would_order_again: typeof seed?.would_order_again === 'boolean' ? seed.would_order_again : null,
-      is_buffacoin: true,
-      created_at: seed?.created_at || new Date().toISOString(),
-    };
-
-    const { error: insErr } = await supabase.from('destination_ratings').insert(insertPayload);
-    if (!insErr) await AsyncStorage.removeItem(ONBOARDING_SEED_RATING_KEY);
+      },
+    });
+    await AsyncStorage.removeItem(ONBOARDING_SEED_RATING_KEY);
   } catch {
     // non blocking
   }

@@ -19,6 +19,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
+import * as Crypto from 'expo-crypto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Slider from '@react-native-community/slider';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -41,6 +42,7 @@ import WingmanAddDialog from '../../../components/WingmanAddDialog';
 import FeedbackState from '../../../components/ui/FeedbackState';
 import { supabase } from '../../../lib/supabase.js';
 import { trackEvent } from '../../../lib/analytics';
+import { submitBuffacoinRatingTransaction } from '../../../lib/buffacoinRatingTransaction';
 import { useLocationCtx } from '../../../providers/LocationProvider';
 import MapView, { Marker, PROVIDER_GOOGLE } from '../../../lib/platformMap';
 import { useLegendaryFeed } from '../../../hooks/useLegendaryFeed';
@@ -592,6 +594,7 @@ export default function PublicRatingsScreen() {
   // Buffacoin state
   const [user, setUser] = useState(null);
   const [buffacoinBalance, setBuffacoinBalance] = useState(0);
+  const buffacoinOperationRef = useRef(null);
 
   // ✅ per-destination escalating cost (1 + # of my prior coin ratings for that destination)
   const [coinCostByDest, setCoinCostByDest] = useState({});
@@ -1512,43 +1515,24 @@ export default function PublicRatingsScreen() {
 
   setCoinSubmitting(true);
   try {
-    // 1) Spend coins (escalating cost per-destination per-user)
     const spendTimes = Math.max(1, Number(coinCostForActive || 1));
+    const operationId = buffacoinOperationRef.current || Crypto.randomUUID();
+    buffacoinOperationRef.current = operationId;
+    const startedAt = Date.now();
+    await trackEvent({
+      eventName: 'rating_submission_started',
+      screen: 'ratings',
+      userId: user.id,
+      destinationId: coinRatingDest.destination_id,
+      metadata: {
+        event_id: Crypto.randomUUID(),
+        operation_id: operationId,
+        actor_type: 'authenticated',
+        crawl_creation_intended: true,
+        retry_count_bucket: 'unknown',
+      },
+    });
 
-    for (let i = 0; i < spendTimes; i++) {
-      const { error: spendErr } = await supabase.rpc('buffacoins_spend_for_wingdex', {
-        p_destination_id: coinRatingDest.destination_id,
-        p_state_code: stateCode,
-      });
-
-      if (spendErr) {
-        console.warn('buffacoins_spend_for_wingdex failed', spendErr.message || spendErr);
-        Alert.alert(
-          'Buffacoins',
-          spendErr.message || 'Could not spend Buffacoins for this rating.'
-        );
-        return;
-      }
-    }
-
-    // ✅ optimistic coin UI update immediately
-    setBuffacoinBalance((prev) => Math.max(0, Number(prev ?? 0) - spendTimes));
-    playCoinDelta(`-${spendTimes}`);
-
-
-    // 2) Create/get token crawl for that state
-    const { data: crawlId, error: crawlErr } = await supabase.rpc(
-      'buffacoins_get_or_create_token_crawl',
-      { p_state_code: stateCode }
-    );
-
-    if (crawlErr || !crawlId) {
-      console.warn('buffacoins_get_or_create_token_crawl failed', crawlErr?.message || crawlErr);
-      Alert.alert('Buffacoins', 'Could not create the token crawl record.');
-      return;
-    }
-
-    // 3) Build rating payload
     const finalScores = payload?.scores ?? {};
     const weightScore = computeWeightScoreFromScores(finalScores);
 
@@ -1559,10 +1543,7 @@ export default function PublicRatingsScreen() {
       : [];
     const safeSpiceLevel = payload?.spiceLevel == null ? null : Number(payload.spiceLevel);
 
-    const insertPayload = {
-      crawl_id: crawlId,
-      destination_id: coinRatingDest.destination_id,
-      user_id: user.id,
+    const ratingPayload = {
       sauce: Number(finalScores.sauce),
       crispiness: Number(finalScores.crispiness),
       meat: Number(finalScores.meat),
@@ -1573,24 +1554,36 @@ export default function PublicRatingsScreen() {
       sauce_style: Number.isFinite(safeSauceStyle) ? safeSauceStyle : null,
       flavor_vibe: safeFlavorVibe.length ? safeFlavorVibe : null,
       spice_level: Number.isFinite(safeSpiceLevel) ? safeSpiceLevel : null,
-      is_buffacoin: true,
     };
-
-    // 4) Insert rating
-    const { error: insErr } = await supabase.from('destination_ratings').insert(insertPayload);
-    if (insErr) {
-      await trackEvent({
-        eventName: 'rating_failed',
-        screen: 'ratings',
-        userId: user.id,
-        destinationId: coinRatingDest.destination_id,
-        crawlId,
-        metadata: { source: 'wingdex_buffacoin', error: insErr.message || String(insErr) },
-      });
-      console.warn('destination_ratings insert failed', insErr.message || insErr);
-      Alert.alert('Rating', insErr.message || 'Could not submit rating.');
-      return;
-    }
+    const committed = await submitBuffacoinRatingTransaction({
+      supabase,
+      operationId,
+      destinationId: coinRatingDest.destination_id,
+      stateCode,
+      coinCost: spendTimes,
+      rating: ratingPayload,
+    });
+    const crawlId = committed.crawl_id;
+    setBuffacoinBalance(committed.new_balance);
+    playCoinDelta(`-${spendTimes}`);
+    buffacoinOperationRef.current = null;
+    await trackEvent({
+      eventName: 'rating_transaction_succeeded',
+      screen: 'ratings',
+      userId: user.id,
+      destinationId: coinRatingDest.destination_id,
+      crawlId,
+      metadata: {
+        event_id: Crypto.randomUUID(),
+        operation_id: operationId,
+        actor_type: 'authenticated',
+        result_code: 'committed',
+        rating_id_present: true,
+        crawl_id_present: true,
+        debit_committed: true,
+        latency_bucket: Date.now() - startedAt < 1000 ? 'lt_1s' : 'gte_1s',
+      },
+    });
 
     // ✅ keep "rated by me" sets correct immediately
     await trackEvent({
@@ -1708,11 +1701,7 @@ export default function PublicRatingsScreen() {
 
 
     // 5) Determine new balance (don’t apply yet; show celebration first)
-    const newBal = Number((buffacoinBalance ?? 0) - spendTimes);
-
-    const safeNewBal = Number.isFinite(newBal)
-      ? newBal
-      : Math.max(0, (buffacoinBalance ?? 0) - 1);
+    const safeNewBal = committed.new_balance;
 
     // 6) Close wizard immediately
     setCoinRateOpen(false);
@@ -1727,6 +1716,26 @@ export default function PublicRatingsScreen() {
       overall: Number(finalScores.overall),
     });
     setCoinCelebrateOpen(true);
+  } catch (error) {
+    await trackEvent({
+      eventName: 'rating_transaction_failed',
+      screen: 'ratings',
+      userId: user.id,
+      destinationId: coinRatingDest.destination_id,
+      metadata: {
+        event_id: Crypto.randomUUID(),
+        operation_id: buffacoinOperationRef.current || 'not_created',
+        actor_type: 'authenticated',
+        result_code: error?.message || 'transaction_failed',
+        rating_id_present: false,
+        crawl_id_present: false,
+        debit_committed: false,
+      },
+    });
+    Alert.alert(
+      'Rating not confirmed',
+      'Nothing will be retried through the old path. Try again to safely check this same operation.'
+    );
   } finally {
     setCoinSubmitting(false);
   }
@@ -1737,7 +1746,6 @@ export default function PublicRatingsScreen() {
   stateCodeFilter,
   coinRatingDest?.stateCode,
   coinCostForActive,
-  buffacoinBalance,
   computeWeightScoreFromScores,
   fetchRecentRatingsForDestination,
   playCoinDelta,

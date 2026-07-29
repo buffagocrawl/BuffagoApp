@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Crypto from 'expo-crypto';
 import {
   Text,
   TextInput,
@@ -42,6 +43,7 @@ import {
 } from '../../lib/socialAuthHelpers';
 import { ENABLE_GOOGLE_AUTH } from '../../config/features';
 import { trackEvent } from '../../lib/analytics';
+import { submitBuffacoinRatingTransaction } from '../../lib/buffacoinRatingTransaction';
 
 // Handoff page (Netlify) includes trailing slash
 const RESET_HANDOFF_URL = 'https://curious-quokka-dbae0b.netlify.app/';
@@ -292,7 +294,8 @@ export default function EmailAuthScreen() {
 
       let seed = null;
       try {
-        seed = JSON.parse(raw);
+        const parsed = JSON.parse(raw);
+        seed = parsed?.status === 'local_preview' ? parsed.payload : parsed;
       } catch {
         await AsyncStorage.removeItem(ONBOARDING_SEED_RATING_KEY);
         return;
@@ -325,46 +328,25 @@ export default function EmailAuthScreen() {
       // Make sure user can spend one coin right away
       await grantOnboardingSeedCoinIfNeeded(userId);
 
-      // Spend 1 Buffacoin using the same RPC Wingdex uses
-      const { error: spendErr } = await supabase.rpc('buffacoins_spend_for_wingdex', {
-        p_destination_id: destinationId,
-        p_state_code: stateCode,
-      });
-
-      if (spendErr) {
-        console.warn('seed spend failed', spendErr.message || spendErr);
-        return;
+      const operationId = seed?.operation_id || Crypto.randomUUID();
+      if (!seed?.operation_id) {
+        seed = { ...seed, operation_id: operationId };
+        await AsyncStorage.setItem(ONBOARDING_SEED_RATING_KEY, JSON.stringify(seed));
       }
-
-      // Create or get token crawl id
-      const { data: crawlId, error: crawlErr } = await supabase.rpc('buffacoins_get_or_create_token_crawl', {
-        p_state_code: stateCode,
-      });
-
-      if (crawlErr || !crawlId) {
-        console.warn('seed token crawl failed', crawlErr?.message || crawlErr);
-        return;
-      }
-
-      // Insert rating row
-      const insertPayload = {
-        crawl_id: crawlId,
-        destination_id: destinationId,
-        user_id: userId,
+      await submitBuffacoinRatingTransaction({
+        supabase,
+        operationId,
+        destinationId,
+        stateCode,
+        coinCost: 1,
+        rating: {
         crispiness: toScoreOrNull(seed?.crispiness),
         sauce: toScoreOrNull(seed?.sauce),
         meat: toScoreOrNull(seed?.meat),
         overall: toScoreOrNull(seed?.overall),
         would_order_again: typeof seed?.would_order_again === 'boolean' ? seed.would_order_again : null,
-        is_buffacoin: true,
-        created_at: seed?.created_at || new Date().toISOString(),
-      };
-
-      const { error: insErr } = await supabase.from('destination_ratings').insert(insertPayload);
-      if (insErr) {
-        console.warn('seed rating insert failed', insErr.message || insErr);
-        return;
-      }
+        },
+      });
 
       await AsyncStorage.removeItem(ONBOARDING_SEED_RATING_KEY);
     } catch (e) {
