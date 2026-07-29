@@ -24,6 +24,7 @@ import WelcomeWizard from '../../../components/WelcomeWizard';
 import { supabase } from '../../../lib/supabase.js';
 import DestinationPickerWizard from '../../../components/DestinationPickerWizard';
 import RatingWizardDialog from '../../../components/RatingWizardDialog';
+import RatingComparisonModal from '../../../components/RatingComparisonModal';
 import { WingShotFlow } from '../../../components/wingShots';
 import { trackEvent } from '../../../lib/analytics';
 import { loadWeeklyMission } from '../../../lib/weeklyMission';
@@ -327,6 +328,8 @@ export default function Home() {
   const [peekOpen, setPeekOpen] = useState(false);
   const [peekLoading, setPeekLoading] = useState(false);
   const [peek, setPeek] = useState(null);
+  const [ratingComparisonVisible, setRatingComparisonVisible] = useState(false);
+  const [ratingComparisonData, setRatingComparisonData] = useState(null);
 
   // Top 50 cache
   const [top50Ids, setTop50Ids] = useState([]);
@@ -2366,6 +2369,7 @@ export default function Home() {
       if (!homeRateDest?.id) return;
 
       const destId = homeRateDest.id;
+      const destinationName = homeRateDest.name || 'Restaurant';
       const uid = session?.user?.id ?? null;
       let crawlId = Crypto.randomUUID();
 
@@ -2374,6 +2378,18 @@ export default function Home() {
       const sauce = Number(scores.sauce ?? scores.sauceFactor ?? scores.sauce_factor);
       const meat = Number(scores.meat ?? scores.meatiness ?? scores.meat_factor);
       const overall = Number(scores.overall ?? scores.total ?? scores.score);
+
+      let priorCommunity = null;
+      try {
+        const { data: priorRows, error: priorError } = await supabase
+          .from('destination_ratings')
+          .select('crispiness, sauce, meat, overall')
+          .eq('destination_id', destId);
+        if (priorError) throw priorError;
+        priorCommunity = Array.isArray(priorRows) ? priorRows : [];
+      } catch (snapshotError) {
+        if (__DEV__) console.warn('[rating-comparison] pre-rating snapshot unavailable', snapshotError?.message || snapshotError);
+      }
 
       const weightScore =
         [crispiness, sauce, meat, overall].every((n) => Number.isFinite(n))
@@ -2435,7 +2451,6 @@ export default function Home() {
 
       setHomeRateSaving(true);
       try {
-        let ratingResult = null;
         if (uid) {
           let verifiedCoords = coords;
           let verifiedAccuracy = null;
@@ -2474,7 +2489,6 @@ export default function Home() {
             p_would_order_again: wouldOrderAgain,
           });
           if (error) throw error;
-          ratingResult = data;
           crawlId = data?.crawl_id ?? crawlId;
         } else {
           // Guest ratings remain supported; Wing Shots still require authentication.
@@ -2567,32 +2581,41 @@ export default function Home() {
         setHomeRateOpen(false);
         setHomeRateDest(null);
 
+        let community = priorCommunity;
+        let communityAveragesAvailable = false;
+        try {
+          if (!community) {
+            const { data: refreshed, error: refreshError } = await supabase.from('destination_ratings').select('crispiness, sauce, meat, overall').eq('destination_id', destId);
+            if (refreshError) throw refreshError;
+            community = Array.isArray(refreshed) ? refreshed : [];
+          }
+          const average = (key) => {
+            const values = community.map((row) => Number(row?.[key])).filter(Number.isFinite);
+            return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
+          };
+          const communityScores = { overall: average('overall'), crispiness: average('crispiness'), sauce: average('sauce'), meat: average('meat') };
+          communityAveragesAvailable = Object.values(communityScores).some((value) => value != null);
+          setRatingComparisonData(Object.freeze({
+            destinationId: String(destId), destinationName,
+            userScores: Object.freeze({ overall, crispiness, sauce, meat }),
+            communityScores: Object.freeze(communityScores), priorRatingCount: community.length,
+          }));
+        } catch (comparisonError) {
+          if (__DEV__) console.warn('[rating-comparison] aggregate refresh unavailable', comparisonError?.message || comparisonError);
+          setRatingComparisonData(Object.freeze({
+            destinationId: String(destId), destinationName,
+            userScores: Object.freeze({ overall, crispiness, sauce, meat }),
+            communityScores: Object.freeze({ overall: null, crispiness: null, sauce: null, meat: null }),
+            priorRatingCount: priorCommunity?.length ?? 0,
+          }));
+        }
+        if (__DEV__) console.log('[rating-comparison] rating submission succeeded', { destinationId: String(destId), communityAveragesAvailable });
+        if (__DEV__) console.log('[rating-comparison] snapshot created', { destinationId: String(destId), communityAveragesAvailable });
+        setRatingComparisonVisible(true);
+        if (__DEV__) console.log('[rating-comparison] comparison modal opened', { destinationId: String(destId), communityAveragesAvailable });
+
         if (session?.user?.id) await refreshHud();
 
-        const shouldPromptWingShot = Boolean(
-          ratingResult?.accepted
-          && ratingResult?.rating_id
-          && wingShotFlags.prompt
-          && (wingShotFlags.photo || wingShotFlags.video)
-        );
-        if (shouldPromptWingShot) {
-          setHomeWingShotRatingId(ratingResult.rating_id);
-          setHomeWingShotDestinationId(destId);
-          setHomeWingShotSubmitted(false);
-          setHomeWingShotVisible(true);
-          await trackEvent({
-            eventName: 'wing_shot_prompt_viewed',
-            screen: 'home',
-            userId: uid,
-            destinationId: destId,
-            crawlId,
-            metadata: { submission_source: 'rating' },
-          });
-        } else {
-          try {
-            await openRestaurantPeek(destId);
-          } catch {}
-        }
       } catch (e) {
         await trackEvent({
           eventName: 'rating_failed',
@@ -3164,7 +3187,7 @@ export default function Home() {
         </ScrollView>
 
         {/* Home Rating Wizard */}
-        <RatingWizardDialog
+      <RatingWizardDialog
           visible={homeRateOpen}
           open={homeRateOpen}
           destinationName={homeRateDest?.name || ''}
@@ -3185,6 +3208,19 @@ export default function Home() {
           onSubmit={saveHomeRating}
           loading={homeRateSaving}
           saving={homeRateSaving}
+      />
+
+        <RatingComparisonModal
+          visible={ratingComparisonVisible}
+          data={ratingComparisonData}
+          onDone={() => {
+            if (__DEV__) console.log('[rating-comparison] comparison modal closed', { destinationId: ratingComparisonData?.destinationId, communityAveragesAvailable: Boolean(ratingComparisonData?.communityScores && Object.values(ratingComparisonData.communityScores).some((value) => value != null)) });
+            setRatingComparisonVisible(false);
+          }}
+          onViewRestaurant={async () => {
+            setRatingComparisonVisible(false);
+            if (ratingComparisonData?.destinationId) await openRestaurantPeek(ratingComparisonData.destinationId);
+          }}
         />
 
         {homeWingShotRatingId ? (

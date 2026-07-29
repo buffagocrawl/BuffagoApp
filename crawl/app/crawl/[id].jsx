@@ -1052,6 +1052,21 @@ export default function CrawlScreen() {
 
       const buffaScore = overall * 4 + crisp * 2 + sauce * 2 + meat * 2;
 
+      // Retain the community snapshot before the insert so the comparison is
+      // against the existing crowd, not against an average containing the user.
+      let priorCommunity = null;
+      let comparisonAveragesAvailable = false;
+      try {
+        const { data: rows, error: snapshotError } = await supabase
+          .from('destination_ratings')
+          .select('crispiness, sauce, meat, overall')
+          .eq('destination_id', activeDest.id);
+        if (snapshotError) throw snapshotError;
+        priorCommunity = Array.isArray(rows) ? rows : [];
+      } catch (snapshotError) {
+        console.warn('[rating-comparison] pre-rating snapshot unavailable', snapshotError?.message || snapshotError);
+      }
+
       const payload = {
         destination_id: activeDest.id,
         crawl_id: crawl.crawl_id,
@@ -1120,8 +1135,6 @@ export default function CrawlScreen() {
       }
 
       let error;
-      let ratingResult = null;
-
       if (userId) {
         const verifiedLocation = verifiedRatingLocationRef.current ?? coords;
         const response = await supabase.rpc('submit_validated_crawl_rating', {
@@ -1142,7 +1155,6 @@ export default function CrawlScreen() {
           p_flavor_vibe: payload.flavor_vibe,
         });
         error = response.error;
-        ratingResult = response.data;
       } else {
         const { error: delErr } = await supabase
           .from('destination_ratings')
@@ -1219,43 +1231,33 @@ export default function CrawlScreen() {
           ? Number(wsRow[0].weight_score)
           : buffaScore;
 
-      // Build the immediate social payoff from the saved rating plus the current
-      // restaurant community. Keep this local to the post-submit flow so the
-      // existing restaurant detail modal remains unchanged.
+      // Build the immutable post-submit comparison snapshot. Aggregate refresh
+      // is best-effort and never blocks a successful rating.
       try {
-        const [{ data: communityRows }, { data: historyRows }] = await Promise.all([
-          supabase
-            .from('destination_ratings')
-            .select('crispiness, sauce, meat, overall')
-            .eq('destination_id', activeDest.id),
-          userId
-            ? supabase.from('destination_ratings').select('crispiness, sauce, meat, overall').eq('user_id', userId).limit(250)
-            : Promise.resolve({ data: [] }),
-        ]);
-        const community = Array.isArray(communityRows) ? communityRows : [];
-        const history = Array.isArray(historyRows) ? historyRows : [];
+        let community = priorCommunity;
+        if (!community) {
+          const { data: refreshed, error: refreshError } = await supabase.from('destination_ratings').select('crispiness, sauce, meat, overall').eq('destination_id', activeDest.id);
+          if (refreshError) throw refreshError;
+          community = Array.isArray(refreshed) ? refreshed : [];
+        }
         const average = (key) => {
           const values = community.map((row) => Number(row?.[key])).filter(Number.isFinite);
-          return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : Number(payload[key]);
+          return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
         };
-        const overallValues = community.map((row) => Number(row?.overall)).filter(Number.isFinite);
-        const lowerCount = overallValues.filter((value) => value < overall).length;
-        const percentile = overallValues.length ? (lowerCount / overallValues.length) * 100 : 50;
+        comparisonAveragesAvailable = community.some((row) => ['overall', 'crispiness', 'sauce', 'meat'].some((key) => Number.isFinite(Number(row?.[key]))));
         setComparisonData({
-          name: activeDest.name,
-          scores: { crispiness: crisp, sauce, meat, overall },
-          averages: { crispiness: average('crispiness'), sauce: average('sauce'), meat: average('meat'), overall: average('overall') },
-          history: [...history, { crispiness: crisp, sauce, meat, overall }],
-          percentile,
+          destinationId: String(activeDest.id), destinationName: activeDest.name,
+          userScores: Object.freeze({ overall, crispiness: crisp, sauce, meat }),
+          communityScores: Object.freeze({ overall: average('overall'), crispiness: average('crispiness'), sauce: average('sauce'), meat: average('meat') }),
+          priorRatingCount: community.length,
         });
       } catch (comparisonError) {
-        console.warn('[rating comparison] load failed', comparisonError?.message || comparisonError);
+        console.warn('[rating-comparison] aggregate refresh unavailable', comparisonError?.message || comparisonError);
         setComparisonData({
-          name: activeDest.name,
-          scores: { crispiness: crisp, sauce, meat, overall },
-          averages: { crispiness: crisp, sauce, meat, overall },
-          history: [{ crispiness: crisp, sauce, meat, overall }],
-          percentile: 50,
+          destinationId: String(activeDest.id), destinationName: activeDest.name,
+          userScores: Object.freeze({ overall, crispiness: crisp, sauce, meat }),
+          communityScores: Object.freeze({ overall: null, crispiness: null, sauce: null, meat: null }),
+          priorRatingCount: priorCommunity?.length ?? 0,
         });
       }
 
@@ -1414,27 +1416,10 @@ export default function CrawlScreen() {
       if (awards.length) showAwards(awards);
 
       setRateVisible(false);
-      const shouldPromptWingShot = Boolean(
-        ratingResult?.accepted
-        && ratingResult?.rating_id
-        && wingShotFlags.prompt
-        && (wingShotFlags.photo || wingShotFlags.video)
-      );
-      if (shouldPromptWingShot) {
-        setEligibleWingShotRatingId(ratingResult.rating_id);
-        setWingShotSubmitted(false);
-        setWingShotVisible(true);
-        await trackEvent({
-          eventName: 'wing_shot_prompt_viewed',
-          screen: 'crawl',
-          userId,
-          destinationId: activeDest.id,
-          crawlId: crawl.crawl_id,
-          metadata: { submission_source: 'rating' },
-        });
-      } else {
-        setComparisonVisible(true);
-      }
+      if (__DEV__) console.log('[rating-comparison] rating submission succeeded', { destinationId: String(activeDest.id), communityAveragesAvailable: comparisonAveragesAvailable });
+      if (__DEV__) console.log('[rating-comparison] snapshot created', { destinationId: String(activeDest.id), communityAveragesAvailable: comparisonAveragesAvailable });
+      if (__DEV__) console.log('[rating-comparison] comparison modal opened', { destinationId: String(activeDest.id), communityAveragesAvailable: comparisonAveragesAvailable });
+      setComparisonVisible(true);
 
       loadPresenceAllSteps();
       loadLeaderboard();
@@ -2405,11 +2390,13 @@ export default function CrawlScreen() {
           <RatingComparisonModal
             visible={comparisonVisible}
             data={comparisonData}
-            onDismiss={() => setComparisonVisible(false)}
-            onCommunityReviews={() => {
+            onDone={() => {
+              if (__DEV__) console.log('[rating-comparison] comparison modal closed', { destinationId: comparisonData?.destinationId, communityAveragesAvailable: Boolean(comparisonData?.communityScores) });
               setComparisonVisible(false);
-              buildCrawlReport(crawl?.crawl_id);
-              setReportOpen(true);
+            }}
+            onViewRestaurant={() => {
+              setComparisonVisible(false);
+              setDetailOpen(true);
             }}
           />
 
