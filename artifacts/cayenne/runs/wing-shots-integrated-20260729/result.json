@@ -1,0 +1,279 @@
+{
+  "contractVersion": "1.0",
+  "runId": "wing-shots-integrated-20260729",
+  "status": "BLOCKED",
+  "startedAt": "2026-07-29T16:00:44+00:00",
+  "finishedAt": "2026-07-29T16:10:07+00:00",
+  "requestedSuite": "smoke",
+  "suite": "smoke-auto",
+  "environment": "production-readonly",
+  "launchPolicy": "PRESERVE_APP_DATA",
+  "device": {
+    "platform": "android",
+    "deviceId": "emulator-5554"
+  },
+  "detectedStartupState": null,
+  "startupStateCandidates": [],
+  "startupStateValidation": "FAILED",
+  "universalAssertionResult": "FAILED",
+  "stateSpecificAssertionResult": "INSUFFICIENT_EVIDENCE",
+  "universalAssertions": [
+    {
+      "assertion": "App launches",
+      "status": "PASSED"
+    },
+    {
+      "assertion": "app.root appears",
+      "status": "PASSED"
+    },
+    {
+      "assertion": "No fatal runtime error",
+      "status": "PASSED"
+    },
+    {
+      "assertion": "Exactly one valid startup state",
+      "status": "FAILED"
+    }
+  ],
+  "stateSpecificAssertions": [],
+  "skippedAssertions": [
+    {
+      "assertion": "onboarding.root and app.root remain visible",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Onboarding navigation controls are discoverable",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Safe onboarding forward/back interaction succeeds",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "auth.screen is visible",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Sign-in controls render",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Available primary navigation renders",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Each visited authenticated surface renders",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assertion": "Authenticated primary navigation",
+      "status": "NOT_APPLICABLE"
+    }
+  ],
+  "skipReason": "Assertions for startup states other than an unambiguous detected state are not applicable",
+  "authentication": {
+    "credentialSource": "unavailable",
+    "credentialsAvailable": false,
+    "login": "BLOCKED",
+    "sessionRestoration": "BLOCKED",
+    "protectedNavigation": "BLOCKED",
+    "logout": "BLOCKED",
+    "profileLoad": "BLOCKED",
+    "rlsBackedRead": "BLOCKED"
+  },
+  "summary": {
+    "acceptanceCriteriaCovered": [],
+    "artifactCount": 14
+  },
+  "runtime": {
+    "adbStart": {
+      "status": "STARTED",
+      "warnings": []
+    },
+    "emulatorStart": {
+      "status": "STARTED",
+      "avd": "Medium_Phone_API_36.1",
+      "pid": 37600,
+      "arguments": [
+        "-no-snapshot-load",
+        "-port",
+        "5554"
+      ]
+    },
+    "adbRecovery": {
+      "status": "RECOVERED",
+      "states": [
+        "missing",
+        "missing",
+        "missing",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "device"
+      ],
+      "reconnect": true,
+      "adbRestart": true
+    },
+    "emulatorBoot": {
+      "status": "BOOTED"
+    },
+    "package": {
+      "status": "INSTALLED",
+      "package": "com.buffago.app"
+    },
+    "launchPolicy": {
+      "policy": "PRESERVE_APP_DATA"
+    },
+    "appProcessControl": {
+      "status": "PASSED",
+      "command": "am force-stop",
+      "output": ""
+    },
+    "metroStart": {
+      "status": "STARTED",
+      "pid": 26636,
+      "log": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\cayenne\\runs\\wing-shots-integrated-20260729\\logs\\metro.log"
+    },
+    "bundlePrewarm": {
+      "status": "PREWARMED",
+      "entry": "node_modules/expo-router/entry.bundle"
+    },
+    "failure": {
+      "category": "DEV_CLIENT_CONNECTION_FAILURE",
+      "message": "Buffago did not replace the Expo launcher with a real app.root selector."
+    }
+  },
+  "stageResults": [
+    {
+      "stage": "environment_readiness",
+      "status": "PASSED",
+      "package": "com.buffago.app",
+      "device": "emulator-5554",
+      "screenUnlocked": true,
+      "appDataControl": "pm clear supported"
+    }
+  ],
+  "cleanup": {
+    "status": "PASSED",
+    "ownedPids": [
+      37600,
+      26636
+    ],
+    "cleanedPids": [
+      26636,
+      37600
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "smoke-auto",
+      "title": "smoke-auto",
+      "status": "BLOCKED",
+      "durationMs": 0,
+      "preconditions": [
+        "Android emulator"
+      ],
+      "steps": [],
+      "assertions": [
+        "App launches",
+        "app.root appears",
+        "No fatal runtime error",
+        "Exactly one valid startup state",
+        "Detected startup state passes its required assertions"
+      ],
+      "detectedStartupState": null,
+      "stateSpecificAssertions": [],
+      "skippedAssertions": [
+        {
+          "assertion": "onboarding.root and app.root remain visible",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Onboarding navigation controls are discoverable",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Safe onboarding forward/back interaction succeeds",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "auth.screen is visible",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Sign-in controls render",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Available primary navigation renders",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Each visited authenticated surface renders",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "assertion": "Authenticated primary navigation",
+          "status": "NOT_APPLICABLE"
+        }
+      ],
+      "skipReason": "Assertions for startup states other than an unambiguous detected state are not applicable",
+      "screenshots": [],
+      "hierarchy": "hierarchies/final.xml",
+      "logs": [
+        "logs/logcat.txt",
+        "logs/metro.log",
+        "maestro/raw-output.log"
+      ],
+      "failureCategory": "ENVIRONMENT_BLOCKER",
+      "failureMessage": "Buffago did not replace the Expo launcher with a real app.root selector.",
+      "retryCount": 0
+    }
+  ],
+  "failures": [
+    {
+      "failureCategory": "ENVIRONMENT_BLOCKER",
+      "runtimeCategory": "DEV_CLIENT_CONNECTION_FAILURE",
+      "failureMessage": "Buffago did not replace the Expo launcher with a real app.root selector."
+    }
+  ],
+  "artifacts": [
+    "environment.json",
+    "prerequisite-check.json",
+    "request.json",
+    "safety-check.json",
+    "stage-results.json",
+    "logs/adb-start.log",
+    "logs/dev-client-focus.txt",
+    "logs/dev-client-hierarchy.xml",
+    "logs/dev-client-logcat.txt",
+    "logs/emulator.stderr.log",
+    "logs/emulator.stdout.log",
+    "logs/metro.log",
+    "runtime/lifecycle.json",
+    "runtime/processes.json"
+  ],
+  "safety": {
+    "environment": "production-readonly",
+    "productionDetected": true,
+    "mutationRequested": false,
+    "mutationAllowed": false,
+    "decision": "ALLOW",
+    "reasons": []
+  },
+  "redaction": {
+    "validated": true,
+    "status": "PASSED"
+  },
+  "limitations": [
+    "DEV_CLIENT_CONNECTION_FAILURE"
+  ]
+}

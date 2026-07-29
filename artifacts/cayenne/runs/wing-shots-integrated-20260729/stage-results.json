@@ -1,0 +1,14 @@
+{
+  "runId": "wing-shots-integrated-20260729",
+  "launchPolicy": "PRESERVE_APP_DATA",
+  "stages": [
+    {
+      "stage": "environment_readiness",
+      "status": "PASSED",
+      "package": "com.buffago.app",
+      "device": "emulator-5554",
+      "screenUnlocked": true,
+      "appDataControl": "pm clear supported"
+    }
+  ]
+}

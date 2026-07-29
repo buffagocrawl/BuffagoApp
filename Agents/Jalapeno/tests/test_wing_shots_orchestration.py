@@ -347,6 +347,34 @@ def test_concurrent_runner_observes_database_lock_and_does_no_work() -> None:
     assert repository.claimed_platforms == []
 
 
+def test_finalized_selection_can_publish_jobs_approved_after_generation() -> None:
+    repository = FakeRepository(
+        selection={"receipt_id": "run-finalized", "status": "COMPLETED"},
+        jobs={
+            Platform.INSTAGRAM: social_job(Platform.INSTAGRAM),
+            Platform.FACEBOOK: social_job(Platform.FACEBOOK),
+        },
+    )
+    receipt = WingShotsNightlyOrchestrator(
+        repository=repository,
+        publishers={
+            Platform.INSTAGRAM: FixedPublisher("posted"),
+            Platform.FACEBOOK: FixedPublisher("posted"),
+        },
+        signed_urls=RecordingSignedUrls(),
+        config=NightlyConfig(dry_run=False),
+        clock=lambda: NOW,
+    ).run(business_date=date(2026, 7, 28))
+
+    assert receipt.status == "COMPLETED"
+    assert receipt.selected_submission_id is None
+    assert repository.claimed_platforms == ["instagram", "facebook"]
+    assert [result[0].platform for result in repository.results] == [
+        Platform.INSTAGRAM,
+        Platform.FACEBOOK,
+    ]
+
+
 def test_selected_submission_waits_cleanly_for_generation() -> None:
     repository = FakeRepository()
     receipt = WingShotsNightlyOrchestrator(

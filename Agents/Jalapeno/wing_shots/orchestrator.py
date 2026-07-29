@@ -151,21 +151,22 @@ class WingShotsNightlyOrchestrator:
         if selection_status == "ALREADY_RUNNING":
             receipt.completed_at = self.clock()
             return receipt
-        if selection_status in {"COMPLETED", "PARTIALLY_COMPLETED", "FAILED"}:
-            receipt.status = "ALREADY_FINALIZED"
-            receipt.completed_at = self.clock()
-            return receipt
-        if selection_status != "SELECTED":
+        selection_was_finalized = selection_status in {
+            "COMPLETED",
+            "PARTIALLY_COMPLETED",
+            "FAILED",
+        }
+        if selection_status != "SELECTED" and not selection_was_finalized:
             receipt.status = "FAILED"
             receipt.failure_code = "INVALID_SELECTION_RESULT"
             receipt.failure_reason = "Nightly selection returned an unknown status"
             receipt.completed_at = self.clock()
             return receipt
 
-        if selection.get("submission_id"):
+        if selection_status == "SELECTED" and selection.get("submission_id"):
             receipt.selected_submission_id = str(selection["submission_id"])
             receipt.candidate_count = 1
-        components = selection.get("score_components")
+        components = selection.get("score_components") if selection_status == "SELECTED" else None
         if isinstance(components, dict):
             receipt.score_components = {
                 str(key): float(value)
@@ -175,7 +176,7 @@ class WingShotsNightlyOrchestrator:
             if isinstance(components.get("total"), (int, float)):
                 receipt.selection_score = float(components["total"])
 
-        if self.generation_worker is not None:
+        if selection_status == "SELECTED" and self.generation_worker is not None:
             generation = self.generation_worker.run_once()
             receipt.generation_result = {
                 "status": generation.status,
@@ -277,6 +278,9 @@ class WingShotsNightlyOrchestrator:
             for result in receipt.platform_results.values()
         )
         if claimed_count == 0:
+            # A finalized selection may have generated jobs awaiting human approval.
+            # Keep the run retryable: a later manual live dispatch can claim a job
+            # only after the required approval has changed it to ready/scheduled.
             receipt.status = "GENERATION_PENDING"
         elif posted_count == len(self.config.platforms):
             receipt.status = "COMPLETED"

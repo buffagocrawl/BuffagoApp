@@ -1,0 +1,66 @@
+{
+  "adbStart": {
+    "status": "STARTED",
+    "warnings": []
+  },
+  "emulatorStart": {
+    "status": "STARTED",
+    "avd": "Medium_Phone_API_36.1",
+    "pid": 37600,
+    "arguments": [
+      "-no-snapshot-load",
+      "-port",
+      "5554"
+    ]
+  },
+  "adbRecovery": {
+    "status": "RECOVERED",
+    "states": [
+      "missing",
+      "missing",
+      "missing",
+      "offline",
+      "offline",
+      "offline",
+      "offline",
+      "offline",
+      "offline",
+      "offline",
+      "offline",
+      "offline",
+      "offline",
+      "offline",
+      "device"
+    ],
+    "reconnect": true,
+    "adbRestart": true
+  },
+  "emulatorBoot": {
+    "status": "BOOTED"
+  },
+  "package": {
+    "status": "INSTALLED",
+    "package": "com.buffago.app"
+  },
+  "launchPolicy": {
+    "policy": "PRESERVE_APP_DATA"
+  },
+  "appProcessControl": {
+    "status": "PASSED",
+    "command": "am force-stop",
+    "output": ""
+  },
+  "metroStart": {
+    "status": "STARTED",
+    "pid": 26636,
+    "log": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\cayenne\\runs\\wing-shots-integrated-20260729\\logs\\metro.log"
+  },
+  "bundlePrewarm": {
+    "status": "PREWARMED",
+    "entry": "node_modules/expo-router/entry.bundle"
+  },
+  "failure": {
+    "category": "DEV_CLIENT_CONNECTION_FAILURE",
+    "message": "Buffago did not replace the Expo launcher with a real app.root selector."
+  }
+}
