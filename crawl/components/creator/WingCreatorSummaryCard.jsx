@@ -194,17 +194,22 @@ export default function WingCreatorSummaryCard({ refreshKey = 0 }) {
         onRequestClose={() => setInfoVisible(false)}
         accessibilityViewIsModal
       >
-        <Pressable style={styles.modalBackdrop} onPress={() => setInfoVisible(false)}>
+        <View style={styles.modalBackdrop}>
           <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={() => setInfoVisible(false)}
+            accessibilityLabel="Close Wing Creator explanation"
+          />
+          <View
             testID="creator.info-modal"
             style={[
               styles.modalSheet,
               { backgroundColor: theme.colors.elevation?.level3 ?? theme.colors.surface },
             ]}
-            onPress={(event) => event.stopPropagation()}
           >
             <SafeAreaView edges={['bottom']} style={styles.modalSafe}>
               <ScrollView
+                style={styles.modalScroll}
                 contentContainerStyle={styles.modalContent}
                 showsVerticalScrollIndicator
                 accessibilityLabel="Wing Creator explanation"
@@ -252,8 +257,8 @@ export default function WingCreatorSummaryCard({ refreshKey = 0 }) {
                 </Button>
               </ScrollView>
             </SafeAreaView>
-          </Pressable>
-        </Pressable>
+          </View>
+        </View>
       </Modal>
     </Card>
   );
@@ -274,8 +279,9 @@ const styles = StyleSheet.create({
   empty: { opacity: 0.72, lineHeight: 18 },
   buttonContent: { minHeight: 44 },
   modalBackdrop: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.58)' },
-  modalSheet: { maxHeight: '82%', borderTopLeftRadius: 20, borderTopRightRadius: 20 },
-  modalSafe: { flexShrink: 1 },
+  modalSheet: { height: '82%', borderTopLeftRadius: 20, borderTopRightRadius: 20 },
+  modalSafe: { flex: 1 },
+  modalScroll: { flex: 1 },
   modalContent: { padding: 18, paddingBottom: 30, gap: 10 },
   modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   modalTitle: { fontWeight: '800' },
