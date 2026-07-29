@@ -1,0 +1,36 @@
+appId: com.buffago.app
+name: Wing Shots authenticated read-only surfaces
+tags: [wing-shots, authenticated, non-mutating]
+---
+- runFlow: ../bootstrap/launch-app.yaml
+- assertVisible:
+    id: nav.home
+- tapOn:
+    id: nav.home
+- assertVisible:
+    id: wing-shots-home-promo
+- assertVisible:
+    id: wing-shots-instagram-cta
+- assertVisible:
+    id: wing-shots-facebook-cta
+- takeScreenshot: wing-shots-home-promotion
+- tapOn:
+    id: nav.leaderboard
+- assertVisible:
+    id: creator.leaderboard
+- tapOn:
+    id: creator.leaderboard.period.week
+- takeScreenshot: wing-shots-creator-leaderboard-week
+- tapOn:
+    id: creator.leaderboard.period.all-time
+- takeScreenshot: wing-shots-creator-leaderboard-all-time
+- tapOn:
+    id: nav.profile
+- assertVisible:
+    id: creator.profile-card
+- takeScreenshot: wing-shots-creator-profile
+- tapOn:
+    id: creator.open-history
+- assertVisible:
+    id: creator.history
+- takeScreenshot: wing-shots-private-history
