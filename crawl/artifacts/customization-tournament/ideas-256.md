@@ -1,0 +1,7940 @@
+# 256 Codebase-Grounded Ideas
+
+Scores use the requested 100-point tournament model.
+
+## 001. Wingman foundation
+- **Category:** Mascot foundation
+- **Pitch:** Wingman foundation makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 94
+
+## 002. Layered 2D cosmetic rig
+- **Category:** Mascot foundation
+- **Pitch:** Layered 2D cosmetic rig makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 84
+
+## 003. Fixed body archetype choice
+- **Category:** Mascot foundation
+- **Pitch:** Fixed body archetype choice makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 81
+
+## 004. Adult-forward colorway palette
+- **Category:** Mascot foundation
+- **Pitch:** Adult-forward colorway palette makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 65
+
+## 005. Expression chip
+- **Category:** Mascot foundation
+- **Pitch:** Expression chip makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 72
+
+## 006. Shirt collection
+- **Category:** Mascot foundation
+- **Pitch:** Shirt collection makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 79
+
+## 007. Hat collection
+- **Category:** Mascot foundation
+- **Pitch:** Hat collection makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 63
+
+## 008. Shoe and wrist accessory slots
+- **Category:** Mascot foundation
+- **Pitch:** Shoe and wrist accessory slots makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 70
+
+## 009. Sauce aura
+- **Category:** Mascot foundation
+- **Pitch:** Sauce aura makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 77
+
+## 010. Static victory pose
+- **Category:** Mascot foundation
+- **Pitch:** Static victory pose makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 61
+
+## 011. Profile backdrop
+- **Category:** Mascot foundation
+- **Pitch:** Profile backdrop makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 68
+
+## 012. Earned profile frame
+- **Category:** Mascot foundation
+- **Pitch:** Earned profile frame makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 75
+
+## 013. Provenance nameplate
+- **Category:** Mascot foundation
+- **Pitch:** Provenance nameplate makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 92
+
+## 014. Milestone title
+- **Category:** Mascot foundation
+- **Pitch:** Milestone title makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 66
+
+## 015. Crawl pennant
+- **Category:** Mascot foundation
+- **Pitch:** Crawl pennant makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 73
+
+## 016. Rating streak patch
+- **Category:** Mascot foundation
+- **Pitch:** Rating streak patch makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 80
+
+## 017. Heat-tolerance badge
+- **Category:** Mascot foundation
+- **Pitch:** Heat-tolerance badge makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 64
+
+## 018. Flats-or-drums emblem
+- **Category:** Mascot foundation
+- **Pitch:** Flats-or-drums emblem makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 71
+
+## 019. Crispy-or-saucy signal
+- **Category:** Mascot foundation
+- **Pitch:** Crispy-or-saucy signal makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 78
+
+## 020. Favorite-sauce identity
+- **Category:** Mascot foundation
+- **Pitch:** Favorite-sauce identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 62
+
+## 021. Weekly mission cosmetic
+- **Category:** Mascot body variations
+- **Pitch:** Weekly mission cosmetic makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 79
+
+## 022. First-rating welcome token
+- **Category:** Mascot body variations
+- **Pitch:** First-rating welcome token makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 76
+
+## 023. Ten-rating jacket patch
+- **Category:** Mascot body variations
+- **Pitch:** Ten-rating jacket patch makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 60
+
+## 024. Fifty-rating wing crown
+- **Category:** Mascot body variations
+- **Pitch:** Fifty-rating wing crown makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 67
+
+## 025. Crawl-completion backpack
+- **Category:** Mascot body variations
+- **Pitch:** Crawl-completion backpack makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 74
+
+## 026. State passport pin
+- **Category:** Mascot body variations
+- **Pitch:** State passport pin makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 81
+
+## 027. Town explorer pin
+- **Category:** Mascot body variations
+- **Pitch:** Town explorer pin makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 65
+
+## 028. Legendary restaurant crest
+- **Category:** Mascot body variations
+- **Pitch:** Legendary restaurant crest makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 72
+
+## 029. Challenge champion laurel
+- **Category:** Mascot body variations
+- **Pitch:** Challenge champion laurel makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 79
+
+## 030. Referral wingman pin
+- **Category:** Mascot body variations
+- **Pitch:** Referral wingman pin makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 63
+
+## 031. Founder apron
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Founder apron makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 70
+
+## 032. Seasonal sauce scarf
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Seasonal sauce scarf makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 77
+
+## 033. Local event wristband
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Local event wristband makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 61
+
+## 034. Restaurant challenge pennant
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Restaurant challenge pennant makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 68
+
+## 035. Collection cabinet
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Collection cabinet makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 85
+
+## 036. Wing passport shelf
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Wing passport shelf makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 82
+
+## 037. Trophy-room highlights
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Trophy-room highlights makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 66
+
+## 038. Favorite venues scrapbook
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Favorite venues scrapbook makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 73
+
+## 039. Rating taste timeline
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Rating taste timeline makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 80
+
+## 040. Crawl map quilt
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Crawl map quilt makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 64
+
+## 041. Personal goals card
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Personal goals card makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 71
+
+## 042. Home focus chip
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Home focus chip makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 78
+
+## 043. Personalized next-wing card
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Personalized next-wing card makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 62
+
+## 044. Dietary discovery preference
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Dietary discovery preference makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 69
+
+## 045. Heat discovery preference
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Heat discovery preference makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 76
+
+## 046. Distance discovery preference
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Distance discovery preference makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 60
+
+## 047. Price discovery preference
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Price discovery preference makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 67
+
+## 048. Group-outing preference
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Group-outing preference makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 74
+
+## 049. Mascot share card
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Mascot share card makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 81
+
+## 050. Challenge winner card
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Challenge winner card makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 65
+
+## 051. Crawl recap card
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Crawl recap card makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 72
+
+## 052. Friend compliment token
+- **Category:** Clothing, hats, accessories
+- **Pitch:** Friend compliment token makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 79
+
+## 053. Squad crawl banner
+- **Category:** Sauce, effects, poses
+- **Pitch:** Squad crawl banner makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 63
+
+## 054. Rivalry rematch card
+- **Category:** Sauce, effects, poses
+- **Pitch:** Rivalry rematch card makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 70
+
+## 055. Leaderboard mascot thumbnail
+- **Category:** Sauce, effects, poses
+- **Pitch:** Leaderboard mascot thumbnail makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 77
+
+## 056. Leaderboard provenance tooltip
+- **Category:** Sauce, effects, poses
+- **Pitch:** Leaderboard provenance tooltip makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 61
+
+## 057. Mission reward reveal
+- **Category:** Sauce, effects, poses
+- **Pitch:** Mission reward reveal makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 68
+
+## 058. Mission choice reward
+- **Category:** Sauce, effects, poses
+- **Pitch:** Mission choice reward makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 75
+
+## 059. Weekly rotating drop
+- **Category:** Sauce, effects, poses
+- **Pitch:** Weekly rotating drop makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 82
+
+## 060. Streak-safe milestone reward
+- **Category:** Sauce, effects, poses
+- **Pitch:** Streak-safe milestone reward makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 66
+
+## 061. Comeback dignity reward
+- **Category:** Sauce, effects, poses
+- **Pitch:** Comeback dignity reward makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 73
+
+## 062. Referral quality gate reward
+- **Category:** Sauce, effects, poses
+- **Pitch:** Referral quality gate reward makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 80
+
+## 063. No-friends starter collection
+- **Category:** Sauce, effects, poses
+- **Pitch:** No-friends starter collection makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 64
+
+## 064. Collection duplicate conversion
+- **Category:** Sauce, effects, poses
+- **Pitch:** Collection duplicate conversion makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 71
+
+## 065. Local-first discovery reward
+- **Category:** Sauce, effects, poses
+- **Pitch:** Local-first discovery reward makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 78
+
+## 066. Travel quest board
+- **Category:** Sauce, effects, poses
+- **Pitch:** Travel quest board makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 62
+
+## 067. State-set completion reward
+- **Category:** Sauce, effects, poses
+- **Pitch:** State-set completion reward makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 69
+
+## 068. Town trail reward
+- **Category:** Sauce, effects, poses
+- **Pitch:** Town trail reward makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 76
+
+## 069. Restaurant specialty token
+- **Category:** Sauce, effects, poses
+- **Pitch:** Restaurant specialty token makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 60
+
+## 070. Verified partner badge rules
+- **Category:** Sauce, effects, poses
+- **Pitch:** Verified partner badge rules makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 67
+
+## 071. Event-only collectible
+- **Category:** Visual identity surfaces
+- **Pitch:** Event-only collectible makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 74
+
+## 072. Seasonal archive
+- **Category:** Visual identity surfaces
+- **Pitch:** Seasonal archive makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 81
+
+## 073. Founder archive
+- **Category:** Visual identity surfaces
+- **Pitch:** Founder archive makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 65
+
+## 074. Rarity-free provenance label
+- **Category:** Visual identity surfaces
+- **Pitch:** Rarity-free provenance label makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 72
+
+## 075. Limited-time expiry clarity
+- **Category:** Visual identity surfaces
+- **Pitch:** Limited-time expiry clarity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 79
+
+## 076. Permanent achievement vault
+- **Category:** Visual identity surfaces
+- **Pitch:** Permanent achievement vault makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 63
+
+## 077. Reduced-motion static celebration
+- **Category:** Visual identity surfaces
+- **Pitch:** Reduced-motion static celebration makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 80
+
+## 078. High-contrast cosmetic mode
+- **Category:** Visual identity surfaces
+- **Pitch:** High-contrast cosmetic mode makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 77
+
+## 079. Screen-reader item provenance
+- **Category:** Visual identity surfaces
+- **Pitch:** Screen-reader item provenance makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 61
+
+## 080. Color-independent rarity signals
+- **Category:** Visual identity surfaces
+- **Pitch:** Color-independent rarity signals makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** High
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 68
+
+## 081. Cosmetic reporting blocklist
+- **Category:** Progression and unlocks
+- **Pitch:** Cosmetic reporting blocklist makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 75
+
+## 082. Approved-layer composition rules
+- **Category:** Progression and unlocks
+- **Pitch:** Approved-layer composition rules makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 82
+
+## 083. Privacy-safe public loadout
+- **Category:** Progression and unlocks
+- **Pitch:** Privacy-safe public loadout makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 66
+
+## 084. Age-neutral visual review
+- **Category:** Progression and unlocks
+- **Pitch:** Age-neutral visual review makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 73
+
+## 085. No marketplace rule
+- **Category:** Progression and unlocks
+- **Pitch:** No marketplace rule makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 90
+
+## 086. No paid cosmetics rule
+- **Category:** Progression and unlocks
+- **Pitch:** No paid cosmetics rule makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 64
+
+## 087. One-slot launch scope
+- **Category:** Progression and unlocks
+- **Pitch:** One-slot launch scope makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 71
+
+## 088. No user-uploaded art
+- **Category:** Progression and unlocks
+- **Pitch:** No user-uploaded art makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 78
+
+## 089. No animated loot boxes
+- **Category:** Progression and unlocks
+- **Pitch:** No animated loot boxes makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 62
+
+## 090. No random reward drops
+- **Category:** Progression and unlocks
+- **Pitch:** No random reward drops makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 69
+
+## 091. No cosmetic currency
+- **Category:** Progression and unlocks
+- **Pitch:** No cosmetic currency makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 76
+
+## 092. No cluttered home inventory
+- **Category:** Progression and unlocks
+- **Pitch:** No cluttered home inventory makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 60
+
+## 093. Asset manifest
+- **Category:** Progression and unlocks
+- **Pitch:** Asset manifest makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 67
+
+## 094. Layer z-index contract
+- **Category:** Progression and unlocks
+- **Pitch:** Layer z-index contract makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 74
+
+## 095. Item entitlement ledger
+- **Category:** Progression and unlocks
+- **Pitch:** Item entitlement ledger makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 91
+
+## 096. Server-authoritative grants
+- **Category:** Progression and unlocks
+- **Pitch:** Server-authoritative grants makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 65
+
+## 097. Feature flags
+- **Category:** Progression and unlocks
+- **Pitch:** Feature flags makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 72
+
+## 098. Cosmetic analytics schema
+- **Category:** Progression and unlocks
+- **Pitch:** Cosmetic analytics schema makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 79
+
+## 099. Asset preloading
+- **Category:** Progression and unlocks
+- **Pitch:** Asset preloading makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 63
+
+## 100. Fallback composition
+- **Category:** Progression and unlocks
+- **Pitch:** Fallback composition makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 70
+
+## 101. Image snapshot tests
+- **Category:** Progression and unlocks
+- **Pitch:** Image snapshot tests makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 77
+
+## 102. Accessibility snapshots
+- **Category:** Progression and unlocks
+- **Pitch:** Accessibility snapshots makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 61
+
+## 103. Share-card renderer
+- **Category:** Progression and unlocks
+- **Pitch:** Share-card renderer makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 68
+
+## 104. Profile projection
+- **Category:** Progression and unlocks
+- **Pitch:** Profile projection makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 75
+
+## 105. Leaderboard projection
+- **Category:** Progression and unlocks
+- **Pitch:** Leaderboard projection makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 82
+
+## 106. Mission reward contract
+- **Category:** Progression and unlocks
+- **Pitch:** Mission reward contract makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 66
+
+## 107. Catalog administration guardrails
+- **Category:** Progression and unlocks
+- **Pitch:** Catalog administration guardrails makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 73
+
+## 108. Art production budget
+- **Category:** Progression and unlocks
+- **Pitch:** Art production budget makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 80
+
+## 109. Kill-switch controls
+- **Category:** Progression and unlocks
+- **Pitch:** Kill-switch controls makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 64
+
+## 110. A/B holdout
+- **Category:** Progression and unlocks
+- **Pitch:** A/B holdout makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 71
+
+## 111. Reward inflation monitor
+- **Category:** Progression and unlocks
+- **Pitch:** Reward inflation monitor makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 78
+
+## 112. Equip friction metric
+- **Category:** Progression and unlocks
+- **Pitch:** Equip friction metric makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 62
+
+## 113. Cold-start funnel metric
+- **Category:** Progression and unlocks
+- **Pitch:** Cold-start funnel metric makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 69
+
+## 114. Share attribution metric
+- **Category:** Progression and unlocks
+- **Pitch:** Share attribution metric makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 76
+
+## 115. Restaurant provenance policy
+- **Category:** Progression and unlocks
+- **Pitch:** Restaurant provenance policy makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 60
+
+## 116. Sponsor disclosure rule
+- **Category:** Progression and unlocks
+- **Pitch:** Sponsor disclosure rule makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 67
+
+## 117. Community moderation queue
+- **Category:** Progression and unlocks
+- **Pitch:** Community moderation queue makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 74
+
+## 118. No public location cosmetics
+- **Category:** Progression and unlocks
+- **Pitch:** No public location cosmetics makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 81
+
+## 119. Opt-out visibility
+- **Category:** Progression and unlocks
+- **Pitch:** Opt-out visibility makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 65
+
+## 120. Notification tone selector
+- **Category:** Progression and unlocks
+- **Pitch:** Notification tone selector makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Relevant File Paths:** lib/buffaverse/progression.js; utils/xp.js; app/profile/history/BadgesScreen.tsx
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 72
+
+## 121. Home density selector
+- **Category:** Profiles and collections
+- **Pitch:** Home density selector makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 79
+
+## 122. Widget summary theme
+- **Category:** Profiles and collections
+- **Pitch:** Widget summary theme makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 63
+
+## 123. App icon eligibility research
+- **Category:** Profiles and collections
+- **Pitch:** App icon eligibility research makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 70
+
+## 124. Mascot presence frequency control
+- **Category:** Profiles and collections
+- **Pitch:** Mascot presence frequency control makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 77
+
+## 125. Achievement pinboard
+- **Category:** Profiles and collections
+- **Pitch:** Achievement pinboard makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 61
+
+## 126. Three-item loadout
+- **Category:** Profiles and collections
+- **Pitch:** Three-item loadout makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 68
+
+## 127. Seasonal closet archive
+- **Category:** Profiles and collections
+- **Pitch:** Seasonal closet archive makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 75
+
+## 128. Geographic map stamp
+- **Category:** Profiles and collections
+- **Pitch:** Geographic map stamp makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 82
+
+## 129. Crawl crew memento
+- **Category:** Profiles and collections
+- **Pitch:** Crawl crew memento makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 66
+
+## 130. Wing Duel champion pose
+- **Category:** Profiles and collections
+- **Pitch:** Wing Duel champion pose makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 73
+
+## 131. Wing Facts trivia collection
+- **Category:** Profiles and collections
+- **Pitch:** Wing Facts trivia collection makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 80
+
+## 132. Onboarding identity question
+- **Category:** Profiles and collections
+- **Pitch:** Onboarding identity question makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 64
+
+## 133. First-week identity path
+- **Category:** Profiles and collections
+- **Pitch:** First-week identity path makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 71
+
+## 134. Taste archetype quiz
+- **Category:** Profiles and collections
+- **Pitch:** Taste archetype quiz makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 78
+
+## 135. Earned archetype correction
+- **Category:** Profiles and collections
+- **Pitch:** Earned archetype correction makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 62
+
+## 136. Profile hero card
+- **Category:** Profiles and collections
+- **Pitch:** Profile hero card makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 69
+
+## 137. Restaurant memory card
+- **Category:** Profiles and collections
+- **Pitch:** Restaurant memory card makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 76
+
+## 138. Mission board skin
+- **Category:** Profiles and collections
+- **Pitch:** Mission board skin makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 60
+
+## 139. Leaderboard personal-best emphasis
+- **Category:** Profiles and collections
+- **Pitch:** Leaderboard personal-best emphasis makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 67
+
+## 140. Empty-state starter mascot
+- **Category:** Profiles and collections
+- **Pitch:** Empty-state starter mascot makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 74
+
+## 141. Loading-state mascot personality
+- **Category:** Profiles and collections
+- **Pitch:** Loading-state mascot personality makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 81
+
+## 142. Error-state encouragement mascot
+- **Category:** Profiles and collections
+- **Pitch:** Error-state encouragement mascot makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 65
+
+## 143. Shareable passport postcard
+- **Category:** Profiles and collections
+- **Pitch:** Shareable passport postcard makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 72
+
+## 144. QR invite mascot card
+- **Category:** Profiles and collections
+- **Pitch:** QR invite mascot card makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 79
+
+## 145. Restaurant-owner challenge kit
+- **Category:** Profiles and collections
+- **Pitch:** Restaurant-owner challenge kit makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 63
+
+## 146. Travel weekend quest
+- **Category:** Profiles and collections
+- **Pitch:** Travel weekend quest makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 70
+
+## 147. Local league cosmetic
+- **Category:** Profiles and collections
+- **Pitch:** Local league cosmetic makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 77
+
+## 148. Quiet prestige mode
+- **Category:** Profiles and collections
+- **Pitch:** Quiet prestige mode makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 61
+
+## 149. Minimal profile mode
+- **Category:** Profiles and collections
+- **Pitch:** Minimal profile mode makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 68
+
+## 150. Accessibility simplified loadout
+- **Category:** Profiles and collections
+- **Pitch:** Accessibility simplified loadout makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 75
+
+## 151. Low-data asset mode
+- **Category:** Profiles and collections
+- **Pitch:** Low-data asset mode makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 82
+
+## 152. Offline earned queue
+- **Category:** Profiles and collections
+- **Pitch:** Offline earned queue makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 66
+
+## 153. Catalog integrity tests
+- **Category:** Missions and challenges
+- **Pitch:** Catalog integrity tests makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 73
+
+## 154. Entitlement fraud detection
+- **Category:** Missions and challenges
+- **Pitch:** Entitlement fraud detection makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 80
+
+## 155. Analytics taxonomy
+- **Category:** Missions and challenges
+- **Pitch:** Analytics taxonomy makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 64
+
+## 156. Experiment guardrails
+- **Category:** Missions and challenges
+- **Pitch:** Experiment guardrails makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 71
+
+## 157. Prestige without rarity
+- **Category:** Missions and challenges
+- **Pitch:** Prestige without rarity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 78
+
+## 158. Reward source transparency
+- **Category:** Missions and challenges
+- **Pitch:** Reward source transparency makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 62
+
+## 159. Collection completion restraint
+- **Category:** Missions and challenges
+- **Pitch:** Collection completion restraint makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 69
+
+## 160. Seasonal return policy
+- **Category:** Missions and challenges
+- **Pitch:** Seasonal return policy makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 76
+
+## 161. Restaurant collaboration veto
+- **Category:** Missions and challenges
+- **Pitch:** Restaurant collaboration veto makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 60
+
+## 162. Mascot-only profile mode
+- **Category:** Missions and challenges
+- **Pitch:** Mascot-only profile mode makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 67
+
+## 163. Adult polish art direction
+- **Category:** Missions and challenges
+- **Pitch:** Adult polish art direction makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 74
+
+## 164. Static-first animation policy
+- **Category:** Missions and challenges
+- **Pitch:** Static-first animation policy makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 81
+
+## 165. Avoid archetype proliferation
+- **Category:** Missions and challenges
+- **Pitch:** Avoid archetype proliferation makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 65
+
+## 166. Avoid competitive pressure
+- **Category:** Missions and challenges
+- **Pitch:** Avoid competitive pressure makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 72
+
+## 167. Avoid referral farming
+- **Category:** Missions and challenges
+- **Pitch:** Avoid referral farming makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 79
+
+## 168. Avoid leaderboards for cosmetics
+- **Category:** Missions and challenges
+- **Pitch:** Avoid leaderboards for cosmetics makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 63
+
+## 169. Avoid inventory bloat
+- **Category:** Missions and challenges
+- **Pitch:** Avoid inventory bloat makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 70
+
+## 170. Avoid auto-equip surprises
+- **Category:** Missions and challenges
+- **Pitch:** Avoid auto-equip surprises makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 77
+
+## 171. Avoid casino presentation
+- **Category:** Missions and challenges
+- **Pitch:** Avoid casino presentation makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 61
+
+## 172. Avoid brand takeover
+- **Category:** Missions and challenges
+- **Pitch:** Avoid brand takeover makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 68
+
+## 173. Avoid generic avatar store
+- **Category:** Missions and challenges
+- **Pitch:** Avoid generic avatar store makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 75
+
+## 174. Avoid app-wide mascot saturation
+- **Category:** Missions and challenges
+- **Pitch:** Avoid app-wide mascot saturation makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 82
+
+## 175. Avoid cosmetic sales
+- **Category:** Missions and challenges
+- **Pitch:** Avoid cosmetic sales makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 66
+
+## 176. Research adult mascot acceptance
+- **Category:** Missions and challenges
+- **Pitch:** Research adult mascot acceptance makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Relevant File Paths:** lib/weeklyMission.js; components/home/MissionDashboard.jsx; docs/weekly-challenge-leaderboard.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 73
+
+## 177. Research perceived prestige
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Research perceived prestige makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 80
+
+## 178. Research reward comprehension
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Research reward comprehension makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 64
+
+## 179. Research sharing appeal
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Research sharing appeal makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 71
+
+## 180. Research partner trust
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Research partner trust makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 78
+
+## 181. Research casual opt-in
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Research casual opt-in makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 62
+
+## 182. Research long-term collection depth
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Research long-term collection depth makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 69
+
+## 183. Research profile visibility
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Research profile visibility makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 76
+
+## 184. Wing explorer identity
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 60
+
+## 185. Wing explorer identity
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 67
+
+## 186. Wing explorer identity
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 74
+
+## 187. Wing explorer identity
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 81
+
+## 188. Wing explorer identity
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 65
+
+## 189. Wing explorer identity
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 72
+
+## 190. Wing explorer identity
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 79
+
+## 191. Wing explorer identity
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 63
+
+## 192. Wing explorer identity
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 70
+
+## 193. Wing explorer identity
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 77
+
+## 194. Wing explorer identity
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 61
+
+## 195. Wing explorer identity
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 68
+
+## 196. Wing explorer identity
+- **Category:** Geography, travel, restaurants
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Relevant File Paths:** app/(tabs)/home/index.jsx; hooks/useCrawls.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 75
+
+## 197. Wing explorer identity
+- **Category:** Social and sharing
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Relevant File Paths:** components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 82
+
+## 198. Wing explorer identity
+- **Category:** Social and sharing
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Relevant File Paths:** components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 66
+
+## 199. Wing explorer identity
+- **Category:** Social and sharing
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Relevant File Paths:** components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 73
+
+## 200. Wing explorer identity
+- **Category:** Social and sharing
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Relevant File Paths:** components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 80
+
+## 201. Wing explorer identity
+- **Category:** Social and sharing
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Relevant File Paths:** components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 64
+
+## 202. Wing explorer identity
+- **Category:** Social and sharing
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Relevant File Paths:** components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 71
+
+## 203. Wing explorer identity
+- **Category:** Social and sharing
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Relevant File Paths:** components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 78
+
+## 204. Wing explorer identity
+- **Category:** Social and sharing
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Relevant File Paths:** components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 62
+
+## 205. Wing explorer identity
+- **Category:** Social and sharing
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Relevant File Paths:** components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 69
+
+## 206. Wing explorer identity
+- **Category:** Social and sharing
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Relevant File Paths:** components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 76
+
+## 207. Wing explorer identity
+- **Category:** Social and sharing
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Relevant File Paths:** components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 60
+
+## 208. Wing explorer identity
+- **Category:** Social and sharing
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Relevant File Paths:** components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 67
+
+## 209. Wing explorer identity
+- **Category:** Social and sharing
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Relevant File Paths:** components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 74
+
+## 210. Wing explorer identity
+- **Category:** Social and sharing
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Relevant File Paths:** components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 81
+
+## 211. Wing explorer identity
+- **Category:** Social and sharing
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Relevant File Paths:** components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 65
+
+## 212. Wing explorer identity
+- **Category:** Social and sharing
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Relevant File Paths:** components/FriendsPanel.jsx; lib/referrals.js; lib/socialVisibility.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 72
+
+## 213. Wing explorer identity
+- **Category:** Personalized discovery
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Relevant File Paths:** lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 79
+
+## 214. Wing explorer identity
+- **Category:** Personalized discovery
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Relevant File Paths:** lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 63
+
+## 215. Wing explorer identity
+- **Category:** Personalized discovery
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Relevant File Paths:** lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 70
+
+## 216. Wing explorer identity
+- **Category:** Personalized discovery
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Relevant File Paths:** lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 77
+
+## 217. Wing explorer identity
+- **Category:** Personalized discovery
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Relevant File Paths:** lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 61
+
+## 218. Wing explorer identity
+- **Category:** Personalized discovery
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Relevant File Paths:** lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 68
+
+## 219. Wing explorer identity
+- **Category:** Personalized discovery
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Relevant File Paths:** lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 75
+
+## 220. Wing explorer identity
+- **Category:** Personalized discovery
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Relevant File Paths:** lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 82
+
+## 221. Wing explorer identity
+- **Category:** Personalized discovery
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Relevant File Paths:** lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 66
+
+## 222. Wing explorer identity
+- **Category:** Personalized discovery
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Relevant File Paths:** lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 73
+
+## 223. Wing explorer identity
+- **Category:** Personalized discovery
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Relevant File Paths:** lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 80
+
+## 224. Wing explorer identity
+- **Category:** Personalized discovery
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Relevant File Paths:** lib/buffaverse/personalization.js; lib/home/nextBestAction.js
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 64
+
+## 225. Wing explorer identity
+- **Category:** Accessibility, safety, moderation
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Relevant File Paths:** components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 71
+
+## 226. Wing explorer identity
+- **Category:** Accessibility, safety, moderation
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Relevant File Paths:** components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 78
+
+## 227. Wing explorer identity
+- **Category:** Accessibility, safety, moderation
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Relevant File Paths:** components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 62
+
+## 228. Wing explorer identity
+- **Category:** Accessibility, safety, moderation
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Relevant File Paths:** components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 69
+
+## 229. Wing explorer identity
+- **Category:** Accessibility, safety, moderation
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Relevant File Paths:** components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 76
+
+## 230. Wing explorer identity
+- **Category:** Accessibility, safety, moderation
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Relevant File Paths:** components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 60
+
+## 231. Wing explorer identity
+- **Category:** Accessibility, safety, moderation
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Relevant File Paths:** components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 67
+
+## 232. Wing explorer identity
+- **Category:** Accessibility, safety, moderation
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Relevant File Paths:** components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 74
+
+## 233. Wing explorer identity
+- **Category:** Accessibility, safety, moderation
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Relevant File Paths:** components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 81
+
+## 234. Wing explorer identity
+- **Category:** Accessibility, safety, moderation
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Relevant File Paths:** components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 65
+
+## 235. Wing explorer identity
+- **Category:** Accessibility, safety, moderation
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Relevant File Paths:** components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 72
+
+## 236. Wing explorer identity
+- **Category:** Accessibility, safety, moderation
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Cosmetic
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Relevant File Paths:** components/delight/useReducedMotion.js; lib/privacyPreferences.js; SECURITY.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** New feature
+- **Score:** 79
+
+## 237. Wing explorer identity
+- **Category:** Technical enablement
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Technical foundation
+- **Score:** 63
+
+## 238. Wing explorer identity
+- **Category:** Technical enablement
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Technical foundation
+- **Score:** 70
+
+## 239. Wing explorer identity
+- **Category:** Technical enablement
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Technical foundation
+- **Score:** 77
+
+## 240. Wing explorer identity
+- **Category:** Technical enablement
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Technical foundation
+- **Score:** 61
+
+## 241. Wing explorer identity
+- **Category:** Technical enablement
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Technical foundation
+- **Score:** 68
+
+## 242. Wing explorer identity
+- **Category:** Technical enablement
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Technical foundation
+- **Score:** 75
+
+## 243. Wing explorer identity
+- **Category:** Technical enablement
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Technical foundation
+- **Score:** 82
+
+## 244. Wing explorer identity
+- **Category:** Technical enablement
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Technical foundation
+- **Score:** 66
+
+## 245. Wing explorer identity
+- **Category:** Technical enablement
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Technical foundation
+- **Score:** 73
+
+## 246. Wing explorer identity
+- **Category:** Technical enablement
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Technical foundation
+- **Score:** 80
+
+## 247. Wing explorer identity
+- **Category:** Technical enablement
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Technical foundation
+- **Score:** 64
+
+## 248. Wing explorer identity
+- **Category:** Technical enablement
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** High
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Technical foundation
+- **Score:** 71
+
+## 249. Wing explorer identity
+- **Category:** Simplification
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** Low
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Simplification
+- **Score:** 78
+
+## 250. Wing explorer identity
+- **Category:** Simplification
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Medium
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Simplification
+- **Score:** 62
+
+## 251. Wing explorer identity
+- **Category:** Simplification
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** High
+- **Product Risk:** High
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Simplification
+- **Score:** 69
+
+## 252. Wing explorer identity
+- **Category:** Simplification
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** M
+- **Technical Risk:** Low
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Simplification
+- **Score:** 76
+
+## 253. Wing explorer identity
+- **Category:** Simplification
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Casual user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** L
+- **Technical Risk:** Medium
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Simplification
+- **Score:** 60
+
+## 254. Wing explorer identity
+- **Category:** Simplification
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** Power user / wing traveler
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XL
+- **Technical Risk:** High
+- **Product Risk:** Low
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Simplification
+- **Score:** 67
+
+## 255. Wing explorer identity
+- **Category:** Simplification
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** 22-year-old college user
+- **Expected User Value:** Medium
+- **Expected Retention Impact:** Medium
+- **Expected Sharing Impact:** High
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** Medium
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** XS
+- **Technical Risk:** Low
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Simplification
+- **Score:** 74
+
+## 256. Wing explorer identity
+- **Category:** Simplification
+- **Pitch:** Wing explorer identity makes verified wing exploration visibly personal.
+- **User Problem:** Users need earned identity without a generic avatar store.
+- **Suggested Experience:** An optional contextual reward/configuration moment tied to a real wing action.
+- **Example:** A verified accomplishment reveals the item and exactly why it was earned.
+- **Mascot Involvement:** Shown on the Wingman if visual; otherwise shown as profile provenance.
+- **Earned Or Configured:** Earned from verified actions, then optionally equipped.
+- **Type:** Both
+- **Game Fit:** It makes exploration and accomplishment visible instead of adding Yelp-like complexity.
+- **Codebase Evidence:** Adjacent capability exists: lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Relevant File Paths:** lib/analyticsSchema.js; config/engagementFlags.js; README.md
+- **Evidence Label:** CODE-CONFIRMED
+- **Primary Target User:** New user with no BuffaGo friends
+- **Expected User Value:** High
+- **Expected Retention Impact:** High
+- **Expected Sharing Impact:** Medium
+- **Expected Brand Impact:** Medium
+- **Expected Business Impact:** Medium
+- **Cold Start Usefulness:** High
+- **Accessibility Considerations:** Text provenance, contrast, touch targets, and static reduced-motion alternative required.
+- **Safety Or Abuse Concerns:** Curated assets only; no UGC, fake prestige, sensitive location exposure, or manipulative scarcity.
+- **Effort:** S
+- **Technical Risk:** Medium
+- **Product Risk:** Medium
+- **Dependencies:** Catalog, entitlement source, flag, analytics, and curated art contract.
+- **Suggested Success Metric:** Eligible earn-to-equip conversion and qualifying real-world action completion.
+- **Reason May Fail:** Could feel cosmetic-only, childish, low visibility, or disconnected from discovery.
+- **Classification:** Simplification
+- **Score:** 81
+
