@@ -32,6 +32,7 @@ from wing_processing_worker.models import (  # noqa: E402
 )
 from wing_processing_worker.moderation import (  # noqa: E402
     HttpModerationProvider,
+    ManualReviewProvider,
     ManualReviewTestProvider,
     ModerationResult,
 )
@@ -211,6 +212,20 @@ def test_test_adapter_is_impossible_in_production(monkeypatch):
     monkeypatch.setenv("WING_PROCESSING_ENVIRONMENT", "production")
     with pytest.raises(ProviderConfigurationError):
         build_provider()
+
+
+def test_production_manual_review_mode_requires_no_provider_credentials(monkeypatch):
+    monkeypatch.setenv("WING_MODERATION_PROVIDER_MODE", "manual-review")
+    monkeypatch.setenv("WING_PROCESSING_ENVIRONMENT", "production")
+    monkeypatch.delenv("WING_MODERATION_PROVIDER_URL", raising=False)
+    monkeypatch.delenv("WING_MODERATION_API_KEY", raising=False)
+    monkeypatch.delenv("WING_MODERATION_MODEL", raising=False)
+    monkeypatch.delenv("WING_MODERATION_MODEL_VERSION", raising=False)
+
+    provider = build_provider()
+
+    assert isinstance(provider, ManualReviewProvider)
+    assert provider.evaluate(Path("not-read"), media_type="video").moderation_recommendation == "manual_review"
 
 
 class ProviderResponse:

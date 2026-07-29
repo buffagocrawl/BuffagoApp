@@ -50,6 +50,11 @@ Production fails closed when the AI provider is not configured or returns an
 invalid structured result. The service-role key must never use an `EXPO_PUBLIC_`
 name or enter a mobile build.
 
+For an intentionally human-reviewed rollout, set
+`WING_MODERATION_PROVIDER_MODE=manual-review`. This production-safe mode sends
+no media to an external provider and routes every successfully processed upload
+to `in_review`; it still requires the private processing worker and FFmpeg.
+
 Nightly publishing secrets:
 
 - `SUPABASE_URL`
@@ -134,4 +139,3 @@ Until real target-environment evidence exists, the following remain
 - production AI moderation model/endpoint behavior
 - production push provider delivery
 - app-store privacy disclosure and legal/counsel approval of consent wording
-

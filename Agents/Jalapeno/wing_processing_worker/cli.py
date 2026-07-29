@@ -13,12 +13,16 @@ from supabase_client import SupabaseClient
 from wing_media_processing import WingMediaProcessor
 
 from .errors import ProviderConfigurationError
-from .moderation import HttpModerationProvider, ManualReviewTestProvider
+from .moderation import (
+    HttpModerationProvider,
+    ManualReviewProvider,
+    ManualReviewTestProvider,
+)
 from .repository import ProcessingRepository
 from .worker import WingProcessingWorker
 
 
-def build_provider() -> HttpModerationProvider | ManualReviewTestProvider:
+def build_provider() -> HttpModerationProvider | ManualReviewProvider | ManualReviewTestProvider:
     mode = os.getenv("WING_MODERATION_PROVIDER_MODE", "http").strip().lower()
     environment = os.getenv("WING_PROCESSING_ENVIRONMENT", "production").strip().lower()
     if mode == "manual-review-test":
@@ -26,6 +30,8 @@ def build_provider() -> HttpModerationProvider | ManualReviewTestProvider:
         if environment == "production" or not allowed:
             raise ProviderConfigurationError()
         return ManualReviewTestProvider()
+    if mode == "manual-review":
+        return ManualReviewProvider()
     if mode != "http":
         raise ProviderConfigurationError()
     endpoint = os.getenv("WING_MODERATION_PROVIDER_URL", "").strip()

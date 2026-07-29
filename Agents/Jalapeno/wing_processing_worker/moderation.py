@@ -226,3 +226,42 @@ class ManualReviewTestProvider:
                 "evaluated_at": now,
             }
         )
+
+
+class ManualReviewProvider:
+    """Production-safe intake adapter that always requires human review.
+
+    This records no automated content verdict. Media still receives the normal
+    private derivative, metadata removal, and duplicate-signal processing, but
+    every accepted file is routed to the internal review queue.
+    """
+
+    def evaluate(self, media_path: Path, *, media_type: str) -> ModerationResult:
+        del media_path, media_type
+        now = datetime.now(timezone.utc).isoformat()
+        return ModerationResult.from_mapping(
+            {
+                "contains_food": False,
+                "contains_chicken_wings": False,
+                "wing_confidence": 0.5,
+                "nudity_or_sexual_content": False,
+                "graphic_content": False,
+                "weapons": False,
+                "hate_symbols": False,
+                "illegal_activity": False,
+                "intoxication_concern": False,
+                "minors_visible": False,
+                "personal_information_visible": False,
+                "faces_visible": False,
+                "alcohol_dominant": False,
+                "offensive_text": False,
+                "spam_probability": 0.5,
+                "duplicate_probability": 0.5,
+                "quality_score": 0.0,
+                "moderation_recommendation": "manual_review",
+                "explanation": "Automated moderation is disabled; human review is required.",
+                "model": "manual-review-intake",
+                "version": "1",
+                "evaluated_at": now,
+            }
+        )

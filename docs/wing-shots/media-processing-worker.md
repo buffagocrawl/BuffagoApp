@@ -33,8 +33,27 @@ results fail closed. No caption, user identity, restaurant, rating, storage
 path, signed URL, or biometric template is sent.
 
 Production startup fails with `MODERATION_PROVIDER_UNCONFIGURED` when the
-provider URL, key, model, or version is absent. Do not substitute the test
-adapter in production.
+HTTP provider URL, key, model, or version is absent. A deployment may instead
+set `WING_MODERATION_PROVIDER_MODE=manual-review` to skip automated content
+verdicts and route every successfully processed upload to human review. Do not
+substitute the test adapter in production.
+
+## Manual-review intake mode
+
+For a human-reviewed launch, configure only:
+
+```text
+WING_MODERATION_PROVIDER_MODE=manual-review
+WING_PROCESSING_ENVIRONMENT=production
+WING_PROCESSING_WORKER_ID=<stable-worker-id>
+```
+
+This mode does not send media to an external moderation service and never
+recommends acceptance. It still validates supported media, strips metadata,
+creates protected derivatives, removes video audio, records duplicate signals,
+and moves successfully processed uploads to `in_review`. Reviewers remain
+responsible for rejecting unsafe, off-topic, duplicate, or otherwise unsuitable
+submissions before approval.
 
 ## Non-production adapter
 
