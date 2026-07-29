@@ -28,6 +28,7 @@ import {
 import { useSocialBadges } from '../../../hooks/useSocialBadges';
 import FriendsPanel from '../../../components/FriendsPanel';
 import FeedbackState from '../../../components/ui/FeedbackState';
+import CreatorLeaderboardPanel from '../../../components/creator/CreatorLeaderboardPanel';
 import { ENABLE_EMPTY_FEED_LAUNCHPAD, ENABLE_SHARE_INVITE_LOOP } from '../../../config/features';
 
 const ADMIN_ID = '23898359-306a-4dd3-91f0-da66da19ccfc';
@@ -1453,6 +1454,8 @@ export default function Leaderboards() {
               </Card>
             ) : (
               <>
+                <CreatorLeaderboardPanel active={Boolean(viewerId)} />
+
                 <LeaderCard
                   title={lbScope === 'state' ? 'Highest Level (Local Legends)' : 'Highest Level'}
                   items={lbHighestLevel}

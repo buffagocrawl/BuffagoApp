@@ -20,7 +20,9 @@ import * as Haptics from 'expo-haptics';
 import { supabase } from '../../lib/supabase.js';
 import { trackEvent } from '../../lib/analytics';
 import RatingWizardDialog from '../../components/RatingWizardDialog';
+import { WingShotFlow } from '../../components/wingShots';
 import { useLocationCtx } from '../../providers/LocationProvider';
+import { useWingShotsFeatureFlags } from '../../hooks/useWingShotsFeatureFlags';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { grantXp, XP } from '../../utils/xp';
 import { useXpToast } from '../../providers/XpToastProvider';
@@ -94,7 +96,11 @@ async function getFreshCoords(fallback) {
       maximumAge: 1000,
       timeout: 5000,
     });
-    return { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
+    return {
+      latitude: pos.coords.latitude,
+      longitude: pos.coords.longitude,
+      accuracy: pos.coords.accuracy ?? null,
+    };
   } catch (e) {
     console.warn('getFreshCoords failed, using fallback:', e?.message || e);
     return fallback ?? null;
@@ -465,6 +471,7 @@ export default function CrawlScreen() {
 
   const pressingRef = useRef(false);
   const lastTooFarAtRef = useRef(0);
+  const verifiedRatingLocationRef = useRef(null);
 
   const [presenceOpen, setPresenceOpen] = useState(false);
   const [presenceLoading, setPresenceLoading] = useState(false);
@@ -623,9 +630,13 @@ export default function CrawlScreen() {
 
   const isAdmin = session?.user?.id === ADMIN_ID;
   const isSignedIn = !!session?.user?.id;
+  const { flags: wingShotFlags } = useWingShotsFeatureFlags(isSignedIn);
 
   // rating wizard (component owned)
   const [rateVisible, setRateVisible] = useState(false);
+  const [wingShotVisible, setWingShotVisible] = useState(false);
+  const [eligibleWingShotRatingId, setEligibleWingShotRatingId] = useState(null);
+  const [wingShotSubmitted, setWingShotSubmitted] = useState(false);
 
   // preflight proximity overlay (shows BEFORE rating modal)
   const [preflightVisible, setPreflightVisible] = useState(false);
@@ -950,6 +961,7 @@ export default function CrawlScreen() {
         Alert.alert('Location required', 'Turn on location to rate this stop.');
         return;
       }
+      verifiedRatingLocationRef.current = fresh;
 
       if (!isAdmin) {
         setPreflightMsg('Checking your distance…');
@@ -1098,11 +1110,29 @@ export default function CrawlScreen() {
       }
 
       let error;
+      let ratingResult = null;
 
       if (userId) {
-        ({ error } = await supabase
-          .from('destination_ratings')
-          .upsert(payload, { onConflict: 'destination_id,crawl_id,user_id' }));
+        const verifiedLocation = verifiedRatingLocationRef.current ?? coords;
+        const response = await supabase.rpc('submit_validated_crawl_rating', {
+          p_crawl_id: crawl.crawl_id,
+          p_destination_id: activeDest.id,
+          p_latitude: verifiedLocation?.latitude ?? null,
+          p_longitude: verifiedLocation?.longitude ?? null,
+          p_accuracy_m: verifiedLocation?.accuracy ?? null,
+          p_crispiness: crisp,
+          p_sauce: sauce,
+          p_meat: meat,
+          p_overall: overall,
+          p_wings_eaten: payload.wings_eaten,
+          p_tag_id: payload.tag_id,
+          p_sauce_style: payload.sauce_style,
+          p_spice_level: payload.spice_level,
+          p_would_order_again: payload.would_order_again,
+          p_flavor_vibe: payload.flavor_vibe,
+        });
+        error = response.error;
+        ratingResult = response.data;
       } else {
         const { error: delErr } = await supabase
           .from('destination_ratings')
@@ -1335,7 +1365,28 @@ export default function CrawlScreen() {
 
       setRateVisible(false);
       setCelebrateScore(savedWeightScore);
-      setCelebrateVisible(true);
+      const shouldPromptWingShot = Boolean(
+        ratingResult?.accepted
+        && ratingResult?.wing_shot_eligible
+        && ratingResult?.rating_id
+        && wingShotFlags.prompt
+        && (wingShotFlags.photo || wingShotFlags.video)
+      );
+      if (shouldPromptWingShot) {
+        setEligibleWingShotRatingId(ratingResult.rating_id);
+        setWingShotSubmitted(false);
+        setWingShotVisible(true);
+        await trackEvent({
+          eventName: 'wing_shot_prompt_viewed',
+          screen: 'crawl',
+          userId,
+          destinationId: activeDest.id,
+          crawlId: crawl.crawl_id,
+          metadata: { eligibility_source: 'verified_in_person' },
+        });
+      } else {
+        setCelebrateVisible(true);
+      }
 
       loadPresenceAllSteps();
       loadLeaderboard();
@@ -2131,6 +2182,38 @@ export default function CrawlScreen() {
             onFinalize={(payload) => saveRating(payload)}
             onSubmit={(payload) => saveRating(payload)}
           />
+
+          {eligibleWingShotRatingId ? (
+            <WingShotFlow
+              visible={wingShotVisible}
+              eligibleRatingId={eligibleWingShotRatingId}
+              allowPhoto={wingShotFlags.photo}
+              allowVideo={wingShotFlags.video}
+              analyticsContext={{
+                screen: 'crawl',
+                userId: session?.user?.id ?? null,
+                destinationId: activeDest?.id ?? null,
+                crawlId: crawl?.crawl_id ?? null,
+              }}
+              onSubmitted={async () => {
+                setWingShotSubmitted(true);
+              }}
+              onClose={async () => {
+                setWingShotVisible(false);
+                if (!wingShotSubmitted) {
+                  await trackEvent({
+                    eventName: 'wing_shot_prompt_skipped',
+                    screen: 'crawl',
+                    userId: session?.user?.id ?? null,
+                    destinationId: activeDest?.id ?? null,
+                    crawlId: crawl?.crawl_id ?? null,
+                    metadata: { rating_remains_saved: true },
+                  });
+                }
+                setCelebrateVisible(true);
+              }}
+            />
+          ) : null}
 
           {/* Crawl Report */}
           <Dialog

@@ -71,9 +71,24 @@ export const ANALYTICS_EVENTS = Object.freeze({
   BUFFAVERSE_ACHIEVEMENT_SHARE_COMPLETED: 'buffaverse_achievement_share_completed',
   BUFFAVERSE_CELEBRATION_SHOWN: 'buffaverse_celebration_shown',
   BUFFAVERSE_LOAD_FAILED: 'buffaverse_load_failed',
+  WING_SHOT_PROMPT_VIEWED: 'wing_shot_prompt_viewed',
+  WING_SHOT_PROMPT_SKIPPED: 'wing_shot_prompt_skipped',
+  WING_SHOT_CAPTURE_STARTED: 'wing_shot_capture_started',
+  WING_SHOT_UPLOAD_STARTED: 'wing_shot_upload_started',
+  WING_SHOT_UPLOAD_COMPLETED: 'wing_shot_upload_completed',
+  WING_SHOT_UPLOAD_FAILED: 'wing_shot_upload_failed',
+  WING_SHOT_CONSENT_COMPLETED: 'wing_shot_consent_completed',
+  WING_SHOT_SUBMISSION_WITHDRAWN: 'wing_shot_submission_withdrawn',
+  WING_SHOT_APPROVED: 'wing_shot_approved',
+  WING_SHOT_REJECTED: 'wing_shot_rejected',
+  WING_SHOT_FEATURED: 'wing_shot_featured',
+  CREATOR_BADGE_EARNED: 'creator_badge_earned',
+  CREATOR_LEADERBOARD_VIEWED: 'creator_leaderboard_viewed',
+  SOCIAL_FOLLOW_CTA_CLICKED: 'social_follow_cta_clicked',
+  SOCIAL_POST_OPENED: 'social_post_opened',
 });
 
-const BLOCKED_KEY = /(token|secret|password|authorization|cookie|email|phone|error_message|access_key|refresh|latitude|longitude|location|address|rating_content|rating_detail)/i;
+const BLOCKED_KEY = /(token|secret|password|authorization|cookie|email|phone|error_message|access_key|refresh|latitude|longitude|location|address|rating_content|rating_detail|signed_url|media_path|caption|moderation)/i;
 const ALLOWED_SCALAR = new Set(['string', 'number', 'boolean']);
 
 export function sanitizeAnalyticsMetadata(input = {}) {

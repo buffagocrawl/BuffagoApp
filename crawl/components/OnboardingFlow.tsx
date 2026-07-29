@@ -1812,10 +1812,13 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
                 </Text>
               </View>
 
-              <View>
-                <Text style={{ fontWeight: '900' }}>Social Feed</Text>
+              <View testID="onboarding-wing-shots-explainer">
+                <Text style={{ fontWeight: '900' }}>Wing Shots</Text>
                 <Text style={{ opacity: 0.82, lineHeight: 20, marginTop: 4 }}>
-                  Share wing wins, crawl completions, and discover spots other people are hyped about.
+                  Rate wings in person, then optionally upload a photo or short video. Approved submissions earn Creator XP and badges and may be featured on BuffaGo&apos;s Instagram and Facebook.
+                </Text>
+                <Text style={{ opacity: 0.82, lineHeight: 20, marginTop: 4 }}>
+                  Check daily to see if your wings and rating made it!
                 </Text>
               </View>
 
