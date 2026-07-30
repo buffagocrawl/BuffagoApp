@@ -40,6 +40,7 @@ import {
 import { useInterpolatedUploadProgress } from './useInterpolatedUploadProgress';
 import { errorContext, mediaLogContext, safeErrorContext, wingShotLog } from '../../lib/wingShotDiagnostics';
 import { stageWingShotMedia, cleanupWingShotStaging } from '../../lib/wingShotStaging';
+import { createWingShotValidationProgress } from '../../lib/wingShotValidationProgress';
 
 type Attribution = 'username' | 'display_name' | 'anonymous';
 type Phase =
@@ -137,6 +138,11 @@ export function WingShotFlow({
   const sessionRef = useRef(createWingShotUploadSession(Crypto.randomUUID));
   const progressBarRef = useRef(new Animated.Value(0));
   const progressController = useInterpolatedUploadProgress();
+  const [validationProgress, setValidationProgress] = useState(0);
+  const validationProgressControllerRef = useRef<ReturnType<typeof createWingShotValidationProgress> | null>(null);
+  if (!validationProgressControllerRef.current) {
+    validationProgressControllerRef.current = createWingShotValidationProgress({ onProgress: setValidationProgress });
+  }
   const skipNavigationRef = useRef(false);
   const submitInFlightRef = useRef(false);
   const disabled = phase === 'choosing' || phase === 'validating' || phase === 'submitting' || phase === 'cancelling';
@@ -145,6 +151,8 @@ export function WingShotFlow({
     (networkState.isConnected !== false && networkState.isInternetReachable !== false);
 
   const resetUploadSession = useCallback(() => {
+    validationProgressControllerRef.current?.stop();
+    setValidationProgress(0);
     progressController.clearTimer();
     sessionRef.current = createWingShotUploadSession(Crypto.randomUUID);
     progressController.stop('canceled');
@@ -226,6 +234,7 @@ export function WingShotFlow({
   useEffect(() => () => {
     mountedRef.current = false;
     validationAbortRef.current?.abort();
+    validationProgressControllerRef.current?.stop();
     abortRef.current?.abort();
   }, []);
 
@@ -286,6 +295,7 @@ export function WingShotFlow({
   const validateSelectedMedia = useCallback(async (selected: WingShotSelectedMedia) => {
     const sequence = ++validationSequenceRef.current;
     validationAbortRef.current?.abort();
+    const validationOperation = validationProgressControllerRef.current?.start();
     const controller = new AbortController();
     validationAbortRef.current = controller;
     const requestState = { dispatched: false };
@@ -322,6 +332,7 @@ export function WingShotFlow({
       }
 
       if (controller.signal.aborted) {
+        validationProgressControllerRef.current?.stop(validationOperation);
         wingShotLog(correlationId, 'validation_return', { reasonCode: 'validation_cancelled', stage: 'local_validation' });
         return;
       }
@@ -354,22 +365,28 @@ export function WingShotFlow({
         staging,
       });
       if (!mountedRef.current) {
+        validationProgressControllerRef.current?.stop(validationOperation);
         wingShotLog(correlationId, 'validation_return', { reasonCode: 'component_unmounted', stage: 'server_validation' });
         return;
       }
       if (controller.signal.aborted) {
+        validationProgressControllerRef.current?.stop(validationOperation);
         wingShotLog(correlationId, 'validation_return', { reasonCode: 'validation_cancelled', stage: 'server_validation' });
         return;
       }
       if (sequence !== validationSequenceRef.current) {
+        validationProgressControllerRef.current?.stop(validationOperation);
         wingShotLog(correlationId, 'stale_validation_ignored', { stage: 'server_validation', reasonCode: 'stale_validation_cancelled' }, 'warn');
         wingShotLog(correlationId, 'validation_return', { reasonCode: 'stale_validation_sequence', stage: 'server_validation', sequence, currentSequence: validationSequenceRef.current });
         return;
       }
       wingShotLog(correlationId, 'validation_passed', { stage: 'server_validation', reasonCode: 'server_validation_passed' });
+      const completed = await validationProgressControllerRef.current?.complete(validationOperation);
+      if (!completed || !mountedRef.current || controller.signal.aborted || sequence !== validationSequenceRef.current) return;
       setPhaseSafely('valid');
       announce('Wing Shot ready.');
     } catch (error) {
+      validationProgressControllerRef.current?.stop(validationOperation);
       const reasonCode = String((error as { code?: string })?.code || 'validation_unknown');
       const retryable = Boolean((error as { retryable?: boolean })?.retryable) || ['validator_unavailable', 'validation_timeout', 'validation_internal_failure', 'validation_network_failure', 'staging_upload_failed', 'upload_authorization_failed', 'rate_limited'].includes(reasonCode);
       wingShotLog(correlationId, retryable ? 'validation_retryable_failure' : 'validation_final_catch', {
@@ -411,6 +428,10 @@ export function WingShotFlow({
   const acceptMedia = useCallback(
     (selected: WingShotSelectedMedia | null) => {
       if (!selected) {
+        validationSequenceRef.current += 1;
+        validationAbortRef.current?.abort();
+        validationProgressControllerRef.current?.stop();
+        setValidationProgress(0);
         wingShotLog(sessionRef.current.correlationId, 'validation_return', { reasonCode: 'selection_cancelled', stage: 'media_selection' });
         setPhaseSafely('empty');
         return;
@@ -497,6 +518,8 @@ export function WingShotFlow({
     setErrorMessage('');
     validationSequenceRef.current += 1;
     validationAbortRef.current?.abort();
+    validationProgressControllerRef.current?.stop();
+    setValidationProgress(0);
     setErrorCode('');
     setPhaseSafely('empty');
     resetUploadSession();
@@ -899,12 +922,12 @@ export function WingShotFlow({
                 accessible
                 accessibilityLabel="Validating your Wing Shot…"
                 accessibilityRole="progressbar"
-                accessibilityValue={{ min: 0, max: 100, now: Math.round(progressController.displayProgress) }}
+                accessibilityValue={{ min: 0, max: 100, now: Math.round(validationProgress) }}
                 style={styles.progressCard}
                 testID="wing-shot.validation-progress"
               >
                 <Text style={styles.progressText} allowFontScaling>Validating your Wing Shot…</Text>
-                <View style={styles.progressTrack}><Animated.View style={[styles.progressFill, styles.validationFill, { width: `${Math.max(5, progressController.displayProgress)}%` }]} /></View>
+                <View style={styles.progressTrack}><View style={[styles.progressFill, styles.validationFill, { width: `${validationProgress}%` }]} /></View>
               </View>
             ) : null}
 
