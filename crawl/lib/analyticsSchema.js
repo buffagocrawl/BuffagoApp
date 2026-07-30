@@ -73,6 +73,7 @@ export const ANALYTICS_EVENTS = Object.freeze({
   BUFFAVERSE_LOAD_FAILED: 'buffaverse_load_failed',
   WING_SHOT_PROMPT_VIEWED: 'wing_shot_prompt_viewed',
   WING_SHOT_PROMPT_SKIPPED: 'wing_shot_prompt_skipped',
+  WING_SHOT_UPLOAD_SKIPPED: 'wing_shot_upload_skipped',
   WING_SHOT_CAPTURE_STARTED: 'wing_shot_capture_started',
   WING_SHOT_UPLOAD_STARTED: 'wing_shot_upload_started',
   WING_SHOT_UPLOAD_COMPLETED: 'wing_shot_upload_completed',

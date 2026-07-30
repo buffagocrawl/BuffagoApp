@@ -22,7 +22,9 @@ test('flow is full-screen, scrollable, keyboard-safe, and post-rating optional',
   assert.match(flow, /presentationStyle="fullScreen"/);
   assert.match(flow, /<ScrollView/);
   assert.match(flow, /<KeyboardAvoidingView/);
-  assert.match(flow, /OPTIONAL · YOUR RATING IS SAVED/);
+  assert.match(flow, /OPTIONAL · YOUR RATING HAS ALREADY SAVED/);
+  assert.match(flow, /flexGrow: 1/);
+  assert.match(flow, /justifyContent: 'center'/);
   assert.match(flow, /testID="wing-shot\.not-now"/);
   assert.match(flow, /animationType="none"/);
 });
@@ -98,6 +100,27 @@ test('photo and video actions fail closed behind independent flags', () => {
   assert.match(flow, /testID="wing-shot\.media-disabled"/);
   assert.match(flow, /selected\.kind === 'photo' && !allowPhoto/);
   assert.match(flow, /selected\.kind === 'video' && !allowVideo/);
+});
+
+test('optional post-rating skip is accessible, idempotent, and resets media state', () => {
+  assert.match(flow, /testID="wing-shot\.skip-media"/);
+  assert.match(flow, /accessibilityLabel="Skip media upload and continue"/);
+  assert.match(flow, /eventName: 'wing_shot_upload_skipped'/);
+  assert.match(flow, /metadata: \{ media_selected: Boolean\(media\) \}/);
+  assert.match(flow, /skipNavigationRef\.current/);
+  assert.match(flow, /resetWingShotForm\(\);[\s\S]*onClose\(\);/);
+  assert.match(flow, /setMedia\(null\)/);
+  assert.match(flow, /setCaption\(''\)/);
+  assert.match(flow, /setUploadResult\(null\)/);
+});
+
+test('submit remains disabled without valid media and skip follows submit', () => {
+  const submitStart = flow.indexOf('disabled={!canSubmit}');
+  const skipStart = flow.indexOf('testID="wing-shot.skip-media"');
+  assert.notEqual(submitStart, -1);
+  assert.ok(skipStart > submitStart);
+  assert.match(flow, /disabled=\{!canSubmit\}/);
+  assert.match(flow, /const canSubmit = Boolean\([\s\S]*media && selectedKindEnabled/);
 });
 
 test('privacy-safe Wing Shot analytics cover capture consent upload and failure', () => {

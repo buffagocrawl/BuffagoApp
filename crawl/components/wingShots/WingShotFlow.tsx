@@ -118,6 +118,7 @@ export function WingShotFlow({
   const sessionRef = useRef(createWingShotUploadSession(Crypto.randomUUID));
   const progressBarRef = useRef(new Animated.Value(0));
   const progressController = useInterpolatedUploadProgress();
+  const skipNavigationRef = useRef(false);
   const disabled =
     phase === 'choosing' || phase === 'uploading' || phase === 'cancelling';
   const networkAvailable =
@@ -157,6 +158,26 @@ export function WingShotFlow({
     onClose();
   }, [onClose, resetWingShotForm]);
 
+  const skipMediaUpload = useCallback(() => {
+    if (
+      skipNavigationRef.current ||
+      phaseRef.current === 'uploading' ||
+      phaseRef.current === 'cancelling'
+    ) return;
+
+    skipNavigationRef.current = true;
+    trackEvent({
+      eventName: 'wing_shot_upload_skipped',
+      screen: analyticsContext?.screen ?? submissionSource,
+      userId: analyticsContext?.userId,
+      destinationId: analyticsContext?.destinationId ?? destinationId,
+      crawlId: analyticsContext?.crawlId ?? null,
+      metadata: { media_selected: Boolean(media) },
+    });
+    resetWingShotForm();
+    onClose();
+  }, [analyticsContext, destinationId, media, onClose, resetWingShotForm, submissionSource]);
+
   const closeFlow = useCallback(() => {
     if (phaseRef.current === 'uploading' || phaseRef.current === 'cancelling') return;
     // Closing an unfinished flow does not silently erase its draft. The
@@ -167,6 +188,10 @@ export function WingShotFlow({
   useEffect(() => {
     phaseRef.current = phase;
   }, [phase]);
+
+  useEffect(() => {
+    if (visible) skipNavigationRef.current = false;
+  }, [visible]);
 
   useEffect(() => {
     let active = true;
@@ -437,14 +462,6 @@ export function WingShotFlow({
           style={styles.flex}
         >
           <View style={styles.header}>
-            <View style={styles.headerCopy}>
-              <Text style={styles.eyebrow} allowFontScaling>
-                OPTIONAL · YOUR RATING IS SAVED
-              </Text>
-              <Text style={styles.title} accessibilityRole="header" allowFontScaling>
-                Show us the wings
-              </Text>
-            </View>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Not now, close Wing Shot"
@@ -463,6 +480,16 @@ export function WingShotFlow({
             showsVerticalScrollIndicator
             testID="wing-shot.scroll"
           >
+            <View style={styles.contentGroup}>
+              <View style={styles.headerCopy}>
+                <Text style={styles.eyebrow} allowFontScaling>
+                  OPTIONAL · YOUR RATING HAS ALREADY SAVED
+                </Text>
+                <Text style={styles.title} accessibilityRole="header" allowFontScaling>
+                  Show us the wings
+                </Text>
+              </View>
+
             <Text style={styles.intro} allowFontScaling>
               Share a photo or short video of wings from this restaurant. Every submission is reviewed;
               only approved photos may be featured on BuffaGo’s Instagram and Facebook. Approved
@@ -713,6 +740,22 @@ export function WingShotFlow({
               </Pressable>
             ) : null}
 
+            {phase !== 'success' && phase !== 'uploading' && phase !== 'cancelling' ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Skip media upload and continue"
+                accessibilityState={{ disabled: skipNavigationRef.current }}
+                disabled={skipNavigationRef.current}
+                onPress={skipMediaUpload}
+                style={({ pressed }) => [styles.skipButton, pressed && styles.pressed]}
+                testID="wing-shot.skip-media"
+              >
+                <Text style={styles.skipText} allowFontScaling>
+                  Skip media upload
+                </Text>
+              </Pressable>
+            ) : null}
+
             {phase === 'success' ? (
               <Pressable
                 accessibilityRole="button"
@@ -725,6 +768,7 @@ export function WingShotFlow({
                 </Text>
               </Pressable>
             ) : null}
+            </View>
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -779,12 +823,12 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#FFF9EF' },
   flex: { flex: 1 },
   header: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#D9D1C5',
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    zIndex: 1,
+    paddingRight: 12,
+    paddingTop: 8,
   },
   headerCopy: { flex: 1, paddingRight: 12 },
   eyebrow: {
@@ -802,7 +846,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 24,
   },
-  content: { padding: 20, paddingBottom: 48, gap: 20 },
+  content: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 76,
+    paddingBottom: 56,
+  },
+  contentGroup: { gap: 20 },
   intro: { color: '#343A45', fontSize: 17, lineHeight: 25 },
   section: { gap: 12 },
   sectionTitle: { color: '#1D2430', fontSize: 20, lineHeight: 27, fontWeight: '800' },
@@ -898,6 +949,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#A83D18',
     paddingHorizontal: 18,
   },
+  skipButton: {
+    minHeight: 56,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#A83D18',
+    backgroundColor: '#FFF9EF',
+    paddingHorizontal: 18,
+  },
+  skipText: { color: '#8A2F19', fontSize: 17, fontWeight: '800' },
   disabledButton: { backgroundColor: '#A8A39C' },
   submitText: { color: '#FFFFFF', fontSize: 18, fontWeight: '900' },
   pressed: { opacity: 0.72 },

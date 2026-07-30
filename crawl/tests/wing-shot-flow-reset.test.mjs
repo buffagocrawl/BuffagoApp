@@ -20,12 +20,12 @@ test('upload progress, failure, and success preserve the draft until Done', () =
   assert.doesNotMatch(submit, /resetWingShotForm\(\)/);
 });
 
-test('the completed-flow handler is the only reset call site', () => {
+test('completed and skipped flows reset safely while X preserves unfinished drafts', () => {
   const directResetCalls = flow.match(/resetWingShotForm\(\);/g) ?? [];
-  assert.equal(directResetCalls.length, 1);
+  assert.equal(directResetCalls.length, 2);
   assert.match(flow, /const handleCompletedFlowClose = useCallback/);
   assert.match(flow, /if \(phaseRef\.current !== 'success'\) return;/);
   assert.match(flow, /onPress=\{handleCompletedFlowClose\}[\s\S]*testID="wing-shot\.done"/);
   assert.match(flow, /onPress=\{closeFlow\}[\s\S]*testID="wing-shot\.not-now"/);
+  assert.match(flow, /onPress=\{skipMediaUpload\}[\s\S]*testID="wing-shot\.skip-media"/);
 });
-
