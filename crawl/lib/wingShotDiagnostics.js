@@ -55,6 +55,8 @@ export function safeErrorContext(error, includeMessage = false) {
 }
 
 export function wingShotLog(attemptId, event, context = {}, level = 'debug') {
+  const development = typeof __DEV__ !== 'undefined' ? __DEV__ : process.env.NODE_ENV !== 'production';
+  if (!development) return;
   const payload = safeValue(context);
   const line = `[WingShot][${attemptId}] ${event}`;
   // This is intentionally scoped to Wing Shot events; do not enable general

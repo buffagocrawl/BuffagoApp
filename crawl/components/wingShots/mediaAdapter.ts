@@ -1,5 +1,6 @@
 import { File as ExpoFile } from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
+import { Platform } from 'react-native';
 import { WING_SHOT_VIDEO_MAX_SECONDS } from '../../lib/wingShots';
 
 export type WingShotMediaKind = 'photo' | 'video';
@@ -94,9 +95,19 @@ function selectedMediaFromAsset(
     height: asset.height || undefined,
     getUploadBody: async (signal) => {
       abortIfNeeded(signal);
-      const body = asset.file
-        ? await asset.file.arrayBuffer()
-        : await nativeFile.arrayBuffer();
+      if (Platform.OS !== 'web') {
+        throw new WingShotMediaAdapterError(
+          'media_reader_unavailable',
+          'Native media is uploaded directly from its local URI.',
+        );
+      }
+      if (!asset.file) {
+        throw new WingShotMediaAdapterError(
+          'media_reader_unavailable',
+          'Browser media bytes are unavailable.',
+        );
+      }
+      const body = await asset.file.arrayBuffer();
       abortIfNeeded(signal);
       return body;
     },

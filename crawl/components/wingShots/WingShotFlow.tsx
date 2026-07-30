@@ -39,6 +39,7 @@ import {
 } from './mediaAdapter';
 import { useInterpolatedUploadProgress } from './useInterpolatedUploadProgress';
 import { errorContext, mediaLogContext, safeErrorContext, wingShotLog } from '../../lib/wingShotDiagnostics';
+import { stageWingShotMedia, cleanupWingShotStaging } from '../../lib/wingShotStaging';
 
 type Attribution = 'username' | 'display_name' | 'anonymous';
 type Phase =
@@ -76,7 +77,7 @@ type Props = {
   validationTransport?: (request: {
     client: typeof supabase;
     media: WingShotSelectedMedia;
-    body: unknown;
+    body?: unknown;
     signal?: AbortSignal;
   }) => Promise<{ data?: { valid?: boolean; reason_code?: string; retryable?: boolean; retry_after_seconds?: number }; error?: unknown }>;
   analyticsContext?: {
@@ -124,6 +125,7 @@ export function WingShotFlow({
   const [caption, setCaption] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [errorCode, setErrorCode] = useState('');
+  const [rateLimitRemainingSeconds, setRateLimitRemainingSeconds] = useState(0);
   const [uploadResult, setUploadResult] = useState<{ submission_id: string; status: string } | null>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
   const networkState = useNetworkState();
@@ -156,6 +158,7 @@ export function WingShotFlow({
       reason,
       stateCleared: true,
     });
+    if (sessionRef.current.staging) void cleanupWingShotStaging({ client: supabaseClient, staging: sessionRef.current.staging, correlationId: sessionRef.current.correlationId });
     setMedia(null);
     setConsentAccepted(false);
     setAttribution(null);
@@ -166,7 +169,7 @@ export function WingShotFlow({
     setPhase('empty');
     resetUploadSession();
     return true;
-  }, [resetUploadSession]);
+  }, [resetUploadSession, supabaseClient]);
 
   const setPhaseSafely = useCallback((nextPhase: Phase) => {
     phaseRef.current = nextPhase;
@@ -239,6 +242,12 @@ export function WingShotFlow({
   useEffect(() => {
     if (visible) skipNavigationRef.current = false;
   }, [visible]);
+
+  useEffect(() => {
+    if (rateLimitRemainingSeconds <= 0) return undefined;
+    const timer = setInterval(() => setRateLimitRemainingSeconds((value) => Math.max(0, value - 1)), 1000);
+    return () => clearInterval(timer);
+  }, [rateLimitRemainingSeconds]);
 
   useEffect(() => {
     let active = true;
@@ -325,12 +334,21 @@ export function WingShotFlow({
         project: 'vhfxnizaxdanmvmouuaf',
         reasonCode: 'local_validation_passed',
       });
+      const staging = (sessionRef.current as any).staging ?? await stageWingShotMedia({
+        client: supabaseClient,
+        media: selected,
+        correlationId,
+        signal: controller.signal,
+        onProgress: (value) => progressController.updateRealProgress(value),
+      });
+      (sessionRef.current as any).staging = staging;
       requestState.dispatched = true;
       await validateWingShotMediaRemotely({
         client: supabaseClient,
         media: selected,
         signal: controller.signal,
         validationTransport,
+        staging,
       });
       if (!mountedRef.current) {
         wingShotLog(correlationId, 'validation_return', { reasonCode: 'component_unmounted', stage: 'server_validation' });
@@ -341,6 +359,7 @@ export function WingShotFlow({
         return;
       }
       if (sequence !== validationSequenceRef.current) {
+        wingShotLog(correlationId, 'stale_validation_ignored', { stage: 'server_validation', reasonCode: 'stale_validation_cancelled' }, 'warn');
         wingShotLog(correlationId, 'validation_return', { reasonCode: 'stale_validation_sequence', stage: 'server_validation', sequence, currentSequence: validationSequenceRef.current });
         return;
       }
@@ -349,12 +368,13 @@ export function WingShotFlow({
       announce('Wing Shot ready.');
     } catch (error) {
       const reasonCode = String((error as { code?: string })?.code || 'validation_unknown');
-      wingShotLog(correlationId, 'validation_final_catch', {
+      const retryable = Boolean((error as { retryable?: boolean })?.retryable) || ['validator_unavailable', 'validation_timeout', 'validation_internal_failure', 'validation_network_failure', 'staging_upload_failed', 'upload_authorization_failed', 'rate_limited'].includes(reasonCode);
+      wingShotLog(correlationId, retryable ? 'validation_retryable_failure' : 'validation_final_catch', {
         stage: (error as { stage?: string })?.stage || (requestState.dispatched ? 'server_validation' : 'local_validation'),
         error: safeErrorContext(error, typeof __DEV__ !== 'undefined' && __DEV__),
         reasonCode,
         requestDispatched: requestState.dispatched,
-      }, 'error');
+      }, retryable ? 'warn' : 'warn');
       if (!mountedRef.current) {
         wingShotLog(correlationId, 'validation_return', { reasonCode: 'component_unmounted', stage: 'final_catch' });
         return;
@@ -368,16 +388,22 @@ export function WingShotFlow({
         return;
       }
       const message = wingShotUserMessage(error);
-      setMedia(null);
+      if (!retryable && sessionRef.current.staging) void cleanupWingShotStaging({ client: supabaseClient, staging: sessionRef.current.staging, correlationId });
+      if (!retryable) setMedia(null);
       setConsentAccepted(false);
       setErrorCode(reasonCode);
       setErrorMessage(message);
-      setPhaseSafely('empty');
+      setPhaseSafely(retryable ? 'error' : 'empty');
       announce(message);
     } finally {
       if (validationAbortRef.current === controller) validationAbortRef.current = null;
     }
-  }, [announce, setPhaseSafely, supabaseClient, validationTransport]);
+  }, [announce, progressController, setPhaseSafely, supabaseClient, validationTransport]);
+
+  const retryValidation = useCallback(() => {
+    if (!media || phaseRef.current !== 'error') return;
+    void validateSelectedMedia(media);
+  }, [media, validateSelectedMedia]);
 
   const acceptMedia = useCallback(
     (selected: WingShotSelectedMedia | null) => {
@@ -462,6 +488,7 @@ export function WingShotFlow({
   );
 
   const removeMedia = useCallback(() => {
+    if (sessionRef.current.staging) void cleanupWingShotStaging({ client: supabaseClient, staging: sessionRef.current.staging, correlationId: sessionRef.current.correlationId });
     setMedia(null);
     setConsentAccepted(false);
     setErrorMessage('');
@@ -471,9 +498,10 @@ export function WingShotFlow({
     setPhaseSafely('empty');
     resetUploadSession();
     announce('Selected media removed.');
-  }, [announce, resetUploadSession, setPhaseSafely]);
+  }, [announce, resetUploadSession, setPhaseSafely, supabaseClient]);
 
   const replaceMedia = useCallback(() => {
+    if (sessionRef.current.staging) void cleanupWingShotStaging({ client: supabaseClient, staging: sessionRef.current.staging, correlationId: sessionRef.current.correlationId });
     setMedia(null);
     setConsentAccepted(false);
     setErrorMessage('');
@@ -483,9 +511,10 @@ export function WingShotFlow({
     setPhaseSafely('empty');
     resetUploadSession();
     announce('Choose a replacement photo or video.');
-  }, [announce, resetUploadSession, setPhaseSafely]);
+  }, [announce, resetUploadSession, setPhaseSafely, supabaseClient]);
 
   const submit = useCallback(async () => {
+    if (phaseRef.current !== 'valid' || rateLimitRemainingSeconds > 0) return;
     if (!networkAvailable) {
       const message = wingShotUserMessage({ code: 'offline' });
       setErrorMessage(message);
@@ -512,7 +541,6 @@ export function WingShotFlow({
     const controller = new AbortController();
     abortRef.current = controller;
     setErrorMessage('');
-    if (phaseRef.current !== 'valid') return;
     setPhaseSafely('submitting');
     const operation = progressController.start();
     trackEvent({
@@ -568,17 +596,22 @@ export function WingShotFlow({
       if (!progressController.isCurrent(operation)) return;
       progressController.stop(controller.signal.aborted ? 'canceled' : 'failed');
       const message = wingShotUserMessage(error);
+      const caughtCode = String((error as { code?: string })?.code || '');
+      const isRateLimited = caughtCode === 'WING_SHOT_RATE_LIMITED' || caughtCode === 'RATE_LIMITED';
+      if (isRateLimited) {
+        setRateLimitRemainingSeconds(Math.max(0, Math.ceil(Number((error as { retryAfterSeconds?: number })?.retryAfterSeconds) || 0)));
+      }
       wingShotLog(sessionRef.current.correlationId, 'Final success or failure', {
         outcome: 'failure',
         ...mediaLogContext(media),
         ratingIdPresent: Boolean(eligibleRatingId),
         destinationIdPresent: Boolean(destinationId),
         userIdPresent: Boolean(analyticsContext?.userId),
-        exception: errorContext(error),
-        userFacingClassification: String((error as { code?: string })?.code || 'unknown'),
+        ...(isRateLimited ? {} : { exception: errorContext(error) }),
+        userFacingClassification: caughtCode || 'unknown',
         userFacingMessage: message,
-      }, 'error');
-      setErrorCode(String((error as { code?: string })?.code || ''));
+      }, 'warn');
+      setErrorCode(caughtCode);
       trackEvent({
         eventName: 'wing_shot_upload_failed',
         screen: analyticsContext?.screen ?? 'wing_shot',
@@ -587,7 +620,7 @@ export function WingShotFlow({
         crawlId: analyticsContext?.crawlId ?? null,
         metadata: {
           media_type: media.kind,
-          error_code: String((error as { code?: string })?.code || 'unknown'),
+          error_code: caughtCode || 'unknown',
           failure_stage: String((error as { stage?: string })?.stage || 'unknown'),
         },
       });
@@ -614,13 +647,14 @@ export function WingShotFlow({
     submissionSource,
     uploadTransport,
     progressController,
+    rateLimitRemainingSeconds,
     setPhaseSafely,
   ]);
 
   const selectedKindEnabled =
     media?.kind === 'photo' ? allowPhoto : media?.kind === 'video' ? allowVideo : false;
   const canSubmit = Boolean(
-    phase === 'valid' && media && selectedKindEnabled && consentAccepted && attribution && !disabled,
+    phase === 'valid' && media && selectedKindEnabled && consentAccepted && attribution && !disabled && rateLimitRemainingSeconds <= 0,
   );
   const safeProgress = Math.max(0, Math.min(100, progressController.displayProgress));
   const progressLabel = useMemo(
@@ -847,8 +881,9 @@ export function WingShotFlow({
               >
                 <Ionicons name="alert-circle" size={22} color="#9C2F16" />
                 <View style={styles.flex}>
-                  {errorCode ? <Text style={styles.errorTitle} allowFontScaling>{wingShotProcessingCopy({ code: errorCode }).title}</Text> : null}
-                  <Text style={styles.errorText} allowFontScaling>{errorMessage}</Text>
+                  {errorCode ? <Text style={styles.errorTitle} allowFontScaling>{wingShotProcessingCopy({ code: errorCode, retryAfterSeconds: rateLimitRemainingSeconds }).title}</Text> : null}
+                <Text style={styles.errorText} allowFontScaling>{errorMessage}</Text>
+                  {phase === 'error' && media ? <Pressable accessibilityRole="button" onPress={retryValidation} style={styles.cancelButton} testID="wing-shot.validation-retry"><Text style={styles.cancelText}>Retry validation</Text></Pressable> : null}
                 </View>
               </View>
             ) : null}
@@ -858,12 +893,12 @@ export function WingShotFlow({
                 accessible
                 accessibilityLabel="Validating your Wing Shot…"
                 accessibilityRole="progressbar"
-                accessibilityValue={{ min: 0, max: 100, now: 50 }}
+                accessibilityValue={{ min: 0, max: 100, now: Math.round(progressController.displayProgress) }}
                 style={styles.progressCard}
                 testID="wing-shot.validation-progress"
               >
                 <Text style={styles.progressText} allowFontScaling>Validating your Wing Shot…</Text>
-                <View style={styles.progressTrack}><View style={[styles.progressFill, styles.validationFill]} /></View>
+                <View style={styles.progressTrack}><Animated.View style={[styles.progressFill, styles.validationFill, { width: `${Math.max(5, progressController.displayProgress)}%` }]} /></View>
               </View>
             ) : null}
 
@@ -951,7 +986,7 @@ export function WingShotFlow({
                 }
               >
                 <Text style={styles.submitText} allowFontScaling>
-                  Submit Wing Shot
+                  {rateLimitRemainingSeconds > 0 ? `Try again in ${formatCountdown(rateLimitRemainingSeconds)}` : 'Submit Wing Shot'}
                 </Text>
               </Pressable>
             ) : null}
@@ -1033,6 +1068,12 @@ function ActionButton({
       <Ionicons name="chevron-forward" size={22} color="#606773" accessibilityElementsHidden />
     </Pressable>
   );
+}
+
+function formatCountdown(totalSeconds: number) {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }
 
 const styles = StyleSheet.create({
