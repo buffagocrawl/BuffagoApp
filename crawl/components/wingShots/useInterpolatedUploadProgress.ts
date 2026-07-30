@@ -4,7 +4,9 @@ import { reconcileDisplayedProgress } from '../../lib/wingShotProgress';
 export type UploadProgressStage =
   | 'idle'
   | 'preparing'
+  | 'authorizing'
   | 'uploading'
+  | 'server_validating'
   | 'finalizing'
   | 'succeeded'
   | 'failed'
@@ -18,7 +20,7 @@ function clamp(value: number) {
 }
 
 function stageCap(stage: UploadProgressStage) {
-  return stage === 'finalizing' ? 95 : stage === 'uploading' || stage === 'preparing' ? 90 : 100;
+  return stage === 'finalizing' ? 95 : stage === 'uploading' || stage === 'preparing' || stage === 'authorizing' || stage === 'server_validating' ? 90 : 100;
 }
 
 export function useInterpolatedUploadProgress() {

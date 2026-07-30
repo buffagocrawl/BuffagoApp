@@ -138,6 +138,7 @@ export function WingShotFlow({
   const progressBarRef = useRef(new Animated.Value(0));
   const progressController = useInterpolatedUploadProgress();
   const skipNavigationRef = useRef(false);
+  const submitInFlightRef = useRef(false);
   const disabled = phase === 'choosing' || phase === 'validating' || phase === 'submitting' || phase === 'cancelling';
   const networkAvailable =
     isOnline ??
@@ -158,7 +159,7 @@ export function WingShotFlow({
       reason,
       stateCleared: true,
     });
-    if (sessionRef.current.staging) void cleanupWingShotStaging({ client: supabaseClient, staging: sessionRef.current.staging, correlationId: sessionRef.current.correlationId });
+    if (sessionRef.current.staging) void cleanupWingShotStaging({ client: supabaseClient, staging: sessionRef.current.staging, correlationId: sessionRef.current.correlationId }).catch(() => undefined);
     setMedia(null);
     setConsentAccepted(false);
     setAttribution(null);
@@ -276,7 +277,9 @@ export function WingShotFlow({
     if (lastAnnouncedStageRef.current === progressController.stage) return;
     lastAnnouncedStageRef.current = progressController.stage;
     if (progressController.stage === 'preparing') announce('Preparing your Wing Shot.');
+    if (progressController.stage === 'authorizing') announce('Securing your Wing Shot upload.');
     if (progressController.stage === 'uploading') announce('Uploading your Wing Shot.');
+    if (progressController.stage === 'server_validating') announce('Checking your Wing Shot.');
     if (progressController.stage === 'finalizing') announce('Finishing your submission.');
   }, [announce, progressController.stage]);
 
@@ -388,7 +391,7 @@ export function WingShotFlow({
         return;
       }
       const message = wingShotUserMessage(error);
-      if (!retryable && sessionRef.current.staging) void cleanupWingShotStaging({ client: supabaseClient, staging: sessionRef.current.staging, correlationId });
+      if (!retryable && sessionRef.current.staging) void cleanupWingShotStaging({ client: supabaseClient, staging: sessionRef.current.staging, correlationId }).catch(() => undefined);
       if (!retryable) setMedia(null);
       setConsentAccepted(false);
       setErrorCode(reasonCode);
@@ -488,7 +491,7 @@ export function WingShotFlow({
   );
 
   const removeMedia = useCallback(() => {
-    if (sessionRef.current.staging) void cleanupWingShotStaging({ client: supabaseClient, staging: sessionRef.current.staging, correlationId: sessionRef.current.correlationId });
+    if (sessionRef.current.staging) void cleanupWingShotStaging({ client: supabaseClient, staging: sessionRef.current.staging, correlationId: sessionRef.current.correlationId }).catch(() => undefined);
     setMedia(null);
     setConsentAccepted(false);
     setErrorMessage('');
@@ -501,7 +504,7 @@ export function WingShotFlow({
   }, [announce, resetUploadSession, setPhaseSafely, supabaseClient]);
 
   const replaceMedia = useCallback(() => {
-    if (sessionRef.current.staging) void cleanupWingShotStaging({ client: supabaseClient, staging: sessionRef.current.staging, correlationId: sessionRef.current.correlationId });
+    if (sessionRef.current.staging) void cleanupWingShotStaging({ client: supabaseClient, staging: sessionRef.current.staging, correlationId: sessionRef.current.correlationId }).catch(() => undefined);
     setMedia(null);
     setConsentAccepted(false);
     setErrorMessage('');
@@ -514,7 +517,7 @@ export function WingShotFlow({
   }, [announce, resetUploadSession, setPhaseSafely, supabaseClient]);
 
   const submit = useCallback(async () => {
-    if (phaseRef.current !== 'valid' || rateLimitRemainingSeconds > 0) return;
+    if (submitInFlightRef.current || phaseRef.current !== 'valid' || rateLimitRemainingSeconds > 0) return;
     if (!networkAvailable) {
       const message = wingShotUserMessage({ code: 'offline' });
       setErrorMessage(message);
@@ -539,6 +542,7 @@ export function WingShotFlow({
       return;
     }
     const controller = new AbortController();
+    submitInFlightRef.current = true;
     abortRef.current = controller;
     setErrorMessage('');
     setPhaseSafely('submitting');
@@ -574,7 +578,7 @@ export function WingShotFlow({
         },
         ...(uploadTransport ? { uploadTransport } : {}),
       });
-      if (!progressController.isCurrent(operation) || controller.signal.aborted) return;
+      if (!mountedRef.current || !progressController.isCurrent(operation) || controller.signal.aborted) return;
       progressController.complete();
       setUploadResult(result);
       setPhaseSafely('submitted');
@@ -593,11 +597,11 @@ export function WingShotFlow({
       announce('Wing Shot submitted for review.');
       onSubmitted?.(result);
     } catch (error) {
-      if (!progressController.isCurrent(operation)) return;
+      if (!mountedRef.current || !progressController.isCurrent(operation)) return;
       progressController.stop(controller.signal.aborted ? 'canceled' : 'failed');
       const message = wingShotUserMessage(error);
       const caughtCode = String((error as { code?: string })?.code || '');
-      const isRateLimited = caughtCode === 'WING_SHOT_RATE_LIMITED' || caughtCode === 'RATE_LIMITED';
+      const isRateLimited = caughtCode === 'WING_SHOT_RATE_LIMITED' || caughtCode === 'RATE_LIMITED' || caughtCode === 'rate_limited';
       if (isRateLimited) {
         setRateLimitRemainingSeconds(Math.max(0, Math.ceil(Number((error as { retryAfterSeconds?: number })?.retryAfterSeconds) || 0)));
       }
@@ -628,6 +632,7 @@ export function WingShotFlow({
       setPhaseSafely(controller.signal.aborted ? 'cancelled' : 'valid');
       announce(message);
     } finally {
+      submitInFlightRef.current = false;
       if (abortRef.current === controller) abortRef.current = null;
     }
   }, [
@@ -659,7 +664,8 @@ export function WingShotFlow({
   const safeProgress = Math.max(0, Math.min(100, progressController.displayProgress));
   const progressLabel = useMemo(
     () => {
-      if (progressController.stage === 'preparing') return 'Preparing your Wing Shot…';
+      if (progressController.stage === 'preparing' || progressController.stage === 'authorizing') return 'Securing your Wing Shot upload…';
+      if (progressController.stage === 'server_validating') return 'Checking your Wing Shot…';
       if (progressController.stage === 'finalizing') return 'Finishing your submission…';
       return `Uploading your Wing Shot — ${Math.round(safeProgress)}%`;
     },

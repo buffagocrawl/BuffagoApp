@@ -41,8 +41,6 @@ export function errorContext(error) {
     status: error.status ?? error.statusCode ?? error.httpStatus ?? null,
     httpStatus: error.status ?? error.statusCode ?? error.httpStatus ?? null,
     stage: error.stage ?? null,
-    stack: error.stack ?? null,
-    cause: error.cause ? errorContext(error.cause) : null,
   };
 }
 
@@ -55,14 +53,18 @@ export function safeErrorContext(error, includeMessage = false) {
 }
 
 export function wingShotLog(attemptId, event, context = {}, level = 'debug') {
-  const development = typeof __DEV__ !== 'undefined' ? __DEV__ : process.env.NODE_ENV !== 'production';
-  if (!development) return;
-  const payload = safeValue(context);
-  const line = `[WingShot][${attemptId}] ${event}`;
-  // This is intentionally scoped to Wing Shot events; do not enable general
-  // Metro logging here.
-  const logger = console[level] || console.debug;
-  logger(line, payload);
+  try {
+    const development = typeof __DEV__ !== 'undefined' ? __DEV__ : process.env.NODE_ENV !== 'production';
+    if (!development) return;
+    const payload = safeValue(context);
+    const line = `[WingShot][${attemptId}] ${event}`;
+    // This is intentionally scoped to Wing Shot events; do not enable general
+    // Metro logging here.
+    const logger = typeof console?.[level] === 'function' ? console[level] : console.debug;
+    if (typeof logger === 'function') logger(line, payload);
+  } catch (_) {
+    // Diagnostics must never become a second upload failure.
+  }
 }
 
 export function mediaLogContext(media) {

@@ -22,6 +22,18 @@ function isAuthFailure(status, body) {
   return status === 401 || ['authentication_required', 'invalid_token'].includes(String(body?.code || body?.reason_code || ''));
 }
 
+function withTimeout(promise, milliseconds) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => {
+      const error = new Error('Wing Shot function request timed out');
+      error.code = 'network_timeout';
+      reject(error);
+    }, milliseconds);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
 export async function invokeWithOneAuthRefresh(client, functionName, body, correlationId) {
   let refreshed = false;
   let requestAccessToken = null;
@@ -41,14 +53,14 @@ export async function invokeWithOneAuthRefresh(client, functionName, body, corre
       apikeyPresent: Boolean(client?.supabaseKey || client?.headers?.apikey || client?.headers?.apiKey),
       refreshAttempted: refreshed,
     }, 'debug');
-    const result = await client.functions.invoke(functionName, {
+    const result = await withTimeout(client.functions.invoke(functionName, {
       body,
       headers: {
         'x-wing-correlation-id': correlationId,
         ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         ...(client?.supabaseKey ? { apikey: client.supabaseKey } : {}),
       },
-    });
+    }), 30_000);
     if (!result?.error) return result;
     const failure = await functionFailure(result.error);
     if (!refreshed && isAuthFailure(failure.status, failure.body)) {

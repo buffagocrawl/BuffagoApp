@@ -40,10 +40,10 @@ export class WingShotMediaAdapterError extends Error {
   }
 }
 
-function assertPermission(permission: ImagePicker.PermissionResponse) {
+function assertPermission(permission: ImagePicker.PermissionResponse, code: 'camera_permission_denied' | 'library_permission_denied') {
   if (!permission.granted) {
     throw new WingShotMediaAdapterError(
-      'permission_denied',
+      code,
       'Media permission was not granted.',
     );
   }
@@ -168,7 +168,7 @@ function enforceVideoDuration(
 export const expoWingShotMediaAdapter: WingShotMediaAdapter = {
   async takePhoto() {
     try {
-      assertPermission(await ImagePicker.requestCameraPermissionsAsync());
+      assertPermission(await ImagePicker.requestCameraPermissionsAsync(), 'camera_permission_denied');
       return firstSelection(
         await ImagePicker.launchCameraAsync({
           mediaTypes: ['images'],
@@ -187,7 +187,7 @@ export const expoWingShotMediaAdapter: WingShotMediaAdapter = {
 
   async recordVideo({ maximumDurationSeconds }) {
     try {
-      assertPermission(await ImagePicker.requestCameraPermissionsAsync());
+      assertPermission(await ImagePicker.requestCameraPermissionsAsync(), 'camera_permission_denied');
       return enforceVideoDuration(
         firstSelection(
           await ImagePicker.launchCameraAsync({
@@ -219,7 +219,7 @@ export const expoWingShotMediaAdapter: WingShotMediaAdapter = {
           'Wing Shot uploads are not enabled.',
         );
       }
-      assertPermission(await ImagePicker.requestMediaLibraryPermissionsAsync(false));
+      assertPermission(await ImagePicker.requestMediaLibraryPermissionsAsync(false), 'library_permission_denied');
       const mediaTypes: ImagePicker.MediaType[] = [];
       if (allowedMediaKinds.includes('photo')) mediaTypes.push('images');
       if (allowedMediaKinds.includes('video')) mediaTypes.push('videos');

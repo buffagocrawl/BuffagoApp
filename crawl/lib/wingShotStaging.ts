@@ -91,7 +91,11 @@ export async function stageWingShotMedia({
 
 export async function cleanupWingShotStaging({ client, staging, correlationId }: { client: any; staging: WingShotStagedMedia; correlationId: string }) {
   wingShotLog(correlationId, 'staging_cleanup_started', { stage: 'staging_cleanup', bucket: staging.bucket, objectPath: sanitizedObjectPath(staging.objectPath) }, 'debug');
-  const result = await invokeWithOneAuthRefresh(client, 'wing-media-staging-cleanup', { bucket: staging.bucket, objectPath: staging.objectPath, correlationId }, correlationId);
-  if (result.error) wingShotLog(correlationId, 'staging_cleanup_failed', { stage: 'staging_cleanup', reasonCode: 'staging_cleanup_failed' }, 'warn');
-  else wingShotLog(correlationId, 'staging_cleanup_completed', { stage: 'staging_cleanup', reasonCode: 'staging_cleanup_completed' }, 'debug');
+  try {
+    const result = await invokeWithOneAuthRefresh(client, 'wing-media-staging-cleanup', { bucket: staging.bucket, objectPath: staging.objectPath, correlationId }, correlationId);
+    if (result.error) wingShotLog(correlationId, 'staging_cleanup_failed', { stage: 'staging_cleanup', reasonCode: 'staging_cleanup_failed' }, 'warn');
+    else wingShotLog(correlationId, 'staging_cleanup_completed', { stage: 'staging_cleanup', reasonCode: 'staging_cleanup_completed' }, 'debug');
+  } catch (error) {
+    wingShotLog(correlationId, 'staging_cleanup_failed', { stage: 'staging_cleanup', reasonCode: 'staging_cleanup_failed', httpStatus: safeStatus(error) }, 'warn');
+  }
 }

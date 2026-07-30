@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import { bearerToken } from '../_shared/wingShotResponse.ts';
 
 const SOURCE_BUCKET = 'wing-shot-staging';
 const DESTINATION_BUCKET = 'wing-submissions';
@@ -50,9 +51,9 @@ Deno.serve(async (request) => {
   const id = correlationId(request, body);
   if (!validUuid(id) || body.correlationId !== id) return response(request, 400, 'invalid_correlation_id', 'The upload correlation identifier is invalid.', 'request', { body });
 
-  const auth = request.headers.get('authorization') || '';
-  const userClient = createClient(Deno.env.get('SUPABASE_URL'), Deno.env.get('SUPABASE_ANON_KEY'), { global: { headers: { authorization: auth } } });
-  const { data: { user } } = await userClient.auth.getUser();
+  const token = bearerToken(request);
+  const userClient = createClient(Deno.env.get('SUPABASE_URL'), Deno.env.get('SUPABASE_ANON_KEY'));
+  const { data: { user } } = token ? await userClient.auth.getUser(token) : { data: { user: null } };
   if (!user) return response(request, 401, 'authentication_required', 'Sign in to continue this upload.', 'authentication', { body });
 
   const { bucket, objectPath, submissionId } = body;

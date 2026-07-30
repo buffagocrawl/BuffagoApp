@@ -1,5 +1,6 @@
 import { errorContext, mediaLogContext, sanitizedObjectPath, wingShotLog } from './wingShotDiagnostics.js';
 import { WING_SHOT_PHOTO_MAX_BYTES, WING_SHOT_VIDEO_MAX_BYTES, WING_SHOT_VIDEO_MAX_MB } from './wingShotLimits.js';
+import { transitionWingShotUpload } from './wingShotUploadState.js';
 
 export const WING_SHOT_CONSENT_VERSION = 'wing-shots-v1';
 export const WING_SHOT_VIDEO_TARGET_SECONDS = 7;
@@ -152,6 +153,7 @@ export function createWingShotUploadSession(idFactory = createCorrelationId) {
   const correlationId = idFactory();
   return {
     correlationId,
+    state: 'idle',
     reserveIdempotencyKey: `wing-reserve-${idFactory()}`,
     finalizeIdempotencyKey: `wing-finalize-${idFactory()}`,
     reservation: null,
@@ -265,11 +267,19 @@ function isFunctionAuthFailure(failure) {
   return failure.status === 401 || ['authentication_required', 'invalid_token'].includes(String(failure.body?.code || failure.body?.reason_code || ''));
 }
 
+function withTimeout(promise, milliseconds) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(Object.assign(new Error('Wing Shot function request timed out'), { code: 'network_timeout' })), milliseconds);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
 function functionClientError(failure, stage, fallbackCode = 'function_request_failed') {
   const body = failure?.body && typeof failure.body === 'object' ? failure.body : {};
   const status = failure?.status ?? null;
   const serverCode = String(body.code || body.reason_code || (body.ok === false ? fallbackCode : `function_http_${status || 'unknown'}`));
-  const code = status === 429 ? 'RATE_LIMITED' : serverCode;
+  const code = status === 401 ? 'authentication_required' : status === 403 ? 'authorization_failed' : status === 429 ? 'rate_limited' : status === 413 ? 'file_too_large' : serverCode;
   const retryable = body.retryable === true || (status >= 500 && status !== 501);
   return new WingShotClientError(code, String(body.message || failure?.text || 'The upload could not finish. Try again.'), {
     stage: body.stage || stage,
@@ -285,11 +295,14 @@ function functionClientError(failure, stage, fallbackCode = 'function_request_fa
 
 async function invokeWingShotFunction(client, functionName, body, correlationId) {
   let refreshed = false;
+  let accessToken = null;
   for (;;) {
-    const sessionResult = await client.auth.getSession();
-    const session = sessionResult?.data?.session ?? null;
-    wingShotLog(correlationId, 'function_request_headers', { stage: functionName, tokenSource: session?.access_token ? 'supabase_session_access_token' : 'none', bearerPresent: Boolean(session?.access_token), bearerShape: session?.access_token ? 'jwt_like' : 'absent', refreshAttempted: refreshed }, 'debug');
-    const result = await client.functions.invoke(functionName, { body, headers: { 'x-wing-correlation-id': correlationId } });
+    if (!accessToken) {
+      const sessionResult = await client.auth.getSession();
+      accessToken = sessionResult?.data?.session?.access_token ?? null;
+    }
+    wingShotLog(correlationId, 'function_request_headers', { stage: functionName, tokenSource: accessToken ? (refreshed ? 'refreshed_access_token' : 'supabase_session_access_token') : 'none', bearerPresent: Boolean(accessToken), bearerShape: accessToken ? 'jwt_like' : 'absent', apikeyPresent: Boolean(client.supabaseKey), refreshAttempted: refreshed }, 'debug');
+    const result = await withTimeout(client.functions.invoke(functionName, { body, headers: { ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}), ...(client.supabaseKey ? { apikey: client.supabaseKey } : {}), 'x-wing-correlation-id': correlationId } }), 30_000);
     if (!result?.error) return result;
     const failure = await parseWingShotFunctionError(result.error);
     if (!refreshed && isFunctionAuthFailure(failure)) {
@@ -297,6 +310,7 @@ async function invokeWingShotFunction(client, functionName, body, correlationId)
       wingShotLog(correlationId, 'auth_refresh_started', { stage: functionName, httpStatus: failure.status, reasonCode: failure.body?.reason_code || 'gateway_auth_failure' }, 'warn');
       const refreshResult = await client.auth.refreshSession();
       if (!refreshResult?.error && refreshResult?.data?.session?.access_token) {
+        accessToken = refreshResult.data.session.access_token;
         wingShotLog(correlationId, 'auth_refresh_succeeded', { stage: functionName, reasonCode: 'token_refreshed' }, 'debug');
         continue;
       }
@@ -318,6 +332,15 @@ function databaseErrorDetails(error) {
   };
 }
 
+function setUploadState(session, nextState) {
+  if (!session) return;
+  try {
+    session.state = transitionWingShotUpload(session.state ?? 'idle', nextState);
+  } catch (_) {
+    session.state = nextState;
+  }
+}
+
 function rpcError(code, stage, error) {
   const serverCode = serverErrorText(error);
   const database = databaseErrorDetails(error);
@@ -329,6 +352,8 @@ function rpcError(code, stage, error) {
         stage,
         cause: error,
         retryAfterSeconds: database.retryAfterSeconds,
+        retryable: true,
+        httpStatus: 429,
         databaseCode: database.code,
         databaseMessage: database.message,
       },
@@ -439,6 +464,7 @@ export async function submitWingShot({
   if (!session?.correlationId) {
     throw new WingShotClientError('session_required', 'Start a new upload session.');
   }
+  setUploadState(session, 'ready');
   const requestFingerprint = JSON.stringify([
     input.ratingId ?? null,
     input.destinationId,
@@ -465,7 +491,8 @@ export async function submitWingShot({
     ...mediaLogContext(input.media),
     preprocessing: 'client upload body preparation',
   });
-  onStage('preparing');
+  setUploadState(session, 'authorizing');
+  onStage('authorizing');
   onProgress(2);
 
   let body = null;
@@ -536,12 +563,12 @@ export async function submitWingShot({
     const { data, error } = reservationResult;
     if (!error && data?.error_code === 'WING_SHOT_RATE_LIMITED') {
       throw new WingShotClientError('RATE_LIMITED', 'Wing Shot upload rate limit reached.', {
-        stage: 'reserve', retryAfterSeconds: data.retry_after_seconds,
+        stage: 'reserve', retryAfterSeconds: data.retry_after_seconds, retryable: true, httpStatus: 429,
       });
     }
     const classifiedError = error ? rpcError('reservation_failed', 'reserve', error) : null;
     const database = databaseErrorDetails(error);
-    wingShotLog(session.correlationId, 'RPC response', { rpcName, databaseCode: database.code, databaseMessage: database.message, clientClassification: classifiedError?.code ?? null, retryAfterSeconds: classifiedError?.retryAfterSeconds ?? null, exception: errorContext(error), existingRecordFound: Boolean(data?.resumed || data?.existing_record_found), existingRecordId: data?.existing_record_id ?? data?.submission_id ?? null, existingRecordStatus: data?.existing_record_status ?? data?.status ?? null, recordCreation: data?.resumed ? 'existing_record_resumed' : error ? 'failed' : 'created' }, error ? 'error' : 'debug');
+    wingShotLog(session.correlationId, 'RPC response', { rpcName, databaseCode: database.code, databaseMessage: database.message, clientClassification: classifiedError?.code ?? null, retryAfterSeconds: classifiedError?.retryAfterSeconds ?? null, exception: errorContext(error), existingRecordFound: Boolean(data?.resumed || data?.existing_record_found), existingRecordId: data?.existing_record_id ?? data?.submission_id ?? null, existingRecordStatus: data?.existing_record_status ?? data?.status ?? null, recordCreation: data?.resumed ? 'existing_record_resumed' : error ? 'failed' : 'created' }, error ? 'warn' : 'debug');
     if (error || !data?.submission_id || !data?.bucket || !data?.upload_path) {
       throw classifiedError ?? rpcError('reservation_failed', 'reserve', error);
     }
@@ -555,6 +582,7 @@ export async function submitWingShot({
   onProgress(20);
 
   if (!session.uploadCompleted && session.staging) {
+    setUploadState(session, 'uploading');
     onStage('uploading');
     try {
       const result = await invokeWingShotFunction(client, 'wing-media-promote', {
@@ -580,8 +608,10 @@ export async function submitWingShot({
     }
     session.uploadCompleted = true;
   } else if (!session.uploadCompleted) {
+    setUploadState(session, 'uploading');
     onStage('uploading');
     const storagePath = session.reservation.uploadPath;
+    let lastUploadProgress = -1;
     let uploadResult;
     try {
       uploadResult = await uploadTransport({
@@ -591,7 +621,13 @@ export async function submitWingShot({
         body,
         mimeType: input.media.mimeType,
         signal,
-        onProgress: (value) => onProgress(Math.max(20, Math.min(85, value))),
+        onProgress: (value) => {
+          const integerProgress = Math.max(20, Math.min(85, Math.round(value)));
+          if (integerProgress !== lastUploadProgress) {
+            lastUploadProgress = integerProgress;
+            onProgress(integerProgress);
+          }
+        },
       });
     } catch (error) {
       wingShotLog(session.correlationId, 'Upload failed', {
@@ -607,7 +643,7 @@ export async function submitWingShot({
       objectPath: sanitizedObjectPath(storagePath),
       ...mediaLogContext(input.media),
       supabaseError: errorContext(error),
-    }, error ? 'error' : 'debug');
+    }, error ? 'warn' : 'debug');
     if (error && !isExistingObjectError(error)) {
       throw new WingShotClientError('upload_failed', 'Upload interrupted. Try again.', {
         stage: 'upload',
@@ -616,6 +652,9 @@ export async function submitWingShot({
     session.uploadCompleted = true;
   }
   throwIfAborted(signal);
+  setUploadState(session, 'server_validating');
+  onStage('server_validating');
+  setUploadState(session, 'finalizing');
   onStage('finalizing');
   onProgress(95);
 
@@ -660,6 +699,18 @@ export async function submitWingShot({
 
 export function wingShotUserMessage(error) {
   const code = String(error?.code ?? '');
+  if (code === 'camera_permission_denied') return 'Camera access is needed to record a Wing Shot. Your rating is already saved—allow camera access or choose another option.';
+  if (code === 'library_permission_denied' || code === 'permission_denied') return 'Photo library access is needed to choose a Wing Shot. Your rating is already saved—allow access or skip the upload.';
+  if (code === 'offline') return 'You appear to be offline. Your rating is saved—reconnect and try the upload again.';
+  if (code === 'network_timeout' || code === 'timeout') return 'The upload timed out. Your rating is saved—check your connection and try again.';
+  if (code === 'authentication_required') return 'Your session expired. Your rating is saved—sign in again to upload your Wing Shot.';
+  if (code === 'authorization_failed') return 'Your rating is saved, but this upload is no longer authorized. Choose the media again or skip the upload.';
+  if (code === 'rate_limited') {
+    const retry = Number.isFinite(Number(error?.retryAfterSeconds)) && Number(error.retryAfterSeconds) > 0 ? `try again in ${formatRetryAfter(Number(error.retryAfterSeconds))}` : 'try again later';
+    return `You’ve uploaded several Wing Shots recently. Your rating is already saved—${retry}.`;
+  }
+  if (code === 'server_temporarily_unavailable') return 'Wing Shot upload is temporarily unavailable. Your rating is saved—please try again.';
+  if (code === 'file_too_large') return 'That file is too large to upload. Choose a smaller photo or video.';
   if (code === 'local_validation_error') return 'This media could not be checked on this device. Choose another file and try again.';
   if (code === 'validation_state_error') return 'This Wing Shot is no longer ready to validate. Choose the media again.';
   if (code === 'media_too_large') return 'This file is too large to upload. Try choosing a shorter video or a smaller photo.';
