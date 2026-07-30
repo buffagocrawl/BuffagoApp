@@ -114,6 +114,29 @@ test('optional post-rating skip is accessible, idempotent, and resets media stat
   assert.match(flow, /setUploadResult\(null\)/);
 });
 
+test('validation failures clear media and return to the empty state', () => {
+  assert.match(flow, /validateWingShotMediaRemotely/);
+  assert.match(flow, /setMedia\(null\)/);
+  assert.match(flow, /setPhaseSafely\('empty'\)/);
+  assert.doesNotMatch(flow, /testID="wing-shot\.try-again"/);
+  assert.doesNotMatch(flow, /testID="wing-shot\.choose-different-video"/);
+  assert.match(flow, /validationSequenceRef\.current/);
+  assert.match(flow, /validationAbortRef\.current\?\.abort/);
+  assert.match(flow, /mountedRef\.current/);
+  assert.match(flow, /testID="wing-shot\.skip-media"/);
+  assert.match(flow, /ratingId: eligibleRatingId/);
+  assert.match(flow, /resetWingShotForm\('explicit_close'\)/);
+});
+
+test('selection automatically validates and submit is gated on valid state', () => {
+  assert.match(flow, /void validateSelectedMedia\(selected\)/);
+  assert.match(flow, /<Text[^>]*>Validating your Wing Shot…<\/Text>/);
+  assert.match(flow, /<Text[^>]*>Wing Shot ready!<\/Text>/);
+  assert.match(flow, /phase === 'valid' && media/);
+  assert.match(flow, /setPhaseSafely\('submitting'\)/);
+  assert.match(flow, /setPhaseSafely\('submitted'\)/);
+});
+
 test('submit remains disabled without valid media and skip follows submit', () => {
   const submitStart = flow.indexOf('disabled={!canSubmit}');
   const skipStart = flow.indexOf('testID="wing-shot.skip-media"');

@@ -18,6 +18,16 @@ from wing_media_processing.video import validate_processed_video, validate_video
 import wing_media_processing.video as video_module
 
 
+def test_high_bitrate_source_is_accepted_for_normalization() -> None:
+    probe = {
+        "format": {"format_name": "mov,mp4,m4a,3gp,3g2,mj2", "duration": "3", "bit_rate": "90000000"},
+        "streams": [{"codec_type": "video", "codec_name": "h264", "width": 1920, "height": 1080}],
+    }
+    source_mime, duration = validate_video_probe(probe, limits=ProcessingLimits())
+    assert source_mime == "video/mp4"
+    assert duration == 3
+
+
 def test_photo_content_is_sniffed_without_trusting_extension(tmp_path: Path) -> None:
     source = tmp_path / "untrusted.exe"
     Image.new("RGB", (32, 24), "orange").save(source, format="PNG")
@@ -174,7 +184,7 @@ def test_subprocess_boundary_always_disables_shell(monkeypatch: pytest.MonkeyPat
     assert observed["arguments"] == ["ffmpeg", "-i", "literal;not-a-shell-command"]
 
 
-def test_video_transcode_command_explicitly_drops_audio(
+def test_video_transcode_command_normalizes_audio_and_video(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -194,7 +204,8 @@ def test_video_transcode_command_explicitly_drops_audio(
     output_probe = {
         "format": {"format_name": "mov,mp4,m4a,3gp,3g2,mj2", "duration": "3"},
         "streams": [
-            {"codec_type": "video", "codec_name": "h264", "width": 1080, "height": 1350}
+            {"codec_type": "video", "codec_name": "h264", "width": 1080, "height": 1350},
+            {"codec_type": "audio", "codec_name": "aac"},
         ],
     }
     probes = iter([source_probe, output_probe])
@@ -220,6 +231,8 @@ def test_video_transcode_command_explicitly_drops_audio(
     )
 
     assert artifacts.processed_path.is_file()
-    assert "-an" in commands[0]
+    assert "-an" not in commands[0]
+    assert "-c:a" in commands[0]
+    assert "aac" in commands[0]
     assert commands[0][commands[0].index("-map") + 1] == "0:v:0"
     assert "-map_metadata" in commands[0]

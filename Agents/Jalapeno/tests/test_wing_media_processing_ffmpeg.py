@@ -80,7 +80,8 @@ def test_real_transcode_removes_known_audio_stream(tmp_path: Path) -> None:
 
     assert isinstance(artifacts, VideoArtifacts)
     processed_probe = _probe(artifacts.processed_path)
-    assert [stream["codec_type"] for stream in processed_probe["streams"]] == ["video"]
+    assert [stream["codec_type"] for stream in processed_probe["streams"]] == ["video", "audio"]
     assert processed_probe["streams"][0]["codec_name"] == "h264"
+    assert processed_probe["streams"][1]["codec_name"] == "aac"
     assert artifacts.thumbnail_path.is_file()
     assert len(artifacts.fingerprint) == 64

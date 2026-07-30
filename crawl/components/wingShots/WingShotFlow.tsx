@@ -22,7 +22,7 @@ import { trackEvent } from '../../lib/analytics';
 import {
   createWingShotUploadSession,
   submitWingShot,
-  validateWingShotMedia,
+  validateWingShotMediaRemotely,
   WING_SHOT_VIDEO_MAX_SECONDS,
   WING_SHOT_VIDEO_TARGET_SECONDS,
   WING_SHOT_VIDEO_MAX_MB,
@@ -41,13 +41,15 @@ import { errorContext, mediaLogContext, wingShotLog } from '../../lib/wingShotDi
 
 type Attribution = 'username' | 'display_name' | 'anonymous';
 type Phase =
-  | 'editing'
+  | 'empty'
   | 'choosing'
-  | 'uploading'
+  | 'validating'
+  | 'valid'
+  | 'submitting'
+  | 'submitted'
   | 'cancelling'
   | 'error'
-  | 'cancelled'
-  | 'success';
+  | 'cancelled';
 
 type Props = {
   visible: boolean;
@@ -70,6 +72,12 @@ type Props = {
     signal?: AbortSignal;
     onProgress?: (value: number) => void;
   }) => Promise<{ error: unknown }>;
+  validationTransport?: (request: {
+    client: typeof supabase;
+    media: WingShotSelectedMedia;
+    body: unknown;
+    signal?: AbortSignal;
+  }) => Promise<{ data?: { valid?: boolean; reason_code?: string; retryable?: boolean; retry_after_seconds?: number }; error?: unknown }>;
   analyticsContext?: {
     screen: string;
     userId?: string | null;
@@ -105,10 +113,11 @@ export function WingShotFlow({
   allowPhoto = true,
   allowVideo = true,
   uploadTransport,
+  validationTransport,
   analyticsContext,
 }: Props) {
   const [media, setMedia] = useState<WingShotSelectedMedia | null>(null);
-  const [phase, setPhase] = useState<Phase>('editing');
+  const [phase, setPhase] = useState<Phase>('empty');
   const [consentAccepted, setConsentAccepted] = useState(false);
   const [attribution, setAttribution] = useState<Attribution | null>(null);
   const [caption, setCaption] = useState('');
@@ -118,13 +127,15 @@ export function WingShotFlow({
   const [reduceMotion, setReduceMotion] = useState(false);
   const networkState = useNetworkState();
   const abortRef = useRef<AbortController | null>(null);
-  const phaseRef = useRef<Phase>('editing');
+  const validationAbortRef = useRef<AbortController | null>(null);
+  const validationSequenceRef = useRef(0);
+  const mountedRef = useRef(true);
+  const phaseRef = useRef<Phase>('empty');
   const sessionRef = useRef(createWingShotUploadSession(Crypto.randomUUID));
   const progressBarRef = useRef(new Animated.Value(0));
   const progressController = useInterpolatedUploadProgress();
   const skipNavigationRef = useRef(false);
-  const disabled =
-    phase === 'choosing' || phase === 'uploading' || phase === 'cancelling';
+  const disabled = phase === 'choosing' || phase === 'validating' || phase === 'submitting' || phase === 'cancelling';
   const networkAvailable =
     isOnline ??
     (networkState.isConnected !== false && networkState.isInternetReachable !== false);
@@ -139,7 +150,7 @@ export function WingShotFlow({
   const resetWingShotForm = useCallback((reason = 'explicit_reset') => {
     // An in-flight upload owns the draft until it settles. The successful
     // server record is never touched by this client-side reset.
-    if (phaseRef.current === 'uploading' || phaseRef.current === 'cancelling') return false;
+    if (phaseRef.current === 'submitting' || phaseRef.current === 'cancelling') return false;
     wingShotLog(sessionRef.current.correlationId, 'Modal close and state cleanup', {
       reason,
       stateCleared: true,
@@ -151,7 +162,7 @@ export function WingShotFlow({
     setErrorMessage('');
     setErrorCode('');
     setUploadResult(null);
-    setPhase('editing');
+    setPhase('empty');
     resetUploadSession();
     return true;
   }, [resetUploadSession]);
@@ -162,7 +173,7 @@ export function WingShotFlow({
   }, []);
 
   const handleCompletedFlowClose = useCallback(() => {
-    if (phaseRef.current !== 'success') return;
+    if (phaseRef.current !== 'submitted') return;
     wingShotLog(sessionRef.current.correlationId, 'Modal close and state cleanup', {
       reason: 'successful_upload_closed',
       stateCleared: true,
@@ -174,7 +185,7 @@ export function WingShotFlow({
   const skipMediaUpload = useCallback(() => {
     if (
       skipNavigationRef.current ||
-      phaseRef.current === 'uploading' ||
+      phaseRef.current === 'submitting' ||
       phaseRef.current === 'cancelling'
     ) return;
 
@@ -196,15 +207,22 @@ export function WingShotFlow({
   }, [analyticsContext, destinationId, media, onClose, resetWingShotForm, submissionSource]);
 
   const closeFlow = useCallback(() => {
-    if (phaseRef.current === 'uploading' || phaseRef.current === 'cancelling') return;
-    // Closing an unfinished flow does not silently erase its draft. The
-    // completed flow has its own explicit Done button and cleanup path below.
+    if (phaseRef.current === 'submitting' || phaseRef.current === 'cancelling') return;
+    // An explicit close is the user's decision to abandon the optional upload.
+    // A failed upload remains intact until this path or Skip media upload runs.
+    resetWingShotForm('explicit_close');
     onClose();
-  }, [onClose]);
+  }, [onClose, resetWingShotForm]);
 
   useEffect(() => {
     phaseRef.current = phase;
   }, [phase]);
+
+  useEffect(() => () => {
+    mountedRef.current = false;
+    validationAbortRef.current?.abort();
+    abortRef.current?.abort();
+  }, []);
 
   useEffect(() => {
     if (!visible) return;
@@ -252,10 +270,41 @@ export function WingShotFlow({
     if (progressController.stage === 'finalizing') announce('Finishing your submission.');
   }, [announce, progressController.stage]);
 
+  const validateSelectedMedia = useCallback(async (selected: WingShotSelectedMedia) => {
+      const sequence = ++validationSequenceRef.current;
+      validationAbortRef.current?.abort();
+      const controller = new AbortController();
+      validationAbortRef.current = controller;
+      setPhaseSafely('validating');
+      try {
+        await validateWingShotMediaRemotely({
+          client: supabaseClient,
+          media: selected,
+          signal: controller.signal,
+          validationTransport,
+        });
+        if (!mountedRef.current || controller.signal.aborted || sequence !== validationSequenceRef.current) return;
+        setPhaseSafely('valid');
+        announce('Wing Shot ready.');
+      } catch (error) {
+        if (!mountedRef.current || controller.signal.aborted || sequence !== validationSequenceRef.current) return;
+        if (String((error as { code?: string })?.code || '') === 'validation_cancelled') return;
+        const message = wingShotUserMessage(error);
+        setMedia(null);
+        setConsentAccepted(false);
+        setErrorCode(String((error as { code?: string })?.code || 'validation_unknown'));
+        setErrorMessage(message);
+        setPhaseSafely('empty');
+        announce(message);
+      } finally {
+        if (validationAbortRef.current === controller) validationAbortRef.current = null;
+      }
+    }, [announce, setPhaseSafely, supabaseClient, validationTransport]);
+
   const acceptMedia = useCallback(
     (selected: WingShotSelectedMedia | null) => {
       if (!selected) {
-        setPhaseSafely('editing');
+        setPhaseSafely('empty');
         return;
       }
       if (
@@ -270,26 +319,13 @@ export function WingShotFlow({
       setMedia(selected);
       setConsentAccepted(false);
       setErrorMessage('');
-      setPhaseSafely('editing');
+      setErrorCode('');
       resetUploadSession();
       wingShotLog(sessionRef.current.correlationId, 'Media recording or selection', mediaLogContext(selected));
-      try {
-        validateWingShotMedia(selected);
-      } catch (error) {
-        wingShotLog(sessionRef.current.correlationId, 'Validation failed', {
-          ...mediaLogContext(selected),
-          validationRule: (error as { code?: string })?.code ?? 'unknown',
-          exception: errorContext(error),
-        }, 'warn');
-        throw error;
-      }
-      wingShotLog(sessionRef.current.correlationId, 'Metadata extraction', {
-        ...mediaLogContext(selected),
-        metadataAvailable: selected.kind !== 'video' || Number.isFinite(selected.durationSeconds),
-      });
       announce(`${selected.kind === 'photo' ? 'Photo' : 'Video'} selected.`);
+      void validateSelectedMedia(selected);
     },
-    [allowPhoto, allowVideo, announce, resetUploadSession, setPhaseSafely],
+    [allowPhoto, allowVideo, announce, resetUploadSession, setPhaseSafely, validateSelectedMedia],
   );
 
   const chooseMedia = useCallback(
@@ -333,7 +369,7 @@ export function WingShotFlow({
           exception: errorContext(error),
         }, 'warn');
         setErrorMessage(message);
-        setPhaseSafely('error');
+        if (mountedRef.current) setPhaseSafely('empty');
         announce(message);
       }
     },
@@ -344,7 +380,10 @@ export function WingShotFlow({
     setMedia(null);
     setConsentAccepted(false);
     setErrorMessage('');
-    setPhaseSafely('editing');
+    validationSequenceRef.current += 1;
+    validationAbortRef.current?.abort();
+    setErrorCode('');
+    setPhaseSafely('empty');
     resetUploadSession();
     announce('Selected media removed.');
   }, [announce, resetUploadSession, setPhaseSafely]);
@@ -353,7 +392,10 @@ export function WingShotFlow({
     setMedia(null);
     setConsentAccepted(false);
     setErrorMessage('');
-    setPhaseSafely('editing');
+    validationSequenceRef.current += 1;
+    validationAbortRef.current?.abort();
+    setErrorCode('');
+    setPhaseSafely('empty');
     resetUploadSession();
     announce('Choose a replacement photo or video.');
   }, [announce, resetUploadSession, setPhaseSafely]);
@@ -385,7 +427,8 @@ export function WingShotFlow({
     const controller = new AbortController();
     abortRef.current = controller;
     setErrorMessage('');
-    setPhaseSafely('uploading');
+    if (phaseRef.current !== 'valid') return;
+    setPhaseSafely('submitting');
     const operation = progressController.start();
     trackEvent({
       eventName: 'wing_shot_upload_started',
@@ -421,7 +464,7 @@ export function WingShotFlow({
       if (!progressController.isCurrent(operation) || controller.signal.aborted) return;
       progressController.complete();
       setUploadResult(result);
-      setPhaseSafely('success');
+      setPhaseSafely('submitted');
       wingShotLog(sessionRef.current.correlationId, 'Final success or failure', {
         outcome: 'success',
         ...mediaLogContext(media),
@@ -464,7 +507,7 @@ export function WingShotFlow({
         },
       });
       setErrorMessage(message);
-      setPhaseSafely(controller.signal.aborted ? 'cancelled' : 'error');
+      setPhaseSafely(controller.signal.aborted ? 'cancelled' : 'valid');
       announce(message);
     } finally {
       if (abortRef.current === controller) abortRef.current = null;
@@ -492,7 +535,7 @@ export function WingShotFlow({
   const selectedKindEnabled =
     media?.kind === 'photo' ? allowPhoto : media?.kind === 'video' ? allowVideo : false;
   const canSubmit = Boolean(
-    media && selectedKindEnabled && consentAccepted && attribution && !disabled,
+    phase === 'valid' && media && selectedKindEnabled && consentAccepted && attribution && !disabled,
   );
   const safeProgress = Math.max(0, Math.min(100, progressController.displayProgress));
   const progressLabel = useMemo(
@@ -721,21 +764,25 @@ export function WingShotFlow({
                 <View style={styles.flex}>
                   {errorCode ? <Text style={styles.errorTitle} allowFontScaling>{wingShotProcessingCopy({ code: errorCode }).title}</Text> : null}
                   <Text style={styles.errorText} allowFontScaling>{errorMessage}</Text>
-                  {phase === 'error' && media ? (
-                    <Pressable accessibilityRole="button" onPress={submit} testID="wing-shot.try-again">
-                      <Text style={styles.errorAction}>Try Again</Text>
-                    </Pressable>
-                  ) : null}
-                  {phase === 'error' ? (
-                        <Pressable accessibilityRole="button" onPress={replaceMedia} testID="wing-shot.choose-different-video">
-                      <Text style={styles.errorAction}>Choose Another Video</Text>
-                    </Pressable>
-                  ) : null}
                 </View>
               </View>
             ) : null}
 
-            {phase === 'uploading' || phase === 'cancelling' ? (
+            {phase === 'validating' ? (
+              <View
+                accessible
+                accessibilityLabel="Validating your Wing Shot…"
+                accessibilityRole="progressbar"
+                accessibilityValue={{ min: 0, max: 100, now: 50 }}
+                style={styles.progressCard}
+                testID="wing-shot.validation-progress"
+              >
+                <Text style={styles.progressText} allowFontScaling>Validating your Wing Shot…</Text>
+                <View style={styles.progressTrack}><View style={[styles.progressFill, styles.validationFill]} /></View>
+              </View>
+            ) : null}
+
+            {phase === 'submitting' || phase === 'cancelling' ? (
               <View
                 accessible
                 accessibilityLabel={progressLabel}
@@ -775,7 +822,14 @@ export function WingShotFlow({
               </View>
             ) : null}
 
-            {phase === 'success' ? (
+            {phase === 'valid' ? (
+              <View accessibilityLiveRegion="polite" style={styles.success} testID="wing-shot.ready">
+                <Ionicons name="checkmark-circle" size={24} color="#287A46" />
+                <Text style={styles.successTitle} allowFontScaling>Wing Shot ready!</Text>
+              </View>
+            ) : null}
+
+            {phase === 'submitted' ? (
               <View
                 accessibilityLiveRegion="polite"
                 style={styles.success}
@@ -794,8 +848,9 @@ export function WingShotFlow({
               </View>
             ) : null}
 
-            {phase !== 'success' &&
-            phase !== 'uploading' &&
+            {phase !== 'submitted' &&
+            phase !== 'submitting' &&
+            phase !== 'validating' &&
             phase !== 'cancelling' &&
             (allowPhoto || allowVideo) ? (
               <Pressable
@@ -811,16 +866,12 @@ export function WingShotFlow({
                 }
               >
                 <Text style={styles.submitText} allowFontScaling>
-                  {phase === 'error' || phase === 'cancelled'
-                    ? media
-                      ? 'Retry upload'
-                      : 'Submit Wing Shot'
-                    : 'Submit Wing Shot'}
+                  Submit Wing Shot
                 </Text>
               </Pressable>
             ) : null}
 
-            {phase !== 'success' && phase !== 'uploading' && phase !== 'cancelling' ? (
+            {phase !== 'submitted' && phase !== 'submitting' && phase !== 'validating' && phase !== 'cancelling' ? (
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Skip media upload and continue"
@@ -836,7 +887,7 @@ export function WingShotFlow({
               </Pressable>
             ) : null}
 
-            {phase === 'success' ? (
+            {phase === 'submitted' ? (
               <Pressable
                 accessibilityRole="button"
                 onPress={handleCompletedFlowClose}
@@ -1011,6 +1062,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E5DFD6',
   },
   progressFill: { height: '100%', borderRadius: 5, backgroundColor: '#A83D18' },
+  validationFill: { width: '50%', opacity: 0.7 },
   cancelButton: { minHeight: 48, alignItems: 'center', justifyContent: 'center' },
   cancelText: { color: '#8A2F19', fontSize: 16, fontWeight: '800' },
   success: {

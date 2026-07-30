@@ -42,18 +42,16 @@ def validate_video_probe(probe: dict, *, limits: ProcessingLimits) -> tuple[str,
     )
     if duration <= 0 or duration > limits.max_video_duration_seconds + 0.05:
         raise PermanentMediaError("video duration is outside allowed bounds")
-    bitrate_value = probe.get("format", {}).get("bit_rate")
-    if bitrate_value not in (None, "N/A"):
-        bitrate = int(_number(bitrate_value, field="bitrate"))
-        if bitrate > limits.max_video_bitrate:
-            raise PermanentMediaError("video bitrate exceeds allowed bounds")
+    # High source bitrate is allowed. The normalized output is bounded by the
+    # encoder settings below, so valid camera videos are not rejected here.
     return source_mime, duration
 
 
 def validate_processed_video(probe: dict, *, limits: ProcessingLimits) -> None:
     streams = probe.get("streams", [])
-    if any(stream.get("codec_type") == "audio" for stream in streams):
-        raise PermanentMediaError("processed video unexpectedly contains audio")
+    audio_streams = [stream for stream in streams if stream.get("codec_type") == "audio"]
+    if len(audio_streams) > 1 or (audio_streams and audio_streams[0].get("codec_name") != "aac"):
+        raise PermanentMediaError("processed video audio is not AAC")
     video_streams = [stream for stream in streams if stream.get("codec_type") == "video"]
     if len(video_streams) != 1 or video_streams[0].get("codec_name") != "h264":
         raise PermanentMediaError("processed video is not a single H.264 stream")
@@ -112,11 +110,12 @@ def process_video(
                 str(source),
                 "-map",
                 "0:v:0",
+                "-map",
+                "0:a:0?",
                 "-map_metadata",
                 "-1",
                 "-map_chapters",
                 "-1",
-                "-an",
                 "-vf",
                 f"scale={limits.social_width}:{limits.social_height}:"
                 "force_original_aspect_ratio=decrease,"
@@ -128,6 +127,12 @@ def process_video(
                 "medium",
                 "-pix_fmt",
                 "yuv420p",
+                "-c:a",
+                "aac",
+                "-b:a",
+                "128k",
+                "-ac",
+                "2",
                 "-b:v",
                 "4000k",
                 "-maxrate",

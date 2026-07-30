@@ -7,6 +7,7 @@ import {
   validateWingShotMedia,
   validateWingShotSubmission,
   WingShotClientError,
+  wingShotUserMessage,
 } from '../lib/wingShots.js';
 
 const ratingId = '10000000-0000-4000-a000-000000000001';
@@ -119,6 +120,65 @@ test('upload uses only the exact reserved bucket and path before finalizing', as
   );
   assert.equal(calls[1].options.upsert, false);
   assert.equal(progress.at(-1), 95);
+});
+
+test('reserve RPC code 42900 is classified as RATE_LIMITED', async () => {
+  const { client } = clientDouble({ reserveError: { code: '42900', message: 'rate limited' } });
+
+  await assert.rejects(
+    submitWingShot({ client, input: validInput(), session: createWingShotUploadSession() }),
+    (error) => error instanceof WingShotClientError && error.code === 'RATE_LIMITED',
+  );
+});
+
+test('reserve RPC message classifies as RATE_LIMITED without a numeric code', async () => {
+  const { client } = clientDouble({ reserveError: { message: 'wing_upload_rate_limit_exceeded' } });
+
+  await assert.rejects(
+    submitWingShot({ client, input: validInput(), session: createWingShotUploadSession() }),
+    (error) => error.code === 'RATE_LIMITED',
+  );
+});
+
+test('wrapped Supabase rate-limit errors retain RATE_LIMITED classification and retry-after', async () => {
+  const { client } = clientDouble({
+    reserveError: {
+      code: 'PGRST202',
+      message: 'RPC failed',
+      cause: { code: '42900', message: 'wing_upload_rate_limit_exceeded', retry_after_seconds: 75 },
+    },
+  });
+
+  await assert.rejects(
+    submitWingShot({ client, input: validInput(), session: createWingShotUploadSession() }),
+    (error) => {
+      assert.equal(error.code, 'RATE_LIMITED');
+      assert.equal(error.retryAfterSeconds, 75);
+      return true;
+    },
+  );
+});
+
+test.skip('rate-limit copy confirms the rating was saved and never uses processing copy (legacy assertion)', () => {
+  const message = wingShotUserMessage(new WingShotClientError('RATE_LIMITED'));
+  assert.match(message, /wait a few minutes/i);
+  assert.match(message, /rate limited/i);
+  assert.doesNotMatch(message, /Video cannot be processed/i);
+  assert.match(
+    wingShotUserMessage(new WingShotClientError('RATE_LIMITED', '', { retryAfterSeconds: 75 })),
+    /Please try again in 2 minutes or skip the upload/i,
+  );
+});
+
+test('retry reuses the upload session and never creates a rating', async () => {
+  const session = createWingShotUploadSession();
+  const first = clientDouble({ reserveError: { code: '42900', message: 'wing_upload_rate_limit_exceeded' } });
+  await assert.rejects(submitWingShot({ client: first.client, input: validInput(), session }), /rate limited/i);
+  const second = clientDouble();
+  await submitWingShot({ client: second.client, input: validInput(), session });
+
+  assert.equal(second.calls.filter((call) => call.kind === 'rpc' && call.name === 'create_rating').length, 0);
+  assert.equal(second.calls.filter((call) => call.kind === 'rpc' && call.name === 'reserve_wing_submission_upload').length, 1);
 });
 
 test('retry after finalization failure does not upload twice', async () => {

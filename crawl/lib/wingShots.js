@@ -5,6 +5,8 @@ export const WING_SHOT_CONSENT_VERSION = 'wing-shots-v1';
 export const WING_SHOT_VIDEO_TARGET_SECONDS = 7;
 export const WING_SHOT_VIDEO_MIN_SECONDS = 3;
 export const WING_SHOT_VIDEO_MAX_SECONDS = 10;
+export const WING_SHOT_MAX_PHOTO_EDGE = 2_048;
+export const WING_SHOT_MAX_VIDEO_EDGE = 4_096;
 export { WING_SHOT_PHOTO_MAX_BYTES, WING_SHOT_VIDEO_MAX_BYTES, WING_SHOT_VIDEO_MAX_MB } from './wingShotLimits.js';
 
 const PHOTO_MIME_TYPES = new Set([
@@ -26,6 +28,9 @@ export class WingShotClientError extends Error {
     this.cause = options.cause ?? null;
     this.durationSeconds = options.durationSeconds ?? null;
     this.sizeBytes = options.sizeBytes ?? null;
+    this.retryAfterSeconds = options.retryAfterSeconds ?? null;
+    this.databaseCode = options.databaseCode ?? null;
+    this.databaseMessage = options.databaseMessage ?? null;
   }
 }
 
@@ -58,6 +63,10 @@ export function validateWingShotMedia(media) {
     if (extension !== 'unknown' && !VIDEO_EXTENSIONS.has(extension)) {
       throw new WingShotClientError('unsupported_media_type', 'This video format is not supported.', { stage: 'validate' });
     }
+  }
+  const maxEdge = media.kind === 'photo' ? WING_SHOT_MAX_PHOTO_EDGE : WING_SHOT_MAX_VIDEO_EDGE;
+  if ((media.width != null || media.height != null) && (!Number.isInteger(media.width) || !Number.isInteger(media.height) || media.width < 1 || media.height < 1 || Math.max(media.width, media.height) > maxEdge)) {
+    throw new WingShotClientError('invalid_dimensions', 'This media’s dimensions are not supported.', { stage: 'validate' });
   }
   const maximumBytes =
     media.kind === 'photo' ? WING_SHOT_PHOTO_MAX_BYTES : WING_SHOT_VIDEO_MAX_BYTES;
@@ -160,8 +169,110 @@ function assertClient(client) {
   }
 }
 
+function errorChain(error, depth = 0) {
+  if (!error || depth > 4) return [];
+  return [error, ...errorChain(error.cause, depth + 1)];
+}
+
+/**
+ * Performs the immediate, server-trusted validation pass. The server returns
+ * reason_code only; transport and exception text never reach the UI.
+ */
+export async function validateWingShotMediaRemotely({
+  client,
+  media,
+  signal,
+  validationTransport,
+}) {
+  validateWingShotMedia(media);
+  if (signal?.aborted) throw new WingShotClientError('validation_cancelled', 'Validation cancelled.', { stage: 'validate' });
+  let body;
+  try {
+    body = await media.getUploadBody(signal);
+  } catch (error) {
+    if (signal?.aborted) throw new WingShotClientError('validation_cancelled', 'Validation cancelled.', { stage: 'validate' });
+    throw new WingShotClientError('media_unreadable', 'The selected media could not be read.', { stage: 'validate', cause: error });
+  }
+  if (signal?.aborted) throw new WingShotClientError('validation_cancelled', 'Validation cancelled.', { stage: 'validate' });
+  let result;
+  try {
+    if (validationTransport) {
+      result = await validationTransport({ client, media, body, signal });
+    } else {
+      const form = new FormData();
+      form.append('media_type', media.kind);
+      form.append('mime_type', media.mimeType);
+      form.append('file_name', media.fileName || 'wing-shot');
+      form.append('width', String(media.width));
+      form.append('height', String(media.height));
+      if (media.durationSeconds != null) form.append('duration_seconds', String(media.durationSeconds));
+      form.append('media', new Blob([body], { type: media.mimeType }), media.fileName || 'wing-shot');
+      result = await client.functions.invoke('wing-media-validate', { body: form });
+    }
+  } catch (error) {
+    throw new WingShotClientError('validation_network_failure', 'Validation is temporarily unavailable.', { stage: 'validate', cause: error });
+  }
+  const data = result?.data;
+  if (result?.error || data?.valid === false) {
+    const code = String(data?.reason_code || 'validation_unknown');
+    const options = { stage: 'validate', retryable: Boolean(data?.retryable), retryAfterSeconds: data?.retry_after_seconds };
+    throw new WingShotClientError(code, 'Wing Shot validation failed.', options);
+  }
+  if (data?.valid !== true) {
+    throw new WingShotClientError('validation_unknown', 'Wing Shot validation failed.', { stage: 'validate' });
+  }
+  return data;
+}
+
+function serverErrorText(error) {
+  return errorChain(error)
+    .flatMap((item) => [item?.code, item?.message, item?.details, item?.hint])
+    .filter(Boolean)
+    .join(' ');
+}
+
+function retryAfterSeconds(error) {
+  for (const item of errorChain(error)) {
+    const candidates = [
+      item?.retry_after_seconds,
+      item?.retryAfterSeconds,
+      item?.retry_after,
+      item?.retryAfter,
+    ];
+    const value = candidates.find((candidate) => Number.isFinite(Number(candidate)) && Number(candidate) > 0);
+    if (value != null) return Math.ceil(Number(value));
+  }
+  return null;
+}
+
+function databaseErrorDetails(error) {
+  const chain = errorChain(error);
+  const source = chain.find((item) =>
+    String(item?.code ?? '') === '42900' || String(item?.message ?? '').includes('wing_upload_rate_limit_exceeded'),
+  ) ?? chain[0] ?? error;
+  return {
+    code: source?.code ?? null,
+    message: source?.message ?? null,
+    retryAfterSeconds: retryAfterSeconds(error),
+  };
+}
+
 function rpcError(code, stage, error) {
-  const serverCode = [error?.code, error?.message, error?.details, error?.hint].filter(Boolean).join(' ');
+  const serverCode = serverErrorText(error);
+  const database = databaseErrorDetails(error);
+  if (/(^|\D)42900(\D|$)/.test(serverCode) || serverCode.includes('wing_upload_rate_limit_exceeded')) {
+    return new WingShotClientError(
+      'RATE_LIMITED',
+      'Wing Shot uploads are temporarily rate limited.',
+      {
+        stage,
+        cause: error,
+        retryAfterSeconds: database.retryAfterSeconds,
+        databaseCode: database.code,
+        databaseMessage: database.message,
+      },
+    );
+  }
   if (serverCode.includes('invalid_media_size')) {
     return new WingShotClientError(
       'media_too_large',
@@ -348,13 +459,25 @@ export async function submitWingShot({
     try {
       reservationResult = await client.rpc(rpcName, rpcArgs);
     } catch (error) {
-      wingShotLog(session.correlationId, 'RPC failure', { rpcName, exception: errorContext(error), recordCreation: 'unknown' }, 'error');
-      throw rpcError('reservation_failed', 'reserve', error);
+      const classifiedError = rpcError('reservation_failed', 'reserve', error);
+      const database = databaseErrorDetails(error);
+      wingShotLog(session.correlationId, 'RPC failure', {
+        rpcName,
+        databaseCode: database.code,
+        databaseMessage: database.message,
+        clientClassification: classifiedError.code,
+        retryAfterSeconds: classifiedError.retryAfterSeconds,
+        exception: errorContext(error),
+        recordCreation: 'unknown',
+      }, 'error');
+      throw classifiedError;
     }
     const { data, error } = reservationResult;
-    wingShotLog(session.correlationId, 'RPC response', { rpcName, exception: errorContext(error), existingRecordFound: Boolean(data?.resumed || data?.existing_record_found), existingRecordId: data?.existing_record_id ?? data?.submission_id ?? null, existingRecordStatus: data?.existing_record_status ?? data?.status ?? null, recordCreation: data?.resumed ? 'existing_record_resumed' : error ? 'failed' : 'created' }, error ? 'error' : 'debug');
+    const classifiedError = error ? rpcError('reservation_failed', 'reserve', error) : null;
+    const database = databaseErrorDetails(error);
+    wingShotLog(session.correlationId, 'RPC response', { rpcName, databaseCode: database.code, databaseMessage: database.message, clientClassification: classifiedError?.code ?? null, retryAfterSeconds: classifiedError?.retryAfterSeconds ?? null, exception: errorContext(error), existingRecordFound: Boolean(data?.resumed || data?.existing_record_found), existingRecordId: data?.existing_record_id ?? data?.submission_id ?? null, existingRecordStatus: data?.existing_record_status ?? data?.status ?? null, recordCreation: data?.resumed ? 'existing_record_resumed' : error ? 'failed' : 'created' }, error ? 'error' : 'debug');
     if (error || !data?.submission_id || !data?.bucket || !data?.upload_path) {
-      throw rpcError('reservation_failed', 'reserve', error);
+      throw classifiedError ?? rpcError('reservation_failed', 'reserve', error);
     }
     session.reservation = {
       submissionId: data.submission_id,
@@ -446,8 +569,24 @@ export async function submitWingShot({
 
 export function wingShotUserMessage(error) {
   const code = String(error?.code ?? '');
+  if (code === 'media_too_large') return 'This file is too large to upload. Try choosing a shorter video or a smaller photo.';
+  if (code === 'video_too_long') return 'This video is longer than we can accept. Trim it and try again.';
+  if (code === 'video_too_short') return 'This video is too short. Record a slightly longer Wing Shot and try again.';
+  if (code === 'unsupported_media_type' || code === 'unsupported_format') return 'We can’t use this file format. Try a standard photo or MP4 video.';
+  if (code === 'media_unreadable' || code === 'corrupt_media' || code === 'media_read_failed') return 'We couldn’t read this file. Try selecting it again or choose another one.';
+  if (code === 'invalid_dimensions' || code === 'photo_dimensions_invalid' || code === 'video_dimensions_invalid') return 'This media’s dimensions aren’t supported. Try another photo or video.';
+  if (code === 'validation_network_failure' || code === 'validation_retryable' || code === 'network_failed') return 'We couldn’t validate your Wing Shot right now. Check your connection and try again.';
+  if (code === 'RATE_LIMITED' || code === 'rate_limited') return 'You’ve tried several uploads recently. Wait a few minutes and try again.';
+  if (code === 'validation_cancelled') return '';
+  if (code === 'validation_unknown') return 'We couldn’t validate this Wing Shot. Try selecting it again or choose another file.';
   const saved = ' Your rating is already saved.';
   if (error instanceof WingShotClientError) {
+    if (code === 'RATE_LIMITED') {
+      const retry = Number.isFinite(error.retryAfterSeconds) && error.retryAfterSeconds > 0
+        ? ` Please try again in ${formatRetryAfter(error.retryAfterSeconds)} or skip the upload.`
+        : ' Please try again later or skip the upload.';
+      return `Your rating is already saved. You’ve been rate limited from uploading more Wing Shots for now.${retry}`;
+    }
     if (code === 'video_too_short') return `This Wing Shot is too short. This video is ${formatSeconds(error.durationSeconds ?? 0)} seconds long. Wing Shots must be between ${WING_SHOT_VIDEO_MIN_SECONDS} and ${WING_SHOT_VIDEO_MAX_SECONDS} seconds.${saved}`;
     if (code === 'video_too_long') return `This Wing Shot is too long. This video is ${formatSeconds(error.durationSeconds ?? 0)} seconds long. Wing Shots must be between ${WING_SHOT_VIDEO_MIN_SECONDS} and ${WING_SHOT_VIDEO_MAX_SECONDS} seconds.${saved}`;
     if (code === 'media_too_large') {
@@ -464,7 +603,7 @@ export function wingShotUserMessage(error) {
     if (code === 'preprocessing_failed') return 'We couldn’t prepare this video for upload. Your rating is already saved—try another video or skip the upload.';
     if (code === 'upload_failed' || code === 'offline' || code === 'network_failed') return `The upload didn’t finish. Check your connection and try again.${saved}`;
     if (code === 'rating_required' || code === 'rating_not_found' || code === 'rating_not_owned' || code === 'destination_mismatch') return 'Your rating was saved, but we couldn’t connect this Wing Shot to it. Please close and try again.';
-    return `${error.message}${saved}`;
+    return 'We couldn’t validate this Wing Shot. Try selecting it again or choose another file.';
   }
   if (code === 'DUPLICATE_MEDIA') {
     return `This video was already submitted in another Wing Shot. Record or choose a different clip and try again.${saved}`;
@@ -481,6 +620,14 @@ export function wingShotUserMessage(error) {
   if (code === 'picker_cancelled') return '';
   if (code === 'offline') return `The upload didn’t finish. Check your connection and try again.${saved}`;
   return 'Your rating is already saved, but we couldn’t process this Wing Shot. Try another video or skip the upload.';
+}
+
+function formatRetryAfter(seconds) {
+  if (seconds < 60) return `${seconds} seconds`;
+  const minutes = Math.ceil(seconds / 60);
+  if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'}`;
+  const hours = Math.ceil(minutes / 60);
+  return `${hours} hour${hours === 1 ? '' : 's'}`;
 }
 
 export function wingShotProcessingCopy(error) {

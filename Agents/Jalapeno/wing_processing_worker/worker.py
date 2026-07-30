@@ -153,6 +153,11 @@ class WingProcessingWorker:
                 source,
                 maximum_bytes=maximum,
             )
+            self._event(
+                "validation_started",
+                submission_id=str(context.submission_id),
+                status="RUNNING",
+            )
             content_hash = hashlib.sha256(source.read_bytes()).hexdigest()
             if self.repository.register_exact_media(
                 context,
@@ -160,11 +165,21 @@ class WingProcessingWorker:
                 size_bytes=source.stat().st_size,
             ):
                 raise DuplicateMediaError()
-            artifacts = self.processor.process(
-                source,
-                output,
-                submission_id=context.submission_id,
-            )
+            if context.media_type == "video":
+                self._event("transcoding_started", submission_id=str(context.submission_id), status="RUNNING")
+            try:
+                artifacts = self.processor.process(
+                    source,
+                    output,
+                    submission_id=context.submission_id,
+                )
+            except Exception:
+                if context.media_type == "video":
+                    self._event("transcoding_failed", submission_id=str(context.submission_id), status="FAILED")
+                raise
+            if context.media_type == "video":
+                self._event("transcoding_completed", submission_id=str(context.submission_id), status="SUCCEEDED")
+            self._event("validation_passed", submission_id=str(context.submission_id), status="SUCCEEDED")
             if context.media_type == "photo" and not isinstance(
                 artifacts, PhotoArtifacts
             ):
@@ -275,6 +290,13 @@ class WingProcessingWorker:
             status = "CLAIM_SETTLEMENT_FAILED"
         self._event(
             "wing_processing_failed",
+            job_id=str(claim.job_id),
+            submission_id=str(claim.submission_id),
+            status=status,
+            error_code=code,
+        )
+        self._event(
+            "validation_retryable_failure" if retryable else "validation_failed",
             job_id=str(claim.job_id),
             submission_id=str(claim.submission_id),
             status=status,

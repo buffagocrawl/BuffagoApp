@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import test from 'node:test';
 
 const root = new URL('../', import.meta.url);
@@ -7,7 +8,6 @@ const read = (path) => readFileSync(new URL(path, root), 'utf8');
 const readRepo = (path) => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
 const migration = read('supabase/migrations/20260729180000_wing_processing_lifecycle_fix.sql');
 const selection = read('supabase/migrations/20260729172000_jalapeno_approved_queue_authority.sql');
-const workflow = readRepo('.github/workflows/wing-processing.yml');
 const mango = readRepo('Agents/Mango Habanero/src/main.jsx');
 
 test('approval is fail-closed on processing completion and private derivatives', () => {
@@ -36,16 +36,8 @@ test('repair is service-only, locked, forward-only, and idempotently enqueues pr
   assert.match(migration, /revoke all on function public\.repair_stranded_wing_submission/);
 });
 
-test('processing workflow is bounded, scheduled, protected, and sanitized', () => {
-  assert.match(workflow, /workflow_dispatch/);
-  assert.match(workflow, /\*\/10 \* \* \* \*/);
-  assert.match(workflow, /python-version: '3\.12'/);
-  assert.match(workflow, /ffmpeg -version && ffprobe -version/);
-  assert.match(workflow, /--validate-config/);
-  assert.match(workflow, /--drain 25/);
-  assert.match(workflow, /SUPABASE_SERVICE_ROLE_KEY/);
-  assert.match(workflow, /cancel-in-progress: false/);
-  assert.doesNotMatch(workflow, /echo.*SUPABASE_SERVICE_ROLE_KEY|storage_path|signedUrl/i);
+test('processing is no longer coupled to a scheduled GitHub Action', () => {
+  assert.equal(existsSync(new URL('../../.github/workflows/wing-processing.yml', import.meta.url)), false);
 });
 
 test('same-day empty receipts remain retryable without reopening active work', () => {
