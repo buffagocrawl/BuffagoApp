@@ -1,0 +1,146 @@
+{
+  "generatedAt": "2026-07-30T10:00:03.102431Z",
+  "jalapeno": {
+    "age_hours": 18.2,
+    "artifact": "latest_snapshot.json",
+    "status": "verified",
+    "timestamp": "2026-07-29T15:50:25.028529Z"
+  },
+  "metrics": {
+    "auth_failures": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "badges_awarded": {
+      "availability": "available",
+      "previousDay": 0,
+      "source": "public.user_badges.earned_at",
+      "trailing30": 2,
+      "trailing7": 1,
+      "yesterday": 0
+    },
+    "crawls_completed": {
+      "availability": "available",
+      "previousDay": 0,
+      "source": "public.crawls.end_time",
+      "trailing30": 27,
+      "trailing7": 27,
+      "yesterday": 27
+    },
+    "crawls_created": {
+      "availability": "available",
+      "previousDay": 0,
+      "source": "public.crawls.start_time",
+      "trailing30": 31,
+      "trailing7": 30,
+      "yesterday": 29
+    },
+    "dau": {
+      "availability": "available",
+      "previousDay": 2,
+      "source": "public.analytics_daily_active_users.active_identities",
+      "trailing30": 98,
+      "trailing7": 66,
+      "yesterday": 6
+    },
+    "error_telemetry": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "jalapeno_errors": {
+      "availability": "available",
+      "previousDay": 0,
+      "source": "public.jalapeno_errors.created_at",
+      "trailing30": 31,
+      "trailing7": 0,
+      "yesterday": 0
+    },
+    "jalapeno_runs": {
+      "availability": "available",
+      "previousDay": 1,
+      "source": "public.jalapeno_runs.started_at",
+      "trailing30": 77,
+      "trailing7": 7,
+      "yesterday": 0
+    },
+    "mau": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "missions": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "onboarding_events": {
+      "availability": "available",
+      "previousDay": 0,
+      "source": "public.onboarding_analytics.started_at",
+      "trailing30": 0,
+      "trailing7": 0,
+      "yesterday": 0
+    },
+    "performance_percentiles": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "ratings_created": {
+      "availability": "available",
+      "previousDay": 0,
+      "source": "public.destination_ratings.created_at",
+      "trailing30": 30,
+      "trailing7": 29,
+      "yesterday": 27
+    },
+    "referrals": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "registered_users": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "retention_d1": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "retention_d30": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "retention_d7": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "state_passport": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "wau": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "wing_battle_votes": {
+      "availability": "available",
+      "previousDay": 0,
+      "source": "public.user_wing_battle_votes.created_at",
+      "trailing30": 0,
+      "trailing7": 0,
+      "yesterday": 0
+    },
+    "xp_claims": {
+      "availability": "available",
+      "previousDay": 0,
+      "source": "public.daily_xp_claims.claimed_at",
+      "trailing30": 3,
+      "trailing7": 3,
+      "yesterday": 1
+    }
+  },
+  "reportDate": "2026-07-29",
+  "schemaVersion": 1,
+  "windows": {
+    "dayEnd": "2026-07-30T04:00:00Z",
+    "dayStart": "2026-07-29T04:00:00Z",
+    "timezone": "America/New_York"
+  }
+}
