@@ -1,5 +1,6 @@
 import { File as ExpoFile } from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
+import { WING_SHOT_VIDEO_MAX_SECONDS } from '../../lib/wingShots';
 
 export type WingShotMediaKind = 'photo' | 'video';
 
@@ -139,7 +140,7 @@ function enforceVideoDuration(
   if (
     media?.kind === 'video' &&
     Number.isFinite(media.durationSeconds) &&
-    Number(media.durationSeconds) > Math.min(10, maximumDurationSeconds)
+    Number(media.durationSeconds) > Math.min(WING_SHOT_VIDEO_MAX_SECONDS, maximumDurationSeconds)
   ) {
     throw new WingShotMediaAdapterError(
       'video_too_long',

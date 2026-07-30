@@ -25,6 +25,7 @@ import {
   validateWingShotMedia,
   WING_SHOT_VIDEO_MAX_SECONDS,
   WING_SHOT_VIDEO_TARGET_SECONDS,
+  WING_SHOT_VIDEO_MAX_MB,
   wingShotUserMessage,
   wingShotProcessingCopy,
 } from '../../lib/wingShots';
@@ -36,6 +37,7 @@ import {
   type WingShotSelectedMedia,
 } from './mediaAdapter';
 import { useInterpolatedUploadProgress } from './useInterpolatedUploadProgress';
+import { errorContext, mediaLogContext, wingShotLog } from '../../lib/wingShotDiagnostics';
 
 type Attribution = 'username' | 'display_name' | 'anonymous';
 type Phase =
@@ -134,10 +136,14 @@ export function WingShotFlow({
     progressBarRef.current.setValue(0);
   }, [progressController]);
 
-  const resetWingShotForm = useCallback(() => {
+  const resetWingShotForm = useCallback((reason = 'explicit_reset') => {
     // An in-flight upload owns the draft until it settles. The successful
     // server record is never touched by this client-side reset.
     if (phaseRef.current === 'uploading' || phaseRef.current === 'cancelling') return false;
+    wingShotLog(sessionRef.current.correlationId, 'Modal close and state cleanup', {
+      reason,
+      stateCleared: true,
+    });
     setMedia(null);
     setConsentAccepted(false);
     setAttribution(null);
@@ -157,6 +163,10 @@ export function WingShotFlow({
 
   const handleCompletedFlowClose = useCallback(() => {
     if (phaseRef.current !== 'success') return;
+    wingShotLog(sessionRef.current.correlationId, 'Modal close and state cleanup', {
+      reason: 'successful_upload_closed',
+      stateCleared: true,
+    });
     resetWingShotForm();
     onClose();
   }, [onClose, resetWingShotForm]);
@@ -169,6 +179,10 @@ export function WingShotFlow({
     ) return;
 
     skipNavigationRef.current = true;
+    wingShotLog(sessionRef.current.correlationId, 'Modal close and state cleanup', {
+      reason: 'explicit_skip',
+      stateCleared: true,
+    });
     trackEvent({
       eventName: 'wing_shot_upload_skipped',
       screen: analyticsContext?.screen ?? submissionSource,
@@ -191,6 +205,17 @@ export function WingShotFlow({
   useEffect(() => {
     phaseRef.current = phase;
   }, [phase]);
+
+  useEffect(() => {
+    if (!visible) return;
+    wingShotLog(sessionRef.current.correlationId, 'Rating-to-Wing-Shot transition', {
+      platform: Platform.OS,
+      ratingIdPresent: Boolean(eligibleRatingId),
+      destinationIdPresent: Boolean(destinationId),
+      userIdPresent: Boolean(analyticsContext?.userId),
+      submissionSource,
+    });
+  }, [analyticsContext?.userId, destinationId, eligibleRatingId, submissionSource, visible]);
 
   useEffect(() => {
     if (visible) skipNavigationRef.current = false;
@@ -242,12 +267,26 @@ export function WingShotFlow({
           'That media type is not enabled for Wing Shots.',
         );
       }
-      validateWingShotMedia(selected);
       setMedia(selected);
       setConsentAccepted(false);
       setErrorMessage('');
       setPhaseSafely('editing');
       resetUploadSession();
+      wingShotLog(sessionRef.current.correlationId, 'Media recording or selection', mediaLogContext(selected));
+      try {
+        validateWingShotMedia(selected);
+      } catch (error) {
+        wingShotLog(sessionRef.current.correlationId, 'Validation failed', {
+          ...mediaLogContext(selected),
+          validationRule: (error as { code?: string })?.code ?? 'unknown',
+          exception: errorContext(error),
+        }, 'warn');
+        throw error;
+      }
+      wingShotLog(sessionRef.current.correlationId, 'Metadata extraction', {
+        ...mediaLogContext(selected),
+        metadataAvailable: selected.kind !== 'video' || Number.isFinite(selected.durationSeconds),
+      });
       announce(`${selected.kind === 'photo' ? 'Photo' : 'Video'} selected.`);
     },
     [allowPhoto, allowVideo, announce, resetUploadSession, setPhaseSafely],
@@ -288,6 +327,11 @@ export function WingShotFlow({
         }
       } catch (error) {
         const message = wingShotUserMessage(error);
+        setErrorCode(String((error as { code?: string })?.code || ''));
+        wingShotLog(sessionRef.current.correlationId, 'Upload failed', {
+          validationRule: (error as { code?: string })?.code ?? null,
+          exception: errorContext(error),
+        }, 'warn');
         setErrorMessage(message);
         setPhaseSafely('error');
         announce(message);
@@ -378,6 +422,10 @@ export function WingShotFlow({
       progressController.complete();
       setUploadResult(result);
       setPhaseSafely('success');
+      wingShotLog(sessionRef.current.correlationId, 'Final success or failure', {
+        outcome: 'success',
+        ...mediaLogContext(media),
+      });
       trackEvent({
         eventName: 'wing_shot_upload_completed',
         screen: analyticsContext?.screen ?? 'wing_shot',
@@ -392,6 +440,16 @@ export function WingShotFlow({
       if (!progressController.isCurrent(operation)) return;
       progressController.stop(controller.signal.aborted ? 'canceled' : 'failed');
       const message = wingShotUserMessage(error);
+      wingShotLog(sessionRef.current.correlationId, 'Final success or failure', {
+        outcome: 'failure',
+        ...mediaLogContext(media),
+        ratingIdPresent: Boolean(eligibleRatingId),
+        destinationIdPresent: Boolean(destinationId),
+        userIdPresent: Boolean(analyticsContext?.userId),
+        exception: errorContext(error),
+        userFacingClassification: String((error as { code?: string })?.code || 'unknown'),
+        userFacingMessage: message,
+      }, 'error');
       setErrorCode(String((error as { code?: string })?.code || ''));
       trackEvent({
         eventName: 'wing_shot_upload_failed',
@@ -542,12 +600,19 @@ export function WingShotFlow({
                 )}
               </View>
             ) : (
-              <WingShotMediaPreview
-                media={media}
-                disabled={disabled}
-                onReplace={replaceMedia}
-                onRemove={removeMedia}
-              />
+              <>
+                <WingShotMediaPreview
+                  media={media}
+                  disabled={disabled}
+                  onReplace={replaceMedia}
+                  onRemove={removeMedia}
+                />
+                {media.kind === 'video' ? (
+                  <Text style={styles.choiceDetail} testID="wing-shot.video-size-help">
+                    Videos must be under {WING_SHOT_VIDEO_MAX_MB} MB.
+                  </Text>
+                ) : null}
+              </>
             )}
 
             {media ? (
@@ -656,9 +721,14 @@ export function WingShotFlow({
                 <View style={styles.flex}>
                   {errorCode ? <Text style={styles.errorTitle} allowFontScaling>{wingShotProcessingCopy({ code: errorCode }).title}</Text> : null}
                   <Text style={styles.errorText} allowFontScaling>{errorMessage}</Text>
-                  {errorCode === 'DUPLICATE_MEDIA' ? (
-                    <Pressable accessibilityRole="button" onPress={replaceMedia} testID="wing-shot.choose-different-video">
-                      <Text style={styles.errorAction}>Choose a different video</Text>
+                  {phase === 'error' && media ? (
+                    <Pressable accessibilityRole="button" onPress={submit} testID="wing-shot.try-again">
+                      <Text style={styles.errorAction}>Try Again</Text>
+                    </Pressable>
+                  ) : null}
+                  {phase === 'error' ? (
+                        <Pressable accessibilityRole="button" onPress={replaceMedia} testID="wing-shot.choose-different-video">
+                      <Text style={styles.errorAction}>Choose Another Video</Text>
                     </Pressable>
                   ) : null}
                 </View>
