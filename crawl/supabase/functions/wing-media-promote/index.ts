@@ -116,7 +116,13 @@ Deno.serve(async (request) => {
       return response(request, 503, 'source_cleanup_failed', 'The media was copied, but cleanup is still pending. Try again.', 'source_cleanup', { body, retryable: true });
     }
     log('promotion_succeeded', { correlation_id: id, submission_id: submissionId, stage: 'complete', destination_bucket: DESTINATION_BUCKET, media_type: intent.media_type, expected_size_bytes: expectedSize });
-    return success(request, { promoted: true, submissionId });
+    return success(request, {
+      promoted: true,
+      submissionId,
+      bucket: DESTINATION_BUCKET,
+      path: destinationPath,
+      fullPath: `${DESTINATION_BUCKET}/${destinationPath}`,
+    });
   } catch (error) {
     log('promotion_internal_failure', { correlation_id: idFromHeader === id ? id : 'unknown', submission_id: validUuid(submissionId) ? submissionId : null, stage: 'internal', reason_code: 'promotion_internal_failure', retryable: true });
     return response(request, 503, 'promotion_internal_failure', 'Promotion is temporarily unavailable. Try again.', 'internal', { body, retryable: true });

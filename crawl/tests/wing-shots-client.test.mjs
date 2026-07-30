@@ -52,7 +52,10 @@ function clientDouble({ reserveError = null, uploadError = null, finalizeError =
       from: (bucket) => ({
         upload: async (path, body, options) => {
           calls.push({ kind: 'upload', bucket, path, body, options });
-          return { data: null, error: uploadError };
+          return {
+            data: uploadError ? null : { path, fullPath: `${bucket}/${path}` },
+            error: uploadError,
+          };
         },
       }),
     },
@@ -119,7 +122,21 @@ test('upload uses only the exact reserved bucket and path before finalizing', as
     'originals/30000000-0000-4000-a000-000000000003/20000000-0000-4000-a000-000000000002/source',
   );
   assert.equal(calls[1].options.upsert, false);
+  assert.equal(calls[2].parameters.p_bucket, 'wing-submissions');
+  assert.equal(calls[2].parameters.p_storage_path, calls[1].path);
   assert.equal(progress.at(-1), 95);
+});
+
+test('uploaded-object validation is a retryable safe domain failure', async () => {
+  const { client } = clientDouble({ finalizeError: { code: 'P0001', message: 'uploaded_object_not_found' } });
+  await assert.rejects(
+    submitWingShot({ client, input: validInput(), session: createWingShotUploadSession() }),
+    (error) => error.code === 'OBJECT_VALIDATION_FAILED' && error.retryable === true,
+  );
+  assert.equal(
+    wingShotUserMessage(new WingShotClientError('OBJECT_VALIDATION_FAILED')),
+    'We couldn’t finish uploading your Wing Shot. Your rating is already saved. Please try the upload again.',
+  );
 });
 
 test('reserve RPC code 42900 is classified as RATE_LIMITED', async () => {
@@ -248,7 +265,13 @@ test('cancel during transport never finalizes the reserved submission', async ()
       signal: controller.signal,
       uploadTransport: async () => {
         controller.abort();
-        return { error: null };
+        return {
+          data: {
+            path: 'originals/30000000-0000-4000-a000-000000000003/20000000-0000-4000-a000-000000000002/source',
+            fullPath: 'wing-submissions/originals/30000000-0000-4000-a000-000000000003/20000000-0000-4000-a000-000000000002/source',
+          },
+          error: null,
+        };
       },
     }),
     (error) => error.code === 'upload_cancelled',

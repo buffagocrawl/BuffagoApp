@@ -160,6 +160,7 @@ export function createWingShotUploadSession(idFactory = createCorrelationId) {
     uploadCompleted: false,
     requestFingerprint: null,
     staging: null,
+    uploadedObject: null,
   };
 }
 
@@ -366,6 +367,11 @@ function rpcError(code, stage, error) {
       { stage, cause: error, sizeBytes: error?.expected_size_bytes ?? error?.sizeBytes ?? null },
     );
   }
+  if (serverCode.includes('uploaded_object_not_found') || serverCode.includes('uploaded_object_invalid')) {
+    return new WingShotClientError('OBJECT_VALIDATION_FAILED', 'The uploaded object could not be securely verified.', {
+      stage, cause: error, retryable: true, databaseCode: database.code, databaseMessage: database.message,
+    });
+  }
   if (serverCode.includes('wing_submission_already_finalized')) {
     return new WingShotClientError('duplicate_completed_submission', 'This rating already has a Wing Shot.', { stage, cause: error });
   }
@@ -424,6 +430,18 @@ async function defaultUploadTransport({
     upsert: false,
     cacheControl: '3600',
   });
+}
+
+function canonicalUploadedObject(bucket, requestedPath, uploadData) {
+  const path = String(uploadData?.path ?? '');
+  const fullPath = String(uploadData?.fullPath ?? '');
+  const expectedFullPath = `${bucket}/${requestedPath}`;
+  // Do not normalize, trim, or decode Storage references. Finalization accepts
+  // only the exact canonical object tied to this reservation.
+  if (!bucket || path !== requestedPath || (fullPath && fullPath !== expectedFullPath)) {
+    throw new WingShotClientError('upload_response_invalid', 'Storage returned an unexpected object reference.', { stage: 'upload', retryable: true });
+  }
+  return { bucket, path, fullPath: fullPath || expectedFullPath };
 }
 
 /**
@@ -601,6 +619,10 @@ export async function submitWingShot({
       if (result.data?.ok === false || result.data?.promoted !== true) {
         throw functionClientError({ status: null, body: result.data, text: null }, 'promote');
       }
+      session.uploadedObject = canonicalUploadedObject(result.data?.bucket, result.data?.path, result.data);
+      if (session.uploadedObject.bucket !== session.reservation.bucket || session.uploadedObject.path !== session.reservation.uploadPath) {
+        throw new WingShotClientError('upload_response_invalid', 'Promotion returned an unexpected object reference.', { stage: 'promote', retryable: true });
+      }
       onProgress(85);
     } catch (error) {
       if (error instanceof WingShotClientError) throw error;
@@ -637,7 +659,7 @@ export async function submitWingShot({
       }, 'warn');
       throw new WingShotClientError('upload_failed', 'Upload interrupted. Try again.', { stage: 'upload', cause: error });
     }
-    const { error } = uploadResult;
+    const { data: uploadData, error } = uploadResult;
     wingShotLog(session.correlationId, 'Supabase Storage upload', {
       bucket: session.reservation.bucket,
       objectPath: sanitizedObjectPath(storagePath),
@@ -649,6 +671,9 @@ export async function submitWingShot({
         stage: 'upload',
       });
     }
+    session.uploadedObject = error
+      ? { bucket: session.reservation.bucket, path: storagePath, fullPath: `${session.reservation.bucket}/${storagePath}` }
+      : canonicalUploadedObject(session.reservation.bucket, storagePath, uploadData);
     session.uploadCompleted = true;
   }
   throwIfAborted(signal);
@@ -664,6 +689,8 @@ export async function submitWingShot({
       p_submission_id: session.reservation.submissionId,
       p_idempotency_key: session.finalizeIdempotencyKey,
       p_correlation_id: session.correlationId,
+      p_bucket: session.uploadedObject?.bucket,
+      p_storage_path: session.uploadedObject?.path,
     });
   } catch (error) {
     wingShotLog(session.correlationId, 'RPC failure', {
@@ -690,7 +717,7 @@ export async function submitWingShot({
     destinationIdPresent: Boolean(input.destinationId),
     userIdPresent: Boolean(input.userId),
     supabaseError: errorContext(error),
-  }, error ? 'error' : 'debug');
+  }, error ? 'warn' : 'debug');
   if (error || !data?.submission_id || data?.status !== 'uploaded') {
     throw rpcError('finalization_failed', 'finalize', error);
   }
@@ -704,6 +731,7 @@ export function wingShotUserMessage(error) {
   if (code === 'offline') return 'You appear to be offline. Your rating is saved—reconnect and try the upload again.';
   if (code === 'network_timeout' || code === 'timeout') return 'The upload timed out. Your rating is saved—check your connection and try again.';
   if (code === 'authentication_required') return 'Your session expired. Your rating is saved—sign in again to upload your Wing Shot.';
+  if (code === 'OBJECT_VALIDATION_FAILED') return 'We couldn’t finish uploading your Wing Shot. Your rating is already saved. Please try the upload again.';
   if (code === 'authorization_failed') return 'Your rating is saved, but this upload is no longer authorized. Choose the media again or skip the upload.';
   if (code === 'rate_limited') {
     const retry = Number.isFinite(Number(error?.retryAfterSeconds)) && Number(error.retryAfterSeconds) > 0 ? `try again in ${formatRetryAfter(Number(error.retryAfterSeconds))}` : 'try again later';

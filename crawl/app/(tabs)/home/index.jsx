@@ -2533,6 +2533,12 @@ export default function Home() {
           submittedRatingId = insertedRating?.id ?? null;
         }
 
+        // The rating commit is the mission boundary. Weekly progress is
+        // reconciled from the saved rating by the database, and this refresh
+        // makes every Home mission surface reflect that authoritative value
+        // before the optional Wing Shot flow starts.
+        if (uid && submittedRatingId) await refreshMissionSummary();
+
         await trackEvent({
           eventName: 'rating_completed',
           screen: 'home',
@@ -2668,6 +2674,7 @@ export default function Home() {
       wingShotFlags.photo,
       wingShotFlags.video,
       refreshHud,
+      refreshMissionSummary,
       openRestaurantPeek,
       saveGuestHomeRated,
       refreshHomeRatedForClosest,

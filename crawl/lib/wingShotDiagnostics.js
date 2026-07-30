@@ -60,7 +60,10 @@ export function wingShotLog(attemptId, event, context = {}, level = 'debug') {
     const line = `[WingShot][${attemptId}] ${event}`;
     // This is intentionally scoped to Wing Shot events; do not enable general
     // Metro logging here.
-    const logger = typeof console?.[level] === 'function' ? console[level] : console.debug;
+    // Expo turns console.error into a developer-visible error overlay. Handled
+    // operational failures remain diagnostic warnings instead.
+    const safeLevel = level === 'error' ? 'warn' : level;
+    const logger = typeof console?.[safeLevel] === 'function' ? console[safeLevel] : console.debug;
     if (typeof logger === 'function') logger(line, payload);
   } catch (_) {
     // Diagnostics must never become a second upload failure.
