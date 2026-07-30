@@ -59,3 +59,32 @@ test('malformed promotion response becomes a typed retryable client error withou
   });
   assert.equal(session.uploadCompleted, false);
 });
+
+test('canonical promotion response is finalized as the exact reserved private object', async () => {
+  const session = createWingShotUploadSession(() => '10000000-0000-4000-a000-000000000010');
+  const path = 'originals/u/10000000-0000-4000-a000-000000000011/source';
+  session.reservation = { submissionId: '10000000-0000-4000-a000-000000000011', bucket: 'wing-submissions', uploadPath: path };
+  session.staging = { bucket: 'wing-shot-staging', objectPath: 'u/10000000-0000-4000-a000-000000000010/wing.mp4', correlationId: session.correlationId, uploadCompleted: true };
+  const calls = [];
+  const client = {
+    auth: { getSession: async () => ({ data: { session: { access_token: 'test' } } }) },
+    functions: { invoke: async () => ({ data: { ok: true, promoted: true, submissionId: session.reservation.submissionId, bucket: 'wing-submissions', path, fullPath: `wing-submissions/${path}` }, error: null }) },
+    rpc: async (name, params) => { calls.push({ name, params }); return { data: { submission_id: session.reservation.submissionId, status: 'uploaded' }, error: null }; },
+    storage: { from: () => ({}) },
+  };
+  const result = await submitWingShot({ client, input, session });
+  assert.equal(session.uploadCompleted, true);
+  assert.deepEqual(session.uploadedObject, { bucket: 'wing-submissions', path, fullPath: `wing-submissions/${path}` });
+  assert.equal(calls[0].name, 'finalize_wing_submission_upload');
+  assert.equal(calls[0].params.p_bucket, 'wing-submissions');
+  assert.equal(calls[0].params.p_storage_path, path);
+  assert.equal(result.status, 'uploaded');
+});
+
+test('promotion retry returns the same canonical reference when destination already exists', () => {
+  assert.match(functionSource, /const existing = await admin\.storage\.from\(DESTINATION_BUCKET\)\.download\(destinationPath\)/);
+  assert.match(functionSource, /let destinationReady = Boolean\(existing\.data\) && !existing\.error/);
+  assert.match(functionSource, /if \(!destinationReady\) \{/);
+  assert.match(functionSource, /bucket: DESTINATION_BUCKET,[\s\S]*path: destinationPath,[\s\S]*fullPath:/);
+  assert.match(functionSource, /upload\(destinationPath, source,[\s\S]*upsert: false/);
+});

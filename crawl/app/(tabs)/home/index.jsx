@@ -29,6 +29,7 @@ import { WingShotFlow } from '../../../components/wingShots';
 import { averageBeforeSubmission } from '../../../lib/ratingComparison.js';
 import { trackEvent } from '../../../lib/analytics';
 import { loadWeeklyMission } from '../../../lib/weeklyMission';
+import { recordSavedRatingMission, resolvedDeviceTimezone } from '../../../lib/engagement/ratingMissionTracking.js';
 import { currentWingDuelCompletion } from '../../../lib/home/monthlyWingDuel';
 import {
   ENABLE_GROWTH_MISSIONS,
@@ -1012,7 +1013,7 @@ export default function Home() {
 
   useFocusEffect(
     useCallback(() => {
-      refreshMissionSummary();
+      void refreshMissionSummary().catch(() => {});
       return undefined;
     }, [refreshMissionSummary])
   );
@@ -1022,7 +1023,7 @@ export default function Home() {
   }, [status, coords?.latitude, coords?.longitude, reloadPreferredFromStorage]);
 
   useEffect(() => {
-    refreshMissionSummary();
+    void refreshMissionSummary().catch(() => {});
   }, [refreshMissionSummary]);
 
 
@@ -2533,11 +2534,21 @@ export default function Home() {
           submittedRatingId = insertedRating?.id ?? null;
         }
 
-        // The rating commit is the mission boundary. Weekly progress is
-        // reconciled from the saved rating by the database, and this refresh
-        // makes every Home mission surface reflect that authoritative value
-        // before the optional Wing Shot flow starts.
-        if (uid && submittedRatingId) await refreshMissionSummary();
+        // This is a post-commit side effect. It is intentionally contained so
+        // an engagement outage can never turn a saved rating into Save failed.
+        await recordSavedRatingMission({
+          supabase,
+          userId: uid,
+          submittedRatingId,
+          timezone: resolvedDeviceTimezone(),
+          refreshMissionSummary,
+          onDiagnostic: async (diagnostic) => {
+            await trackEvent({
+              eventName: 'qualifying_action_failed', screen: 'home', userId: uid,
+              destinationId: destId, crawlId, metadata: diagnostic,
+            });
+          },
+        });
 
         await trackEvent({
           eventName: 'rating_completed',
@@ -3197,7 +3208,7 @@ export default function Home() {
               style={styles.missionEntry}
               onPress={async () => {
                 setMissionDialogOpen(true);
-                refreshMissionSummary();
+                await refreshMissionSummary();
                 await trackEvent({ eventName: 'mission_entry_viewed', screen: 'home', userId: session?.user?.id ?? null, metadata: { source: 'home_compact_entry', mission_state: missionError ? 'error' : missionLoading ? 'loading' : missionSummary ? 'active' : 'empty' } });
               }}
             >

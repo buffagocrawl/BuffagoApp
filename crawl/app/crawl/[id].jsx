@@ -23,6 +23,7 @@ import RatingWizardDialog from '../../components/RatingWizardDialog';
 import RatingComparisonModal from '../../components/RatingComparisonModal';
 import { WingShotFlow } from '../../components/wingShots';
 import { averageBeforeSubmission } from '../../lib/ratingComparison.js';
+import { recordSavedRatingMission, resolvedDeviceTimezone } from '../../lib/engagement/ratingMissionTracking.js';
 import { useLocationCtx } from '../../providers/LocationProvider';
 import { useWingShotsFeatureFlags } from '../../hooks/useWingShotsFeatureFlags';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -1176,6 +1177,22 @@ export default function CrawlScreen() {
 
       if (error) throw error;
 
+      // Do this only after the canonical crawl-rating RPC has committed. The
+      // helper absorbs its own failure so the completed rating UI remains so.
+      await recordSavedRatingMission({
+        supabase,
+        userId,
+        submittedRatingId,
+        timezone: resolvedDeviceTimezone(),
+        onDiagnostic: async (diagnostic) => {
+          await trackEvent({
+            eventName: 'qualifying_action_failed', screen: 'crawl', userId,
+            destinationId: activeDest.id, crawlId: crawl.crawl_id,
+            routeId: crawl?.route_id ?? null, metadata: diagnostic,
+          });
+        },
+      });
+
       await trackEvent({
         eventName: 'rating_completed',
         screen: 'crawl',
@@ -1437,8 +1454,8 @@ export default function CrawlScreen() {
       else setWingShotVisible(false);
       setComparisonVisible(!canOfferWingShot);
 
-      loadPresenceAllSteps();
-      loadLeaderboard();
+      void loadPresenceAllSteps().catch(() => {});
+      void loadLeaderboard().catch(() => {});
     } catch (e) {
       await trackEvent({
         eventName: 'rating_failed',

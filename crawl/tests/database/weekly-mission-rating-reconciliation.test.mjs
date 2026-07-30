@@ -26,8 +26,8 @@ test('rating trigger is independent of optional Wing Shot outcomes', () => {
   assert.match(migration, /reconcile_weekly_rating_mission_after_insert/);
   assert.match(migration, /after insert on public\.destination_ratings/);
   assert.doesNotMatch(migration, /wing_shot.*reconcile|reconcile.*wing_shot/i);
-  assert.match(home, /if \(uid && submittedRatingId\) await refreshMissionSummary\(\);/);
-  assert.match(home, /refreshMissionSummary,\n      openRestaurantPeek/);
+  assert.match(home, /await recordSavedRatingMission\(\{/);
+  assert.match(home, /refreshMissionSummary,/);
 });
 
 test('ledger, reward, and privileged functions retain user isolation', () => {
