@@ -11,6 +11,13 @@ test('camera and library selections start one guarded validation pass', () => {
   assert.match(flow, /void validateSelectedMedia\(selected\)/);
   assert.match(flow, /validationAbortRef\.current\?\.abort\(\)/);
   assert.match(flow, /sequence !== validationSequenceRef\.current/);
+  assert.match(flow, /validation_handoff_started/);
+  assert.match(flow, /local_validation_started/);
+  assert.match(flow, /local_validation_passed/);
+  assert.match(flow, /local_validation_failed/);
+  assert.match(flow, /validation_final_catch/);
+  assert.match(flow, /requestDispatched/);
+  assert.match(flow, /wing-media-validate/);
 });
 
 test('validation status and submit gating are explicit', () => {

@@ -6,7 +6,6 @@ const root = (name) => readFileSync(new URL(`../${name}`, import.meta.url), 'utf
 const crawl = root('app/crawl/[id].jsx');
 const home = root('app/(tabs)/home/index.jsx');
 const ratings = root('app/(tabs)/ratings/index.jsx');
-const profile = root('components/creator/WingCreatorSummaryCard.jsx');
 const onboarding = root('components/OnboardingFlow.tsx');
 const client = root('lib/wingShots.js');
 const sql = root('supabase/migrations/20260729140000_wing_shots_unrestricted_sources.sql');
@@ -20,9 +19,10 @@ test('remote and admin-bypassed rating results both receive the optional prompt'
 });
 
 test('independent sources are intentional and restaurant selection is searchable', () => {
-  for (const [source, content] of [['buffacoin', ratings], ['profile', profile], ['home_cta', home], ['onboarding', onboarding]]) {
-    assert.match(content, new RegExp(`source=${source}`));
-  }
+  assert.doesNotMatch(ratings, /source=buffacoin/);
+  assert.doesNotMatch(ratings, /buffacoin-add-wing-shot|Add a Wing Shot/);
+  assert.match(onboarding, /source=onboarding/);
+  assert.match(home, /submissionSource="rating"/);
   assert.match(root('components/wingShots/WingShotComposer.tsx'), /ilike\('name'/);
 });
 

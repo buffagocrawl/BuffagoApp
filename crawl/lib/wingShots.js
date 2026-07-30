@@ -569,6 +569,8 @@ export async function submitWingShot({
 
 export function wingShotUserMessage(error) {
   const code = String(error?.code ?? '');
+  if (code === 'local_validation_error') return 'This media could not be checked on this device. Choose another file and try again.';
+  if (code === 'validation_state_error') return 'This Wing Shot is no longer ready to validate. Choose the media again.';
   if (code === 'media_too_large') return 'This file is too large to upload. Try choosing a shorter video or a smaller photo.';
   if (code === 'video_too_long') return 'This video is longer than we can accept. Trim it and try again.';
   if (code === 'video_too_short') return 'This video is too short. Record a slightly longer Wing Shot and try again.';

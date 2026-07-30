@@ -40,6 +40,15 @@ test('video size boundary is inclusive and reports the detected size', () => {
   assert.equal(message, 'This file is too large to upload. Try choosing a shorter video or a smaller photo.');
 });
 
+test('4K video within configured size and duration limits remains eligible', () => {
+  assert.doesNotThrow(() => validateWingShotMedia(media({
+    sizeBytes: 35 * 1024 * 1024,
+    durationSeconds: 7.5,
+    width: 3840,
+    height: 2160,
+  })));
+});
+
 test('messages are actionable and confirm the rating was saved', () => {
   const cases = [
     ['video_too_short', 'too short'],

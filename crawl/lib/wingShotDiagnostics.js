@@ -46,6 +46,14 @@ export function errorContext(error) {
   };
 }
 
+export function safeErrorContext(error, includeMessage = false) {
+  if (!error) return { name: null, message: null };
+  return {
+    name: error.name ?? error.constructor?.name ?? 'Error',
+    ...(includeMessage ? { message: error.message ?? String(error) } : {}),
+  };
+}
+
 export function wingShotLog(attemptId, event, context = {}, level = 'debug') {
   const payload = safeValue(context);
   const line = `[WingShot][${attemptId}] ${event}`;

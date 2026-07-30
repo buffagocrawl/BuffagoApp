@@ -2573,19 +2573,6 @@ export default function PublicRatingsScreen() {
                 <Text style={{ opacity: 0.85 }}>Sign in to keep your Wingdex progress and earn Buffacoins.</Text>
               </View>
             ) : null}
-            {user?.id ? (
-              <Button
-                mode="contained-tonal"
-                icon="camera-plus"
-                onPress={() => {
-                  setCoinInfoOpen(false);
-                  router.push('/profile/wing-shots/submit?source=buffacoin');
-                }}
-                testID="buffacoin-add-wing-shot"
-              >
-                Add a Wing Shot
-              </Button>
-            ) : null}
           </Dialog.Content>
           <Dialog.Actions>
             <Button onPress={() => setCoinInfoOpen(false)}>Close</Button>

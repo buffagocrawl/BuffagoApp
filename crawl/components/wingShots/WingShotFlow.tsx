@@ -23,6 +23,7 @@ import {
   createWingShotUploadSession,
   submitWingShot,
   validateWingShotMediaRemotely,
+  validateWingShotMedia,
   WING_SHOT_VIDEO_MAX_SECONDS,
   WING_SHOT_VIDEO_TARGET_SECONDS,
   WING_SHOT_VIDEO_MAX_MB,
@@ -37,7 +38,7 @@ import {
   type WingShotSelectedMedia,
 } from './mediaAdapter';
 import { useInterpolatedUploadProgress } from './useInterpolatedUploadProgress';
-import { errorContext, mediaLogContext, wingShotLog } from '../../lib/wingShotDiagnostics';
+import { errorContext, mediaLogContext, safeErrorContext, wingShotLog } from '../../lib/wingShotDiagnostics';
 
 type Attribution = 'username' | 'display_name' | 'anonymous';
 type Phase =
@@ -271,39 +272,117 @@ export function WingShotFlow({
   }, [announce, progressController.stage]);
 
   const validateSelectedMedia = useCallback(async (selected: WingShotSelectedMedia) => {
-      const sequence = ++validationSequenceRef.current;
-      validationAbortRef.current?.abort();
-      const controller = new AbortController();
-      validationAbortRef.current = controller;
-      setPhaseSafely('validating');
+    const sequence = ++validationSequenceRef.current;
+    validationAbortRef.current?.abort();
+    const controller = new AbortController();
+    validationAbortRef.current = controller;
+    const requestState = { dispatched: false };
+    const correlationId = sessionRef.current.correlationId;
+
+    setPhaseSafely('validating');
+
+    try {
+      wingShotLog(correlationId, 'local_validation_started', {
+        ...mediaLogContext(selected),
+        reasonCode: null,
+      });
       try {
-        await validateWingShotMediaRemotely({
-          client: supabaseClient,
-          media: selected,
-          signal: controller.signal,
-          validationTransport,
+        // This is deliberately separate from the remote validator. A local
+        // metadata/state error must be visible and must never look like a
+        // network failure.
+        validateWingShotMedia(selected);
+        wingShotLog(correlationId, 'local_validation_passed', {
+          ...mediaLogContext(selected),
+          reasonCode: 'local_validation_passed',
         });
-        if (!mountedRef.current || controller.signal.aborted || sequence !== validationSequenceRef.current) return;
-        setPhaseSafely('valid');
-        announce('Wing Shot ready.');
       } catch (error) {
-        if (!mountedRef.current || controller.signal.aborted || sequence !== validationSequenceRef.current) return;
-        if (String((error as { code?: string })?.code || '') === 'validation_cancelled') return;
-        const message = wingShotUserMessage(error);
-        setMedia(null);
-        setConsentAccepted(false);
-        setErrorCode(String((error as { code?: string })?.code || 'validation_unknown'));
-        setErrorMessage(message);
-        setPhaseSafely('empty');
-        announce(message);
-      } finally {
-        if (validationAbortRef.current === controller) validationAbortRef.current = null;
+        const reasonCode = String((error as { code?: string })?.code || 'local_validation_error');
+        wingShotLog(correlationId, 'local_validation_failed', {
+          ...mediaLogContext(selected),
+          reasonCode,
+          error: safeErrorContext(error, typeof __DEV__ !== 'undefined' && __DEV__),
+        }, 'warn');
+        if ((error as { code?: string })?.code) throw error;
+        const localError = new Error('local validation failed');
+        (localError as { code?: string }).code = 'local_validation_error';
+        (localError as { stage?: string }).stage = 'local_validation';
+        throw localError;
       }
-    }, [announce, setPhaseSafely, supabaseClient, validationTransport]);
+
+      if (controller.signal.aborted) {
+        wingShotLog(correlationId, 'validation_return', { reasonCode: 'validation_cancelled', stage: 'local_validation' });
+        return;
+      }
+      if (!correlationId) {
+        const error = new Error('missing validation correlation id');
+        (error as { code?: string }).code = 'validation_state_error';
+        throw error;
+      }
+
+      wingShotLog(correlationId, 'validation_started', {
+        stage: 'staging_upload_server_validator',
+        validator: 'wing-media-validate',
+        project: 'vhfxnizaxdanmvmouuaf',
+        reasonCode: 'local_validation_passed',
+      });
+      requestState.dispatched = true;
+      await validateWingShotMediaRemotely({
+        client: supabaseClient,
+        media: selected,
+        signal: controller.signal,
+        validationTransport,
+      });
+      if (!mountedRef.current) {
+        wingShotLog(correlationId, 'validation_return', { reasonCode: 'component_unmounted', stage: 'server_validation' });
+        return;
+      }
+      if (controller.signal.aborted) {
+        wingShotLog(correlationId, 'validation_return', { reasonCode: 'validation_cancelled', stage: 'server_validation' });
+        return;
+      }
+      if (sequence !== validationSequenceRef.current) {
+        wingShotLog(correlationId, 'validation_return', { reasonCode: 'stale_validation_sequence', stage: 'server_validation', sequence, currentSequence: validationSequenceRef.current });
+        return;
+      }
+      wingShotLog(correlationId, 'validation_passed', { stage: 'server_validation', reasonCode: 'server_validation_passed' });
+      setPhaseSafely('valid');
+      announce('Wing Shot ready.');
+    } catch (error) {
+      const reasonCode = String((error as { code?: string })?.code || 'validation_unknown');
+      wingShotLog(correlationId, 'validation_final_catch', {
+        stage: (error as { stage?: string })?.stage || (requestState.dispatched ? 'server_validation' : 'local_validation'),
+        error: safeErrorContext(error, typeof __DEV__ !== 'undefined' && __DEV__),
+        reasonCode,
+        requestDispatched: requestState.dispatched,
+      }, 'error');
+      if (!mountedRef.current) {
+        wingShotLog(correlationId, 'validation_return', { reasonCode: 'component_unmounted', stage: 'final_catch' });
+        return;
+      }
+      if (controller.signal.aborted || reasonCode === 'validation_cancelled') {
+        wingShotLog(correlationId, 'validation_return', { reasonCode: 'validation_cancelled', stage: 'final_catch' });
+        return;
+      }
+      if (sequence !== validationSequenceRef.current) {
+        wingShotLog(correlationId, 'validation_return', { reasonCode: 'stale_validation_sequence', stage: 'final_catch', sequence, currentSequence: validationSequenceRef.current });
+        return;
+      }
+      const message = wingShotUserMessage(error);
+      setMedia(null);
+      setConsentAccepted(false);
+      setErrorCode(reasonCode);
+      setErrorMessage(message);
+      setPhaseSafely('empty');
+      announce(message);
+    } finally {
+      if (validationAbortRef.current === controller) validationAbortRef.current = null;
+    }
+  }, [announce, setPhaseSafely, supabaseClient, validationTransport]);
 
   const acceptMedia = useCallback(
     (selected: WingShotSelectedMedia | null) => {
       if (!selected) {
+        wingShotLog(sessionRef.current.correlationId, 'validation_return', { reasonCode: 'selection_cancelled', stage: 'media_selection' });
         setPhaseSafely('empty');
         return;
       }
@@ -311,6 +390,7 @@ export function WingShotFlow({
         (selected.kind === 'photo' && !allowPhoto) ||
         (selected.kind === 'video' && !allowVideo)
       ) {
+        wingShotLog(sessionRef.current.correlationId, 'validation_return', { reasonCode: 'media_kind_disabled', stage: 'media_selection' }, 'warn');
         throw new WingShotMediaAdapterError(
           'media_kind_disabled',
           'That media type is not enabled for Wing Shots.',
@@ -322,6 +402,11 @@ export function WingShotFlow({
       setErrorCode('');
       resetUploadSession();
       wingShotLog(sessionRef.current.correlationId, 'Media recording or selection', mediaLogContext(selected));
+      wingShotLog(sessionRef.current.correlationId, 'validation_handoff_started', {
+        ...mediaLogContext(selected),
+        correlationId: sessionRef.current.correlationId,
+        currentValidationState: phaseRef.current,
+      });
       announce(`${selected.kind === 'photo' ? 'Photo' : 'Video'} selected.`);
       void validateSelectedMedia(selected);
     },
