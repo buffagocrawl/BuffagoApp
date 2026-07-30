@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import tempfile
@@ -18,7 +19,7 @@ from wing_media_processing import (
     WingMediaProcessor,
 )
 
-from .errors import WorkerContractError, WorkerError
+from .errors import DuplicateMediaError, WorkerContractError, WorkerError
 from .models import FingerprintCandidate, ProcessingClaim, ProcessingContext
 from .moderation import ModerationProvider
 from .repository import ProcessingRepository
@@ -60,6 +61,21 @@ def _nearest(
             best_id = candidate.submission_id
             best = similarity
     return best_id, best
+
+
+def _permanent_failure_code(exc: PermanentMediaError) -> str:
+    reason = str(exc).lower()
+    if "codec" in reason and "supported" in reason:
+        return "UNSUPPORTED_VIDEO_CODEC"
+    if "duration" in reason:
+        return "VIDEO_DURATION_OUT_OF_BOUNDS"
+    if "dimension" in reason:
+        return "VIDEO_DIMENSIONS_OUT_OF_BOUNDS"
+    if "bitrate" in reason:
+        return "VIDEO_BITRATE_OUT_OF_BOUNDS"
+    if "container" in reason:
+        return "INVALID_VIDEO_CONTAINER"
+    return "INVALID_MEDIA"
 
 
 class WingProcessingWorker:
@@ -137,6 +153,13 @@ class WingProcessingWorker:
                 source,
                 maximum_bytes=maximum,
             )
+            content_hash = hashlib.sha256(source.read_bytes()).hexdigest()
+            if self.repository.register_exact_media(
+                context,
+                content_hash=content_hash,
+                size_bytes=source.stat().st_size,
+            ):
+                raise DuplicateMediaError()
             artifacts = self.processor.process(
                 source,
                 output,
@@ -225,7 +248,7 @@ class WingProcessingWorker:
         exc: Exception,
     ) -> ProcessingOutcome:
         if isinstance(exc, PermanentMediaError):
-            code = "INVALID_MEDIA"
+            code = _permanent_failure_code(exc)
             retryable = False
             reason = "The uploaded media failed safe validation."
         elif isinstance(exc, RetryableMediaError):
@@ -237,7 +260,7 @@ class WingProcessingWorker:
             retryable = exc.retryable
             reason = exc.public_reason
         else:
-            code = "UNEXPECTED_PROCESSING_FAILURE"
+            code = "MEDIA_PROCESSING_FAILED"
             retryable = True
             reason = "An unexpected processing dependency failed."
         try:

@@ -331,6 +331,12 @@ export async function submitWingShot({
 export function wingShotUserMessage(error) {
   if (error instanceof WingShotClientError) return error.message;
   const code = String(error?.code ?? '');
+  if (code === 'DUPLICATE_MEDIA') {
+    return 'This video was already submitted in another Wing Shot. Record or choose a different clip and try again.';
+  }
+  if (code === 'MEDIA_PROCESSING_FAILED' || code === 'UNEXPECTED_PROCESSING_FAILURE') {
+    return 'We couldn’t prepare this video for review. Try recording or choosing a different clip.';
+  }
   if (code === 'permission_denied') {
     return 'Permission was not granted. You can choose another option or submit later.';
   }
@@ -340,4 +346,11 @@ export function wingShotUserMessage(error) {
   if (code === 'picker_cancelled') return '';
   if (code === 'offline') return 'You appear to be offline. Reconnect and try again.';
   return 'Something went wrong. Your rating is still saved, and you can try the upload again.';
+}
+
+export function wingShotProcessingCopy(error) {
+  if (String(error?.code ?? error?.failure_code ?? '') === 'DUPLICATE_MEDIA') {
+    return { title: 'Duplicate video', message: 'This video was already submitted in another Wing Shot. Record or choose a different clip and try again.', primaryAction: 'Choose a different video', secondaryAction: 'Close' };
+  }
+  return { title: 'Video couldn’t be processed', message: 'We couldn’t prepare this video for review. Try recording or choosing a different clip.', primaryAction: 'Choose a different video', secondaryAction: 'Close' };
 }

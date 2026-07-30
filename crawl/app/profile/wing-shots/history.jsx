@@ -140,7 +140,7 @@ export default function WingShotHistoryScreen() {
               <View style={styles.titleBlock}><Text variant="titleMedium" style={styles.itemTitle}>{mediaLabel(item.media_type)}</Text><Text variant="bodySmall" style={styles.muted}>Submitted {formatDate(item.created_at)}</Text></View>
               <SubmissionStatusChip status={item.display_status} />
             </View>
-            {item.display_status === 'Rejected' && item.rejection_category ? <Text variant="bodySmall" style={styles.rejection}>{formatWingShotRejectionReason(item.rejection_category)}</Text> : null}
+            {(item.display_status === 'Rejected' || item.display_status === 'Duplicate video') && item.rejection_category ? <Text variant="bodySmall" style={styles.rejection}>{formatWingShotRejectionReason(item.rejection_category)}</Text> : null}
           </Card.Content>
         </Card>
       )}

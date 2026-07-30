@@ -257,6 +257,15 @@ export default function WingShotDetailScreen() {
           </Card>
         ) : null}
 
+        {detail.display_status === 'Duplicate video' ? (
+          <Card testID="creator.detail.duplicate" style={styles.card}>
+            <Card.Content>
+              <Text variant="titleMedium" style={styles.sectionTitle}>Duplicate video</Text>
+              <Text style={styles.body}>This clip matches a previous Wing Shot and cannot be submitted again.</Text>
+            </Card.Content>
+          </Card>
+        ) : null}
+
         {detail.display_status === 'Rejected' ? (
           <Card testID="creator.detail.rejection" style={styles.card}>
             <Card.Content>

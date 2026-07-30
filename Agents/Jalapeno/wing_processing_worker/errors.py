@@ -7,6 +7,11 @@ class WorkerError(RuntimeError):
     public_reason = "Wing Shot processing could not be completed."
 
 
+class DuplicateMediaError(WorkerError):
+    code = "DUPLICATE_MEDIA"
+    public_reason = "This video was already submitted in another Wing Shot."
+
+
 class RetryableWorkerError(WorkerError):
     code = "TRANSIENT_DEPENDENCY_FAILURE"
     retryable = True

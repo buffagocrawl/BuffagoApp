@@ -206,6 +206,24 @@ class ProcessingRepository:
             raise WorkerContractError() from exc
         return candidates
 
+    def register_exact_media(
+        self, context: ProcessingContext, *, content_hash: str, size_bytes: int
+    ) -> bool:
+        result = self._scalar(
+            self._rpc(
+                "register_wing_exact_media",
+                {
+                    "p_submission_id": str(context.submission_id),
+                    "p_media_type": context.media_type,
+                    "p_sha256": content_hash,
+                    "p_size_bytes": size_bytes,
+                },
+            )
+        )
+        if not isinstance(result, dict) or not isinstance(result.get("duplicate"), bool):
+            raise WorkerContractError()
+        return result["duplicate"]
+
     def record_moderation(
         self,
         context: ProcessingContext,

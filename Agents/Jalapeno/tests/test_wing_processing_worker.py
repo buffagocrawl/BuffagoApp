@@ -111,6 +111,7 @@ class FakeRepository:
         self.fingerprint = None
         self.cleanup_claim = None
         self.cleanup_receipt = None
+        self.exact_duplicate = False
 
     def enqueue_backlog(self, *, limit):
         self.calls.append(("enqueue", limit))
@@ -139,6 +140,10 @@ class FakeRepository:
     def fingerprint_candidates(self, context, *, algorithm, version):
         self.calls.append(("candidates", algorithm, version))
         return self.candidates
+
+    def register_exact_media(self, context, *, content_hash, size_bytes):
+        self.calls.append(("exact_media", content_hash, size_bytes))
+        return self.exact_duplicate
 
     def record_moderation(self, context, *, payload):
         self.moderation_payload = payload
@@ -372,6 +377,21 @@ def test_mock_video_duplicate_is_folded_into_moderation_probability(tmp_path):
     assert repository.fingerprint["similarity"] == 1.0
 
 
+def test_approximate_or_different_video_is_not_exact_duplicate(tmp_path):
+    source = tmp_path / "different.mp4"
+    source.write_bytes(b"different-video")
+    repository = FakeRepository(source, media_type="video")
+    repository.candidates = [FingerprintCandidate(uuid4(), "a" * 64)]
+    outcome = WingProcessingWorker(
+        repository=repository,
+        processor=FakeVideoProcessor(),
+        moderation_provider=FixtureProvider(),
+        worker_id="test-different-video-worker",
+    ).run_once()
+    assert outcome.status == "IN_REVIEW"
+    assert repository.failure is None
+
+
 class PermanentFailureProcessor:
     class Limits:
         max_photo_bytes = 20 * 1024 * 1024
@@ -395,6 +415,51 @@ def test_invalid_media_dead_letters_without_retry(tmp_path):
     ).run_once()
     assert outcome.status == "DEAD"
     assert repository.failure[:2] == (False, "INVALID_MEDIA")
+
+
+@pytest.mark.parametrize(
+    ("reason", "code"),
+    [
+        ("video codec is not supported", "UNSUPPORTED_VIDEO_CODEC"),
+        ("video duration is outside allowed bounds", "VIDEO_DURATION_OUT_OF_BOUNDS"),
+        ("video dimensions are outside allowed bounds", "VIDEO_DIMENSIONS_OUT_OF_BOUNDS"),
+        ("video bitrate exceeds allowed bounds", "VIDEO_BITRATE_OUT_OF_BOUNDS"),
+        ("video container is not supported", "INVALID_VIDEO_CONTAINER"),
+    ],
+)
+def test_video_validation_failures_keep_specific_codes(tmp_path, reason, code):
+    class ValidationFailureProcessor(PermanentFailureProcessor):
+        def process(self, source, output, *, submission_id):
+            raise PermanentMediaError(reason)
+
+    source = tmp_path / "invalid.mp4"
+    source.write_bytes(b"invalid-video")
+    repository = FakeRepository(source, media_type="video")
+    outcome = WingProcessingWorker(
+        repository=repository,
+        processor=ValidationFailureProcessor(),
+        moderation_provider=FixtureProvider(),
+        worker_id="test-specific-code-worker",
+    ).run_once()
+    assert outcome.error_code == code
+    assert repository.failure[:2] == (False, code)
+
+
+def test_identical_media_dead_letters_as_duplicate_media(tmp_path):
+    source = tmp_path / "duplicate.mp4"
+    source.write_bytes(b"identical-video")
+    repository = FakeRepository(source, media_type="video")
+    repository.exact_duplicate = True
+    outcome = WingProcessingWorker(
+        repository=repository,
+        processor=FakeVideoProcessor(),
+        moderation_provider=FixtureProvider(),
+        worker_id="test-duplicate-worker",
+    ).run_once()
+    assert outcome.status == "DEAD"
+    assert outcome.error_code == "DUPLICATE_MEDIA"
+    assert repository.failure[:2] == (False, "DUPLICATE_MEDIA")
+    assert not repository.uploads
 
 
 def test_temporary_provider_failure_requests_bounded_database_retry(tmp_path):

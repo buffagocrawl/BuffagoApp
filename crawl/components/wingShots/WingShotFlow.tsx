@@ -26,6 +26,7 @@ import {
   WING_SHOT_VIDEO_MAX_SECONDS,
   WING_SHOT_VIDEO_TARGET_SECONDS,
   wingShotUserMessage,
+  wingShotProcessingCopy,
 } from '../../lib/wingShots';
 import { WingShotMediaPreview } from './WingShotMediaPreview';
 import {
@@ -110,6 +111,7 @@ export function WingShotFlow({
   const [attribution, setAttribution] = useState<Attribution | null>(null);
   const [caption, setCaption] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [errorCode, setErrorCode] = useState('');
   const [uploadResult, setUploadResult] = useState<{ submission_id: string; status: string } | null>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
   const networkState = useNetworkState();
@@ -141,6 +143,7 @@ export function WingShotFlow({
     setAttribution(null);
     setCaption('');
     setErrorMessage('');
+    setErrorCode('');
     setUploadResult(null);
     setPhase('editing');
     resetUploadSession();
@@ -389,6 +392,7 @@ export function WingShotFlow({
       if (!progressController.isCurrent(operation)) return;
       progressController.stop(controller.signal.aborted ? 'canceled' : 'failed');
       const message = wingShotUserMessage(error);
+      setErrorCode(String((error as { code?: string })?.code || ''));
       trackEvent({
         eventName: 'wing_shot_upload_failed',
         screen: analyticsContext?.screen ?? 'wing_shot',
@@ -649,9 +653,15 @@ export function WingShotFlow({
                 testID="wing-shot.error"
               >
                 <Ionicons name="alert-circle" size={22} color="#9C2F16" />
-                <Text style={styles.errorText} allowFontScaling>
-                  {errorMessage}
-                </Text>
+                <View style={styles.flex}>
+                  {errorCode ? <Text style={styles.errorTitle} allowFontScaling>{wingShotProcessingCopy({ code: errorCode }).title}</Text> : null}
+                  <Text style={styles.errorText} allowFontScaling>{errorMessage}</Text>
+                  {errorCode === 'DUPLICATE_MEDIA' ? (
+                    <Pressable accessibilityRole="button" onPress={replaceMedia} testID="wing-shot.choose-different-video">
+                      <Text style={styles.errorAction}>Choose a different video</Text>
+                    </Pressable>
+                  ) : null}
+                </View>
               </View>
             ) : null}
 
@@ -920,6 +930,8 @@ const styles = StyleSheet.create({
     padding: 14,
   },
   errorText: { flex: 1, color: '#702411', fontSize: 15, lineHeight: 22 },
+  errorTitle: { color: '#702411', fontWeight: '800', marginBottom: 3 },
+  errorAction: { color: '#9C2F16', fontWeight: '800', marginTop: 8 },
   progressCard: { borderRadius: 14, backgroundColor: '#FFFFFF', padding: 16, gap: 12 },
   progressText: { color: '#1D2430', fontSize: 16, fontWeight: '700' },
   progressTrack: {
