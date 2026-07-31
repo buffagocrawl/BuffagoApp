@@ -426,16 +426,12 @@ async function recoverFinalizedSubmission(client, submissionId) {
     });
     if (error || !Array.isArray(data)) return null;
     const row = data.find((item) => item?.submission_id === submissionId);
-    if (!row || ['Rejected', 'Withdrawn', 'Upload Failed'].includes(row.display_status)) return null;
+    if (!row || row.display_status !== 'In Review') return null;
     const displayStatus = row.display_status || 'In Review';
     return {
       submission_id: submissionId,
-      status: /processing/i.test(displayStatus)
-        ? 'processing'
-        : /featured|approved|publish|complete/i.test(displayStatus)
-          ? 'complete'
-          : 'in_review',
-      review_status: /in review/i.test(displayStatus) ? 'pending_review' : null,
+      status: 'in_review',
+      review_status: 'pending_review',
       display_status: displayStatus,
     };
   } catch (_) {
@@ -771,7 +767,7 @@ export async function submitWingShot({
     }
     throw classified;
   }
-  if (!data?.submission_id || !['in_review', 'pending_review', 'processing', 'complete', 'completed'].includes(data?.status)) {
+  if (!data?.submission_id || !['in_review', 'pending_review'].includes(data?.status)) {
     throw new WingShotClientError(
       'finalization_recovery_pending',
       'Your Wing Shot uploaded, but we’re finishing it in the background.',
