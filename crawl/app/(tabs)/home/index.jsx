@@ -29,6 +29,10 @@ import { WingShotFlow } from '../../../components/wingShots';
 import { averageBeforeSubmission } from '../../../lib/ratingComparison.js';
 import { trackEvent } from '../../../lib/analytics';
 import { loadWeeklyMission } from '../../../lib/weeklyMission';
+import {
+  dismissWeeklyChallenge,
+  loadWeeklyChallengeDismissal,
+} from '../../../lib/engagement/weeklyChallengeDismissal';
 import { recordSavedRatingMission, resolvedDeviceTimezone } from '../../../lib/engagement/ratingMissionTracking.js';
 import { currentWingDuelCompletion } from '../../../lib/home/monthlyWingDuel';
 import {
@@ -452,6 +456,7 @@ export default function Home() {
   const [missionSummary, setMissionSummary] = useState(null);
   const [missionLoading, setMissionLoading] = useState(ENABLE_GROWTH_MISSIONS);
   const [missionError, setMissionError] = useState(false);
+  const [missionDismissed, setMissionDismissed] = useState(false);
   const missionRequestRef = useRef(0);
   const [missionDialogOpen, setMissionDialogOpen] = useState(false);
   const [missionTab, setMissionTab] = useState('active');
@@ -1036,6 +1041,35 @@ export default function Home() {
     }, MS_5_MIN);
     return () => clearInterval(id);
   }, [status, refreshPosition, refreshClosestDistanceOnly, reloadPreferredFromStorage]);
+
+  useEffect(() => {
+    let active = true;
+    setMissionDismissed(false);
+    if (missionSummary?.assignmentId && session?.user?.id) {
+      loadWeeklyChallengeDismissal(session.user.id, {
+        id: missionSummary.assignmentId,
+        expires_at: missionSummary.expiresAt,
+      }).then((dismissed) => {
+        if (active) setMissionDismissed(dismissed);
+      });
+    }
+    return () => {
+      active = false;
+    };
+  }, [missionSummary?.assignmentId, missionSummary?.expiresAt, session?.user?.id]);
+
+  const dismissCompletedMission = useCallback(async () => {
+    if (!missionSummary?.mission?.complete || !session?.user?.id || !missionSummary.assignmentId) return;
+    setMissionDismissed(true);
+    try {
+      await dismissWeeklyChallenge(session.user.id, {
+        id: missionSummary.assignmentId,
+        expires_at: missionSummary.expiresAt,
+      });
+    } catch {
+      // Keep the dismissal for this session if storage is unavailable.
+    }
+  }, [missionSummary, session?.user?.id]);
 
   // Refresh GPS button action: update coords, then update ONLY the distance text
   const refreshDistanceNow = useCallback(async () => {
@@ -3200,22 +3234,34 @@ export default function Home() {
             )}
           </View>
 
-          {ENABLE_GROWTH_MISSIONS ? (
-            <Pressable
-              testID="weekly-mission-entry"
-              accessibilityRole="button"
-              accessibilityLabel={missionLoading ? 'Weekly mission loading' : missionSummary?.mission?.complete ? 'Weekly mission complete, celebrate your win' : missionSummary ? `Weekly mission, ${missionSummary.mission.label}, ${missionSummary.mission.current} of ${missionSummary.mission.target} complete` : 'View weekly missions'}
-              style={[styles.missionEntry, missionSummary?.mission?.complete && styles.missionEntryComplete]}
-              onPress={async () => {
-                setMissionDialogOpen(true);
-                await refreshMissionSummary();
-                await trackEvent({ eventName: 'mission_entry_viewed', screen: 'home', userId: session?.user?.id ?? null, metadata: { source: 'home_compact_entry', mission_state: missionError ? 'error' : missionLoading ? 'loading' : missionSummary ? 'active' : 'empty' } });
-              }}
-            >
-              <Text style={styles.missionEntryIcon}>{missionSummary?.mission?.complete ? '🎉' : '🏆'}</Text>
-              <View style={styles.missionEntryCopy}><Text style={[styles.missionEntryTitle, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>{missionSummary?.mission?.complete ? 'Weekly Mission Complete!' : 'Weekly Mission'}</Text><Text style={[styles.missionEntryMission, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>{missionLoading ? 'Loading mission…' : missionSummary?.mission?.complete ? 'You crushed it — nice work!' : missionSummary?.mission?.label || 'Mission details are temporarily unavailable.'}</Text>{missionSummary ? <Text style={[styles.missionEntryDetail, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>{missionSummary.mission.current} of {missionSummary.mission.target} complete{missionSummary?.mission?.complete ? ' · Reward earned' : ''}</Text> : null}</View>
-              <Text style={[styles.missionEntryChevron, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>›</Text>
-            </Pressable>
+          {ENABLE_GROWTH_MISSIONS && !missionDismissed ? (
+            <View>
+              <Pressable
+                testID="weekly-mission-entry"
+                accessibilityRole="button"
+                accessibilityLabel={missionLoading ? 'Weekly mission loading' : missionSummary?.mission?.complete ? 'Weekly mission complete, celebrate your win' : missionSummary ? `Weekly mission, ${missionSummary.mission.label}, ${missionSummary.mission.current} of ${missionSummary.mission.target} complete` : 'View weekly missions'}
+                style={[styles.missionEntry, missionSummary?.mission?.complete && styles.missionEntryComplete]}
+                onPress={async () => {
+                  setMissionDialogOpen(true);
+                  await refreshMissionSummary();
+                  await trackEvent({ eventName: 'mission_entry_viewed', screen: 'home', userId: session?.user?.id ?? null, metadata: { source: 'home_compact_entry', mission_state: missionError ? 'error' : missionLoading ? 'loading' : missionSummary ? 'active' : 'empty' } });
+                }}
+              >
+                <Text style={styles.missionEntryIcon}>{missionSummary?.mission?.complete ? '🎉' : '🏆'}</Text>
+                <View style={styles.missionEntryCopy}><Text style={[styles.missionEntryTitle, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>{missionSummary?.mission?.complete ? 'Weekly Mission Complete!' : 'Weekly Mission'}</Text><Text style={[styles.missionEntryMission, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>{missionLoading ? 'Loading mission…' : missionSummary?.mission?.complete ? 'You crushed it — nice work!' : missionSummary?.mission?.label || 'Mission details are temporarily unavailable.'}</Text>{missionSummary ? <Text style={[styles.missionEntryDetail, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>{missionSummary.mission.current} of {missionSummary.mission.target} complete{missionSummary?.mission?.complete ? ' · Reward earned' : ''}</Text> : null}</View>
+                <Text style={[styles.missionEntryChevron, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>›</Text>
+              </Pressable>
+              {missionSummary?.mission?.complete ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Hide completed weekly mission until next week"
+                  onPress={dismissCompletedMission}
+                  style={({ pressed }) => [styles.missionDismiss, pressed && styles.missionDismissPressed]}
+                >
+                  <Text style={styles.missionDismissText}>Hide until next week</Text>
+                </Pressable>
+              ) : null}
+            </View>
           ) : null}
 
           <Pressable testID="quick-action-wing-facts" accessibilityRole="button" accessibilityLabel="Wing Facts, open a wing fact" onPress={openWingFacts} style={({ pressed }) => [styles.wingFactsAction, pressed && { opacity: 0.82 }]}><Text style={styles.wingFactsIcon}>🍗</Text><Text style={styles.wingFactsLabel}>Wing Facts</Text></Pressable>
@@ -3962,6 +4008,9 @@ const styles = StyleSheet.create({
   missionEntryDetail: { marginTop: 2, fontSize: 13, opacity: 0.76 },
   missionEntryChevron: { color: '#FFB36F', fontSize: 30, lineHeight: 30 },
   missionEntryCompleteText: { color: '#245B2A', opacity: 1 },
+  missionDismiss: { alignSelf: 'center', paddingHorizontal: 12, paddingVertical: 8 },
+  missionDismissPressed: { opacity: 0.7 },
+  missionDismissText: { color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: '800' },
   closestName: { fontSize: 18, fontWeight: '900', textAlign: 'center', color: 'rgba(255,255,255,0.95)' },
   addressRow: { marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 10 },
   closestAddr: { opacity: 0.8, textAlign: 'center' },

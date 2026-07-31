@@ -63,7 +63,7 @@ export function buildWeeklyMissionFromAssignment(assignment) {
   const definition = weeklyMissionDefinition(assignment, target);
   if (definition.title.startsWith('Mission details')) console.warn('[weekly-mission] unknown_definition', { missionKey: assignment.mission_key || null });
   const item = { key: assignment.mission_key || 'weekly_mission', label: definition.title, detail: definition.requirement, current: progress, target, complete: progress >= target };
-  return { assignmentId: assignment.id || null, items: [item], mission: item, completedCount: progress >= target ? 1 : 0, totalCount: 1, completionRatio: progress / target, nextMission: progress >= target ? null : definition.action, reward: { kind: 'xp', title: `${Number(assignment.reward_xp) || 0} XP`, detail: 'Reward progress is calculated by BuffaGo after eligible activity.' }, resetCopy: weeklyMissionResetCopy(assignment.expires_at) };
+  return { assignmentId: assignment.id || null, expiresAt: assignment.expires_at || null, items: [item], mission: item, completedCount: progress >= target ? 1 : 0, totalCount: 1, completionRatio: progress / target, nextMission: progress >= target ? null : definition.action, reward: { kind: 'xp', title: `${Number(assignment.reward_xp) || 0} XP`, detail: 'Reward progress is calculated by BuffaGo after eligible activity.' }, resetCopy: weeklyMissionResetCopy(assignment.expires_at) };
 }
 
 export function weeklyMissionResult(data) {
