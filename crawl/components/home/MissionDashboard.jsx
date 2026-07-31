@@ -95,7 +95,7 @@ export function CompactMissionCard({ mission, onPress }) {
   );
 }
 
-export function WeeklyChallengeCard({ challenge, loading, error, onPress, onRetry }) {
+export function WeeklyChallengeCard({ challenge, loading, error, onPress, onRetry, onDismiss }) {
   if (!challenge && !loading && !error) return null;
   return (
     <View style={styles.weekly}>
@@ -123,6 +123,16 @@ export function WeeklyChallengeCard({ challenge, loading, error, onPress, onRetr
           >
             <Text style={styles.retryText}>{challenge.ctaLabel}</Text>
           </Pressable>
+          {challenge.complete && onDismiss ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Hide completed weekly challenge until next week"
+              onPress={onDismiss}
+              style={({ pressed }) => [styles.dismiss, pressed && styles.pressed]}
+            >
+              <Text style={styles.dismissText}>Hide until next week</Text>
+            </Pressable>
+          ) : null}
         </>
       ) : null}
     </View>
@@ -166,6 +176,8 @@ const styles = StyleSheet.create({
   compactCount: { color: '#FF9A4F', fontSize: 20, fontWeight: '900', marginBottom: 4 },
   weekly: { borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', backgroundColor: 'rgba(255,255,255,0.045)', padding: 14 },
   retry: { minHeight: 44, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,122,24,0.65)', alignItems: 'center', justifyContent: 'center', marginTop: 12 },
+  dismiss: { alignItems: 'center', justifyContent: 'center', paddingVertical: 10, marginTop: 2 },
+  dismissText: { color: 'rgba(255,255,255,0.62)', fontSize: 12, fontWeight: '800' },
   claim: { backgroundColor: '#FF7A18' },
   retryText: { color: '#FFF', fontWeight: '900' },
 });
