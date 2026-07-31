@@ -1053,6 +1053,7 @@ declare
   v_transition uuid;
   v_note text;
   v_rejection_reason text;
+  v_media_readiness jsonb;
 begin
   if not exists (
     select 1
@@ -1132,6 +1133,31 @@ begin
   ) then
     raise exception 'original_media_required_for_review';
   end if;
+  v_media_readiness := jsonb_build_object(
+    'original_object_exists', true,
+    'processed_object_exists', exists (
+      select 1 from storage.objects object
+       where object.bucket_id = 'wing-submissions'
+         and object.name = v_submission.processed_storage_path
+    ),
+    'thumbnail_object_exists', exists (
+      select 1 from storage.objects object
+       where object.bucket_id = 'wing-submissions'
+         and object.name = v_submission.thumbnail_storage_path
+    ),
+    'processing_succeeded', exists (
+      select 1 from public.wing_processing_jobs job
+       where job.submission_id = v_submission.id
+         and job.job_kind in ('photo_process', 'video_process')
+         and job.status = 'succeeded'
+    ),
+    'active_processing_job', exists (
+      select 1 from public.wing_processing_jobs job
+       where job.submission_id = v_submission.id
+         and job.job_kind in ('photo_process', 'video_process')
+         and job.status in ('pending', 'claimed', 'retry')
+    )
+  );
   if p_action = 'approve'
      and (
        v_submission.moderation_status in ('clear_rejection', 'failed')
@@ -1163,6 +1189,7 @@ begin
         when p_action = 'reject' then v_rejection_reason
         else null
       end,
+      'media_readiness', v_media_readiness,
       'processing_required_before_publish', not exists (
         select 1
         from public.wing_processing_jobs job
@@ -1177,6 +1204,10 @@ begin
      set reviewed_at = now(),
          reviewed_by = p_reviewer_id,
          reviewer_notes = v_note,
+         approved_at = case when p_action = 'approve' then approved_at else null end,
+         approved_by = case when p_action = 'approve' then approved_by else null end,
+         rejected_at = case when p_action = 'approve' then null else rejected_at end,
+         rejection_reason = case when p_action = 'approve' then null else rejection_reason end,
          moderation_status = case
            when p_action = 'approve'
              and moderation_status in ('pending', 'manual_review')
@@ -1256,7 +1287,9 @@ begin
     jsonb_build_object('status', 'in_review'),
     jsonb_build_object(
       'status',
-      case when p_action = 'approve' then 'approved' else 'rejected' end
+      case when p_action = 'approve' then 'approved' else 'rejected' end,
+      'media_readiness', v_media_readiness,
+      'error_code', null
     ),
     'mango:' || p_idempotency_key,
     md5(concat_ws(
@@ -1272,6 +1305,7 @@ begin
 
   return jsonb_build_object(
     'submission_id', p_submission_id,
+    'prior_status', v_submission.status,
     'status', case
       when p_action = 'approve' then 'approved'
       else 'rejected'
@@ -1284,6 +1318,8 @@ begin
         and job.job_kind in ('photo_process', 'video_process')
         and job.status = 'succeeded'
     ),
+    'media_readiness', v_media_readiness,
+    'error_code', null,
     'correlation_id', p_correlation_id
   );
 end;
