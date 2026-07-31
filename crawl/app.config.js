@@ -16,9 +16,7 @@ module.exports = ({ config }) => ({
 
   // Strongly recommended once you ship both platforms:
   // Keeps OTA updates compatible with native builds.
-  runtimeVersion: {
-    policy: "appVersion",
-  },
+  runtimeVersion: "1.0.4",
 
   ios: {
     supportsTablet: false,
