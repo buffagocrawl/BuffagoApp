@@ -20,7 +20,7 @@ const media = {
   getUploadBody: async () => new Uint8Array([1, 2, 3]),
 };
 
-function clientDouble({ reserveError = null, uploadError = null, finalizeError = null } = {}) {
+function clientDouble({ reserveError = null, uploadError = null, finalizeError = null, historyRows = null } = {}) {
   const calls = [];
   const client = {
     rpc: async (name, parameters) => {
@@ -36,7 +36,10 @@ function clientDouble({ reserveError = null, uploadError = null, finalizeError =
                   'originals/30000000-0000-4000-a000-000000000003/20000000-0000-4000-a000-000000000002/source',
               },
               error: null,
-            };
+          };
+      }
+      if (name === 'get_my_wing_submission_history') {
+        return { data: historyRows, error: null };
       }
       return finalizeError
         ? { data: null, error: finalizeError }
@@ -217,6 +220,22 @@ test('retry after finalization failure does not upload twice', async () => {
     second.calls.map((call) => call.name),
     ['finalize_wing_submission_upload'],
   );
+});
+
+test('duplicate finalization after a timeout refreshes history and succeeds without reuploading', async () => {
+  const session = createWingShotUploadSession();
+  const first = clientDouble({
+    finalizeError: { code: '23505', message: 'duplicate key wing_processing_jobs_submission_id_job_kind_generation_key' },
+    historyRows: [{ submission_id: '20000000-0000-4000-a000-000000000002', display_status: 'In Review' }],
+  });
+
+  const result = await submitWingShot({ client: first.client, input: validInput(), session });
+
+  assert.equal(result.status, 'in_review');
+  assert.equal(result.review_status, 'pending_review');
+  assert.equal(first.calls.some((call) => call.kind === 'upload'), true);
+  assert.equal(first.calls.filter((call) => call.kind === 'rpc' && call.name === 'finalize_wing_submission_upload').length, 1);
+  assert.equal(first.calls.filter((call) => call.kind === 'rpc' && call.name === 'get_my_wing_submission_history').length, 1);
 });
 
 test('storage interruption never calls finalize', async () => {
