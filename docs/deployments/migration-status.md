@@ -52,6 +52,7 @@ remote deployment; verify the remote migration ledger before applying them.
 | 20260729155000_wing_upload_rating_eligibility_repair.sql | candidate | not applied here | source-contract validated; remote ledger/schema out of sync | Wing Shot rating eligibility repair | 59b240ee30c567724bc18a84d2ae29c0c4d2b3c8a513d7a5c00640cf0f4e8c12 |
 | 20260729180000_wing_processing_lifecycle_fix.sql | candidate | not applied here | source-contract validated; production repair invocation intentionally not executed | Wing Shot processing, approval, and stranded-row repair | d474ca7124708f817cfd05580980d231b082a73c4f54eaccb5665459b71c3bb9 |
 | 20260729200000_duplicate_media_classification.sql | candidate | not applied here | source-contract validated; fixed allowlist repair only | Exact duplicate media classification and sanitized status surfaces | 62a3f0c8db6afeb1561874337f4471a53fed570390ae3713c09ed230dc65de41 |
+| 20260731005535_wing_finalize_service_role_promotion_contract.sql | candidate | not applied here | source-contract validated; production transaction validation pending | Wing Shot service-role promotion finalizer hotfix | 374a24057c5a87dc0e4a9753721c523492870497b06b87d5be3328fa4e3c1a75 |
 
 
 The exact deployment order is: Strategy B baseline preflight, the retention
