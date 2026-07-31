@@ -69,16 +69,15 @@ test('canonical promotion response is finalized as the exact reserved private ob
   const client = {
     auth: { getSession: async () => ({ data: { session: { access_token: 'test' } } }) },
     functions: { invoke: async () => ({ data: { ok: true, promoted: true, submissionId: session.reservation.submissionId, bucket: 'wing-submissions', path, fullPath: `wing-submissions/${path}` }, error: null }) },
-    rpc: async (name, params) => { calls.push({ name, params }); return { data: { submission_id: session.reservation.submissionId, status: 'uploaded' }, error: null }; },
+    rpc: async (name, params) => { calls.push({ name, params }); return { data: { submission_id: session.reservation.submissionId, status: 'in_review' }, error: null }; },
     storage: { from: () => ({}) },
   };
   const result = await submitWingShot({ client, input, session });
   assert.equal(session.uploadCompleted, true);
   assert.deepEqual(session.uploadedObject, { bucket: 'wing-submissions', path, fullPath: `wing-submissions/${path}` });
   assert.equal(calls[0].name, 'finalize_wing_submission_upload');
-  assert.equal(calls[0].params.p_bucket, 'wing-submissions');
-  assert.equal(calls[0].params.p_storage_path, path);
-  assert.equal(result.status, 'uploaded');
+  assert.deepEqual(Object.keys(calls[0].params).sort(), ['p_correlation_id', 'p_idempotency_key', 'p_submission_id']);
+  assert.equal(result.status, 'in_review');
 });
 
 test('promotion retry returns the same canonical reference when destination already exists', () => {

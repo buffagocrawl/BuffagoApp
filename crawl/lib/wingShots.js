@@ -689,8 +689,6 @@ export async function submitWingShot({
       p_submission_id: session.reservation.submissionId,
       p_idempotency_key: session.finalizeIdempotencyKey,
       p_correlation_id: session.correlationId,
-      p_bucket: session.uploadedObject?.bucket,
-      p_storage_path: session.uploadedObject?.path,
     });
   } catch (error) {
     wingShotLog(session.correlationId, 'RPC failure', {
@@ -718,7 +716,7 @@ export async function submitWingShot({
     userIdPresent: Boolean(input.userId),
     supabaseError: errorContext(error),
   }, error ? 'warn' : 'debug');
-  if (error || !data?.submission_id || data?.status !== 'uploaded') {
+  if (error || !data?.submission_id || data?.status !== 'in_review') {
     throw rpcError('finalization_failed', 'finalize', error);
   }
   return data;

@@ -3204,17 +3204,17 @@ export default function Home() {
             <Pressable
               testID="weekly-mission-entry"
               accessibilityRole="button"
-              accessibilityLabel={missionLoading ? 'Weekly mission loading' : missionSummary ? `Weekly mission, ${missionSummary.mission.label}, ${missionSummary.mission.current} of ${missionSummary.mission.target} complete` : 'View weekly missions'}
-              style={styles.missionEntry}
+              accessibilityLabel={missionLoading ? 'Weekly mission loading' : missionSummary?.mission?.complete ? 'Weekly mission complete, celebrate your win' : missionSummary ? `Weekly mission, ${missionSummary.mission.label}, ${missionSummary.mission.current} of ${missionSummary.mission.target} complete` : 'View weekly missions'}
+              style={[styles.missionEntry, missionSummary?.mission?.complete && styles.missionEntryComplete]}
               onPress={async () => {
                 setMissionDialogOpen(true);
                 await refreshMissionSummary();
                 await trackEvent({ eventName: 'mission_entry_viewed', screen: 'home', userId: session?.user?.id ?? null, metadata: { source: 'home_compact_entry', mission_state: missionError ? 'error' : missionLoading ? 'loading' : missionSummary ? 'active' : 'empty' } });
               }}
             >
-              <Text style={styles.missionEntryIcon}>🏆</Text>
-              <View style={styles.missionEntryCopy}><Text style={styles.missionEntryTitle}>Weekly Mission</Text><Text style={styles.missionEntryMission}>{missionLoading ? 'Loading mission…' : missionSummary?.mission?.label || 'Mission details are temporarily unavailable.'}</Text>{missionSummary ? <Text style={styles.missionEntryDetail}>{missionSummary.mission.current} of {missionSummary.mission.target} complete</Text> : null}</View>
-              <Text style={styles.missionEntryChevron}>›</Text>
+              <Text style={styles.missionEntryIcon}>{missionSummary?.mission?.complete ? '🎉' : '🏆'}</Text>
+              <View style={styles.missionEntryCopy}><Text style={[styles.missionEntryTitle, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>{missionSummary?.mission?.complete ? 'Weekly Mission Complete!' : 'Weekly Mission'}</Text><Text style={[styles.missionEntryMission, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>{missionLoading ? 'Loading mission…' : missionSummary?.mission?.complete ? 'You crushed it — nice work!' : missionSummary?.mission?.label || 'Mission details are temporarily unavailable.'}</Text>{missionSummary ? <Text style={[styles.missionEntryDetail, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>{missionSummary.mission.current} of {missionSummary.mission.target} complete{missionSummary?.mission?.complete ? ' · Reward earned' : ''}</Text> : null}</View>
+              <Text style={[styles.missionEntryChevron, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>›</Text>
             </Pressable>
           ) : null}
 
@@ -3954,12 +3954,14 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   missionEntry: { minHeight: 64, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,122,24,0.35)', backgroundColor: 'rgba(255,122,24,0.10)', paddingHorizontal: 12, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  missionEntryComplete: { borderColor: '#86C98A', backgroundColor: '#DDF5DF' },
   missionEntryIcon: { fontSize: 20 },
   missionEntryCopy: { flex: 1 },
   missionEntryTitle: { fontSize: 16, fontWeight: '900', color: 'rgba(255,255,255,0.96)' },
   missionEntryMission: { marginTop: 1, fontSize: 14, lineHeight: 18, fontWeight: '800', color: 'rgba(255,255,255,0.92)' },
   missionEntryDetail: { marginTop: 2, fontSize: 13, opacity: 0.76 },
   missionEntryChevron: { color: '#FFB36F', fontSize: 30, lineHeight: 30 },
+  missionEntryCompleteText: { color: '#245B2A', opacity: 1 },
   closestName: { fontSize: 18, fontWeight: '900', textAlign: 'center', color: 'rgba(255,255,255,0.95)' },
   addressRow: { marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 10 },
   closestAddr: { opacity: 0.8, textAlign: 'center' },

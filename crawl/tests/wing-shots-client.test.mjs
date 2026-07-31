@@ -43,7 +43,7 @@ function clientDouble({ reserveError = null, uploadError = null, finalizeError =
         : {
             data: {
               submission_id: '20000000-0000-4000-a000-000000000002',
-              status: 'uploaded',
+              status: 'in_review',
             },
             error: null,
           };
@@ -111,7 +111,7 @@ test('upload uses only the exact reserved bucket and path before finalizing', as
     onProgress: (value) => progress.push(value),
   });
 
-  assert.equal(result.status, 'uploaded');
+  assert.equal(result.status, 'in_review');
   assert.deepEqual(
     calls.map((call) => (call.kind === 'rpc' ? call.name : call.kind)),
     ['reserve_wing_submission_upload', 'upload', 'finalize_wing_submission_upload'],
@@ -122,8 +122,11 @@ test('upload uses only the exact reserved bucket and path before finalizing', as
     'originals/30000000-0000-4000-a000-000000000003/20000000-0000-4000-a000-000000000002/source',
   );
   assert.equal(calls[1].options.upsert, false);
-  assert.equal(calls[2].parameters.p_bucket, 'wing-submissions');
-  assert.equal(calls[2].parameters.p_storage_path, calls[1].path);
+  assert.deepEqual(calls[2].parameters, {
+    p_submission_id: '20000000-0000-4000-a000-000000000002',
+    p_idempotency_key: calls[2].parameters.p_idempotency_key,
+    p_correlation_id: calls[2].parameters.p_correlation_id,
+  });
   assert.equal(progress.at(-1), 95);
 });
 
@@ -295,7 +298,7 @@ test('existing reserved object is finalized rather than overwritten', async () =
     session: createWingShotUploadSession(),
   });
 
-  assert.equal(result.status, 'uploaded');
+  assert.equal(result.status, 'in_review');
   assert.equal(calls[1].options.upsert, false);
   assert.equal(calls[2].name, 'finalize_wing_submission_upload');
 });

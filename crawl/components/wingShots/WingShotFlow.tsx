@@ -990,7 +990,7 @@ export function WingShotFlow({
                     Wing Shot submitted
                   </Text>
                   <Text style={styles.successText} allowFontScaling>
-                    {uploadResult?.status === 'submitted_for_review' ? 'Your submission is now under review.' : 'Your submission was saved.'} Approved photos may be featured, and approved
+                    {uploadResult?.status === 'in_review' ? 'Your submission is now under review.' : 'Your submission was saved.'} Approved photos may be featured, and approved
                     creators earn XP, badges, and recognition.
                   </Text>
                 </View>
