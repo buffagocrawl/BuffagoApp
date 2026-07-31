@@ -411,6 +411,38 @@ function formatSeconds(value) {
   return Number.isInteger(value) ? String(value) : Number(value).toFixed(1);
 }
 
+function finalizationMayHaveCommitted(error) {
+  const serverCode = serverErrorText(error).toLowerCase();
+  return error?.status >= 500
+    || error?.statusCode >= 500
+    || /23505|duplicate|wing_processing_jobs|timeout|network|fetch/.test(serverCode);
+}
+
+async function recoverFinalizedSubmission(client, submissionId) {
+  try {
+    const { data, error } = await client.rpc('get_my_wing_submission_history', {
+      p_limit: 100,
+      p_before: null,
+    });
+    if (error || !Array.isArray(data)) return null;
+    const row = data.find((item) => item?.submission_id === submissionId);
+    if (!row || ['Rejected', 'Withdrawn', 'Upload Failed'].includes(row.display_status)) return null;
+    const displayStatus = row.display_status || 'In Review';
+    return {
+      submission_id: submissionId,
+      status: /processing/i.test(displayStatus)
+        ? 'processing'
+        : /featured|approved|publish|complete/i.test(displayStatus)
+          ? 'complete'
+          : 'in_review',
+      review_status: /in review/i.test(displayStatus) ? 'pending_review' : null,
+      display_status: displayStatus,
+    };
+  } catch (_) {
+    return null;
+  }
+}
+
 function isExistingObjectError(error) {
   return (
     Number(error?.statusCode ?? error?.status) === 409 ||
@@ -699,7 +731,17 @@ export async function submitWingShot({
       existingRecordStatus: 'reserved',
       recordCreation: 'already_reserved',
     }, 'warn');
-    throw rpcError('finalization_failed', 'finalize', error);
+    const recovered = await recoverFinalizedSubmission(client, session.reservation.submissionId);
+    if (recovered) return recovered;
+    const classified = rpcError('finalization_failed', 'finalize', error);
+    if (finalizationMayHaveCommitted(error) && classified.code !== 'OBJECT_VALIDATION_FAILED') {
+      throw new WingShotClientError(
+        'finalization_recovery_pending',
+        'Your Wing Shot uploaded, but we’re finishing it in the background.',
+        { stage: 'finalize', cause: error, retryable: true },
+      );
+    }
+    throw classified;
   }
   const { data, error } = finalizeResult;
   wingShotLog(session.correlationId, 'RPC response', {
@@ -716,8 +758,25 @@ export async function submitWingShot({
     userIdPresent: Boolean(input.userId),
     supabaseError: errorContext(error),
   }, error ? 'warn' : 'debug');
-  if (error || !data?.submission_id || data?.status !== 'in_review') {
-    throw rpcError('finalization_failed', 'finalize', error);
+  if (error) {
+    const recovered = await recoverFinalizedSubmission(client, session.reservation.submissionId);
+    if (recovered) return recovered;
+    const classified = rpcError('finalization_failed', 'finalize', error);
+    if (finalizationMayHaveCommitted(error) && classified.code !== 'OBJECT_VALIDATION_FAILED') {
+      throw new WingShotClientError(
+        'finalization_recovery_pending',
+        'Your Wing Shot uploaded, but we’re finishing it in the background.',
+        { stage: 'finalize', cause: error, retryable: true },
+      );
+    }
+    throw classified;
+  }
+  if (!data?.submission_id || !['in_review', 'pending_review', 'processing', 'complete', 'completed'].includes(data?.status)) {
+    throw new WingShotClientError(
+      'finalization_recovery_pending',
+      'Your Wing Shot uploaded, but we’re finishing it in the background.',
+      { stage: 'finalize', retryable: true },
+    );
   }
   return data;
 }
@@ -730,6 +789,7 @@ export function wingShotUserMessage(error) {
   if (code === 'network_timeout' || code === 'timeout') return 'The upload timed out. Your rating is saved—check your connection and try again.';
   if (code === 'authentication_required') return 'Your session expired. Your rating is saved—sign in again to upload your Wing Shot.';
   if (code === 'OBJECT_VALIDATION_FAILED') return 'We couldn’t finish uploading your Wing Shot. Your rating is already saved. Please try the upload again.';
+  if (code === 'finalization_recovery_pending' || code === 'finalization_failed') return 'Your Wing Shot uploaded, but we’re finishing it in the background. Check your Creator history shortly.';
   if (code === 'authorization_failed') return 'Your rating is saved, but this upload is no longer authorized. Choose the media again or skip the upload.';
   if (code === 'rate_limited') {
     const retry = Number.isFinite(Number(error?.retryAfterSeconds)) && Number(error.retryAfterSeconds) > 0 ? `try again in ${formatRetryAfter(Number(error.retryAfterSeconds))}` : 'try again later';
