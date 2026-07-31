@@ -97,6 +97,12 @@ export function CompactMissionCard({ mission, onPress }) {
 
 export function WeeklyChallengeCard({ challenge, loading, error, onPress, onRetry, onDismiss }) {
   if (!challenge && !loading && !error) return null;
+  const isComplete = Boolean(
+    challenge?.complete ||
+      challenge?.completed ||
+      challenge?.completed_at ||
+      (Number.isFinite(Number(challenge?.current)) && Number.isFinite(Number(challenge?.target)) && Number(challenge.current) >= Number(challenge.target))
+  );
   return (
     <View style={styles.weekly}>
       <Text style={styles.eyebrow}>WEEKLY CHALLENGE</Text>
@@ -123,7 +129,7 @@ export function WeeklyChallengeCard({ challenge, loading, error, onPress, onRetr
           >
             <Text style={styles.retryText}>{challenge.ctaLabel}</Text>
           </Pressable>
-          {challenge.complete && onDismiss ? (
+          {isComplete && onDismiss ? (
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Hide completed weekly challenge until next week"
