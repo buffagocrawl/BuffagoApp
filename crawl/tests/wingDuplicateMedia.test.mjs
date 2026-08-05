@@ -10,11 +10,11 @@ const mango = fs.readFileSync(new URL('../Agents/Mango Habanero/src/main.jsx', r
 
 test('duplicate processing copy is explicit and never calls it an upload failure', () => {
   assert.match(copy, /DUPLICATE_MEDIA/);
-  assert.match(copy, /Duplicate video/);
-  assert.match(copy, /Choose a different video/);
+  assert.match(copy, /Duplicate photo/);
+  assert.match(copy, /Choose a different photo/);
   assert.match(copy, /another Wing Shot/);
   assert.doesNotMatch(copy.slice(copy.indexOf('export function wingShotProcessingCopy')), /Upload failed/);
-  assert.match(flow, /testID="wing-shot\.choose-different-video"/);
+  assert.doesNotMatch(flow, /video/);
 });
 
 test('exact identity is server-authoritative and approximate fingerprints stay separate', () => {
@@ -34,4 +34,3 @@ test('owner and Mango surfaces expose sanitized duplicate state only', () => {
   assert.match(mango, /Exact duplicate detected/);
   assert.match(mango, /No publication occurred/);
 });
-

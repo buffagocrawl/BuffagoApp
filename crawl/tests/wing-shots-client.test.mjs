@@ -79,7 +79,7 @@ function validInput(overrides = {}) {
   };
 }
 
-test('media validation enforces the ten-second video limit', () => {
+test('media validation rejects video uploads in the photo-only user path', () => {
   assert.throws(
     () =>
       validateWingShotMedia({
@@ -88,7 +88,7 @@ test('media validation enforces the ten-second video limit', () => {
         mimeType: 'video/mp4',
         durationSeconds: 10.01,
       }),
-    (error) => error instanceof WingShotClientError && error.code === 'video_too_long',
+    (error) => error instanceof WingShotClientError && error.code === 'unsupported_media_type',
   );
 });
 

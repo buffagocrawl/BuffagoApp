@@ -123,12 +123,12 @@ test('interpolation and lifecycle safeguards are wired to the flow', () => {
   assert.match(hook, /setInterval\(tick, TICK_MS\)/);
   assert.match(hook, /clearInterval\(timerRef\.current\)/);
   assert.match(hook, /useEffect\(\(\) => \(\) =>/);
-  assert.match(flow, /progressController\.complete\(\)/);
+  assert.match(flow, /progressController\.complete\(/);
   assert.match(flow, /createWingShotValidationProgress/);
   assert.match(flow, /validationProgressControllerRef\.current\?\.stop\(\)/);
   assert.match(flow, /validationProgressControllerRef\.current\?\.complete\(validationOperation\)/);
   assert.match(flow, /controller\.signal\.aborted/);
-  assert.match(preview, /fullscreenOptions=\{\{ enable: false \}\}/);
+  assert.match(preview, /testID="wing-shot\.preview\.photo"/);
   assert.match(flow, /AccessibilityInfo\.isReduceMotionEnabled/);
   assert.match(flow, /accessibilityValue=\{\{ min: 0, max: 100, now: Math\.round\(safeProgress\) \}\}/);
 });

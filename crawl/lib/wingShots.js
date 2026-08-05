@@ -16,9 +16,7 @@ const PHOTO_MIME_TYPES = new Set([
   'image/webp',
   'image/heic',
 ]);
-const VIDEO_MIME_TYPES = new Set(['video/mp4', 'video/quicktime']);
 const ATTRIBUTION_PREFERENCES = new Set(['username', 'display_name', 'anonymous']);
-const VIDEO_EXTENSIONS = new Set(['mp4', 'mov']);
 
 export class WingShotClientError extends Error {
   constructor(code, message, options = {}) {
@@ -51,61 +49,29 @@ export function createCorrelationId() {
 }
 
 export function validateWingShotMedia(media) {
-  if (!media || !['photo', 'video'].includes(media.kind)) {
-    throw new WingShotClientError('invalid_media', 'Choose a supported photo or video.');
+  if (!media || media.kind !== 'photo') {
+    throw new WingShotClientError('unsupported_media_type', 'Choose a supported photo (JPEG, PNG, WebP, or HEIC).');
   }
   if (!Number.isInteger(media.sizeBytes) || media.sizeBytes < 1) {
     throw new WingShotClientError('invalid_media_size', 'The media size could not be verified.');
   }
-  const allowedMimes = media.kind === 'photo' ? PHOTO_MIME_TYPES : VIDEO_MIME_TYPES;
-  if (!allowedMimes.has(media.mimeType)) {
+  if (!PHOTO_MIME_TYPES.has(media.mimeType)) {
     throw new WingShotClientError(
       'unsupported_media_type',
-      'Choose a JPEG, PNG, WebP, HEIC, MP4, or QuickTime file.',
+      'Choose a JPEG, PNG, WebP, or HEIC photo.',
     );
   }
-  if (media.kind === 'video') {
-    const extension = String(media.fileName ?? '').split(/[?#]/)[0].split('.').pop()?.toLowerCase() || 'unknown';
-    if (extension !== 'unknown' && !VIDEO_EXTENSIONS.has(extension)) {
-      throw new WingShotClientError('unsupported_media_type', 'This video format is not supported.', { stage: 'validate' });
-    }
-  }
-  const maxEdge = media.kind === 'photo' ? WING_SHOT_MAX_PHOTO_EDGE : WING_SHOT_MAX_VIDEO_EDGE;
+  const maxEdge = WING_SHOT_MAX_PHOTO_EDGE;
   if ((media.width != null || media.height != null) && (!Number.isInteger(media.width) || !Number.isInteger(media.height) || media.width < 1 || media.height < 1 || Math.max(media.width, media.height) > maxEdge)) {
     throw new WingShotClientError('invalid_dimensions', 'This media’s dimensions are not supported.', { stage: 'validate' });
   }
-  const maximumBytes =
-    media.kind === 'photo' ? WING_SHOT_PHOTO_MAX_BYTES : WING_SHOT_VIDEO_MAX_BYTES;
+  const maximumBytes = WING_SHOT_PHOTO_MAX_BYTES;
   if (media.sizeBytes > maximumBytes) {
     throw new WingShotClientError(
       'media_too_large',
-      media.kind === 'photo'
-        ? 'That photo is too large. Choose one under 20 MiB.'
-        : 'That video is too large. Choose one under 50 MiB.',
+      'That photo is too large. Choose one under 20 MiB.',
       { sizeBytes: media.sizeBytes },
     );
-  }
-  if (media.kind === 'video') {
-    if (!Number.isFinite(media.durationSeconds) || media.durationSeconds <= 0) {
-      throw new WingShotClientError(
-        'invalid_video_duration',
-        'The video duration could not be verified.',
-      );
-    }
-    if (media.durationSeconds < WING_SHOT_VIDEO_MIN_SECONDS) {
-      throw new WingShotClientError(
-        'video_too_short',
-        `This video is ${formatSeconds(media.durationSeconds)} seconds long. Wing Shots must be between ${WING_SHOT_VIDEO_MIN_SECONDS} and ${WING_SHOT_VIDEO_MAX_SECONDS} seconds.`,
-        { stage: 'validate', durationSeconds: media.durationSeconds },
-      );
-    }
-    if (media.durationSeconds > WING_SHOT_VIDEO_MAX_SECONDS) {
-      throw new WingShotClientError(
-        'video_too_long',
-        'Keep your Wing Shot video to 10 seconds or less.',
-        { stage: 'validate', durationSeconds: media.durationSeconds },
-      );
-    }
   }
   if (typeof media.getUploadBody !== 'function') {
     throw new WingShotClientError(
@@ -363,7 +329,7 @@ function rpcError(code, stage, error) {
   if (serverCode.includes('invalid_media_size')) {
     return new WingShotClientError(
       'media_too_large',
-      'This media is too large. Choose a smaller file (photos under 20 MiB, videos under 50 MiB).',
+      'This photo is too large. Choose a photo under 20 MiB.',
       { stage, cause: error, sizeBytes: error?.expected_size_bytes ?? error?.sizeBytes ?? null },
     );
   }
@@ -533,7 +499,7 @@ export async function submitWingShot({
   }
   session.requestFingerprint = requestFingerprint;
   throwIfAborted(signal);
-  wingShotLog(session.correlationId, 'Video preprocessing or normalization', {
+  wingShotLog(session.correlationId, 'Photo upload preparation', {
     ...mediaLogContext(input.media),
     preprocessing: 'client upload body preparation',
   });
@@ -792,15 +758,14 @@ export function wingShotUserMessage(error) {
     return `You’ve uploaded several Wing Shots recently. Your rating is already saved—${retry}.`;
   }
   if (code === 'server_temporarily_unavailable') return 'Wing Shot upload is temporarily unavailable. Your rating is saved—please try again.';
-  if (code === 'file_too_large') return 'That file is too large to upload. Choose a smaller photo or video.';
+  if (code === 'file_too_large') return 'That photo is too large to upload. Choose one under 20 MiB.';
   if (code === 'local_validation_error') return 'This media could not be checked on this device. Choose another file and try again.';
   if (code === 'validation_state_error') return 'This Wing Shot is no longer ready to validate. Choose the media again.';
-  if (code === 'media_too_large') return 'This file is too large to upload. Try choosing a shorter video or a smaller photo.';
-  if (code === 'video_too_long') return 'This video is longer than we can accept. Trim it and try again.';
-  if (code === 'video_too_short') return 'This video is too short. Record a slightly longer Wing Shot and try again.';
-  if (code === 'unsupported_media_type' || code === 'unsupported_format') return 'We can’t use this file format. Try a standard photo or MP4 video.';
+  if (code === 'media_too_large') return 'This photo is too large to upload. Choose one under 20 MiB.';
+  if (code === 'video_too_long' || code === 'video_too_short') return 'Only photos can be uploaded for Wing Shots. Choose a photo instead.';
+  if (code === 'unsupported_media_type' || code === 'unsupported_format') return 'We can’t use this file format. Try a JPEG, PNG, WebP, or HEIC photo.';
   if (code === 'media_unreadable' || code === 'corrupt_media' || code === 'media_read_failed') return 'We couldn’t read this file. Try selecting it again or choose another one.';
-  if (code === 'invalid_dimensions' || code === 'photo_dimensions_invalid' || code === 'video_dimensions_invalid') return 'This media’s dimensions aren’t supported. Try another photo or video.';
+  if (code === 'invalid_dimensions' || code === 'photo_dimensions_invalid' || code === 'video_dimensions_invalid') return 'This photo’s dimensions aren’t supported. Choose another photo.';
   if (code === 'validation_network_failure' || code === 'validation_retryable' || code === 'network_failed') return 'We couldn’t validate your Wing Shot right now. Check your connection and try again.';
   if (code === 'WING_SHOT_RATE_LIMITED' || code === 'RATE_LIMITED' || code === 'rate_limited') {
     const retry = Number.isFinite(Number(error?.retryAfterSeconds)) && Number(error.retryAfterSeconds) > 0
@@ -811,7 +776,7 @@ export function wingShotUserMessage(error) {
   if (code === 'authentication_required') return 'Please sign in before validating a Wing Shot.';
   if (code === 'upload_authorization_failed' || code === 'staging_upload_failed') return 'The Wing Shot upload could not start or finish. Check your connection and try again.';
   if (code === 'staging_object_missing' || code === 'staging_object_forbidden') return 'This Wing Shot upload expired. Choose the media again.';
-  if (code === 'unreadable_media' || code === 'corrupted_media') return 'We couldnâ€™t read this media. Choose another photo or video.';
+  if (code === 'unreadable_media' || code === 'corrupted_media') return 'We couldnâ€™t read this photo. Choose another image.';
   if (code === 'validator_unavailable' || code === 'validation_timeout' || code === 'validation_internal_failure') return 'Validation is temporarily unavailable. Try again.';
   if (code === 'stale_validation_cancelled') return '';
   if (code === 'validation_cancelled') return '';
@@ -824,29 +789,28 @@ export function wingShotUserMessage(error) {
         : ' Please try again later or skip the upload.';
       return `Your rating is already saved. You’ve been rate limited from uploading more Wing Shots for now.${retry}`;
     }
-    if (code === 'video_too_short') return `This Wing Shot is too short. This video is ${formatSeconds(error.durationSeconds ?? 0)} seconds long. Wing Shots must be between ${WING_SHOT_VIDEO_MIN_SECONDS} and ${WING_SHOT_VIDEO_MAX_SECONDS} seconds.${saved}`;
-    if (code === 'video_too_long') return `This Wing Shot is too long. This video is ${formatSeconds(error.durationSeconds ?? 0)} seconds long. Wing Shots must be between ${WING_SHOT_VIDEO_MIN_SECONDS} and ${WING_SHOT_VIDEO_MAX_SECONDS} seconds.${saved}`;
+    if (code === 'video_too_short' || code === 'video_too_long') return `Only photos can be uploaded for Wing Shots. Choose a photo instead.${saved}`;
     if (code === 'media_too_large') {
       const sizeMb = Number.isFinite(error.sizeBytes) ? (error.sizeBytes / (1024 * 1024)).toFixed(1) : '?';
-      return `Your rating is already saved. This video is ${sizeMb} MB; Wing Shots must be under ${WING_SHOT_VIDEO_MAX_MB} MB. Choose another video or skip the upload.`;
+      return `Your rating is already saved. This photo is ${sizeMb} MB; Wing Shots must be under 20 MiB. Choose another photo or skip the upload.`;
     }
     if (code === 'retryable_submission') return 'Your rating is already saved. Let’s retry your Wing Shot.';
     if (code === 'duplicate_completed_submission') return 'This rating already has a Wing Shot.';
-    if (code === 'rpc_server_validation') return 'Your rating is already saved, but this video could not be accepted. Choose another video or skip the upload.';
+    if (code === 'rpc_server_validation') return 'Your rating is already saved, but this photo could not be accepted. Choose another photo or skip the upload.';
     if (code === 'temporary_server_or_network') return 'Your rating is already saved. The upload didn’t finish—check your connection and try again.';
-    if (code === 'unsupported_media_type') return `This video format isn’t supported. Try recording a new video or selecting an MP4 or MOV.${saved}`;
-    if (code === 'media_read_failed' || code === 'media_reader_unavailable') return `We can’t access this video anymore. Please select or record it again.${saved}`;
-    if (code === 'invalid_video_duration' || code === 'metadata_extraction_failed') return `We couldn’t read this video’s details. Try recording it again or choose another video.${saved}`;
-    if (code === 'preprocessing_failed') return 'We couldn’t prepare this video for upload. Your rating is already saved—try another video or skip the upload.';
+    if (code === 'unsupported_media_type') return `This photo format isn’t supported. Choose a JPEG, PNG, WebP, or HEIC photo.${saved}`;
+    if (code === 'media_read_failed' || code === 'media_reader_unavailable') return `We can’t access this photo anymore. Please select it again.${saved}`;
+    if (code === 'invalid_video_duration' || code === 'metadata_extraction_failed') return `We couldn’t read this photo’s details. Choose another photo.${saved}`;
+    if (code === 'preprocessing_failed') return 'We couldn’t prepare this photo for upload. Your rating is already saved—try another photo or skip the upload.';
     if (code === 'upload_failed' || code === 'offline' || code === 'network_failed') return `The upload didn’t finish. Check your connection and try again.${saved}`;
     if (code === 'rating_required' || code === 'rating_not_found' || code === 'rating_not_owned' || code === 'destination_mismatch') return 'Your rating was saved, but we couldn’t connect this Wing Shot to it. Please close and try again.';
     return 'We couldn’t validate this Wing Shot. Try selecting it again or choose another file.';
   }
   if (code === 'DUPLICATE_MEDIA') {
-    return `This video was already submitted in another Wing Shot. Record or choose a different clip and try again.${saved}`;
+    return `This photo was already submitted in another Wing Shot. Choose a different photo and try again.${saved}`;
   }
   if (code === 'MEDIA_PROCESSING_FAILED' || code === 'UNEXPECTED_PROCESSING_FAILURE') {
-    return 'We couldn’t prepare this video for upload. Your rating is already saved—try another video or skip the upload.';
+    return 'We couldn’t prepare this photo for upload. Your rating is already saved—try another photo or skip the upload.';
   }
   if (code === 'permission_denied') {
     return 'Permission was not granted. Your rating is already saved—choose another option or skip the upload.';
@@ -856,7 +820,7 @@ export function wingShotUserMessage(error) {
   }
   if (code === 'picker_cancelled') return '';
   if (code === 'offline') return `The upload didn’t finish. Check your connection and try again.${saved}`;
-  return 'Your rating is already saved, but we couldn’t process this Wing Shot. Try another video or skip the upload.';
+  return 'Your rating is already saved, but we couldn’t process this Wing Shot. Try another photo or skip the upload.';
 }
 
 function formatRetryAfter(seconds) {
@@ -872,7 +836,7 @@ export function wingShotProcessingCopy(error) {
     return { title: 'Too many Wing Shots', message: wingShotUserMessage(error), primaryAction: 'Try again', secondaryAction: 'Skip media upload' };
   }
   if (String(error?.code ?? error?.failure_code ?? '') === 'DUPLICATE_MEDIA') {
-    return { title: 'Duplicate video', message: 'This video was already submitted in another Wing Shot. Record or choose a different clip and try again.', primaryAction: 'Choose a different video', secondaryAction: 'Close' };
+    return { title: 'Duplicate photo', message: 'This photo was already submitted in another Wing Shot. Choose a different photo and try again.', primaryAction: 'Choose a different photo', secondaryAction: 'Close' };
   }
-  return { title: 'Wing Shot upload issue', message: 'Your rating is already saved. Try another video or skip the upload.', primaryAction: 'Try again', secondaryAction: 'Skip media upload' };
+  return { title: 'Wing Shot upload issue', message: 'Your rating is already saved. Try another photo or skip the upload.', primaryAction: 'Try again', secondaryAction: 'Skip photo upload' };
 }

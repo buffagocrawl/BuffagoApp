@@ -22,19 +22,21 @@ export async function stageWingShotMedia({
   client,
   media,
   correlationId,
+  destinationId,
   signal,
   onProgress = (_value: number) => {},
 }: {
   client: any;
   media: WingShotSelectedMedia;
   correlationId: string;
+  destinationId?: string | number | null;
   signal?: AbortSignal;
   onProgress?: (value: number) => void;
 }): Promise<WingShotStagedMedia> {
   if (signal?.aborted) throw new WingShotClientError('stale_validation_cancelled', 'Validation cancelled.', { stage: 'staging_upload' });
   const hasSession = Boolean((await client.auth.getSession()).data?.session);
   wingShotLog(correlationId, 'staging_authorization_started', { stage: 'staging_authorization', mediaType: media.kind, fileSizeBytes: media.sizeBytes, authenticatedSession: hasSession }, 'debug');
-  const authorization = await invokeWithOneAuthRefresh(client, 'wing-media-stage-authorize', { correlationId, mediaType: media.kind, mimeType: media.mimeType, fileName: media.fileName ?? 'wing-shot', fileSizeBytes: media.sizeBytes }, correlationId);
+  const authorization = await invokeWithOneAuthRefresh(client, 'wing-media-stage-authorize', { correlationId, destinationId: destinationId ?? null, mediaType: media.kind, mimeType: media.mimeType, fileName: media.fileName ?? 'wing-shot', fileSizeBytes: media.sizeBytes }, correlationId);
   if (authorization.error || !authorization.data?.signedUploadUrl || !authorization.data?.objectPath) {
     const failure = authorization.__wingFailure || {};
     const reasonCode = failure.reasonCode || authorization.data?.reason_code || 'upload_authorization_failed';

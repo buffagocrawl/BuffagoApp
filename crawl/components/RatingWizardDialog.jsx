@@ -277,6 +277,7 @@ export default function RatingWizardDialog({
   const [wouldOrderAgain, setWouldOrderAgain] = useState(null);
   const [wingsEaten, setWingsEaten] = useState(6);
   const [selectedTagId, setSelectedTagId] = useState(null);
+  const finalizeInFlightRef = useRef(false);
 
   const sliderDescriptions = useMemo(
     () => ({
@@ -317,6 +318,7 @@ export default function RatingWizardDialog({
     setWouldOrderAgain(null);
     setWingsEaten(6);
     setSelectedTagId(null);
+    finalizeInFlightRef.current = false;
   }, [visible]);
 
   const goBack = () => {
@@ -326,7 +328,7 @@ export default function RatingWizardDialog({
   };
 
   const goNext = async () => {
-    if (saving) return;
+    if (saving || finalizeInFlightRef.current) return;
     if (step < totalSteps - 1) {
       setStep((s) => Math.min(totalSteps - 1, s + 1));
       return;
@@ -348,7 +350,12 @@ export default function RatingWizardDialog({
       wouldOrderAgain: wouldOrderAgain == null ? null : !!wouldOrderAgain,
     });
 
-    await onFinalize?.(payload);
+    finalizeInFlightRef.current = true;
+    try {
+      await onFinalize?.(payload);
+    } finally {
+      finalizeInFlightRef.current = false;
+    }
   };
 
   return (

@@ -48,7 +48,7 @@ test('image and video limits match the private bucket contract', () => {
   assert.match(root('supabase/config.toml'), /file_size_limit = "50MiB"/);
 });
 
-test('the observed 35.2 MB MP4 remains valid', () => {
+test('legacy video media is rejected by the new user upload validator', () => {
   const media = {
     kind: 'video',
     mimeType: 'video/mp4',
@@ -56,5 +56,5 @@ test('the observed 35.2 MB MP4 remains valid', () => {
     durationSeconds: 7,
     getUploadBody: async () => new Uint8Array([1]),
   };
-  assert.equal(validateWingShotMedia(media), media);
+  assert.throws(() => validateWingShotMedia(media), /supported photo/i);
 });

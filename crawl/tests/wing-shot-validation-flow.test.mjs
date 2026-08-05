@@ -31,9 +31,9 @@ test('validation status and submit gating are explicit', () => {
 test('every client reason code has safe actionable copy', () => {
   const cases = {
     media_too_large: 'too large',
-    video_too_long: 'longer than we can accept',
-    video_too_short: 'too short',
-    unsupported_media_type: 'standard photo or MP4',
+    video_too_long: 'Only photos can be uploaded',
+    video_too_short: 'Only photos can be uploaded',
+    unsupported_media_type: 'JPEG, PNG, WebP, or HEIC',
     media_unreadable: 'couldn’t read',
     invalid_dimensions: 'dimensions aren’t supported',
     validation_network_failure: 'couldn’t validate',
@@ -48,7 +48,7 @@ test('every client reason code has safe actionable copy', () => {
 
 test('server endpoint uses stable reason codes and structured lifecycle logs', () => {
   const endpoint = fs.readFileSync(new URL('../supabase/functions/wing-media-validate/index.ts', import.meta.url), 'utf8');
-  for (const code of ['media_too_large', 'video_too_long', 'video_too_short', 'unsupported_media_type', 'corrupt_media', 'invalid_dimensions', 'validation_network_failure']) assert.match(endpoint, new RegExp(code));
+  for (const code of ['file_too_large', 'unsupported_media_type', 'media_corrupt', 'invalid_dimensions', 'server_temporarily_unavailable']) assert.match(endpoint, new RegExp(code));
   for (const event of ['validation_started', 'validation_passed', 'validation_retryable_failure']) assert.match(endpoint, new RegExp(event));
   assert.doesNotMatch(endpoint, /signed_url|signedUrl|file\.text\(\)/i);
 });

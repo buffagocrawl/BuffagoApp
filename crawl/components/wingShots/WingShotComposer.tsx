@@ -28,7 +28,7 @@ export function WingShotComposer({ source, onClose }: { source: Source; onClose:
     return (
       <View style={styles.picker} testID={`wing-shot-picker-${source}`}>
         <Text style={styles.title}>Where were these wings from?</Text>
-        <Text style={styles.copy}>Choose the restaurant associated with your photo or video. You do not need to be there now.</Text>
+        <Text style={styles.copy}>Choose the restaurant associated with your photo. You do not need to be there now.</Text>
         <TextInput value={query} onChangeText={setQuery} placeholder="Search restaurants" style={styles.input} testID="wing-shot.restaurant-search" />
         {loading ? <Text>Searching…</Text> : null}
         <FlatList data={restaurants} keyExtractor={(item) => item.id} renderItem={({ item }) => (

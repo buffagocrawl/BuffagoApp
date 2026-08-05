@@ -7,8 +7,27 @@ $envFile = Join-Path (Split-Path -Parent $base) 'Chipotle.env.local'
 $lockPath = Join-Path $base 'artifacts\chipotle.lock'
 $logPath = Join-Path $base 'logs\chipotle.log'
 New-Item -ItemType Directory -Force (Split-Path $lockPath), (Split-Path $logPath) | Out-Null
-if (Test-Path -LiteralPath $lockPath) { Write-Error 'Chipotle is already running (lock exists).'; exit 75 }
-New-Item -ItemType File -Path $lockPath -Force | Out-Null
+$ownsLock = $false
+$staleAfter = New-TimeSpan -Hours 3
+if (Test-Path -LiteralPath $lockPath) {
+  $lock = Get-Item -LiteralPath $lockPath
+  if ((Get-Date) - $lock.LastWriteTime -gt $staleAfter) {
+    Remove-Item -LiteralPath $lockPath -Force
+  } else {
+    Write-Error 'Chipotle is already running (lock exists).'; exit 75
+  }
+}
+try {
+  # CreateNew makes acquisition atomic when two scheduled/manual runs start together.
+  $stream = [System.IO.File]::Open($lockPath, [System.IO.FileMode]::CreateNew, [System.IO.FileAccess]::Write, [System.IO.FileShare]::Read)
+  try {
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes("PID=$PID`nSTARTED=$((Get-Date).ToUniversalTime().ToString('o'))`n")
+    $stream.Write($bytes, 0, $bytes.Length)
+  } finally { $stream.Dispose() }
+  $ownsLock = $true
+} catch [System.IO.IOException] {
+  Write-Error 'Chipotle is already running (lock exists).'; exit 75
+}
 try {
   if (Test-Path -LiteralPath $envFile) {
     foreach ($line in Get-Content -LiteralPath $envFile) {
@@ -26,4 +45,6 @@ try {
   & $python @args 2>&1 | ForEach-Object { $_.ToString() -replace '(?i)(bearer\s+|apikey[=:]\s*|service_role[^\s=]*[=:]\s*)[^\s]+','$1[REDACTED]' } | Tee-Object -FilePath $logPath -Append
   exit $LASTEXITCODE
 } catch { $_.Exception.Message -replace '(?i)(bearer\s+|apikey[=:]\s*|service_role[^\s=]*[=:]\s*)[^\s]+','$1[REDACTED]' | Tee-Object -FilePath $logPath -Append; exit 2
-} finally { Remove-Item -LiteralPath $lockPath -Force -ErrorAction SilentlyContinue }
+} finally {
+  if ($ownsLock) { Remove-Item -LiteralPath $lockPath -Force -ErrorAction SilentlyContinue }
+}

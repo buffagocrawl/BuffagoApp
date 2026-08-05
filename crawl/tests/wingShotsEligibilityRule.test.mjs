@@ -45,7 +45,7 @@ test('client maps the revised product errors without in-person messaging', () =>
   assert.doesNotMatch(client, /in_person_not_verified|verified as an in-person visit|onboarding_rating/);
 });
 
-test('photo and video media remain supported and publication stays approval-gated', () => {
+test('photo media remains supported while legacy video rows remain reviewable', () => {
   const media = (kind, mimeType) => ({
     kind,
     mimeType,
@@ -54,7 +54,7 @@ test('photo and video media remain supported and publication stays approval-gate
     getUploadBody: async () => new Uint8Array([1]),
   });
   assert.equal(validateWingShotMedia(media('photo', 'image/jpeg')).kind, 'photo');
-  assert.equal(validateWingShotMedia(media('video', 'video/mp4')).kind, 'video');
+  assert.throws(() => validateWingShotMedia(media('video', 'video/mp4')), /supported photo/i);
   assert.match(root('supabase/migrations/20260729120000_wing_shots_core.sql'), /status text not null default 'uploaded'/);
   assert.match(root('supabase/migrations/20260729122000_wing_shots_creator_rewards.sql'), /approved/);
 });

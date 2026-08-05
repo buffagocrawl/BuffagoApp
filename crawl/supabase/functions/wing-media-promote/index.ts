@@ -4,8 +4,8 @@ import { bearerToken } from '../_shared/wingShotResponse.ts';
 
 const SOURCE_BUCKET = 'wing-shot-staging';
 const DESTINATION_BUCKET = 'wing-submissions';
-const MAX_BYTES = { photo: 20 * 1024 * 1024, video: 50 * 1024 * 1024 };
-const MIMES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'video/mp4', 'video/quicktime']);
+const MAX_BYTES = { photo: 20 * 1024 * 1024 };
+const MIMES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic']);
 const baseHeaders = { 'content-type': 'application/json', 'cache-control': 'no-store' };
 
 function correlationId(request, body = {}) {
@@ -81,10 +81,10 @@ Deno.serve(async (request) => {
 
     const expectedMime = String(body.expectedMimeType || intent.expected_mime_type || '').toLowerCase();
     const expectedSize = Number(body.expectedSizeBytes ?? intent.expected_size_bytes);
-    if (!MIMES.has(expectedMime) || !Number.isInteger(expectedSize) || expectedSize < 1 || intent.media_type !== body.mediaType && body.mediaType != null) {
+    if (intent.media_type !== 'photo' || !MIMES.has(expectedMime) || !Number.isInteger(expectedSize) || expectedSize < 1 || intent.media_type !== body.mediaType && body.mediaType != null) {
       return response(request, 400, 'promotion_contract_invalid', 'The promotion request does not match the reserved media.', 'validation', { body });
     }
-    if (expectedSize > (MAX_BYTES[intent.media_type] || MAX_BYTES.video)) return response(request, 413, 'payload_too_large', 'This media is too large to store.', 'validation', { body });
+    if (expectedSize > MAX_BYTES.photo) return response(request, 413, 'payload_too_large', 'This photo is too large to store.', 'validation', { body });
 
     const destinationPath = intent.expected_storage_path;
     const existing = await admin.storage.from(DESTINATION_BUCKET).download(destinationPath);

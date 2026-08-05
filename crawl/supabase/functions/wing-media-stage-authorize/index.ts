@@ -2,8 +2,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
 
 const BUCKET = 'wing-shot-staging';
-const MAX = { photo: 20 * 1024 * 1024, video: 50 * 1024 * 1024 };
-const MIMES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'video/mp4', 'video/quicktime']);
+const MAX = { photo: 20 * 1024 * 1024 };
+const MIMES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic']);
 const headers = { 'content-type': 'application/json', 'cache-control': 'no-store' };
 const correlation = (request, body = {}) => String(request.headers.get('x-wing-correlation-id') || body.correlationId || 'unknown');
 const json = (status, body) => new Response(JSON.stringify(body), { status, headers });
@@ -49,13 +49,12 @@ Deno.serve(async (request) => {
     const kind = body.mediaType;
     const mime = String(body.mimeType || '').toLowerCase();
     const size = Number(body.fileSizeBytes);
-    if (!['photo', 'video'].includes(kind) || !MIMES.has(mime)) return fail(request, 'unsupported_format', 'This media format is not supported.', 400, body);
+    if (kind !== 'photo' || !MIMES.has(mime)) return fail(request, 'unsupported_format', 'Only JPEG, PNG, WebP, or HEIC photos are supported.', 400, body);
     if (!/^[0-9a-f-]{36}$/i.test(String(body.correlationId || '')) || String(body.correlationId) !== correlationId) return fail(request, 'invalid_correlation_id', 'The upload correlation identifier is invalid.', 400, body);
     if (!Number.isInteger(size) || size < 1) return fail(request, 'invalid_media_size', 'The media size could not be verified.', 400, body);
     if (size > MAX[kind]) return fail(request, 'file_too_large', 'This media is too large to upload.', 413, body);
-    const extension = cleanName(body.fileName).split('.').pop()?.toLowerCase() || (kind === 'video' ? 'mp4' : 'jpg');
-    if (kind === 'video' && !['mp4', 'mov'].includes(extension)) return fail(request, 'unsupported_format', 'This video format is not supported.', 400, body);
-    if (kind === 'photo' && !['jpg', 'jpeg', 'png', 'webp', 'heic'].includes(extension)) return fail(request, 'unsupported_format', 'This photo format is not supported.', 400, body);
+    const extension = cleanName(body.fileName).split('.').pop()?.toLowerCase() || 'jpg';
+    if (!['jpg', 'jpeg', 'png', 'webp', 'heic'].includes(extension)) return fail(request, 'unsupported_format', 'This photo format is not supported.', 400, body);
     const admin = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'));
     const objectPath = `${user.id}/${correlationId}/${cleanName(body.fileName)}`;
     const { data, error } = await admin.storage.from(BUCKET).createSignedUploadUrl(objectPath, { upsert: false });
