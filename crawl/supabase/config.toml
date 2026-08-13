@@ -139,6 +139,9 @@ verify_jwt = false
 
 [functions.wing-media-staging-gc]
 verify_jwt = false
+
+[functions.wing-public-gallery]
+verify_jwt = false
 # public = false
 # file_size_limit = "50MiB"
 # allowed_mime_types = ["image/png", "image/jpeg"]

@@ -55,6 +55,7 @@ remote deployment; verify the remote migration ledger before applying them.
 | 20260731005535_wing_finalize_service_role_promotion_contract.sql | candidate | not applied here | source-contract validated; production transaction validation pending | Wing Shot service-role promotion finalizer hotfix | 374a24057c5a87dc0e4a9753721c523492870497b06b87d5be3328fa4e3c1a75 |
 | 20260731010940_wing_finalize_processing_job_idempotency_recovery.sql | candidate | not applied here | source-contract validated; production transaction validation pending | Wing Shot processing-job idempotency and stranded reservation recovery | 634d91fcac98b1441ef05387a29d46b2552c5a91e2b87c16f66aa384fd290ba7 |
 | 20260731013034_wing_review_only_finalization.sql | candidate | not applied here | source-contract validated; production transaction validation pending | Wing Shot validate-upload-review-only finalization | 4fe419a09722631f5e3061f405f324f60bd012014c11dde02573c7cd65f063d6 |
+| 20260802143027_wing_shots_photo_only_upload_enforcement.sql | applied | vhfxnizaxdanmvmouuaf | source-contract validated; deployed and remotely verified; no production data changes | Enforce photo-only user uploads while preserving legacy video records | 7ab9c5f6d9c556a1756f31794d7d7c7a0619393f34957795a3b28c427ecc24ce |
 
 
 The exact deployment order is: Strategy B baseline preflight, the retention

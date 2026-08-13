@@ -10,8 +10,8 @@ import {
 
 const functionSource = readFileSync(new URL('../supabase/functions/wing-media-promote/index.ts', import.meta.url), 'utf8');
 const media = {
-  uri: 'private-device-uri', kind: 'video', mimeType: 'video/mp4', sizeBytes: 1024,
-  durationSeconds: 7, getUploadBody: async () => new Uint8Array([1]),
+  uri: 'private-device-uri', kind: 'photo', mimeType: 'image/jpeg', sizeBytes: 1024,
+  width: 1200, height: 800, getUploadBody: async () => new Uint8Array([1]),
 };
 const input = {
   ratingId: '10000000-0000-4000-a000-000000000001',
@@ -43,7 +43,7 @@ test('FunctionsHttpError JSON preserves status and server metadata', async () =>
 test('malformed promotion response becomes a typed retryable client error without throwing while reading it', async () => {
   const session = createWingShotUploadSession(() => '10000000-0000-4000-a000-000000000010');
   session.reservation = { submissionId: '10000000-0000-4000-a000-000000000011', bucket: 'wing-submissions', uploadPath: 'originals/u/s/source' };
-  session.staging = { bucket: 'wing-shot-staging', objectPath: 'u/10000000-0000-4000-a000-000000000010/wing.mp4', correlationId: session.correlationId, uploadCompleted: true };
+  session.staging = { bucket: 'wing-shot-staging', objectPath: 'u/10000000-0000-4000-a000-000000000010/wing.jpg', correlationId: session.correlationId, uploadCompleted: true };
   const client = {
     auth: { getSession: async () => ({ data: { session: { access_token: 'test' } } }) },
     functions: { invoke: async () => ({ error: Object.assign(new Error('FunctionsHttpError'), { context: new Response('gateway unavailable', { status: 503 }) }) }) },
@@ -64,7 +64,7 @@ test('canonical promotion response is finalized as the exact reserved private ob
   const session = createWingShotUploadSession(() => '10000000-0000-4000-a000-000000000010');
   const path = 'originals/u/10000000-0000-4000-a000-000000000011/source';
   session.reservation = { submissionId: '10000000-0000-4000-a000-000000000011', bucket: 'wing-submissions', uploadPath: path };
-  session.staging = { bucket: 'wing-shot-staging', objectPath: 'u/10000000-0000-4000-a000-000000000010/wing.mp4', correlationId: session.correlationId, uploadCompleted: true };
+  session.staging = { bucket: 'wing-shot-staging', objectPath: 'u/10000000-0000-4000-a000-000000000010/wing.jpg', correlationId: session.correlationId, uploadCompleted: true };
   const calls = [];
   const client = {
     auth: { getSession: async () => ({ data: { session: { access_token: 'test' } } }) },

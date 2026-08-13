@@ -12,11 +12,11 @@ test('media confirmation only populates the draft and never resets it', () => {
 });
 
 test('upload progress, failure, and success preserve the draft until Done', () => {
-  const submit = flow.slice(flow.indexOf('const submit'), flow.indexOf('const selectedKindEnabled'));
-  assert.match(submit, /setPhaseSafely\('uploading'\)/);
-  assert.match(submit, /setPhaseSafely\(controller\.signal\.aborted \? 'cancelled' : 'error'\)/);
+  const submit = flow.slice(flow.indexOf('const submit = useCallback'), flow.indexOf('const selectedKindEnabled'));
+  assert.match(submit, /setPhaseSafely\('submitting'\)/);
+  assert.match(submit, /setPhaseSafely\(controller\.signal\.aborted \? 'cancelled' : 'valid'\)/);
   assert.match(submit, /setUploadResult\(result\)/);
-  assert.match(submit, /setPhaseSafely\('success'\)/);
+  assert.match(submit, /setPhaseSafely\('submitted'\)/);
   assert.doesNotMatch(submit, /resetWingShotForm\(\)/);
 });
 
@@ -24,7 +24,7 @@ test('completed and skipped flows reset safely while X preserves unfinished draf
   const directResetCalls = flow.match(/resetWingShotForm\(\);/g) ?? [];
   assert.equal(directResetCalls.length, 2);
   assert.match(flow, /const handleCompletedFlowClose = useCallback/);
-  assert.match(flow, /if \(phaseRef\.current !== 'success'\) return;/);
+  assert.match(flow, /if \(phaseRef\.current !== 'submitted'\) return;/);
   assert.match(flow, /onPress=\{handleCompletedFlowClose\}[\s\S]*testID="wing-shot\.done"/);
   assert.match(flow, /onPress=\{closeFlow\}[\s\S]*testID="wing-shot\.not-now"/);
   assert.match(flow, /onPress=\{skipMediaUpload\}[\s\S]*testID="wing-shot\.skip-media"/);

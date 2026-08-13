@@ -74,3 +74,10 @@ export const ENABLE_BUFFAVERSE_CELEBRATIONS = parseBooleanFlag(
   process.env.EXPO_PUBLIC_ENABLE_BUFFAVERSE_CELEBRATIONS,
   false
 );
+
+// Reversible and disabled by default until contract, RLS, privacy, and runtime
+// gates are verified. When enabled, assignment remains deterministic 50/50.
+export const ENABLE_ONBOARDING_FIRST_VALUE_EXPERIMENT = parseBooleanFlag(
+  process.env.EXPO_PUBLIC_ONBOARDING_FIRST_VALUE_EXPERIMENT,
+  false
+);

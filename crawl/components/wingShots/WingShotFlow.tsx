@@ -24,9 +24,6 @@ import {
   submitWingShot,
   validateWingShotMediaRemotely,
   validateWingShotMedia,
-  WING_SHOT_VIDEO_MAX_SECONDS,
-  WING_SHOT_VIDEO_TARGET_SECONDS,
-  WING_SHOT_VIDEO_MAX_MB,
   wingShotUserMessage,
   wingShotProcessingCopy,
 } from '../../lib/wingShots';
@@ -59,13 +56,21 @@ type Props = {
   eligibleRatingId?: string | null;
   destinationId: string;
   submissionSource: 'rating' | 'onboarding' | 'buffacoin' | 'profile' | 'home_cta';
+  draftMode?: boolean;
+  draftResetSignal?: number;
+  onDraftContinue?: (draft: {
+    media: WingShotSelectedMedia;
+    session: ReturnType<typeof createWingShotUploadSession>;
+    consentAccepted: boolean;
+    attributionPreference: Attribution;
+    caption: string;
+  }) => void;
   onClose: () => void;
   onSubmitted?: (result: { submission_id: string; status: string }) => void;
   mediaAdapter?: WingShotMediaAdapter;
   supabaseClient?: typeof supabase;
   isOnline?: boolean;
   allowPhoto?: boolean;
-  allowVideo?: boolean;
   uploadTransport?: (request: {
     client: typeof supabase;
     bucket: string;
@@ -108,13 +113,15 @@ export function WingShotFlow({
   eligibleRatingId,
   destinationId,
   submissionSource,
+  draftMode = false,
+  draftResetSignal = 0,
+  onDraftContinue,
   onClose,
   onSubmitted,
   mediaAdapter = expoWingShotMediaAdapter,
   supabaseClient = supabase,
   isOnline,
   allowPhoto = true,
-  allowVideo = true,
   uploadTransport,
   validationTransport,
   analyticsContext,
@@ -139,6 +146,7 @@ export function WingShotFlow({
   const progressBarRef = useRef(new Animated.Value(0));
   const progressController = useInterpolatedUploadProgress();
   const [validationProgress, setValidationProgress] = useState(0);
+  const previousDraftResetSignalRef = useRef(draftResetSignal);
   const validationProgressControllerRef = useRef<ReturnType<typeof createWingShotValidationProgress> | null>(null);
   if (!validationProgressControllerRef.current) {
     validationProgressControllerRef.current = createWingShotValidationProgress({ onProgress: setValidationProgress });
@@ -230,6 +238,12 @@ export function WingShotFlow({
   useEffect(() => {
     phaseRef.current = phase;
   }, [phase]);
+
+  useEffect(() => {
+    if (previousDraftResetSignalRef.current === draftResetSignal) return;
+    previousDraftResetSignalRef.current = draftResetSignal;
+    resetWingShotForm('rating_cancelled');
+  }, [draftResetSignal, resetWingShotForm]);
 
   useEffect(() => () => {
     mountedRef.current = false;
@@ -352,6 +366,7 @@ export function WingShotFlow({
         client: supabaseClient,
         media: selected,
         correlationId,
+        destinationId,
         signal: controller.signal,
         onProgress: (value) => progressController.updateRealProgress(value),
       });
@@ -384,7 +399,7 @@ export function WingShotFlow({
       const completed = await validationProgressControllerRef.current?.complete(validationOperation);
       if (!completed || !mountedRef.current || controller.signal.aborted || sequence !== validationSequenceRef.current) return;
       setPhaseSafely('valid');
-      announce('Wing Shot ready.');
+      announce(draftMode ? 'Photo ready. Continue to your rating.' : 'Wing Shot ready.');
     } catch (error) {
       validationProgressControllerRef.current?.stop(validationOperation);
       const reasonCode = String((error as { code?: string })?.code || 'validation_unknown');
@@ -418,7 +433,12 @@ export function WingShotFlow({
     } finally {
       if (validationAbortRef.current === controller) validationAbortRef.current = null;
     }
-  }, [announce, progressController, setPhaseSafely, supabaseClient, validationTransport]);
+  }, [announce, destinationId, draftMode, progressController, setPhaseSafely, supabaseClient, validationTransport]);
+
+  useEffect(() => {
+    if (!visible || draftMode || !media || phaseRef.current !== 'valid' || sessionRef.current.staging) return;
+        void validateSelectedMedia(media);
+  }, [draftMode, media, validateSelectedMedia, visible]);
 
   const retryValidation = useCallback(() => {
     if (!media || phaseRef.current !== 'error') return;
@@ -437,8 +457,7 @@ export function WingShotFlow({
         return;
       }
       if (
-        (selected.kind === 'photo' && !allowPhoto) ||
-        (selected.kind === 'video' && !allowVideo)
+        selected.kind !== 'photo' || !allowPhoto
       ) {
         wingShotLog(sessionRef.current.correlationId, 'validation_return', { reasonCode: 'media_kind_disabled', stage: 'media_selection' }, 'warn');
         throw new WingShotMediaAdapterError(
@@ -451,20 +470,20 @@ export function WingShotFlow({
       setErrorMessage('');
       setErrorCode('');
       resetUploadSession();
-      wingShotLog(sessionRef.current.correlationId, 'Media recording or selection', mediaLogContext(selected));
+      wingShotLog(sessionRef.current.correlationId, 'Photo selection', mediaLogContext(selected));
       wingShotLog(sessionRef.current.correlationId, 'validation_handoff_started', {
         ...mediaLogContext(selected),
         correlationId: sessionRef.current.correlationId,
         currentValidationState: phaseRef.current,
       });
-      announce(`${selected.kind === 'photo' ? 'Photo' : 'Video'} selected.`);
+      announce('Photo selected.');
       void validateSelectedMedia(selected);
     },
-    [allowPhoto, allowVideo, announce, resetUploadSession, setPhaseSafely, validateSelectedMedia],
+    [allowPhoto, announce, resetUploadSession, setPhaseSafely, validateSelectedMedia],
   );
 
   const chooseMedia = useCallback(
-    async (source: 'photo' | 'video' | 'library') => {
+    async (source: 'photo' | 'library') => {
       trackEvent({
         eventName: 'wing_shot_capture_started',
         screen: analyticsContext?.screen ?? 'wing_shot',
@@ -478,21 +497,10 @@ export function WingShotFlow({
       try {
         if (source === 'photo') {
           acceptMedia(await mediaAdapter.takePhoto());
-        } else if (source === 'video') {
-          acceptMedia(
-            await mediaAdapter.recordVideo({
-              targetDurationSeconds: WING_SHOT_VIDEO_TARGET_SECONDS,
-              maximumDurationSeconds: WING_SHOT_VIDEO_MAX_SECONDS,
-            }),
-          );
         } else {
           acceptMedia(
             await mediaAdapter.chooseFromLibrary({
-              maximumVideoDurationSeconds: WING_SHOT_VIDEO_MAX_SECONDS,
-              allowedMediaKinds: [
-                ...(allowPhoto ? (['photo'] as const) : []),
-                ...(allowVideo ? (['video'] as const) : []),
-              ],
+              allowedMediaKinds: ['photo'],
             }),
           );
         }
@@ -508,7 +516,7 @@ export function WingShotFlow({
         announce(message);
       }
     },
-    [acceptMedia, allowPhoto, allowVideo, analyticsContext, announce, mediaAdapter, setPhaseSafely],
+    [acceptMedia, analyticsContext, announce, mediaAdapter, setPhaseSafely],
   );
 
   const removeMedia = useCallback(() => {
@@ -536,7 +544,7 @@ export function WingShotFlow({
     setErrorCode('');
     setPhaseSafely('empty');
     resetUploadSession();
-    announce('Choose a replacement photo or video.');
+    announce('Choose a replacement photo.');
   }, [announce, resetUploadSession, setPhaseSafely, supabaseClient]);
 
   const submit = useCallback(async () => {
@@ -549,15 +557,12 @@ export function WingShotFlow({
       return;
     }
     if (!media) {
-      const message = 'Choose a photo or video first.';
+      const message = 'Choose a photo first.';
       setErrorMessage(message);
       announce(message);
       return;
     }
-    if (
-      (media.kind === 'photo' && !allowPhoto) ||
-      (media.kind === 'video' && !allowVideo)
-    ) {
+    if (media.kind === 'photo' && !allowPhoto) {
       const message = 'That media type is not enabled for Wing Shots.';
       setErrorMessage(message);
       setPhaseSafely('error');
@@ -662,7 +667,6 @@ export function WingShotFlow({
     announce,
     analyticsContext,
     allowPhoto,
-    allowVideo,
     attribution,
     caption,
     consentAccepted,
@@ -679,11 +683,20 @@ export function WingShotFlow({
     setPhaseSafely,
   ]);
 
-  const selectedKindEnabled =
-    media?.kind === 'photo' ? allowPhoto : media?.kind === 'video' ? allowVideo : false;
+  const selectedKindEnabled = media?.kind === 'photo' ? allowPhoto : false;
   const canSubmit = Boolean(
     phase === 'valid' && media && selectedKindEnabled && consentAccepted && attribution && !disabled && rateLimitRemainingSeconds <= 0,
   );
+  const continueToRating = useCallback(() => {
+    if (!draftMode || !canSubmit || !media || !attribution) return;
+    onDraftContinue?.({
+      media,
+      session: sessionRef.current,
+      consentAccepted,
+      attributionPreference: attribution,
+      caption,
+    });
+  }, [attribution, canSubmit, caption, consentAccepted, draftMode, media, onDraftContinue]);
   const safeProgress = Math.max(0, Math.min(100, progressController.displayProgress));
   const progressLabel = useMemo(
     () => {
@@ -739,12 +752,12 @@ export function WingShotFlow({
                   OPTIONAL · YOUR RATING HAS ALREADY SAVED
                 </Text>
                 <Text style={styles.title} accessibilityRole="header" allowFontScaling>
-                  Show us the wings
+                  {draftMode ? 'Add a photo' : 'Show us the wings'}
                 </Text>
               </View>
 
             <Text style={styles.intro} allowFontScaling>
-              Share a photo or short video of wings from this restaurant. Every submission is reviewed;
+              Share a photo of wings from this restaurant. Every submission is reviewed;
               only approved photos may be featured on BuffaGo’s Instagram and Facebook. Approved
               creators earn XP, badges, and recognition.
             </Text>
@@ -760,17 +773,7 @@ export function WingShotFlow({
                     onPress={() => chooseMedia('photo')}
                   />
                 ) : null}
-                {allowVideo ? (
-                  <ActionButton
-                    icon="videocam"
-                    label="Record Video"
-                    detail="Aim for 7 seconds · 10 seconds maximum"
-                    testID="wing-shot.record-video"
-                    disabled={disabled}
-                    onPress={() => chooseMedia('video')}
-                  />
-                ) : null}
-                {allowPhoto || allowVideo ? (
+                {allowPhoto ? (
                   <ActionButton
                     icon="images"
                     label="Choose from Library"
@@ -798,11 +801,6 @@ export function WingShotFlow({
                   onReplace={replaceMedia}
                   onRemove={removeMedia}
                 />
-                {media.kind === 'video' ? (
-                  <Text style={styles.choiceDetail} testID="wing-shot.video-size-help">
-                    Videos must be under {WING_SHOT_VIDEO_MAX_MB} MB.
-                  </Text>
-                ) : null}
               </>
             )}
 
@@ -1001,21 +999,21 @@ export function WingShotFlow({
             phase !== 'submitting' &&
             phase !== 'validating' &&
             phase !== 'cancelling' &&
-            (allowPhoto || allowVideo) ? (
+            allowPhoto ? (
               <Pressable
                 accessibilityRole="button"
                 accessibilityState={{ disabled: !canSubmit }}
                 disabled={!canSubmit}
-                onPress={submit}
+                onPress={draftMode ? continueToRating : submit}
                 style={[styles.submitButton, !canSubmit && styles.disabledButton]}
                 testID={
                   phase === 'error' || phase === 'cancelled'
                     ? 'wing-shot.upload-retry'
-                    : 'wing-shot.submit'
+                    : draftMode ? 'wing-shot.continue-rating' : 'wing-shot.submit'
                 }
               >
                 <Text style={styles.submitText} allowFontScaling>
-                  {rateLimitRemainingSeconds > 0 ? `Try again in ${formatCountdown(rateLimitRemainingSeconds)}` : 'Submit Wing Shot'}
+                  {draftMode ? 'Continue to rating' : rateLimitRemainingSeconds > 0 ? `Try again in ${formatCountdown(rateLimitRemainingSeconds)}` : 'Submit Wing Shot'}
                 </Text>
               </Pressable>
             ) : null}
@@ -1023,7 +1021,7 @@ export function WingShotFlow({
             {phase !== 'submitted' && phase !== 'submitting' && phase !== 'validating' && phase !== 'cancelling' ? (
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Skip media upload and continue"
+                accessibilityLabel="Skip photo upload and continue"
                 accessibilityState={{ disabled: skipNavigationRef.current }}
                 disabled={skipNavigationRef.current}
                 onPress={skipMediaUpload}
@@ -1031,7 +1029,7 @@ export function WingShotFlow({
                 testID="wing-shot.skip-media"
               >
                 <Text style={styles.skipText} allowFontScaling>
-                  Skip media upload
+                  Skip for now — you can add a photo later from Rating History.
                 </Text>
               </Pressable>
             ) : null}
@@ -1057,7 +1055,7 @@ export function WingShotFlow({
 }
 
 type ActionButtonProps = {
-  icon: 'camera' | 'videocam' | 'images';
+  icon: 'camera' | 'images';
   label: string;
   detail?: string;
   disabled: boolean;

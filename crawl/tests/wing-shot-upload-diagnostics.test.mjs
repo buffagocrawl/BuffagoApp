@@ -12,40 +12,40 @@ import {
 import { errorContext, sanitizedObjectPath, uriScheme } from '../lib/wingShotDiagnostics.js';
 
 const media = (overrides = {}) => ({
-  uri: 'content://local/video',
-  fileName: 'wing.mp4',
-  kind: 'video',
-  mimeType: 'video/mp4',
+  uri: 'content://local/photo',
+  fileName: 'wing.jpg',
+  kind: 'photo',
+  mimeType: 'image/jpeg',
   sizeBytes: 1024,
-  durationSeconds: 7,
+  width: 1200,
+  height: 800,
   getUploadBody: async () => new Uint8Array([1]),
   ...overrides,
 });
 
-test('video validation classifies duration, size, and format failures', () => {
-  assert.throws(() => validateWingShotMedia(media({ durationSeconds: WING_SHOT_VIDEO_MIN_SECONDS - 1 })), (error) => error.code === 'video_too_short');
-  assert.throws(() => validateWingShotMedia(media({ durationSeconds: WING_SHOT_VIDEO_MAX_SECONDS + 1 })), (error) => error.code === 'video_too_long');
-  assert.throws(() => validateWingShotMedia(media({ sizeBytes: WING_SHOT_VIDEO_MAX_BYTES + 1 })), (error) => error.code === 'media_too_large');
-  assert.throws(() => validateWingShotMedia(media({ fileName: 'wing.avi' })), (error) => error.code === 'unsupported_media_type');
+test('photo validation rejects legacy video, bad MIME, and oversized photos', () => {
+  assert.throws(() => validateWingShotMedia(media({ kind: 'video', mimeType: 'video/mp4' })), /supported photo/i);
+  assert.throws(() => validateWingShotMedia(media({ mimeType: 'image/gif' })), (error) => error.code === 'unsupported_media_type');
+  assert.throws(() => validateWingShotMedia(media({ sizeBytes: 20 * 1024 * 1024 + 1 })), (error) => error.code === 'media_too_large');
+  assert.throws(() => validateWingShotMedia(media({ fileName: 'wing.avi', mimeType: 'image/avi' })), (error) => error.code === 'unsupported_media_type');
 });
 
-test('video size boundary is inclusive and reports the detected size', () => {
-  assert.doesNotThrow(() => validateWingShotMedia(media({ sizeBytes: WING_SHOT_VIDEO_MAX_BYTES })));
-  assert.throws(() => validateWingShotMedia(media({ sizeBytes: WING_SHOT_VIDEO_MAX_BYTES + 1 })), (error) => {
+test('photo size boundary is inclusive and reports the detected size', () => {
+  assert.doesNotThrow(() => validateWingShotMedia(media({ sizeBytes: 20 * 1024 * 1024 })));
+  assert.throws(() => validateWingShotMedia(media({ sizeBytes: 20 * 1024 * 1024 + 1 })), (error) => {
     assert.equal(error.code, 'media_too_large');
-    assert.equal(error.sizeBytes, WING_SHOT_VIDEO_MAX_BYTES + 1);
+    assert.equal(error.sizeBytes, 20 * 1024 * 1024 + 1);
     return true;
   });
   const message = wingShotUserMessage(new WingShotClientError('media_too_large', 'too large', { sizeBytes: 35_197_314 }));
-  assert.equal(message, 'This file is too large to upload. Try choosing a shorter video or a smaller photo.');
+  assert.match(message, /photo is too large/i);
 });
 
-test('4K video within configured size and duration limits remains eligible', () => {
+test('photos within configured size and dimensions remain eligible', () => {
   assert.doesNotThrow(() => validateWingShotMedia(media({
-    sizeBytes: 35 * 1024 * 1024,
-    durationSeconds: 7.5,
-    width: 3840,
-    height: 2160,
+    sizeBytes: 19 * 1024 * 1024,
+    width: 2048,
+    height: 1600,
   })));
 });
 

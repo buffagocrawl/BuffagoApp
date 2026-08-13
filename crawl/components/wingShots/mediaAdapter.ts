@@ -1,9 +1,8 @@
 import { File as ExpoFile } from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import { Platform } from 'react-native';
-import { WING_SHOT_VIDEO_MAX_SECONDS } from '../../lib/wingShots';
 
-export type WingShotMediaKind = 'photo' | 'video';
+export type WingShotMediaKind = 'photo';
 
 export type WingShotSelectedMedia = {
   uri: string;
@@ -20,13 +19,8 @@ export type WingShotSelectedMedia = {
 
 export type WingShotMediaAdapter = {
   takePhoto: () => Promise<WingShotSelectedMedia | null>;
-  recordVideo: (options: {
-    targetDurationSeconds: number;
-    maximumDurationSeconds: number;
-  }) => Promise<WingShotSelectedMedia | null>;
   chooseFromLibrary: (options: {
-    maximumVideoDurationSeconds: number;
-    allowedMediaKinds: WingShotMediaKind[];
+    allowedMediaKinds?: WingShotMediaKind[];
   }) => Promise<WingShotSelectedMedia | null>;
 };
 
@@ -58,14 +52,13 @@ function abortIfNeeded(signal?: AbortSignal) {
 function selectedMediaFromAsset(
   asset: ImagePicker.ImagePickerAsset,
 ): WingShotSelectedMedia {
-  const kind =
-    asset.type === 'image' ? 'photo' : asset.type === 'video' ? 'video' : null;
-  if (!kind) {
+  if (asset.type !== 'image') {
     throw new WingShotMediaAdapterError(
       'unsupported_media_type',
-      'Choose a standard photo or video.',
+      'Choose a standard photo (JPEG, PNG, WebP, or HEIC).',
     );
   }
+  const kind: WingShotMediaKind = 'photo';
   const nativeFile = new ExpoFile(asset.uri);
   const sizeBytes = asset.fileSize ?? nativeFile.size;
   const mimeType = asset.mimeType || nativeFile.type;
@@ -87,10 +80,6 @@ function selectedMediaFromAsset(
     kind,
     mimeType: mimeType.toLowerCase(),
     sizeBytes,
-    durationSeconds:
-      kind === 'video' && Number.isFinite(asset.duration)
-        ? Number(asset.duration) / 1_000
-        : undefined,
     width: asset.width || undefined,
     height: asset.height || undefined,
     getUploadBody: async (signal) => {
@@ -114,10 +103,7 @@ function selectedMediaFromAsset(
   };
 }
 
-function firstSelection(
-  result: ImagePicker.ImagePickerResult,
-  allowedKinds: WingShotMediaKind[],
-) {
+function firstSelection(result: ImagePicker.ImagePickerResult) {
   if (result.canceled) return null;
   const asset = result.assets[0];
   if (!asset) {
@@ -127,12 +113,6 @@ function firstSelection(
     );
   }
   const selected = selectedMediaFromAsset(asset);
-  if (!allowedKinds.includes(selected.kind)) {
-    throw new WingShotMediaAdapterError(
-      'media_kind_disabled',
-      'That media type is not enabled for Wing Shots.',
-    );
-  }
   return selected;
 }
 
@@ -142,23 +122,6 @@ function safePickerFailure(error: unknown): never {
     'picker_failed',
     'The media picker could not be opened.',
   );
-}
-
-function enforceVideoDuration(
-  media: WingShotSelectedMedia | null,
-  maximumDurationSeconds: number,
-) {
-  if (
-    media?.kind === 'video' &&
-    Number.isFinite(media.durationSeconds) &&
-    Number(media.durationSeconds) > Math.min(WING_SHOT_VIDEO_MAX_SECONDS, maximumDurationSeconds)
-  ) {
-    throw new WingShotMediaAdapterError(
-      'video_too_long',
-      'Keep your Wing Shot video to 10 seconds or less.',
-    );
-  }
-  return media;
 }
 
 /**
@@ -178,65 +141,25 @@ export const expoWingShotMediaAdapter: WingShotMediaAdapter = {
           exif: false,
           base64: false,
         }),
-        ['photo'],
       );
     } catch (error) {
       return safePickerFailure(error);
     }
   },
 
-  async recordVideo({ maximumDurationSeconds }) {
+  async chooseFromLibrary() {
     try {
-      assertPermission(await ImagePicker.requestCameraPermissionsAsync(), 'camera_permission_denied');
-      return enforceVideoDuration(
-        firstSelection(
-          await ImagePicker.launchCameraAsync({
-            mediaTypes: ['videos'],
-            cameraType: ImagePicker.CameraType.back,
-            allowsEditing: false,
-            videoMaxDuration: Math.min(10, maximumDurationSeconds),
-            videoQuality: ImagePicker.UIImagePickerControllerQualityType.Medium,
-            exif: false,
-            base64: false,
-          }),
-          ['video'],
-        ),
-        maximumDurationSeconds,
-      );
-    } catch (error) {
-      return safePickerFailure(error);
-    }
-  },
-
-  async chooseFromLibrary({
-    allowedMediaKinds,
-    maximumVideoDurationSeconds,
-  }) {
-    try {
-      if (allowedMediaKinds.length === 0) {
-        throw new WingShotMediaAdapterError(
-          'media_kind_disabled',
-          'Wing Shot uploads are not enabled.',
-        );
-      }
       assertPermission(await ImagePicker.requestMediaLibraryPermissionsAsync(false), 'library_permission_denied');
-      const mediaTypes: ImagePicker.MediaType[] = [];
-      if (allowedMediaKinds.includes('photo')) mediaTypes.push('images');
-      if (allowedMediaKinds.includes('video')) mediaTypes.push('videos');
-      return enforceVideoDuration(
-        firstSelection(
-          await ImagePicker.launchImageLibraryAsync({
-            mediaTypes,
-            allowsMultipleSelection: false,
-            selectionLimit: 1,
-            allowsEditing: false,
-            quality: 0.9,
-            exif: false,
-            base64: false,
-          }),
-          allowedMediaKinds,
-        ),
-        maximumVideoDurationSeconds,
+      return firstSelection(
+        await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ['images'],
+          allowsMultipleSelection: false,
+          selectionLimit: 1,
+          allowsEditing: false,
+          quality: 0.9,
+          exif: false,
+          base64: false,
+        }),
       );
     } catch (error) {
       return safePickerFailure(error);
@@ -257,6 +180,5 @@ const unavailable = async (): Promise<never> => {
  */
 export const unavailableWingShotMediaAdapter: WingShotMediaAdapter = {
   takePhoto: unavailable,
-  recordVideo: unavailable,
   chooseFromLibrary: unavailable,
 };

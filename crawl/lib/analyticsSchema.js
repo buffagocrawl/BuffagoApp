@@ -114,6 +114,18 @@ export function buildSerranoEventMetadata(input = {}) {
     experiment_id: null,
     variant: null,
     correlation_id: null,
+    experiment_version: null,
+    experiment_user_id: null,
+    assignment: null,
+    onboarding_version: null,
+    step_name: null,
+    elapsed_ms: null,
+    restaurant_id_hash: null,
+    rating_mode: null,
+    submission_id: null,
+    confirmation_state: null,
+    error_code: null,
+    event_timestamp: null,
     ...input,
   });
 }

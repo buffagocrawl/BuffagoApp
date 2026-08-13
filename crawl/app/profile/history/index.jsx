@@ -13,6 +13,7 @@ import FriendProfileActions from '../../../components/FriendProfileActions';
 import ScreenHeader from '../../../components/ScreenHeader';
 import WeeklyChallengeStats from '../../../components/WeeklyChallengeStats';
 import WingCreatorSummaryCard from '../../../components/creator/WingCreatorSummaryCard';
+import { WingShotFlow } from '../../../components/wingShots';
 
 /* ---------------- helpers ---------------- */
 
@@ -119,6 +120,7 @@ export default function HistoryIndex() {
 
   const [crawls, setCrawls] = useState([]);
   const [ratings, setRatings] = useState([]);
+  const [imageRating, setImageRating] = useState(null);
 
   const [ratingAlignment, setRatingAlignment] = useState({ closest: null, farthest: null });
 
@@ -345,10 +347,12 @@ export default function HistoryIndex() {
       .from('destination_ratings')
       .select(
         `
+          id,
           destination_id,
           created_at,
           wings_eaten,
           crispiness, sauce, meat, overall, weight_score,
+          is_buffacoin,
           destinations!destination_ratings_destination_id_fkey ( name )
         `
       )
@@ -357,7 +361,36 @@ export default function HistoryIndex() {
 
     if (rErr) throw rErr;
 
-    const ratingsList = ratingsRows || [];
+    let ratingsList = ratingsRows || [];
+
+    // Only inspect media for the signed-in user's own ratings. The upload
+    // RPC remains the authoritative ownership/eligibility boundary; this
+    // lookup only keeps the Journey affordance hidden for ratings that
+    // already have a submission, including legacy video submissions.
+    if (viewerId && viewerId === userId && ratingsList.length) {
+      const ratingIds = ratingsList.map((rating) => rating.id).filter(Boolean);
+      let mediaRows = [];
+      let mediaLookupFailed = false;
+      if (ratingIds.length) {
+        const { data, error: mediaError } = await supabase
+          .from('wing_media_submissions')
+          .select('rating_id')
+          .eq('user_id', userId)
+          .in('rating_id', ratingIds);
+        mediaRows = data || [];
+        mediaLookupFailed = !!mediaError;
+        if (mediaError) console.warn('rating image eligibility lookup failed:', mediaError.message || mediaError);
+      }
+      const mediaRatingIds = new Set(mediaRows.map((row) => row.rating_id).filter(Boolean));
+      ratingsList = ratingsList.map((rating) => ({
+        ...rating,
+        hasMediaSubmission: mediaRatingIds.has(rating.id),
+        imageEligibilityKnown: !mediaLookupFailed,
+        imageEligible: [rating.crispiness, rating.sauce, rating.meat, rating.overall]
+          .every((value) => Number.isFinite(Number(value)) && Number(value) >= 1 && Number(value) <= 10)
+          && !rating.is_buffacoin,
+      }));
+    }
 
     // alignment
     const perDestLocal = new Map();
@@ -869,6 +902,20 @@ export default function HistoryIndex() {
               </Text>
             </View>
           </View>
+
+          {isViewingSelf && item.imageEligibilityKnown && item.imageEligible && !item.hasMediaSubmission ? (
+            <Button
+              mode="text"
+              icon="image-plus"
+              compact
+              testID={`rating.add-image.${item.id}`}
+              style={{ alignSelf: 'flex-start', marginTop: 4 }}
+              contentStyle={{ paddingHorizontal: 0 }}
+              onPress={() => setImageRating(item)}
+            >
+              Add image
+            </Button>
+          ) : null}
         </Card.Content>
       </Card>
     );
@@ -1253,6 +1300,26 @@ export default function HistoryIndex() {
                 />
               )}
             </Card>
+          ) : null}
+
+          {imageRating ? (
+            <WingShotFlow
+              visible
+              eligibleRatingId={imageRating.id}
+              destinationId={imageRating.destination_id}
+              submissionSource="profile"
+              allowPhoto
+              analyticsContext={{
+                screen: 'profile_history_rating_image',
+                userId: session?.user?.id ?? null,
+                destinationId: imageRating.destination_id,
+              }}
+              onClose={() => setImageRating(null)}
+              onSubmitted={async () => {
+                setImageRating(null);
+                if (viewUserId) await fetchAll(viewUserId);
+              }}
+            />
           ) : null}
         </View>
       </SafeAreaView>

@@ -647,6 +647,8 @@ export default function CrawlScreen() {
   // rating wizard (component owned)
   const [rateVisible, setRateVisible] = useState(false);
   const [wingShotVisible, setWingShotVisible] = useState(false);
+  const [wingShotDraftMode, setWingShotDraftMode] = useState(false);
+  const [wingShotDraftResetSignal, setWingShotDraftResetSignal] = useState(0);
   const [eligibleWingShotRatingId, setEligibleWingShotRatingId] = useState(null);
   const [wingShotSubmitted, setWingShotSubmitted] = useState(false);
   const postRatingAdvancedRef = useRef(false);
@@ -941,7 +943,13 @@ export default function CrawlScreen() {
       routeId: crawl?.route_id ?? null,
       metadata: { source: 'crawl_stop', stop_order: dest?.ord ?? null },
     });
-    setRateVisible(true);
+    const canCaptureBeforeRating = Boolean(
+      session?.user?.id && wingShotFlags.prompt && (wingShotFlags.photo || wingShotFlags.video),
+    );
+    setWingShotDraftMode(canCaptureBeforeRating);
+    setEligibleWingShotRatingId(null);
+    setWingShotVisible(canCaptureBeforeRating);
+    setRateVisible(!canCaptureBeforeRating);
   };
 
   // Preflight: check coords + proximity BEFORE opening the rating wizard
@@ -1447,6 +1455,7 @@ export default function CrawlScreen() {
 
       setRateVisible(false);
       const canOfferWingShot = Boolean(userId && submittedRatingId && wingShotFlags.prompt && (wingShotFlags.photo || wingShotFlags.video));
+      setWingShotDraftMode(false);
       postRatingAdvancedRef.current = false;
       setWingShotSubmitted(false);
       setEligibleWingShotRatingId(canOfferWingShot ? submittedRatingId : null);
@@ -2273,18 +2282,35 @@ export default function CrawlScreen() {
             options={tagOptions}                                   // harmless extra prop if your component ignores it
             saving={saving}
             onDismiss={() => {
-              if (!saving) setRateVisible(false);
+              if (!saving) {
+                setRateVisible(false);
+                setWingShotVisible(false);
+                setWingShotDraftMode(false);
+                setWingShotDraftResetSignal((value) => value + 1);
+              }
             }}
             onClose={() => {
-              if (!saving) setRateVisible(false);
+              if (!saving) {
+                setRateVisible(false);
+                setWingShotVisible(false);
+                setWingShotDraftMode(false);
+                setWingShotDraftResetSignal((value) => value + 1);
+              }
             }}
             onFinalize={(payload) => saveRating(payload)}
             onSubmit={(payload) => saveRating(payload)}
           />
 
-          {eligibleWingShotRatingId ? (
+          {activeDest?.id ? (
             <WingShotFlow
               visible={wingShotVisible}
+              draftMode={wingShotDraftMode}
+              draftResetSignal={wingShotDraftResetSignal}
+              onDraftContinue={() => {
+                setWingShotVisible(false);
+                setWingShotDraftMode(false);
+                setRateVisible(true);
+              }}
               eligibleRatingId={eligibleWingShotRatingId}
               destinationId={activeDest?.id}
               submissionSource="rating"
@@ -2300,6 +2326,12 @@ export default function CrawlScreen() {
                 setWingShotSubmitted(true);
               }}
               onClose={async () => {
+                if (wingShotDraftMode) {
+                  setWingShotVisible(false);
+                  setWingShotDraftMode(false);
+                  setRateVisible(true);
+                  return;
+                }
                 if (postRatingAdvancedRef.current) return;
                 postRatingAdvancedRef.current = true;
                 setWingShotVisible(false);

@@ -32,7 +32,6 @@ test('flow is full-screen, scrollable, keyboard-safe, and post-rating optional',
 test('capture actions and stable selectors are present', () => {
   for (const selector of [
     'wing-shot.take-photo',
-    'wing-shot.record-video',
     'wing-shot.choose-library',
     'wing-shot.preview.replace',
     'wing-shot.preview.remove',
@@ -42,8 +41,7 @@ test('capture actions and stable selectors are present', () => {
   ]) {
     assert.match(`${flow}\n${preview}`, new RegExp(selector.replace('.', '\\.')));
   }
-  assert.match(flow, /targetDurationSeconds: WING_SHOT_VIDEO_TARGET_SECONDS/);
-  assert.match(flow, /maximumDurationSeconds: WING_SHOT_VIDEO_MAX_SECONDS/);
+  assert.doesNotMatch(flow, /record-video|targetDurationSeconds|maximumDurationSeconds/);
 });
 
 test('consent is affirmative and attribution has no default', () => {
@@ -73,38 +71,31 @@ test('fallback adapter does not ask for permissions or invent media', () => {
 test('production adapter requests permissions only inside user actions', () => {
   assert.match(adapter, /expoWingShotMediaAdapter/);
   assert.match(adapter, /async takePhoto\(\)[\s\S]*requestCameraPermissionsAsync/);
-  assert.match(adapter, /async recordVideo[\s\S]*videoMaxDuration: Math\.min\(10/);
   assert.match(
     adapter,
     /async chooseFromLibrary\([^)]*\)[\s\S]*requestMediaLibraryPermissionsAsync/,
   );
   assert.match(adapter, /new ExpoFile\(asset\.uri\)/);
   assert.match(adapter, /arrayBuffer\(\)/);
-  assert.match(adapter, /allowedMediaKinds/);
-  assert.match(adapter, /media_kind_disabled/);
+  assert.match(adapter, /mediaTypes: \['images'\]/);
 });
 
-test('video preview is playable but always initialized muted', () => {
-  assert.match(preview, /useVideoPlayer/);
-  assert.match(preview, /configuredPlayer\.muted = true/);
-  assert.match(preview, /<VideoView/);
-  assert.match(preview, /nativeControls/);
+test('photo preview remains image-only', () => {
+  assert.match(preview, /<Image/);
+  assert.doesNotMatch(preview, /useVideoPlayer|VideoView/);
 });
 
-test('photo and video actions fail closed behind independent flags', () => {
+test('photo actions fail closed and video actions are absent', () => {
   assert.match(flow, /allowPhoto = true/);
-  assert.match(flow, /allowVideo = true/);
   assert.match(flow, /\{allowPhoto \? \(/);
-  assert.match(flow, /\{allowVideo \? \(/);
-  assert.match(flow, /\{allowPhoto \|\| allowVideo \? \(/);
   assert.match(flow, /testID="wing-shot\.media-disabled"/);
-  assert.match(flow, /selected\.kind === 'photo' && !allowPhoto/);
-  assert.match(flow, /selected\.kind === 'video' && !allowVideo/);
+  assert.match(flow, /selected\.kind !== 'photo' \|\| !allowPhoto/);
+  assert.doesNotMatch(flow, /allowVideo|record-video|videocam/);
 });
 
 test('optional post-rating skip is accessible, idempotent, and resets media state', () => {
   assert.match(flow, /testID="wing-shot\.skip-media"/);
-  assert.match(flow, /accessibilityLabel="Skip media upload and continue"/);
+  assert.match(flow, /accessibilityLabel="Skip photo upload and continue"/);
   assert.match(flow, /eventName: 'wing_shot_upload_skipped'/);
   assert.match(flow, /metadata: \{ media_selected: Boolean\(media\) \}/);
   assert.match(flow, /skipNavigationRef\.current/);

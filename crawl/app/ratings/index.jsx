@@ -17,8 +17,10 @@ import {
   useTheme,
 } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { Image } from 'expo-image';
 import { supabase } from '../../lib/supabase.js';
 import { trackEvent } from '../../lib/analytics';
+import { loadWingdexGallery, loadWingdexRestaurantGallery } from '../../lib/wingdexGallery';
 import { useLocationCtx } from '../../providers/LocationProvider';
 import MapView, { Marker, PROVIDER_GOOGLE } from '../../lib/platformMap';
 
@@ -178,6 +180,7 @@ export default function PublicRatingsScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   const [rows, setRows] = useState([]);
+  const [pictureCounts, setPictureCounts] = useState({});
 
   const [tagNameById, setTagNameById] = useState({});
   const [selectedTagIds, setSelectedTagIds] = useState([]);
@@ -204,6 +207,7 @@ export default function PublicRatingsScreen() {
 
   const [openMap, setOpenMap] = useState(false);
   const allMapRef = useRef(null);
+  const [gallery, setGallery] = useState({ visible: false, loading: false, error: null, restaurant: null, images: [] });
   
 
   // ✅ Apply Home->Ratings parameters:
@@ -658,6 +662,15 @@ export default function PublicRatingsScreen() {
       return aDist - bDist;
     });
 
+    try {
+      const galleryByDestination = await loadWingdexGallery(list.map((item) => item.destination_id), supabase);
+      setPictureCounts(Object.fromEntries(Object.entries(galleryByDestination).map(([id, value]) => [id, value.count])));
+    } catch (galleryError) {
+      // Ratings remain usable if the optional gallery surface is unavailable.
+      console.warn('Wingdex gallery fetch failed', galleryError?.message || galleryError);
+      setPictureCounts({});
+    }
+
     setRows(list);
     setMyRated(myRatedSet);
 
@@ -775,6 +788,7 @@ export default function PublicRatingsScreen() {
     const ratingsLabel = hasRatings
       ? `${item.count} rating${item.count === 1 ? '' : 's'}`
       : 'No ratings yet';
+    const pictureCount = Number(pictureCounts[String(item.destination_id)] || 0);
 
     const displayAvg = hasRatings ? fmt2(item.avgWeight) : '—';
 
@@ -809,6 +823,26 @@ export default function PublicRatingsScreen() {
               {ratingsLabel}
               {distText}
             </Text>
+
+            <Pressable
+              accessibilityRole={pictureCount > 0 ? 'button' : undefined}
+              accessibilityLabel={pictureCount > 0 ? `View ${pictureCount} pictures of ${item.name}` : `${item.name} has no approved pictures`}
+              disabled={pictureCount === 0}
+              onPress={(event) => {
+                event?.stopPropagation?.();
+                if (pictureCount === 0) return;
+                setGallery({ visible: true, loading: true, error: null, restaurant: item, images: [] });
+                loadWingdexRestaurantGallery(item.destination_id, supabase)
+                  .then((result) => setGallery({ visible: true, loading: false, error: null, restaurant: item, images: result.images }))
+                  .catch(() => setGallery({ visible: true, loading: false, error: 'Pictures are temporarily unavailable.', restaurant: item, images: [] }));
+              }}
+              style={({ pressed }) => [styles.pictureLink, pressed && styles.pictureLinkPressed]}
+              testID={`wingdex.pictures.${item.destination_id}`}
+            >
+              <Text variant="bodySmall" style={[styles.pictureText, pictureCount === 0 && styles.pictureTextEmpty]}>
+                {pictureCount} {pictureCount === 1 ? 'Picture' : 'Pictures'}
+              </Text>
+            </Pressable>
 
             {/* Tag context */}
             {hasRatings ? (
@@ -1219,6 +1253,38 @@ export default function PublicRatingsScreen() {
         </Dialog>
       </Portal>
 
+      <Portal>
+        <Dialog
+          visible={gallery.visible}
+          onDismiss={() => setGallery((previous) => ({ ...previous, visible: false }))}
+          style={styles.dialog}
+        >
+          <Dialog.Title style={{ textAlign: 'center' }}>
+            {gallery.restaurant?.name ?? 'Pictures'}
+          </Dialog.Title>
+          <Dialog.Content>
+            {gallery.loading ? (
+              <View style={styles.galleryState}><ActivityIndicator /></View>
+            ) : gallery.error ? (
+              <Text style={styles.galleryStateText}>{gallery.error}</Text>
+            ) : gallery.images.length === 0 ? (
+              <Text style={styles.galleryStateText}>No approved pictures yet.</Text>
+            ) : (
+              <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
+                {gallery.images.map((image) => (
+                  <View key={image.submission_id} style={styles.galleryFrame}>
+                    <Image source={{ uri: image.signed_url }} contentFit="contain" style={styles.galleryImage} accessibilityLabel="Approved restaurant picture" />
+                  </View>
+                ))}
+              </ScrollView>
+            )}
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setGallery((previous) => ({ ...previous, visible: false }))}>Close</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+
       {/* Restaurants Map dialog */}
       <Portal>
         <Dialog
@@ -1362,6 +1428,10 @@ const styles = StyleSheet.create({
   },
   name: { fontWeight: '700' },
   muted: { opacity: 0.7, marginTop: 2 },
+  pictureLink: { alignSelf: 'flex-start', marginTop: 3, paddingVertical: 2 },
+  pictureLinkPressed: { opacity: 0.6 },
+  pictureText: { color: '#B84C00', fontWeight: '700' },
+  pictureTextEmpty: { opacity: 0.55 },
 
   tagLine: { marginTop: 4 },
   tagLineMuted: { marginTop: 4, opacity: 0.6 },
@@ -1419,6 +1489,11 @@ const styles = StyleSheet.create({
   metricPrettyLabel: { fontWeight: '700' },
   metricPrettyVal: { fontWeight: '900' },
   metricBar: { height: 8, borderRadius: 8 },
+
+  galleryState: { minHeight: 220, alignItems: 'center', justifyContent: 'center' },
+  galleryStateText: { minHeight: 80, textAlign: 'center', textAlignVertical: 'center', opacity: 0.7 },
+  galleryFrame: { width: 300, height: 300, alignItems: 'center', justifyContent: 'center' },
+  galleryImage: { width: '100%', height: '100%', borderRadius: 12 },
 
   tagChipWrap: {
     flexDirection: 'row',

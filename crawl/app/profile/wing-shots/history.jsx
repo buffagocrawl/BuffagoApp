@@ -124,7 +124,7 @@ export default function WingShotHistoryScreen() {
       ListEmptyComponent={error ? (
         <View testID="creator.history.error" style={styles.centerBlock}><Text style={{ color: theme.colors.error, textAlign: 'center' }}>{error}</Text><Button onPress={() => load({ append: false })}>Retry</Button></View>
       ) : (
-        <View testID="creator.history.empty" style={styles.centerBlock}><Text variant="titleMedium" style={styles.emptyTitle}>No Wing Shots yet</Text><Text style={styles.emptyBody}>You can optionally share a photo or short video from any restaurant.</Text></View>
+        <View testID="creator.history.empty" style={styles.centerBlock}><Text variant="titleMedium" style={styles.emptyTitle}>No Wing Shots yet</Text><Text style={styles.emptyBody}>You can optionally share a photo from any restaurant.</Text></View>
       )}
       renderItem={({ item, index }) => (
         <Card
