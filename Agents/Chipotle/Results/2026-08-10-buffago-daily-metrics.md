@@ -1,4 +1,4 @@
-# Buffago Metrics — 2026-08-12
+# Buffago Metrics — 2026-08-10
 
 - Collection status: **partial**; completeness: **14.1%**; evidence confidence: **medium**.
 - Meaningful DAU / WAU / MAU: **Unavailable / Unavailable / Unavailable**.
@@ -30,4 +30,4 @@ Manual verified facts are read from `Buffago/metrics/manual-business-facts.json`
 
 Important gaps: acquisition_cost, acquisition_spending, activated_users, activation_rate, active_market_growth, active_partner_conversations, anonymous_authenticated_activity, application_errors. Prior-week comparisons are present only where complete historical snapshots exist; no maturity score is calculated here.
 
-Machine-readable: `Buffago/metrics/latest.json` and `Buffago/metrics/daily/2026-08-12.json`.
+Machine-readable: `Buffago/metrics/latest.json` and `Buffago/metrics/daily/2026-08-10.json`.

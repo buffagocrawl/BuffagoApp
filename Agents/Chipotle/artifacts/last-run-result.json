@@ -1,23 +1,9 @@
 {
-  "collection": "partial",
-  "completeness": 14.1,
-  "confidence": "medium",
-  "endedAt": "2026-08-04T18:41:58.434569Z",
-  "gitCommitStatus": "skipped_dry_run",
-  "gitPushStatus": "skipped_dry_run",
-  "reportDate": "2026-08-03",
-  "reportPaths": [
-    "C:\\Users\\Brand\\repo\\BuffagoApp\\Agents\\Chipotle\\Results\\2026-08-03-buffago-daily-metrics.md",
-    "C:\\Users\\Brand\\repo\\BuffagoApp\\Agents\\Chipotle\\Results\\2026-08-03-buffago-daily-metrics.json",
-    "C:\\Users\\Brand\\repo\\BuffagoApp\\Agents\\Chipotle\\Results\\latest.md",
-    "C:\\Users\\Brand\\repo\\Agents\\Buffago\\Daily Output\\2026-08-03-chipotle-buffago-daily-metrics.md",
-    "C:\\Users\\Brand\\repo\\Agents\\Buffago\\Daily Output\\chipotle-latest.md",
-    "C:\\Users\\Brand\\repo\\Agents\\Buffago\\metrics\\daily\\2026-08-03.regenerated-fe6a8a5f1987.json",
-    "C:\\Users\\Brand\\repo\\Agents\\Buffago\\metrics\\daily\\2026-08-03.regenerated-fe6a8a5f1987.md",
-    "C:\\Users\\Brand\\repo\\Agents\\Buffago\\metrics\\latest.json",
-    "C:\\Users\\Brand\\repo\\Agents\\Buffago\\metrics\\latest.md"
-  ],
-  "runId": "905f7f6b-8c70-41d5-9b34-85a37bf27754",
-  "startedAt": "2026-08-04T18:41:44.039906Z",
-  "success": true
+  "endedAt": "2026-08-13T10:00:18.656952Z",
+  "errorCategory": "git_unsafe_state",
+  "gitCommitStatus": "not_started",
+  "gitPushStatus": "not_started",
+  "runId": "bd7a1ca4-d961-4068-b5a7-1486377f963b",
+  "startedAt": "2026-08-13T10:00:04.752207Z",
+  "success": false
 }
