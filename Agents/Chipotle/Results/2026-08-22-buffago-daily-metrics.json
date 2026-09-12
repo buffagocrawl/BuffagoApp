@@ -1,0 +1,106 @@
+{
+  "generatedAt": "2026-08-23T16:41:48.692812Z",
+  "jalapeno": {
+    "age_hours": 600.9,
+    "artifact": "latest_snapshot.json",
+    "status": "stale",
+    "timestamp": "2026-07-29T15:50:25.028529Z"
+  },
+  "metrics": {
+    "auth_failures": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "badges_awarded": {
+      "availability": "unavailable",
+      "reason": "supabase_unreachable"
+    },
+    "crawls_completed": {
+      "availability": "unavailable",
+      "reason": "supabase_unreachable"
+    },
+    "crawls_created": {
+      "availability": "unavailable",
+      "reason": "supabase_unreachable"
+    },
+    "dau": {
+      "availability": "unavailable",
+      "reason": "supabase_unreachable"
+    },
+    "error_telemetry": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "jalapeno_errors": {
+      "availability": "unavailable",
+      "reason": "supabase_unreachable"
+    },
+    "jalapeno_runs": {
+      "availability": "unavailable",
+      "reason": "supabase_unreachable"
+    },
+    "mau": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "missions": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "onboarding_events": {
+      "availability": "unavailable",
+      "reason": "supabase_unreachable"
+    },
+    "performance_percentiles": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "ratings_created": {
+      "availability": "unavailable",
+      "reason": "supabase_unreachable"
+    },
+    "referrals": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "registered_users": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "retention_d1": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "retention_d30": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "retention_d7": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "state_passport": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "wau": {
+      "availability": "unavailable",
+      "reason": "no_authoritative_privacy_safe_aggregate_source_detected"
+    },
+    "wing_battle_votes": {
+      "availability": "unavailable",
+      "reason": "supabase_unreachable"
+    },
+    "xp_claims": {
+      "availability": "unavailable",
+      "reason": "supabase_unreachable"
+    }
+  },
+  "reportDate": "2026-08-22",
+  "schemaVersion": 1,
+  "windows": {
+    "dayEnd": "2026-08-23T04:00:00Z",
+    "dayStart": "2026-08-22T04:00:00Z",
+    "timezone": "America/New_York"
+  }
+}

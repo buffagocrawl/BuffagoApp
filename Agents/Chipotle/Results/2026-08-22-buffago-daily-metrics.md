@@ -1,8 +1,8 @@
-# Buffago Metrics — 2026-09-08
+# Buffago Metrics — 2026-08-22
 
-- Collection status: **partial**; completeness: **14.1%**; evidence confidence: **medium**.
+- Collection status: **partial**; completeness: **0.0%**; evidence confidence: **low**.
 - Meaningful DAU / WAU / MAU: **Unavailable / Unavailable / Unavailable**.
-- Any-activity DAU: **0** (the current daily aggregate cannot safely calculate WAU/MAU).
+- Any-activity DAU: **Unavailable** (the current daily aggregate cannot safely calculate WAU/MAU).
 
 ## Growth and activation
 
@@ -10,7 +10,7 @@ Growth acquisition and activation completion are unavailable pending identity-sa
 
 ## Engagement and geography
 
-- Ratings created: **0**; crawls created: **0**; Wing Duel votes: **0**.
+- Ratings created: **Unavailable**; crawls created: **Unavailable**; Wing Duel votes: **Unavailable**.
 - Geographic and market-density data: unavailable pending aggregate views.
 
 ## Retention and product health
@@ -30,4 +30,4 @@ Manual verified facts are read from `Buffago/metrics/manual-business-facts.json`
 
 Important gaps: acquisition_cost, acquisition_spending, activated_users, activation_rate, active_market_growth, active_partner_conversations, anonymous_authenticated_activity, application_errors. Prior-week comparisons are present only where complete historical snapshots exist; no maturity score is calculated here.
 
-Machine-readable: `Buffago/metrics/latest.json` and `Buffago/metrics/daily/2026-09-08.json`.
+Machine-readable: `Buffago/metrics/latest.json` and `Buffago/metrics/daily/2026-08-22.json`.
