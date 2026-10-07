@@ -75,7 +75,7 @@ test('Wing Shot reset and navigation contracts are centralized and idempotent', 
   assert.match(flow, /setMedia\(null\)/);
   assert.match(flow, /setCaption\(''\)/);
   assert.match(flow, /setUploadResult\(null\)/);
-  assert.match(flow, /phaseRef\.current === 'uploading'/);
+  assert.match(flow, /phaseRef\.current === 'submitting'/);
   assert.match(crawl, /postRatingAdvancedRef\.current/);
   assert.match(home, /homePostRatingAdvancedRef\.current/);
   assert.match(flow, /onRequestClose=\{disabled \? undefined : closeFlow\}/);

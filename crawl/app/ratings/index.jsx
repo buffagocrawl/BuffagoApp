@@ -17,12 +17,14 @@ import {
   useTheme,
 } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { Image } from 'expo-image';
 import { supabase } from '../../lib/supabase.js';
 import { trackEvent } from '../../lib/analytics';
 import { loadWingdexGallery, loadWingdexRestaurantGallery } from '../../lib/wingdexGallery';
 import { useLocationCtx } from '../../providers/LocationProvider';
 import MapView, { Marker, PROVIDER_GOOGLE } from '../../lib/platformMap';
+import { mapCoordinate } from '../../lib/mapSafety';
 
 /* ---------------- helpers ---------------- */
 const fmt2 = (n) => {
@@ -208,6 +210,41 @@ export default function PublicRatingsScreen() {
   const [openMap, setOpenMap] = useState(false);
   const allMapRef = useRef(null);
   const [gallery, setGallery] = useState({ visible: false, loading: false, error: null, restaurant: null, images: [] });
+  const galleryRequestRef = useRef(0);
+  useEffect(() => () => { galleryRequestRef.current += 1; }, []);
+  const closeGallery = useCallback(() => {
+    galleryRequestRef.current += 1;
+    setGallery((previous) => ({ ...previous, visible: false }));
+  }, []);
+  const openGallery = useCallback(async (restaurant) => {
+    const request = ++galleryRequestRef.current;
+    setGallery({ visible: true, loading: true, error: null, restaurant, images: [] });
+    try {
+      const result = await loadWingdexRestaurantGallery(restaurant.destination_id, supabase);
+      if (request !== galleryRequestRef.current) return;
+      setGallery({ visible: true, loading: false, error: null, restaurant, images: result.images, count: result.count, nextOffset: 60 });
+    } catch {
+      if (request !== galleryRequestRef.current) return;
+      setGallery({ visible: true, loading: false, error: 'Pictures are temporarily unavailable.', restaurant, images: [] });
+    }
+  }, []);
+  const loadMoreGallery = useCallback(async () => {
+    if (gallery.loading || !gallery.restaurant || gallery.nextOffset >= gallery.count) return;
+    const request = ++galleryRequestRef.current;
+    setGallery((previous) => ({ ...previous, loadingMore: true }));
+    try {
+      const result = await loadWingdexRestaurantGallery(gallery.restaurant.destination_id, supabase, { offset: gallery.nextOffset });
+      if (request !== galleryRequestRef.current) return;
+      setGallery((previous) => {
+        const existing = new Set(previous.images.map((image) => image.submission_id));
+        return { ...previous, loadingMore: false, count: result.count, nextOffset: previous.nextOffset + 60,
+          images: [...previous.images, ...result.images.filter((image) => !existing.has(image.submission_id))] };
+      });
+    } catch {
+      if (request !== galleryRequestRef.current) return;
+      setGallery((previous) => ({ ...previous, loadingMore: false, error: 'Pictures are temporarily unavailable.' }));
+    }
+  }, [gallery]);
   
 
   // ✅ Apply Home->Ratings parameters:
@@ -303,18 +340,8 @@ export default function PublicRatingsScreen() {
 
   const openRestaurantsMap = useCallback(() => {
     setOpenMap(true);
-    requestAnimationFrame(() => {
-      const points = (filtered || [])
-        .filter((r) => Number.isFinite(Number(r.lat)) && Number.isFinite(Number(r.lng)))
-        .map((r) => ({ latitude: Number(r.lat), longitude: Number(r.lng) }));
-      if (allMapRef.current && points.length >= 2) {
-        allMapRef.current.fitToCoordinates(points, {
-          edgePadding: { top: 60, right: 60, bottom: 60, left: 60 },
-          animated: false,
-        });
-      }
-    });
-  }, [filtered]);
+    // The shared map fits current valid markers only after onMapReady.
+  }, []);
 
   /* ---------- FACET PIPELINE ---------- */
 
@@ -751,7 +778,7 @@ export default function PublicRatingsScreen() {
     fetchRoutesForDestination(found.destination_id);
   }, [openDestinationId, loading, rows, fetchRoutesForDestination]);
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
     let alive = true;
     (async () => {
       try {
@@ -766,12 +793,14 @@ export default function PublicRatingsScreen() {
     return () => {
       alive = false;
     };
-  }, [fetchAll]);
+  }, [fetchAll]));
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
       await fetchAll();
+    } catch (error) {
+      console.warn('Wingdex refresh failed', error?.message || error);
     } finally {
       setRefreshing(false);
     }
@@ -831,10 +860,7 @@ export default function PublicRatingsScreen() {
               onPress={(event) => {
                 event?.stopPropagation?.();
                 if (pictureCount === 0) return;
-                setGallery({ visible: true, loading: true, error: null, restaurant: item, images: [] });
-                loadWingdexRestaurantGallery(item.destination_id, supabase)
-                  .then((result) => setGallery({ visible: true, loading: false, error: null, restaurant: item, images: result.images }))
-                  .catch(() => setGallery({ visible: true, loading: false, error: 'Pictures are temporarily unavailable.', restaurant: item, images: [] }));
+                void openGallery(item);
               }}
               style={({ pressed }) => [styles.pictureLink, pressed && styles.pictureLinkPressed]}
               testID={`wingdex.pictures.${item.destination_id}`}
@@ -1256,7 +1282,7 @@ export default function PublicRatingsScreen() {
       <Portal>
         <Dialog
           visible={gallery.visible}
-          onDismiss={() => setGallery((previous) => ({ ...previous, visible: false }))}
+          onDismiss={closeGallery}
           style={styles.dialog}
         >
           <Dialog.Title style={{ textAlign: 'center' }}>
@@ -1266,21 +1292,25 @@ export default function PublicRatingsScreen() {
             {gallery.loading ? (
               <View style={styles.galleryState}><ActivityIndicator /></View>
             ) : gallery.error ? (
-              <Text style={styles.galleryStateText}>{gallery.error}</Text>
+              <View><Text style={styles.galleryStateText}>{gallery.error}</Text><Button onPress={() => void openGallery(gallery.restaurant)}>Retry pictures</Button></View>
             ) : gallery.images.length === 0 ? (
               <Text style={styles.galleryStateText}>No approved pictures yet.</Text>
             ) : (
               <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
                 {gallery.images.map((image) => (
                   <View key={image.submission_id} style={styles.galleryFrame}>
-                    <Image source={{ uri: image.signed_url }} contentFit="contain" style={styles.galleryImage} accessibilityLabel="Approved restaurant picture" />
+                    <Image source={{ uri: image.signed_url }} contentFit="contain" style={styles.galleryImage} accessibilityLabel="Approved restaurant picture"
+                      onError={() => setGallery((previous) => previous.visible && previous.restaurant?.destination_id === gallery.restaurant?.destination_id ? { ...previous, error: 'A picture could not load. Refresh the gallery to try again.' } : previous)} />
                   </View>
                 ))}
               </ScrollView>
             )}
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setGallery((previous) => ({ ...previous, visible: false }))}>Close</Button>
+            {gallery.visible && !gallery.loading && !gallery.error && gallery.nextOffset < gallery.count ? (
+              <Button loading={gallery.loadingMore} disabled={gallery.loadingMore} onPress={() => void loadMoreGallery()}>More pictures</Button>
+            ) : null}
+            <Button onPress={closeGallery}>Close</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -1318,8 +1348,7 @@ export default function PublicRatingsScreen() {
                 {filtered
                   .filter(
                     (r) =>
-                      Number.isFinite(Number(r.lat)) &&
-                      Number.isFinite(Number(r.lng))
+                      mapCoordinate(r)
                   )
                   .map((r) => {
                     const color = statusColorFor(r.destination_id);

@@ -27,6 +27,8 @@ Use a development build or emulator for the full native map/location experience.
 ```bash
 EXPO_PUBLIC_SUPABASE_URL=
 EXPO_PUBLIC_SUPABASE_ANON_KEY=
+EXPO_PUBLIC_GOOGLE_ANDROID_API_KEY=
+EXPO_PUBLIC_GOOGLE_IOS_API_KEY=
 EXPO_PUBLIC_GOOGLE_API_KEY=
 EXPO_PUBLIC_STRICT_ENV=false
 EXPO_PUBLIC_USE_PROXY=false
@@ -39,6 +41,13 @@ EXPO_PUBLIC_ENABLE_RESTAURANT_OWNER_LOOP=true
 Values prefixed with `EXPO_PUBLIC_` are visible in the mobile bundle. Keep
 OpenAI keys, Supabase service role keys, and unrestricted Google Places keys in
 Supabase Edge Function secrets only.
+
+Android native Maps consumes `EXPO_PUBLIC_GOOGLE_ANDROID_API_KEY` and iOS
+native Maps consumes `EXPO_PUBLIC_GOOGLE_IOS_API_KEY` from EAS. Legacy walking
+Directions temporarily uses `EXPO_PUBLIC_GOOGLE_API_KEY`.
+Native builds reject a missing target key. Updating a native key requires a new
+binary. Directions failures omit the route and preserve valid markers.
+See SECURITY.md for restrictions and migration follow-up.
 
 The rollout switches above are intentionally additive. They let BuffaGo gate
 new onboarding, sharing, and restaurant-owner surfaces without breaking the

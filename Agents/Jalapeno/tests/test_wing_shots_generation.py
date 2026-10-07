@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import shutil
+import subprocess
 from dataclasses import replace
 from pathlib import Path
 from uuid import UUID
@@ -107,6 +108,23 @@ def test_real_pillow_photo_generation_contains_brand_copy_and_no_exif(
     )
 
 
+def test_photo_generation_never_enters_legacy_video_toolchain(tmp_path: Path) -> None:
+    class ForbiddenVideoRunner:
+        def ffmpeg(self, *args, **kwargs):
+            pytest.fail("New photo submissions must never enter FFmpeg generation")
+
+        def ffprobe(self, *args, **kwargs):
+            pytest.fail("New photo submissions must never enter video probing")
+
+    source = tmp_path / "processed.jpg"
+    Image.new("RGB", (900, 1200), (90, 45, 20)).save(source, "JPEG")
+    assets = BrandedContentGenerator(logo_path=LOGO, command_runner=ForbiddenVideoRunner()).generate(
+        context("photo"), source, tmp_path / "output",
+    )
+    assert (assets.instagram_post_type, assets.facebook_post_type) == ("photo", "photo")
+    assert assets.instagram_path.suffix == assets.facebook_path.suffix == ".jpg"
+
+
 class FakeRepository:
     def __init__(self, source: Path, ctx: GenerationContext) -> None:
         self.source = source
@@ -197,17 +215,28 @@ def test_permanent_generation_failure_is_dead_lettered_without_upload(
     assert repository.failures[0][0] is False
 
 
+@pytest.fixture
+def docker_ffmpeg_runner():
+    # An installed CLI is insufficient: Docker Desktop may be stopped.
+    if shutil.which("docker") is None:
+        pytest.skip("Docker is required for the real FFmpeg media test")
+    try:
+        probe = subprocess.run(["docker", "info", "--format", "{{.ServerVersion}}"], capture_output=True, timeout=10, check=False)
+    except (OSError, subprocess.TimeoutExpired):
+        pytest.skip("Docker daemon is unavailable for the real FFmpeg media test")
+    if probe.returncode:
+        pytest.skip("Docker daemon is unavailable for the real FFmpeg media test")
+    return FfmpegCommandRunner(docker_image="jrottenberg/ffmpeg:7.1-alpine", timeout_seconds=180)
+
+
 @pytest.mark.skipif(
     shutil.which("docker") is None,
     reason="Docker is required for the real FFmpeg media test",
 )
 def test_real_ffmpeg_video_generation_is_vertical_and_has_no_audio(
-    tmp_path: Path,
+    tmp_path: Path, docker_ffmpeg_runner,
 ) -> None:
-    runner = FfmpegCommandRunner(
-        docker_image="jrottenberg/ffmpeg:7.1-alpine",
-        timeout_seconds=180,
-    )
+    runner = docker_ffmpeg_runner
     source = tmp_path / "processed.mp4"
     runner.ffmpeg(
         [
@@ -263,12 +292,9 @@ def test_real_ffmpeg_video_generation_is_vertical_and_has_no_audio(
     reason="Docker is required for the real FFmpeg media test",
 )
 def test_video_source_with_audio_is_refused_before_branding(
-    tmp_path: Path,
+    tmp_path: Path, docker_ffmpeg_runner,
 ) -> None:
-    runner = FfmpegCommandRunner(
-        docker_image="jrottenberg/ffmpeg:7.1-alpine",
-        timeout_seconds=180,
-    )
+    runner = docker_ffmpeg_runner
     source = tmp_path / "processed-with-audio.mp4"
     runner.ffmpeg(
         [

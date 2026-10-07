@@ -1,5 +1,7 @@
 // @ts-nocheck
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import jpeg from 'npm:jpeg-js@0.4.4';
+import { decode as decodePng } from 'npm:fast-png@6.2.0';
 import { bearerToken, correlationId as getCorrelationId, failure, response, safePathFingerprint } from '../_shared/wingShotResponse.ts';
 
 const BUCKET = 'wing-shot-staging';
@@ -10,17 +12,27 @@ const LEGACY_REASON_CODES = ['media_too_large', 'corrupt_media', 'unsupported_me
 const stage = 'server_validation';
 const log = (event, fields = {}) => console.log(JSON.stringify({ event, ...fields }));
 
-function isJpeg(bytes) { return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff; }
-function isPng(bytes) { return bytes.length >= 8 && bytes.slice(0, 8).every((v, i) => v === [137, 80, 78, 71, 13, 10, 26, 10][i]); }
+const ACCEPTED_MIMES = new Set(['image/jpeg', 'image/png']);
+const MAX_EDGE = 2048;
+const hex = (bytes) => [...new Uint8Array(bytes)].map((value) => value.toString(16).padStart(2, '0')).join('');
+
+function decodeImage(bytes, mime) {
+  if (mime === 'image/jpeg') {
+    const decoded = jpeg.decode(bytes, { useTArray: true, tolerantDecoding: false, formatAsRGBA: false });
+    return { width: decoded.width, height: decoded.height };
+  }
+  const decoded = decodePng(bytes);
+  return { width: decoded.width, height: decoded.height };
+}
 
 Deno.serve(async (request) => {
   const requestCorrelationId = getCorrelationId(request);
   if (request.method !== 'POST') return failure(request, 'unsupported_request', 'Only POST is supported.', stage, 405);
+  try {
   const token = bearerToken(request);
   const userClient = createClient(Deno.env.get('SUPABASE_URL'), Deno.env.get('SUPABASE_ANON_KEY'));
   const { data: { user } } = token ? await userClient.auth.getUser(token) : { data: { user: null } };
   if (!user) return failure(request, 'authentication_required', 'Please sign in again to upload your Wing Shot.', stage, 401);
-  try {
     const input = await request.json();
     const correlationId = getCorrelationId(request, input);
     const bucket = input.bucket;
@@ -28,28 +40,45 @@ Deno.serve(async (request) => {
     const kind = input.mediaType;
     const mime = String(input.declaredMimeType || '').toLowerCase();
     const size = Number(input.declaredFileSizeBytes);
-    const local = input.localMetadata || {};
     log('validation_started', { correlation_id: correlationId, stage, validator: 'wing-media-validate', media_type: kind, file_size_bytes: size, authenticated_session: true, object_id: safePathFingerprint(objectPath) });
     if (bucket !== BUCKET || typeof objectPath !== 'string' || !new RegExp(`^${user.id}/[0-9a-f-]{36}/[a-zA-Z0-9._-]{1,96}$`, 'i').test(objectPath)) return failure(request, 'staging_object_forbidden', 'This staged object is not owned by the signed-in user.', stage, 403, input);
     if (kind !== 'photo') return failure(request, 'unsupported_media_type', 'Only photos can be uploaded for Wing Shots.', stage, 400, input);
     const maximum = PHOTO_MAX_BYTES;
     if (!Number.isInteger(size) || size < 1) return failure(request, 'file_unreadable', 'The media size could not be verified.', stage, 400, input);
     if (size > maximum) return failure(request, 'file_too_large', 'That file is too large to upload.', stage, 413, input);
-    if (!['image/jpeg', 'image/png', 'image/webp', 'image/heic'].includes(mime)) return failure(request, 'unsupported_media_type', 'Choose a JPEG, PNG, WebP, or HEIC photo.', stage, 400, input);
-    const admin = createClient(Deno.env.get('SUPABASE_URL'), Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'));
+    if (!ACCEPTED_MIMES.has(mime)) return failure(request, 'unsupported_media_type', 'Choose a JPEG or PNG photo.', stage, 400, input);
+    const admin = createClient(Deno.env.get('SUPABASE_URL'), Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'), {
+    global: { fetch: (input, init) => {
+      const url = new URL(typeof input === 'string' ? input : input.url ?? String(input));
+      if ((init?.method ?? 'GET').toUpperCase() === 'GET' && url.pathname.includes('/storage/v1/object/')) {
+        url.searchParams.set('wing_validation_nonce', crypto.randomUUID());
+      }
+      return fetch(url, { ...init, cache: 'no-store' });
+    } },
+  });
     const { data: file, error: downloadError } = await admin.storage.from(BUCKET).download(objectPath);
     if (downloadError || !file) return failure(request, 'file_unreadable', 'We could not read the staged media.', stage, 404, input);
     if (Number(file.size) !== size) return failure(request, 'file_unreadable', 'The staged media changed before validation.', stage, 400, input);
     if (Number(file.size) > maximum) return failure(request, 'file_too_large', 'That file is too large to upload.', stage, 413, input);
-    const prefix = new Uint8Array(await file.slice(0, 64 * 1024).arrayBuffer());
-    const readable = mime === 'image/jpeg' ? isJpeg(prefix) : mime === 'image/png' ? isPng(prefix) : prefix.length > 12;
-    if (!readable) return failure(request, 'media_corrupt', 'We could not read that photo. Choose another image.', stage, 400, input);
-    const width = Number(local.width), height = Number(local.height);
-    if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height < 1 || Math.max(width, height) > 2048) return failure(request, 'invalid_dimensions', 'We could not verify the photo dimensions.', stage, 400, input);
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    let dimensions;
+    try { dimensions = decodeImage(bytes, mime); } catch (_) {
+      return failure(request, 'media_corrupt', 'We could not read that photo. Choose another image.', stage, 400, input);
+    }
+    const { width, height } = dimensions;
+    if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height < 1 || Math.max(width, height) > MAX_EDGE) return failure(request, 'invalid_dimensions', 'This photo is too large. Choose another image.', stage, 400, input);
+    const digest = hex(await crypto.subtle.digest('SHA-256', bytes));
+    const { error: receiptError } = await admin.from('wing_media_validation_receipts').upsert({
+      user_id: user.id, correlation_id: correlationId, staging_bucket: BUCKET,
+      staging_path: objectPath, sha256: digest, size_bytes: bytes.byteLength,
+      mime_type: mime, width, height, validated_at: new Date().toISOString(),
+      expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+    }, { onConflict: 'user_id,correlation_id,staging_path' });
+    if (receiptError) return failure(request, 'validation_state_error', 'We could not save this validation result.', stage, 503, input, { retryable: true });
     log('validation_passed', { correlation_id: correlationId, stage, media_type: kind, file_size_bytes: Number(file.size), object_id: safePathFingerprint(objectPath) });
-    return response(200, { ok: true, valid: true, code: 'validation_passed', stage, staged: true, correlationId });
+    return response(200, { ok: true, valid: true, code: 'validation_passed', stage, staged: true, correlationId, width, height });
   } catch (_) {
-    log('validation_retryable_failure', { correlation_id: correlationId, reason_code: 'validator_unavailable' });
+    log('validation_retryable_failure', { correlation_id: requestCorrelationId, reason_code: 'validator_unavailable' });
     return failure(request, 'server_temporarily_unavailable', 'Media validation is temporarily unavailable.', stage, 503, {}, { retryable: true });
   }
 });

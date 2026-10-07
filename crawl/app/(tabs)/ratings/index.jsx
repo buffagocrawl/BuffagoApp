@@ -45,6 +45,9 @@ import { trackEvent } from '../../../lib/analytics';
 import { submitBuffacoinRatingTransaction } from '../../../lib/buffacoinRatingTransaction';
 import { useLocationCtx } from '../../../providers/LocationProvider';
 import MapView, { Marker, PROVIDER_GOOGLE } from '../../../lib/platformMap';
+import { mapCoordinate } from '../../../lib/mapSafety';
+import WingdexPhotoGallery from '../../../components/WingdexPhotoGallery';
+import { loadWingdexGallery } from '../../../lib/wingdexGallery';
 import { useLegendaryFeed } from '../../../hooks/useLegendaryFeed';
 import {
   LegendaryDetailBanner,
@@ -534,6 +537,17 @@ export default function PublicRatingsScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   const [rows, setRows] = useState([]);
+  const [pictureCounts, setPictureCounts] = useState({});
+  const [galleryRestaurant, setGalleryRestaurant] = useState(null);
+  const pictureRequestRef = useRef(0);
+  useEffect(() => {
+    const request = ++pictureRequestRef.current;
+    setPictureCounts({});
+    void loadWingdexGallery(rows.map((row) => row.destination_id), supabase).then((result) => {
+      if (request === pictureRequestRef.current) setPictureCounts(Object.fromEntries(Object.entries(result).map(([id, value]) => [id, value.count])));
+    }).catch(() => console.warn('[Wingdex] picture counts unavailable'));
+    return () => { pictureRequestRef.current += 1; };
+  }, [rows]);
 
   const [tagNameById, setTagNameById] = useState({});
   const ratingTagOptions = useMemo(
@@ -695,18 +709,7 @@ export default function PublicRatingsScreen() {
     });
     setOpenMap(true);
 
-    requestAnimationFrame(() => {
-      const points = (filteredRef.current || [])
-        .filter((r) => Number.isFinite(Number(r.lat)) && Number.isFinite(Number(r.lng)))
-        .map((r) => ({ latitude: Number(r.lat), longitude: Number(r.lng) }));
-
-      if (allMapRef.current && points.length >= 2) {
-        allMapRef.current.fitToCoordinates(points, {
-          edgePadding: { top: 60, right: 60, bottom: 60, left: 60 },
-          animated: false,
-        });
-      }
-    });
+    // The shared map fits current valid markers only after onMapReady.
   }, [locationMode, user?.id]);
 
   const applyLocationFilter = useCallback(
@@ -1840,7 +1843,9 @@ export default function PublicRatingsScreen() {
           </View>
         
           {/* MIDDLE: spacer (keeps layout stable) */}
-          <View style={styles.metaMid} />
+          <Button icon="image-multiple" compact onPress={(event) => {
+            event?.stopPropagation?.(); setGalleryRestaurant(item);
+          }}>{pictureCounts[String(item.destination_id)] || 0} Pictures</Button>
         
           {/* RIGHT: Rate */}
           <View style={styles.metaRight}>
@@ -2190,6 +2195,8 @@ export default function PublicRatingsScreen() {
       ) : null}
 
       {/* Drill-down modal (full screen) */}
+      {galleryRestaurant ? <WingdexPhotoGallery key={galleryRestaurant.destination_id} restaurant={galleryRestaurant}
+        onClose={() => setGalleryRestaurant(null)} /> : null}
       <Portal>
         <Modal
           visible={open}
@@ -2249,6 +2256,9 @@ export default function PublicRatingsScreen() {
                 label="BuffaGo Score"
                 subLabel="Average weighted score"
               />
+              <Button icon="image-multiple" onPress={() => { setOpen(false); setGalleryRestaurant(active); }}>
+                {pictureCounts[String(active.destination_id)] || 0} Pictures
+              </Button>
       
               <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 6 }}>
                 <Text style={{ color: colors.onSurface, opacity: 0.7, textAlign: 'center' }}>
@@ -2449,7 +2459,7 @@ export default function PublicRatingsScreen() {
                 }}
               >
                 {(filtered || [])
-                  .filter((r) => Number.isFinite(Number(r.lat)) && Number.isFinite(Number(r.lng)))
+                  .filter((r) => mapCoordinate(r))
                   .filter((r) => {
                     if (!mapLegendFilter) return true;
                     const isRated = myRated.has(r.destination_id);

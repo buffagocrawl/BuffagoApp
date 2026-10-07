@@ -14,6 +14,8 @@ import ScreenHeader from '../../../components/ScreenHeader';
 import WeeklyChallengeStats from '../../../components/WeeklyChallengeStats';
 import WingCreatorSummaryCard from '../../../components/creator/WingCreatorSummaryCard';
 import { WingShotFlow } from '../../../components/wingShots';
+import { useWingShotsFeatureFlags } from '../../../hooks/useWingShotsFeatureFlags';
+import { journeyPhotoStatus } from '../../../lib/journeyPhoto';
 
 /* ---------------- helpers ---------------- */
 
@@ -111,6 +113,7 @@ export default function HistoryIndex() {
   const [funFact, setFunFact] = useState(null);
 
   const [session, setSession] = useState(null);
+  const { flags: wingShotFlags, refresh: refreshPhotoFlags } = useWingShotsFeatureFlags(Boolean(session?.user?.id));
   const [authReady, setAuthReady] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -372,19 +375,19 @@ export default function HistoryIndex() {
       let mediaRows = [];
       let mediaLookupFailed = false;
       if (ratingIds.length) {
-        const { data, error: mediaError } = await supabase
-          .from('wing_media_submissions')
-          .select('rating_id')
-          .eq('user_id', userId)
-          .in('rating_id', ratingIds);
+        const { data, error: mediaError } = await supabase.rpc('get_my_rating_wing_shots', {
+          p_rating_ids: ratingIds,
+        });
         mediaRows = data || [];
         mediaLookupFailed = !!mediaError;
         if (mediaError) console.warn('rating image eligibility lookup failed:', mediaError.message || mediaError);
       }
       const mediaRatingIds = new Set(mediaRows.map((row) => row.rating_id).filter(Boolean));
+      const mediaByRating = new Map(mediaRows.map((row) => [row.rating_id, row]));
       ratingsList = ratingsList.map((rating) => ({
         ...rating,
         hasMediaSubmission: mediaRatingIds.has(rating.id),
+        wingShot: mediaByRating.get(rating.id) ?? null,
         imageEligibilityKnown: !mediaLookupFailed,
         imageEligible: [rating.crispiness, rating.sauce, rating.meat, rating.overall]
           .every((value) => Number.isFinite(Number(value)) && Number(value) >= 1 && Number(value) <= 10)
@@ -524,8 +527,9 @@ export default function HistoryIndex() {
       }
       if (!viewUserId) return;
       if (!didInitialLoadRef.current) return;
+      void refreshPhotoFlags();
       fetchAll(viewUserId);
-    }, [viewUserId, fetchAll, session?.user?.id, isViewingSelf, params?.sourceSurface])
+    }, [viewUserId, fetchAll, session?.user?.id, isViewingSelf, params?.sourceSurface, refreshPhotoFlags])
   );
 
   const onRefresh = useCallback(async () => {
@@ -903,7 +907,7 @@ export default function HistoryIndex() {
             </View>
           </View>
 
-          {isViewingSelf && item.imageEligibilityKnown && item.imageEligible && !item.hasMediaSubmission ? (
+          {isViewingSelf && wingShotFlags.prompt && wingShotFlags.photo && item.imageEligibilityKnown && item.imageEligible && !item.hasMediaSubmission ? (
             <Button
               mode="text"
               icon="image-plus"
@@ -913,7 +917,14 @@ export default function HistoryIndex() {
               contentStyle={{ paddingHorizontal: 0 }}
               onPress={() => setImageRating(item)}
             >
-              Add image
+              Add Photo
+            </Button>
+          ) : null}
+          {isViewingSelf && item.wingShot ? (
+            <Button mode="text" icon="image" compact
+              testID={`rating.image.${item.id}`}
+              onPress={() => router.push(`/profile/wing-shots/${item.wingShot.submission_id}`)}>
+              View Photo · {journeyPhotoStatus(item.wingShot.status)}
             </Button>
           ) : null}
         </Card.Content>
@@ -1308,7 +1319,7 @@ export default function HistoryIndex() {
               eligibleRatingId={imageRating.id}
               destinationId={imageRating.destination_id}
               submissionSource="profile"
-              allowPhoto
+              allowPhoto={wingShotFlags.prompt && wingShotFlags.photo}
               analyticsContext={{
                 screen: 'profile_history_rating_image',
                 userId: session?.user?.id ?? null,

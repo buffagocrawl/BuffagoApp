@@ -130,7 +130,8 @@ test('interpolation and lifecycle safeguards are wired to the flow', () => {
   assert.match(flow, /controller\.signal\.aborted/);
   assert.match(preview, /testID="wing-shot\.preview\.photo"/);
   assert.match(flow, /AccessibilityInfo\.isReduceMotionEnabled/);
-  assert.match(flow, /accessibilityValue=\{\{ min: 0, max: 100, now: Math\.round\(safeProgress\) \}\}/);
+  assert.match(flow, /accessibilityValue=\{\{ text: progressLabel \}\}/);
+  assert.doesNotMatch(flow, /Math\.round\(safeProgress\)|validationProgress}%/);
 });
 
 test('the client exposes separate progress stages and never declares UI success', () => {

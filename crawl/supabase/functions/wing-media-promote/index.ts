@@ -5,7 +5,8 @@ import { bearerToken } from '../_shared/wingShotResponse.ts';
 const SOURCE_BUCKET = 'wing-shot-staging';
 const DESTINATION_BUCKET = 'wing-submissions';
 const MAX_BYTES = { photo: 20 * 1024 * 1024 };
-const MIMES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic']);
+const MIMES = new Set(['image/jpeg', 'image/png']);
+const hex = (bytes) => [...new Uint8Array(bytes)].map((value) => value.toString(16).padStart(2, '0')).join('');
 const baseHeaders = { 'content-type': 'application/json', 'cache-control': 'no-store' };
 
 function correlationId(request, body = {}) {
@@ -50,21 +51,29 @@ Deno.serve(async (request) => {
   }
   const id = correlationId(request, body);
   if (!validUuid(id) || body.correlationId !== id) return response(request, 400, 'invalid_correlation_id', 'The upload correlation identifier is invalid.', 'request', { body });
-
+  const submissionId = body.submissionId;
+  try {
   const token = bearerToken(request);
   const userClient = createClient(Deno.env.get('SUPABASE_URL'), Deno.env.get('SUPABASE_ANON_KEY'));
   const { data: { user } } = token ? await userClient.auth.getUser(token) : { data: { user: null } };
   if (!user) return response(request, 401, 'authentication_required', 'Sign in to continue this upload.', 'authentication', { body });
 
-  const { bucket, objectPath, submissionId } = body;
+  const { bucket, objectPath } = body;
   const objectName = safeObjectName(objectPath);
   if (bucket !== SOURCE_BUCKET || !validUuid(submissionId) || typeof objectPath !== 'string'
     || objectPath !== `${user.id}/${id}/${objectName}` || !/^[a-zA-Z0-9._-]{1,96}$/.test(objectName)) {
     return response(request, 403, 'staging_object_forbidden', 'This staged upload is not owned by the current user.', 'authorization', { body });
   }
 
-  const admin = createClient(Deno.env.get('SUPABASE_URL'), Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'));
-  try {
+  const admin = createClient(Deno.env.get('SUPABASE_URL'), Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'), {
+    global: { fetch: (input, init) => {
+      const url = new URL(typeof input === 'string' ? input : input.url ?? String(input));
+      if ((init?.method ?? 'GET').toUpperCase() === 'GET' && url.pathname.includes('/storage/v1/object/')) {
+        url.searchParams.set('wing_validation_nonce', crypto.randomUUID());
+      }
+      return fetch(url, { ...init, cache: 'no-store' });
+    } },
+  });
     // Reservation precedes promotion. The authoritative pre-finalization row is
     // the upload intent; wing_media_submissions is created by finalize RPC.
     const { data: intent, error: intentError } = await admin.from('wing_submission_upload_intents')
@@ -81,10 +90,29 @@ Deno.serve(async (request) => {
 
     const expectedMime = String(body.expectedMimeType || intent.expected_mime_type || '').toLowerCase();
     const expectedSize = Number(body.expectedSizeBytes ?? intent.expected_size_bytes);
+    if (expectedMime !== String(intent.expected_mime_type).toLowerCase() || expectedSize !== Number(intent.expected_size_bytes)) {
+      return response(request, 400, 'promotion_contract_invalid', 'The promotion request does not match the reserved media.', 'validation', { body });
+    }
     if (intent.media_type !== 'photo' || !MIMES.has(expectedMime) || !Number.isInteger(expectedSize) || expectedSize < 1 || intent.media_type !== body.mediaType && body.mediaType != null) {
       return response(request, 400, 'promotion_contract_invalid', 'The promotion request does not match the reserved media.', 'validation', { body });
     }
     if (expectedSize > MAX_BYTES.photo) return response(request, 413, 'payload_too_large', 'This photo is too large to store.', 'validation', { body });
+
+    const { data: validation, error: validationError } = await admin.from('wing_media_validation_receipts')
+      .select('id,user_id,correlation_id,staging_bucket,staging_path,sha256,size_bytes,mime_type,expires_at,submission_id')
+      .eq('user_id', user.id).eq('correlation_id', id).eq('staging_bucket', SOURCE_BUCKET)
+      .eq('staging_path', objectPath).maybeSingle();
+    if (validationError) return response(request, 503, 'validation_state_unavailable', 'We could not verify this upload yet. Try again.', 'validation', { body, retryable: true });
+    if (!validation || new Date(validation.expires_at).getTime() <= Date.now()) return response(request, 409, 'validation_required', 'Validate this exact staged photo before promotion.', 'validation', { body });
+    if (validation.submission_id && validation.submission_id !== submissionId) return response(request, 409, 'validation_already_used', 'This validation belongs to another upload.', 'validation', { body });
+    if (Number(validation.size_bytes) !== expectedSize || String(validation.mime_type).toLowerCase() !== expectedMime) return response(request, 409, 'validation_mismatch', 'The validated photo does not match this reservation.', 'validation', { body });
+    if (!validation.submission_id) {
+      const { data: bound, error: bindError } = await admin.from('wing_media_validation_receipts')
+        .update({ submission_id: submissionId }).eq('id', validation.id).is('submission_id', null)
+        .select('id').maybeSingle();
+      if (bindError) return response(request, 503, 'validation_state_unavailable', 'We could not bind this validated upload. Try again.', 'validation', { body, retryable: true });
+      if (!bound) return response(request, 409, 'validation_already_used', 'This validation was already claimed by another upload.', 'validation', { body });
+    }
 
     const destinationPath = intent.expected_storage_path;
     const existing = await admin.storage.from(DESTINATION_BUCKET).download(destinationPath);
@@ -92,12 +120,19 @@ Deno.serve(async (request) => {
     if (destinationReady && (Number(existing.data.size) !== expectedSize || (existing.data.type && String(existing.data.type).toLowerCase() !== expectedMime))) {
       return response(request, 409, 'destination_object_conflict', 'A different media object already uses this upload reservation.', 'destination_copy', { body });
     }
+    if (destinationReady) {
+      const destinationDigest = hex(await crypto.subtle.digest('SHA-256', new Uint8Array(await existing.data.arrayBuffer())));
+      if (destinationDigest !== validation.sha256) return response(request, 409, 'destination_object_conflict', 'A different media object already uses this upload reservation.', 'destination_copy', { body });
+    }
     if (!destinationReady) {
       const { data: source, error: sourceError } = await admin.storage.from(SOURCE_BUCKET).download(objectPath);
       if (sourceError || !source) return response(request, 404, 'staging_object_missing', 'The staged media could not be found. Choose it again.', 'source_read', { body });
       if (Number(source.size) !== expectedSize) return response(request, 400, 'staging_size_mismatch', 'The staged media does not match the reserved upload.', 'source_read', { body });
       const sourceMime = String(source.type || '').toLowerCase();
       if (sourceMime && sourceMime !== expectedMime) return response(request, 400, 'staging_mime_mismatch', 'The staged media type does not match the reserved upload.', 'source_read', { body });
+      const sourceBytes = new Uint8Array(await source.arrayBuffer());
+      const sourceDigest = hex(await crypto.subtle.digest('SHA-256', sourceBytes));
+      if (sourceDigest !== validation.sha256) return response(request, 409, 'staging_object_changed', 'The staged photo changed after validation.', 'source_read', { body });
       const { error: copyError } = await admin.storage.from(DESTINATION_BUCKET).upload(destinationPath, source, {
         contentType: expectedMime, upsert: false, cacheControl: '3600',
       });
@@ -109,6 +144,8 @@ Deno.serve(async (request) => {
       destinationReady = true;
     }
     if (!destinationReady) return response(request, 503, 'destination_unavailable', 'The media destination is temporarily unavailable. Try again.', 'destination_copy', { body, retryable: true });
+    const { error: promotedStateError } = await admin.from('wing_media_validation_receipts').update({ promoted_at: new Date().toISOString() }).eq('id', validation.id).eq('submission_id', submissionId);
+    if (promotedStateError) return response(request, 503, 'validation_state_unavailable', 'We could not finish recording this promotion. Try again.', 'validation', { body, retryable: true });
     const { error: cleanupError } = await admin.storage.from(SOURCE_BUCKET).remove([objectPath]);
     if (cleanupError) {
       if (errorStatus(cleanupError) === 429) return response(request, 429, 'promotion_rate_limited', 'Promotion is temporarily rate limited. Try again later.', 'source_cleanup', { body, retryable: true, retryAfterSeconds: errorRetryAfter(cleanupError) });

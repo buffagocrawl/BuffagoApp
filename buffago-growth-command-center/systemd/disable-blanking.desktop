@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=Disable display blanking for Buffago
+Exec=sh -c 'xset s off; xset -dpms; xset s noblank'
+X-GNOME-Autostart-enabled=true

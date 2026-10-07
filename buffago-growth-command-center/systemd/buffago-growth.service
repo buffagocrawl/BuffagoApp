@@ -1,0 +1,29 @@
+[Unit]
+Description=Buffago Growth Command Center
+After=network-online.target graphical.target
+Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=10
+
+[Service]
+Type=simple
+User=branden
+Group=branden
+WorkingDirectory=/opt/buffago-growth-command-center
+EnvironmentFile=/etc/buffago-growth-command-center.env
+# The environment file must be owned by root:root with mode 0600. systemd reads
+# it before starting this unprivileged service; never put credentials in this unit.
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/branden/.Xauthority
+Environment=BUFFAGO_GROWTH_FULLSCREEN=true
+ExecStart=/bin/sh /opt/buffago-growth-command-center/systemd/start-display.sh
+Restart=on-failure
+RestartSec=10
+ProtectHome=false
+TimeoutStartSec=0
+# Logs go to journald; the app's local rotating log is capped near 1.5 MB.
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=graphical.target

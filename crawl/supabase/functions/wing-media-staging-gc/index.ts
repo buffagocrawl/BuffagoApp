@@ -6,6 +6,13 @@ Deno.serve(async (request) => {
   const expected = Deno.env.get('WING_STAGING_GC_SECRET');
   if (!expected || request.headers.get('x-wing-staging-gc-secret') !== expected) return response(401, { ok: false, code: 'authentication_required', message: 'Cleanup authentication failed.', stage: 'staging_gc', retryable: false, correlationId: 'system' });
   const admin = createClient(Deno.env.get('SUPABASE_URL'), Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'));
+  const { data: abandoned, error: abandonedError } = await admin.rpc('get_expired_wing_original_cleanup');
+  if (abandonedError) return response(503, { ok: false, code: 'server_temporarily_unavailable', stage: 'original_gc' });
+  const paths = (abandoned || []).map((row) => row.storage_path).filter(Boolean);
+  if (paths.length) {
+    const { error: removalError } = await admin.storage.from('wing-submissions').remove(paths);
+    if (removalError) return response(503, { ok: false, code: 'server_temporarily_unavailable', stage: 'original_gc' });
+  }
   // Never delete staged media while its reservation is still active. If the
   // guard query fails, fail closed and leave objects for a later run.
   const { data: activeIntents, error: intentError } = await admin

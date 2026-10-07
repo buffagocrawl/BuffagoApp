@@ -8,7 +8,7 @@ import {
 const session = { user: { id: 'user-id' } };
 const signedIn = () => Promise.resolve({ data: { session, user: session.user }, error: null });
 
-test('successful password sign-in bootstraps a profile before one navigation request', async () => {
+test('successful password sign-in returns a session and bootstraps independently', async () => {
   const phases = [];
   let navigations = 0;
   const result = await runPasswordSignInAttempt({
@@ -18,6 +18,7 @@ test('successful password sign-in bootstraps a profile before one navigation req
     timeoutMs: 20,
   });
   if (result.user.id) navigations += 1;
+  await result.bootstrap;
   assert.equal(navigations, 1);
   assert.deepEqual(phases, ['supabase_request_started', 'supabase_response_received', 'session_present', 'profile_bootstrap_started', 'bootstrapped', 'profile_bootstrap_completed']);
 });
@@ -38,18 +39,17 @@ test('a rejected Supabase request clears through the caller error path', async (
   assert.match(getPasswordSignInErrorMessage(new Error('network request failed')), /Check your connection/);
 });
 
-test('the complete operation times out when profile bootstrap never resolves', async () => {
-  await assert.rejects(
-    runPasswordSignInAttempt({ signIn: signedIn, bootstrapProfile: () => new Promise(() => {}), timeoutMs: 1 }),
-    (error) => error?.code === 'PASSWORD_AUTH_TIMEOUT'
-  );
+test('successful auth never times out when profile bootstrap never resolves', async () => {
+  const result = await runPasswordSignInAttempt({ signIn: signedIn, bootstrapProfile: () => new Promise(() => {}), timeoutMs: 1 });
+  assert.equal(result.session, session);
 });
 
 test('profile query failures and missing profile rows are distinguishable from auth failure', async () => {
-  await assert.rejects(
-    runPasswordSignInAttempt({ signIn: signedIn, bootstrapProfile: async () => { throw new Error('RLS denied'); } }),
-    (error) => error?.code === 'PASSWORD_PROFILE_BOOTSTRAP_FAILED'
-  );
+  let failure;
+  const authed = await runPasswordSignInAttempt({ signIn: signedIn, bootstrapProfile: async () => { throw new Error('RLS denied'); }, onBootstrapError: (error) => { failure = error; } });
+  await authed.bootstrap;
+  assert.equal(authed.session, session);
+  assert.equal(failure.message, 'RLS denied');
   const result = await runPasswordSignInAttempt({ signIn: signedIn, bootstrapProfile: async () => {} });
   assert.equal(result.user.id, 'user-id');
 });

@@ -64,7 +64,7 @@ test('review actions are server allowlisted, require notes, and record human ove
   assert.match(sql, /review_wing_submission_v2\([\s\S]*?\) to authenticated/);
 });
 
-test('preview handoff is one-time, requester bound, short lived, and never serves originals', () => {
+test('admin claim remains one-time and role-bound; owner photo fallback stays privately authorized', () => {
   const claim = sql.match(
     /create or replace function public\.claim_wing_media_access_request_for_user[\s\S]*?\n\$\$;/,
   )?.[0];
@@ -82,7 +82,12 @@ test('preview handoff is one-time, requester bound, short lived, and never serve
   assert.match(edge, /createSignedUrl\(claim\.object_path, SIGNED_URL_SECONDS\)/);
   assert.match(edge, /const SIGNED_URL_SECONDS = 60/);
   assert.match(edge, /cache-control.*no-store/i);
-  assert.doesNotMatch(edge, /original_storage_path|serviceRoleKey.*JSON\.stringify/s);
+  assert.match(edge, /submission\.original_storage_path/);
+  assert.match(edge, /eq\('requester_id', authData\.user\.id\)/);
+  assert.match(edge, /eq\('user_id', authData\.user\.id\)/);
+  assert.match(edge, /eq\('status', 'pending'\)/);
+  assert.match(edge, /gt\('expires_at'/);
+  assert.doesNotMatch(edge, /serviceRoleKey.*JSON\.stringify/s);
 });
 
 test('admin client uses only protected RPC and Edge Function boundaries', () => {

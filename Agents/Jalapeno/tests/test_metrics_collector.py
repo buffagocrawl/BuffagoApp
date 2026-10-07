@@ -305,7 +305,7 @@ def test_diagnostics_detects_recent_media_mismatch(monkeypatch) -> None:
                 rows[0]["instagram_permalink"] = "https://instagram.com/p/correct/"
             return rows
 
-    diagnostics = metrics_module.run_metrics_diagnostics(_config(), _MismatchClient())
+    diagnostics = metrics_module.run_metrics_diagnostics(_config(), _MismatchClient(), now=datetime(2026, 7, 5, tzinfo=timezone.utc))
 
     assert diagnostics.me_ok is True
     assert diagnostics.configured_page_found is True
@@ -347,7 +347,7 @@ def test_diagnostics_sanitizes_reserved_log_keys_in_mismatch(monkeypatch) -> Non
     stream = StringIO()
     logger = initialize_logging(replace(_config(), log_directory=PROJECT_DIR / "tmp" / "pytest-metrics" / "logs"), stream=stream)
 
-    diagnostics = metrics_module.run_metrics_diagnostics(_config(), _MismatchClient(), logger=logger)
+    diagnostics = metrics_module.run_metrics_diagnostics(_config(), _MismatchClient(), logger=logger, now=datetime(2026, 7, 5, tzinfo=timezone.utc))
 
     assert diagnostics.mismatch_count == 1
     log_output = stream.getvalue()

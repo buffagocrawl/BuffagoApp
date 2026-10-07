@@ -7,7 +7,7 @@ const wizard = readFileSync(new URL('../components/RatingWizardDialog.jsx', impo
 const flow = readFileSync(new URL('../components/wingShots/WingShotFlow.tsx', import.meta.url), 'utf8');
 
 test('new rating carries a real image session into the rating save', () => {
-  assert.match(home, /onDraftContinue=\{\(draft\) =>/);
+  assert.match(home, /onDraftContinue=\{async \(draft\) =>/);
   assert.match(home, /homeDraftImageRef\.current = \{ draft/);
   assert.match(home, /submitWingShot\(/);
   assert.match(home, /ratingId,\s*media: draft\.media/);

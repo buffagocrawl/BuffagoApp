@@ -232,8 +232,12 @@ def test_workflow_has_one_community_only_off_hour_schedule_and_safe_controls() -
     workflow = WORKFLOW.read_text(encoding="utf-8")
     assert 'cron: "17 5 * * *"' in workflow
     assert workflow.count("cron:") == 1
-    assert "default: dry-run" in workflow
-    assert "PUBLISH_APPROVED_COMMUNITY_WING_SHOTS" in workflow
+    assert "default: dry_run" in workflow
+    assert "options: [dry_run, publish]" in workflow
+    assert "vars.JALAPENO_AUTOMATION_ENABLED == 'true'" in workflow
+    assert "WING_SHOTS_LIVE_PUBLISHING_ENABLED || 'false'" in workflow
+    assert "WING_INSTAGRAM_PUBLISHING_ENABLED || 'false'" in workflow
+    assert "WING_FACEBOOK_PUBLISHING_ENABLED || 'false'" in workflow
     assert "python wing_shots_main.py" in workflow
     assert "python main.py" not in workflow
     assert "post_type:" not in workflow
@@ -246,8 +250,8 @@ def test_workflow_has_one_community_only_off_hour_schedule_and_safe_controls() -
     assert "META_APP_SECRET" not in workflow
     assert "META_GRAPH_API_VERSION: ${{ vars.META_GRAPH_API_VERSION }}" in workflow
     assert "META_GRAPH_API_VERSION ||" not in workflow
-    assert workflow.count("SUPABASE_SERVICE_ROLE_KEY:") == 2
-    assert workflow.count("META_LONG_LIVED_ACCESS_TOKEN:") == 2
+    assert workflow.count("SUPABASE_SERVICE_ROLE_KEY:") == 1
+    assert workflow.count("META_LONG_LIVED_ACCESS_TOKEN:") == 1
     assert "permissions:\n  contents: read" in workflow
     assert "cancel-in-progress: false" in workflow
     assert "timeout-minutes: 30" in workflow

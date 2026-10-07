@@ -10,7 +10,10 @@ node_modules/
 .expo/
 .expo-shared/
 
-# Native build outputs and caches (keep the Android project sources).
+# Native projects are generated on EAS from the current app.config.js and keys.
+android/
+ios/
+# Native build outputs and caches.
 .gradle/
 android/.gradle/
 android/build/
@@ -21,6 +24,7 @@ android/app/.cxx/
 
 # Generated output and test artifacts
 dist/
+output/
 build/
 web-build/
 artifacts/

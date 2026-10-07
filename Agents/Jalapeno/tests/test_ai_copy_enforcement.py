@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from datetime import datetime, timezone
 from io import StringIO
 from pathlib import Path
 import sys
@@ -165,7 +166,7 @@ def test_openai_copy_duplicate_caption_triggers_retry(monkeypatch: pytest.Monkey
     )
     monkeypatch.setattr(OpenAIContentClient, "from_env", classmethod(lambda cls, **_kwargs: fake_client))
     logger, stream = _logger(tmp_path)
-    recent_posts = [{"id": "post-1", "selected_caption": "Send this to the person you're getting wings with", "published_at": "2026-07-01T00:00:00+00:00"}]
+    recent_posts = [{"id": "post-1", "selected_caption": "Send this to the person you're getting wings with", "published_at": datetime.now(timezone.utc).isoformat()}]
 
     package = generate_caption_package(_candidate(), snapshot={}, external_context={}, performance_context={}, recent_posts=recent_posts, logger=logger, require_ai_copy=True)
 

@@ -55,3 +55,6 @@ Agents/Chipotle/artifacts/last-run-result.json
 # Generated Expo exports are deployment/CI artifacts, not source.
 /crawl/output/
 /output/buffaverse-web-correction/
+
+# Generated image-workflow regression evidence (source tests and fixtures live elsewhere).
+/artifacts/qa-image-regression/

@@ -1,0 +1,22 @@
+{
+  "current_experiment": {
+    "title": "Turn ratings into shares",
+    "goal": "Learn whether a post-rating share prompt creates organic installs.",
+    "progress": "18 of 50 target shares",
+    "day": 4,
+    "duration_days": 14
+  },
+  "todays_growth_move": {
+    "action": "Talk to three recent raters.",
+    "why": "Their language can sharpen the next sharing prompt."
+  },
+  "founder_balance": {
+    "product_actions": null,
+    "growth_actions": null,
+    "customer_conversations": null
+  },
+  "growth_insight": {
+    "title": "No current insight",
+    "detail": "Jalapeno recommendations will appear here."
+  }
+}
