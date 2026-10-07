@@ -41,7 +41,7 @@ describe('Mango Habanero contracts', () => {
   it('allows original private media to drive review and preview', () => {
     expect(contractFix).toContain("'original_object_exists'");
     expect(contractFix).toContain("when s.status = 'approved' then 'Approved / Awaiting Media Preparation'");
-    expect(server).toContain("row.processed_storage_path || row.thumbnail_storage_path || row.original_storage_path");
+    expect(server).toContain("const path = selectWingPreviewPath(row)");
     expect(server).toContain("path_kind: path === row.original_storage_path ? 'original'");
   });
   it('keeps approval atomic, reasoned, and transition-audited', () => {

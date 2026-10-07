@@ -1,86 +1,71 @@
-// utils/walkRoute.js
+import { mapCoordinate, mapCoordinates } from '../lib/mapSafety.js';
+
 const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
 
-/** Decode Google encoded polyline -> [{latitude, longitude}, ...] */
+/** Reject truncated and overflowing encoded paths before native Maps. */
 export function decodePolyline(encoded) {
+  if (typeof encoded !== 'string' || encoded.length > 1000000) return [];
   let index = 0, lat = 0, lng = 0;
   const points = [];
+  const component = () => {
+    let result = 0, shift = 0;
+    while (index < encoded.length && shift <= 30) {
+      const byte = encoded.charCodeAt(index++) - 63;
+      if (byte < 0 || byte > 63) return null;
+      result += (byte & 31) * 2 ** shift;
+      if (byte < 32) return result % 2 ? -(Math.floor(result / 2) + 1) : result / 2;
+      shift += 5;
+    }
+    return null;
+  };
   while (index < encoded.length) {
-    let b, shift = 0, result = 0;
-    do { b = encoded.charCodeAt(index++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
-    const dlat = (result & 1) ? ~(result >> 1) : (result >> 1);
-    lat += dlat;
-    shift = 0; result = 0;
-    do { b = encoded.charCodeAt(index++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
-    const dlng = (result & 1) ? ~(result >> 1) : (result >> 1);
-    lng += dlng;
-    points.push({ latitude: lat / 1e5, longitude: lng / 1e5 });
+    const dlat = component(), dlng = component();
+    if (dlat === null || dlng === null) return [];
+    lat += dlat; lng += dlng;
+    const point = mapCoordinate({ latitude: lat / 1e5, longitude: lng / 1e5 });
+    if (!point) return [];
+    points.push(point);
   }
   return points;
 }
 
-/**
- * Build a walking path over roads for each consecutive stop.
- * Returns a stitched array of coordinates following the road.
- */
-export async function getWalkingPath(coords) {
-  if (!API_KEY) throw new Error('Missing EXPO_PUBLIC_GOOGLE_API_KEY');
-  if (!coords || coords.length < 2) return [];
-
+export async function getWalkingPath(values, { signal, isCurrent = () => true, fetchImpl = fetch, apiKey = API_KEY } = {}) {
+  const coords = mapCoordinates(values);
+  if (!apiKey || coords.length < 2 || signal?.aborted || !isCurrent()) return [];
   const all = [];
-
   for (let i = 0; i < coords.length - 1; i++) {
+    if (signal?.aborted || !isCurrent()) return [];
     const origin = `${coords[i].latitude},${coords[i].longitude}`;
     const destination = `${coords[i + 1].latitude},${coords[i + 1].longitude}`;
-
-    const url =
-      `https://maps.googleapis.com/maps/api/directions/json` +
-      `?origin=${encodeURIComponent(origin)}` +
-      `&destination=${encodeURIComponent(destination)}` +
-      `&mode=walking&key=${API_KEY}`;
-
-    let json;
+    const controller = new AbortController();
+    const abort = () => controller.abort();
+    signal?.addEventListener('abort', abort, { once: true });
+    let timer;
     try {
-      const res = await fetch(url);
-      json = await res.json();
-    } catch (err) {
-      console.warn('[Directions] network error', err);
-      continue;
-    }
-
-    if (json.status !== 'OK' || !json.routes?.length) {
-      console.warn('[Directions] bad status', json.status, json.error_message);
-      continue;
-    }
-
-    // Prefer overview polyline; if missing, stitch legs/steps
-    let segment = [];
-    const route0 = json.routes[0];
-
-    if (route0.overview_polyline?.points) {
-      segment = decodePolyline(route0.overview_polyline.points);
-    } else if (route0.legs?.length) {
-      for (const leg of route0.legs) {
-        for (const step of leg.steps || []) {
-          if (step.polyline?.points) {
-            const pts = decodePolyline(step.polyline.points);
-            if (segment.length && pts.length) pts.shift(); // avoid duplicate joint
-            segment.push(...pts);
-          }
+      const response = await Promise.race([
+        fetchImpl(`https://maps.googleapis.com/maps/api/directions/json?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&mode=walking&key=${apiKey}`, { signal: controller.signal }).then((res) => res.json()),
+        new Promise((_, reject) => { timer = setTimeout(() => { controller.abort(); reject(new Error('route_timeout')); }, 8000); }),
+      ]);
+      if (signal?.aborted || !isCurrent()) return [];
+      if (response?.status !== 'OK' || !Array.isArray(response.routes) || !response.routes.length) {
+        console.warn('[Directions] route unavailable');
+        return [];
+      }
+      const route = response.routes[0];
+      let segment = decodePolyline(route?.overview_polyline?.points);
+      if (!segment.length && Array.isArray(route?.legs)) {
+        for (const leg of route.legs) for (const step of Array.isArray(leg?.steps) ? leg.steps : []) {
+          const points = decodePolyline(step?.polyline?.points);
+          if (!points.length) return [];
+          segment.push(...points);
         }
       }
-    }
-
-    if (!segment.length) {
-      console.warn('[Directions] no polyline for segment', i, origin, destination);
-      continue;
-    }
-
-    // Stitch without duplicating the joint
-    if (i > 0 && segment.length) segment.shift();
-    all.push(...segment);
+      if (!segment.length) return [];
+      all.push(...segment);
+    } catch {
+      console.warn('[Directions] request unavailable');
+      return [];
+    } finally { clearTimeout(timer); signal?.removeEventListener('abort', abort); }
   }
-
-  console.log('[Directions] built road path points:', all.length);
-  return all;
+  return isCurrent() && !signal?.aborted ? all : [];
 }

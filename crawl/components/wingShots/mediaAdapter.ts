@@ -1,5 +1,6 @@
 import { File as ExpoFile } from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { Platform } from 'react-native';
 
 export type WingShotMediaKind = 'photo';
@@ -49,9 +50,9 @@ function abortIfNeeded(signal?: AbortSignal) {
   }
 }
 
-function selectedMediaFromAsset(
+async function selectedMediaFromAsset(
   asset: ImagePicker.ImagePickerAsset,
-): WingShotSelectedMedia {
+): Promise<WingShotSelectedMedia> {
   if (asset.type !== 'image') {
     throw new WingShotMediaAdapterError(
       'unsupported_media_type',
@@ -59,9 +60,18 @@ function selectedMediaFromAsset(
     );
   }
   const kind: WingShotMediaKind = 'photo';
-  const nativeFile = new ExpoFile(asset.uri);
-  const sizeBytes = asset.fileSize ?? nativeFile.size;
-  const mimeType = asset.mimeType || nativeFile.type;
+  // Decode and normalize camera/library photos before preview and upload.
+  // Native photos commonly exceed the server's 2048px edge limit.
+  const context = ImageManipulator.manipulate(asset.uri);
+  if (Math.max(asset.width, asset.height) > 2048) {
+    context.resize(asset.width >= asset.height ? { width: 2048 } : { height: 2048 });
+  }
+  const rendered = await context.renderAsync();
+  const prepared = await rendered.saveAsync({ format: SaveFormat.JPEG, compress: 0.9 });
+  const nativeFile = Platform.OS === 'web' ? null : new ExpoFile(prepared.uri);
+  const webFile = Platform.OS === 'web' ? await (await fetch(prepared.uri)).blob() : null;
+  const sizeBytes = nativeFile?.size ?? webFile?.size ?? 0;
+  const mimeType = 'image/jpeg';
   if (!Number.isInteger(sizeBytes) || sizeBytes < 1) {
     throw new WingShotMediaAdapterError(
       'invalid_media_size',
@@ -75,13 +85,13 @@ function selectedMediaFromAsset(
     );
   }
   return {
-    uri: asset.uri,
-    fileName: asset.fileName || undefined,
+    uri: prepared.uri,
+    fileName: 'wing-shot.jpg',
     kind,
     mimeType: mimeType.toLowerCase(),
     sizeBytes,
-    width: asset.width || undefined,
-    height: asset.height || undefined,
+    width: prepared.width || undefined,
+    height: prepared.height || undefined,
     getUploadBody: async (signal) => {
       abortIfNeeded(signal);
       if (Platform.OS !== 'web') {
@@ -90,13 +100,13 @@ function selectedMediaFromAsset(
           'Native media is uploaded directly from its local URI.',
         );
       }
-      if (!asset.file) {
+      if (!webFile) {
         throw new WingShotMediaAdapterError(
           'media_reader_unavailable',
           'Browser media bytes are unavailable.',
         );
       }
-      const body = await asset.file.arrayBuffer();
+      const body = await webFile.arrayBuffer();
       abortIfNeeded(signal);
       return body;
     },
@@ -132,7 +142,7 @@ export const expoWingShotMediaAdapter: WingShotMediaAdapter = {
   async takePhoto() {
     try {
       assertPermission(await ImagePicker.requestCameraPermissionsAsync(), 'camera_permission_denied');
-      return firstSelection(
+      return await firstSelection(
         await ImagePicker.launchCameraAsync({
           mediaTypes: ['images'],
           cameraType: ImagePicker.CameraType.back,
@@ -150,7 +160,7 @@ export const expoWingShotMediaAdapter: WingShotMediaAdapter = {
   async chooseFromLibrary() {
     try {
       assertPermission(await ImagePicker.requestMediaLibraryPermissionsAsync(false), 'library_permission_denied');
-      return firstSelection(
+      return await firstSelection(
         await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ['images'],
           allowsMultipleSelection: false,

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from datetime import datetime, timezone
 from io import StringIO
 import json
 import logging
@@ -19,7 +20,7 @@ from ai_client import JalapenoAIClient  # noqa: E402
 from config import initialize_logging, load_configuration  # noqa: E402
 from content_engine.candidate_generator import ContentCandidate  # noqa: E402
 from content_engine import caption_generator as caption_generator_module  # noqa: E402
-from content_engine.caption_generator import AICopyRequiredError, generate_caption_package  # noqa: E402
+from content_engine.caption_generator import AICopyRequiredError, OpenAICopyPlanResult, generate_caption_package  # noqa: E402
 from content_engine.content_ranking import score_caption_overlay_variant  # noqa: E402
 from data_snapshot import generate_latest_snapshot  # noqa: E402
 from openai_client import OpenAIContentClient  # noqa: E402
@@ -28,6 +29,9 @@ from validation import validate_content_engine_environment  # noqa: E402
 
 @pytest.fixture(autouse=True)
 def required_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    # Offline exercises explicitly opt in; require_ai_copy=True still forbids fallback.
+    monkeypatch.setenv("JALAPENO_ALLOW_COPY_FALLBACK", "true")
+    monkeypatch.setattr(caption_generator_module, "_utcnow", lambda: datetime(2026, 7, 10, tzinfo=timezone.utc))
     monkeypatch.setenv("FACEBOOK_PAGE_ID", "facebook-page-id")
     monkeypatch.setenv("INSTAGRAM_BUSINESS_ACCOUNT_ID", "instagram-business-account-id")
     for key in (
@@ -44,6 +48,20 @@ def required_env(monkeypatch: pytest.MonkeyPatch) -> None:
         "META_LONG_LIVED_ACCESS_TOKEN",
     ):
         monkeypatch.delenv(key, raising=False)
+
+
+def _copy_plan(variants, client, failure_reason, raw_content):
+    # Production plans contain repaired, validated variants, not raw API drafts.
+    variants = [caption_generator_module._repair_openai_variant(
+        _candidate(), variant, snapshot={}, external_context={},
+        feedback_summary=caption_generator_module.build_feedback_summary({}, {}), index=index,
+    ) for index, variant in enumerate(variants)]
+    return OpenAICopyPlanResult(
+        variants=variants, client=client, failure_reason=failure_reason,
+        raw_content=raw_content, attempt_count=1, total_latency_ms=0,
+        total_usage={}, last_request_id=None, last_error_category=None,
+        repair_applied=bool(variants),
+    )
 
 
 def _candidate() -> ContentCandidate:
@@ -257,6 +275,7 @@ def test_openai_client_parses_json_in_code_fences_and_prose() -> None:
     class _FakeResponse:
         status_code = 200
         reason = "OK"
+        headers = {}
 
         def json(self) -> dict[str, object]:
             return {
@@ -375,14 +394,14 @@ def test_validate_post_pair_accepts_matched_overlay_and_caption() -> None:
     assert result["caption_overlay_concept"] is not None
 
 
-def test_validate_post_pair_allows_overlay_without_cta_when_it_reinforces_caption() -> None:
+def test_validate_post_pair_rejects_overlay_without_cta_even_when_it_reinforces_caption() -> None:
     result = validate_post_pair(
         "Send this to someone who owes you wings.",
         "YOUR WING CREW",
     )
 
-    assert result["passed"] is True
-    assert result["overlay_reinforces_caption"] is True
+    assert result["passed"] is False
+    assert "overlay:overlay_not_direct_enough" in result["issues"]
 
 
 def test_generate_caption_package_uses_allowed_styles_and_short_caption() -> None:
@@ -434,7 +453,7 @@ def test_generate_caption_package_falls_back_when_primary_caption_is_invalid(mon
     )
     monkeypatch.setattr(
         "content_engine.caption_generator._openai_variant_plan",
-        lambda *args, **kwargs: ([], None, "OpenAI is not configured", None),
+        lambda *args, **kwargs: _copy_plan([], None, "OpenAI is not configured", None),
     )
     monkeypatch.setattr(
         "content_engine.caption_generator._pick_caption",
@@ -449,7 +468,7 @@ def test_generate_caption_package_falls_back_when_primary_caption_is_invalid(mon
 
     assert package.fallback_used is True
     assert package.validation_passed is True
-    assert package.caption_source == "fallback"
+    assert package.caption_source == "template"
     assert package.caption_style in CAPTION_STYLE_ORDER
     assert "main character energy" not in package.caption.lower()
     assert "\n\n" in package.caption
@@ -465,7 +484,7 @@ def test_generate_caption_package_repairs_openai_variant_with_missing_cta(monkey
     monkeypatch.setattr("content_engine.caption_generator._local_variant_plan", lambda *args, **kwargs: [])
     monkeypatch.setattr(
         "content_engine.caption_generator._openai_variant_plan",
-        lambda *args, **kwargs: (
+        lambda *args, **kwargs: _copy_plan(
             [
                 {
                     "source": "openai",
@@ -493,7 +512,8 @@ def test_generate_caption_package_repairs_openai_variant_with_missing_cta(monkey
         require_ai_copy=True,
     )
 
-    assert package.copy_source == "repaired"
+    assert package.copy_source == "openai"
+    assert package.repair_applied is True
     assert package.openai_used is True
     assert len(package.hashtags) == 5
     assert package.caption.count("#") == 5
@@ -507,7 +527,7 @@ def test_generate_caption_package_repairs_banned_voicemail_variant(monkeypatch: 
     monkeypatch.setattr("content_engine.caption_generator._local_variant_plan", lambda *args, **kwargs: [])
     monkeypatch.setattr(
         "content_engine.caption_generator._openai_variant_plan",
-        lambda *args, **kwargs: (
+        lambda *args, **kwargs: _copy_plan(
             [
                 {
                     "source": "openai",
@@ -535,7 +555,8 @@ def test_generate_caption_package_repairs_banned_voicemail_variant(monkeypatch: 
         require_ai_copy=True,
     )
 
-    assert package.copy_source in {"repaired", "fallback"}
+    assert package.copy_source == "openai"
+    assert package.repair_applied is True
     assert "voicemail" not in package.caption.lower()
     assert len(package.hashtags) == 5
     assert validate_caption(package.caption, require_hashtags=True)["passed"] is True
@@ -545,14 +566,14 @@ def test_generate_caption_package_dry_run_fallback_does_not_raise_when_openai_re
     monkeypatch.setattr("content_engine.caption_generator._local_variant_plan", lambda *args, **kwargs: [])
     monkeypatch.setattr(
         "content_engine.caption_generator._openai_variant_plan",
-        lambda *args, **kwargs: ([], None, "all_openai_variants_invalid", "raw response"),
+        lambda *args, **kwargs: _copy_plan([], None, "all_openai_variants_invalid", "raw response"),
     )
 
     package = generate_caption_package(
         _candidate(),
         snapshot={},
         external_context={},
-        require_ai_copy=True,
+        require_ai_copy=False,
     )
 
     assert package.copy_source == "fallback"
@@ -574,7 +595,7 @@ def test_generate_caption_package_uses_fallback_when_openai_missing(monkeypatch:
         _candidate(),
         snapshot={},
         external_context={},
-        require_ai_copy=True,
+        require_ai_copy=False,
     )
 
     assert package.copy_source == "fallback"
@@ -607,6 +628,7 @@ def test_generate_caption_package_logs_openai_request_and_blocks_recent_reuse(
     class _FakeResponse:
         status_code = 200
         reason = "OK"
+        headers = {}
 
         def json(self) -> dict[str, object]:
             return {
@@ -691,8 +713,8 @@ def test_generate_caption_package_logs_openai_request_and_blocks_recent_reuse(
     messages = [record.getMessage() for record in caplog.records]
     assert any("openai_request_started" in message for message in messages)
     assert any("openai_request_succeeded" in message for message in messages)
-    assert any("ai_caption_selected" in message for message in messages)
-    assert any("ai_overlay_selected" in message for message in messages)
+    assert any("creative_pair_caption_finalized" in message for message in messages)
+    assert any("creative_pair_overlay_selected" in message for message in messages)
     assert package.copy_source == "openai"
     assert package.openai_used is True
     assert package.caption != "Send this to someone who owes you wings. #Buffago #BuffaloWings #WingNight #ChickenWings #Foodie"
@@ -819,7 +841,7 @@ def test_ranking_penalizes_recent_repetition() -> None:
     )
     fresh = score_caption_overlay_variant(
         "Tag the friend who would demolish this plate.",
-        "WHO'S EATING\nTHIS WITH YOU?",
+        "TAG YOUR\nWING FRIEND",
         ["#Buffago", "#BuffaloWings", "#WingCrawl", "#CTFood", "#ConnecticutEats"],
         candidate=candidate,
         feedback_summary=feedback_summary,

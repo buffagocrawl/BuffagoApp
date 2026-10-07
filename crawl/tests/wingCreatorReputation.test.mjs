@@ -11,13 +11,13 @@ test('Wing Creator uses Reputation and removes the First Wing Shot chip', () => 
   assert.match(card, /Creator Reputation/);
   assert.doesNotMatch(card, /Creator XP/);
   assert.doesNotMatch(card, /First Wing Shot/);
-  assert.match(card, /creator\.info-button/);
+  assert.match(card, /testID="creator\.info"/);
   assert.match(card, /How Wing Creator works/);
-  assert.match(card, /creator\.info-modal/);
+  assert.match(card, /<Modal[\s\S]*accessibilityViewIsModal/);
   assert.match(card, /<ScrollView/);
   assert.match(card, /Close Wing Creator explanation/);
   assert.match(card, /Got It/);
-  assert.match(card, /paddingBottom: 30/);
+  assert.match(card, /<SafeAreaView style=\{styles\.modalSafeArea\}/);
 });
 
 test('rejection codes always render friendly copy', () => {

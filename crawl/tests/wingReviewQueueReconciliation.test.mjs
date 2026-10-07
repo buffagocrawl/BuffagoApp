@@ -34,7 +34,7 @@ test('Mango exposes pending-review actions and structured transition failures', 
   assert.match(mango, /Reject/);
   assert.match(server, /status_transition/);
   assert.match(server, /status_transition_failed/);
-  assert.match(server, /failure_reason/);
+  assert.match(server, /error_code: error\.code/);
 });
 
 test('manual review remains the only approval path and rejects invalid states', () => {

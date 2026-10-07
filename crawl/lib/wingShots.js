@@ -114,11 +114,14 @@ export function validateWingShotSubmission(input) {
   return input;
 }
 
+let lastSessionTimestamp = 0;
 /** @param {() => string} idFactory */
 export function createWingShotUploadSession(idFactory = createCorrelationId) {
   const correlationId = idFactory();
+  lastSessionTimestamp = Math.max(Date.now(), lastSessionTimestamp + 1);
   return {
     correlationId,
+    createdAt: lastSessionTimestamp,
     state: 'idle',
     reserveIdempotencyKey: `wing-reserve-${idFactory()}`,
     finalizeIdempotencyKey: `wing-finalize-${idFactory()}`,
@@ -454,6 +457,7 @@ export async function submitWingShot({
   onProgress = (_value) => {},
   onStage = (_stage) => {},
   uploadTransport = defaultUploadTransport,
+  onSessionChange = async () => {},
 }) {
   assertClient(client);
   wingShotLog(session?.correlationId ?? 'unknown', 'Upload preparation', {
@@ -498,6 +502,10 @@ export async function submitWingShot({
     );
   }
   session.requestFingerprint = requestFingerprint;
+  if (session.restored && session.reservation) {
+    const recovered = await recoverFinalizedSubmission(client, session.reservation.submissionId);
+    if (recovered) return recovered;
+  }
   throwIfAborted(signal);
   wingShotLog(session.correlationId, 'Photo upload preparation', {
     ...mediaLogContext(input.media),
@@ -589,6 +597,7 @@ export async function submitWingShot({
       bucket: data.bucket,
       uploadPath: data.upload_path,
     };
+    await onSessionChange(session);
   }
   throwIfAborted(signal);
   onProgress(20);
@@ -623,6 +632,7 @@ export async function submitWingShot({
       throw new WingShotClientError('upload_failed', 'Upload interrupted. Try again.', { stage: 'promote', cause: error, retryable: true });
     }
     session.uploadCompleted = true;
+    await onSessionChange(session);
   } else if (!session.uploadCompleted) {
     setUploadState(session, 'uploading');
     onStage('uploading');
@@ -743,7 +753,13 @@ export async function submitWingShot({
   return data;
 }
 
-export function wingShotUserMessage(error) {
+export function wingShotUserMessage(error, { ratingSaved = true } = {}) {
+  const message = wingShotSavedRatingMessage(error);
+  if (ratingSaved) return message;
+  return message.replace(/Your rating (?:is|was|has)(?: already)? saved(?:[.,]|—)?(?:\s*(?:but|and))?\s*/gi, '');
+}
+
+function wingShotSavedRatingMessage(error) {
   const code = String(error?.code ?? '');
   if (code === 'camera_permission_denied') return 'Camera access is needed to record a Wing Shot. Your rating is already saved—allow camera access or choose another option.';
   if (code === 'library_permission_denied' || code === 'permission_denied') return 'Photo library access is needed to choose a Wing Shot. Your rating is already saved—allow access or skip the upload.';

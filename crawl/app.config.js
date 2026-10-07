@@ -1,6 +1,17 @@
 ﻿// app.config.js
 /** @type {import('@expo/config').ExpoConfig} */
-module.exports = ({ config }) => ({
+module.exports = ({ config }) => {
+  // EAS supplies the target for native builds, including production builds.
+  // Config inspection and web exports have no native target and need no Maps key.
+  const mapsVariable = {
+    android: "EXPO_PUBLIC_GOOGLE_ANDROID_API_KEY",
+    ios: "EXPO_PUBLIC_GOOGLE_IOS_API_KEY",
+  }[process.env.EAS_BUILD_PLATFORM];
+  if (mapsVariable && !process.env[mapsVariable]?.trim()) {
+    throw new Error(`Missing ${mapsVariable} for native Maps build`);
+  }
+
+  return ({
   ...config,
   name: "BuffaGo",
   slug: "buffago",
@@ -25,7 +36,7 @@ module.exports = ({ config }) => ({
     associatedDomains: ["applinks:buffago.com"],
   
     config: {
-      googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_API_KEY,
+      googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_IOS_API_KEY,
     },
   
     infoPlist: {
@@ -56,7 +67,7 @@ module.exports = ({ config }) => ({
     config: {
       googleMaps: {
         // Read at build time by RN Maps config plugin
-        apiKey: process.env.EXPO_PUBLIC_GOOGLE_API_KEY,
+        apiKey: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_API_KEY,
       },
     },
 
@@ -144,10 +155,13 @@ module.exports = ({ config }) => ({
 
   extra: {
     ...config.extra,
+    androidMapsConfigured: Boolean(process.env.EXPO_PUBLIC_GOOGLE_ANDROID_API_KEY?.trim()),
+    iosGoogleMapsConfigured: Boolean(process.env.EXPO_PUBLIC_GOOGLE_IOS_API_KEY?.trim()),
     supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL ?? null,
     supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? null,
     eas: { projectId: "f08e790e-af47-4fc1-ba5e-707a0a15f7be" },
   },
 
   userInterfaceStyle: "dark",
-});
+  });
+};

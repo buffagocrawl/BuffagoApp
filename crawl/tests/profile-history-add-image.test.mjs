@@ -7,15 +7,15 @@ const historyPath = path.join(process.cwd(), 'app', 'profile', 'history', 'index
 const history = fs.readFileSync(historyPath, 'utf8');
 
 test('Journey history exposes add-image only for the signed-in owner', () => {
-  assert.match(history, /isViewingSelf && item\.imageEligibilityKnown && item\.imageEligible && !item\.hasMediaSubmission/);
+  assert.match(history, /isViewingSelf && wingShotFlags\.prompt && wingShotFlags\.photo && item\.imageEligibilityKnown && item\.imageEligible && !item\.hasMediaSubmission/);
   assert.match(history, /testID=\{`rating\.add-image\.\$\{item\.id\}`\}/);
-  assert.match(history, /\.from\('wing_media_submissions'\)[\s\S]*?\.eq\('user_id', userId\)/);
+  assert.match(history, /rpc\('get_my_rating_wing_shots'/);
 });
 
 test('Journey add-image reuses the review upload pipeline in photo-only mode', () => {
   assert.match(history, /eligibleRatingId=\{imageRating\.id\}/);
   assert.match(history, /submissionSource="profile"/);
-  assert.match(history, /allowPhoto/);
+  assert.match(history, /allowPhoto=\{wingShotFlags\.prompt && wingShotFlags\.photo\}/);
   assert.doesNotMatch(history, /allowVideo/);
   assert.match(history, /onSubmitted=\{async \(\) =>/);
 });

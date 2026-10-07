@@ -27,6 +27,9 @@ import RatingWizardDialog from '../../../components/RatingWizardDialog';
 import RatingComparisonModal from '../../../components/RatingComparisonModal';
 import { WingShotFlow } from '../../../components/wingShots';
 import { submitWingShot, wingShotUserMessage } from '../../../lib/wingShots.js';
+import { wingShotDrafts } from '../../../lib/wingShotDrafts.js';
+import { resolveRatingPhotoStep } from '../../../lib/photoWorkflowFlags.js';
+import { ratingSaveUserMessage } from '../../../lib/ratingErrors.js';
 import { averageBeforeSubmission } from '../../../lib/ratingComparison.js';
 import { trackEvent } from '../../../lib/analytics';
 import { loadWeeklyMission } from '../../../lib/weeklyMission';
@@ -353,7 +356,7 @@ export default function Home() {
 
   const [session, setSession] = useState(null);
   const isSignedIn = !!session?.user?.id;
-  const { flags: wingShotFlags } = useWingShotsFeatureFlags(isSignedIn);
+  const { flags: wingShotFlags, refresh: refreshPhotoFlags } = useWingShotsFeatureFlags(isSignedIn);
 
   const [activeCrawl, setActiveCrawl] = useState(null);
   const [preloadedFact, setPreloadedFact] = useState('');
@@ -448,6 +451,7 @@ export default function Home() {
   const [homeWingShotDestinationId, setHomeWingShotDestinationId] = useState(null);
   const [homeWingShotSubmitted, setHomeWingShotSubmitted] = useState(false);
   const homeDraftImageRef = useRef(null);
+  const homeImageStepShownRef = useRef(false);
   const draftAttachmentInFlightRef = useRef(false);
   const homePostRatingAdvancedRef = useRef(false);
 
@@ -2343,8 +2347,13 @@ export default function Home() {
   }, [closest?.id, session?.user?.id]);
 
   // ---------- open wizard from Home ----------
+  const homeRatingStartInFlightRef = useRef(false);
+  const [homeRatingStarting, setHomeRatingStarting] = useState(false);
   const openHomeRatingWizard = useCallback(async () => {
-    if (!closest?.id) return;
+    if (!closest?.id || homeRatingStartInFlightRef.current) return;
+    homeRatingStartInFlightRef.current = true;
+    setHomeRatingStarting(true);
+    try {
 
     trackEvent({
       eventName: 'primary_cta_clicked',
@@ -2391,23 +2400,31 @@ export default function Home() {
 
     setHomeRateDest({ id: closest.id, name: closest.name || 'Wing Spot' });
     homeRatingOperationRef.current = Crypto.randomUUID();
+    const previousDraft = await wingShotDrafts.load({ userId: session?.user?.id, flow: 'home-rating' });
+    if (previousDraft) await wingShotDrafts.clear(previousDraft.correlationId);
+    if (homeDraftImageRef.current?.draft) await wingShotDrafts.clear(homeDraftImageRef.current.draft.session.correlationId);
     homeDraftImageRef.current = null;
     if (!homeTagOptions?.length) await loadHomeTagOptions();
-    await trackEvent({
+    void trackEvent({
       eventName: 'rating_started',
       screen: 'home',
       userId: session?.user?.id ?? null,
       destinationId: closest.id,
       metadata: { source: 'closest_restaurant_card', distance_miles: milesAway },
-    });
-    const canCaptureBeforeRating = Boolean(
-      session?.user?.id && wingShotFlags.prompt && wingShotFlags.photo,
-    );
+    }).catch(() => {});
+    let canCaptureBeforeRating;
+    try { canCaptureBeforeRating = Boolean(session?.user?.id) && await resolveRatingPhotoStep(refreshPhotoFlags); }
+    catch { Alert.alert('Photo options unavailable', 'Please try starting your rating again.'); return; }
+    homeImageStepShownRef.current = canCaptureBeforeRating;
     setHomeWingShotDraftMode(canCaptureBeforeRating);
     setHomeWingShotRatingId(null);
     setHomeWingShotDestinationId(canCaptureBeforeRating ? closest.id : null);
     setHomeWingShotVisible(canCaptureBeforeRating);
     setHomeRateOpen(!canCaptureBeforeRating);
+    } finally {
+      homeRatingStartInFlightRef.current = false;
+      setHomeRatingStarting(false);
+    }
   }, [
     closest?.id,
     closest?.name,
@@ -2417,15 +2434,19 @@ export default function Home() {
     alreadyRatedThis,
     homeRated?.score,
     session?.user?.id,
-    wingShotFlags.prompt,
-    wingShotFlags.photo,
+    refreshPhotoFlags,
   ]);
 
   // ---------- save rating from Home wizard ----------
   const attachHomeDraftImage = useCallback(async (draft, ratingId, destinationId) => {
     if (!draft?.media || !draft?.session || !ratingId || draftAttachmentInFlightRef.current) return null;
+    const pending = homeDraftImageRef.current;
     draftAttachmentInFlightRef.current = true;
     try {
+      const persist = () => wingShotDrafts.save({ userId: session?.user?.id, destinationId,
+        flow: 'home-rating', ratingId, ratingOperationId: homeRatingOperationRef.current,
+        lifecycle: 'attaching', draft });
+      await persist();
       const result = await submitWingShot({
         client: supabase,
         input: {
@@ -2439,8 +2460,10 @@ export default function Home() {
           submissionSource: 'rating',
         },
         session: draft.session,
+        onSessionChange: persist,
       });
-      homeDraftImageRef.current = null;
+      await wingShotDrafts.clear(draft.session.correlationId);
+      if (homeDraftImageRef.current === pending) homeDraftImageRef.current = null;
       return result;
     } finally {
       draftAttachmentInFlightRef.current = false;
@@ -2456,6 +2479,38 @@ export default function Home() {
       Alert.alert('Photo still needs attention', wingShotUserMessage(error));
     }
   }, [attachHomeDraftImage]);
+
+  useEffect(() => {
+    let active = true;
+    void (async () => {
+      const auth = await supabase.auth.getSession();
+      if (!session?.user?.id && auth.data?.session?.user?.id) return null;
+      return wingShotDrafts.load({ userId: session?.user?.id, flow: 'home-rating' });
+    })().then((saved) => {
+      if (!active || !saved || homeDraftImageRef.current) return;
+      homeDraftImageRef.current = { draft: saved.draft, ratingId: saved.ratingId, destinationId: saved.destinationId };
+      homeRatingOperationRef.current = saved.ratingOperationId ?? Crypto.randomUUID();
+      Alert.alert('Resume your photo', saved.ratingId ? 'Your rating is saved. Continue attaching your photo.' : 'Continue the rating for your saved photo.', [
+        { text: 'Discard', style: 'cancel', onPress: () => {
+          void wingShotDrafts.clear(saved.correlationId);
+          if (homeDraftImageRef.current?.draft.session.correlationId === saved.correlationId) homeDraftImageRef.current = null;
+        } },
+        { text: 'Continue', onPress: async () => {
+          const current = await wingShotDrafts.load({ userId: session?.user?.id, destinationId: saved.destinationId, flow: 'home-rating' });
+          if (!current || current.correlationId !== saved.correlationId) return;
+          if (current.ratingId) { await retryHomeDraftImage(); return; }
+          setHomeRateDest({ id: current.destinationId, name: 'Saved restaurant' });
+          if (current.draft.consentAccepted && current.draft.attributionPreference) setHomeRateOpen(true);
+          else {
+            setHomeWingShotDestinationId(current.destinationId);
+            setHomeWingShotDraftMode(true);
+            setHomeWingShotVisible(true);
+          }
+        } },
+      ]);
+    }).catch(() => undefined);
+    return () => { active = false; homeDraftImageRef.current = null; };
+  }, [retryHomeDraftImage, session?.user?.id]);
 
   const saveHomeRating = useCallback(
     async (payload) => {
@@ -2545,7 +2600,7 @@ export default function Home() {
       setHomeRateSaving(true);
       try {
       let submittedRatingId = null;
-      const draftImage = homeDraftImageRef.current?.draft ?? null;
+      const draftImage = homeDraftImageRef.current?.destinationId === destId ? homeDraftImageRef.current.draft : null;
       if (uid) {
           let verifiedCoords = coords;
           let verifiedAccuracy = null;
@@ -2566,6 +2621,8 @@ export default function Home() {
           }
           const operationId = homeRatingOperationRef.current ?? Crypto.randomUUID();
           homeRatingOperationRef.current = operationId;
+          if (draftImage) await wingShotDrafts.save({ userId: uid, destinationId: destId, flow: 'home-rating',
+            ratingOperationId: operationId, lifecycle: 'rating', draft: draftImage });
           const { data, error } = await supabase.rpc('submit_validated_restaurant_rating', {
             p_operation_id: operationId,
             p_destination_id: destId,
@@ -2737,7 +2794,7 @@ export default function Home() {
             priorRatingCount: priorCommunity?.length ?? 0,
           }));
         }
-        const canOfferWingShot = Boolean(!draftImage && uid && submittedRatingId && wingShotFlags.prompt && wingShotFlags.photo);
+        const canOfferWingShot = Boolean(!draftImage && !homeImageStepShownRef.current && uid && submittedRatingId && wingShotFlags.prompt && wingShotFlags.photo);
         setHomeWingShotDraftMode(false);
         homePostRatingAdvancedRef.current = false;
         setHomeWingShotSubmitted(false);
@@ -2783,7 +2840,7 @@ export default function Home() {
           },
         });
         console.warn('saveHomeRating failed:', e?.message || e);
-        Alert.alert('Error', e?.message ?? 'Could not save your rating.');
+        Alert.alert('Rating needs attention', ratingSaveUserMessage(e));
       } finally {
         setHomeRateSaving(false);
       }
@@ -3262,8 +3319,8 @@ export default function Home() {
                     contentStyle={{ height: 40 }}
                     uppercase={false}
                     onPress={openHomeRatingWizard}
-                    loading={homeRateSaving}
-                    disabled={homeRateSaving || alreadyRatedThis}
+                    loading={homeRatingStarting || homeRateSaving}
+                    disabled={homeRatingStarting || homeRateSaving || alreadyRatedThis}
                   >
                     {alreadyRatedThis
                     ? `Already Rated`.trim()
@@ -3397,7 +3454,10 @@ export default function Home() {
             visible={homeWingShotVisible}
             draftMode={homeWingShotDraftMode}
             draftResetSignal={homeWingShotDraftResetSignal}
-            onDraftContinue={(draft) => {
+            onDraftContinue={async (draft) => {
+              const saved = await wingShotDrafts.save({ userId: session?.user?.id, destinationId: homeWingShotDestinationId,
+                flow: 'home-rating', ratingOperationId: homeRatingOperationRef.current, lifecycle: 'validated', draft });
+              if (!saved) throw new Error('This photo draft has been replaced.');
               homeDraftImageRef.current = { draft, ratingId: null, destinationId: homeWingShotDestinationId };
               setHomeWingShotVisible(false);
               setHomeWingShotDraftMode(false);

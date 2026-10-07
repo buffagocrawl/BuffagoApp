@@ -63,7 +63,26 @@ Deno.serve(async (request: Request) => {
     return respond(401, { ok: false, error: 'authentication_required' });
   }
 
-  const { data: claims, error: claimError } = await admin.rpc(
+  // The historical claim RPC is intentionally admin-review-only. Owner
+  // previews need a separate requester + submission-owner check before a
+  // conditional, one-time claim; do not broaden the existing admin RPC.
+  const { data: access } = await admin.from('wing_media_access_requests')
+    .select('id,submission_id,requester_id,purpose,status,expires_at,requested_path')
+    .eq('id', payload.request_id).eq('requester_id', authData.user.id).maybeSingle();
+  let ownerClaim = null;
+  if (access?.purpose === 'owner_preview' && access.status === 'pending' && Date.parse(access.expires_at) > Date.now()) {
+    const { data: submission } = await admin.from('wing_media_submissions')
+      .select('id,user_id,media_type,original_storage_path,processed_storage_path,thumbnail_storage_path')
+      .eq('id', access.submission_id).eq('user_id', authData.user.id).maybeSingle();
+    if (submission?.media_type === 'photo' && [submission.original_storage_path, submission.processed_storage_path, submission.thumbnail_storage_path].filter(Boolean).includes(access.requested_path)) {
+      const { data: claimed } = await admin.from('wing_media_access_requests')
+        .update({ status: 'consumed', consumed_at: new Date().toISOString() })
+        .eq('id', access.id).eq('requester_id', authData.user.id).eq('status', 'pending')
+        .gt('expires_at', new Date().toISOString()).select('id').maybeSingle();
+      if (claimed) ownerClaim = { bucket_id: 'wing-submissions', object_path: access.requested_path };
+    }
+  }
+  const { data: claims, error: claimError } = ownerClaim ? { data: [ownerClaim], error: null } : await admin.rpc(
     'claim_wing_media_access_request_for_user',
     {
       p_request_id: payload.request_id,
@@ -72,6 +91,15 @@ Deno.serve(async (request: Request) => {
   );
   const claim = Array.isArray(claims) ? claims[0] : null;
   if (claimError || !claim?.bucket_id || !claim?.object_path) {
+    return respond(404, { ok: false, error: 'preview_unavailable' });
+  }
+
+  // Storage signed URLs are capabilities, so confirm the claimed canonical
+  // object exists before minting one. Never echo the private path to callers.
+  const { data: object, error: objectError } = await admin.storage
+    .from(claim.bucket_id)
+    .download(claim.object_path);
+  if (objectError || !object) {
     return respond(404, { ok: false, error: 'preview_unavailable' });
   }
 

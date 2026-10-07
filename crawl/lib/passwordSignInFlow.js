@@ -36,15 +36,16 @@ export function getPasswordSignInErrorMessage(error) {
 }
 
 /**
- * Runs the complete user-visible password sign-in operation. Callers provide
- * isCurrent so a cancelled, timed-out, or superseded attempt cannot continue
- * into profile work or navigation when a late request eventually resolves.
+ * Time only authentication. A late valid session reconciles via onAuthenticated;
+ * cancelled or superseded attempts cannot navigate. Bootstrap is best effort.
  */
 export async function runPasswordSignInAttempt({
   signIn,
   bootstrapProfile,
   isCurrent = () => true,
   onPhase = () => {},
+  onAuthenticated = () => {},
+  onBootstrapError = () => {},
   timeoutMs,
 }) {
   const requireCurrent = () => {
@@ -64,16 +65,21 @@ export async function runPasswordSignInAttempt({
     onPhase(session ? 'session_present' : 'session_absent');
     if (!session || !user?.id) throw createSessionMissingError();
 
-    try {
-      onPhase('profile_bootstrap_started');
-      await bootstrapProfile(user);
-      onPhase('profile_bootstrap_completed');
-    } catch (error) {
-      onPhase('profile_bootstrap_failed');
-      throw createProfileBootstrapError();
-    }
     requireCurrent();
-    return { session, user };
+    // A valid session is the authentication boundary, including a late response.
+    // Navigation happens before profile work; bootstrap cannot reject login.
+    onAuthenticated({ session, user });
+    const bootstrap = Promise.resolve().then(async () => {
+      onPhase('profile_bootstrap_started');
+      try {
+        await bootstrapProfile?.(user);
+        onPhase('profile_bootstrap_completed');
+      } catch (error) {
+        onPhase('profile_bootstrap_failed');
+        onBootstrapError(error);
+      }
+    });
+    return { session, user, bootstrap };
   };
 
   return withPasswordAuthTimeout(operation(), timeoutMs);

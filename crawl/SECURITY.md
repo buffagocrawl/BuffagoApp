@@ -6,13 +6,38 @@ Values prefixed with `EXPO_PUBLIC_` are bundled into the mobile app and must be 
 
 `OPENAI_API_KEY` and `SUPABASE_SERVICE_ROLE_KEY` must live only in backend environments such as Supabase Edge Function secrets. Mobile app code must call Edge Functions for privileged work instead of calling OpenAI or using service role credentials directly.
 
-`EXPO_PUBLIC_GOOGLE_API_KEY` is compiled into client JavaScript whenever app
-code references it. It must never be a server/web-service credential. Use
-separate Google keys per platform and environment, with API restrictions plus
-the matching Android package/certificate, iOS bundle ID, or web referrer
-restriction. Client calls to Google Maps Platform web-service endpoints should
-go through an authenticated server proxy unless the endpoint's documented
-mobile restriction headers are implemented and verified.
+Native Maps credentials are read from EAS environment variables:
+
+- `EXPO_PUBLIC_GOOGLE_ANDROID_API_KEY`: Android apps restriction, package
+  `com.buffago.app`, Google Play App Signing SHA-1, Maps SDK for Android only.
+- `EXPO_PUBLIC_GOOGLE_IOS_API_KEY`: iOS apps restriction, bundle ID
+  `com.buffago.app`, Maps SDK for iOS only.
+
+EAS native builds (including production) fail config evaluation when the target's
+key is absent or blank, using `EAS_BUILD_PLATFORM`. Config inspection and Expo
+exports without a native build target do not require these keys. For local
+native build validation, set `EAS_BUILD_PLATFORM` to `android` or `ios`.
+Errors name the missing variable and never print its value. Store actual values
+in Expo/EAS or ignored local environment files; never commit real values.
+
+Walking Directions temporarily reads `EXPO_PUBLIC_GOOGLE_API_KEY` in
+`utils/walkRoute.js`; it will move server-side separately. Platform restrictions
+can reject these web-service requests; errors return no route and do not block
+Maps. Do not loosen native Maps key restrictions to enable Directions.
+Moving Directions behind a backend/Edge Function remains a follow-up.
+
+Shared-variable occurrence classification after this rotation:
+
+- Native Android Maps: build-time read; iOS uses its own variable.
+- `utils/walkRoute.js`: Directions credential read, with controlled failure.
+- `.env.example`, `README.md`, and this file: setup documentation.
+- `tests/google-maps-config.test.mjs`: placeholder-only configuration regression.
+- Repository `artifacts/security/google-api-key-investigation/` and
+  `docs/reviews/serrano-cayenne-final-review-20260724/secret-findings-register.md`:
+  historical investigation records describing the previous configuration.
+- Repository `artifacts/cayenne/release-e2e/build-logs/`,
+  `artifacts/release-smoke-final.log`, and `output/launch-video/expo-web.log`:
+  historical build/export logs naming the environment variable.
 
 Run `npm run security:scan` from `crawl/` before committing. Generated Expo
 exports under `crawl/output/` and `output/buffaverse-web-correction/` are

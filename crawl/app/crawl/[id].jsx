@@ -22,6 +22,10 @@ import { trackEvent } from '../../lib/analytics';
 import RatingWizardDialog from '../../components/RatingWizardDialog';
 import RatingComparisonModal from '../../components/RatingComparisonModal';
 import { WingShotFlow } from '../../components/wingShots';
+import { submitWingShot, wingShotUserMessage } from '../../lib/wingShots.js';
+import { wingShotDrafts } from '../../lib/wingShotDrafts.js';
+import { resolveRatingPhotoStep } from '../../lib/photoWorkflowFlags.js';
+import { ratingSaveUserMessage } from '../../lib/ratingErrors.js';
 import { averageBeforeSubmission } from '../../lib/ratingComparison.js';
 import { recordSavedRatingMission, resolvedDeviceTimezone } from '../../lib/engagement/ratingMissionTracking.js';
 import { useLocationCtx } from '../../providers/LocationProvider';
@@ -642,7 +646,7 @@ export default function CrawlScreen() {
 
   const isAdmin = session?.user?.id === ADMIN_ID;
   const isSignedIn = !!session?.user?.id;
-  const { flags: wingShotFlags } = useWingShotsFeatureFlags(isSignedIn);
+  const { flags: wingShotFlags, refresh: refreshPhotoFlags } = useWingShotsFeatureFlags(isSignedIn);
 
   // rating wizard (component owned)
   const [rateVisible, setRateVisible] = useState(false);
@@ -652,6 +656,9 @@ export default function CrawlScreen() {
   const [eligibleWingShotRatingId, setEligibleWingShotRatingId] = useState(null);
   const [wingShotSubmitted, setWingShotSubmitted] = useState(false);
   const postRatingAdvancedRef = useRef(false);
+  const crawlDraftImageRef = useRef(null);
+  const crawlImageStepShownRef = useRef(false);
+  const crawlImageAttachmentInFlightRef = useRef(false);
 
   // preflight proximity overlay (shows BEFORE rating modal)
   const [preflightVisible, setPreflightVisible] = useState(false);
@@ -934,7 +941,7 @@ export default function CrawlScreen() {
   const openRating = async (dest) => {
     setActiveDest(dest);
     loadTagsForDestination(dest.id);
-    await trackEvent({
+    void trackEvent({
       eventName: 'rating_started',
       screen: 'crawl',
       userId: session?.user?.id ?? null,
@@ -942,10 +949,16 @@ export default function CrawlScreen() {
       crawlId: crawl?.crawl_id ?? null,
       routeId: crawl?.route_id ?? null,
       metadata: { source: 'crawl_stop', stop_order: dest?.ord ?? null },
-    });
-    const canCaptureBeforeRating = Boolean(
-      session?.user?.id && wingShotFlags.prompt && (wingShotFlags.photo || wingShotFlags.video),
-    );
+    }).catch(() => {});
+    let canCaptureBeforeRating;
+    try { canCaptureBeforeRating = Boolean(session?.user?.id) && await resolveRatingPhotoStep(refreshPhotoFlags); }
+    catch { Alert.alert('Photo options unavailable', 'Please try starting your rating again.'); return; }
+    const saved = await wingShotDrafts.load({ userId: session?.user?.id, destinationId: dest.id, flow: `crawl-rating:${crawl?.crawl_id}` });
+    const previousDraft = await wingShotDrafts.load({ userId: session?.user?.id, flow: `crawl-rating:${crawl?.crawl_id}` });
+    if (!saved && previousDraft) await wingShotDrafts.clear(previousDraft.correlationId);
+    if (crawlDraftImageRef.current?.draft && !saved) await wingShotDrafts.clear(crawlDraftImageRef.current.draft.session.correlationId);
+    crawlDraftImageRef.current = saved ? { draft: saved.draft, ratingId: saved.ratingId, destinationId: saved.destinationId, userId: saved.userId } : null;
+    crawlImageStepShownRef.current = canCaptureBeforeRating;
     setWingShotDraftMode(canCaptureBeforeRating);
     setEligibleWingShotRatingId(null);
     setWingShotVisible(canCaptureBeforeRating);
@@ -1021,9 +1034,10 @@ export default function CrawlScreen() {
         }
       }
 
-      setPreflightVisible(false);
+      setPreflightMsg('Loading photo options…');
       await openRating(dest);
     } finally {
+      setPreflightVisible(false);
       setTimeout(() => {
         pressingRef.current = false;
       }, 500);
@@ -1047,6 +1061,68 @@ export default function CrawlScreen() {
   };
 
   /** Save rating (called from wizard Finalize) */
+  const attachCrawlDraftImage = useCallback(async (pending) => {
+    if (!pending?.ratingId || crawlImageAttachmentInFlightRef.current) return;
+    crawlImageAttachmentInFlightRef.current = true;
+    try {
+      const persist = () => wingShotDrafts.save({ ...pending, flow: `crawl-rating:${crawl.crawl_id}`, lifecycle: 'attaching' });
+      await persist();
+      await submitWingShot({
+        client: supabase,
+        input: { userId: pending.userId, ratingId: pending.ratingId, destinationId: pending.destinationId,
+          media: pending.draft.media, consentAccepted: pending.draft.consentAccepted,
+          attributionPreference: pending.draft.attributionPreference, caption: pending.draft.caption,
+          submissionSource: 'rating' },
+        session: pending.draft.session,
+        onSessionChange: persist,
+      });
+      await wingShotDrafts.clear(pending.draft.session.correlationId);
+      if (crawlDraftImageRef.current === pending) crawlDraftImageRef.current = null;
+    } finally {
+      crawlImageAttachmentInFlightRef.current = false;
+    }
+  }, [crawl?.crawl_id]);
+
+  useEffect(() => {
+    if (!crawl?.crawl_id || !session?.user?.id || !routeMeta.stops?.length) return;
+    let active = true;
+    void wingShotDrafts.load({ userId: session.user.id, flow: `crawl-rating:${crawl.crawl_id}` }).then(async (saved) => {
+      if (!active || !saved || crawlDraftImageRef.current) return;
+      const dest = routeMeta.stops.find((stop) => stop.id === saved.destinationId);
+      if (!dest) return;
+      let ratingId = saved.ratingId;
+      if (!ratingId && ['rating', 'attaching'].includes(saved.lifecycle)) {
+        const found = await supabase.from('destination_ratings').select('id')
+          .eq('user_id', session.user.id).eq('crawl_id', crawl.crawl_id).eq('destination_id', dest.id).maybeSingle();
+        if (found.error) return;
+        ratingId = found.data?.id ?? null;
+      }
+      if (!active) return;
+      const pending = { draft: saved.draft, ratingId, destinationId: dest.id, userId: session.user.id };
+      crawlDraftImageRef.current = pending;
+      Alert.alert('Resume your photo', ratingId ? 'Continue attaching the photo to your saved rating.' : 'Continue rating this crawl stop.', [
+        { text: 'Discard', style: 'cancel', onPress: () => {
+          void wingShotDrafts.clear(saved.correlationId);
+          if (crawlDraftImageRef.current === pending) crawlDraftImageRef.current = null;
+        } },
+        { text: 'Continue', onPress: async () => {
+          const current = await wingShotDrafts.load({ userId: session.user.id, destinationId: dest.id, flow: `crawl-rating:${crawl.crawl_id}` });
+          if (!current || current.correlationId !== saved.correlationId) return;
+          if (ratingId) {
+            await attachCrawlDraftImage(pending).catch((error) => Alert.alert('Photo still needs attention', wingShotUserMessage(error)));
+            return;
+          }
+          setActiveDest(dest);
+          loadTagsForDestination(dest.id);
+          crawlImageStepShownRef.current = true;
+          setWingShotDraftMode(true);
+          setWingShotVisible(true);
+        } },
+      ]);
+    }).catch(() => undefined);
+    return () => { active = false; crawlDraftImageRef.current = null; };
+  }, [attachCrawlDraftImage, crawl?.crawl_id, routeMeta.stops, session?.user?.id]);
+
   const saveRating = async (wizard) => {
     if (!activeDest || !crawl?.crawl_id) return;
 
@@ -1103,6 +1179,8 @@ export default function CrawlScreen() {
       };
 
       if (userId) {
+        if (crawlDraftImageRef.current?.draft) await wingShotDrafts.save({ userId, destinationId: activeDest.id,
+          flow: `crawl-rating:${crawl.crawl_id}`, lifecycle: 'rating', draft: crawlDraftImageRef.current.draft });
         try {
           const [{ data: destProfile }, { data: priorRows }] = await Promise.all([
             supabase
@@ -1454,7 +1532,20 @@ export default function CrawlScreen() {
       if (awards.length) showAwards(awards);
 
       setRateVisible(false);
-      const canOfferWingShot = Boolean(userId && submittedRatingId && wingShotFlags.prompt && (wingShotFlags.photo || wingShotFlags.video));
+      const draft = crawlDraftImageRef.current?.destinationId === activeDest.id ? crawlDraftImageRef.current.draft : null;
+      if (draft && submittedRatingId) {
+        const pending = { draft, ratingId: submittedRatingId, destinationId: activeDest.id, userId };
+        crawlDraftImageRef.current = pending;
+        try {
+          await attachCrawlDraftImage(pending);
+        } catch (imageError) {
+          Alert.alert('Rating saved', wingShotUserMessage(imageError), [
+            { text: 'Retry photo', onPress: () => { void attachCrawlDraftImage(pending).catch((retryError) => Alert.alert('Photo still needs attention', wingShotUserMessage(retryError))); } },
+            { text: 'Continue', style: 'cancel' },
+          ]);
+        }
+      }
+      const canOfferWingShot = Boolean(!crawlImageStepShownRef.current && userId && submittedRatingId && wingShotFlags.prompt && wingShotFlags.photo);
       setWingShotDraftMode(false);
       postRatingAdvancedRef.current = false;
       setWingShotSubmitted(false);
@@ -1487,7 +1578,7 @@ export default function CrawlScreen() {
           error_message: e?.message || String(e),
         },
       });
-      Alert.alert('Save failed', e.message ?? String(e));
+      Alert.alert('Rating needs attention', ratingSaveUserMessage(e));
     } finally {
       setSaving(false);
     }
@@ -2306,7 +2397,11 @@ export default function CrawlScreen() {
               visible={wingShotVisible}
               draftMode={wingShotDraftMode}
               draftResetSignal={wingShotDraftResetSignal}
-              onDraftContinue={() => {
+              onDraftContinue={async (draft) => {
+                const saved = await wingShotDrafts.save({ userId: session?.user?.id, destinationId: activeDest?.id,
+                  flow: `crawl-rating:${crawl?.crawl_id}`, lifecycle: 'validated', draft });
+                if (!saved) throw new Error('This photo draft has been replaced.');
+                crawlDraftImageRef.current = { draft, destinationId: activeDest?.id };
                 setWingShotVisible(false);
                 setWingShotDraftMode(false);
                 setRateVisible(true);
@@ -2315,7 +2410,6 @@ export default function CrawlScreen() {
               destinationId={activeDest?.id}
               submissionSource="rating"
               allowPhoto={wingShotFlags.photo}
-              allowVideo={wingShotFlags.video}
               analyticsContext={{
                 screen: 'crawl',
                 userId: session?.user?.id ?? null,

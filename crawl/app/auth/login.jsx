@@ -128,10 +128,37 @@ export default function EmailAuthScreen() {
   const mountedRef = useRef(true);
   const attemptRef = useRef(0);
   const busyRef = useRef(false);
+  const passwordRequestPendingRef = useRef(false);
+  const navigatedRef = useRef(false);
+  const cancelledRef = useRef(false);
+
+  const acceptSession = (user) => {
+    if (!mountedRef.current || navigatedRef.current || cancelledRef.current) return;
+    navigatedRef.current = true;
+    setSnack({ open: false, msg: '' });
+    setBusy(false);
+    router.replace('/(tabs)/home');
+    // Bootstrap is detached from the auth timeout and screen lifetime. Retry
+    // once after a transient failure, only while the same user is signed in.
+    void Promise.resolve().then(async () => {
+      try { await afterAuthSuccess(user); return; }
+      catch { console.warn('[password-auth] profile bootstrap failed; retrying account setup'); }
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const { data } = await supabase.auth.getUser();
+      if (data?.user?.id !== user.id) return;
+      try { await afterAuthSuccess(user); }
+      catch { console.warn('[password-auth] account setup retry failed'); }
+    }).catch(() => console.warn('[password-auth] account setup retry unavailable'));
+  };
 
   useEffect(() => {
     mountedRef.current = true;
+    // Never await Supabase work inside its auth listener (it holds the auth lock).
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user?.id) Promise.resolve().then(() => acceptSession(session.user));
+    });
     return () => {
+      subscription.unsubscribe();
       mountedRef.current = false;
       attemptRef.current += 1;
       busyRef.current = false;
@@ -434,7 +461,8 @@ export default function EmailAuthScreen() {
       return;
     }
 
-    if (busyRef.current) return;
+    if (busyRef.current || passwordRequestPendingRef.current || navigatedRef.current) return;
+    cancelledRef.current = false;
     const attemptId = attemptRef.current + 1;
     attemptRef.current = attemptId;
     const isCurrent = () => mountedRef.current && attemptRef.current === attemptId;
@@ -447,8 +475,12 @@ export default function EmailAuthScreen() {
       // Analytics must never hold the visible authentication operation open.
       void trackEvent({ eventName: 'auth_started', screen: 'auth/login', metadata: { auth_method: 'password' } }).catch(() => {});
       const { user } = await runPasswordSignInAttempt({
-        signIn: () => supabase.auth.signInWithPassword({ email, password }),
-        bootstrapProfile: afterAuthSuccess,
+        signIn: async () => {
+          passwordRequestPendingRef.current = true;
+          try { return await supabase.auth.signInWithPassword({ email, password }); }
+          finally { passwordRequestPendingRef.current = false; }
+        },
+        onAuthenticated: ({ user }) => { if (isCurrent()) acceptSession(user); },
         isCurrent,
         onPhase: passwordAuthDiagnostic,
       });
@@ -456,9 +488,9 @@ export default function EmailAuthScreen() {
 
       passwordAuthDiagnostic('navigation_requested');
       console.info('[cayenne-auth] submit_completed', { outcome: 'session_received', duration_ms: Date.now() - submittedAt });
-      router.replace('/(tabs)/home');
+      acceptSession(user);
     } catch (e) {
-      if (!isCurrent()) return;
+      if (!isCurrent() || navigatedRef.current) return;
       if (e?.code === 'PASSWORD_AUTH_TIMEOUT') passwordAuthDiagnostic('attempt_timed_out');
       console.info('[cayenne-auth] submit_completed', { outcome: 'error', duration_ms: Date.now() - submittedAt });
       show(getPasswordSignInErrorMessage(e));
@@ -472,6 +504,7 @@ export default function EmailAuthScreen() {
   };
 
   const cancelPasswordAttempt = () => {
+    cancelledRef.current = true;
     if (busyRef.current) {
       attemptRef.current += 1;
       busyRef.current = false;

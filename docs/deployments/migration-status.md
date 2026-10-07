@@ -56,6 +56,7 @@ remote deployment; verify the remote migration ledger before applying them.
 | 20260731010940_wing_finalize_processing_job_idempotency_recovery.sql | candidate | not applied here | source-contract validated; production transaction validation pending | Wing Shot processing-job idempotency and stranded reservation recovery | 634d91fcac98b1441ef05387a29d46b2552c5a91e2b87c16f66aa384fd290ba7 |
 | 20260731013034_wing_review_only_finalization.sql | candidate | not applied here | source-contract validated; production transaction validation pending | Wing Shot validate-upload-review-only finalization | 4fe419a09722631f5e3061f405f324f60bd012014c11dde02573c7cd65f063d6 |
 | 20260802143027_wing_shots_photo_only_upload_enforcement.sql | applied | vhfxnizaxdanmvmouuaf | source-contract validated; deployed and remotely verified; no production data changes | Enforce photo-only user uploads while preserving legacy video records | 7ab9c5f6d9c556a1756f31794d7d7c7a0619393f34957795a3b28c427ecc24ce |
+| 20261007000241_image_workflow_rc_regression.sql | applied | vhfxnizaxdanmvmouuaf | focused PostgreSQL lifecycle/RLS tests and scoped live security smoke passed; exact ledger version verified | Add exact-byte validation receipts and restore image finalization, private preview, public gallery, and abandoned-original cleanup contracts | 4527dee61824d89a477400f0c62bde9b178b77c3b0d52aa638d7222df46b7f94 |
 
 
 The exact deployment order is: Strategy B baseline preflight, the retention

@@ -17,6 +17,7 @@ import {
   HelperText,
 } from 'react-native-paper';
 import MapView, { Marker, PROVIDER_GOOGLE } from '../../lib/platformMap';
+import { mapCoordinate } from '../../lib/mapSafety';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../../lib/supabase.js';
 import { useLocationCtx } from '../../providers/LocationProvider';
@@ -704,7 +705,7 @@ export default function RoutesIndex() {
     const items = (filtered || [])
       .map((r) => {
         const first = r.stops?.[0];
-        if (first?.lat != null && first?.lng != null) {
+        if (mapCoordinate(first)) {
           return {
             route: r,
             coord: { latitude: Number(first.lat), longitude: Number(first.lng) },
@@ -717,14 +718,7 @@ export default function RoutesIndex() {
     setAllMarkers(items);
     setOpenAllMap(true);
 
-    requestAnimationFrame(() => {
-      if (allMapRef.current && items.length >= 2) {
-        allMapRef.current.fitToCoordinates(items.map((i) => i.coord), {
-          edgePadding: { top: 60, right: 60, bottom: 60, left: 60 },
-          animated: false,
-        });
-      }
-    });
+    // The shared map fits current valid markers only after onMapReady.
   }, [filtered]);
 
   /* ---------- render item ---------- */

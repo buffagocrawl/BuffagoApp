@@ -400,6 +400,7 @@ def test_dry_run_logs_optional_post_type_for_manual_dispatch(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    monkeypatch.setenv("JALAPENO_ALLOW_COPY_FALLBACK", "true")
     monkeypatch.setenv("POST_TYPE", "video")
     monkeypatch.setenv("GITHUB_ACTIONS", "true")
     monkeypatch.setenv("GITHUB_EVENT_NAME", "workflow_dispatch")
@@ -841,7 +842,11 @@ def test_buffago_prompt_variety_rotates_across_candidates() -> None:
     assert len(scene_types) >= 3
 
 
-def test_candidate_overlays_include_questions_but_not_only_questions() -> None:
+def test_candidate_overlays_include_questions_but_not_only_questions(monkeypatch: pytest.MonkeyPatch) -> None:
+    from uuid import UUID
+    from itertools import count
+    ids = count(1)
+    monkeypatch.setattr("content_engine.candidate_generator.uuid4", lambda: UUID(int=next(ids)))
     generator = CandidateGenerator(ContentEngineSettings(candidate_count_min=5, candidate_count_max=10, preferred_candidate_count=7))
     candidates = generator.generate_candidates(
         snapshot={
@@ -874,7 +879,8 @@ def test_candidate_overlays_include_questions_but_not_only_questions() -> None:
     assert question_count < len(overlays)
 
 
-def test_content_engine_validation_runs_dry_run_without_posting(tmp_path: Path) -> None:
+def test_content_engine_validation_runs_dry_run_without_posting(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("JALAPENO_ALLOW_COPY_FALLBACK", "true")
     config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
     snapshot = generate_latest_snapshot(output_path=tmp_path / "latest_snapshot.json").snapshot
     external_context = {
@@ -917,7 +923,8 @@ def test_content_engine_validation_runs_dry_run_without_posting(tmp_path: Path) 
     assert "content_saved" in stream.getvalue()
 
 
-def test_content_engine_validation_targets_meme_schedule(tmp_path: Path) -> None:
+def test_content_engine_validation_targets_meme_schedule(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("JALAPENO_ALLOW_COPY_FALLBACK", "true")
     config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
     snapshot = generate_latest_snapshot(output_path=tmp_path / "latest_snapshot.json").snapshot
     external_context = {
@@ -951,7 +958,8 @@ def test_content_engine_validation_targets_meme_schedule(tmp_path: Path) -> None
     assert result.result["winner"]["content_type"] == "meme"
 
 
-def test_content_engine_validation_targets_buffago_schedule(tmp_path: Path) -> None:
+def test_content_engine_validation_targets_buffago_schedule(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("JALAPENO_ALLOW_COPY_FALLBACK", "true")
     config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
     snapshot = generate_latest_snapshot(output_path=tmp_path / "latest_snapshot.json").snapshot
     external_context = {
@@ -1067,7 +1075,8 @@ def test_image_asset_insert_removes_binary_metadata() -> None:
     assert source_details["response_id"] == "img_123"
 
 
-def test_content_engine_validation_creates_run_before_related_rows(tmp_path: Path) -> None:
+def test_content_engine_validation_creates_run_before_related_rows(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("JALAPENO_ALLOW_COPY_FALLBACK", "true")
     config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
     snapshot = generate_latest_snapshot(output_path=tmp_path / "latest_snapshot.json").snapshot
     external_context = {
@@ -1101,7 +1110,8 @@ def test_content_engine_validation_creates_run_before_related_rows(tmp_path: Pat
     assert "jalapeno_content_decisions" in client.insert_order
 
 
-def test_content_engine_validation_logs_failed_persistence_when_candidate_insert_fails(tmp_path: Path) -> None:
+def test_content_engine_validation_logs_failed_persistence_when_candidate_insert_fails(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("JALAPENO_ALLOW_COPY_FALLBACK", "true")
     config = load_configuration(env_path=PROJECT_DIR / ".missing-test-env", config_path=PROJECT_DIR / "config.yaml")
     snapshot = generate_latest_snapshot(output_path=tmp_path / "latest_snapshot.json").snapshot
     external_context = {

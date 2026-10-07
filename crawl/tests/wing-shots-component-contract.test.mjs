@@ -75,7 +75,8 @@ test('production adapter requests permissions only inside user actions', () => {
     adapter,
     /async chooseFromLibrary\([^)]*\)[\s\S]*requestMediaLibraryPermissionsAsync/,
   );
-  assert.match(adapter, /new ExpoFile\(asset\.uri\)/);
+  assert.match(adapter, /new ExpoFile\(prepared\.uri\)/);
+  assert.match(adapter, /ImageManipulator\.manipulate\(asset\.uri\)/);
   assert.match(adapter, /arrayBuffer\(\)/);
   assert.match(adapter, /mediaTypes: \['images'\]/);
 });

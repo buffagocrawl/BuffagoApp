@@ -3,7 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
 
 const BUCKET = 'wing-shot-staging';
 const MAX = { photo: 20 * 1024 * 1024 };
-const MIMES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic']);
+const MIMES = new Set(['image/jpeg', 'image/png']);
 const headers = { 'content-type': 'application/json', 'cache-control': 'no-store' };
 const correlation = (request, body = {}) => String(request.headers.get('x-wing-correlation-id') || body.correlationId || 'unknown');
 const json = (status, body) => new Response(JSON.stringify(body), { status, headers });
@@ -37,7 +37,12 @@ Deno.serve(async (request) => {
   // function can return a controlled response. Auth still verifies the caller
   // token against this project; the token is passed explicitly to getUser.
   const authClient = createClient(supabaseUrl, anonKey, { auth: { autoRefreshToken: false, persistSession: false } });
-  const { data: authData, error: authError } = await authClient.auth.getUser(token);
+  let authData, authError;
+  try {
+    ({ data: authData, error: authError } = await authClient.auth.getUser(token));
+  } catch {
+    return fail(request, 'authorization_unavailable', 'Authentication is temporarily unavailable. Try again.', 503, body);
+  }
   if (authError || !authData?.user?.id) {
     log('authorization_rejected', { correlation_id: correlationId, stage: 'staging_authorization', http_status: 401, reason_code: 'authentication_required', auth_boundary: 'function', auth_source: 'getUser', project_ref: projectRef(supabaseUrl), request_dispatched: true, auth_error_code: authError?.code || null });
     return fail(request, 'authentication_required', 'Please sign in again to upload your Wing Shot.', 401, body);
@@ -49,14 +54,33 @@ Deno.serve(async (request) => {
     const kind = body.mediaType;
     const mime = String(body.mimeType || '').toLowerCase();
     const size = Number(body.fileSizeBytes);
-    if (kind !== 'photo' || !MIMES.has(mime)) return fail(request, 'unsupported_format', 'Only JPEG, PNG, WebP, or HEIC photos are supported.', 400, body);
+    if (kind !== 'photo' || !MIMES.has(mime)) return fail(request, 'unsupported_format', 'Only JPEG or PNG photos are supported.', 400, body);
     if (!/^[0-9a-f-]{36}$/i.test(String(body.correlationId || '')) || String(body.correlationId) !== correlationId) return fail(request, 'invalid_correlation_id', 'The upload correlation identifier is invalid.', 400, body);
     if (!Number.isInteger(size) || size < 1) return fail(request, 'invalid_media_size', 'The media size could not be verified.', 400, body);
     if (size > MAX[kind]) return fail(request, 'file_too_large', 'This media is too large to upload.', 413, body);
-    const extension = cleanName(body.fileName).split('.').pop()?.toLowerCase() || 'jpg';
-    if (!['jpg', 'jpeg', 'png', 'webp', 'heic'].includes(extension)) return fail(request, 'unsupported_format', 'This photo format is not supported.', 400, body);
+    const safeName = cleanName(body.fileName);
+    const mimeExtension = { 'image/jpeg': 'jpg', 'image/png': 'png' }[mime];
+    const extension = safeName.includes('.') ? safeName.split('.').pop()?.toLowerCase() : mimeExtension;
+    if (!['jpg', 'jpeg', 'png'].includes(extension)) return fail(request, 'unsupported_format', 'This photo format is not supported.', 400, body);
+    // Check the caller's current server cohort on every new staging request.
+    // Cached mobile flags and direct endpoint calls cannot start an upload after rollback.
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+    let flags, flagError;
+    try {
+      ({ data: flags, error: flagError } = await userClient.rpc('get_wing_shots_feature_flags'));
+    } catch {
+      return fail(request, 'authorization_unavailable', 'Upload availability could not be verified. Try again.', 503, body);
+    }
+    if (flagError || !Array.isArray(flags)) return fail(request, 'authorization_unavailable', 'Upload availability could not be verified. Try again.', 503, body);
+    const enabled = (key) => flags.some((flag) => flag.flag_key === key && flag.enabled_for_user === true);
+    if (!enabled('wing_shot_prompt') || !enabled('wing_shot_photo_upload')) {
+      return fail(request, 'wing_shot_photo_upload_disabled', 'Photo uploads are currently unavailable.', 403, body);
+    }
     const admin = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'));
-    const objectPath = `${user.id}/${correlationId}/${cleanName(body.fileName)}`;
+    const objectPath = `${user.id}/${correlationId}/${safeName.includes('.') ? safeName : `${safeName}.${extension}`}`;
     const { data, error } = await admin.storage.from(BUCKET).createSignedUploadUrl(objectPath, { upsert: false });
     if (error || !data?.signedUrl) {
       log('authorization_failed', { correlation_id: correlationId, stage: 'staging_authorization', http_status: 503, reason_code: 'upload_authorization_failed', auth_boundary: 'function', user_id: user.id, project_ref: projectRef(supabaseUrl), request_dispatched: true });

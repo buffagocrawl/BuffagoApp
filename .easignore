@@ -6,6 +6,11 @@ Agents/
 .worktrees/
 .vs/
 .tmp/
+# Generated native projects must be regenerated from app.config.js on EAS.
+# Including local Android sources can bypass Maps key injection during prebuild.
+crawl/android/
+crawl/ios/
+crawl/output/
 tmp/
 artifacts/
 evidence/

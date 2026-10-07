@@ -6,8 +6,9 @@ import { wingShotUserMessage, WingShotClientError } from '../lib/wingShots.js';
 const flow = fs.readFileSync(new URL('../components/wingShots/WingShotFlow.tsx', import.meta.url), 'utf8');
 
 test('camera and library selections start one guarded validation pass', () => {
-  assert.match(flow, /acceptMedia\(await mediaAdapter\.takePhoto\(\)\)/);
-  assert.match(flow, /acceptMedia\(\s*await mediaAdapter\.chooseFromLibrary/);
+  assert.match(flow, /await mediaAdapter\.takePhoto\(\)/);
+  assert.match(flow, /await mediaAdapter\.chooseFromLibrary/);
+  assert.match(flow, /acceptMedia\(selected\)/);
   assert.match(flow, /void validateSelectedMedia\(selected\)/);
   assert.match(flow, /validationAbortRef\.current\?\.abort\(\)/);
   assert.match(flow, /sequence !== validationSequenceRef\.current/);
