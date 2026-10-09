@@ -40,6 +40,7 @@ class ProcessingContext:
     processed_path: str
     thumbnail_path: str
     correlation_id: UUID
+    preserve_approval: bool = False
 
     @classmethod
     def from_payload(cls, payload: object) -> "ProcessingContext":
@@ -53,11 +54,14 @@ class ProcessingContext:
             processed_path=str(payload["processed_path"]),
             thumbnail_path=str(payload["thumbnail_path"]),
             correlation_id=UUID(str(payload["correlation_id"])),
+            preserve_approval=payload.get("preserve_approval", False),
         )
         context.validate()
         return context
 
     def validate(self) -> None:
+        if not isinstance(self.preserve_approval, bool):
+            raise ValueError("invalid approval preservation flag")
         submission = str(self.submission_id)
         if self.media_type not in {"photo", "video"}:
             raise ValueError("unsupported media type")

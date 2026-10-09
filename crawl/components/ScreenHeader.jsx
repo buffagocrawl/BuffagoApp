@@ -18,7 +18,7 @@ export default function ScreenHeader({
       <View style={styles.headerTopRow}>
         {leftContent ? <View style={styles.leftContent}>{leftContent}</View> : null}
         <View style={styles.textBlock}>
-          <Text variant="headlineSmall" style={[styles.title, titleStyle]}>
+          <Text variant="titleLarge" style={[styles.title, titleStyle]}>
             {title}
           </Text>
           {subtitle ? (
@@ -37,13 +37,13 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 16,
     paddingTop: 12,
-    paddingBottom: 4,
+    paddingBottom: 8,
   },
   headerTopRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 12,
+    gap: 8,
   },
   textBlock: {
     flex: 1,
@@ -53,16 +53,16 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   subtitle: {
-    opacity: 0.7,
+    opacity: 0.8,
     marginTop: 2,
   },
   rightContent: {
     flexShrink: 0,
-    alignSelf: 'flex-start',
+    alignSelf: 'center',
   },
   leftContent: {
     flexShrink: 0,
-    alignSelf: 'flex-start',
+    alignSelf: 'center',
     marginLeft: -8,
   },
 });

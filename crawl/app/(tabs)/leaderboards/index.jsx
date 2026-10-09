@@ -1,6 +1,6 @@
 // app/(tabs)/leaderboards/index.jsx
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Pressable, Image  } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Image  } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Text,
@@ -28,6 +28,8 @@ import {
 import { useSocialBadges } from '../../../hooks/useSocialBadges';
 import FriendsPanel from '../../../components/FriendsPanel';
 import FeedbackState from '../../../components/ui/FeedbackState';
+import { SectionHeader, WingShotImage, LoadingSkeleton, FilterChips } from '../../../components/ui/OperationUI';
+import { loadWingdexRestaurantGallery } from '../../../lib/wingdexGallery';
 import CreatorLeaderboardPanel from '../../../components/creator/CreatorLeaderboardPanel';
 import { ENABLE_EMPTY_FEED_LAUNCHPAD, ENABLE_SHARE_INVITE_LOOP } from '../../../config/features';
 
@@ -261,7 +263,7 @@ const LeaderCard = ({ title, items, formatValue, formatSub, onView, onUserPress,
 
   return (
     <Card style={[styles.card, { backgroundColor: cardBg }]}>
-      <Card.Title title={title} titleVariant="titleMedium" titleStyle={{ color: titleColor }} />
+      <Card.Title title={title} titleNumberOfLines={0} titleVariant="titleMedium" titleStyle={{ color: titleColor }} />
       <Card.Content style={{ gap: 10 }}>
         {top3.length === 0 ? (
           <Text style={[styles.muted, { color: theme.colors.onSurface }]}>
@@ -290,59 +292,9 @@ const LeaderCard = ({ title, items, formatValue, formatSub, onView, onUserPress,
   );
 };
 
-const TogglePills = ({ options, value, onChange, size = 'sm' }) => {
-  const theme = useTheme();
-  const surface = theme.colors.elevation?.level1 ?? (theme.dark ? '#1f1f1f' : '#ffffff');
-  const active = theme.colors.primary;
-  const text = theme.colors.onSurface;
-
-  const isLg = size === 'lg';
-
-  return (
-    <View
-      style={[
-        styles.pillsWrap,
-        {
-          backgroundColor: surface,
-          alignSelf: isLg ? 'stretch' : 'flex-start',
-          width: isLg ? '100%' : undefined,
-        },
-      ]}
-    >
-      {options.map((opt) => {
-        const isActive = opt.value === value;
-        const isDisabled = !!opt.disabled;
-        return (
-          <Pressable
-            key={opt.value}
-            onPress={() => (!isDisabled ? onChange(opt.value) : null)}
-            style={[
-              styles.pill,
-              isLg ? styles.pillLg : null,
-              {
-                backgroundColor: isActive ? active : 'transparent',
-                opacity: isDisabled ? 0.45 : 1,
-                flex: isLg ? 1 : undefined,
-                minWidth: isLg ? 0 : styles.pill.minWidth,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.pillText,
-                isLg ? styles.pillTextLg : null,
-                { color: isActive ? theme.colors.onPrimary : text },
-              ]}
-              numberOfLines={1}
-            >
-              {opt.label}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-};
+const TogglePills = ({ options, value, onChange }) => (
+  <FilterChips options={options} value={value} onChange={onChange} />
+);
 
 // ---------- screen ----------
 export default function Leaderboards() {
@@ -429,6 +381,24 @@ export default function Leaderboards() {
   const [feedLoading, setFeedLoading] = useState(false);
   const [feedError, setFeedError] = useState('');
   const [feedRows, setFeedRows] = useState([]);
+  const [restaurantShots, setRestaurantShots] = useState({});
+
+  // Only approved public restaurant media crosses this existing gallery boundary.
+  useEffect(() => {
+    if (mode !== 'feed') return;
+    const ids = Array.from(new Set(feedRows.map((row) => row.destination_id).filter(Boolean))).filter((id) => !(String(id) in restaurantShots));
+    if (!ids.length) return;
+    let cancelled = false;
+    Promise.all(ids.map(async (id) => {
+      try {
+        const gallery = await loadWingdexRestaurantGallery(id, supabase);
+        return [String(id), gallery.images?.[0]?.signed_url || null];
+      } catch { return [String(id), null]; }
+    })).then((entries) => {
+      if (!cancelled) setRestaurantShots((current) => ({ ...current, ...Object.fromEntries(entries) }));
+    });
+    return () => { cancelled = true; };
+  }, [feedRows, mode, restaurantShots]);
   const [feedPage, setFeedPage] = useState(0);
   const [feedHasMore, setFeedHasMore] = useState(true);
 
@@ -979,11 +949,11 @@ export default function Leaderboards() {
   }, [lbScope, viewerId]);
 
   // ---------- names ----------
-  const nameOf = (uid) => {
+  const nameOf = useCallback((uid) => {
     const meta = usersMap.get(uid);
     const nm = meta?.username?.trim?.();
     return nm && nm.length > 0 ? nm : `Winglet_${String(uid || '').slice(0, 6)}`;
-  };
+  }, [usersMap]);
   const xpOf = (uid) => usersMap.get(uid)?.xp ?? 0;
   const levelOf = (uid) => usersMap.get(uid)?.level ?? null;
 
@@ -1191,56 +1161,41 @@ export default function Leaderboards() {
 
   // ---------- Social Feed row render ----------
   const renderFeedRow = (row, idx) => {
-  const uname = (row?.username || '').trim() || `Winglet_${String(row?.user_id || '').slice(0, 6)}`;
-  const destName = row?.destination_name || 'Unknown spot';
-  const city = row?.destination_city ? ` • ${row.destination_city}` : '';
-  const isToken = !!row?.is_buffacoin;
-
-  const score = typeof row?.weight_score === 'number' ? row.weight_score : null;
-  const scoreText = score != null ? `${score.toFixed(1)}` : '—';
-
-  return (
-      <TouchableOpacity
-        key={`${row?.created_at || idx}-${row?.user_id || idx}-${row?.destination_id || idx}`}
-        style={styles.feedRow}
-        activeOpacity={0.75}
-        onPress={() => openRatingDetails(row)}
-      >
-        <Avatar.Text
-          size={34}
-          label={initials(uname)}
-          onPress={() => goToJourney(row?.user_id, 'social_feed')}
-          style={{
-            backgroundColor: theme.colors.elevation?.level1 ?? (theme.dark ? '#2a2a2a' : '#f1f3f5'),
-          }}
-        />
-        <View style={{ flex: 1, gap: 2 }}>
-          <View style={styles.feedTopLine}>
-            <Text style={[styles.feedUser, { color: textColor }]} numberOfLines={1}>
-              {uname}
-            </Text>
-            <Text style={[styles.feedTime, { color: textColor }]} numberOfLines={1}>
-              {fmtShortDate(row?.created_at)}
-            </Text>
+    const uname = (row?.username || '').trim() || 'Winglet_' + String(row?.user_id || '').slice(0, 6);
+    const score = typeof row?.weight_score === 'number' ? row.weight_score : null;
+    const shotUri = restaurantShots[String(row?.destination_id)];
+    return (
+      <Card key={String(row?.created_at || idx) + '-' + String(row?.user_id || idx) + '-' + String(row?.destination_id || idx)}
+        mode="outlined" style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outlineVariant }]}
+        onPress={() => openRatingDetails(row)}>
+        <Card.Content style={{ gap: 10 }}>
+          <View style={styles.feedRow}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel={'View ' + uname + ' profile'}
+              onPress={() => goToJourney(row?.user_id, 'social_feed')} style={{ minWidth: 44, minHeight: 44, justifyContent: 'center' }}>
+              <Avatar.Text size={36} label={initials(uname)} style={{ backgroundColor: theme.colors.surfaceVariant }} />
+            </TouchableOpacity>
+            <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
+              <Text style={[styles.feedUser, { color: textColor }]}>{uname}</Text>
+              <Text style={[styles.feedTime, { color: theme.colors.onSurfaceVariant }]}>{fmtShortDate(row?.created_at)}</Text>
+            </View>
+            <View style={[styles.feedScorePill, { backgroundColor: theme.colors.surfaceVariant }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                {row?.is_buffacoin ? <TokenIcon size={18} /> : null}
+                <Text style={[styles.feedScore, { color: theme.colors.primary }]}>{score != null ? score.toFixed(1) : '\u2014'}</Text>
+              </View>
+              <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>Score</Text>
+            </View>
           </View>
-
-            <Text style={[styles.feedDest, { color: textColor }]} numberOfLines={2}>
-            <Text style={{ fontWeight: '800' }}>{destName}</Text>
-            {city}
-          </Text>
-        </View>
-        <View
-          style={[
-            styles.feedScorePill,
-            { backgroundColor: theme.colors.elevation?.level1 ?? 'rgba(255,255,255,0.06)' },
-          ]}
-        >
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            {isToken ? <TokenIcon size={18} /> : null}
-            <Text style={[styles.feedScore, { color: theme.colors.onSurface }]}>{scoreText}</Text>
+          <View style={{ gap: 6 }}>
+            <Text variant="titleSmall" style={{ fontWeight: '700', color: textColor }}>{row?.destination_name || 'Unknown spot'}{row?.destination_city ? ` · ${row.destination_city}` : ''}</Text>
+            {shotUri ? <WingShotImage uri={shotUri} approved style={{ width: '100%', height: undefined, aspectRatio: 16 / 9, borderRadius: 12 }} /> : null}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
+              {shotUri ? <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>Restaurant Wing Shot</Text> : null}
+              <Text variant="labelSmall" style={{ color: theme.colors.primary }}>View rating</Text>
+            </View>
           </View>
-        </View>
-      </TouchableOpacity>
+        </Card.Content>
+      </Card>
     );
   };
 
@@ -1290,10 +1245,10 @@ export default function Leaderboards() {
 
   // ---------- render ----------
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={styles.scroll}>
+    <SafeAreaView edges={['top', 'left', 'right']} style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scroll}>
         <View style={styles.headerWrap}>
-          <Text variant="headlineSmall" style={[styles.title, { color: textColor }]}>
+          <Text variant="titleLarge" style={[styles.title, { color: textColor }]}>
             Social
           </Text>
 
@@ -1302,8 +1257,8 @@ export default function Leaderboards() {
             value={mode}
             onChange={(v) => setMode(v)}
             options={[
-              { label: 'Social Feed', value: 'feed' },
-              { label: 'Leaderboards', value: 'leaderboards' },
+              { label: 'Feed', value: 'feed' },
+              { label: 'Leaderboard', value: 'leaderboards' },
               { label: socialBadges.total ? `Friends (${socialBadges.total})` : 'Friends', value: 'friends' },
             ]}
           />
@@ -1335,20 +1290,15 @@ export default function Leaderboards() {
             ) : null}
 
             {feedLoading && (feedRows?.length || 0) === 0 ? (
-              <View style={{ alignItems: 'center', padding: 24 }}>
-                <ActivityIndicator />
-                <Text style={{ marginTop: 8, color: textColor }}>Loading the latest wing action…</Text>
-              </View>
+              <View style={{ gap: 12 }}><LoadingSkeleton height={150} /><LoadingSkeleton height={150} /></View>
             ) : null}
 
             {showNewAppEmpty ? (
               <Card style={[styles.card, { backgroundColor: theme.colors.elevation?.level2 ?? (theme.dark ? '#1f1f1f' : '#fff') }]}>
                 <Card.Content style={{ gap: 10 }}>
                   <Text style={[styles.emptyTitle, { color: textColor }]}>Nothing yet in {stateName}…</Text>
-                  <Text style={{ color: textColor, opacity: 0.85, lineHeight: 20 }}>
-                    BuffaGo is still new — but once word spreads, this feed is going to be 🔥.
-                    {'\n\n'}
-                    Be the first to make it pop: get out, rate some wings… and tell your friends.
+                  <Text style={{ color: theme.colors.onSurfaceVariant, lineHeight: 20 }}>
+                    Discover a nearby spot and share your first wing rating.
                   </Text>
                   {ENABLE_EMPTY_FEED_LAUNCHPAD ? (
                     <>
@@ -1375,39 +1325,17 @@ export default function Leaderboards() {
             ) : null}
 
             {(feedRows?.length || 0) > 0 ? (
-              <Card style={[styles.card, { backgroundColor: theme.colors.elevation?.level2 ?? (theme.dark ? '#1f1f1f' : '#fff') }]}>
-                <Card.Title
-                  title={
-                    feedScope === 'all'
-                      ? 'Latest Ratings'
-                      : feedScope === 'friends'
-                      ? 'Latest from Wing Friends'
-                      : `Latest in ${stateName}`
-                  }
-                  titleVariant="titleMedium"
-                  titleStyle={{ color: textColor }}
-                />
-                <Card.Content style={{ gap: 10 }}>
-                  {feedRows.map(renderFeedRow)}
-
-                  <View style={{ height: 4 }} />
-
-                  {feedHasMore ? (
-                    <Button
-                      mode="contained-tonal"
-                      onPress={() => fetchFeedPage({ reset: false })}
-                      style={{ borderRadius: 14 }}
-                      loading={feedLoading}
-                      disabled={feedLoading}
-                    >
-                      Load more
-                    </Button>
-                  ) : (
-                    <Text style={{ color: textColor, opacity: 0.7, textAlign: 'center' }}>That’s the latest for now 🐔</Text>
-                  )}
-                </Card.Content>
-              </Card>
+              <View style={{ gap: 10 }}>
+                <SectionHeader title={feedScope === 'all' ? 'Latest wing ratings' : feedScope === 'friends' ? 'From your Wing Friends' : 'Latest in ' + stateName} />
+                {feedRows.map(renderFeedRow)}
+                {feedHasMore ? <Button mode="outlined" onPress={() => fetchFeedPage({ reset: false })}
+                  loading={feedLoading} disabled={feedLoading} style={{ borderRadius: 12 }}>Load more</Button>
+                  : <Text style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center' }}>All caught up</Text>}
+              </View>
             ) : null}
+            {feedScope === 'all' && !feedLoading && !feedError && !feedRows.length ? <FeedbackState compact icon="food-drumstick-outline"
+              title="Your wing community starts here" body="Public wing ratings will appear here. Discover a spot and share your first rating."
+              actionLabel="Browse Wingdex" onAction={() => router.push('/(tabs)/ratings')} /> : null}
             {feedScope === 'friends' && !feedLoading && !feedError && !feedRows.length ? (
               <FeedbackState
                 compact
@@ -1694,12 +1622,12 @@ export default function Leaderboards() {
 }
 
 const styles = StyleSheet.create({
-  scroll: { padding: 20, gap: 14 },
+  scroll: { padding: 16, paddingBottom: 24, gap: 12 },
   headerWrap: { gap: 12 },
   subHeaderWrap: { gap: 10 },
   title: { fontWeight: '800' },
 
-  card: { borderRadius: 18, elevation: 1 },
+  card: { borderRadius: 16, elevation: 0, borderWidth: 1 },
   muted: { opacity: 0.7 },
 
   // Pills

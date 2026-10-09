@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { PGlite as BundledPGlite } from '@electric-sql/pglite';
+import { edgeRuntime } from './helpers/edge-runtime.mjs';
+import { normalizeWingdexGalleryResponse } from '../lib/wingdexGallery.js';
 
 const modulePath = process.env.BUFFAGO_QA_PGLITE_MODULE;
 const read = (path) => readFileSync(new URL(path, import.meta.url), 'utf8');
@@ -80,6 +82,30 @@ test('real PostgreSQL image lifecycle boundaries', async (t) => {
       const row = (await db.query('select * from wing_media_submissions')).rows[0];
       assert.equal(row.rating_id,rating); assert.equal(row.destination_id,destination); assert.equal(row.user_id,user);
       assert.equal((await db.query('select status from wing_submission_upload_intents')).rows[0].status,'finalized');
+    });
+    await check('normal review-first upload and approval reproduces original-only gallery compatibility gap', async () => {
+      await finalize();
+      await db.exec('set role service_role');
+      const approved=(await db.query('select mango_review_wing_submission($1,$2,$3,$4,$5,$6,$7) result',
+        [submission,'approve','standard_acceptable','Controlled upload pipeline fixture',otherUser,'gallery-fixture-approval',correlation])).rows[0].result;
+      assert.equal(approved.status,'approved');
+      await db.exec('reset role');
+      assert.equal((await db.query('select count(*)::int n from wing_processing_jobs')).rows[0].n,0);
+      const legacy=(await db.query('select get_wing_public_gallery($1,true) result',[[destination]])).rows[0].result[0];
+      assert.equal(legacy.picture_count,1); assert.equal(legacy.images[0].storage_path,path);
+      // Real SQL-produced fixture, passed through the actual proposed Edge handler.
+      const rows=(await db.query("select *,0 as like_count,0 as dislike_count, null as owner_deleted_at,'v1' as consent_version,now() as consented_at from wing_media_submissions")).rows;
+      const client={from:()=>{
+        let selected=rows;
+        return {select(){return this;},in(k,v){selected=selected.filter(row=>v.includes(row[k]));return this;},
+          eq(k,v){selected=selected.filter(row=>row[k]===v);return this;},order(){return this;},
+          is(k,v){selected=selected.filter(row=>row[k]==v);return this;},not(k,_op,v){selected=selected.filter(row=>row[k]!=v);return this;},
+          async range(start,end){return {data:selected.slice(start,end+1),error:null};}};
+      },storage:{from(){throw new Error('Original-only fixture must never be signed');}}};
+      const result=await edgeRuntime('wing-public-gallery',client)({destination_ids:[destination],include_covers:true});
+      assert.equal(result.status,200);
+      const normalized=normalizeWingdexGalleryResponse(result.body)[destination];
+      assert.equal(normalized.count,0); assert.equal(normalized.approvedSubmissionCount,1); assert.deepEqual(normalized.images,[]);
     });
     await check('duplicate finalization keys produce one media row and one transition', async () => {
       await finalize(); await finalize(); await finalize('different-retry-key');

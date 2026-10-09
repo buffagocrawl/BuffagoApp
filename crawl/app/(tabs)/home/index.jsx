@@ -10,9 +10,10 @@ import {
   Pressable,
   DeviceEventEmitter,
   Linking,
+  useWindowDimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { operationTabBarStyle } from '../../../src/theme/operationTokens';
 import { Text, Button, useTheme, Dialog, Portal, Avatar, TextInput } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useFocusEffect, useNavigation } from 'expo-router';
@@ -20,6 +21,8 @@ import * as Crypto from 'expo-crypto';
 import * as Location from 'expo-location';
 import WingmanAddDialog from '../../../components/WingmanAddDialog';
 import FeedbackState from '../../../components/ui/FeedbackState';
+import { PlayerProgressCard, StatCard, WingShotImage, ProgressBar } from '../../../components/ui/OperationUI';
+import { loadWingdexRestaurantGallery } from '../../../lib/wingdexGallery';
 import WelcomeWizard from '../../../components/WelcomeWizard';
 import { supabase } from '../../../lib/supabase.js';
 import DestinationPickerWizard from '../../../components/DestinationPickerWizard';
@@ -142,14 +145,14 @@ const findNearestStateAbbrev = async (coords) => {
       if (d?.lat == null || d?.lng == null || d?.state_id == null) continue;
       const distPickM = haversine(lat0, lng0, Number(d.lat), Number(d   .lng)); // for “nearest to basis”
       const distDisplayM = haversine(lat0, lng0, Number(d.lat), Number(d.lng));
-      
+
       if (!best || distPickM < best._pickDistanceM) {
         best = {
           id: d.id,
           state_id: d.state_id, // ✅ THIS is the missing piece
           lat: d.lat ?? null,
           lng: d.lng ?? null,
-      
+
           distanceM: distDisplayM,
           _pickDistanceM: distPickM,
         };
@@ -217,30 +220,8 @@ async function hydrateSelectedRouteFromDb(sel) {
   }
 }
 
-/**
- * Small XP bar
- */
-function XpPepperBar({ progress = 0, label = '' }) {
-  const p = Math.max(0, Math.min(1, Number(progress) || 0));
-  return (
-    <View style={styles.xpOuter}>
-      <View style={styles.xpVisual} pointerEvents="none">
-        <View style={styles.xpBase}>
-          <View style={[styles.xpFill, { width: `${p * 100}%` }]} />
-          {!!label && (
-            <View style={styles.xpTextOverlay}>
-              <Text style={styles.xpText} numberOfLines={1}>
-                {label}
-              </Text>
-            </View>
-          )}
-        </View>
-      </View>
-    </View>
-  );
-}
-
 function DailyGiftPill({ claimed, claiming, onPress }) {
+  const theme = useTheme();
   if (claimed) return null;
 
   return (
@@ -255,7 +236,7 @@ function DailyGiftPill({ claimed, claiming, onPress }) {
       ]}
     >
       <Text style={styles.dailyPillEmoji}>🎁</Text>
-      <Text style={styles.dailyPillText}>{claiming ? '…' : '+10 Daily XP'}</Text>
+      <Text style={[styles.dailyPillText, { color: theme.colors.onSurface }]}>{claiming ? '…' : '+10 Daily XP'}</Text>
     </Pressable>
   );
 }
@@ -314,8 +295,11 @@ function StatLine({ label, done, onPress, rightText, prefix }) {
 }
 
 export default function Home() {
-  const tabBarHeight = useBottomTabBarHeight();
-  const { colors, dark } = useTheme();
+  const { width: viewportWidth, fontScale } = useWindowDimensions();
+  const stackedSpotActions = viewportWidth < 360 || fontScale > 1.15;
+  const safeInsets = useSafeAreaInsets();
+  const theme = useTheme();
+  const { colors } = theme;
   const router = useRouter();
   const navigation = useNavigation();
   const { coords, status, refreshPosition } = useLocationCtx();
@@ -343,9 +327,10 @@ export default function Home() {
   const [ratingComparisonData, setRatingComparisonData] = useState(null);
 
   useEffect(() => {
-    navigation.setOptions({ tabBarStyle: ratingComparisonVisible ? { display: 'none' } : undefined });
-    return () => navigation.setOptions({ tabBarStyle: undefined });
-  }, [navigation, ratingComparisonVisible]);
+    const tabStyle = operationTabBarStyle(theme, safeInsets.bottom);
+    navigation.setOptions({ tabBarStyle: ratingComparisonVisible ? { display: 'none' } : tabStyle });
+    return () => navigation.setOptions({ tabBarStyle: tabStyle });
+  }, [navigation, ratingComparisonVisible, theme, safeInsets.bottom]);
 
   // Top 50 cache
   const [top50Ids, setTop50Ids] = useState([]);
@@ -366,6 +351,25 @@ export default function Home() {
   // Closest Restaurant + Picker
   const [closestLoading, setClosestLoading] = useState(false);
   const [closest, setClosest] = useState(null);
+  const [featuredPhoto, setFeaturedPhoto] = useState(null);
+  const [featuredPhotoLoading, setFeaturedPhotoLoading] = useState(false);
+  const [featuredRatingCount, setFeaturedRatingCount] = useState(null);
+  useEffect(() => {
+    let active = true;
+    setFeaturedPhoto(null);
+    setFeaturedPhotoLoading(Boolean(closest?.id));
+    setFeaturedRatingCount(null);
+    if (closest?.id) {
+      // The existing public gallery enforces approval and visibility server-side.
+      void loadWingdexRestaurantGallery(closest.id, supabase).then((gallery) => {
+        if (active) setFeaturedPhoto({ destinationId: closest.id, uri: gallery.images[0]?.signed_url || null });
+      }).catch(() => { if (active) setFeaturedPhoto({ destinationId: closest.id, uri: null, unavailable: true }); }).finally(() => { if (active) setFeaturedPhotoLoading(false); });
+      void supabase.from('destination_ratings').select('id', { count: 'exact', head: true }).eq('destination_id', closest.id).then(({ count, error }) => {
+        if (active && !error && typeof count === 'number') setFeaturedRatingCount(count);
+      }).catch(() => {});
+    }
+    return () => { active = false; };
+  }, [closest?.id]);
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -1004,6 +1008,30 @@ export default function Home() {
     },
     [coords, status]
   );
+
+  // Only refresh the distance text for the current closest card.
+  const refreshClosestDistanceOnly = useCallback(() => {
+    try {
+      if (status !== 'granted') return;
+
+      const userLat = coords?.latitude != null ? Number(coords.latitude) : null;
+      const userLng = coords?.longitude != null ? Number(coords.longitude) : null;
+      if (userLat == null || userLng == null) return;
+
+      const destLat = closest?.lat != null ? Number(closest.lat) : null;
+      const destLng = closest?.lng != null ? Number(closest.lng) : null;
+      if (destLat == null || destLng == null) return;
+
+      const distDisplayM = haversine(userLat, userLng, destLat, destLng);
+
+      setClosest((prev) => {
+        if (!prev) return prev;
+        return { ...prev, distanceM: distDisplayM };
+      });
+    } catch (e) {
+      console.warn('refreshClosestDistanceOnly failed:', e?.message || e);
+    }
+  }, [status, coords?.latitude, coords?.longitude, closest?.lat, closest?.lng]);
 
   const reloadPreferredFromStorage = useCallback(async () => {
     try {
@@ -1912,7 +1940,6 @@ export default function Home() {
     ]
   );
 
-  const xpBarLabel = hudStats.xp != null && hudStats.xpMax != null ? `XP ${hudStats.xp}/${hudStats.xpMax}` : '';
   const shownTitle = titleOverride?.title || hudStats.levelTitle;
   const titleIsClickable = isSignedIn && Number(hudStats.level || 0) >= 2;
 
@@ -1936,8 +1963,6 @@ export default function Home() {
 
   const top50Pct = useMemo(() => clamp01(top50X / 50), [top50X]);
 
-  const hudBarColor = '#2E7D32';
-  const hudBaseBg = dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
 
   // Closest Restaurant logic
   const getBasisCoords = useCallback(() => {
@@ -2021,30 +2046,6 @@ export default function Home() {
     const sub = DeviceEventEmitter.addListener(HOME_NEXT_SPOT_EVENT, applyHomeNextSpot);
     return () => sub.remove();
   }, [applyHomeNextSpot]);
-
-  // Only refresh the distance text for the current closest card.
-  const refreshClosestDistanceOnly = useCallback(() => {
-    try {
-      if (status !== 'granted') return;
-  
-      const userLat = coords?.latitude != null ? Number(coords.latitude) : null;
-      const userLng = coords?.longitude != null ? Number(coords.longitude) : null;
-      if (userLat == null || userLng == null) return;
-  
-      const destLat = closest?.lat != null ? Number(closest.lat) : null;
-      const destLng = closest?.lng != null ? Number(closest.lng) : null;
-      if (destLat == null || destLng == null) return;
-  
-      const distDisplayM = haversine(userLat, userLng, destLat, destLng);
-  
-      setClosest((prev) => {
-        if (!prev) return prev;
-        return { ...prev, distanceM: distDisplayM };
-      });
-    } catch (e) {
-      console.warn('refreshClosestDistanceOnly failed:', e?.message || e);
-    }
-  }, [status, coords?.latitude, coords?.longitude, closest?.lat, closest?.lng]);
 
   const refreshClosest = useCallback(async () => {
   if (status !== 'granted') return;
@@ -2135,17 +2136,17 @@ export default function Home() {
 
   useEffect(() => {
     if (status !== 'granted') return;
-  
+
     // If nothing selected yet, pick one on first grant
     if (!closest?.id) {
       refreshClosest();
       return;
     }
-  
+
     // If searchOverride changes, it's ok to re-pick
     refreshClosest();
   }, [status, searchOverride?.latitude, searchOverride?.longitude, refreshClosest, closest?.id]);
-  
+
   useEffect(() => {
   if (status !== 'granted') return;
   refreshClosestDistanceOnly();
@@ -2380,9 +2381,9 @@ export default function Home() {
 
     const ADMIN_ID = '23898359-306a-4dd3-91f0-da66da19ccfc';
     const isAdmin = session?.user?.id === ADMIN_ID;
-    
+
     const milesAway = closest?.distanceM != null ? metersToMiles(closest.distanceM) : null;
-    
+
     if (!isAdmin && (milesAway == null || milesAway > 0.1)) {
       trackEvent({
         eventName: 'rating_validation_failed',
@@ -2962,16 +2963,16 @@ export default function Home() {
   const pickSearchResult = useCallback(
     async (row) => {
       if (!row?.id) return;
-  
+
       const lat = row?.lat != null ? Number(row.lat) : null;
       const lng = row?.lng != null ? Number(row.lng) : null;
-  
+
       // 1) Immediately lock the Home card to the picked restaurant
       const distM =
         coords?.latitude != null && coords?.longitude != null && lat != null && lng != null
           ? haversine(Number(coords.latitude), Number(coords.longitude), lat, lng)
           : null;
-  
+
       manualClosestRef.current = true;
       await trackEvent({
         eventName: 'restaurant_search_result_selected',
@@ -3005,7 +3006,7 @@ export default function Home() {
         lng,
         distanceM: distM,
       });
-  
+
       // 2) Optional: keep override for suggestion logic only
       // If you want suggestions to be based around the picked town spot, keep this.
       // If you do not want that, delete this block.
@@ -3018,7 +3019,7 @@ export default function Home() {
             }
           : null
       );
-  
+
       closeRestaurantSearch();
     },
     [closeRestaurantSearch, coords?.latitude, coords?.longitude, session?.user?.id]
@@ -3072,10 +3073,11 @@ export default function Home() {
 
   return (
     <LocationGate>
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <SafeAreaView edges={['top', 'left', 'right']} style={{ flex: 1, backgroundColor: colors.background }}>
         <ScrollView
-          contentContainerStyle={[styles.scroll, { paddingBottom: tabBarHeight + 12 }]}
+          contentContainerStyle={[styles.scroll, { paddingBottom: 16 }]}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
           {/* Header */}
           <View style={styles.headerRow}>
@@ -3102,18 +3104,20 @@ export default function Home() {
                     testID={`home-social-${platform}`}
                     hitSlop={12}
                   >
-                    <MaterialCommunityIcons name={icon} size={11} color={BUFFAGO_ORANGE} />
+                    <MaterialCommunityIcons name={icon} size={18} color={BUFFAGO_ORANGE} />
                   </Pressable>
                 );
               })}
             </View>
 
+            <View style={styles.logo} pointerEvents="none" accessibilityLabel="BuffaGo">
             <Image
               source={require('../../../assets/images/buffago-logo.png')}
               resizeMode="contain"
-              style={styles.logo}
+              style={{ width: 84, height: 84, position: 'absolute', top: -20 }}
               pointerEvents="none"
             />
+            </View>
 
             <View style={styles.rightCluster}>
               <Pressable
@@ -3124,7 +3128,7 @@ export default function Home() {
                 style={[styles.circleButton, !canShowWelcomeWizard && { opacity: 0.3 }]}
                 hitSlop={12}
               >
-                <MaterialCommunityIcons name="help-circle-outline" size={11} color={BUFFAGO_ORANGE} />
+                <MaterialCommunityIcons name="help-circle-outline" size={18} color={BUFFAGO_ORANGE} />
               </Pressable>
               <Pressable
                 accessibilityRole="button"
@@ -3134,7 +3138,7 @@ export default function Home() {
                 hitSlop={12}
               >
                 {isSignedIn && session?.user?.user_metadata?.avatar_url ? (
-                  <Avatar.Image size={15} source={{ uri: session.user.user_metadata.avatar_url }} />
+                  <Avatar.Image size={24} source={{ uri: session.user.user_metadata.avatar_url }} />
                 ) : (
                   <Avatar.Icon
                     size={15}
@@ -3175,87 +3179,18 @@ export default function Home() {
             />
           ) : null}
 
-          {/* Signed-in: Level row */}
           {isSignedIn ? (
-            <View style={styles.levelRow}>
-              <View style={styles.levelHeaderRow}>
-                <Pressable
-                  onPress={titleIsClickable ? openTitlePicker : undefined}
-                  disabled={!titleIsClickable}
-                  style={({ pressed }) => [
-                    styles.titlePressable,
-                    pressed && titleIsClickable && { transform: [{ scale: 0.99 }] },
-                    !titleIsClickable && { opacity: 0.95 },
-                  ]}
-                >
-                  <Text style={styles.levelLine} numberOfLines={1}>
-                    Lvl {hudStats.level ?? '—'}
-                    {shownTitle ? ` • ${shownTitle}` : ''}
-                  </Text>
-
-                  {titleIsClickable ? <Text style={styles.titleHint}>Tap to see unlocked titles</Text> : null}
-                </Pressable>
+            <>
+              <PlayerProgressCard level={hudStats.level} title={shownTitle} xp={hudStats.xp} target={hudStats.xpMax} progress={hudStats.levelPct ?? 0}
+                onTitlePress={titleIsClickable ? openTitlePicker : undefined}
+                action={<DailyGiftPill claimed={!!dailyGift.claimedToday} claiming={!!dailyGift.claiming} onPress={() => claimDaily(session.user.id)} />} />
+              <View style={styles.counterRow}>
+                <StatCard style={{ paddingVertical: 8, gap: 2, minWidth: 120 }} icon="map-marker" label={hudStats.stateAbbrev ? hudStats.stateAbbrev + ' Wingdex' : 'State Wingdex'} value={(hudStats.stateX ?? '?') + '/' + (hudStats.stateY ?? '?')} onPress={() => openStats('ct')} progress={statePct} />
+                <StatCard style={{ paddingVertical: 8, gap: 2, minWidth: 120 }} icon="trophy" label="Top 50 US" value={top50X + '/50'} onPress={() => openStats('us_top50')} progress={top50Pct} />
+                <StatCard style={{ paddingVertical: 8, gap: 2, minWidth: 120 }} icon="flag" label="States visited" value={(hudStats.statesX ?? '?') + '/' + (hudStats.statesY ?? '?')} onPress={() => openStats('states')} progress={statesPct} />
               </View>
-
-              <View style={{ marginTop: 10, width: '100%' }}>
-                <View style={styles.xpRow}>
-                  <View style={{ flex: 1 }}>
-                    <XpPepperBar progress={hudStats.levelPct ?? 0} label={xpBarLabel} />
-                  </View>
-
-                  <DailyGiftPill
-                    claimed={!!dailyGift.claimedToday}
-                    claiming={!!dailyGift.claiming}
-                    onPress={() => claimDaily(session.user.id)}
-                  />
-                </View>
-                <Text style={styles.levelSub}> </Text>
-              </View>
-            </View>
+            </>
           ) : null}
-
-          {/* Tiles */}
-          {isSignedIn && (
-            <View style={styles.hudRow}>
-              <Pressable style={styles.hudItem} onPress={() => openStats('ct')}>
-                <View style={[styles.wingdexWrap, { backgroundColor: hudBaseBg }]}>
-                  <View style={[styles.wingdexFill, { left: 0, width: `${Math.round(statePct * 100)}%`, backgroundColor: hudBarColor }]} />
-                  <View style={styles.wingdexContent}>
-                    <Text style={styles.hudLabel}>{hudStats.stateAbbrev ? `${hudStats.stateAbbrev} WINGDEX` : 'STATE WINGDEX'}</Text>
-                    <Text style={styles.hudValue}>
-                      {hudStats.stateX ?? '—'}/{hudStats.stateY ?? '—'}
-                    </Text>
-                  </View>
-                </View>
-              </Pressable>
-
-              <View style={styles.hudDivider} />
-
-              <Pressable style={styles.hudItem} onPress={() => openStats('us_top50')}>
-                <View style={[styles.wingdexWrap, { backgroundColor: hudBaseBg }]}>
-                  <View style={[styles.wingdexFill, { left: 0, width: `${Math.round(top50Pct * 100)}%`, backgroundColor: hudBarColor }]} />
-                  <View style={styles.wingdexContent}>
-                    <Text style={styles.hudLabel}>TOP 50 US</Text>
-                    <Text style={styles.hudValue}>{top50X}/50</Text>
-                  </View>
-                </View>
-              </Pressable>
-
-              <View style={styles.hudDivider} />
-
-              <Pressable style={styles.hudItem} onPress={() => openStats('states')}>
-                <View style={[styles.wingdexWrap, { backgroundColor: hudBaseBg }]}>
-                  <View style={[styles.wingdexFill, { left: 0, width: `${Math.round(statesPct * 100)}%`, backgroundColor: hudBarColor }]} />
-                  <View style={styles.wingdexContent}>
-                    <Text style={styles.hudLabel}>STATES</Text>
-                    <Text style={styles.hudValue}>
-                      {hudStats.statesX ?? '—'}/{hudStats.statesY ?? '—'}
-                    </Text>
-                  </View>
-                </View>
-              </Pressable>
-            </View>
-          )}
 
           {/* Suggested restaurant card */}
           <View style={styles.closestCard}>
@@ -3268,9 +3203,46 @@ export default function Home() {
               </View>
             ) : closest ? (
               <>
-                <Text style={styles.closestName} numberOfLines={2}>
-                  {closest.name || 'Wing Spot'}
-                </Text>
+                <Text variant="labelSmall" style={{ color: colors.primary, fontWeight: '700', marginBottom: 6 }}>NEARBY SPOT</Text>
+                <View style={{ position: 'relative' }}>
+                {featuredPhotoLoading ? (
+                  <View style={[styles.featuredImage, styles.featuredPhotoLoading, { backgroundColor: colors.surfaceVariant }]}><ActivityIndicator /></View>
+                ) : featuredPhoto?.destinationId === closest.id && featuredPhoto.uri ? (
+                  <>
+                    <WingShotImage approved uri={featuredPhoto.uri} style={styles.featuredImage} />
+                    <Pressable accessibilityRole="button" accessibilityLabel="View restaurant ratings and details" onPress={() => openRestaurantPeek(closest.id)} style={{ minHeight: 44, padding: 8, borderRadius: 12, justifyContent: 'center', backgroundColor: colors.surface }}>
+                      <Text style={[styles.closestName, { color: colors.onSurface }]} numberOfLines={2}>{closest.name || 'Wing Spot'}</Text>
+                      <Text style={{ fontSize: 12, color: colors.onSurfaceVariant }}>View ratings and details</Text>
+                      {featuredRatingCount != null ? <Text variant="bodySmall" style={{ color: colors.onSurfaceVariant }}>{featuredRatingCount} community rating{featuredRatingCount === 1 ? '' : 's'}</Text> : null}
+                    </Pressable>
+                  </>
+                ) : featuredPhoto?.destinationId === closest.id && featuredPhoto.unavailable ? (
+                  <View style={[styles.featuredImage, styles.featuredPhotoLoading, { backgroundColor: colors.surfaceVariant }]}>
+                    <Text style={{ color: colors.onSurfaceVariant, textAlign: 'center' }}>Wing Shots are temporarily unavailable.</Text>
+                  </View>
+                ) : (
+                  <View style={[styles.featuredPhotoEmpty, { backgroundColor: colors.surfaceVariant }]}>
+                    <Pressable accessibilityRole="button" accessibilityLabel="View restaurant ratings and details" onPress={() => openRestaurantPeek(closest.id)} style={{ minHeight: 44, justifyContent: 'center' }}><Text style={[styles.closestName, { color: colors.onSurface }]}>{closest.name || 'Wing Spot'}</Text><Text variant="bodySmall">View ratings and details</Text></Pressable>
+                    <View style={styles.featuredPhotoMessage}>
+                      <MaterialCommunityIcons name="camera-plus-outline" size={20} color={colors.primary} />
+                      <View style={{ flex: 1, minWidth: 0 }}>
+                        <Text style={{ color: colors.onSurface, fontWeight: '800', fontSize: 13 }}>No Wing Shots yet</Text>
+                        <Text style={{ color: colors.onSurfaceVariant, fontSize: 12 }}>Be the first to share a Wing Shot</Text>
+                      </View>
+                    </View>
+                    <Button
+                      mode="contained-tonal"
+                      onPress={() => alreadyRatedThis ? router.push('/(tabs)/journey') : openHomeRatingWizard()}
+                      accessibilityHint={alreadyRatedThis ? 'Opens Journey to add a Wing Shot to your existing rating' : 'Starts the existing rating flow for this restaurant'}
+                      contentStyle={{ minHeight: 44 }}
+                      labelStyle={{ fontSize: 11, marginHorizontal: 4 }}
+                      uppercase={false}
+                    >
+                      {alreadyRatedThis ? 'Add a Wing Shot' : 'Rate & share a Wing Shot'}
+                    </Button>
+                  </View>
+                )}
+                </View>
 
                 <View style={styles.addressRow}>
                   <Pressable
@@ -3286,9 +3258,9 @@ export default function Home() {
                   </Pressable>
 
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.closestAddr} numberOfLines={2}>
+                    <Text style={styles.closestAddr}>
                       {(closest.address || '').trim()}
-                      {closest.city ? `${closest.address ? ', ' : ''}${closest.city}` : ''}
+                      {closest.city && !String(closest.address || '').toLowerCase().includes(String(closest.city).toLowerCase()) ? `${closest.address ? ', ' : ''}${closest.city}` : ''}
                     </Text>
                   </View>
 
@@ -3312,11 +3284,12 @@ export default function Home() {
                   </View>
                 ) : null}
 
-                <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 10 }}>
                   <Button
                     mode="contained"
-                    style={[styles.rateBtn, { flex: 1 }]}
-                    contentStyle={{ height: 40 }}
+                    labelStyle={{ fontSize: 12 }}
+                    style={[styles.rateBtn, { flex: 1, minWidth: 140, flexBasis: stackedSpotActions ? '100%' : 'auto' }]}
+                    contentStyle={{ minHeight: 44 }}
                     uppercase={false}
                     onPress={openHomeRatingWizard}
                     loading={homeRatingStarting || homeRateSaving}
@@ -3329,8 +3302,9 @@ export default function Home() {
 
                   <Button
                     mode="outlined"
-                    style={[styles.searchBtn, { flex: 1 }]}
-                    contentStyle={{ height: 40 }}
+                    labelStyle={{ fontSize: 12 }}
+                    style={[styles.searchBtn, { flex: 1, minWidth: 140, flexBasis: stackedSpotActions ? '100%' : 'auto' }]}
+                    contentStyle={{ minHeight: 44 }}
                     uppercase={false}
                     onPress={() => {
                       setSearchOpen(false);
@@ -3338,7 +3312,7 @@ export default function Home() {
                     }}
                     icon="magnify"
                   >
-                    Swap Spot
+                    Find Wings
                   </Button>
                 </View>
 
@@ -3370,8 +3344,9 @@ export default function Home() {
             )}
           </View>
 
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'stretch' }}>
           {ENABLE_GROWTH_MISSIONS && !missionDismissed ? (
-            <View>
+            <View style={{ flex: 1, minWidth: 148 }}>
               <Pressable
                 testID="weekly-mission-entry"
                 accessibilityRole="button"
@@ -3384,7 +3359,8 @@ export default function Home() {
                 }}
               >
                 <Text style={styles.missionEntryIcon}>{missionSummary?.mission?.complete ? '🎉' : '🏆'}</Text>
-                <View style={styles.missionEntryCopy}><Text style={[styles.missionEntryTitle, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>{missionSummary?.mission?.complete ? 'Weekly Mission Complete!' : 'Weekly Mission'}</Text><Text style={[styles.missionEntryMission, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>{missionLoading ? 'Loading mission…' : missionSummary?.mission?.complete ? 'You crushed it — nice work!' : missionSummary?.mission?.label || 'Mission details are temporarily unavailable.'}</Text>{missionSummary ? <Text style={[styles.missionEntryDetail, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>{missionSummary.mission.current} of {missionSummary.mission.target} complete{missionSummary?.mission?.complete ? ' · Reward earned' : ''}</Text> : null}</View>
+                <View style={styles.missionEntryCopy}><Text style={[styles.missionEntryTitle, { color: colors.onSurface }, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>{missionSummary?.mission?.complete ? 'Weekly Mission Complete!' : 'Weekly Mission'}</Text><Text style={[styles.missionEntryMission, { color: colors.onSurface }, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>{missionLoading ? 'Loading mission…' : missionSummary?.mission?.complete ? 'You crushed it — nice work!' : missionSummary?.mission?.label || 'Mission details are temporarily unavailable.'}</Text>{missionSummary ? <Text style={[styles.missionEntryDetail, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>{missionSummary.mission.current} of {missionSummary.mission.target} complete{missionSummary?.mission?.complete ? ' · Reward earned' : ''}</Text> : null}</View>
+                {missionSummary ? <ProgressBar progress={missionSummary.mission.target ? missionSummary.mission.current / missionSummary.mission.target : 0} style={{ width: 42 }} /> : null}
                 <Text style={[styles.missionEntryChevron, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>›</Text>
               </Pressable>
               {missionSummary?.mission?.complete ? (
@@ -3400,7 +3376,8 @@ export default function Home() {
             </View>
           ) : null}
 
-          <Pressable testID="quick-action-wing-facts" accessibilityRole="button" accessibilityLabel="Wing Facts, open a wing fact" onPress={openWingFacts} style={({ pressed }) => [styles.wingFactsAction, pressed && { opacity: 0.82 }]}><Text style={styles.wingFactsIcon}>🍗</Text><Text style={styles.wingFactsLabel}>Wing Facts</Text></Pressable>
+          <Pressable testID="quick-action-wing-facts" accessibilityRole="button" accessibilityLabel="Wing Facts, open a wing fact" onPress={openWingFacts} style={({ pressed }) => [styles.wingFactsAction, pressed && { opacity: 0.82 }]}><Text style={styles.wingFactsIcon}>🍗</Text><Text style={[styles.wingFactsLabel, { color: colors.onSurface }]}>Wing Facts</Text></Pressable>
+          </View>
         </ScrollView>
 
         {/* Home Rating Wizard */}
@@ -3982,7 +3959,7 @@ export default function Home() {
             }
             onApplyDestination={(d) => {
               manualClosestRef.current = true;
-            
+
               setClosest({
                 id: d.id,
                 name: d.name,
@@ -3992,7 +3969,7 @@ export default function Home() {
                 lng: d.lng ?? null,
                 distanceM: d.distanceM ?? null,
               });
-            
+
               setDestinationWizardOpen(false);
           }}
         />
@@ -4036,36 +4013,35 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  // The tab bar height comes from navigation, so the final card can scroll fully
-  // above every Android/iOS tab bar and its safe-area inset.
-  scroll: { paddingHorizontal: 12, paddingTop: 10, gap: 6 },
-
-  headerRow: { minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  socialActions: { width: 72, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  // Navigation reserves the tab bar and bottom inset outside this scroll view.
+  scroll: { paddingHorizontal: 16, paddingTop: 6, gap: 8 },
+  counterRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  featuredImage: { width: '100%', height: undefined, aspectRatio: 16 / 9, borderRadius: 12 },
+  featuredPhotoLoading: { alignItems: 'center', justifyContent: 'center' },
+  featuredPhotoEmpty: { borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', justifyContent: 'space-between', padding: 8 },
+  featuredPhotoMessage: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 40 },
+  headerRow: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  socialActions: { width: 92, flexDirection: 'row', alignItems: 'center', gap: 8 },
   circleButton: {
-    width: 24,
-    height: 24,
+    width: 44,
+    height: 44,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255, 122, 24, 0.72)',
     backgroundColor: 'rgba(255,255,255,0.03)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.16,
-    shadowRadius: 4,
-    elevation: 2,
   },
   circleButtonPressed: { backgroundColor: 'rgba(255, 122, 24, 0.16)' },
   socialButtonDisabled: { opacity: 0.35 },
-  rightCluster: { width: 56, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 8 },
+  rightCluster: { width: 92, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 8 },
   logo: {
     position: 'absolute',
     left: '50%',
-    width: 225,
-    height: 62.5,
-    marginLeft: -112.5,
+    width: 84,
+    height: 44,
+    overflow: 'hidden',
+    marginLeft: -42,
     alignSelf: 'center',
   },
   avatarIcon: { backgroundColor: 'transparent' },
@@ -4129,13 +4105,13 @@ const styles = StyleSheet.create({
   wingdexFill: { position: 'absolute', top: 0, bottom: 0, opacity: 0.35 },
   wingdexContent: { alignItems: 'center' },
 
-  wingFactsAction: { minHeight: 52, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,122,24,0.30)', backgroundColor: 'rgba(255,255,255,0.035)', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  wingFactsAction: { flex: 1, minWidth: 148, minHeight: 80, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,122,24,0.30)', backgroundColor: 'rgba(255,255,255,0.035)', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   wingFactsIcon: { fontSize: 17, lineHeight: 22 },
   wingFactsLabel: { fontSize: 14, lineHeight: 18, fontWeight: '900', color: 'rgba(255,255,255,0.96)' },
 
   xpRow: { width: '100%', flexDirection: 'row', alignItems: 'center', gap: 10 },
   dailyPill: {
-    height: 28,
+    minHeight: 44,
     minWidth: 92,
     paddingHorizontal: 10,
     borderRadius: 999,
@@ -4159,19 +4135,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  missionEntry: { minHeight: 64, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,122,24,0.35)', backgroundColor: 'rgba(255,122,24,0.10)', paddingHorizontal: 12, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  missionEntryComplete: { borderColor: '#86C98A', backgroundColor: '#DDF5DF' },
-  missionEntryIcon: { fontSize: 20 },
-  missionEntryCopy: { flex: 1 },
-  missionEntryTitle: { fontSize: 16, fontWeight: '900', color: 'rgba(255,255,255,0.96)' },
-  missionEntryMission: { marginTop: 1, fontSize: 14, lineHeight: 18, fontWeight: '800', color: 'rgba(255,255,255,0.92)' },
-  missionEntryDetail: { marginTop: 2, fontSize: 13, opacity: 0.76 },
-  missionEntryChevron: { color: '#FFB36F', fontSize: 30, lineHeight: 30 },
-  missionEntryCompleteText: { color: '#245B2A', opacity: 1 },
+  missionEntry: { minHeight: 80, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,122,24,0.35)', backgroundColor: 'rgba(255,122,24,0.10)', paddingHorizontal: 12, paddingVertical: 8, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 4 },
+  missionEntryComplete: { borderColor: '#347F56', backgroundColor: '#14271D' },
+  missionEntryIcon: { fontSize: 18, marginBottom: 4 },
+  missionEntryCopy: { width: '100%', minWidth: 0 },
+  missionEntryTitle: { fontSize: 13, lineHeight: 18, fontWeight: '900', color: 'rgba(255,255,255,0.96)' },
+  missionEntryMission: { marginTop: 1, fontSize: 12, lineHeight: 16, fontWeight: '600', color: 'rgba(255,255,255,0.92)' },
+  missionEntryDetail: { marginTop: 2, fontSize: 11, opacity: 0.76 },
+  missionEntryChevron: { position: 'absolute', right: 6, bottom: 6, color: '#FFB36F', fontSize: 22, lineHeight: 22 },
+  missionEntryCompleteText: { color: '#86DDA4', opacity: 1 },
   missionDismiss: { alignSelf: 'center', paddingHorizontal: 12, paddingVertical: 8 },
   missionDismissPressed: { opacity: 0.7 },
   missionDismissText: { color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: '800' },
-  closestName: { fontSize: 18, fontWeight: '900', textAlign: 'center', color: 'rgba(255,255,255,0.95)' },
+  closestName: { fontSize: 18, fontWeight: '800', textAlign: 'left', color: 'rgba(255,255,255,0.95)' },
   addressRow: { marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 10 },
   closestAddr: { opacity: 0.8, textAlign: 'center' },
   restaurantIconButton: { width: 40, height: 40, borderRadius: 20, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },

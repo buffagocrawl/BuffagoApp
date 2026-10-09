@@ -18,7 +18,7 @@ class MapBoundary extends React.Component {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
   componentDidCatch() { console.warn('[Maps] render unavailable'); }
-  render() { return this.state.failed ? <Text>Map unavailable for this location.</Text> : this.props.children; }
+  render() { return this.state.failed ? <View style={[{ alignItems: 'center', justifyContent: 'center', padding: 16, backgroundColor: '#14161A' }, this.props.style]} accessibilityLabel="Map unavailable"><Text style={{ color: '#F5F6F8', textAlign: 'center' }}>Map unavailable for this location.</Text><Text style={{ color: '#A9AFB9', textAlign: 'center', marginTop: 8 }}>Close the map to continue browsing restaurants and crawls.</Text></View> : this.props.children; }
 }
 
 const SafeMap = forwardRef(function SafeMap({ initialRegion, region, provider, onMapReady, children, ...props }, ref) {
@@ -43,10 +43,10 @@ const SafeMap = forwardRef(function SafeMap({ initialRegion, region, provider, o
   if (!markerPoints.length || (Platform.OS === 'android' && !configured.androidMapsConfigured)) {
     ready.current = false;
     pendingFit.current = null;
-    return <View style={props.style}><Text>Map unavailable for this location.</Text></View>;
+    return <View style={[{ alignItems: 'center', justifyContent: 'center', padding: 16, backgroundColor: '#14161A' }, props.style]} accessibilityLabel="Map unavailable"><Text style={{ color: '#F5F6F8', textAlign: 'center' }}>Map unavailable for this location.</Text><Text style={{ color: '#A9AFB9', textAlign: 'center', marginTop: 8 }}>Close the map to continue browsing restaurants and crawls.</Text></View>;
   }
   const safeProvider = Platform.OS === 'ios' && !configured.iosGoogleMapsConfigured ? undefined : provider;
-  return <MapBoundary><NativeMap {...props} ref={native} provider={safeProvider} initialRegion={safeInitial}
+  return <MapBoundary style={props.style}><NativeMap {...props} ref={native} provider={safeProvider} initialRegion={safeInitial}
     {...(safeRegion ? { region: safeRegion } : {})}
     onMapReady={(event) => {
       ready.current = true;

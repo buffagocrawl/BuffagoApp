@@ -1,6 +1,7 @@
 ﻿import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { Appearance } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { operationTokens } from '../src/theme/operationTokens';
 import {
   MD3DarkTheme as PaperDark,
   MD3LightTheme as PaperLight,
@@ -26,6 +27,7 @@ const lightTheme = {
   colors: {
     ...PaperLight.colors,
     primary: '#E67E22',
+    onPrimary: '#17100B',
     secondary: '#8E44AD',
     background: '#FFFCE8',
     // keep surfaces close but distinct
@@ -39,32 +41,44 @@ const lightTheme = {
 
 const darkTheme = {
   ...PaperDark,
+  roundness: 12,
   colors: {
     ...PaperDark.colors,
-    primary: '#E67E22',
-    secondary: '#8E44AD',
+    primary: operationTokens.colors.orange,
+    onPrimary: '#17100B',
+    primaryContainer: '#452718',
+    onPrimaryContainer: '#FFD9C3',
+    secondary: operationTokens.colors.muted,
+    secondaryContainer: '#272B31',
+    onSecondaryContainer: operationTokens.colors.text,
+    tertiary: operationTokens.colors.amber,
+    onBackground: operationTokens.colors.text,
+    onSurface: operationTokens.colors.text,
+    onSurfaceVariant: operationTokens.colors.muted,
+    outline: operationTokens.colors.border,
+    success: operationTokens.colors.success,
 
     // Darker page background, so content & popups float above it
-    background: '#050607',
+    background: operationTokens.colors.background,
 
     // Base surface slightly lighter than background
-    surface: '#111218',
+    surface: operationTokens.colors.surface,
 
     // Surfaces used for cards/dialogs/etc
-    surfaceVariant: '#20222C',
+    surfaceVariant: operationTokens.colors.surfaceRaised,
 
     // Outlines for subtle separation
-    outlineVariant: '#393B46',
+    outlineVariant: operationTokens.colors.border,
 
     // Tuned elevation steps so dialogs & sheets clearly stand out
     elevation: {
       ...PaperDark.colors.elevation,
       level0: 'transparent',
-      level1: '#151821',
-      level2: '#1C1F2A', // typical cards
-      level3: '#222634',
-      level4: '#272C3C',
-      level5: '#2D3244', // dialogs / highest elevation
+      level1: '#14161A',
+      level2: '#1D2025',
+      level3: '#252930',
+      level4: '#2B3038',
+      level5: '#323842',
     },
 
     // Slightly stronger backdrop for modals

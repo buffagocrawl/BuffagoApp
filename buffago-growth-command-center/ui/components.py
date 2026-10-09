@@ -62,7 +62,7 @@ class Painter:
                                 font=self.font(size, weight), anchor=anchor, **kwargs)
 
     def label(self, x: int, y: int, value: str) -> None:
-        self.text(x, y, value.upper(), 12, theme.MUTED, "bold")
+        self.text(x, y, value.upper(), 12, theme.ACCENT, "bold")
 
     def metric(self, x: int, y: int, title: str, value: str, detail: str = "",
                direction: str | None = None) -> None:

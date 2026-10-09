@@ -1,5 +1,7 @@
 # Buffago Growth Command Center
 
+The October 8 operational follow-up is documented in [the redesign report](artifacts/operations-redesign/REPORT.md), including screenshots, metric definitions, tests and exact later deployment requirements. It is not deployed. Use only the new `20261008165529_growth_wall_activity_weekly_catalog.sql` follow-up for these backend changes; the deployed predecessor differs from the earlier local migration copy.
+
 A low-resource, always-on founder dashboard for Buffago. It is a separate Tkinter application: the display uses no browser, JavaScript runtime or Supabase SDK. An independent Python LAN server provides phone controls; no mobile app changes are included.
 
 ## Run locally
@@ -23,7 +25,7 @@ python3 app.py
 
 ## Demo mode
 
-Set `BUFFAGO_GROWTH_DEMO=true`. Sample product and Growth OS data lives in `data/demo_snapshot.json`. `data/growth_config.json` remains the local fallback for experiment, daily action, founder balance, and insight whenever a valid backend section is absent. Demo mode still exercises parsing, rendering, refresh scheduling, and caching.
+Set `BUFFAGO_GROWTH_DEMO=true`. Sample Product Pulse and Growth OS data lives in `data/demo_snapshot.json`. When a Today's Move is absent, the wall derives a next action from the weakest score factor without writing a Growth OS record. Demo mode still exercises parsing, rendering, refresh scheduling, and caching.
 
 ## Live Supabase configuration
 
@@ -92,9 +94,15 @@ node --check control_web/control.js
 
 The runtime imports only Python's standard library. Tkinter links to Tcl/Tk through the OS package. There is no pip runtime dependency, animation loop, or continuous redraw. Exact resident memory depends on the Pi OS/Tk build; measure it on target with `ps -o pid,rss,%cpu,cmd -C python3` after several refresh cycles.
 
-V1 derives the downloads arrow only from whether daily downloads are positive because the provided payload has no previous-day download field. Backend-managed Growth OS sections take precedence independently; missing or malformed sections use local JSON and then the existing empty state. Local growth content is edited as JSON and reloaded on process restart. The client does not read Jalapeno files directly.
+Product Pulse reports mobile-only iOS and Android device opens, New York calendar-month MAU, all-time entity totals, monthly chart history from the first real mobile app-open month through the current month, pending photo review and all open operations work. Pre-instrumentation MAU/device history is untracked (`null`), while actual zero months remain zero. Marketing Score retains its separate trailing 12-month scoring window. Growth Engine presents the versioned Marketing Score, its factors and explanation, the active Growth OS experiment, today's move or a derived local action, ranked recommendations, and the current unexpired insight. The rolling-30-day Growth OS north-star remains intact and named separately from calendar MAU. Store ingestion and snapshot fields remain available for future connection, but unconnected store cards are omitted from the wall.
 
 Phone controls now use the existing admin backend described below; the display continues to use only its snapshot endpoint.
+
+## Product Pulse backend update
+
+See `artifacts/product-pulse/report.md` for the earlier operational snapshot work and `artifacts/redesign/report.md` for the Growth Command Center redesign, score formula, live values, checks, screenshot paths, and Pi update commands. Production already has `20261008121036_product_pulse_operations` applied. The unapplied follow-up `supabase/migrations/20261008130000_growth_command_center_redesign.sql` adds mobile-only Product Pulse metrics and Marketing Score fields without reusing the applied migration. The active snapshot Edge Function returns the RPC object with a generic spread, so no Edge Function deployment is needed.
+
+Run `node --test tests/*.test.mjs` for local PostgreSQL/RPC tests. They reuse the pinned PGlite development dependency in `../crawl/node_modules` and the inspected deployed RPC fixture. Python screenshot tests require Pillow as a development dependency and a desktop/X session; the Pi runtime remains standard-library-only. Screenshots are written to `artifacts/product-pulse/`.
 
 ## Phone control architecture
 
@@ -214,3 +222,26 @@ systemctl is-enabled buffago-growth.service buffago-growth-control.service
 ```
 
 Both should report `enabled`. Reboot and check both with `systemctl status`. Enable automatic desktop login for `branden` so X11 becomes available without keyboard interaction. These files configure boot behavior; running installation and verification on the actual Pi is required.
+
+## Daily manual marketing missions
+
+Click **Today's Marketing Mission** in the Growth Engine to open instructions, evidence limits, an engagement question and a 24–48-hour evaluation checklist. The dashboard shows the Eastern date, topic, platforms, estimated time and weekly progress. Themes follow Monday rankings, Tuesday Wing Wars, Wednesday Hidden Gem, Thursday debate, Friday challenge, Saturday spotlight and Sunday recap. Towns and debates rotate every six weeks. The mission changes on the next minute tick after America/New_York midnight, including when Supabase is unavailable.
+
+Create all content yourself and publish manually. Select only the platforms actually used, then **Mark as Posted**. This records an owner confirmation, not independently verified publication. Reopen to correct platform choices or undo. Expand the weekly overview or completed history; click a row to view its mission and correct its confirmation. Completed records retain the original theme and selected topic even if recommendations change later.
+
+Records use the existing atomic local JSON cache pattern in `marketing-missions.json`, beside `BUFFAGO_GROWTH_CACHE_PATH` (by default in `data/`). Back up this file and ensure the display service user can write its directory. Only the display process writes these records. They do not update Supabase, Marketing Score, weekly goals or experiment progress. The existing Monday goal refresh remains managed by the existing backend workflow.
+
+The current snapshot supplies aggregate rating activity but no verified restaurant-level scores, comparison coverage or approved-photo details. Missions therefore use predefined evergreen topics and instruct the owner to verify restaurant evidence manually. Aggregate activity is described only as the existing snapshot window; no trends or winners are inferred. Existing upstream account exclusions are reused without new queries. No social APIs, LLM dependencies, content generation, scheduling or publishing are introduced.
+
+The dashboard retains its existing Tkinter kiosk layout at 800×480, 1280×720 and 1600×900. Mission details scroll and controls wrap into rows at narrow widths. This feature is in the display application; the existing LAN phone admin page remains unchanged. It is not a new mobile web interface.
+
+### Manual Raspberry Pi update
+
+No deployment or production restart was performed during development. When ready to update manually:
+
+1. Back up your existing installation, protected environment file and snapshot/mission data. Copy the reviewed source files (`app.py`, `missions.py`, `ui/dashboard.py`, `ui/mission_panel.py`) into the existing `/opt/buffago-growth-command-center` installation, preserving owner and permissions. Do not replace `.env` or the data directory.
+2. Verify Python 3.9+ and the OS timezone database: `python3 -c "from zoneinfo import ZoneInfo; print(ZoneInfo('America/New_York'))"`. If missing, install the OS `tzdata` package. No Python runtime package is added.
+3. Verify that `branden` can write the directory containing `BUFFAGO_GROWTH_CACHE_PATH`, since it also stores mission confirmations. No migration or new credentials are required.
+4. Run `python3 -m unittest discover -s tests` from the reviewed source directory in a desktop session with Tk available. The screenshot capture test uses optional developer Pillow; the application does not require it.
+5. At a time you choose, restart only the display: `sudo systemctl restart buffago-growth.service`. Check `systemctl status buffago-growth.service` and `journalctl -u buffago-growth.service -n 50`. The control service needs no update for this feature.
+6. Open the mission, confirm one platform, reopen and correct it, then undo the trial confirmation. Verify weekly progress, existing metrics and charts. For a restart persistence check, confirm a real completed mission, restart the display manually and check that the confirmation remains.

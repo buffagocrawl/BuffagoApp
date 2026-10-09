@@ -1,16 +1,18 @@
 // app/(tabs)/routes/index.jsx
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { View, FlatList, RefreshControl, StyleSheet, ScrollView, Animated, Alert } from 'react-native';
+import { View, FlatList, RefreshControl, StyleSheet, ScrollView, Alert, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import {
   ActivityIndicator,
+  IconButton,
   Card,
   Text,
   Portal,
   Dialog,
   Button,
   Divider,
-  Chip,
   ProgressBar,
   useTheme,
   TextInput,
@@ -22,12 +24,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../../../lib/supabase.js';
 import { useLocationCtx } from '../../../providers/LocationProvider';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useNavigation } from '@react-navigation/native';
 import { createSoloCrawl } from '../../../utils/crawls';
 import { fetchRandomFunFact } from '../../../utils/funFacts';
 import RoutesWelcomeWizard from '../../../components/RoutesWelcomeWizard';
 import FeedbackState from '../../../components/ui/FeedbackState';
+import RoutePreview from '../../../components/RoutePreview';
+import { featuredRecommendation } from '../../../lib/routePreview';
 import { trackEvent } from '../../../lib/analytics';
+import { SectionHeader, StatusBadge, LoadingSkeleton, SelectionChip as Chip } from '../../../components/ui/OperationUI';
 
 const SEARCH_RADIUS_M = 160934; // 100 miles
 
@@ -60,7 +64,6 @@ const fmtDateTime = (iso) => {
 export default function RoutesIndex() {
   const { coords, status } = useLocationCtx();
   const router = useRouter();
-  const navigation = useNavigation();
 
   const params = useLocalSearchParams();
   const openRouteIdParam = params?.openRouteId ? String(params.openRouteId) : null;
@@ -73,94 +76,8 @@ export default function RoutesIndex() {
 
   const { colors, dark } = useTheme();
 
-  // ---------------- hide header + bottom tab bar on scroll ----------------
-  const [headerHeight, setHeaderHeight] = useState(0);
-  const headerTranslateY = useRef(new Animated.Value(0)).current;
-
-  const headerHiddenRef = useRef(false);
-  const lastYRef = useRef(0);
-
-  const HIDE_THRESHOLD = 18;
-
-  const setTabBarHidden = useCallback(
-    (hidden) => {
-      const parent = navigation?.getParent?.();
-  
-      // 1) Parent tabs (most common)
-      if (parent?.setOptions) {
-        parent.setOptions({
-          tabBarStyle: hidden ? { display: 'none' } : undefined,
-        });
-      }
-  
-      // 2) Also set on this screen (covers some expo-router nesting cases)
-      if (navigation?.setOptions) {
-        navigation.setOptions({
-          tabBarStyle: hidden ? { display: 'none' } : undefined,
-        });
-      }
-    },
-    [navigation]
-  );
-
-  const showHeader = useCallback(() => {
-    if (!headerHiddenRef.current) return;
-    headerHiddenRef.current = false;
-
-    setTabBarHidden(false);
-
-    Animated.timing(headerTranslateY, {
-      toValue: 0,
-      duration: 160,
-      useNativeDriver: true,
-    }).start();
-  }, [headerTranslateY, setTabBarHidden]);
-
-  const hideHeader = useCallback(() => {
-    if (headerHiddenRef.current) return;
-    headerHiddenRef.current = true;
-
-    setTabBarHidden(true);
-
-    const h = headerHeight > 0 ? headerHeight : 140;
-    Animated.timing(headerTranslateY, {
-      toValue: -h,
-      duration: 160,
-      useNativeDriver: true,
-    }).start();
-  }, [headerTranslateY, headerHeight, setTabBarHidden]);
-
-  useEffect(() => {
-    // safety, ensure tab bar is visible when leaving screen
-    return () => setTabBarHidden(false);
-  }, [setTabBarHidden]);
-
   // ---------------- prevents double-taps ----------------
   const [selectingRoute, setSelectingRoute] = useState(false);
-
-  // palette
-  const themed = useMemo(() => {
-    const cardNeutral = colors.elevation?.level2 ?? colors.surface;
-    const cardYellow = dark ? '#3A3212' : '#FFF9C4';
-    const chipYellow = dark ? '#4A3F16' : '#FFF3CD';
-    const onYellow = dark ? '#F4E7B3' : '#5C4A00';
-    const cardGreen = dark ? '#133D2B' : '#C8E6C9';
-    const chipGreen = dark ? '#174F39' : '#2E7D32';
-    const onGreen = dark ? '#CFF3DD' : '#FFFFFF';
-    const pillBg = colors.surfaceVariant;
-
-    return {
-      cardNeutral,
-      cardYellow,
-      onYellow,
-      chipYellow,
-      cardGreen,
-      onGreen,
-      chipGreen,
-      pillBg,
-      textMuted: colors.onSurface,
-    };
-  }, [colors, dark]);
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -174,7 +91,6 @@ export default function RoutesIndex() {
   const [openDetails, setOpenDetails] = useState(false);
   const [active, setActive] = useState(null);
 
-  const actionLabel = active && activeProgressByRoute?.[active.id] ? 'Resume Crawl' : 'Begin Crawl';
 
 
   // fun-fact loader
@@ -200,6 +116,7 @@ export default function RoutesIndex() {
 
   // in-progress crawls
   const [activeProgressByRoute, setActiveProgressByRoute] = useState({});
+  const actionLabel = active && activeProgressByRoute?.[active.id] ? 'Resume Crawl' : 'Begin Crawl';
 
   // auth session
   const [session, setSession] = useState(null);
@@ -530,7 +447,7 @@ export default function RoutesIndex() {
     const withoutDist = withStops.filter((x) => x.distanceM == null);
 
     setRoutesRaw([...withDist, ...withoutDist, ...withoutStops].slice(0, 50));
-  }, [coords?.latitude, coords?.longitude, status, tags, fetchStopsByRouteIds]);
+  }, [coords, status, tags, fetchStopsByRouteIds]);
 
   // initial load
   useEffect(() => {
@@ -671,7 +588,7 @@ export default function RoutesIndex() {
           await trackEvent({
             eventName: 'crawl_started',
             screen: 'routes',
-            userId: userId ?? null,
+            userId: session?.user?.id ?? null,
             routeId: routeItem.id,
             crawlId: existingCrawlId,
             metadata: { flow_step: 'resume_existing', source_screen: 'routes' },
@@ -946,108 +863,93 @@ export default function RoutesIndex() {
     // The shared map fits current valid markers only after onMapReady.
   }, [filtered, selectedStatus, selectedTag?.label, session?.user?.id]);
 
-  // render item
+  // Compact cards preserve all existing route data and actions.
+  const routeTravelLabel = (item) => tags.find((tag) => tag.id === item.travel_tag_id)?.travel || item.tagLabel;
   const renderItem = ({ item }) => {
     const visited = hasCompleted(item.id);
     const progress = activeProgressByRoute[item.id];
     const isActive = !!progress;
     const totalStops = item.stops?.length ?? 0;
     const hits = progress?.hits ?? 0;
-
-    const cardBg = isActive ? themed.cardYellow : visited ? themed.cardGreen : themed.cardNeutral;
-
-    const progressPct = totalStops > 0 ? Math.max(0, Math.min(1, hits / totalStops)) : 0;
-    const ctaLabel = isActive ? 'Resume' : visited ? 'Review' : 'Start';
-
     return (
-      <Card style={[styles.card, { backgroundColor: cardBg }]} mode="elevated" onPress={() => handleOpenDetails(item)}>
+      <Card mode="outlined" style={[styles.card, { backgroundColor: isActive ? (dark ? '#281A0D' : '#FFF3E0') : visited ? (dark ? '#112619' : '#E8F5E9') : colors.surface, borderColor: isActive ? colors.primary : visited ? '#39794B' : colors.outlineVariant }]}
+        onPress={() => handleOpenDetails(item)}>
         <Card.Content style={styles.routeCardContent}>
-          <View style={{ flex: 1, minWidth: 0 }}>
-            <View style={styles.routeTitleRow}>
-            <Text variant="titleMedium" style={[styles.name, styles.routeName]} numberOfLines={2}>
-              {item.title}
-            </Text>
-              <View style={[styles.routeCtaPill, { backgroundColor: isActive ? '#F9A825' : visited ? '#2E7D32' : '#FF6F00' }]}>
-                <Text style={styles.routeCtaText} numberOfLines={1}>{ctaLabel}</Text>
-              </View>
-            </View>
-
-            <View style={styles.statusRow}>
-              {visited && !isActive ? (
-                <Chip
-                  compact
-                  style={[styles.youRatedChip, { backgroundColor: themed.chipGreen }]}
-                  textStyle={{ color: themed.onGreen, fontWeight: '700' }}
-                  icon="check"
-                >
-                  You completed this crawl
-                </Chip>
-              ) : null}
-
-              {isActive ? (
-                <Chip
-                  compact
-                  style={[styles.inProgressChip, { backgroundColor: themed.chipYellow }]}
-                  textStyle={{ color: themed.onYellow, fontWeight: '700' }}
-                  icon="progress-clock"
-                >
-                  You have stopped at {hits} of {totalStops}
-                </Chip>
-              ) : null}
-            </View>
-
-            <View style={styles.metaRow}>
-              {item.tagLabel ? (
-                <View style={[styles.pill, { backgroundColor: themed.pillBg }]}>
-                  <Text style={styles.pillText}>{item.tagLabel}</Text>
-                </View>
-              ) : null}
-
-              <View style={[styles.pill, { marginLeft: item.tagLabel ? 6 : 0, backgroundColor: themed.pillBg }]}>
-                <Text style={styles.pillText}>
-                  {totalStops} {totalStops === 1 ? 'stop' : 'stops'}
-                </Text>
-              </View>
-
-              <Text style={[styles.muted, { color: themed.textMuted, opacity: 0.7 }]}>
-                {Number.isFinite(Number(item.distanceMi)) ? ` • ${fmt1(item.distanceMi)} mi away` : ''}
-              </Text>
-            </View>
-
-            {isActive ? (
-              <ProgressBar progress={progressPct} style={styles.routeProgress} />
-            ) : null}
+          <View style={styles.routeTitleRow}>
+            <Text variant="titleMedium" style={[styles.name, styles.routeName]}>{item.title}</Text>
+            <StatusBadge label={isActive ? 'Active' : visited ? 'Completed' : 'Discover'} status={isActive ? 'active' : visited ? 'completed' : 'neutral'} />
           </View>
+          {item.city ? <Text variant="bodySmall" style={styles.muted}>{item.city}</Text> : null}
+          <View style={styles.metaRow}>
+            <Text variant="bodySmall" style={styles.muted}>{totalStops} {totalStops === 1 ? 'stop' : 'stops'}</Text>
+            {routeTravelLabel(item) ? <Text variant="bodySmall" style={styles.muted}> / {routeTravelLabel(item)}</Text> : null}
+            {item.distanceMi != null && Number.isFinite(Number(item.distanceMi)) ? <Text variant="bodySmall" style={styles.muted}> / {fmt1(item.distanceMi)} mi to first stop</Text> : null}
+          </View>
+          {isActive ? <>
+            <View style={[styles.rowBetween, { marginTop: 10 }]}>
+              <Text variant="labelSmall" style={styles.muted}>Stops rated</Text>
+              <Text variant="labelSmall">{hits} / {totalStops}</Text>
+            </View>
+            <View style={styles.routeProgress}>
+              <ProgressBar progress={totalStops > 0 ? Math.max(0, Math.min(1, hits / totalStops)) : 0} color="#E7AD43" style={{ height: 7, borderRadius: 999 }} />
+            </View>
+          </> : null}
+          <Button mode={isActive ? 'contained' : 'outlined'} icon={isActive ? 'play' : visited ? 'check-circle-outline' : 'arrow-right'}
+            style={{ marginTop: 12, borderRadius: 10, alignSelf: isActive ? 'stretch' : 'flex-start' }} disabled={selectingRoute}
+            onPress={() => isActive ? startOrResumeCrawlFromList(item) : handleOpenDetails(item)}>
+            {isActive ? 'Resume crawl' : visited ? 'Review crawl' : 'View route'}
+          </Button>
         </Card.Content>
       </Card>
     );
   };
+
+  const featured = !selectedStatus || selectedStatus === 'not_started' ? featuredRecommendation(filtered, activeProgressByRoute, hasCompleted) : null;
+  const listedRoutes = featured ? filtered.filter((route) => route.id !== featured.id) : filtered;
+  const renderFeatured = (item) => (
+    <Card mode="outlined" style={[styles.card, { borderColor: colors.outlineVariant, marginBottom: 18 }]} onPress={() => handleOpenDetails(item)}>
+      <View style={styles.featureHeading}><Text variant="titleMedium" style={styles.name}>Recommended near you</Text></View>
+      <RoutePreview stops={item.stops} />
+      <Card.Content style={styles.featureContent}>
+        <View style={{ flex: 1, minWidth: 0 }}>
+        <Text variant="titleMedium" style={styles.name}>{item.title}</Text>
+        <Text variant="bodySmall" style={styles.featureMeta}>{item.stops?.length ?? 0} stops / {item.distanceMi != null && Number.isFinite(Number(item.distanceMi)) ? fmt1(item.distanceMi) + ' mi to first stop' : 'Distance unavailable'}</Text>
+          {routeTravelLabel(item) ? <Text variant="labelSmall" style={styles.muted}>{routeTravelLabel(item)}</Text> : null}
+        </View>
+        <IconButton mode="contained" icon="arrow-right" accessibilityLabel="View crawl" style={{ backgroundColor: colors.primary, margin: 0 }} iconColor={colors.onPrimary} onPress={() => handleOpenDetails(item)} />
+      </Card.Content>
+    </Card>
+  );
 
   // header
   const Header = () => {
     return (
       <View style={styles.header}>
         <View style={styles.headerTopRow}>
-          <View>
-            <Text variant="headlineSmall" style={styles.title}>
-              Closest Routes
-            </Text>
-            <Text variant="bodySmall" style={styles.subtitle}>
-              Location based on the first stop
+          <View style={{ flex: 1, minWidth: 100 }}>
+            <Text variant="titleLarge" style={styles.title}>
+              Crawls
             </Text>
           </View>
-          <Button mode="contained-tonal" icon="map" onPress={openAllRoutesMap} style={{ borderRadius: 12 }}>
-            Map
-          </Button>
+          <IconButton icon="map-outline" mode="outlined" accessibilityLabel="Open routes map" onPress={openAllRoutesMap} style={{ margin: 0, marginRight: 6 }} />
+          <Button mode="contained" icon="plus" compact onPress={openSubmit} style={{ borderRadius: 12 }} contentStyle={{ minHeight: 44 }} labelStyle={{ marginHorizontal: 10 }}>Create crawl</Button>
         </View>
+        <Text variant="bodySmall" style={styles.subtitle}>Plan. Explore. Conquer.</Text>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{ marginTop: 10 }}
-          contentContainerStyle={{ paddingRight: 16 }}
-        >
-          <Chip selected={!selectedTag} onPress={() => setSelectedTag(null)} style={styles.chip}>
+
+
+        <View style={[styles.discoverySegments, { backgroundColor: colors.surfaceVariant }]}>
+          {[[null, 'Nearby'], ['in_progress', 'My Crawls'], ['completed', 'Completed']].map(([value, label]) => (
+            <Pressable key={label} accessibilityRole="button" accessibilityState={{ selected: selectedStatus === value }}
+              onPress={() => setSelectedStatus(value)}
+              style={[styles.segment, { backgroundColor: selectedStatus === value ? colors.primary : 'transparent' }]}>
+              <Text variant="labelMedium" style={{ textAlign: 'center', color: selectedStatus === value ? colors.onPrimary : colors.onSurface }}>{label}</Text>
+            </Pressable>
+          ))}
+        </View>
+        <View style={[styles.filterRail, { marginTop: 10 }]}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginRight: 36 }} contentContainerStyle={{ paddingRight: 36 }}>
+          <Chip selected={!selectedTag} maxFontSizeMultiplier={1.2} accessibilityLabel="All routes" onPress={() => setSelectedTag(null)} style={styles.chip}>
             All routes
           </Chip>
 
@@ -1055,6 +957,8 @@ export default function RoutesIndex() {
             <Chip
               key={t.id}
               selected={!!selectedTag && selectedTag.key === 'id' && selectedTag.id === t.id}
+              maxFontSizeMultiplier={1.2}
+              accessibilityLabel={t.travel}
               onPress={() =>
                 setSelectedTag(
                   selectedTag?.key === 'id' && selectedTag.id === t.id ? null : { key: 'id', id: t.id, label: t.travel }
@@ -1062,108 +966,48 @@ export default function RoutesIndex() {
               }
               style={styles.chip}
             >
-              {t.travel}
+              {t.travel === 'Walkable and Short Drive' ? 'Walk + drive' : t.travel}
             </Chip>
           ))}
+          <Chip selected={selectedStatus === 'not_started'} maxFontSizeMultiplier={1.2} accessibilityLabel="Not started" onPress={() => setSelectedStatus(selectedStatus === 'not_started' ? null : 'not_started')} style={styles.chip}>Not started</Chip>
         </ScrollView>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{ marginTop: 10 }}
-          contentContainerStyle={{ paddingRight: 16 }}
-        >
-          <Chip selected={!selectedStatus} onPress={() => setSelectedStatus(null)} style={styles.chip}>
-            All Statuses
-          </Chip>
-
-          <Chip
-            selected={selectedStatus === 'completed'}
-            onPress={() => setSelectedStatus(selectedStatus === 'completed' ? null : 'completed')}
-            style={styles.chip}
-            icon="check-circle"
-          >
-            Completed
-          </Chip>
-
-          <Chip
-            selected={selectedStatus === 'in_progress'}
-            onPress={() => setSelectedStatus(selectedStatus === 'in_progress' ? null : 'in_progress')}
-            style={styles.chip}
-            icon="progress-clock"
-          >
-            In progress
-          </Chip>
-
-          <Chip
-            selected={selectedStatus === 'not_started'}
-            onPress={() => setSelectedStatus(selectedStatus === 'not_started' ? null : 'not_started')}
-            style={styles.chip}
-            icon="play-circle-outline"
-          >
-            Not started
-          </Chip>
-        </ScrollView>
+        <LinearGradient pointerEvents="none" colors={['transparent', colors.background]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.filterRailHint}>
+          <MaterialCommunityIcons name="chevron-right" size={20} color={colors.onSurfaceVariant} />
+        </LinearGradient>
+        </View>
       </View>
     );
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      {/* Floating header that hides on scroll */}
-      <Animated.View
-        onLayout={(e) => setHeaderHeight(Math.ceil(e.nativeEvent.layout.height))}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 20,
-          transform: [{ translateY: headerTranslateY }],
-          backgroundColor: colors.background,
-        }}
-      >
-        <Header />
-      </Animated.View>
-
+    <SafeAreaView edges={['top', 'left', 'right']} style={{ flex: 1, backgroundColor: colors.background }}>
       {/* Welcome wizard */}
       {authReady && welcomeChecked && welcomeVisible && (
         <RoutesWelcomeWizard visible onDone={markRouteWelcomeSeen} onSkip={markRouteWelcomeSeen} />
       )}
 
       {loading ? (
-        <View style={styles.center}>
-          <ActivityIndicator />
-        </View>
+        <View style={{ padding: 16, gap: 12 }}><Header /><LoadingSkeleton height={160} /><LoadingSkeleton height={130} /></View>
       ) : (
         <FlatList
-          data={filtered}
+          data={listedRoutes}
           keyExtractor={(it) => String(it.id)}
           renderItem={renderItem}
           contentContainerStyle={{
             padding: 16,
             paddingBottom: 20,
-            paddingTop: 8 + headerHeight,
+            paddingTop: 4,
           }}
           ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-          scrollEventThrottle={16}
-          onScroll={(e) => {
-            const y = e.nativeEvent.contentOffset.y;
-
-            if (y <= 0) {
-              lastYRef.current = 0;
-              showHeader();
-              return;
-            }
-
-            const dy = y - lastYRef.current;
-            lastYRef.current = y;
-
-            if (dy > HIDE_THRESHOLD) hideHeader();
-            if (dy < -HIDE_THRESHOLD) showHeader();
-          }}
-          ListEmptyComponent={
+          keyboardShouldPersistTaps="handled"
+          ListHeaderComponent={<>
+            <Header />
+            {featured ? renderFeatured(featured) : null}
+            <SectionHeader title={selectedStatus === 'in_progress' ? 'Continue your crawls' : selectedStatus === 'completed' ? 'Completed crawls' : selectedStatus === 'not_started' ? 'Discover more crawls' : 'Your crawls & more'}
+              subtitle={listedRoutes.length + ' routes / within 100 miles when distance is available'} />
+          </>}
+          ListEmptyComponent={featured ? null :
             <FeedbackState
               style={{ marginTop: 24 }}
               icon="map-marker-path"
@@ -1337,7 +1181,7 @@ export default function RoutesIndex() {
         <Dialog visible={openAllMap} onDismiss={() => setOpenAllMap(false)} style={styles.dialog}>
           <Dialog.Title style={{ textAlign: 'center' }}>Routes Map</Dialog.Title>
           <Dialog.Content>
-            <View style={{ height: 420, borderRadius: 12, overflow: 'hidden' }}>
+            <View style={{ height: 280, borderRadius: 12, overflow: 'hidden' }}>
               <MapView
                 ref={allMapRef}
                 style={{ flex: 1 }}
@@ -1401,7 +1245,7 @@ export default function RoutesIndex() {
             >
               My location
             </Button>
-            <Button onPress={() => setOpenAllMap(false)}>Close</Button>
+            <Button contentStyle={{ minHeight: 44 }} onPress={() => setOpenAllMap(false)}>Close</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -1416,8 +1260,10 @@ export default function RoutesIndex() {
           }}
           style={styles.dialog}
         >
-          <Dialog.Title style={{ textAlign: 'center' }}>Submit a Route</Dialog.Title>
-          <Dialog.Content>
+          <Dialog.Title style={{ textAlign: 'center' }}>Suggest a Crawl</Dialog.Title>
+          <Text style={{ marginHorizontal: 24, marginBottom: 12 }}>Propose a crawl for review. Submission does not create a playable route immediately.</Text>
+          <Dialog.ScrollArea>
+            <ScrollView keyboardShouldPersistTaps="handled" style={{ maxHeight: 280 }} contentContainerStyle={{ paddingVertical: 12 }}>
             <Text style={{ marginBottom: 8 }}>Add up to five restaurants you think should be a wing crawl.</Text>
 
             <TextInput label="Stop 1" value={stop1} onChangeText={setStop1} style={{ marginBottom: 8 }} />
@@ -1431,7 +1277,8 @@ export default function RoutesIndex() {
             </HelperText>
 
             {submitErr ? <Text style={{ color: colors.error }}>{submitErr}</Text> : null}
-          </Dialog.Content>
+                      </ScrollView>
+          </Dialog.ScrollArea>
           <Dialog.Actions style={{ justifyContent: 'space-between' }}>
             <Button
               onPress={() => {
@@ -1442,7 +1289,7 @@ export default function RoutesIndex() {
               Cancel
             </Button>
             <Button mode="contained" onPress={handleSubmitRoute} disabled={!hasAnyStop || savingSubmit} loading={savingSubmit}>
-              Submit
+              Submit suggestion
             </Button>
           </Dialog.Actions>
         </Dialog>
@@ -1453,20 +1300,27 @@ export default function RoutesIndex() {
 
 /* ---------------- styles ---------------- */
 const styles = StyleSheet.create({
-  header: { paddingHorizontal: 16, paddingTop: 32, paddingBottom: 6 },
-  headerTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  filterRail: { position: 'relative' },
+  filterRailHint: { position: 'absolute', top: 0, right: 0, bottom: 0, width: 36, alignItems: 'center', justifyContent: 'center' },
+  header: { paddingTop: 8, paddingBottom: 16 },
+  featureHeading: { paddingHorizontal: 14, paddingTop: 12, paddingBottom: 8 },
+  featureContent: { paddingVertical: 12, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  featureMeta: { marginTop: 5, marginBottom: 6, opacity: 0.8 },
+  discoverySegments: { marginTop: 14, borderRadius: 14, flexDirection: 'row', padding: 3, gap: 3 },
+  segment: { flex: 1, borderRadius: 12, minHeight: 44, justifyContent: 'center', paddingHorizontal: 3, paddingVertical: 8 },
+  headerTopRow: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 6, alignItems: 'center', justifyContent: 'space-between' },
   title: { fontWeight: '800' },
   subtitle: { opacity: 0.7, marginTop: 2 },
 
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 
-  card: { borderRadius: 16 },
+  card: { borderRadius: 16, borderWidth: 1, overflow: 'hidden' },
   rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   name: { fontWeight: '700' },
   muted: { opacity: 0.7 },
   routeCardContent: { paddingVertical: 14, paddingHorizontal: 14 },
   routeName: { flex: 1, minWidth: 0, paddingRight: 8 },
-  routeTitleRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' },
+  routeTitleRow: { flexDirection: 'row', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8, justifyContent: 'space-between' },
   routeCtaPill: {
     borderRadius: 999,
     paddingVertical: 4,
@@ -1484,14 +1338,14 @@ const styles = StyleSheet.create({
   youRatedChip: {},
   inProgressChip: {},
 
-  metaRow: { flexDirection: 'row', alignItems: 'center', marginTop: 6 },
+  metaRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', marginTop: 6 },
 
   pill: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 },
   pillText: { fontSize: 12, opacity: 0.85 },
 
   dialog: { alignSelf: 'center', width: '92%', maxWidth: 520, borderRadius: 16 },
 
-  chip: { marginRight: 8, borderRadius: 999 },
+  chip: { marginRight: 8, borderRadius: 999, minHeight: 44, justifyContent: 'center' },
 
   badge: {
     width: 26,

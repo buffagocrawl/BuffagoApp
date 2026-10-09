@@ -5,6 +5,7 @@ import logging
 import sys
 from pathlib import Path
 from uuid import uuid4
+from dataclasses import replace
 
 import pytest
 from PIL import Image
@@ -38,6 +39,80 @@ from wing_processing_worker.moderation import (  # noqa: E402
 )
 from wing_processing_worker.cli import build_provider  # noqa: E402
 from wing_processing_worker.worker import WingProcessingWorker  # noqa: E402
+
+
+def test_approved_recovery_uses_real_processor_without_rewriting_moderation(tmp_path):
+    source = tmp_path / 'recovery.png'
+    image = Image.new('RGB', (900, 600), (180, 50, 20))
+    exif = Image.Exif()
+    exif[270] = 'private recovery metadata'
+    image.save(source, exif=exif)
+    repository = FakeRepository(source)
+    repository.context = replace(repository.context, preserve_approval=True)
+    repository.settle_success = lambda *a, **k: {'job_status': 'succeeded', 'submission_status': 'approved'}
+    repository.exact_duplicate = True  # Existing approval remains authoritative.
+    worker = WingProcessingWorker(repository=repository, processor=WingMediaProcessor(),
+                                  moderation_provider=FixtureProvider(error=AssertionError('no re-moderation')),
+                                  worker_id='approved-recovery-test')
+    assert worker.run_once().status == 'APPROVED'
+    assert repository.context.processed_path in repository.uploads
+    assert repository.context.thumbnail_path in repository.uploads
+    assert not any(call[0] in {'exact_media', 'moderation', 'fingerprint', 'candidates'} for call in repository.calls)
+    import io
+    with Image.open(io.BytesIO(repository.uploads[repository.context.processed_path][0])) as processed:
+        assert processed.format == 'JPEG'
+        assert not processed.getexif()
+
+
+def test_cancelled_settlement_is_never_reported_as_success(tmp_path):
+    source = tmp_path / 'photo.png'
+    Image.new('RGB', (100, 100)).save(source)
+    repository = FakeRepository(source)
+    repository.context = replace(repository.context, preserve_approval=True)
+    repository.settle_success = lambda *a, **k: {'job_status': 'cancelled', 'submission_status': 'withdrawn'}
+    worker = WingProcessingWorker(repository=repository, processor=WingMediaProcessor(),
+                                  moderation_provider=FixtureProvider(), worker_id='cancelled-photo-test')
+    assert worker.run_once().status == 'CANCELLED'
+
+
+def test_recovery_of_corrupt_original_reports_failure_without_success(tmp_path):
+    source = tmp_path / 'bad.jpg'
+    source.write_bytes(b'not a photo')
+    repository = FakeRepository(source)
+    repository.context = replace(repository.context, preserve_approval=True)
+    worker = WingProcessingWorker(repository=repository, processor=WingMediaProcessor(),
+                                  moderation_provider=FixtureProvider(), worker_id='corrupt-recovery-test')
+    assert worker.run_once().status == 'DEAD'
+    assert not repository.uploads
+    assert repository.failure[0] is False
+
+
+@pytest.mark.parametrize('status,exit_code', [('APPROVED', 0), ('IN_REVIEW', 0), ('NO_JOB', 0),
+    ('DEAD', 3), ('RETRY', 3), ('CANCELLED', 3), ('CLAIM_SETTLEMENT_FAILED', 3)])
+def test_photo_cli_reports_non_success_without_changing_legacy_commands(monkeypatch, status, exit_code):
+    import wing_processing_worker.cli as cli
+    from types import SimpleNamespace
+    monkeypatch.setattr(cli, 'build_provider', lambda: object())
+    monkeypatch.setattr(cli.SupabaseClient, 'from_env', lambda: object())
+    monkeypatch.setattr(cli, 'WingMediaProcessor', lambda: object())
+    monkeypatch.setattr(cli, 'WingProcessingWorker', lambda **kwargs: SimpleNamespace(run_once=lambda: SimpleNamespace(status=status)))
+    assert cli.main(['--photo-once']) == exit_code
+
+
+def test_photo_cli_scopes_canary_to_one_submission(monkeypatch):
+    import wing_processing_worker.cli as cli
+    from types import SimpleNamespace
+    target = uuid4()
+    repositories = []
+    monkeypatch.setattr(cli, 'build_provider', lambda: object())
+    monkeypatch.setattr(cli.SupabaseClient, 'from_env', lambda: object())
+    monkeypatch.setattr(cli, 'WingMediaProcessor', lambda: object())
+    monkeypatch.setattr(cli, 'PhotoDerivativeRepository',
+                        lambda _client, **kwargs: repositories.append(kwargs) or object())
+    monkeypatch.setattr(cli, 'WingProcessingWorker',
+                        lambda **kwargs: SimpleNamespace(run_once=lambda: SimpleNamespace(status='APPROVED')))
+    assert cli.main(['--photo-once', '--photo-submission-id', str(target)]) == 0
+    assert repositories == [{'submission_id': target}]
 
 
 def _moderation_payload(**overrides):
