@@ -38,10 +38,11 @@ test('collapsed mission card identifies the assigned mission and its exact progr
 });
 
 test('Home clears the measured tab bar so Wing Facts remains reachable on compact Android screens', () => {
-  assert.match(home, /useBottomTabBarHeight/);
-  assert.match(home, /contentContainerStyle=\{\[styles\.scroll, \{ paddingBottom: tabBarHeight \+ 12 \}\]\}/);
-  assert.match(home, /wingFactsAction: \{ minHeight: 52/);
-  assert.match(home, /scroll: \{ paddingHorizontal: 12, paddingTop: 10, gap: 6 \}/);
+  assert.doesNotMatch(home, /useBottomTabBarHeight/);
+  assert.match(home, /contentContainerStyle=\{\[styles\.scroll, \{ paddingBottom: 16 \}\]\}/);
+  assert.match(home, /edges=\{\['top', 'left', 'right'\]\}/);
+  assert.match(home, /wingFactsAction: \{ flex: 1, minWidth: 148, minHeight: 80/);
+  assert.match(home, /scroll: \{ paddingHorizontal: 16, paddingTop: 6, gap: 8 \}/);
 });
 
 test('Rewards keeps the existing explanation and adds wrapping-safe prestige context', () => {

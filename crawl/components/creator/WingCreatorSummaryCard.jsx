@@ -73,7 +73,7 @@ export default function WingCreatorSummaryCard({ refreshKey = 0 }) {
   return (
     <Card
       testID="creator.profile-card"
-      mode="elevated"
+      mode="outlined"
       style={[
         styles.card,
         {
@@ -85,7 +85,7 @@ export default function WingCreatorSummaryCard({ refreshKey = 0 }) {
       <Card.Content style={styles.content}>
         <View style={styles.heading}>
           <View style={{ flex: 1 }}>
-            <Text variant="titleLarge" style={styles.title}>
+            <Text variant="titleMedium" style={styles.title}>
               Wing Creator
             </Text>
           </View>
@@ -119,7 +119,7 @@ export default function WingCreatorSummaryCard({ refreshKey = 0 }) {
           <>
             <View style={styles.metrics} accessible accessibilityLabel="Wing Creator totals">
               <View style={styles.metric}>
-                <Text variant="headlineSmall" style={styles.metricValue}>
+                <Text variant="titleLarge" style={styles.metricValue}>
                   {Number(stats?.creator_xp || 0).toLocaleString()}
                 </Text>
                 <Text variant="labelMedium">Creator Reputation</Text>
@@ -228,7 +228,7 @@ export default function WingCreatorSummaryCard({ refreshKey = 0 }) {
 
 const styles = StyleSheet.create({
   card: { borderRadius: 16, marginBottom: 12 },
-  content: { gap: 10, paddingVertical: 14 },
+  content: { gap: 6, paddingVertical: 10 },
   heading: { flexDirection: 'row', alignItems: 'flex-start' },
   title: { fontWeight: '800' },
   infoButton: { margin: -8, marginTop: -10, minWidth: 44, minHeight: 44 },
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   metricValue: { fontWeight: '900' },
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   empty: { opacity: 0.72, lineHeight: 18 },
-  buttonContent: { minHeight: 48 },
+  buttonContent: { minHeight: 44 },
   modalSafeArea: { flex: 1, justifyContent: 'flex-end' },
   backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.62)' },
   modalCard: { maxHeight: '88%', borderTopLeftRadius: 24, borderTopRightRadius: 24 },

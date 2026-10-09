@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Share, View } from 'react-native';
+import { Alert, Share, View, useWindowDimensions } from 'react-native';
 import { Avatar, Button, Card, Dialog, Divider, Portal, Searchbar, Text, useTheme } from 'react-native-paper';
 import QRCode from 'react-native-qrcode-svg';
 import { useRouter } from 'expo-router';
@@ -36,6 +36,8 @@ const displayName = (row) =>
 export default function FriendsPanel({ pendingBadge = 0, activityBadge = 0, onBadgeChange }) {
   const theme = useTheme();
   const router = useRouter();
+  const { width, fontScale } = useWindowDimensions();
+  const stackInviteActions = width < 360 || fontScale > 1.15;
   const [tab, setTab] = useState('friends');
   const [friends, setFriends] = useState([]);
   const [invites, setInvites] = useState([]);
@@ -75,12 +77,16 @@ export default function FriendsPanel({ pendingBadge = 0, activityBadge = 0, onBa
   }, [load]);
 
   useEffect(() => {
+    let alive = true;
+    markFriendActivitySeen(tab === 'pending' ? 'requests' : 'activity')
+      .catch(() => {
+        if (alive) setError('Activity status is temporarily unavailable.');
+      })
+      .finally(() => { if (alive) onBadgeChange?.(); });
     if (tab === 'pending') {
-      markFriendActivitySeen('requests').finally(() => onBadgeChange?.());
       trackEvent({ eventName: 'friend_request_received_viewed', screen: 'friends' });
-    } else {
-      markFriendActivitySeen('activity').finally(() => onBadgeChange?.());
     }
+    return () => { alive = false; };
   }, [tab, onBadgeChange]);
 
   useEffect(() => {
@@ -243,15 +249,16 @@ export default function FriendsPanel({ pendingBadge = 0, activityBadge = 0, onBa
             autoCapitalize="none"
           />
 
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <Button mode="contained-tonal" icon="qrcode" onPress={openQr} style={{ flex: 1 }}>
+          <View style={{ flexDirection: stackInviteActions ? 'column' : 'row', gap: 8 }}>
+            <Button mode="contained-tonal" icon="qrcode" onPress={openQr} style={{ flex: stackInviteActions ? undefined : 1 }} contentStyle={{ minHeight: 44 }}>
               My Friend QR
             </Button>
             <Button
               mode="outlined"
               icon="qrcode-scan"
               onPress={() => router.push('/friends/add')}
-              style={{ flex: 1 }}
+              style={{ flex: stackInviteActions ? undefined : 1 }}
+              contentStyle={{ minHeight: 44 }}
             >
               Enter Code
             </Button>

@@ -23,6 +23,7 @@ from .errors import DuplicateMediaError, WorkerContractError, WorkerError
 from .models import FingerprintCandidate, ProcessingClaim, ProcessingContext
 from .moderation import ModerationProvider
 from .repository import ProcessingRepository
+from wing_media_processing.sniff import sniff_photo
 
 
 @dataclass(frozen=True, slots=True)
@@ -113,19 +114,22 @@ class WingProcessingWorker:
         try:
             context = self.repository.begin(claim)
             self._process_claim(claim, context)
-            self.repository.settle_success(
+            receipt = self.repository.settle_success(
                 claim,
                 context,
                 perceptual_hash=self._perceptual_hash,
             )
+            status = (str(receipt.get("submission_status", "in_review")).upper()
+                      if receipt.get("job_status") == "succeeded"
+                      else str(receipt.get("job_status", "cancelled")).upper())
             self._event(
                 "wing_processing_completed",
                 job_id=str(claim.job_id),
                 submission_id=str(claim.submission_id),
-                status="IN_REVIEW",
+                status=status,
             )
             return ProcessingOutcome(
-                status="IN_REVIEW",
+                status=status,
                 job_id=claim.job_id,
                 submission_id=claim.submission_id,
             )
@@ -159,7 +163,7 @@ class WingProcessingWorker:
                 status="RUNNING",
             )
             content_hash = hashlib.sha256(source.read_bytes()).hexdigest()
-            if self.repository.register_exact_media(
+            if not context.preserve_approval and self.repository.register_exact_media(
                 context,
                 content_hash=content_hash,
                 size_bytes=source.stat().st_size,
@@ -167,6 +171,11 @@ class WingProcessingWorker:
                 raise DuplicateMediaError()
             if context.media_type == "video":
                 self._event("transcoding_started", submission_id=str(context.submission_id), status="RUNNING")
+            else:
+                # A declared photo must decode as a photo. Do not fall through
+                # to video probing and misclassify corrupt images as a missing
+                # FFmpeg dependency that can be retried indefinitely.
+                sniff_photo(source)
             try:
                 artifacts = self.processor.process(
                     source,
@@ -228,6 +237,10 @@ class WingProcessingWorker:
                 content_type="image/jpeg",
             )
 
+            # Derive already-reviewed content without rewriting human approval
+            # through advisory moderation or duplicate classification.
+            if context.preserve_approval:
+                return
             candidates = self.repository.fingerprint_candidates(
                 context,
                 algorithm=algorithm,

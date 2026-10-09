@@ -2,22 +2,220 @@
   "generated_at": "2026-10-06T14:22:00Z",
   "timezone": "America/New_York",
   "product_pulse": {
-    "wing_ratings": {"total": 309, "last_24h": 12, "previous_24h": 8, "change_pct": 50, "direction": "up"},
-    "active_users": {"last_24h": 47, "previous_24h": 52, "change_pct": -9.6, "direction": "down"},
-    "feedback": {"open_total": 3, "new_open_24h": 1, "oldest_open_at": "2026-10-04T18:00:00Z"},
+    "device_opens": {
+      "all_time": {
+        "total": 42,
+        "ios": 13,
+        "android": 29
+      },
+      "last_24h": {
+        "total": 6,
+        "ios": 2,
+        "android": 4
+      }
+    },
+    "calendar_mau": {
+      "previous_month": {
+        "month": "2026-09-01",
+        "value": 8
+      },
+      "current_month": {
+        "month": "2026-10-01",
+        "value": 11
+      }
+    },
+    "totals": {
+      "wing_ratings": 137,
+      "restaurants": 83,
+      "accounts": 20,
+      "users_created": 20
+    },
+    "monthly_history": [
+      {
+        "month": "2025-11-01",
+        "mau": null,
+        "unique_devices": null,
+        "wing_ratings": 12,
+        "new_accounts": 2,
+        "app_open_tracking_available": false
+      },
+      {
+        "month": "2025-12-01",
+        "mau": null,
+        "unique_devices": null,
+        "wing_ratings": 14,
+        "new_accounts": 1,
+        "app_open_tracking_available": false
+      },
+      {
+        "month": "2026-01-01",
+        "mau": null,
+        "unique_devices": null,
+        "wing_ratings": 15,
+        "new_accounts": 2,
+        "app_open_tracking_available": false
+      },
+      {
+        "month": "2026-02-01",
+        "mau": null,
+        "unique_devices": null,
+        "wing_ratings": 17,
+        "new_accounts": 1,
+        "app_open_tracking_available": false
+      },
+      {
+        "month": "2026-03-01",
+        "mau": null,
+        "unique_devices": null,
+        "wing_ratings": 18,
+        "new_accounts": 2,
+        "app_open_tracking_available": false
+      },
+      {
+        "month": "2026-04-01",
+        "mau": null,
+        "unique_devices": null,
+        "wing_ratings": 20,
+        "new_accounts": 2,
+        "app_open_tracking_available": false
+      },
+      {
+        "month": "2026-05-01",
+        "mau": null,
+        "unique_devices": null,
+        "wing_ratings": 22,
+        "new_accounts": 3,
+        "app_open_tracking_available": false
+      },
+      {
+        "month": "2026-06-01",
+        "mau": 5,
+        "unique_devices": 31,
+        "wing_ratings": 24,
+        "new_accounts": 4,
+        "app_open_tracking_available": true
+      },
+      {
+        "month": "2026-07-01",
+        "mau": 6,
+        "unique_devices": 34,
+        "wing_ratings": 27,
+        "new_accounts": 3,
+        "app_open_tracking_available": true
+      },
+      {
+        "month": "2026-08-01",
+        "mau": 7,
+        "unique_devices": 36,
+        "wing_ratings": 29,
+        "new_accounts": 4,
+        "app_open_tracking_available": true
+      },
+      {
+        "month": "2026-09-01",
+        "mau": 8,
+        "unique_devices": 39,
+        "wing_ratings": 31,
+        "new_accounts": 4,
+        "app_open_tracking_available": true
+      },
+      {
+        "month": "2026-10-01",
+        "mau": 11,
+        "unique_devices": 42,
+        "wing_ratings": 34,
+        "new_accounts": 5,
+        "app_open_tracking_available": true
+      }
+    ],
+    "pending_photos": {
+      "total": 2
+    },
+    "open_work": {
+      "total": 0
+    },
+    "wing_ratings": {
+      "total": 309,
+      "last_24h": 12,
+      "previous_24h": 8,
+      "change_pct": 50,
+      "direction": "up"
+    },
+    "active_users": {
+      "last_24h": 47,
+      "previous_24h": 52,
+      "change_pct": -9.6,
+      "direction": "down"
+    },
+    "feedback": {
+      "open_total": 3,
+      "new_open_24h": 1,
+      "oldest_open_at": "2026-10-04T18:00:00Z"
+    },
     "store": {
-      "ios": {"downloads_total": 684, "downloads_daily": 18, "store_rating": 4.8, "store_rating_count": 42},
-      "android": {"downloads_total": 1284, "downloads_daily": 31, "store_rating": 4.7, "store_rating_count": 86}
+      "ios": {
+        "downloads_total": 684,
+        "downloads_daily": 18,
+        "store_rating": 4.8,
+        "store_rating_count": 42,
+        "metric_date": "2026-10-05",
+        "fetched_at": "2026-10-06T14:00:00Z"
+      },
+      "android": {
+        "downloads_total": 1284,
+        "downloads_daily": 31,
+        "store_rating": 4.7,
+        "store_rating_count": 86,
+        "metric_date": "2026-10-05",
+        "fetched_at": "2026-10-06T14:00:00Z"
+      }
+    },
+    "catalog_health": {
+      "restaurants_without_ratings": {
+        "count": 163,
+        "percentage": 28.6
+      },
+      "restaurants_without_photos": {
+        "count": 412,
+        "percentage": 72.3
+      }
     }
   },
   "growth_7d": {
     "window": "rolling_7d_vs_previous_7d",
-    "wing_ratings": {"current": 36, "previous": 24, "change_pct": 50.0, "direction": "up"},
-    "active_users": {"current": 254, "previous": 184, "change_pct": 38.0, "direction": "up"},
-    "new_users": {"current": 17, "previous": 21, "change_pct": -19.0, "direction": "down"},
+    "wing_ratings": {
+      "current": 36,
+      "previous": 24,
+      "change_pct": 50.0,
+      "direction": "up"
+    },
+    "active_users": {
+      "current": 254,
+      "previous": 184,
+      "change_pct": 38.0,
+      "direction": "up"
+    },
+    "new_users": {
+      "current": 17,
+      "previous": 21,
+      "change_pct": -19.0,
+      "direction": "down"
+    },
     "downloads": {
-      "ios": {"current": 42, "previous": 33, "current_days_available": 7, "previous_days_available": 7, "change_pct": 27.3},
-      "android": {"current": 67, "previous": 54, "current_days_available": 7, "previous_days_available": 7, "change_pct": 24.1}
+      "ios": {
+        "current": 42,
+        "previous": 33,
+        "current_days_available": 7,
+        "previous_days_available": 7,
+        "change_pct": 27.3
+      },
+      "android": {
+        "current": 67,
+        "previous": 54,
+        "current_days_available": 7,
+        "previous_days_available": 7,
+        "change_pct": 24.1
+      }
     }
   },
   "growth_os": {
@@ -62,20 +260,245 @@
       "expires_at": null
     }
   },
+  "marketing": {
+    "score": 62,
+    "score_version": "v1",
+    "confidence": "limited",
+    "explanation": "MAU is rebounding, while app-open tracking covers 5 months, so score confidence is limited.",
+    "factors": {
+      "mau": 59,
+      "acquisition": 58,
+      "engagement": 57,
+      "account_growth": 55
+    }
+  },
   "history_14d": [
-    {"date": "2026-09-23", "wing_ratings": 2, "active_users": 21, "new_users": 2, "ios_downloads": 4, "android_downloads": 7},
-    {"date": "2026-09-24", "wing_ratings": 4, "active_users": 28, "new_users": 4, "ios_downloads": 5, "android_downloads": 8},
-    {"date": "2026-09-25", "wing_ratings": 3, "active_users": 24, "new_users": 3, "ios_downloads": 4, "android_downloads": 7},
-    {"date": "2026-09-26", "wing_ratings": 5, "active_users": 31, "new_users": 3, "ios_downloads": 6, "android_downloads": 9},
-    {"date": "2026-09-27", "wing_ratings": 2, "active_users": 19, "new_users": 2, "ios_downloads": 3, "android_downloads": 6},
-    {"date": "2026-09-28", "wing_ratings": 3, "active_users": 26, "new_users": 4, "ios_downloads": 5, "android_downloads": 8},
-    {"date": "2026-09-29", "wing_ratings": 5, "active_users": 35, "new_users": 3, "ios_downloads": 6, "android_downloads": 9},
-    {"date": "2026-09-30", "wing_ratings": 4, "active_users": 29, "new_users": 2, "ios_downloads": 5, "android_downloads": 8},
-    {"date": "2026-10-01", "wing_ratings": 6, "active_users": 38, "new_users": 3, "ios_downloads": 7, "android_downloads": 10},
-    {"date": "2026-10-02", "wing_ratings": 3, "active_users": 27, "new_users": 1, "ios_downloads": 4, "android_downloads": 7},
-    {"date": "2026-10-03", "wing_ratings": 7, "active_users": 44, "new_users": 4, "ios_downloads": 8, "android_downloads": 12},
-    {"date": "2026-10-04", "wing_ratings": 4, "active_users": 33, "new_users": 2, "ios_downloads": 5, "android_downloads": 9},
-    {"date": "2026-10-05", "wing_ratings": 5, "active_users": 36, "new_users": 2, "ios_downloads": 6, "android_downloads": 10},
-    {"date": "2026-10-06", "wing_ratings": 7, "active_users": 47, "new_users": 3, "ios_downloads": 7, "android_downloads": 11}
-  ]
+    {
+      "date": "2026-09-23",
+      "wing_ratings": 2,
+      "active_users": 21,
+      "new_users": 2,
+      "ios_downloads": 4,
+      "android_downloads": 7
+    },
+    {
+      "date": "2026-09-24",
+      "wing_ratings": 4,
+      "active_users": 28,
+      "new_users": 4,
+      "ios_downloads": 5,
+      "android_downloads": 8
+    },
+    {
+      "date": "2026-09-25",
+      "wing_ratings": 3,
+      "active_users": 24,
+      "new_users": 3,
+      "ios_downloads": 4,
+      "android_downloads": 7
+    },
+    {
+      "date": "2026-09-26",
+      "wing_ratings": 5,
+      "active_users": 31,
+      "new_users": 3,
+      "ios_downloads": 6,
+      "android_downloads": 9
+    },
+    {
+      "date": "2026-09-27",
+      "wing_ratings": 2,
+      "active_users": 19,
+      "new_users": 2,
+      "ios_downloads": 3,
+      "android_downloads": 6
+    },
+    {
+      "date": "2026-09-28",
+      "wing_ratings": 3,
+      "active_users": 26,
+      "new_users": 4,
+      "ios_downloads": 5,
+      "android_downloads": 8
+    },
+    {
+      "date": "2026-09-29",
+      "wing_ratings": 5,
+      "active_users": 35,
+      "new_users": 3,
+      "ios_downloads": 6,
+      "android_downloads": 9
+    },
+    {
+      "date": "2026-09-30",
+      "wing_ratings": 4,
+      "active_users": 29,
+      "new_users": 2,
+      "ios_downloads": 5,
+      "android_downloads": 8
+    },
+    {
+      "date": "2026-10-01",
+      "wing_ratings": 6,
+      "active_users": 38,
+      "new_users": 3,
+      "ios_downloads": 7,
+      "android_downloads": 10
+    },
+    {
+      "date": "2026-10-02",
+      "wing_ratings": 3,
+      "active_users": 27,
+      "new_users": 1,
+      "ios_downloads": 4,
+      "android_downloads": 7
+    },
+    {
+      "date": "2026-10-03",
+      "wing_ratings": 7,
+      "active_users": 44,
+      "new_users": 4,
+      "ios_downloads": 8,
+      "android_downloads": 12
+    },
+    {
+      "date": "2026-10-04",
+      "wing_ratings": 4,
+      "active_users": 33,
+      "new_users": 2,
+      "ios_downloads": 5,
+      "android_downloads": 9
+    },
+    {
+      "date": "2026-10-05",
+      "wing_ratings": 5,
+      "active_users": 36,
+      "new_users": 2,
+      "ios_downloads": 6,
+      "android_downloads": 10
+    },
+    {
+      "date": "2026-10-06",
+      "wing_ratings": 7,
+      "active_users": 47,
+      "new_users": 3,
+      "ios_downloads": 7,
+      "android_downloads": 11
+    }
+  ],
+  "recent_activity": {
+    "logins": [
+      {
+        "user_id": "demo-0",
+        "display_name": "Sarah M.",
+        "occurred_at": "2026-10-08T16:55:00Z"
+      },
+      {
+        "user_id": "demo-1",
+        "display_name": "wingking42",
+        "occurred_at": "2026-10-08T16:51:00Z"
+      },
+      {
+        "user_id": "demo-2",
+        "display_name": "John",
+        "occurred_at": "2026-10-08T16:47:00Z"
+      },
+      {
+        "user_id": "demo-3",
+        "display_name": "Maya",
+        "occurred_at": "2026-10-08T16:43:00Z"
+      },
+      {
+        "user_id": "demo-4",
+        "display_name": "Chris",
+        "occurred_at": "2026-10-08T16:39:00Z"
+      },
+      {
+        "user_id": "demo-5",
+        "display_name": "Elena",
+        "occurred_at": "2026-10-08T15:35:00Z"
+      },
+      {
+        "user_id": "demo-6",
+        "display_name": "flatsfan",
+        "occurred_at": "2026-10-08T15:31:00Z"
+      },
+      {
+        "user_id": "demo-7",
+        "display_name": "Alex",
+        "occurred_at": "2026-10-08T15:27:00Z"
+      },
+      {
+        "user_id": "demo-8",
+        "display_name": "Nico",
+        "occurred_at": "2026-10-08T15:23:00Z"
+      },
+      {
+        "user_id": "demo-9",
+        "display_name": "Jamie",
+        "occurred_at": "2026-10-08T15:19:00Z"
+      }
+    ],
+    "ratings": [
+      {
+        "destination_name": "J. Timothy’s",
+        "city": "Plainville",
+        "created_at": "2026-10-08T16:50:00Z"
+      },
+      {
+        "destination_name": "Archie Moore’s",
+        "city": "New Haven",
+        "created_at": "2026-10-08T16:46:00Z"
+      },
+      {
+        "destination_name": "Sliders",
+        "city": "Berlin",
+        "created_at": "2026-10-08T16:42:00Z"
+      },
+      {
+        "destination_name": "Hoodoo Brown",
+        "city": "Ridgefield",
+        "created_at": "2026-10-08T16:38:00Z"
+      },
+      {
+        "destination_name": "Dew Drop Inn",
+        "city": "Derby",
+        "created_at": "2026-10-08T16:34:00Z"
+      },
+      {
+        "destination_name": "Blind Rhino",
+        "city": "Norwalk",
+        "created_at": "2026-10-08T15:30:00Z"
+      },
+      {
+        "destination_name": "TK’s",
+        "city": "Danbury",
+        "created_at": "2026-10-08T15:26:00Z"
+      },
+      {
+        "destination_name": "The Bidwell",
+        "city": "Coventry",
+        "created_at": "2026-10-08T15:22:00Z"
+      },
+      {
+        "destination_name": "Black Bear",
+        "city": "Hartford",
+        "created_at": "2026-10-08T15:18:00Z"
+      },
+      {
+        "destination_name": "Side Street",
+        "city": "Hamden",
+        "created_at": "2026-10-08T15:14:00Z"
+      }
+    ]
+  },
+  "marketing_weekly_goal": {
+    "week_start": "2026-10-05",
+    "goal": "Acquire 3 qualified active users from one measurable channel.",
+    "next_step": "Launch one tracked local acquisition test.",
+    "what_to_do": "Choose one restaurant and one local audience. Share one creative with a tagged app link; record channel clicks and first opens. Keep the test to one channel.",
+    "expected_result": "3 attributable or likely incremental mobile users; at least one repeat open. Compare with the pre-test baseline.",
+    "timeline": "Launch Monday. Check Wednesday. Review Sunday.",
+    "why": "Device acquisition is the weakest available Marketing Score factor. Review pending photos before featuring community content."
+  }
 }

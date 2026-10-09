@@ -1,6 +1,8 @@
 .env
 data/snapshot-cache.json
 data/snapshot-cache.json.tmp
+data/marketing-missions.json
+data/marketing-missions.json.tmp
 logs/
 __pycache__/
 *.py[cod]

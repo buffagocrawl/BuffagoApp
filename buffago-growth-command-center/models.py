@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
+from decimal import Decimal
 import math
 from typing import Any
 
@@ -197,18 +198,144 @@ class HistoryPoint:
 
 
 @dataclass(frozen=True)
+class MonthlyPoint:
+    month: date
+    mau: int | float | None = None
+    unique_devices: int | float | None = None
+    wing_ratings: int | float | None = None
+    new_accounts: int | float | None = None
+    app_open_tracking_available: bool = False
+
+    @classmethod
+    def parse(cls, value: Any) -> "MonthlyPoint | None":
+        data = as_dict(value)
+        raw_month = data.get("month")
+        month = None
+        if (isinstance(raw_month, str) and len(raw_month) == 7
+                and raw_month[4] == "-" and raw_month[:4].isdigit() and raw_month[5:].isdigit()):
+            try:
+                month = datetime.strptime(raw_month, "%Y-%m").date()
+            except ValueError:
+                pass
+        if month is None:
+            month = parse_date(raw_month)
+        if month is None:
+            return None
+        available = data.get("app_open_tracking_available") is True
+        return cls(month.replace(day=1), as_number(data.get("mau")) if available else None,
+                   as_number(data.get("unique_devices")) if available else None,
+                   as_number(data.get("wing_ratings")), as_number(data.get("new_accounts")), available)
+
+
+@dataclass(frozen=True)
+class MarketingScore:
+    score: int = 0
+    score_version: str = "v1"
+    confidence: str = "limited"
+    explanation: str = "App-open tracking history is limited."
+    factors: dict[str, int | None] = field(default_factory=dict)
+
+
+MARKETING_SCORE_WEIGHTS = {"mau": 0.40, "acquisition": 0.25, "engagement": 0.20, "account_growth": 0.15}
+
+
+def _momentum_factor(values: list[int | float | None]) -> int | None:
+    """v1: compare recency-weighted averages of the newer/older available halves.
+
+    Monthly recency weights rise linearly from 1.0 to 2.0 across the 12 slots.
+    Missing values are omitted. A five-activity pseudocount smooths small samples;
+    relative movement is capped to [-1, 1] before mapping to a 0-100 factor.
+    """
+    present = [(index, float(value)) for index, value in enumerate(values) if value is not None]
+    if len(present) < 2:
+        return None
+    split = len(present) // 2
+    previous, recent = present[:split], present[split:]
+
+    def weighted_average(items: list[tuple[int, float]]) -> Decimal:
+        weighted = [(Decimal(str(value)), Decimal(1) + Decimal(index) / Decimal(max(1, len(values) - 1)))
+                    for index, value in items]
+        return sum(v * w for v, w in weighted) / sum(w for _, w in weighted)
+
+    prior = weighted_average(previous)
+    change = (weighted_average(recent) - prior) / (prior + Decimal(5))
+    change = max(Decimal(-1), min(Decimal(1), change))
+    return math.floor(Decimal(50) + Decimal(50) * change + Decimal("0.5"))
+
+
+def marketing_score(months: tuple[MonthlyPoint, ...] | list[MonthlyPoint]) -> MarketingScore:
+    """Calculate reproducible Growth Command Center Marketing Score v1."""
+    points = list(months)[-12:]
+    if len(points) < 12:
+        points = [MonthlyPoint(date(2000, 1, 1))] * (12 - len(points)) + points
+    tracked = sum(1 for point in points if point.app_open_tracking_available)
+    confidence = "limited" if tracked < 6 else "medium" if tracked <= 8 else "high"
+    factors = {
+        "mau": _momentum_factor([p.mau if p.app_open_tracking_available else None for p in points]),
+        "acquisition": _momentum_factor([p.unique_devices if p.app_open_tracking_available else None for p in points]),
+        "engagement": _momentum_factor([p.wing_ratings for p in points]),
+        "account_growth": _momentum_factor([p.new_accounts for p in points]),
+    }
+    active = [(factors[key], weight) for key, weight in MARKETING_SCORE_WEIGHTS.items() if factors[key] is not None]
+    if active:
+        weighted = [(Decimal(value), Decimal(str(weight))) for value, weight in active]
+        score = math.floor(sum(value * weight for value, weight in weighted) /
+                           sum(weight for _, weight in weighted) + Decimal("0.5"))
+    else:
+        score = 0
+    named = {"mau": "MAU", "acquisition": "device acquisition", "engagement": "rating engagement", "account_growth": "new-account growth"}
+    available = [(key, value) for key, value in factors.items() if value is not None]
+    strongest = max(available, key=lambda item: item[1], default=None)
+    weakest = min(available, key=lambda item: item[1], default=None)
+    if strongest and weakest and strongest[0] != weakest[0] and strongest[1] >= 55 and weakest[1] <= 45:
+        explanation = f"{named[strongest[0]]} is improving while {named[weakest[0]]} remains weak."
+    elif strongest and weakest and strongest[0] != weakest[0] and weakest[1] <= 45 and strongest[1] - weakest[1] >= 15:
+        explanation = f"{named[weakest[0]]} is weak; {named[strongest[0]]} is holding up."
+    elif weakest and weakest[1] <= 45:
+        explanation = f"Growth momentum is soft, led by weakness in {named[weakest[0]]}."
+    elif available:
+        explanation = "Growth factors are broadly steady." if all(40 <= v <= 60 for _, v in available) else f"{named[strongest[0]]} leads current growth momentum."
+    else:
+        explanation = "Not enough monthly history to score growth yet."
+    if tracked < 9:
+        explanation += f" App-open tracking covers {tracked} months, so score confidence is {confidence}."
+    return MarketingScore(score, "v1", confidence, explanation, factors)
+
+
+@dataclass(frozen=True)
 class StoreMetric:
     downloads_total: int | float | None = None
     downloads_daily: int | float | None = None
     store_rating: int | float | None = None
     store_rating_count: int | float | None = None
+    metric_date: date | None = None
+    fetched_at: datetime | None = None
 
     @classmethod
     def parse(cls, value: Any) -> "StoreMetric":
         data = as_dict(value)
         return cls(*(as_number(data.get(key)) for key in (
             "downloads_total", "downloads_daily", "store_rating", "store_rating_count"
-        )))
+        )), metric_date=parse_date(data.get("metric_date")), fetched_at=parse_datetime(data.get("fetched_at")))
+
+
+@dataclass(frozen=True)
+class DeviceOpens:
+    total: int | float | None = None
+    ios: int | float | None = None
+    android: int | float | None = None
+
+    @classmethod
+    def parse(cls, value: Any) -> "DeviceOpens":
+        data = as_dict(value)
+        ios, android = as_number(data.get("ios")), as_number(data.get("android"))
+        # Historical snapshot totals could include web IDs. The wall is mobile-only.
+        total = ios + android if ios is not None and android is not None else None
+        return cls(total, ios, android)
+
+    @property
+    def breakdown(self) -> str:
+        return f"iOS {fmt_number(self.ios)}  •  Android {fmt_number(self.android)}"
 
 
 @dataclass(frozen=True)
@@ -383,6 +510,20 @@ class GrowthOSState:
 
 @dataclass(frozen=True)
 class Snapshot:
+    recent_activity: dict[str, tuple[dict[str, Any], ...]] = field(default_factory=dict)
+    marketing_weekly_goal: dict[str, str] = field(default_factory=dict)
+    catalog_health: dict[str, dict[str, Any]] = field(default_factory=dict)
+    device_all_time: DeviceOpens = field(default_factory=DeviceOpens)
+    device_last_24h: DeviceOpens = field(default_factory=DeviceOpens)
+    device_previous_24h: DeviceOpens = field(default_factory=DeviceOpens)
+    pending_photos: int | float | None = None
+    open_work: int | float | None = None
+    calendar_previous_month: tuple[str | None, int | float | None] = (None, None)
+    calendar_current_month: tuple[str | None, int | float | None] = (None, None)
+    total_restaurants: int | float | None = None
+    total_accounts: int | float | None = None
+    monthly_history: tuple[MonthlyPoint, ...] = ()
+    marketing: MarketingScore = field(default_factory=MarketingScore)
     generated_at: datetime | None = None
     wing_total: int | float | None = None
     wing: TrendMetric = field(default_factory=TrendMetric)
@@ -405,7 +546,10 @@ class Snapshot:
         if not isinstance(payload, dict):
             raise ValueError("Snapshot payload must be a JSON object")
         pulse = as_dict(payload.get("product_pulse"))
+        devices = as_dict(pulse.get("device_opens"))
         wing_data = as_dict(pulse.get("wing_ratings"))
+        calendar = as_dict(pulse.get("calendar_mau"))
+        totals = as_dict(pulse.get("totals"))
         feedback = as_dict(pulse.get("feedback"))
         store = as_dict(pulse.get("store"))
         growth = as_dict(payload.get("growth_7d"))
@@ -416,9 +560,52 @@ class Snapshot:
                 point = HistoryPoint.parse(value)
                 if point is not None:
                     history.append(point)
+        monthly_values = pulse.get("monthly_history")
+        monthly = []
+        if isinstance(monthly_values, list):
+            for value in monthly_values:
+                point = MonthlyPoint.parse(value)
+                if point is not None:
+                    monthly.append(point)
+        marketing_data = as_dict(payload.get("marketing"))
+        calculated_marketing = marketing_score(monthly)
+        factor_data = as_dict(marketing_data.get("factors"))
+        supplied_score = as_number(marketing_data.get("score"))
+        marketing = MarketingScore(
+            int(supplied_score if supplied_score is not None else calculated_marketing.score),
+            as_text(marketing_data.get("score_version")) or calculated_marketing.score_version,
+            as_text(marketing_data.get("confidence")) or calculated_marketing.confidence,
+            as_text(marketing_data.get("explanation")) or calculated_marketing.explanation,
+            {key: as_number(as_dict(factor_data.get(key)).get('score') if isinstance(factor_data.get(key), dict)
+                            else factor_data.get(key)) if key in factor_data else calculated_marketing.factors.get(key)
+             for key in MARKETING_SCORE_WEIGHTS},
+        )
+        previous_month, current_month = as_dict(calendar.get("previous_month")), as_dict(calendar.get("current_month"))
         return cls(
+            recent_activity={key: tuple({field: item.get(field) for field in fields}
+                for item in as_dict(payload.get('recent_activity')).get(key, [])[:10] if isinstance(item, dict))
+                for key, fields in (('logins', ('user_id', 'display_name', 'occurred_at')),
+                                    ('ratings', ('destination_name', 'city', 'created_at')))
+                if isinstance(as_dict(payload.get('recent_activity')).get(key, []), list)},
+            marketing_weekly_goal={key: as_text(as_dict(payload.get('marketing_weekly_goal')).get(key)) or ''
+                for key in ('week_start', 'goal', 'next_step', 'what_to_do', 'expected_result', 'timeline', 'why')},
+            catalog_health={key: {'count': as_number(as_dict(as_dict(pulse.get('catalog_health')).get(key)).get('count')),
+                'percentage': as_number(as_dict(as_dict(pulse.get('catalog_health')).get(key)).get('percentage'))}
+                for key in ('restaurants_without_ratings', 'restaurants_without_photos')},
+            device_all_time=DeviceOpens.parse(devices.get("all_time")),
+            device_last_24h=DeviceOpens.parse(devices.get("last_24h")),
+            device_previous_24h=DeviceOpens.parse(devices.get("previous_24h")),
+            pending_photos=as_number(as_dict(pulse.get("pending_photos")).get("total")),
+            open_work=as_number(as_dict(pulse.get("open_work")).get("total")),
+            calendar_previous_month=(as_text(previous_month.get("month")), as_number(previous_month.get("value"))),
+            calendar_current_month=(as_text(current_month.get("month")), as_number(current_month.get("value"))),
+            total_restaurants=as_number(totals.get("restaurants")),
+            total_accounts=as_number(totals.get("users_created", totals.get("accounts"))),
+            monthly_history=tuple(monthly),
+            marketing=marketing,
             generated_at=parse_datetime(payload.get("generated_at")),
-            wing_total=as_number(wing_data.get("total")),
+            wing_total=(as_number(totals.get("wing_ratings")) if "wing_ratings" in totals
+                        else as_number(wing_data.get("total"))),
             wing=TrendMetric.parse(wing_data),
             users=TrendMetric.parse(pulse.get("active_users")),
             feedback_open=as_number(feedback.get("open_total")),

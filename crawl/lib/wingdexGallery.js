@@ -12,6 +12,8 @@ export function normalizeWingdexGalleryResponse(payload) {
     result[String(row.destination_id)] = {
       count: Number.isFinite(Number(row.picture_count)) && row.picture_count != null
         ? Math.max(0, Number(row.picture_count)) : images.length,
+      approvedSubmissionCount: Number.isFinite(Number(row.approved_submission_count)) && row.approved_submission_count != null
+        ? Math.max(0, Number(row.approved_submission_count)) : null,
       images,
     };
     return result;
@@ -25,12 +27,27 @@ export async function loadWingdexGallery(destinationIds, client) {
   // Match the server limit instead of silently losing counts beyond 250 places.
   for (let start = 0; start < ids.length; start += 250) {
     const { data, error } = await client.functions.invoke('wing-public-gallery', {
-      body: { destination_ids: ids.slice(start, start + 250), include_images: false },
+      body: { destination_ids: ids.slice(start, start + 250), include_images: false, include_covers: true },
     });
     if (error || data?.ok === false) throw error || new Error('Pictures are temporarily unavailable.');
     Object.assign(result, normalizeWingdexGalleryResponse(data));
   }
   return result;
+}
+
+/** Revalidate approval and sign only the selected processed asset. */
+export async function loadWingdexFullPhoto(photo, client) {
+  const { data, error } = await client.functions.invoke('wing-public-gallery', {
+    body: { destination_ids: [photo.destination_id], submission_id: photo.submission_id },
+  });
+  if (error || data?.ok === false) throw new Error('Photo unavailable. Check your connection and retry.');
+  const image = normalizeWingdexGalleryResponse(data)[photo.destination_id]?.images[0];
+  // Older deployed handlers may ignore submission_id and return a different
+  // photo from the same restaurant. Never substitute that image in the viewer.
+  if (!image?.submission_id || image.submission_id !== photo.submission_id) {
+    throw new Error('This photo is no longer available.');
+  }
+  return image;
 }
 
 export async function loadWingdexRestaurantGallery(destinationId, client, { offset = 0 } = {}) {

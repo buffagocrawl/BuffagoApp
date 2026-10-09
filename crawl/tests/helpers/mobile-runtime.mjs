@@ -56,5 +56,7 @@ export function findElement(tree, testID) {
   if (!tree) return null;
   if (Array.isArray(tree)) return tree.map((node) => findElement(node, testID)).find(Boolean) || null;
   if (tree.props?.testID === testID) return tree;
+  if (tree.type === 'flatlist') return findElement(tree.props.data.map((item, index) =>
+    tree.props.renderItem({ item, index })), testID);
   return findElement(tree.props?.children, testID);
 }

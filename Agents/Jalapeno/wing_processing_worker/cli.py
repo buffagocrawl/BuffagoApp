@@ -8,6 +8,7 @@ import logging
 import os
 import socket
 import sys
+from uuid import UUID
 
 from supabase_client import SupabaseClient
 from wing_media_processing import WingMediaProcessor
@@ -19,6 +20,7 @@ from .moderation import (
     ManualReviewTestProvider,
 )
 from .repository import ProcessingRepository
+from .photo_derivatives import PhotoDerivativeRepository
 from .worker import WingProcessingWorker
 
 
@@ -63,6 +65,10 @@ def _worker_id() -> str:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Process private Wing Shot media")
     parser.add_argument("--once", action="store_true", help="Process at most one job")
+    parser.add_argument("--photo-once", action="store_true", help="Process one queued photo derivative job")
+    parser.add_argument("--photo-drain", type=int, default=0, help="Process up to N queued photo derivative jobs")
+    parser.add_argument("--photo-submission-id", type=UUID,
+                        help="Claim photo jobs only for this submission")
     parser.add_argument(
         "--drain",
         type=int,
@@ -86,16 +92,22 @@ def main(argv: list[str] | None = None) -> int:
         help="Validate required configuration without claiming a job",
     )
     args = parser.parse_args(argv)
+    if args.photo_drain < 0 or args.photo_drain > 100:
+        parser.error("--photo-drain must be between 0 and 100")
     if args.drain < 0 or args.drain > 100:
         parser.error("--drain must be between 0 and 100")
     if args.cleanup_drain < 0 or args.cleanup_drain > 100:
         parser.error("--cleanup-drain must be between 0 and 100")
+    if args.photo_submission_id and (not (args.photo_once or args.photo_drain)
+                                      or args.once or args.drain or args.cleanup_once or args.cleanup_drain):
+        parser.error("--photo-submission-id requires only --photo-once or --photo-drain")
     if (
         not args.once
         and args.drain == 0
         and not args.cleanup_once
         and args.cleanup_drain == 0
         and not args.validate_config
+        and not args.photo_once and args.photo_drain == 0
     ):
         parser.error(
             "choose --once, --drain N, --cleanup-once, "
@@ -104,7 +116,7 @@ def main(argv: list[str] | None = None) -> int:
 
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     try:
-        provider_required = args.validate_config or args.once or args.drain > 0
+        provider_required = args.validate_config or args.once or args.drain > 0 or args.photo_once or args.photo_drain > 0
         provider = (
             build_provider()
             if provider_required
@@ -134,12 +146,23 @@ def main(argv: list[str] | None = None) -> int:
         outcome = worker.run_once()
         if outcome.status == "NO_JOB":
             break
+    photo_worker = WingProcessingWorker(
+        repository=PhotoDerivativeRepository(client, submission_id=args.photo_submission_id), processor=WingMediaProcessor(),
+        moderation_provider=provider, worker_id=_worker_id(),
+    )
+    photo_failed = False
+    for _ in range(1 if args.photo_once else args.photo_drain):
+        outcome = photo_worker.run_once()
+        if outcome.status == "NO_JOB":
+            break
+        if outcome.status not in {"IN_REVIEW", "APPROVED"}:
+            photo_failed = True
     cleanup_count = 1 if args.cleanup_once else args.cleanup_drain
     for _ in range(cleanup_count):
         outcome = worker.run_cleanup_once()
         if outcome.status == "NO_JOB":
             break
-    return 0
+    return 3 if photo_failed else 0
 
 
 if __name__ == "__main__":

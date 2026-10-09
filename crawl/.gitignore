@@ -52,3 +52,10 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Reproducible UI/gallery QA output; retain source fixtures and reports in tests/docs.
+/artifacts/operation-ui-overhaul/
+/artifacts/visual-polish-v2/
+/artifacts/wingdex-photos/
+/artifacts/branch-consolidation/
+/artifacts/consolidation-native/

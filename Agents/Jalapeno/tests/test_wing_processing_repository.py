@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import pytest
 from pathlib import Path
 from types import SimpleNamespace
 from uuid import uuid4
@@ -16,6 +17,65 @@ from wing_processing_worker.models import (  # noqa: E402
     ProcessingContext,
 )
 from wing_processing_worker.repository import ProcessingRepository  # noqa: E402
+from wing_processing_worker.photo_derivatives import PhotoDerivativeRepository  # noqa: E402
+from wing_processing_worker.errors import RetryableWorkerError, WorkerContractError  # noqa: E402
+
+
+def test_photo_repository_revalidates_before_private_storage_io(tmp_path):
+    client = FakeClient()
+    submission, job, token, correlation = uuid4(), uuid4(), uuid4(), uuid4()
+    revoked = False
+
+    def request(method, path, *, json_payload):
+        client.calls.append((method, path, json_payload))
+        if path.endswith('claim_wing_photo_derivative_job'):
+            return {'job_id': str(job), 'submission_id': str(submission), 'job_kind': 'photo_process', 'claim_token': str(token)}
+        if revoked:
+            raise RuntimeError('claim no longer authorized')
+        return {'submission_id': str(submission), 'media_type': 'photo', 'bucket': 'wing-submissions',
+                'original_path': f'originals/{uuid_owner}/{submission}/source',
+                'processed_path': f'processed/{submission}/primary', 'thumbnail_path': f'thumbnails/{submission}/preview',
+                'correlation_id': str(correlation), 'preserve_approval': True}
+
+    uuid_owner = uuid4()
+    client.request = request
+    repository = PhotoDerivativeRepository(client)
+    assert repository.enqueue_backlog() == 0
+    assert not client.calls
+    claim = repository.claim(worker_id='photo-test')
+    context = repository.begin(claim)
+    source = tmp_path / 'source'
+    repository.download_original(context, source, maximum_bytes=100)
+    assert len(client._session.gets) == 1
+    repository.upload_artifact(context, storage_path=context.processed_path, local_path=source, content_type='image/jpeg')
+    assert len(client.uploads) == 1
+    revoked = True
+    with pytest.raises(RetryableWorkerError):
+        repository.upload_artifact(context, storage_path=context.thumbnail_path, local_path=source, content_type='image/jpeg')
+    assert len(client.uploads) == 1
+
+
+def test_photo_repository_claim_passes_explicit_submission_scope():
+    client = FakeClient()
+    target = uuid4()
+    captured = []
+    def request(method, path, *, json_payload):
+        captured.append((method, path, json_payload))
+        return None
+    client.request = request
+    repository = PhotoDerivativeRepository(client, submission_id=target)
+    assert repository.claim(worker_id='canary-worker') is None
+    assert captured == [('POST', 'rpc/claim_wing_photo_derivative_job',
+                         {'p_worker': 'canary-worker', 'p_lease_seconds': 300,
+                          'p_submission_id': str(target)})]
+
+
+def test_processing_context_rejects_non_boolean_approval_flag():
+    submission = uuid4()
+    with pytest.raises(ValueError, match='approval preservation'):
+        ProcessingContext.from_payload({'submission_id': str(submission), 'media_type': 'photo', 'bucket': 'wing-submissions',
+            'original_path': f'originals/{uuid4()}/{submission}/source', 'processed_path': f'processed/{submission}/primary',
+            'thumbnail_path': f'thumbnails/{submission}/preview', 'correlation_id': str(uuid4()), 'preserve_approval': 'true'})
 
 
 class FakeResponse:

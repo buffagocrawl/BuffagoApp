@@ -4,7 +4,6 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import {
   View,
-  FlatList,
   RefreshControl,
   StyleSheet,
   ScrollView,
@@ -15,9 +14,10 @@ import {
   Animated,
   Modal,
   DeviceEventEmitter,
+  useWindowDimensions,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import * as Crypto from 'expo-crypto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -32,14 +32,15 @@ import {
   Button,
   Divider,
   Searchbar,
-  Chip,
   ProgressBar,
   useTheme,
 } from 'react-native-paper';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import RatingWizardDialog from '../../../components/RatingWizardDialog';
 import WingmanAddDialog from '../../../components/WingmanAddDialog';
 import FeedbackState from '../../../components/ui/FeedbackState';
+import { WingShotImage, LoadingSkeleton, SelectionChip as Chip } from '../../../components/ui/OperationUI';
+import { operationTokens as tokens } from '../../../src/theme/operationTokens';
 import { supabase } from '../../../lib/supabase.js';
 import { trackEvent } from '../../../lib/analytics';
 import { submitBuffacoinRatingTransaction } from '../../../lib/buffacoinRatingTransaction';
@@ -330,86 +331,18 @@ function StepDesc({ children }) {
 
 /* ---------------- main ---------------- */
 export default function PublicRatingsScreen() {
+  const { width: viewportWidth, height: viewportHeight, fontScale } = useWindowDimensions();
+  const compactMapAction = viewportWidth < 360 || fontScale > 1.2;
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  // Reserve space for the title, two scalable legend rows, and dialog actions.
+  // A fixed 420dp map pushed the actions outside the dialog on short/scaled screens.
+  const mapDialogMaxHeight = viewportHeight - insets.top - insets.bottom - 24;
+  const mapCanvasHeight = Math.min(420, Math.max(240, mapDialogMaxHeight - 365 * Math.max(1, fontScale)));
   const { byRestaurant: legendaryByRestaurant } = useLegendaryFeed({ limit: 50 });
 
-  const navigation = useNavigation();
-
-  // ✅ header height state (used for FlatList padding)
-  const headerH = useRef(0);
+  const { map: requestedMap } = useLocalSearchParams();
   const [headerHeight, setHeaderHeight] = useState(0);
-  
-  // Collapsible header + hide tab bar on scroll
-  const scrollY = useRef(new Animated.Value(0)).current;
-  
-  // clamp 0..headerHeight so animation stays stable
-  const clampY = useMemo(() => {
-    const h = Math.max(1, headerHeight || 1);
-    return Animated.diffClamp(scrollY, 0, h);
-  }, [scrollY, headerHeight]);
-  
-  const headerTranslateY = useMemo(() => {
-    const h = Math.max(1, headerHeight || 1);
-    return clampY.interpolate({
-      inputRange: [0, h],
-      outputRange: [0, -h],
-      extrapolate: 'clamp',
-    });
-  }, [clampY, headerHeight]);
-  
-  const headerOpacity = useMemo(() => {
-    const h = Math.max(1, headerHeight || 1);
-    return clampY.interpolate({
-      inputRange: [0, h * 0.75],
-      outputRange: [1, 0],
-      extrapolate: 'clamp',
-    });
-  }, [clampY, headerHeight]);  
-
-  const tabsHiddenRef = useRef(false);
-  const tabStyleRef = useRef(null);
-  const lastScrollY = useRef(0);
-
-  const findTabNavigator = useCallback(() => {
-    let p = navigation;
-    for (let i = 0; i < 8; i++) {
-      const st = p?.getState?.();
-      if (st?.type === 'tab') return p;
-      p = p?.getParent?.();
-      if (!p) break;
-    }
-    return null;
-  }, [navigation]);
-  
-  const setTabsHidden = useCallback(
-    (hidden) => {
-      const tabNav = findTabNavigator();
-      if (!tabNav) return;
-  
-      // capture original style once so we can restore it exactly
-      if (tabStyleRef.current == null) {
-        tabStyleRef.current = tabNav.getCurrentOptions?.()?.tabBarStyle ?? null;
-      }
-  
-      if (tabsHiddenRef.current === hidden) return;
-      tabsHiddenRef.current = hidden;
-  
-      tabNav.setOptions({
-        tabBarStyle: hidden
-          ? [{ ...(tabStyleRef.current || {}) }, { display: 'none' }]
-          : tabStyleRef.current || undefined,
-      });
-    },
-    [findTabNavigator]
-  );
-
-  // Ensure tabs come back when leaving screen
-  useFocusEffect(
-    useCallback(() => {
-      return () => setTabsHidden(false);
-    }, [setTabsHidden])
-  );
 
   const { coords, status, askPermission } = useLocationCtx();
   const { colors, dark } = useTheme();
@@ -538,16 +471,33 @@ export default function PublicRatingsScreen() {
 
   const [rows, setRows] = useState([]);
   const [pictureCounts, setPictureCounts] = useState({});
+  const [pictureCountsStatus, setPictureCountsStatus] = useState('loading');
+  const [approvedThumbnails, setApprovedThumbnails] = useState({});
+  const [photoRevision, setPhotoRevision] = useState(0);
+  const [discoverySort, setDiscoverySort] = useState('overall');
   const [galleryRestaurant, setGalleryRestaurant] = useState(null);
   const pictureRequestRef = useRef(0);
   useEffect(() => {
     const request = ++pictureRequestRef.current;
     setPictureCounts({});
+    setPictureCountsStatus('loading');
     void loadWingdexGallery(rows.map((row) => row.destination_id), supabase).then((result) => {
-      if (request === pictureRequestRef.current) setPictureCounts(Object.fromEntries(Object.entries(result).map(([id, value]) => [id, value.count])));
-    }).catch(() => console.warn('[Wingdex] picture counts unavailable'));
+      if (request === pictureRequestRef.current) {
+        setPictureCounts(Object.fromEntries(Object.entries(result).map(([id, value]) => [id, value.count])));
+        setApprovedThumbnails(Object.fromEntries(Object.entries(result).map(([id, value]) => [id, value.images[0]?.signed_url])));
+        setPictureCountsStatus('ready');
+      }
+    }).catch(() => {
+      if (request === pictureRequestRef.current) setPictureCountsStatus('error');
+      console.warn('[Wingdex] picture counts unavailable');
+    });
     return () => { pictureRequestRef.current += 1; };
-  }, [rows]);
+  }, [rows, photoRevision]);
+  useFocusEffect(useCallback(() => {
+    setPhotoRevision((n) => n + 1);
+    const timer = setInterval(() => setPhotoRevision((n) => n + 1), 240000);
+    return () => clearInterval(timer);
+  }, []));
 
   const [tagNameById, setTagNameById] = useState({});
   const ratingTagOptions = useMemo(
@@ -712,6 +662,12 @@ export default function PublicRatingsScreen() {
     // The shared map fits current valid markers only after onMapReady.
   }, [locationMode, user?.id]);
 
+  useEffect(() => {
+    if (requestedMap !== '1') return;
+    openRestaurantsMap();
+    router.setParams({ map: undefined });
+  }, [requestedMap, openRestaurantsMap, router]);
+
   const applyLocationFilter = useCallback(
     (dataIn) => {
       let data = dataIn;
@@ -817,6 +773,18 @@ export default function PublicRatingsScreen() {
       return aDist - bDist;
     });
   }, [rows, applyLocationFilter, query, selectedTagId]);
+
+  const discoveryRows = useMemo(() => {
+    if (discoverySort === 'overall') return filtered;
+    return filtered.slice().sort((a, b) => {
+      if (discoverySort === 'nearest') {
+        const distance = (row) => row.distanceMi != null && Number.isFinite(Number(row.distanceMi)) ? Number(row.distanceMi) : Infinity;
+        return distance(a) - distance(b);
+      }
+      if (discoverySort === 'photos') return (pictureCounts[String(b.destination_id)] || 0) - (pictureCounts[String(a.destination_id)] || 0);
+      return (b.count || 0) - (a.count || 0);
+    });
+  }, [filtered, discoverySort, pictureCounts]);
 
   useEffect(() => {
     filteredRef.current = filtered;
@@ -1762,10 +1730,7 @@ export default function PublicRatingsScreen() {
     const distText =
       locationMode === 'radius' && Number.isFinite(Number(item.distanceMi))
         ? ` • ${fmt2(item.distanceMi)} mi`
-        : '';
-
-    const myAvg = item.myAvgWeight;
-    const ratingsLabel = hasRatings
+        : '';    const ratingsLabel = hasRatings
       ? `${item.count} rating${item.count === 1 ? '' : 's'}`
       : 'No ratings yet';
 
@@ -1791,88 +1756,60 @@ export default function PublicRatingsScreen() {
         onPress={() => openDestinationDetail(item)}
       >
       <Card.Content style={styles.cardContent}>
-        {/* LINE 1: centered name */}
-        <View style={styles.nameLine}>
+        {approvedThumbnails[destIdStr] ? <WingShotImage approved uri={approvedThumbnails[destIdStr]} style={{ width: '100%', height: undefined, aspectRatio: 16 / 9, borderRadius: 12, marginBottom: 10 }} /> : null}
+        <View style={styles.compactRestaurantRow}>
           <View style={styles.restaurantIdentity}>
-          <Text
-            variant="titleMedium"
-            numberOfLines={1}
-            style={[styles.nameCentered, ratedByMe && { color: themed.ratedName }]}
-          >
-            {item.name}
-          </Text>
-          <Text
-            variant="bodySmall"
-            numberOfLines={1}
-            style={[styles.locationLine, { color: themed.muted }]}
-          >
-            {[item.town, item.stateCode].filter(Boolean).join(', ') || 'Location pending'}
-            {distText}
-          </Text>
-          </View>
-        
-          <Text
-            variant="bodySmall"
-            numberOfLines={1}
-            style={[styles.nameRatingsInline, { color: themed.muted }]}
-          >
-            {hasRatings ? ` · ${item.count} rating${item.count === 1 ? '' : 's'}` : ' · no ratings'}
-          </Text>
-        </View>
-
-        {/* LINE 2: overall badge | (no mid count) | Rate */}
-        <View style={styles.metaRow}>
-          {/* LEFT: overall score */}
-          <View
-            style={[
-              styles.scoreBadgeCompact,
-              { backgroundColor: themed.scoreBadgeBg },
-              ratedByMe && { backgroundColor: themed.ratedBadgeBg },
-            ]}
-          >
-            <Text
-              style={[
-                styles.scoreBadgeTextCompact,
-                { color: themed.scoreBadgeText },
-                ratedByMe && { color: themed.ratedBadgeText },
-              ]}
-            >
-              {displayAvg}
+            <Text variant="titleSmall" style={styles.nameCentered}>{item.name}</Text>
+            <Text variant="bodySmall" numberOfLines={2} style={[styles.locationLine, { opacity: 1, color: dark ? colors.onSurface : colors.onSurfaceVariant }]}>
+              {[item.town, item.stateCode].filter(Boolean).join(', ') || 'Location pending'}{distText}
             </Text>
-            <Text style={styles.badgeSub}>overall</Text>
+            <View style={styles.restaurantMetrics}>
+              <Text style={[styles.compactScore, { color: dark ? tokens.colors.orange : '#9B3B00', backgroundColor: colors.surface, borderRadius: 6, paddingHorizontal: 4 }]}>{displayAvg} <Text style={[styles.compactMetric, { color: dark ? colors.onSurface : colors.onSurfaceVariant }]}>overall</Text></Text>
+              <Text style={[styles.compactMetric, { color: dark ? colors.onSurface : colors.onSurfaceVariant }]}>{ratingsLabel}</Text>
+            </View>
           </View>
-        
-          {/* MIDDLE: spacer (keeps layout stable) */}
-          <Button icon="image-multiple" compact onPress={(event) => {
-            event?.stopPropagation?.(); setGalleryRestaurant(item);
-          }}>{pictureCounts[String(item.destination_id)] || 0} Pictures</Button>
-        
-          {/* RIGHT: Rate */}
-          <View style={styles.metaRight}>
-            {showCoinRate ? (
-              <Button
-                mode="contained"
-                icon={({ size }) => <TokenIcon size={Math.round(size * 2.0)} />}
-                onPress={(e) => {
-                  e?.stopPropagation?.();
-                  onPressCoinRate(item);
-                }}
-                style={styles.rateBtnInline}
-                contentStyle={styles.rateBtnInlineContent}
-                labelStyle={styles.rateBtnInlineLabel}
-              >
-                {`Rate · ${coinCost}`}
-              </Button>
-            ) : ratedByMe ? (
-              <View style={[styles.ratedInlineChip, { backgroundColor: themed.ratedChipBg }]}>
-                <Text style={[styles.ratedInlineChipText, { color: themed.ratedChipText }]}>
-                  {ratedWithCoin ? 'Rated With Coin' : 'Rated'}
-                </Text>
-              </View>
-            ) : (
-              <View style={{ height: 34, width: 92 }} />
-            )}
-          </View>
+        </View>
+        <View style={styles.restaurantActions}>
+          {pictureCountsStatus === 'loading' ? (
+            <Button icon="image-multiple-outline" compact disabled contentStyle={{ minHeight: 44 }} labelStyle={styles.compactMetric}>Checking photos…</Button>
+          ) : pictureCountsStatus === 'error' ? (
+            <Button icon="image-multiple-outline" compact contentStyle={{ minHeight: 44 }} labelStyle={styles.compactMetric} onPress={(event) => {
+              event?.stopPropagation?.(); setGalleryRestaurant(item);
+            }}>Photos unavailable</Button>
+          ) : (pictureCounts[destIdStr] || 0) > 0 ? (
+            <Button icon="image-multiple-outline" compact labelStyle={[styles.compactMetric, { color: dark ? colors.onSurface : colors.onSurfaceVariant }]} contentStyle={{ minHeight: 44 }} onPress={(event) => {
+              event?.stopPropagation?.(); setGalleryRestaurant(item);
+            }}>{pictureCounts[destIdStr]} photos</Button>
+          ) : (
+            <Button
+              icon="camera-plus-outline"
+              compact
+              contentStyle={{ minHeight: 44 }}
+              labelStyle={[styles.compactMetric, { color: dark ? colors.onSurface : colors.onSurfaceVariant, fontSize: 11 }]}
+              accessibilityLabel={`Share the first Wing Shot for ${item.name}`}
+              accessibilityHint={ratedByMe ? 'Opens Journey to attach a photo to your existing rating' : 'Selects this restaurant on Home so you can rate it and share a Wing Shot'}
+              onPress={(event) => {
+                event?.stopPropagation?.();
+                if (ratedByMe) router.push('/(tabs)/journey');
+                else void pickAsHomeNextSpot(item);
+              }}
+            >
+              Be the first to share a Wing Shot
+            </Button>
+          )}
+          {showCoinRate ? (
+            <Button mode="contained" icon={({ size }) => <TokenIcon size={size + 4} />}
+              onPress={(event) => { event?.stopPropagation?.(); onPressCoinRate(item); }}
+              style={styles.rateBtnInline} contentStyle={styles.rateBtnInlineContent} labelStyle={styles.rateBtnInlineLabel}>
+              {'Rate · ' + coinCost}
+            </Button>
+          ) : ratedByMe ? (
+            <View style={[styles.ratedInlineChip, { backgroundColor: themed.ratedChipBg }]}>
+              <Text style={[styles.ratedInlineChipText, { color: themed.ratedChipText }]}>{ratedWithCoin ? 'Rated with coin' : 'Rated'}</Text>
+            </View>
+          ) : (
+            <Button mode="outlined" compact onPress={(event) => { event?.stopPropagation?.(); openDestinationDetail(item); }}>View</Button>
+          )}
         </View>
       </Card.Content>
       </Card>
@@ -1944,32 +1881,28 @@ export default function PublicRatingsScreen() {
 
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+    <SafeAreaView edges={["top", "left", "right"]} style={{ flex: 1, backgroundColor: colors.background }}>
         <Animated.View
           collapsable={false}
           onLayout={(e) => {
-            const h = e?.nativeEvent?.layout?.height ?? 0;
-            headerH.current = h;
-            if (h && h !== headerHeight) setHeaderHeight(h);
+            const h = e?.nativeEvent?.layout?.height ?? 0;            if (h && h !== headerHeight) setHeaderHeight(h);
           }}
           style={[
             styles.header,
             {
-              paddingTop: Math.max(12, insets.top + 8),
+              // The header is absolutely positioned, so SafeAreaView's padding
+              // does not offset it. Apply the native inset directly here.
+              top: insets.top,
+              paddingTop: 8,
               zIndex: 10,
               backgroundColor: colors.background,
-              opacity: headerOpacity,
-              transform: [{ translateY: headerTranslateY }],
             },
           ]}
         >
         <View style={styles.headerTopRow}>
-          <View style={{ flex: 1, paddingRight: 10 }}>
-            <Text variant="headlineSmall" style={styles.title}>
+          <View style={{ flex: 1, minWidth: 140 }}>
+            <Text variant="titleLarge" style={styles.title}>
               Wingdex
-            </Text>
-            <Text variant="bodySmall" style={styles.subtitle}>
-              {wingdexContextLabel} · sorted by {sortLabel}
             </Text>
           </View>
           <View style={{ position: 'relative' }}>
@@ -2000,37 +1933,31 @@ export default function PublicRatingsScreen() {
               </Animated.View>
             ) : null}
           </View>
-          <Button
+          {compactMapAction ? <Pressable accessibilityRole="button" accessibilityLabel="Open Wingdex map" onPress={openRestaurantsMap} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: colors.surfaceVariant, alignItems: 'center', justifyContent: 'center' }}><MaterialCommunityIcons name="map" size={22} color={colors.onSurface} /></Pressable> : <Button
+            compact
             mode="contained-tonal"
             icon="map"
             onPress={openRestaurantsMap}
-            style={{ borderRadius: 12, marginLeft: 10 }}
+            style={{ borderRadius: 12 }}
+            labelStyle={{ fontSize: 12 }}
           >
             Map
-          </Button>
+          </Button>}
         </View>
+        <Text variant="bodySmall" style={styles.subtitle}>{wingdexContextLabel} · sorted by {discoverySort === 'overall' ? sortLabel : discoverySort === 'nearest' ? 'nearest' : discoverySort === 'ratings' ? 'most ratings' : 'most photos'}</Text>
 
         <Searchbar
           placeholder="Search destinations…"
           value={query}
           onChangeText={setQuery}
-          style={{ marginTop: 10, borderRadius: 12 }}
+          style={{ marginTop: 8, borderRadius: 12, minHeight: Math.max(48, 48 * fontScale) }}
+          inputStyle={{ minHeight: 0 }}
         />
 
-        {wingdexHintVisible ? (
-          <View style={[styles.hintPanel, { backgroundColor: colors.surfaceVariant }]}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.hintTitle}>Wingdex workspace</Text>
-              <Text style={[styles.hintText, { color: colors.onSurface }]}>
-                Review coverage, add missing restaurants, and rate prior visits with Buffacoins.
-              </Text>
-            </View>
-            <Button compact onPress={dismissWingdexHint}>
-              Got it
-            </Button>
-          </View>
-        ) : null}
-
+        {wingdexHintVisible ? <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Text variant="bodySmall" style={{ flex: 1, color: colors.onSurfaceVariant }}>Add missing spots and rate past visits with coins.</Text>
+          <Button compact onPress={dismissWingdexHint}>Got it</Button>
+        </View> : null}
         <View style={styles.filterSectionHeader}>
           <Text style={styles.filterSectionTitle}>Location</Text>
           <Text style={styles.filterSectionSub}>
@@ -2038,22 +1965,21 @@ export default function PublicRatingsScreen() {
           </Text>
         </View>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{ marginTop: 8 }}
-          contentContainerStyle={{ paddingRight: 16 }}
-        >
+        <View style={[styles.filterRail, { marginTop: 8 }]}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginRight: 60 }} contentContainerStyle={{ paddingRight: 60 }}>
           {RADIUS_OPTIONS.map((mi) => (
             <Chip
               key={mi}
               selected={locationMode === 'radius' && radiusMiles === mi}
+              maxFontSizeMultiplier={1}
+              accessibilityLabel={`${mi} miles`}
               onPress={() => {
                 setRadiusMiles(mi);
                 setLocationMode('radius');
                 setStateCodeFilter(null);
               }}
-              style={styles.chip}
+              style={[styles.chip, styles.filterChip, styles.radiusChip]}
+              textStyle={styles.radiusChipText}
             >
               {mi} mi
             </Chip>
@@ -2062,11 +1988,13 @@ export default function PublicRatingsScreen() {
           {currentState && (
             <Chip
               selected={locationMode === 'state' && stateCodeFilter === currentState}
+              maxFontSizeMultiplier={1}
+              accessibilityLabel={`Current state: ${currentState}`}
               onPress={() => {
                 setLocationMode('state');
                 setStateCodeFilter(currentState);
               }}
-              style={styles.chip}
+              style={[styles.chip, styles.filterChip]}
             >
               {`Current state: ${currentState}`}
             </Chip>
@@ -2074,8 +2002,10 @@ export default function PublicRatingsScreen() {
 
           <Chip
             selected={locationMode === 'state' && stateCodeFilter && stateCodeFilter !== currentState}
+            maxFontSizeMultiplier={1}
+            accessibilityLabel="Choose your state"
             onPress={() => setStatePickerOpen(true)}
-            style={styles.chip}
+            style={[styles.chip, styles.filterChip]}
             icon="map-search"
           >
             Choose your state
@@ -2083,32 +2013,51 @@ export default function PublicRatingsScreen() {
 
           <Chip
             selected={locationMode === 'all'}
+            maxFontSizeMultiplier={1}
+            accessibilityLabel="All locations"
             onPress={() => {
               setLocationMode('all');
               setStateCodeFilter(null);
             }}
-            style={styles.chip}
+            style={[styles.chip, styles.filterChip]}
             icon="earth"
           >
             All
           </Chip>
         </ScrollView>
+        <LinearGradient pointerEvents="none" colors={[colors.background, colors.background]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.filterRailHint}>
+          <MaterialCommunityIcons name="chevron-right" size={20} color={colors.onSurfaceVariant} />
+        </LinearGradient>
+        </View>
 
+        <View style={[styles.filterRail, { marginTop: 4 }]}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginRight: 60 }} contentContainerStyle={{ paddingVertical: 6, paddingRight: 60 }}>
+          {[['overall', 'Score', 'Overall score'], ['nearest', 'Near', 'Nearest'], ['ratings', 'Votes', 'Most ratings'], ['photos', 'Photos', 'Most photos']].map(([value, label, accessibilityLabel]) => (
+            <Chip key={value} maxFontSizeMultiplier={1} accessibilityLabel={accessibilityLabel} selected={discoverySort === value} onPress={() => setDiscoverySort(value)} style={[styles.chip, styles.filterChip]}>{label}</Chip>
+          ))}
+          <Chip maxFontSizeMultiplier={1} accessibilityLabel="Rated by you" selected={selectedTagId === 'my'} onPress={() => setSelectedTagId(selectedTagId === 'my' ? null : 'my')} style={[styles.chip, styles.filterChip]}>My ratings</Chip>
+          {tagsForFilter.map((tag) => <Chip key={tag.id} maxFontSizeMultiplier={1} accessibilityLabel={tag.name} selected={selectedTagId === tag.id} onPress={() => setSelectedTagId(selectedTagId === tag.id ? null : tag.id)} style={[styles.chip, styles.filterChip]}>{tag.name}</Chip>)}
+        </ScrollView>
+        <LinearGradient pointerEvents="none" colors={[colors.background, colors.background]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.filterRailHint}>
+          <MaterialCommunityIcons name="chevron-right" size={20} color={colors.onSurfaceVariant} />
+        </LinearGradient>
+        </View>
         <Divider style={{ marginTop: 10, marginBottom: 6 }} />
       </Animated.View>
 
       {loading ? (
         <View style={styles.center}>
-          <ActivityIndicator />
+          <LoadingSkeleton rows={3} style={{ width: "90%", paddingTop: headerHeight }} />
         </View>
       ) : (
         <Animated.FlatList
-          data={filtered}
+          data={discoveryRows}
+          viewabilityConfig={{ itemVisiblePercentThreshold: 20 }}
           keyExtractor={(it) => String(it.destination_id)}
           renderItem={renderItem}
           contentContainerStyle={{
             padding: 16,
-            paddingBottom: Math.max(96, insets.bottom + 92),
+            paddingBottom: 24,
             paddingTop: headerHeight,
           }}
           ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
@@ -2149,30 +2098,6 @@ export default function PublicRatingsScreen() {
               }}
             />
           }
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            {
-              useNativeDriver: true,
-              listener: (e) => {
-                const y = e?.nativeEvent?.contentOffset?.y ?? 0;
-              
-                const prevY = lastScrollY.current;
-                const delta = y - prevY;
-              
-                // scrolling down → hide
-                if (delta > 6 && y > 40) {
-                  setTabsHidden(true);
-                }
-              
-                // scrolling up → show
-                if (delta < -6) {
-                  setTabsHidden(false);
-                }
-              
-                lastScrollY.current = y;
-              },
-            }
-          )}
           scrollEventThrottle={16}
         />
       )}
@@ -2196,7 +2121,7 @@ export default function PublicRatingsScreen() {
 
       {/* Drill-down modal (full screen) */}
       {galleryRestaurant ? <WingdexPhotoGallery key={galleryRestaurant.destination_id} restaurant={galleryRestaurant}
-        onClose={() => setGalleryRestaurant(null)} /> : null}
+        onClose={() => { setGalleryRestaurant(null); setPhotoRevision((n) => n + 1); }} /> : null}
       <Portal>
         <Modal
           visible={open}
@@ -2442,10 +2367,10 @@ export default function PublicRatingsScreen() {
 
       {/* Restaurants Map dialog */}
       <Portal>
-        <Dialog visible={openMap} onDismiss={() => setOpenMap(false)} style={styles.dialog}>
+        <Dialog visible={openMap} onDismiss={() => setOpenMap(false)} style={[styles.dialog, { maxHeight: mapDialogMaxHeight }]}>
           <Dialog.Title style={{ textAlign: 'center' }}>Restaurants Map</Dialog.Title>
           <Dialog.Content>
-            <View style={{ height: 420, borderRadius: 12, overflow: 'hidden' }}>
+            <View style={{ height: mapCanvasHeight, borderRadius: 12, overflow: 'hidden' }}>
               <MapView
                 ref={allMapRef}
                 style={{ flex: 1 }}
@@ -2544,7 +2469,7 @@ export default function PublicRatingsScreen() {
             >
               My location
             </Button>
-            <Button onPress={() => setOpenMap(false)}>Close</Button>
+            <Button contentStyle={{ minHeight: 44 }} onPress={() => setOpenMap(false)}>Close</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -2676,6 +2601,13 @@ export default function PublicRatingsScreen() {
 
 /* ---------------- styles ---------------- */
 const styles = StyleSheet.create({
+  compactRestaurantRow: { flexDirection: 'row', gap: 12, alignItems: 'center' },
+  restaurantBackdrop: { ...StyleSheet.absoluteFillObject, width: '100%', height: '100%', borderRadius: 12 },
+  restaurantScrim: { ...StyleSheet.absoluteFillObject, borderRadius: 12, backgroundColor: 'rgba(9,10,12,0.86)' },
+  restaurantMetrics: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center', marginTop: 6 },
+  compactScore: { color: tokens.colors.orange, fontWeight: '800', fontSize: 16 },
+  compactMetric: { fontSize: 12, color: tokens.colors.muted },
+  restaurantActions: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 4, marginTop: 6 },
   header: {
   position: 'absolute',
   left: 0,
@@ -2684,7 +2616,9 @@ const styles = StyleSheet.create({
   paddingHorizontal: 16,
   paddingBottom: 0,
 },
-  headerTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  filterRail: { position: 'relative' },
+  filterRailHint: { position: 'absolute', top: 0, right: 0, bottom: 0, width: 60, alignItems: 'center', justifyContent: 'center' },
+  headerTopRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, alignItems: 'center', justifyContent: 'space-between' },
   title: { fontWeight: '900', letterSpacing: 0 },
   subtitle: { opacity: 0.68, marginTop: 2, lineHeight: 17 },
   yourScoreRow: {
@@ -2731,13 +2665,13 @@ const styles = StyleSheet.create({
   coinPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 10,
+    gap: 4,
+    paddingHorizontal: 8,
     paddingVertical: 8,
     borderRadius: 999,
   },
-  coinImg: { width: 34, height: 34 },
-  coinCount: { fontWeight: '900' },
+  coinImg: { width: 20, height: 20 },
+  coinCount: { fontWeight: '900', fontSize: 12 },
 
   hintPanel: {
     marginTop: 10,
@@ -2843,7 +2777,7 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(255,255,255,0.12)',
   },
 
-  card: { borderRadius: 8, borderColor: 'rgba(255,255,255,0.12)' },
+  card: { borderRadius: tokens.radius.card, borderColor: tokens.colors.border },
   rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   name: { fontWeight: '700' },
   muted: { opacity: 0.7, marginTop: 2 },
@@ -2892,6 +2826,9 @@ const styles = StyleSheet.create({
   dialog: { alignSelf: 'center', width: '92%', maxWidth: 520, borderRadius: 16, maxHeight: '90%' },
 
   chip: { marginRight: 8, borderRadius: 999 },
+  filterChip: { flexShrink: 0 },
+  radiusChip: { minWidth: 68, alignItems: 'center' },
+  radiusChipText: { fontSize: 12, fontWeight: '700' },
 
   stateGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   stateChip: { borderRadius: 999 },
@@ -3012,17 +2949,14 @@ rateBtnInline: {
   minWidth: 92,
 },
 
-rateBtnInlineContent: {
-  paddingHorizontal: 10,
-  height: 34,
-},
+rateBtnInlineContent: { paddingHorizontal: 8, minHeight: 44 },
 
   rateBtnInlineLabel: {
   fontWeight: '800',
   fontSize: 12,
 },
 ratedInlineChip: {
-  height: 34,
+  minHeight: 44,
   minWidth: 92,
   borderRadius: 999,
   alignItems: 'center',

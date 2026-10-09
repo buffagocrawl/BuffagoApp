@@ -1,10 +1,13 @@
-﻿// app/profile/history/index.jsx
+// app/profile/history/index.jsx
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { PlayerProgressCard, SectionHeader, LoadingSkeleton, StatCard, SurfaceCard } from '../../../components/ui/OperationUI';
+import { operationTokens as tokens } from '../../../src/theme/operationTokens';
 import ProfileWelcomeWizard from '../../../components/ProfileWelcomeWizard';
 import { View, FlatList, StyleSheet, ScrollView, RefreshControl, Alert, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ActivityIndicator, Card, Text, Button, Divider, ProgressBar, useTheme } from 'react-native-paper';
+import { Card, Text, Button, Divider, ProgressBar, useTheme } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../../../lib/supabase.js';
@@ -30,7 +33,7 @@ function fmtDate(iso) {
   }
 }
 
-const fmt2 = (n) => (Number.isFinite(Number(n)) ? Number(n).toFixed(2) : '—');
+const fmt2 = (n) => (n != null && n !== '' && Number.isFinite(Number(n)) ? Number(n).toFixed(2) : '—');
 
 async function fetchFunFact() {
   try {
@@ -96,7 +99,7 @@ class HistoryErrorBoundary extends React.Component {
 
 /* ---------------- main ---------------- */
 
-export default function HistoryIndex() {
+export default function HistoryIndex({ onOpenBuffaverse } = {}) {
   const router = useRouter();
   const params = useLocalSearchParams();
   const theme = useTheme();
@@ -111,6 +114,7 @@ export default function HistoryIndex() {
   const outline = theme.colors.outlineVariant ?? theme.colors.outline;
 
   const [funFact, setFunFact] = useState(null);
+  const [playerProgress, setPlayerProgress] = useState(null);
 
   const [session, setSession] = useState(null);
   const { flags: wingShotFlags, refresh: refreshPhotoFlags } = useWingShotsFeatureFlags(Boolean(session?.user?.id));
@@ -134,6 +138,31 @@ export default function HistoryIndex() {
   const [wizardVisible, setWizardVisible] = useState(false);
 
   const isViewingSelf = !!session?.user?.id && !!viewUserId && viewUserId === session.user.id;
+
+  useFocusEffect(useCallback(() => {
+    let alive = true;
+    setPlayerProgress(null);
+    if (!isViewingSelf) return undefined;
+    (async () => {
+      try {
+        const { data, error } = await supabase.from('user_with_level').select('level, xp').eq('user_id', session.user.id).limit(1);
+        if (error || !data?.[0]) return;
+        const { level, xp } = data[0];
+        const { data: thresholds, error: thresholdError } = await supabase.from('level_thresholds').select('level, xp_required, level_title').in('level', [Number(level), Number(level) + 1]);
+        if (thresholdError) return;
+        const current = thresholds?.find((row) => Number(row.level) === Number(level));
+        const next = thresholds?.find((row) => Number(row.level) === Number(level) + 1);
+        const pref = await AsyncStorage.getItem('buffago:titlePref');
+        let override = null;
+        try { override = pref ? JSON.parse(pref)?.override : null; } catch {}
+        const title = override?.level <= Number(level) ? override.title : current?.level_title;
+        const span = Number(next?.xp_required) - Number(current?.xp_required);
+        const progress = span > 0 ? (Number(xp) - Number(current?.xp_required)) / span : 0;
+        if (alive) setPlayerProgress({ level, xp, title, target: next?.xp_required, progress });
+      } catch { /* The existing history remains usable if progression is unavailable. */ }
+    })();
+    return () => { alive = false; };
+  }, [isViewingSelf, session?.user?.id]));
 
   /* ---------- boot ---------- */
 
@@ -599,6 +628,12 @@ export default function HistoryIndex() {
     return { o: n ? so / n : null, s: n ? ss / n : null, m: n ? sm / n : null, c: n ? sc / n : null };
   }, [ratings]);
 
+  const summaryStats = useMemo(() => {
+    const scores = ratings.map(r => r.weight_score).filter(v => v != null && v !== '' && Number.isFinite(Number(v))).map(Number);
+    return { highest: scores.length ? Math.max(...scores) : null, average: scores.length ? scores.reduce((sum, score) => sum + score, 0) / scores.length : null,
+      wings: ratings.reduce((sum, r) => sum + (Number(r.wings_eaten) || 0), 0) };
+  }, [ratings]);
+
   const activeCrawls = useMemo(() => crawls.filter(isActiveCrawl), [crawls]);
   const completedCrawls = useMemo(
     () => crawls.filter((c) => (c.status || '').toLowerCase().trim() === 'completed'),
@@ -645,10 +680,10 @@ export default function HistoryIndex() {
       : null;
 
   const headerTitle =
-    isViewingSelf || !viewUserId ? 'Your Chicken Wing Journey' : `${possessiveName(viewUsername)} Chicken Wing Journey`;
+    isViewingSelf || !viewUserId ? 'Journey' : `${possessiveName(viewUsername)} Chicken Wing Journey`;
 
   const headerSubtitle = isViewingSelf
-    ? 'Personal stats and averages across your ratings'
+    ? 'Your wings, milestones, and next adventure'
     : 'Stats and averages across this winglet’s ratings';
 
   const hasCompletedCrawls = completedCrawls.length > 0;
@@ -952,7 +987,7 @@ export default function HistoryIndex() {
 
   return (
     <HistoryErrorBoundary fallback={fallbackUI}>
-      <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }} edges={['top']}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }} edges={['top', 'left', 'right']}>
         <View style={{ flex: 1 }} onLayout={handleRootLayout}>
           {authReady && wizardChecked && wizardVisible && (isViewingSelf || !session?.user?.id) && (
             <ProfileWelcomeWizard visible onDone={markProfileWizardSeen} onSkip={markProfileWizardSeen} />
@@ -969,16 +1004,16 @@ export default function HistoryIndex() {
 
           {loading ? (
             <View style={styles.center}>
-              <ActivityIndicator />
+              <LoadingSkeleton style={{ width: "90%" }} />
             </View>
           ) : (
             <ScrollView
               style={{ flex: 1 }}
-              contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
+              contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
               refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
               keyboardShouldPersistTaps="handled"
             >
-            <View style={styles.tilesRow}>
+            <View style={styles.tilesRow} accessibilityLabel={`Year to date ${nowYear}`}>
               <TouchableOpacity
                 activeOpacity={hasCompletedCrawls ? 0.7 : 1}
                 onPress={async () => {
@@ -989,7 +1024,7 @@ export default function HistoryIndex() {
                 style={[styles.tilePressable, styles.tileClickable, { backgroundColor: cardBg }]}
               >
                 <View style={{ alignItems: 'center', justifyContent: 'center', paddingVertical: 10 }}>
-                  <Text style={[styles.tileLabel, styles.clickableLabel, { textAlign: 'center' }]} numberOfLines={1}>
+                  <Text style={[styles.tileLabel, styles.clickableLabel, { textAlign: 'center' }]} >
                     Crawls YTD
                   </Text>
                   <Text style={[styles.metricValue, styles.clickableValue, { textAlign: 'center' }]}>{crawlsYTD}</Text>
@@ -1006,7 +1041,7 @@ export default function HistoryIndex() {
                 style={[styles.tilePressable, styles.tileClickable, { backgroundColor: cardBg }]}
               >
                 <View style={{ alignItems: 'center', justifyContent: 'center', paddingVertical: 10 }}>
-                  <Text style={[styles.tileLabel, styles.clickableLabel, { textAlign: 'center' }]} numberOfLines={1}>
+                  <Text style={[styles.tileLabel, styles.clickableLabel, { textAlign: 'center' }]} >
                     Rated YTD
                   </Text>
                   <Text style={[styles.metricValue, styles.clickableValue, { textAlign: 'center' }]}>
@@ -1027,7 +1062,7 @@ export default function HistoryIndex() {
                 activeOpacity={0.7}
               >
                 <View style={{ alignItems: 'center', justifyContent: 'center', paddingVertical: 10 }}>
-                  <Text style={[styles.tileLabel, styles.clickableLabel]} numberOfLines={1}>
+                  <Text style={[styles.tileLabel, styles.clickableLabel]} >
                     Wings YTD
                   </Text>
                   <Text style={[styles.metricValue, styles.clickableValue, { textAlign: 'center' }]}>{wingsYTD}</Text>
@@ -1035,6 +1070,22 @@ export default function HistoryIndex() {
               </TouchableOpacity>
             </View>
 
+            {isViewingSelf ? <View style={{ gap: 8, marginVertical: 8 }}>
+              {playerProgress ? <PlayerProgressCard {...playerProgress} /> : null}
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                {onOpenBuffaverse ? <Button icon="trophy-outline" mode="outlined" onPress={onOpenBuffaverse} contentStyle={{ minHeight: 44 }}>Achievements & objectives</Button> : null}
+                <Button icon="history" mode="contained-tonal" onPress={() => { setDialogMode('ratings'); setDialogOpen(true); }} contentStyle={{ minHeight: 44 }}>Rating history</Button>
+              </View>
+            </View> : null}
+            <SurfaceCard style={{ marginVertical: 8 }}>
+              <SectionHeader title="Your Stats" />
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                <StatCard label="Highest rating" value={fmt2(summaryStats.highest)} icon="star" style={styles.summaryStat} />
+                <StatCard label="Average rating" value={fmt2(summaryStats.average)} icon="chart-bar" style={styles.summaryStat} />
+                <StatCard label="Total spots" value={perDest.size} icon="map-marker" style={styles.summaryStat} />
+                <StatCard label="Total wings" value={summaryStats.wings} icon="food-drumstick" style={styles.summaryStat} />
+              </View>
+            </SurfaceCard>
             {isViewingSelf ? <WingCreatorSummaryCard refreshKey={ratings.length} /> : null}
 
             <WeeklyChallengeStats
@@ -1043,6 +1094,7 @@ export default function HistoryIndex() {
               isPublic={!isViewingSelf}
             />
 
+            <SectionHeader title="Personal statistics · details" />
             <View style={styles.metricsRow}>
               <View
                 style={[
@@ -1340,9 +1392,10 @@ export default function HistoryIndex() {
 
 /* ---------------- styles ---------------- */
 
-const ORANGE = '#FF6F00';
+const ORANGE = tokens.colors.orange;
 
 const styles = StyleSheet.create({
+  summaryStat: { minWidth: 120, flexBasis: '45%', padding: 12 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 
   card: { borderRadius: 16 },
@@ -1351,27 +1404,21 @@ const styles = StyleSheet.create({
   muted: { opacity: 0.7 },
 
   tileLabel: { fontWeight: '700', opacity: 0.75, letterSpacing: 0.2, fontSize: 12, lineHeight: 14 },
-  tilesRow: { flexDirection: 'row', gap: 8, marginBottom: 8, alignItems: 'stretch' },
+  tilesRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8, alignItems: 'stretch' },
 
-  metricValue: { fontWeight: '900', fontSize: 24, marginTop: 4 },
+  metricValue: { fontWeight: '900', fontSize: 22, marginTop: 4 },
 
   tilePressable: {
     flex: 1,
-    borderRadius: 14,
+    borderRadius: tokens.radius.card,
     borderWidth: StyleSheet.hairlineWidth,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
-    minWidth: 0,
+    minWidth: 120,
+    flexBasis: '45%',
   },
-  tileClickable: {
-    borderColor: ORANGE,
-    shadowColor: ORANGE,
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
-  },
+  tileClickable: { borderColor: tokens.colors.border, minHeight: 80 },
   clickableLabel: { color: ORANGE },
   clickableValue: { color: ORANGE },
 

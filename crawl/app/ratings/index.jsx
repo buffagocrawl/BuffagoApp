@@ -21,7 +21,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Image } from 'expo-image';
 import { supabase } from '../../lib/supabase.js';
 import { trackEvent } from '../../lib/analytics';
-import { loadWingdexGallery, loadWingdexRestaurantGallery } from '../../lib/wingdexGallery';
+import { loadWingdexGallery } from '../../lib/wingdexGallery';
+import WingdexPhotoGallery from '../../components/WingdexPhotoGallery';
 import { useLocationCtx } from '../../providers/LocationProvider';
 import MapView, { Marker, PROVIDER_GOOGLE } from '../../lib/platformMap';
 import { mapCoordinate } from '../../lib/mapSafety';
@@ -209,43 +210,21 @@ export default function PublicRatingsScreen() {
 
   const [openMap, setOpenMap] = useState(false);
   const allMapRef = useRef(null);
-  const [gallery, setGallery] = useState({ visible: false, loading: false, error: null, restaurant: null, images: [] });
-  const galleryRequestRef = useRef(0);
-  useEffect(() => () => { galleryRequestRef.current += 1; }, []);
-  const closeGallery = useCallback(() => {
-    galleryRequestRef.current += 1;
-    setGallery((previous) => ({ ...previous, visible: false }));
-  }, []);
-  const openGallery = useCallback(async (restaurant) => {
-    const request = ++galleryRequestRef.current;
-    setGallery({ visible: true, loading: true, error: null, restaurant, images: [] });
-    try {
-      const result = await loadWingdexRestaurantGallery(restaurant.destination_id, supabase);
-      if (request !== galleryRequestRef.current) return;
-      setGallery({ visible: true, loading: false, error: null, restaurant, images: result.images, count: result.count, nextOffset: 60 });
-    } catch {
-      if (request !== galleryRequestRef.current) return;
-      setGallery({ visible: true, loading: false, error: 'Pictures are temporarily unavailable.', restaurant, images: [] });
-    }
-  }, []);
-  const loadMoreGallery = useCallback(async () => {
-    if (gallery.loading || !gallery.restaurant || gallery.nextOffset >= gallery.count) return;
-    const request = ++galleryRequestRef.current;
-    setGallery((previous) => ({ ...previous, loadingMore: true }));
-    try {
-      const result = await loadWingdexRestaurantGallery(gallery.restaurant.destination_id, supabase, { offset: gallery.nextOffset });
-      if (request !== galleryRequestRef.current) return;
-      setGallery((previous) => {
-        const existing = new Set(previous.images.map((image) => image.submission_id));
-        return { ...previous, loadingMore: false, count: result.count, nextOffset: previous.nextOffset + 60,
-          images: [...previous.images, ...result.images.filter((image) => !existing.has(image.submission_id))] };
-      });
-    } catch {
-      if (request !== galleryRequestRef.current) return;
-      setGallery((previous) => ({ ...previous, loadingMore: false, error: 'Pictures are temporarily unavailable.' }));
-    }
-  }, [gallery]);
-  
+  const [galleryRestaurant, setGalleryRestaurant] = useState(null);
+  const [coverPhotos, setCoverPhotos] = useState({});
+  const openGallery = useCallback((restaurant) => setGalleryRestaurant(restaurant), []);
+  useFocusEffect(useCallback(() => {
+    let alive = true;
+    const refreshCovers = async () => {
+      try {
+        const result = await loadWingdexGallery(rows.map((r) => r.destination_id), supabase);
+        if (alive) setCoverPhotos(Object.fromEntries(Object.entries(result).map(([id, value]) => [id, value.images[0]])));
+      } catch { /* Existing cards and the gallery Retry remain available offline. */ }
+    };
+    void refreshCovers();
+    const timer = setInterval(() => void refreshCovers(), 240000);
+    return () => { alive = false; clearInterval(timer); };
+  }, [rows]));
 
   // ✅ Apply Home->Ratings parameters:
   // - q: prefill search bar
@@ -692,6 +671,7 @@ export default function PublicRatingsScreen() {
     try {
       const galleryByDestination = await loadWingdexGallery(list.map((item) => item.destination_id), supabase);
       setPictureCounts(Object.fromEntries(Object.entries(galleryByDestination).map(([id, value]) => [id, value.count])));
+      setCoverPhotos(Object.fromEntries(Object.entries(galleryByDestination).map(([id, value]) => [id, value.images[0]])));
     } catch (galleryError) {
       // Ratings remain usable if the optional gallery surface is unavailable.
       console.warn('Wingdex gallery fetch failed', galleryError?.message || galleryError);
@@ -839,6 +819,10 @@ export default function PublicRatingsScreen() {
           fetchRoutesForDestination(item.destination_id);
         }}
       >
+        {coverPhotos[String(item.destination_id)] ? <Image source={{ uri: coverPhotos[String(item.destination_id)].signed_url }}
+          contentFit="cover" style={{ width: '100%', height: 150 }} accessibilityLabel={item.name + ' community photo'} />
+          : <View style={{ alignItems: 'center', padding: 20, backgroundColor: colors.surfaceVariant }}>
+            <Text variant="labelLarge">BUFFAGO</Text><Text>Be the first to add a photo</Text></View>}
         <Card.Content style={styles.rowBetween}>
           <View style={{ flex: 1, paddingRight: 8 }}>
             <Text
@@ -1279,41 +1263,8 @@ export default function PublicRatingsScreen() {
         </Dialog>
       </Portal>
 
-      <Portal>
-        <Dialog
-          visible={gallery.visible}
-          onDismiss={closeGallery}
-          style={styles.dialog}
-        >
-          <Dialog.Title style={{ textAlign: 'center' }}>
-            {gallery.restaurant?.name ?? 'Pictures'}
-          </Dialog.Title>
-          <Dialog.Content>
-            {gallery.loading ? (
-              <View style={styles.galleryState}><ActivityIndicator /></View>
-            ) : gallery.error ? (
-              <View><Text style={styles.galleryStateText}>{gallery.error}</Text><Button onPress={() => void openGallery(gallery.restaurant)}>Retry pictures</Button></View>
-            ) : gallery.images.length === 0 ? (
-              <Text style={styles.galleryStateText}>No approved pictures yet.</Text>
-            ) : (
-              <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
-                {gallery.images.map((image) => (
-                  <View key={image.submission_id} style={styles.galleryFrame}>
-                    <Image source={{ uri: image.signed_url }} contentFit="contain" style={styles.galleryImage} accessibilityLabel="Approved restaurant picture"
-                      onError={() => setGallery((previous) => previous.visible && previous.restaurant?.destination_id === gallery.restaurant?.destination_id ? { ...previous, error: 'A picture could not load. Refresh the gallery to try again.' } : previous)} />
-                  </View>
-                ))}
-              </ScrollView>
-            )}
-          </Dialog.Content>
-          <Dialog.Actions>
-            {gallery.visible && !gallery.loading && !gallery.error && gallery.nextOffset < gallery.count ? (
-              <Button loading={gallery.loadingMore} disabled={gallery.loadingMore} onPress={() => void loadMoreGallery()}>More pictures</Button>
-            ) : null}
-            <Button onPress={closeGallery}>Close</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+      {galleryRestaurant ? <WingdexPhotoGallery restaurant={galleryRestaurant}
+        key={galleryRestaurant.destination_id} onClose={() => { setGalleryRestaurant(null); void fetchAll(); }} /> : null}
 
       {/* Restaurants Map dialog */}
       <Portal>
