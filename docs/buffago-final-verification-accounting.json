@@ -1,0 +1,51 @@
+{
+  "target": "vhfxnizaxdanmvmouuaf",
+  "uniquePassing": 409,
+  "featureFailures": 0,
+  "existingSkipped": 1,
+  "historicalAssertions": {
+    "pass": 3,
+    "fail": 2,
+    "countedInFeatureTotal": false
+  },
+  "historicalIntegrity": "FAIL_UNAPPROVED_EXCEPTION",
+  "groups": [
+    {
+      "scope": "compatibility",
+      "uniquePassing": 33,
+      "path": "crawl/.expo/final-A-postgres-regressions.log",
+      "sha256": "1e3a19b35fdcf26a19fd29082aa03df018f8f8daf249c86d9dc0d136ad4947c9"
+    },
+    {
+      "scope": "adapter-executor",
+      "uniquePassing": 35,
+      "path": "crawl/.expo/final-release/adapter-executor-final.log",
+      "sha256": "7e705d8e452c7ff9d4f3aea2250caa46d6217364b228fa4f11ff703f93176554"
+    },
+    {
+      "scope": "adapter-scale",
+      "uniquePassing": 2,
+      "path": "crawl/.expo/final-B-scale-final.log",
+      "sha256": "8b932fa62c3802269433a6f471cd86f9d65e993f4e72e6cb370bb5e4aaa45987"
+    },
+    {
+      "scope": "postgres-package-history",
+      "uniquePassing": 36,
+      "path": "crawl/.expo/final-release/postgres-final-complete.log",
+      "sha256": "02f5f448dd7634abe8b3a8b3ba6a977716780e10aa34f2c766064c284669bde9"
+    },
+    {
+      "scope": "application",
+      "uniquePassing": 302,
+      "path": "crawl/.expo/final-release/client-edge-verified.log",
+      "sha256": "8999035dc10065bd19f1a3eeacd79187c332f371b6f594a7ca62b363c706dc7b"
+    },
+    {
+      "scope": "additional-pagination-regression",
+      "uniquePassing": 1,
+      "path": "crawl/.expo/final-release/edge-runtime-reviewed.log",
+      "sha256": "3e168f75f3673228e39b6b6d9d6ba422e070b6304bae1b287dbb0b1c85f06a63"
+    }
+  ],
+  "note": "Runtime20 overlaps earlier cases; only the new server-row-cap deletion regression is added. Independent review reruns are not added."
+}

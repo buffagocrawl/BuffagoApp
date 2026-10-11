@@ -1,0 +1,62 @@
+[
+  {
+    "function": "public.enqueue_friend_rating_notification",
+    "localPath": "supabase/migrations/20260724012000_daily_engagement_notifications.sql",
+    "productionProsrcMd5": "698de3165796ddc48b9198b3e7f261b3",
+    "checkoutProsrcMd5": "698de3165796ddc48b9198b3e7f261b3",
+    "checkoutTextMatch": true,
+    "lfProsrcMd5": "91c47ca2159fdf7bcd9007ceb26a7496",
+    "lfTextMatch": false,
+    "scope": "function-body text only, not file provenance/dependency behavior"
+  },
+  {
+    "function": "public.guard_buffacoin_rating_writes",
+    "localPath": "supabase/migrations/20260729153000_serrano_trust_repair.sql",
+    "productionProsrcMd5": "b20e1dd1709b7f4f309086cc44e57511",
+    "checkoutProsrcMd5": "b20e1dd1709b7f4f309086cc44e57511",
+    "checkoutTextMatch": true,
+    "lfProsrcMd5": "cb46e1068123afde35246b538ec53e77",
+    "lfTextMatch": false,
+    "scope": "function-body text only, not file provenance/dependency behavior"
+  },
+  {
+    "function": "public.mango_clear_ineligible_priority",
+    "localPath": "supabase/migrations/20260729170000_mango_habanero_review_dashboard.sql",
+    "productionProsrcMd5": "e6afd97295efcd4fd14542212290b7f0",
+    "checkoutProsrcMd5": "0b716cf31e5d673c63e29ce753f46f68",
+    "checkoutTextMatch": false,
+    "lfProsrcMd5": "0b716cf31e5d673c63e29ce753f46f68",
+    "lfTextMatch": false,
+    "scope": "function-body text only, not file provenance/dependency behavior"
+  },
+  {
+    "function": "public.wing_apply_owner_pseudonymization",
+    "localPath": "supabase/migrations/20260729121000_wing_shots_security_rpc.sql",
+    "productionProsrcMd5": "de76b9c0f76f833db3712676d0cc1b60",
+    "checkoutProsrcMd5": "de76b9c0f76f833db3712676d0cc1b60",
+    "checkoutTextMatch": true,
+    "lfProsrcMd5": "cd4452635d10dd01720fad3d9ddf27bf",
+    "lfTextMatch": false,
+    "scope": "function-body text only, not file provenance/dependency behavior"
+  },
+  {
+    "function": "private.refresh_wing_media_photo_vote_counts",
+    "localPath": "supabase/migrations/20261008232910_wing_photo_vote_gallery_eligibility.sql",
+    "productionProsrcMd5": "3678ca3e53070266debd85cf6523eea2",
+    "checkoutProsrcMd5": "9add494f5565fe32e89e9f19772d10e4",
+    "checkoutTextMatch": false,
+    "lfProsrcMd5": "3678ca3e53070266debd85cf6523eea2",
+    "lfTextMatch": true,
+    "scope": "function-body text only, not file provenance/dependency behavior"
+  },
+  {
+    "function": "private.validate_wing_media_photo_vote",
+    "localPath": "supabase/migrations/20261008232910_wing_photo_vote_gallery_eligibility.sql",
+    "productionProsrcMd5": "93667fd6433a290d1cf4e89267327649",
+    "checkoutProsrcMd5": "2ca1f95900d3631fde7c9bd335601a83",
+    "checkoutTextMatch": false,
+    "lfProsrcMd5": "93667fd6433a290d1cf4e89267327649",
+    "lfTextMatch": true,
+    "scope": "function-body text only, not file provenance/dependency behavior"
+  }
+]

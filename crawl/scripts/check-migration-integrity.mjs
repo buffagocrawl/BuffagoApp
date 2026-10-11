@@ -21,10 +21,18 @@ function sha256(path) {
   return createHash('sha256').update(readFileSync(path)).digest('hex');
 }
 
+function canonicalSha256(path) {
+  // Historical manifest rows contain both LF and CRLF hashes. Accepting the
+  // recorded hash in either representation prevents Windows checkout line
+  // endings from creating false drift without hiding content changes.
+  const canonical = readFileSync(path).toString('utf8').replace(/\r\n/g, '\n');
+  return createHash('sha256').update(canonical, 'utf8').digest('hex');
+}
+
 function parseMigration(path) {
   const name = basename(path);
   const match = name.match(migrationPattern);
-  return match ? { path, name, version: match[1], hash: sha256(path) } : null;
+  return match ? { path, name, version: match[1], hash: sha256(path), canonicalHash: canonicalSha256(path) } : null;
 }
 
 function parseManifest() {
@@ -55,7 +63,10 @@ export function inspect({ ledgerFile } = {}) {
   for (const item of [...rootFiles, ...archiveTimestamped]) byVersion.set(item.version, [...(byVersion.get(item.version) || []), item]);
   const duplicates = [...byVersion.entries()].filter(([, items]) => items.length > 1);
   const manifest = parseManifest();
-  const checksumMismatches = rootFiles.filter((item) => manifest.has(item.name) && manifest.get(item.name).hash !== item.hash);
+  const checksumMismatches = rootFiles.filter((item) => {
+    const expected = manifest.get(item.name)?.hash;
+    return expected && expected !== item.hash && expected !== item.canonicalHash;
+  });
   const unmanifested = rootFiles.filter((item) => !manifest.has(item.name));
   const rootNames = new Set(rootFiles.map((item) => item.name));
   const manifestedMissingRoot = [...manifest.entries()]

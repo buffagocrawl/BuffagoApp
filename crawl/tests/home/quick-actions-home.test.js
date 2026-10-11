@@ -11,7 +11,7 @@ test('Home uses the compact layout without removing content', () => {
   assert.doesNotMatch(home, /useBottomTabBarHeight/);
   assert.match(home, /logo: \{\s*position: 'absolute',[\s\S]*?height: 44/);
   assert.match(home, /closestCard:[\s\S]*?paddingHorizontal: 12,\s*paddingVertical: 10/);
-  assert.match(home, /missionEntry: \{ minHeight: 80/);
+  assert.doesNotMatch(home, /missionEntry/);
   assert.match(home, /PlayerProgressCard level=\{hudStats.level\}/);
   assert.match(home, /loadWingdexRestaurantGallery\(closest.id, supabase\)/);
   assert.match(home, /WingShotImage approved uri=/);
@@ -19,11 +19,22 @@ test('Home uses the compact layout without removing content', () => {
   assert.match(home, /contentStyle=\{\{ minHeight: 44 \}\}/);
 });
 
+test('Home removes States Visited while retaining state tracking and the other cards', () => {
+  assert.doesNotMatch(home, /States visited/);
+  assert.doesNotMatch(home, /icon="flag" label="States visited"/);
+  assert.match(home, /stateX/);
+  assert.match(home, /stateY/);
+  assert.match(home, /label=\"Top 50 US\"/);
+  assert.match(home, /label=\{hudStats\.stateAbbrev \? hudStats\.stateAbbrev \+ ' Wingdex' : 'State Wingdex'\}/);
+});
+
 test('Home removes Sauce Duel and keeps Wing Facts as one compact secondary action', () => {
   assert.match(home, /testID="quick-action-wing-facts"/);
   assert.doesNotMatch(home, /testID="quick-action-wing-duel"/);
   assert.doesNotMatch(home, /title="Wing Duel"/);
-  assert.match(home, /wingFactsAction: \{ flex: 1, minWidth: 148, minHeight: 80/);
+  assert.match(home, /wingFactsAction: \{ flex: 1, flexBasis: 0, minWidth: 148, minHeight: 80/);
+  assert.match(home, /wingJuryAction: \{ flex: 1, flexBasis: 0, minWidth: 148, minHeight: 80/);
+  assert.match(home, /homeFunRow: \{ flexDirection: 'row', flexWrap: 'wrap', gap: 8/);
   assert.match(home, /wingFactsLabel: \{ fontSize: 14, lineHeight: 18/);
   assert.doesNotMatch(home, /quick-action-share-wing-spot/);
   assert.doesNotMatch(home, /Share a Wing Spot/);

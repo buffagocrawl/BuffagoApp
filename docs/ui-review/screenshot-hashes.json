@@ -1,0 +1,72 @@
+[
+  {
+    "path": "docs/ui-review/screenshots/01-home.png",
+    "bytes": 47501,
+    "sha256": "acaf3c5a7e4e3dcfdfd289e2069836478a5d8d94f38f6610a2c374819adcf026"
+  },
+  {
+    "path": "docs/ui-review/screenshots/02-wingdex.png",
+    "bytes": 49540,
+    "sha256": "d6f09c23a13cbcb1922ac1672f12419a859c02e1e2b46ef51716bd5b74d7df20"
+  },
+  {
+    "path": "docs/ui-review/screenshots/03-journey.png",
+    "bytes": 40558,
+    "sha256": "eeb68d0ec91fbb49c7f245bab144fe46973b2dc08b0fd21d4021df48b33e4d9e"
+  },
+  {
+    "path": "docs/ui-review/screenshots/04-crawls.png",
+    "bytes": 35990,
+    "sha256": "19096e8db338eb2a6cd4b189cff79dd526ae5433512258eecee85e950f262925"
+  },
+  {
+    "path": "docs/ui-review/screenshots/05-social.png",
+    "bytes": 44938,
+    "sha256": "7bd8b22113e11e86026064d8d773c94f0e15aa6c6e9876a3e5298c5c34b05dce"
+  },
+  {
+    "path": "docs/ui-review/screenshots/06-wing-jury-voting.png",
+    "bytes": 154619,
+    "sha256": "b8bf3d0c4167ddeb23960f98647328a032d56b7a12e37e7bd6c79705af4f3ba3"
+  },
+  {
+    "path": "docs/ui-review/screenshots/07-wing-jury-reveal.png",
+    "bytes": 165159,
+    "sha256": "7055c2864c4d205939a40dbb79bda64d8d28c55cf134cbe81835fff4570dd923"
+  },
+  {
+    "path": "docs/ui-review/screenshots/08-favorites-populated.png",
+    "bytes": 42181,
+    "sha256": "8fa72102e8b5671b5e7dc442c95bf9b298283b8bfc08624110359256f51f6bc1"
+  },
+  {
+    "path": "docs/ui-review/screenshots/09-want-to-try-populated.png",
+    "bytes": 42993,
+    "sha256": "6943e663cce9a39bdd6471b4839270554ceba1945a48ccbd92681c6cfea6f1f5"
+  },
+  {
+    "path": "docs/ui-review/screenshots/10-home-wing-facts-jury.png",
+    "bytes": 38646,
+    "sha256": "a2d8a8f81021f4a4a4ac9d46e7745b741610b3b98562f450c7db9029f7bccbd3"
+  },
+  {
+    "path": "docs/ui-review/screenshots/11-journey-creator.png",
+    "bytes": 45839,
+    "sha256": "ac0761b93e5a3dc4f22dc52b80b30a1a714f270c8c2d74e3521737eb21492986"
+  },
+  {
+    "path": "docs/ui-review/screenshots/12-favorites-empty.png",
+    "bytes": 37694,
+    "sha256": "a5883ad9f1540c08a08bb467895c7cf338a58ee262bba540daf6c15a43efd39e"
+  },
+  {
+    "path": "docs/ui-review/screenshots/13-want-to-try-empty.png",
+    "bytes": 37806,
+    "sha256": "c5bf6d13a7754d200d3489d192489969c3125e7b05617ed5dc70ad662b72a33d"
+  },
+  {
+    "path": "docs/ui-review/screenshots/14-wing-jury-reveal-actions.png",
+    "bytes": 164339,
+    "sha256": "c9d1bcee1ec5342f6ddfeace14b76a9fe1b1b88ee4f69ae25a528d2f5e0458f7"
+  }
+]

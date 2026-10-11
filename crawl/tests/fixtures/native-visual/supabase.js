@@ -6,6 +6,12 @@ const other = '00000000-0000-4000-8000-000000000002';
 const now = '2026-10-08T12:00:00Z';
 const user = { id: uid, aud: 'authenticated', role: 'authenticated', email: 'native-fixture@example.invalid', user_metadata: { username: 'QA Wing Explorer' }, app_metadata: { provider: 'email' } };
 const token = 'eyJhbGciOiJIUzI1NiJ9.' + btoa(JSON.stringify({ sub: uid, exp: 2000000000, aud: 'authenticated', role: 'authenticated' })) + '.fixture';
+const guestQA = typeof process !== 'undefined' && process.env.EXPO_PUBLIC_BUFFAGO_NATIVE_GUEST_QA === '1';
+const ratedJuryQA = !(typeof process !== 'undefined' && process.env.EXPO_PUBLIC_BUFFAGO_NATIVE_JURY_UNRATED_QA === '1');
+const exhaustedJuryQA = typeof process !== 'undefined' && process.env.EXPO_PUBLIC_BUFFAGO_NATIVE_JURY_EXHAUSTED_QA === '1';
+const wingPhotoAsset = require('../../../assets/wing-user.png');
+const logoPhotoAsset = require('../../../assets/logo/BuffaGo-master.png');
+const assetUri = (asset) => typeof asset === 'string' ? asset : asset?.uri || asset?.default?.uri || asset?.default || null;
 const session = { access_token: token, refresh_token: 'fixture-only', expires_at: 2000000000, expires_in: 86400, token_type: 'bearer', user };
 let saved = JSON.stringify(session);
 const destinations = ['QA Harbor Wings', 'QA Long Restaurant Name Buffalo Wing House & Grill', 'QA Northside Wings'].map((name, i) => ({ id: `fixture-spot-${i}`, destination_id: `fixture-spot-${i}`, name, city: 'Buffalo', state_id: 1, state_code: 'NY', address: `${i + 1} Fixture Street`, lat: 42.8874 + i * .001, lng: -78.8784 }));
@@ -20,6 +26,8 @@ if (typeof process !== 'undefined' && process.env.EXPO_PUBLIC_BUFFAGO_NATIVE_RAD
   }
 }
 const ratings = destinations.map((d, i) => ({ id: `fixture-rating-${i}`, user_id: i === 0 ? other : uid, destination_id: d.id, weight_score: 96.73 - i, overall: 9, crispiness: 8, meat: 8, sauce: 9, wings_eaten: 12345, wings_qty: 12, created_at: now, is_buffacoin: false, destinations: d, destination: d }));
+const savedFavorites = [{ user_id: uid, destination_id: destinations[1].id, created_at: now }];
+const savedWantToTry = [{ user_id: uid, destination_id: destinations[0].id, created_at: now }];
 const routes = [{ id: 'fixture-route', title: 'QA Buffalo Classics', travel_tag_id: 1, stop1_id: destinations[0].id, stop2_id: destinations[1].id, stop3_id: destinations[2].id }];
 // The resumed crawl reads PostgREST destination joins, while the list reads IDs.
 // Both views describe the same three fixture stops; no writes are enabled.
@@ -39,6 +47,8 @@ const tables = {
   route_travel_tag: [{ id: 1, travel: 'Walking' }, { id: 2, travel: 'Walkable and Short Drive' }, { id: 3, travel: 'Drivable' }],
   crawls: [{ crawl_id: 'fixture-active', route_id: 'fixture-route', user_id: uid, status: 'in_progress', start_time: now, routes: { title: routes[0].title } }],
   v_social_feed: destinations.map(d => ({ user_id: other, username: 'QA Wing Scout', destination_id: d.id, destination_name: d.name, destination_city: 'Buffalo', destination_state_id: 1, weight_score: 96.7, created_at: now })),
+  user_destination_favorites: savedFavorites,
+  user_want_to_try: savedWantToTry,
 };
 const rpc = {
   get_public_challenge_stats: [{ total_completed: 12345, this_week_completed: 12, current_weekly_streak: 123, best_weekly_streak: 234 }],
@@ -52,9 +62,22 @@ async function fixtureFetch(input, options = {}) {
   if (url.hostname !== 'native-fixture.invalid') throw new Error('Fixture network boundary blocked');
   const method = options.method || 'GET';
   let payload = [];
-  if (url.pathname.includes('/auth/v1/user')) payload = user;
+  if (url.pathname.includes('/auth/v1/user')) payload = guestQA ? null : user;
   else if (url.pathname.includes('/auth/v1/token')) payload = session;
-  else if (url.pathname.includes('/functions/v1/wing-public-gallery')) {
+  else if (url.pathname.includes('/functions/v1/wing-jury-feed')) {
+    const body = JSON.parse(options.body || '{}');
+    const photos = [
+      { submission_id: 'fixture-jury-photo-1', signed_url: assetUri(wingPhotoAsset), media_type: 'photo', expires_at: '2099-01-01T00:00:00Z' },
+      { submission_id: 'fixture-jury-photo-2', signed_url: assetUri(logoPhotoAsset), media_type: 'photo', expires_at: '2099-01-01T00:00:00Z' },
+    ].filter((photo) => !(body.judged_submission_ids || []).includes(photo.submission_id));
+    if (exhaustedJuryQA) photos.length = 0;
+    payload = { ok: true, photos, has_more: false, next_cursor: null, location_fallback: true };
+  } else if (url.pathname.includes('/functions/v1/wing-jury-vote')) {
+    payload = { ok: true, status: 'recorded', submission_id: 'fixture-jury-photo-1', vote: Number(JSON.parse(options.body || '{}').vote), like_count: 12, existing_vote: false };
+  } else if (url.pathname.includes('/functions/v1/wing-jury-reveal')) {
+    const destination = ratedJuryQA ? destinations[1] : destinations[0];
+    payload = { ok: true, restaurant: destination, photo_like_count: 12, restaurant_rating: { average_weight_score: ratedJuryQA ? 91.4 : null, rating_count: ratedJuryQA ? 3 : 0 }, personal_rating: ratedJuryQA ? { weight_score: 94.2, created_at: now } : null, favorite: ratedJuryQA, want_to_try: !ratedJuryQA, save_action: guestQA ? 'sign_in_to_save' : (ratedJuryQA ? 'favorite' : 'want_to_try') };
+  } else if (url.pathname.includes('/functions/v1/wing-public-gallery')) {
     const body = JSON.parse(options.body || '{}');
     const faultQA = typeof process !== 'undefined' && process.env.EXPO_PUBLIC_BUFFAGO_NATIVE_IMAGE_FAULT_QA === '1';
     const kind = body.submission_id ? 'full' : body.include_images ? 'gallery' : 'covers';
@@ -87,4 +110,4 @@ async function fixtureFetch(input, options = {}) {
   const total = Array.isArray(payload) ? payload.length : 1;
   return new Response(method === 'HEAD' ? null : JSON.stringify(payload), { status: 200, headers: { 'Content-Type': 'application/json', 'Content-Range': `0-${Math.max(0, total - 1)}/${total}` } });
 }
-export const supabase = createClient('https://native-fixture.invalid', 'fixture.anonymous.key', { auth: { storageKey: 'native-visual-fixture-session', storage: { getItem: async () => saved, setItem: async (_key, value) => { saved = value; }, removeItem: async () => { saved = null; } }, autoRefreshToken: false, detectSessionInUrl: false }, global: { fetch: fixtureFetch } });
+export const supabase = createClient('https://native-fixture.invalid', 'fixture.anonymous.key', { auth: { storageKey: 'native-visual-fixture-session', storage: { getItem: async () => guestQA ? null : saved, setItem: async (_key, value) => { saved = value; }, removeItem: async () => { saved = null; } }, autoRefreshToken: false, detectSessionInUrl: false }, global: { fetch: fixtureFetch } });

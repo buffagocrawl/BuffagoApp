@@ -31,6 +31,8 @@ import {
 import { Button, useTheme } from 'react-native-paper';
 import { resolveCallbackFallbackRoute, withCallbackTimeout } from '../../lib/authCallbackHelpers';
 import { submitBuffacoinRatingTransaction } from '../../lib/buffacoinRatingTransaction';
+import { claimSavedDestinationAuthHandoff } from '../../lib/savedDestinations.js';
+import { accountKey } from '../../lib/accountBoundary.js';
 
 // Onboarding keys (match OnboardingFlow)
 const ONBOARDING_SEED_RATING_KEY = 'buffago:onboarding:seed_rating';
@@ -334,6 +336,12 @@ export default function AuthCallback() {
     ranRef.current = true;
 
     let cancelled = false;
+    let accountIdentity;
+    let accountRevision = 0;
+    const { data: accountSubscription } = supabase.auth.onAuthStateChange((_event, session) => {
+      const next = accountKey(session?.user || null);
+      if (next !== accountIdentity) { accountIdentity = next; accountRevision += 1; }
+    });
 
     const finish = async () => {
       const callbackStartedAt = Date.now();
@@ -694,6 +702,14 @@ export default function AuthCallback() {
         const { data: userData, error: userError } = await supabase.auth.getUser();
         if (userError) throw userError;
         let user = userData?.user || null;
+        accountIdentity = accountKey(user);
+        const handoffRevision = accountRevision;
+        const handoffCurrent = () => !cancelled && handoffRevision === accountRevision;
+        // Reserve this account's handoff before optional setup can fail or unmount.
+        let savedIntent = null;
+        if (user?.id && !user.is_anonymous) {
+          try { savedIntent = await claimSavedDestinationAuthHandoff({ client: supabase, userId: user.id, isCurrent: handoffCurrent }); } catch {}
+        }
         const providerState = user?.id
           ? await refreshLinkedProviders()
           : { facebook: false, providers: [], identities: [], error: null };
@@ -878,7 +894,12 @@ export default function AuthCallback() {
           flowProvider === 'facebook' ? 'facebook' : 'auth'
         );
 
-        const finalRoute = returnPath || '/(tabs)/home';
+        const { data: currentAccount, error: accountError } = await supabase.auth.getUser();
+        if (cancelled || accountError || currentAccount?.user?.id !== user?.id || currentAccount?.user?.is_anonymous) return;
+        const finalRoute = savedIntent ? {
+          pathname: '/(tabs)/ratings',
+          params: { savedAction: savedIntent.kind, savedDestinationId: savedIntent.destinationId, savedActionState: savedIntent.saved === false ? 'remove' : 'save', savedActionUserId: savedIntent.userId },
+        } : returnPath || '/(tabs)/home';
         await trackEvent({
           eventName: 'auth_callback_completed',
           screen: 'auth/callback',
@@ -904,7 +925,8 @@ export default function AuthCallback() {
           flowProvider === 'facebook' ? 'facebook' : 'auth'
         );
 
-        if (!cancelled) router.replace(finalRoute);
+        const { data: finalAccount, error: finalAccountError } = await supabase.auth.getUser();
+        if (handoffCurrent() && !finalAccountError && finalAccount?.user?.id === user?.id && !finalAccount?.user?.is_anonymous) router.replace(finalRoute);
         })(), flowProvider);
       } catch (e) {
         const msg = String(e?.message || e);
@@ -986,6 +1008,7 @@ export default function AuthCallback() {
 
     return () => {
       cancelled = true;
+      accountSubscription?.subscription?.unsubscribe?.();
     };
   }, [attempt, params?.code, params?.returnUrl, liveUrl, router]);
 

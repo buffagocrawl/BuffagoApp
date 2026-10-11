@@ -1,3 +1,5 @@
+import { ratingRpcRetry } from './ratingRpcRetry.js';
+
 export async function submitBuffacoinRatingTransaction({
   supabase,
   operationId,
@@ -7,7 +9,7 @@ export async function submitBuffacoinRatingTransaction({
   rating,
 }) {
   if (!operationId) throw new Error('operation_id_required');
-  const { data, error } = await supabase.rpc('submit_buffacoin_rating_v1', {
+  const { data, error } = await ratingRpcRetry(supabase, 'submit_buffacoin_rating_v1', {
     p_operation_id: operationId,
     p_destination_id: destinationId,
     p_state_code: stateCode,

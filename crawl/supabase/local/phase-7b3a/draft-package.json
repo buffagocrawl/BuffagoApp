@@ -1,0 +1,16 @@
+{
+    "format":  1,
+    "status":  "quarantined-not-approved",
+    "projectEvidence":  "vhfxnizaxdanmvmouuaf",
+    "observedRemoteMaximum":  "20261009201342",
+    "artifacts":  [
+                      {
+                          "path":  "supabase/migrations/20261010192747_wing_jury_saved_destinations_forward.sql",
+                          "sha256":  "f66c4585b7c0295579ca3b188bb4464815c84328f1b2ae71b4abe7354e6cfab3"
+                      },
+                      {
+                          "path":  "production-fingerprint-preflight.sql",
+                          "sha256":  "66ce48f694c2e458a5622d63fd737676a26380a7aa098e748614b5fb74ef299b"
+                      }
+                  ]
+}

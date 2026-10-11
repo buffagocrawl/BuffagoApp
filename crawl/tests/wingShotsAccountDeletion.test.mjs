@@ -20,7 +20,7 @@ test('account deletion prepares and completes Wing Shot cleanup before auth dele
 
 test('private deletion is bounded and fails closed without returning paths', () => {
   assert.match(edge, /objectPaths\.length; index \+= 100/);
-  assert.match(edge, /if \(!objectsDeleted \|\| completionError\)/);
+  assert.match(edge, /if \(!objectsDeleted \|\| completionError \|\| completionResult !== true\)/);
   assert.match(edge, /Private media cleanup did not complete/);
   assert.doesNotMatch(edge, /JSON\.stringify\(\{[^}]*objectPaths/);
 });

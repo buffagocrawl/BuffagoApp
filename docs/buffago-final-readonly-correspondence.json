@@ -1,0 +1,674 @@
+{
+  "evidence": "buffago-production-readonly-evidence-2026-10-10.md",
+  "normalization": "CRLF to LF only; no whitespace or semantic rewriting",
+  "results": [
+    {
+      "schema": "public",
+      "name": "award_referral_xp_internal",
+      "signature": "award_referral_xp_internal(uuid,integer,uuid,text)",
+      "source": "ee57684e110b9b013e947ffcd1979b0f",
+      "definer": true,
+      "searchPath": "public",
+      "config": "dcd2abd514173991611a622e71d06e6f",
+      "status": "EXACT MATCH",
+      "selected": {
+        "file": "20260724033000_referral_system_v1.sql",
+        "signature": "uuid,integer,uuid,text",
+        "raw": "ee57684e110b9b013e947ffcd1979b0f",
+        "lf": "b78c91bc46fab0fa13df0d7cfe604290",
+        "config": "dcd2abd514173991611a622e71d06e6f",
+        "definer": true,
+        "searchPath": "public"
+      },
+      "signatureMatch": true,
+      "configMatch": true,
+      "definerMatch": true,
+      "candidates": [
+        {
+          "file": "20260724033000_referral_system_v1.sql",
+          "raw": "ee57684e110b9b013e947ffcd1979b0f",
+          "lf": "b78c91bc46fab0fa13df0d7cfe604290",
+          "signature": "uuid,integer,uuid,text",
+          "config": "dcd2abd514173991611a622e71d06e6f"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "Badge_Add_Rating_Milestones",
+      "signature": "\"Badge_Add_Rating_Milestones\"()",
+      "source": "298aa31f809efe43252005021f089fc1",
+      "definer": true,
+      "searchPath": "public",
+      "config": "dcd2abd514173991611a622e71d06e6f",
+      "status": "SOURCE NOT AVAILABLE",
+      "selected": null,
+      "signatureMatch": null,
+      "configMatch": null,
+      "definerMatch": null,
+      "candidates": []
+    },
+    {
+      "schema": "public",
+      "name": "can_user_appear_socially",
+      "signature": "can_user_appear_socially(uuid)",
+      "source": "f4519e4112e7497b0acc5207054f2e3c",
+      "definer": false,
+      "searchPath": "unspecified",
+      "config": "d41d8cd98f00b204e9800998ecf8427e",
+      "status": "EXACT MATCH",
+      "selected": {
+        "file": "20260622130000_add_social_opt_out.sql",
+        "signature": "uuid",
+        "raw": "f4519e4112e7497b0acc5207054f2e3c",
+        "lf": "71b0ead8cde41e1101e52844ea97c8a5",
+        "config": "d41d8cd98f00b204e9800998ecf8427e",
+        "definer": false,
+        "searchPath": "unspecified"
+      },
+      "signatureMatch": true,
+      "configMatch": true,
+      "definerMatch": true,
+      "candidates": [
+        {
+          "file": "20260622130000_add_social_opt_out.sql",
+          "raw": "f4519e4112e7497b0acc5207054f2e3c",
+          "lf": "71b0ead8cde41e1101e52844ea97c8a5",
+          "signature": "uuid",
+          "config": "d41d8cd98f00b204e9800998ecf8427e"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "enqueue_referral_push_internal",
+      "signature": "enqueue_referral_push_internal(uuid,uuid,text,text,text)",
+      "source": "79f580d07ab242be795e3bf0965a6f59",
+      "definer": true,
+      "searchPath": "public",
+      "config": "dcd2abd514173991611a622e71d06e6f",
+      "status": "EXACT MATCH",
+      "selected": {
+        "file": "20260724033000_referral_system_v1.sql",
+        "signature": "uuid,uuid,text,text,text",
+        "raw": "79f580d07ab242be795e3bf0965a6f59",
+        "lf": "60b86c245533e467452ede0312bac688",
+        "config": "dcd2abd514173991611a622e71d06e6f",
+        "definer": true,
+        "searchPath": "public"
+      },
+      "signatureMatch": true,
+      "configMatch": true,
+      "definerMatch": true,
+      "candidates": [
+        {
+          "file": "20260724033000_referral_system_v1.sql",
+          "raw": "79f580d07ab242be795e3bf0965a6f59",
+          "lf": "60b86c245533e467452ede0312bac688",
+          "signature": "uuid,uuid,text,text,text",
+          "config": "dcd2abd514173991611a622e71d06e6f"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "flag_referral_account_deletion",
+      "signature": "flag_referral_account_deletion()",
+      "source": "65b376c54d2fdf603650f063d1f14df6",
+      "definer": true,
+      "searchPath": "public",
+      "config": "dcd2abd514173991611a622e71d06e6f",
+      "status": "EXACT MATCH",
+      "selected": {
+        "file": "20260724033000_referral_system_v1.sql",
+        "signature": "",
+        "raw": "65b376c54d2fdf603650f063d1f14df6",
+        "lf": "d7bfcc8afeb0a15f4552bcb7d0febd85",
+        "config": "dcd2abd514173991611a622e71d06e6f",
+        "definer": true,
+        "searchPath": "public"
+      },
+      "signatureMatch": true,
+      "configMatch": true,
+      "definerMatch": true,
+      "candidates": [
+        {
+          "file": "20260724033000_referral_system_v1.sql",
+          "raw": "65b376c54d2fdf603650f063d1f14df6",
+          "lf": "d7bfcc8afeb0a15f4552bcb7d0febd85",
+          "signature": "",
+          "config": "dcd2abd514173991611a622e71d06e6f"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "friend_pair_is_blocked",
+      "signature": "friend_pair_is_blocked(uuid,uuid)",
+      "source": "dbb0188e6e65df3e38d401d995812e50",
+      "definer": true,
+      "searchPath": "public",
+      "config": "dcd2abd514173991611a622e71d06e6f",
+      "status": "MISMATCH",
+      "selected": {
+        "file": "20260623190000_add_friends_system.sql",
+        "signature": "uuid,uuid",
+        "raw": "77b9e45f4b6d11f9049e653650001b83",
+        "lf": "77b9e45f4b6d11f9049e653650001b83",
+        "config": "dcd2abd514173991611a622e71d06e6f",
+        "definer": true,
+        "searchPath": "public"
+      },
+      "signatureMatch": true,
+      "configMatch": true,
+      "definerMatch": true,
+      "candidates": [
+        {
+          "file": "20260623190000_add_friends_system.sql",
+          "raw": "77b9e45f4b6d11f9049e653650001b83",
+          "lf": "77b9e45f4b6d11f9049e653650001b83",
+          "signature": "uuid,uuid",
+          "config": "dcd2abd514173991611a622e71d06e6f"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "mango_clear_ineligible_priority",
+      "signature": "mango_clear_ineligible_priority()",
+      "source": "e6afd97295efcd4fd14542212290b7f0",
+      "definer": false,
+      "searchPath": "pg_catalog, public",
+      "config": "77a607835d4d56bfe514d9272db9300d",
+      "status": "MISMATCH",
+      "selected": {
+        "file": "20260729170000_mango_habanero_review_dashboard.sql",
+        "signature": "",
+        "raw": "0b716cf31e5d673c63e29ce753f46f68",
+        "lf": "0b716cf31e5d673c63e29ce753f46f68",
+        "config": "77a607835d4d56bfe514d9272db9300d",
+        "definer": false,
+        "searchPath": "pg_catalog, public"
+      },
+      "signatureMatch": true,
+      "configMatch": true,
+      "definerMatch": true,
+      "candidates": [
+        {
+          "file": "20260729170000_mango_habanero_review_dashboard.sql",
+          "raw": "0b716cf31e5d673c63e29ce753f46f68",
+          "lf": "0b716cf31e5d673c63e29ce753f46f68",
+          "signature": "",
+          "config": "77a607835d4d56bfe514d9272db9300d"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "referral_profile_eligibility",
+      "signature": "referral_profile_eligibility(uuid)",
+      "source": "3e430d004bfebc4c183545257015f45d",
+      "definer": true,
+      "searchPath": "public",
+      "config": "dcd2abd514173991611a622e71d06e6f",
+      "status": "EXACT MATCH",
+      "selected": {
+        "file": "20260724133000_referral_profile_eligibility.sql",
+        "signature": "uuid",
+        "raw": "3e430d004bfebc4c183545257015f45d",
+        "lf": "af8ccd920e53105578ac067ee53a5544",
+        "config": "dcd2abd514173991611a622e71d06e6f",
+        "definer": true,
+        "searchPath": "public"
+      },
+      "signatureMatch": true,
+      "configMatch": true,
+      "definerMatch": true,
+      "candidates": [
+        {
+          "file": "20260724133000_referral_profile_eligibility.sql",
+          "raw": "3e430d004bfebc4c183545257015f45d",
+          "lf": "af8ccd920e53105578ac067ee53a5544",
+          "signature": "uuid",
+          "config": "dcd2abd514173991611a622e71d06e6f"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "settle_referral_for_rating_internal",
+      "signature": "settle_referral_for_rating_internal(uuid,uuid)",
+      "source": "582d64ecad7b96c027de2c7384ece5be",
+      "definer": true,
+      "searchPath": "public",
+      "config": "dcd2abd514173991611a622e71d06e6f",
+      "status": "EXACT MATCH",
+      "selected": {
+        "file": "20260724133000_referral_profile_eligibility.sql",
+        "signature": "uuid,uuid",
+        "raw": "582d64ecad7b96c027de2c7384ece5be",
+        "lf": "fe89fc9ea0a3167bffc0aaadf22839ac",
+        "config": "dcd2abd514173991611a622e71d06e6f",
+        "definer": true,
+        "searchPath": "public"
+      },
+      "signatureMatch": true,
+      "configMatch": true,
+      "definerMatch": true,
+      "candidates": [
+        {
+          "file": "20260724033000_referral_system_v1.sql",
+          "raw": "702899ec9f8dc100aa10d97560294d2b",
+          "lf": "33343807268d7839b555dead06556a94",
+          "signature": "uuid,uuid",
+          "config": "dcd2abd514173991611a622e71d06e6f"
+        },
+        {
+          "file": "20260724133000_referral_profile_eligibility.sql",
+          "raw": "582d64ecad7b96c027de2c7384ece5be",
+          "lf": "fe89fc9ea0a3167bffc0aaadf22839ac",
+          "signature": "uuid,uuid",
+          "config": "dcd2abd514173991611a622e71d06e6f"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "sync_verified_referral_badges_internal",
+      "signature": "sync_verified_referral_badges_internal(uuid)",
+      "source": "990b49ddc24b22b12a913858b1b04320",
+      "definer": true,
+      "searchPath": "public",
+      "config": "dcd2abd514173991611a622e71d06e6f",
+      "status": "EXACT MATCH",
+      "selected": {
+        "file": "20260724033000_referral_system_v1.sql",
+        "signature": "uuid",
+        "raw": "990b49ddc24b22b12a913858b1b04320",
+        "lf": "782f35bd82eff909e1bbade59b631355",
+        "config": "dcd2abd514173991611a622e71d06e6f",
+        "definer": true,
+        "searchPath": "public"
+      },
+      "signatureMatch": true,
+      "configMatch": true,
+      "definerMatch": true,
+      "candidates": [
+        {
+          "file": "20260724033000_referral_system_v1.sql",
+          "raw": "990b49ddc24b22b12a913858b1b04320",
+          "lf": "782f35bd82eff909e1bbade59b631355",
+          "signature": "uuid",
+          "config": "dcd2abd514173991611a622e71d06e6f"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "wing_photo_processing_blocker",
+      "signature": "wing_photo_processing_blocker(uuid)",
+      "source": "77e5eb7a71360ecea76985ac278ce8a2",
+      "definer": true,
+      "searchPath": "pg_catalog, public, storage",
+      "config": "047a8d61c365228c81e80926d3284293",
+      "status": "NORMALIZED MATCH",
+      "selected": {
+        "file": "20261008171906_wing_photo_derivative_recovery.sql",
+        "signature": "uuid",
+        "raw": "759cfdb3a5e6a6bdf07765719474fd99",
+        "lf": "77e5eb7a71360ecea76985ac278ce8a2",
+        "config": "047a8d61c365228c81e80926d3284293",
+        "definer": true,
+        "searchPath": "pg_catalog, public, storage"
+      },
+      "signatureMatch": true,
+      "configMatch": true,
+      "definerMatch": true,
+      "candidates": [
+        {
+          "file": "20261008171906_wing_photo_derivative_recovery.sql",
+          "raw": "759cfdb3a5e6a6bdf07765719474fd99",
+          "lf": "77e5eb7a71360ecea76985ac278ce8a2",
+          "signature": "uuid",
+          "config": "047a8d61c365228c81e80926d3284293"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "wing_transition_submission",
+      "signature": "wing_transition_submission(uuid,text,text,text,uuid,text,text,uuid,jsonb)",
+      "source": "ed3cd6c94145df3a63a364e2cef69fcc",
+      "definer": true,
+      "searchPath": "pg_catalog, public",
+      "config": "77a607835d4d56bfe514d9272db9300d",
+      "status": "EXACT MATCH",
+      "selected": {
+        "file": "20260730233913_wing_review_intake_lifecycle.sql",
+        "signature": "uuid,text,text,text,uuid,text,text,uuid,jsonb",
+        "raw": "ed3cd6c94145df3a63a364e2cef69fcc",
+        "lf": "6febaf0fda38f06c6ece140f66ff4975",
+        "config": "77a607835d4d56bfe514d9272db9300d",
+        "definer": true,
+        "searchPath": "pg_catalog, public"
+      },
+      "signatureMatch": true,
+      "configMatch": true,
+      "definerMatch": true,
+      "candidates": [
+        {
+          "file": "20260729121000_wing_shots_security_rpc.sql",
+          "raw": "f30330a8d531afd43f3401bd02f8446c",
+          "lf": "b902f54312639fa88591d74bad0586cd",
+          "signature": "uuid,text,text,text,uuid,text,text,uuid,jsonb",
+          "config": "77a607835d4d56bfe514d9272db9300d"
+        },
+        {
+          "file": "20260730233913_wing_review_intake_lifecycle.sql",
+          "raw": "ed3cd6c94145df3a63a364e2cef69fcc",
+          "lf": "6febaf0fda38f06c6ece140f66ff4975",
+          "signature": "uuid,text,text,text,uuid,text,text,uuid,jsonb",
+          "config": "77a607835d4d56bfe514d9272db9300d"
+        }
+      ]
+    },
+    {
+      "schema": "storage",
+      "name": "protect_delete",
+      "signature": "storage.protect_delete()",
+      "source": "998d324ea2b1abc49351e8c2367b5796",
+      "definer": false,
+      "searchPath": "unspecified",
+      "config": "d41d8cd98f00b204e9800998ecf8427e",
+      "status": "SOURCE NOT AVAILABLE",
+      "selected": null,
+      "signatureMatch": null,
+      "configMatch": null,
+      "definerMatch": null,
+      "candidates": []
+    },
+    {
+      "schema": "storage",
+      "name": "update_updated_at_column",
+      "signature": "storage.update_updated_at_column()",
+      "source": "7596e66a7698d5a6b5129c5ce9b24c5f",
+      "definer": false,
+      "searchPath": "unspecified",
+      "config": "d41d8cd98f00b204e9800998ecf8427e",
+      "status": "SOURCE NOT AVAILABLE",
+      "selected": null,
+      "signatureMatch": null,
+      "configMatch": null,
+      "definerMatch": null,
+      "candidates": []
+    },
+    {
+      "schema": null,
+      "name": "grant_pg_graphql_access",
+      "signature": "grant_pg_graphql_access()",
+      "source": "dd3f3e2bb94cff45ef24b9cecb6af1c8",
+      "definer": false,
+      "searchPath": "\"\"",
+      "config": "af3be9c3d4c2d891da1a7618c49685d3",
+      "event": "issue_pg_graphql_access",
+      "status": "SOURCE NOT AVAILABLE",
+      "selected": null,
+      "signatureMatch": null,
+      "configMatch": null,
+      "definerMatch": null,
+      "candidates": []
+    },
+    {
+      "schema": null,
+      "name": "pgrst_ddl_watch",
+      "signature": "pgrst_ddl_watch()",
+      "source": "7f27b8118fea5c88b0164331292859e3",
+      "definer": false,
+      "searchPath": "\"\"",
+      "config": "af3be9c3d4c2d891da1a7618c49685d3",
+      "event": "pgrst_ddl_watch",
+      "status": "SOURCE NOT AVAILABLE",
+      "selected": null,
+      "signatureMatch": null,
+      "configMatch": null,
+      "definerMatch": null,
+      "candidates": []
+    },
+    {
+      "schema": "public",
+      "name": "complete_wing_account_media_cleanup",
+      "signature": "public.complete_wing_account_media_cleanup(uuid,boolean,text)",
+      "source": "bb59e829e4cf848befa9e9c90fb93801",
+      "config": "77a607835d4d56bfe514d9272db9300d",
+      "definer": true,
+      "owner": "postgres",
+      "status": "EXACT MATCH",
+      "selected": {
+        "file": "20260729121000_wing_shots_security_rpc.sql",
+        "signature": "uuid,boolean,text",
+        "raw": "bb59e829e4cf848befa9e9c90fb93801",
+        "lf": "b59ee6c63588fbab83b432f7aeb6eb69",
+        "config": "77a607835d4d56bfe514d9272db9300d",
+        "definer": true,
+        "searchPath": "pg_catalog, public"
+      },
+      "signatureMatch": true,
+      "configMatch": true,
+      "definerMatch": true,
+      "candidates": [
+        {
+          "file": "20260729121000_wing_shots_security_rpc.sql",
+          "raw": "bb59e829e4cf848befa9e9c90fb93801",
+          "lf": "b59ee6c63588fbab83b432f7aeb6eb69",
+          "signature": "uuid,boolean,text",
+          "config": "77a607835d4d56bfe514d9272db9300d"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "finalize_wing_submission_upload",
+      "signature": "public.finalize_wing_submission_upload(uuid,text,uuid)",
+      "source": "d7c7c9a5f47e72f04450197be6f76b53",
+      "config": "047a8d61c365228c81e80926d3284293",
+      "definer": true,
+      "owner": "postgres",
+      "status": "MISMATCH",
+      "selected": {
+        "file": "20261007000241_image_workflow_rc_regression.sql",
+        "signature": "uuid,text,uuid",
+        "raw": "9e768f97f38fead75ed36cc70841be94",
+        "lf": "026517bc51bae5678c5359a304ac106f",
+        "config": "047a8d61c365228c81e80926d3284293",
+        "definer": true,
+        "searchPath": "pg_catalog, public, storage"
+      },
+      "signatureMatch": true,
+      "configMatch": true,
+      "definerMatch": true,
+      "candidates": [
+        {
+          "file": "20260729121000_wing_shots_security_rpc.sql",
+          "raw": "c52e2c6953fec0a3c08ace6b877c1755",
+          "lf": "509aa02c9019c3ff66042ff39541dab3",
+          "signature": "uuid,text,uuid",
+          "config": "047a8d61c365228c81e80926d3284293"
+        },
+        {
+          "file": "20260729140000_wing_shots_unrestricted_sources.sql",
+          "raw": "b32211322352dfb11b5851c0aa957e74",
+          "lf": "b32211322352dfb11b5851c0aa957e74",
+          "signature": "uuid,text,uuid",
+          "config": "047a8d61c365228c81e80926d3284293"
+        },
+        {
+          "file": "20260730120000_wing_shot_uploaded_object_validation.sql",
+          "raw": "4e03c853a4c01f7c27fca3d0110161e0",
+          "lf": "4e03c853a4c01f7c27fca3d0110161e0",
+          "signature": "uuid,text,uuid,text,text",
+          "config": "047a8d61c365228c81e80926d3284293"
+        },
+        {
+          "file": "20260730222132_wing_shot_finalize_legacy_compat.sql",
+          "raw": "739fdc1c2d44489ef85e2f40c0252e0d",
+          "lf": "739fdc1c2d44489ef85e2f40c0252e0d",
+          "signature": "uuid,text,uuid",
+          "config": "047a8d61c365228c81e80926d3284293"
+        },
+        {
+          "file": "20260730233913_wing_review_intake_lifecycle.sql",
+          "raw": "9c3480258674a68a65fbb748e46f7882",
+          "lf": "8b63cc48325ad9bc5210c79fa819e829",
+          "signature": "uuid,text,uuid",
+          "config": "047a8d61c365228c81e80926d3284293"
+        },
+        {
+          "file": "20260731005535_wing_finalize_service_role_promotion_contract.sql",
+          "raw": "734acc56e07d0812486529178a76efdb",
+          "lf": "0eea732d431cb49d2c39229a6345e85c",
+          "signature": "uuid,text,uuid",
+          "config": "047a8d61c365228c81e80926d3284293"
+        },
+        {
+          "file": "20260731010940_wing_finalize_processing_job_idempotency_recovery.sql",
+          "raw": "ae8610b0d09c7a6f1de1131c72330faa",
+          "lf": "67dc88a479491e3189e9182ccbd57ace",
+          "signature": "uuid,text,uuid",
+          "config": "047a8d61c365228c81e80926d3284293"
+        },
+        {
+          "file": "20260731013034_wing_review_only_finalization.sql",
+          "raw": "17edebb966e14a87e77fb3691fb14610",
+          "lf": "8f0875d9743ab16b97b7d769408475b4",
+          "signature": "uuid,text,uuid",
+          "config": "047a8d61c365228c81e80926d3284293"
+        },
+        {
+          "file": "20261007000241_image_workflow_rc_regression.sql",
+          "raw": "9e768f97f38fead75ed36cc70841be94",
+          "lf": "026517bc51bae5678c5359a304ac106f",
+          "signature": "uuid,text,uuid",
+          "config": "047a8d61c365228c81e80926d3284293"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "prepare_wing_account_media_cleanup",
+      "signature": "public.prepare_wing_account_media_cleanup(uuid,uuid)",
+      "source": "7fb25452bff5a1911d85e41bd3b7dbed",
+      "config": "77a607835d4d56bfe514d9272db9300d",
+      "definer": true,
+      "owner": "postgres",
+      "status": "EXACT MATCH",
+      "selected": {
+        "file": "20260729121000_wing_shots_security_rpc.sql",
+        "signature": "uuid,uuid",
+        "raw": "7fb25452bff5a1911d85e41bd3b7dbed",
+        "lf": "b1a9306ff0b4f804f2e4e756f3e2de69",
+        "config": "77a607835d4d56bfe514d9272db9300d",
+        "definer": true,
+        "searchPath": "pg_catalog, public"
+      },
+      "signatureMatch": true,
+      "configMatch": true,
+      "definerMatch": true,
+      "candidates": [
+        {
+          "file": "20260729121000_wing_shots_security_rpc.sql",
+          "raw": "7fb25452bff5a1911d85e41bd3b7dbed",
+          "lf": "b1a9306ff0b4f804f2e4e756f3e2de69",
+          "signature": "uuid,uuid",
+          "config": "77a607835d4d56bfe514d9272db9300d"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "reserve_wing_submission_upload",
+      "signature": "public.reserve_wing_submission_upload(uuid,text,text,bigint,text,text,text,text,uuid,uuid,text)",
+      "source": "b743ef604059e9ffa454dc8085caad9b",
+      "config": "047a8d61c365228c81e80926d3284293",
+      "definer": true,
+      "owner": "postgres",
+      "status": "MISMATCH",
+      "selected": {
+        "file": "20261007000241_image_workflow_rc_regression.sql",
+        "signature": "uuid,text,text,bigint,text,text,text,text,uuid,uuid,text",
+        "raw": "ddd9692ce92ee1a4561e36452c19b771",
+        "lf": "efa690b798033db82faf8b0cbb465df4",
+        "config": "047a8d61c365228c81e80926d3284293",
+        "definer": true,
+        "searchPath": "pg_catalog, public, storage"
+      },
+      "signatureMatch": true,
+      "configMatch": true,
+      "definerMatch": true,
+      "candidates": [
+        {
+          "file": "20260729121000_wing_shots_security_rpc.sql",
+          "raw": "9201c6da62e654594a53f439b6355489",
+          "lf": "4b8d900da4e07fdbc95eff23f4b450bb",
+          "signature": "uuid,text,text,bigint,text,text,text,text,uuid",
+          "config": "047a8d61c365228c81e80926d3284293"
+        },
+        {
+          "file": "20260729136000_wing_upload_retry_after_expiry.sql",
+          "raw": "f7aee57618e75e1696629bed2cf8fc98",
+          "lf": "bf3ea9c69854d99d93a91fdf9aedafe3",
+          "signature": "uuid,text,text,bigint,text,text,text,text,uuid",
+          "config": "047a8d61c365228c81e80926d3284293"
+        },
+        {
+          "file": "20260729140000_wing_shots_unrestricted_sources.sql",
+          "raw": "41bad730ae7fc2151200e891a9c14414",
+          "lf": "41bad730ae7fc2151200e891a9c14414",
+          "signature": "uuid,uuid,text,text,bigint,text,text,text,text,uuid,text",
+          "config": "047a8d61c365228c81e80926d3284293"
+        },
+        {
+          "file": "20260729150000_reconcile_wing_upload_rpc.sql",
+          "raw": "0c5aff9ba664d742ca271a511fa4ed82",
+          "lf": "0c5aff9ba664d742ca271a511fa4ed82",
+          "signature": "uuid,text,text,bigint,text,text,text,text,uuid,uuid,text",
+          "config": "047a8d61c365228c81e80926d3284293"
+        },
+        {
+          "file": "20260729155000_wing_upload_rating_eligibility_repair.sql",
+          "raw": "d6cc1a4dc6b10a8b1d80eaecc4dd57df",
+          "lf": "d6cc1a4dc6b10a8b1d80eaecc4dd57df",
+          "signature": "uuid,text,text,bigint,text,text,text,text,uuid,uuid,text",
+          "config": "047a8d61c365228c81e80926d3284293"
+        },
+        {
+          "file": "20260729160000_wing_shot_rating_rule.sql",
+          "raw": "ec87a91828471cc456bb4c4ffff3f392",
+          "lf": "ec87a91828471cc456bb4c4ffff3f392",
+          "signature": "uuid,text,text,bigint,text,text,text,text,uuid,uuid,text",
+          "config": "047a8d61c365228c81e80926d3284293"
+        },
+        {
+          "file": "20260729210000_wing_upload_retry_idempotency.sql",
+          "raw": "f022fa306529358ae498e8a5ff054341",
+          "lf": "f022fa306529358ae498e8a5ff054341",
+          "signature": "uuid,text,text,bigint,text,text,text,text,uuid,uuid,text",
+          "config": "047a8d61c365228c81e80926d3284293"
+        },
+        {
+          "file": "20260730150000_wing_shot_completed_upload_rate_limit.sql",
+          "raw": "3c083fde42c1e58cb0cf76d83522b15e",
+          "lf": "3c083fde42c1e58cb0cf76d83522b15e",
+          "signature": "uuid,text,text,bigint,text,text,text,text,uuid,uuid,text",
+          "config": "047a8d61c365228c81e80926d3284293"
+        },
+        {
+          "file": "20261007000241_image_workflow_rc_regression.sql",
+          "raw": "ddd9692ce92ee1a4561e36452c19b771",
+          "lf": "efa690b798033db82faf8b0cbb465df4",
+          "signature": "uuid,text,text,bigint,text,text,text,text,uuid,uuid,text",
+          "config": "047a8d61c365228c81e80926d3284293"
+        }
+      ]
+    }
+  ]
+}

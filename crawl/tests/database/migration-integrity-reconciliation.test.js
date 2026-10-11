@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { inspect } from '../../scripts/check-migration-integrity.mjs';
 
 test('recovered Phase 2 migration has an exact canonical root and manifest hash', () => {
@@ -17,6 +18,14 @@ test('known current-schema migration is explicitly registered and checksum-stabl
   assert.equal(report.checksumMismatches.length, 0);
 });
 
+test('migration checksum validation is portable across Windows CRLF checkouts', () => {
+  const report = inspect();
+  assert.equal(
+    report.checksumMismatches.some((item) => item.name === '20260729120000_wing_shots_core.sql'),
+    false,
+  );
+});
+
 test('recovered Phase 1 migrations are present as unique root files', () => {
   const report = inspect();
   for (const name of [
@@ -26,4 +35,10 @@ test('recovered Phase 1 migrations are present as unique root files', () => {
     assert.equal(report.rootFiles.filter((item) => item.name === name).length, 1);
   }
   assert.equal(report.duplicates.length, 0);
+});
+
+test('duplicate guard groups migration files by the 14-digit version prefix', () => {
+  const guard = fs.readFileSync(new URL('../../supabase/validation/duplicate-migration-guard.ps1', import.meta.url), 'utf8');
+  assert.match(guard, /Group-Object Version/);
+  assert.match(guard, /\^\(\?<version>\\d\{14\}\)_/);
 });

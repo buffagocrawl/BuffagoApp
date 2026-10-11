@@ -13,7 +13,6 @@ import {
   Share,
   Animated,
   Modal,
-  DeviceEventEmitter,
   useWindowDimensions,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -50,14 +49,18 @@ import { mapCoordinate } from '../../../lib/mapSafety';
 import WingdexPhotoGallery from '../../../components/WingdexPhotoGallery';
 import { loadWingdexGallery } from '../../../lib/wingdexGallery';
 import { useLegendaryFeed } from '../../../hooks/useLegendaryFeed';
+import { useSavedDestinations } from '../../../hooks/useSavedDestinations';
+import { ENABLE_SAVED_DESTINATIONS } from '../../../config/features';
+import { saveSavedDestinationIntent } from '../../../lib/savedDestinations.js';
+import { accountBoundRpc, accountUserId, createAccountScope, lookupAccount } from '../../../lib/accountBoundary.js';
+import { normalizeDestination, openDestinationDirections } from '../../../lib/destinationNavigation.js';
+import { persistHomeDestination } from '../../../lib/homeDestination.js';
 import {
   LegendaryDetailBanner,
   LegendaryMapMarker,
 } from '../../../components/buffaverse/LegendarySurfaces';
 
 const WINGDEX_HINT_DISMISSED_KEY = 'buffago:wingdex_hint_dismissed';
-const HOME_NEXT_SPOT_KEY = 'buffago:homeNextSpot';
-const HOME_NEXT_SPOT_EVENT = 'buffago:home_next_spot_selected';
 
 /* ---------------- helpers ---------------- */
 const fmt2 = (n) => {
@@ -341,7 +344,18 @@ export default function PublicRatingsScreen() {
   const mapCanvasHeight = Math.min(420, Math.max(240, mapDialogMaxHeight - 365 * Math.max(1, fontScale)));
   const { byRestaurant: legendaryByRestaurant } = useLegendaryFeed({ limit: 50 });
 
-  const { map: requestedMap } = useLocalSearchParams();
+  const { map: requestedMap, savedAction, savedDestinationId, savedActionState, savedActionUserId } = useLocalSearchParams();
+  const savedFeatureEnabled = ENABLE_SAVED_DESTINATIONS;
+  const saved = useSavedDestinations({ client: supabase, enabled: savedFeatureEnabled });
+  const loadSavedList = saved.loadList;
+  const [savedView, setSavedView] = useState('discover');
+  const pendingIntentRef = useRef('');
+  const accountScope = useRef(createAccountScope()).current;
+  const accountRef = useRef(undefined);
+  const fetchRequestRef = useRef(0);
+  const recentRequestRef = useRef(0);
+  const fetchAllRef = useRef(null);
+  const destinationActionRef = useRef(false);
   const [headerHeight, setHeaderHeight] = useState(0);
 
   const { coords, status, askPermission } = useLocationCtx();
@@ -392,6 +406,9 @@ export default function PublicRatingsScreen() {
 
   /* ---------- DATA LOAD ---------- */
   const fetchBuffacoinBalance = useCallback(async (u) => {
+    const epoch = accountScope.capture();
+    const isCurrent = () => accountScope.current(epoch) && accountUserId(u) === accountRef.current;
+    if (!isCurrent()) return;
     if (!u?.id) {
       setBuffacoinBalance(0);
       return;
@@ -403,6 +420,7 @@ export default function PublicRatingsScreen() {
       .eq('user_id', u.id)
       .maybeSingle();
 
+    if (!isCurrent()) return;
     if (error) {
       console.warn('buffacoin_wallets fetch failed', error.message || error);
       setBuffacoinBalance(0);
@@ -410,14 +428,14 @@ export default function PublicRatingsScreen() {
     }
 
     setBuffacoinBalance(Number(data?.balance ?? 0));
-  }, []);
+  }, [accountScope]);
 
   const refreshCoins = useCallback(async () => {
-  const { data: userData } = await supabase.auth.getUser();
-  const u = userData?.user ?? null;
-  setUser(u);
+  const epoch = accountScope.capture();
+  const u = await lookupAccount(supabase);
+  if (!accountScope.current(epoch) || accountUserId(u) !== accountRef.current) return;
   await fetchBuffacoinBalance(u);
-  }, [fetchBuffacoinBalance]);
+  }, [accountScope, fetchBuffacoinBalance]);
 
   useFocusEffect(
   useCallback(() => {
@@ -574,6 +592,32 @@ export default function PublicRatingsScreen() {
 
   useEffect(() => {
     let alive = true;
+    let revision = 0;
+    accountScope.activate();
+    const accept = (u) => {
+      if (!alive) return;
+      const changed = accountScope.update(u);
+      accountRef.current = accountUserId(u);
+      setUser(accountRef.current ? u : null);
+      if (!changed) return;
+      fetchRequestRef.current += 1;
+      recentRequestRef.current += 1;
+      setRows([]); setMyRated(new Set()); setMyCoinRated(new Set());
+      setRecentRatings([]); setRecentRatingsLoading(false); setActive(null); setOpen(false);
+      setBuffacoinBalance(0); setCoinCostByDest({}); setCoinCostForActive(1);
+      setCoinRatingDest(null); setCoinRateOpen(false); setCoinCelebrateOpen(false);
+      setPendingSummary(null); setPendingCoinBalance(null); setCoinSubmitting(false);
+      buffacoinOperationRef.current = null;
+      pendingIntentRef.current = '';
+      Promise.resolve().then(() => { if (alive) void fetchAllRef.current?.().catch(() => {}); });
+    };
+    lookupAccount(supabase).then((u) => { if (!revision) accept(u); }).catch(() => {});
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => { revision += 1; accept(session?.user || null); });
+    return () => { alive = false; accountScope.dispose(); data?.subscription?.unsubscribe?.(); };
+  }, [accountScope]);
+
+  useEffect(() => {
+    let alive = true;
 
     (async () => {
       try {
@@ -597,6 +641,46 @@ export default function PublicRatingsScreen() {
       // Non-critical. The hint can show again if persistence fails.
     }
   }, []);
+
+  const openSavedAuthPrompt = useCallback(async (item, kind) => {
+    const epoch = accountScope.capture();
+    const isCurrent = () => accountScope.current(epoch);
+    Alert.alert(
+      'Save this restaurant',
+      'Found wings worth trying? Sign in to save this restaurant.',
+      [
+        { text: 'Not Now', style: 'cancel' },
+        { text: 'Sign In / Create Account', onPress: async () => {
+          if (!isCurrent()) return;
+          const stored = await saveSavedDestinationIntent({ destinationId: item?.destination_id, kind, saved: true }, AsyncStorage, isCurrent).catch(() => false);
+          if (stored && isCurrent()) router.push('/auth/login');
+        } },
+      ],
+    );
+  }, [accountScope, router]);
+
+  const handleSavedAction = useCallback(async (item, kind, nextSaved) => {
+    const epoch = accountScope.capture();
+    const isCurrent = () => accountScope.current(epoch);
+    if (!item?.destination_id) return;
+    if (!user?.id) {
+      await openSavedAuthPrompt(item, kind);
+      return;
+    }
+    try {
+      await saved.mutate({ kind, destinationId: item.destination_id, saved: nextSaved, expectedUserId: accountRef.current });
+      if (!isCurrent()) return;
+      if (savedView !== 'discover') await saved.loadList(savedView);
+    } catch (error) {
+      if (!isCurrent()) return;
+      const message = error?.code === 'FAVORITE_REQUIRES_RATING'
+        ? 'Rate this restaurant before adding it to Favorites.'
+        : error?.code === 'WANT_TO_TRY_REQUIRES_UNRATED'
+          ? 'Want to Try is only available before your first rating.'
+          : error?.message || 'We could not update your saved restaurants. Try again.';
+      Alert.alert('Could not update saved restaurants', message);
+    }
+  }, [accountScope, openSavedAuthPrompt, saved, savedView, user?.id]);
 
   const getWingmanStateContext = useCallback(async () => {
     const stateCode = currentState || stateCodeFilter || null;
@@ -786,6 +870,25 @@ export default function PublicRatingsScreen() {
     });
   }, [filtered, discoverySort, pictureCounts]);
 
+  const savedRows = useMemo(() => (saved.listRows || []).map((row) => ({
+    ...row,
+    stateCode: row.stateCode || deriveStateCode(row.address),
+    town: row.town || deriveTown(row.address),
+    distanceMi: null,
+  })), [saved.listRows]);
+
+  const savedVisibleRows = useMemo(() => {
+    const text = query.trim().toLowerCase();
+    return savedRows.filter((row) => {
+      if (!text) return true;
+      return [row.name, row.address, row.town, row.stateCode]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(text));
+    });
+  }, [query, savedRows]);
+
+  const displayedRows = savedView === 'discover' ? discoveryRows : savedVisibleRows;
+
   useEffect(() => {
     filteredRef.current = filtered;
   }, [filtered]);
@@ -872,12 +975,16 @@ export default function PublicRatingsScreen() {
   ]);
 
   const fetchAll = useCallback(async () => {
-    const { data: userData } = await supabase.auth.getUser();
-    const u = userData?.user ?? null;
-    setUser(u);
+    const epoch = accountScope.capture();
+    const request = ++fetchRequestRef.current;
+    const isCurrent = () => accountScope.current(epoch) && request === fetchRequestRef.current;
+    const u = await lookupAccount(supabase);
+    if (!isCurrent() || accountUserId(u) !== accountRef.current) return;
     await fetchBuffacoinBalance(u);
+    if (!isCurrent()) return;
 
     const { data: tags, error: tagsErr } = await supabase.from('destination_tags').select('id, tag');
+    if (!isCurrent()) return;
     if (tagsErr) throw tagsErr;
 
     const tagNameMapObj = Object.fromEntries((tags || []).map((t) => [Number(t.id), t.tag]));
@@ -892,6 +999,7 @@ export default function PublicRatingsScreen() {
     `);
     if (error) throw error;
 
+    if (!isCurrent()) return;
     const coinCountsByDest = new Map();
     const myCoinRatedSet = new Set();
     
@@ -1026,6 +1134,7 @@ export default function PublicRatingsScreen() {
       .from('destinations')
       .select('id, name, lat, lng, address');
 
+    if (!isCurrent()) return;
     const unratedList = [];
     if (!destErr && Array.isArray(allDest)) {
       for (const d of allDest) {
@@ -1088,7 +1197,9 @@ export default function PublicRatingsScreen() {
       }
       if (nearest?.stateCode) setCurrentState(nearest.stateCode);
     }
-  }, [coords?.latitude, coords?.longitude, fetchBuffacoinBalance]);
+  }, [accountScope, coords?.latitude, coords?.longitude, fetchBuffacoinBalance]);
+
+  fetchAllRef.current = fetchAll;
 
   const fetchRoutesForDestination = useCallback(async (destinationId) => {
     if (!destinationId) {
@@ -1166,12 +1277,46 @@ export default function PublicRatingsScreen() {
     setRefreshing(true);
     try {
       await fetchAll();
+      if (savedFeatureEnabled && savedView !== 'discover') await loadSavedList(savedView);
     } finally {
       setRefreshing(false);
     }
-  }, [fetchAll]);
+  }, [fetchAll, loadSavedList, savedFeatureEnabled, savedView]);
 
   // ✅ coin-rate for any nearby restaurant 
+  useFocusEffect(
+    useCallback(() => {
+      if (!savedFeatureEnabled || savedView === 'discover') return undefined;
+      void loadSavedList(savedView).catch(() => {});
+      return undefined;
+    }, [loadSavedList, savedFeatureEnabled, savedView])
+  );
+
+  useEffect(() => {
+    if (!savedFeatureEnabled || !user?.id || !savedAction || !savedDestinationId) return;
+    const kind = Array.isArray(savedAction) ? savedAction[0] : savedAction;
+    const destinationId = Array.isArray(savedDestinationId) ? savedDestinationId[0] : savedDestinationId;
+    const actionState = Array.isArray(savedActionState) ? savedActionState[0] : savedActionState;
+    const claimedUserId = Array.isArray(savedActionUserId) ? savedActionUserId[0] : savedActionUserId;
+    if (!['favorites', 'wantToTry'].includes(kind) || claimedUserId !== user.id || accountRef.current !== user.id) return;
+    const epoch = accountScope.capture();
+    const isCurrent = () => accountScope.current(epoch);
+    const key = `${user.id}:${kind}:${destinationId}:${actionState || 'save'}`;
+    if (pendingIntentRef.current === key) return;
+    pendingIntentRef.current = key;
+    void saved.mutate({ kind, destinationId, saved: actionState !== 'remove', expectedUserId: claimedUserId })
+      .then(() => {
+        if (!isCurrent()) return;
+        setSavedView(kind === 'favorites' ? 'favorites' : 'wantToTry');
+        Alert.alert('Saved', 'Your saved restaurant is ready in Wingdex.');
+      })
+      .catch((error) => { if (isCurrent()) Alert.alert('Could not save restaurant', error?.message || 'Try again from Wingdex.'); })
+      .finally(() => {
+        if (!isCurrent()) return;
+        router.setParams({ savedAction: undefined, savedDestinationId: undefined, savedActionState: undefined, savedActionUserId: undefined });
+      });
+  }, [accountScope, router, saved, savedAction, savedActionUserId, savedActionState, savedDestinationId, savedFeatureEnabled, user?.id]);
+
   const canRateWithCoins = useCallback(
     (item) => {
       if (!item?.destination_id) return false;
@@ -1273,6 +1418,9 @@ export default function PublicRatingsScreen() {
   }, [user?.id]);
 
   const fetchRecentRatingsForDestination = useCallback(async (destinationId) => {
+    const epoch = accountScope.capture();
+    const request = ++recentRequestRef.current;
+    const isCurrent = () => accountScope.current(epoch) && request === recentRequestRef.current;
     if (!destinationId) {
       setRecentRatings([]);
       return;
@@ -1287,6 +1435,7 @@ export default function PublicRatingsScreen() {
         .order('created_at', { ascending: false })
         .limit(10);
 
+      if (!isCurrent()) return;
       if (error) {
         console.warn('recent ratings fetch failed', error.message || error);
         setRecentRatings([]);
@@ -1313,6 +1462,7 @@ export default function PublicRatingsScreen() {
         }
       }
 
+      if (!isCurrent()) return;
       setRecentRatings(
         (ratings || []).map((r) => ({
           ...r,
@@ -1323,9 +1473,9 @@ export default function PublicRatingsScreen() {
         }))
       );
     } finally {
-      setRecentRatingsLoading(false);
+      if (isCurrent()) setRecentRatingsLoading(false);
     }
-  }, [user?.id]);
+  }, [accountScope, user?.id]);
 
   const openDestinationDetail = useCallback(
     (item) => {
@@ -1432,23 +1582,20 @@ export default function PublicRatingsScreen() {
     return Math.max(0, Math.min(100, Math.round(safe)));
   }, []);
 
-  const pickAsHomeNextSpot = useCallback(async (item) => {
-    if (!item?.destination_id) return;
-
-    const payload = {
-      id: item.destination_id,
-      name: item.name ?? 'Wing Spot',
-      address: item.address ?? null,
-      city: item.town ?? item.city ?? null,
-      lat: item.lat ?? null,
-      lng: item.lng ?? null,
-      selectedAt: Date.now(),
-      source: 'wingdex_detail',
-    };
-
+  const setHomeDestination = useCallback(async (item, { returnHome = true } = {}) => {
+    if (destinationActionRef.current) return false;
+    destinationActionRef.current = true;
     try {
-      await AsyncStorage.setItem(HOME_NEXT_SPOT_KEY, JSON.stringify(payload));
-      DeviceEventEmitter.emit(HOME_NEXT_SPOT_EVENT, payload);
+      const payload = normalizeDestination({
+        id: item?.destination_id,
+        name: item?.name,
+        address: item?.address,
+        city: item?.town ?? item?.city,
+        lat: item?.lat,
+        lng: item?.lng,
+        source: 'wingdex_want_to_try',
+      });
+      await persistHomeDestination(payload);
       await trackEvent({
         eventName: 'primary_cta_clicked',
         screen: 'ratings',
@@ -1462,16 +1609,35 @@ export default function PublicRatingsScreen() {
         },
       });
       setOpen(false);
-      router.push('/(tabs)/home');
+      if (returnHome) router.push('/(tabs)/home');
+      return true;
     } catch (e) {
       console.warn('pickAsHomeNextSpot failed', e?.message || e);
-      Alert.alert('Could not update Home', 'Try again in a moment.');
+      Alert.alert('Could not set destination', e?.message || 'Try again in a moment.');
+      return false;
+    } finally {
+      destinationActionRef.current = false;
     }
   }, [router, user?.id]);
+
+  const pickAsHomeNextSpot = useCallback((item) => setHomeDestination(item), [setHomeDestination]);
+
+  const takeMeThere = useCallback(async (item) => {
+    const selected = await setHomeDestination(item, { returnHome: false });
+    if (!selected) return;
+    try {
+      await openDestinationDirections({ destination: item });
+    } catch (error) {
+      Alert.alert('Directions unavailable', error?.message || 'We could not open directions on this device.');
+    }
+  }, [setHomeDestination]);
 
 
   const submitCoinRating = useCallback(async (payload) => {
   if (!user?.id || !coinRatingDest?.destination_id) return;
+  const epoch = accountScope.capture();
+  const isCurrent = () => accountScope.current(epoch) && accountRef.current === user.id;
+  if (!isCurrent()) return;
 
   if (payload?.wouldOrderAgain === null) {
     Alert.alert('Quick one', 'Would you go back again? 👍 / 👎');
@@ -1526,14 +1692,18 @@ export default function PublicRatingsScreen() {
       flavor_vibe: safeFlavorVibe.length ? safeFlavorVibe : null,
       spice_level: Number.isFinite(safeSpiceLevel) ? safeSpiceLevel : null,
     };
+    if (!isCurrent()) return;
+    const transactionClient = await accountBoundRpc(supabase, user.id, isCurrent);
+    if (!isCurrent()) return;
     const committed = await submitBuffacoinRatingTransaction({
-      supabase,
+      supabase: transactionClient,
       operationId,
       destinationId: coinRatingDest.destination_id,
       stateCode,
       coinCost: spendTimes,
       rating: ratingPayload,
     });
+    if (!isCurrent()) return;
     const crawlId = committed.crawl_id;
     setBuffacoinBalance(committed.new_balance);
     playCoinDelta(`-${spendTimes}`);
@@ -1588,6 +1758,7 @@ export default function PublicRatingsScreen() {
       },
     });
 
+    if (!isCurrent()) return;
     setMyCoinRated((prev) => {
       const next = new Set(prev);
       next.add(coinRatingDest.destination_id);
@@ -1602,7 +1773,11 @@ export default function PublicRatingsScreen() {
     
     // ✅ optimistic rating update (list + drilldown) so it feels instant
     const destId = coinRatingDest.destination_id;
+    // The database trigger is authoritative for Want to Try cleanup; refresh the
+    // client cache only after the rating transaction has committed.
+    await saved.invalidateAfterRating(destId);
     await fetchRecentRatingsForDestination(destId);
+    if (!isCurrent()) return;
     
     setRows((prev) =>
       (prev || []).map((r) => {
@@ -1688,6 +1863,7 @@ export default function PublicRatingsScreen() {
     });
     setCoinCelebrateOpen(true);
   } catch (error) {
+    if (!isCurrent()) return;
     await trackEvent({
       eventName: 'rating_transaction_failed',
       screen: 'ratings',
@@ -1703,14 +1879,16 @@ export default function PublicRatingsScreen() {
         debit_committed: false,
       },
     });
+    if (!isCurrent()) return;
     Alert.alert(
       'Rating not confirmed',
       'Nothing will be retried through the old path. Try again to safely check this same operation.'
     );
   } finally {
-    setCoinSubmitting(false);
+    if (isCurrent()) setCoinSubmitting(false);
   }
 }, [
+  accountScope,
   user?.id,
   coinRatingDest?.destination_id,
   currentState,
@@ -1720,12 +1898,17 @@ export default function PublicRatingsScreen() {
   computeWeightScoreFromScores,
   fetchRecentRatingsForDestination,
   playCoinDelta,
+  saved,
 ]);
 
 
   /* ---------- RENDER ---------- */
   const renderItem = ({ item }) => {
-    const ratedByMe = item.ratedByMe || myRated.has(item.destination_id);
+    const ratedByMe = item.ratedByMe || myRated.has(item.destination_id) || saved.ratedIds.has(item.destination_id);
+    const isFavorite = saved.favoriteIds.has(item.destination_id);
+    const isWantToTry = saved.wantToTryIds.has(item.destination_id);
+    const favoritePending = saved.isPending('favorites', item.destination_id);
+    const wantToTryPending = saved.isPending('wantToTry', item.destination_id);
     const hasRatings = (item.count ?? 0) > 0;
     const distText =
       locationMode === 'radius' && Number.isFinite(Number(item.distanceMi))
@@ -1811,6 +1994,78 @@ export default function PublicRatingsScreen() {
             <Button mode="outlined" compact onPress={(event) => { event?.stopPropagation?.(); openDestinationDetail(item); }}>View</Button>
           )}
         </View>
+        {savedFeatureEnabled ? (
+          <View style={styles.savedActionRow}>
+            <Button
+              mode={isFavorite ? 'contained-tonal' : 'outlined'}
+              compact
+              icon={isFavorite ? 'heart' : 'heart-outline'}
+              disabled={favoritePending || (!ratedByMe && !isFavorite)}
+              loading={favoritePending}
+              accessibilityLabel={ratedByMe ? `${isFavorite ? 'Remove from' : 'Add to'} Favorites: ${item.name}` : `Rate ${item.name} to add it to Favorites`}
+              onPress={(event) => {
+                event?.stopPropagation?.();
+                void handleSavedAction(item, 'favorites', !isFavorite);
+              }}
+              style={styles.savedActionButton}
+              contentStyle={styles.savedActionContent}
+              labelStyle={styles.savedActionLabel}
+            >
+              {ratedByMe ? (isFavorite ? 'Favorited' : 'Favorite') : 'Rate to favorite'}
+            </Button>
+            <Button
+              mode={isWantToTry ? 'contained-tonal' : 'outlined'}
+              compact
+              icon={isWantToTry ? 'bookmark' : 'bookmark-outline'}
+              disabled={wantToTryPending || ratedByMe}
+              loading={wantToTryPending}
+              accessibilityLabel={ratedByMe ? `${item.name} is already rated` : `${isWantToTry ? 'Remove from' : 'Save to'} Want to Try: ${item.name}`}
+              onPress={(event) => {
+                event?.stopPropagation?.();
+                void handleSavedAction(item, 'wantToTry', !isWantToTry);
+              }}
+              style={styles.savedActionButton}
+              contentStyle={styles.savedActionContent}
+              labelStyle={styles.savedActionLabel}
+            >
+              {ratedByMe ? 'Already rated' : (isWantToTry ? 'Saved' : 'Want to Try')}
+            </Button>
+          </View>
+        ) : null}
+        {savedFeatureEnabled && savedView === 'wantToTry' ? (
+          <View style={styles.destinationActionRow}>
+            <Button
+              mode="contained-tonal"
+              compact
+              icon="map-marker-check-outline"
+              accessibilityLabel={`Set ${item.name} as your Home destination`}
+              onPress={(event) => {
+                event?.stopPropagation?.();
+                void pickAsHomeNextSpot(item);
+              }}
+              style={styles.destinationActionButton}
+              contentStyle={styles.savedActionContent}
+              labelStyle={styles.savedActionLabel}
+            >
+              Set Destination
+            </Button>
+            <Button
+              mode="outlined"
+              compact
+              icon="navigation-variant-outline"
+              accessibilityLabel={`Take me to ${item.name}`}
+              onPress={(event) => {
+                event?.stopPropagation?.();
+                void takeMeThere(item);
+              }}
+              style={styles.destinationActionButton}
+              contentStyle={styles.savedActionContent}
+              labelStyle={styles.savedActionLabel}
+            >
+              Take Me There
+            </Button>
+          </View>
+        ) : null}
       </Card.Content>
       </Card>
     );
@@ -1946,6 +2201,29 @@ export default function PublicRatingsScreen() {
         </View>
         <Text variant="bodySmall" style={styles.subtitle}>{wingdexContextLabel} · sorted by {discoverySort === 'overall' ? sortLabel : discoverySort === 'nearest' ? 'nearest' : discoverySort === 'ratings' ? 'most ratings' : 'most photos'}</Text>
 
+        {savedFeatureEnabled ? (
+          <View style={styles.savedDestinationRail} accessibilityRole="tablist">
+            {[
+              ['discover', 'Discover', 'compass-outline'],
+              ['favorites', 'Favorites', 'heart-outline'],
+              ['wantToTry', 'Want to Try', 'bookmark-outline'],
+            ].map(([value, label, icon]) => (
+              <Chip
+                key={value}
+                selected={savedView === value}
+                icon={icon}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: savedView === value }}
+                accessibilityLabel={`Show ${label}`}
+                onPress={() => setSavedView(value)}
+                style={styles.savedDestinationChip}
+              >
+                {label}
+              </Chip>
+            ))}
+          </View>
+        ) : null}
+
         <Searchbar
           placeholder="Search destinations…"
           value={query}
@@ -2045,13 +2323,13 @@ export default function PublicRatingsScreen() {
         <Divider style={{ marginTop: 10, marginBottom: 6 }} />
       </Animated.View>
 
-      {loading ? (
+      {loading || (savedView !== 'discover' && saved.listStatus === 'loading' && displayedRows.length === 0) ? (
         <View style={styles.center}>
           <LoadingSkeleton rows={3} style={{ width: "90%", paddingTop: headerHeight }} />
         </View>
       ) : (
         <Animated.FlatList
-          data={discoveryRows}
+          data={displayedRows}
           viewabilityConfig={{ itemVisiblePercentThreshold: 20 }}
           keyExtractor={(it) => String(it.destination_id)}
           renderItem={renderItem}
@@ -2063,40 +2341,60 @@ export default function PublicRatingsScreen() {
           ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           ListEmptyComponent={
-            <FeedbackState
-              style={styles.emptyState}
-              icon="map-search-outline"
-              title={locationMode === 'radius' ? 'No wing spots in this radius' : 'No Wingdex matches'}
-              body="Broaden the search, jump to a state, or add the missing restaurant so your local Wingdex gets better."
-              actionLabel="Add restaurant"
-              onAction={() => {
-                trackEvent({
-                  eventName: 'empty_state_cta_clicked',
-                  screen: 'ratings',
-                  userId: user?.id ?? null,
-                  metadata: {
-                    state: 'wingdex_no_results',
-                    cta_name: 'add_restaurant_empty_wingdex',
-                    source_screen: 'ratings',
-                    query_length: query.trim().length,
-                    location_mode: locationMode,
-                    state_code: stateCodeFilter ?? null,
-                    radius_miles: locationMode === 'radius' ? radiusMiles : null,
-                    selected_tag_id: selectedTagId ?? null,
-                  },
-                });
-                openWingman('wingdex_empty_state');
-              }}
-              secondaryLabel={locationMode === 'radius' ? 'Expand radius' : 'View all'}
-              onSecondary={() => {
-                if (locationMode === 'radius') {
-                  expandRadius();
-                  return;
-                }
-                setLocationMode('all');
-                setStateCodeFilter(null);
-              }}
-            />
+            savedView !== 'discover' && saved.listStatus === 'error' ? (
+              <FeedbackState
+                style={styles.emptyState}
+                icon="cloud-alert-outline"
+                title={`Could not load ${savedView === 'favorites' ? 'Favorites' : 'Want to Try'}`}
+                body={saved.listError || 'Check your connection and try again.'}
+                actionLabel="Try again"
+                onAction={() => void saved.loadList(savedView)}
+              />
+            ) : savedView !== 'discover' ? (
+              <FeedbackState
+                style={styles.emptyState}
+                icon={savedView === 'favorites' ? 'heart-outline' : 'bookmark-outline'}
+                title={savedView === 'favorites' ? 'No Favorites yet' : 'Nothing in Want to Try yet'}
+                body={savedView === 'favorites'
+                  ? 'Rate a restaurant, then save it here for an easy return.'
+                  : 'Save unrated restaurants here when you find wings worth trying.'}
+              />
+            ) : (
+              <FeedbackState
+                style={styles.emptyState}
+                icon="map-search-outline"
+                title={locationMode === 'radius' ? 'No wing spots in this radius' : 'No Wingdex matches'}
+                body="Broaden the search, jump to a state, or add the missing restaurant so your local Wingdex gets better."
+                actionLabel="Add restaurant"
+                onAction={() => {
+                  trackEvent({
+                    eventName: 'empty_state_cta_clicked',
+                    screen: 'ratings',
+                    userId: user?.id ?? null,
+                    metadata: {
+                      state: 'wingdex_no_results',
+                      cta_name: 'add_restaurant_empty_wingdex',
+                      source_screen: 'ratings',
+                      query_length: query.trim().length,
+                      location_mode: locationMode,
+                      state_code: stateCodeFilter ?? null,
+                      radius_miles: locationMode === 'radius' ? radiusMiles : null,
+                      selected_tag_id: selectedTagId ?? null,
+                    },
+                  });
+                  openWingman('wingdex_empty_state');
+                }}
+                secondaryLabel={locationMode === 'radius' ? 'Expand radius' : 'View all'}
+                onSecondary={() => {
+                  if (locationMode === 'radius') {
+                    expandRadius();
+                    return;
+                  }
+                  setLocationMode('all');
+                  setStateCodeFilter(null);
+                }}
+              />
+            )
           }
           scrollEventThrottle={16}
         />
@@ -2205,8 +2503,58 @@ export default function PublicRatingsScreen() {
                   contentStyle={{ height: 46 }}
                   uppercase={false}
                 >
-                  I want this spot next
+                  Set Destination
                 </Button>
+                <Button
+                  mode="outlined"
+                  icon="navigation-variant-outline"
+                  onPress={() => void takeMeThere(active)}
+                  style={styles.nextSpotButton}
+                  contentStyle={{ height: 46 }}
+                  uppercase={false}
+                >
+                  Take Me There
+                </Button>
+
+                {savedFeatureEnabled ? (
+                  <View style={styles.detailSavedActionRow}>
+                    {(() => {
+                      const ratedByMe = active.ratedByMe || myRated.has(active.destination_id) || saved.ratedIds.has(active.destination_id);
+                      const isFavorite = saved.favoriteIds.has(active.destination_id);
+                      const isWantToTry = saved.wantToTryIds.has(active.destination_id);
+                      const favoritePending = saved.isPending('favorites', active.destination_id);
+                      const wantToTryPending = saved.isPending('wantToTry', active.destination_id);
+                      return (
+                        <>
+                          <Button
+                            mode={isFavorite ? 'contained-tonal' : 'outlined'}
+                            icon={isFavorite ? 'heart' : 'heart-outline'}
+                            disabled={favoritePending || (!ratedByMe && !isFavorite)}
+                            loading={favoritePending}
+                            onPress={() => void handleSavedAction(active, 'favorites', !isFavorite)}
+                            style={styles.detailSavedButton}
+                            contentStyle={styles.savedActionContent}
+                            accessibilityLabel={ratedByMe ? `${isFavorite ? 'Remove from' : 'Add to'} Favorites` : 'Rate this restaurant to add it to Favorites'}
+                          >
+                            {ratedByMe ? (isFavorite ? 'Favorited' : 'Favorite') : 'Rate to favorite'}
+                          </Button>
+                          <Button
+                            mode={isWantToTry ? 'contained-tonal' : 'outlined'}
+                            icon={isWantToTry ? 'bookmark' : 'bookmark-outline'}
+                            disabled={wantToTryPending || ratedByMe}
+                            loading={wantToTryPending}
+                            onPress={() => void handleSavedAction(active, 'wantToTry', !isWantToTry)}
+                            style={styles.detailSavedButton}
+                            contentStyle={styles.savedActionContent}
+                            accessibilityLabel={ratedByMe ? 'This restaurant is already rated' : `${isWantToTry ? 'Remove from' : 'Save to'} Want to Try`}
+                          >
+                            {ratedByMe ? 'Already rated' : (isWantToTry ? 'Saved' : 'Want to Try')}
+                          </Button>
+                        </>
+                      );
+                    })()}
+                  </View>
+                ) : null}
               </View>
       
               {Number.isFinite(Number(active?.myAvgWeight)) ? (
@@ -2607,7 +2955,17 @@ const styles = StyleSheet.create({
   restaurantMetrics: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center', marginTop: 6 },
   compactScore: { color: tokens.colors.orange, fontWeight: '800', fontSize: 16 },
   compactMetric: { fontSize: 12, color: tokens.colors.muted },
-  restaurantActions: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 4, marginTop: 6 },
+  restaurantActions: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 10 },
+  savedDestinationRail: { flexDirection: 'row', gap: 6, marginTop: 8, marginBottom: 2 },
+  savedDestinationChip: { flex: 1, minHeight: 40, justifyContent: 'center' },
+  savedActionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
+  savedActionButton: { flexGrow: 1, flexBasis: 132, minWidth: 132, borderRadius: 10 },
+  savedActionContent: { minHeight: 44 },
+  savedActionLabel: { fontSize: 12, marginHorizontal: 8 },
+  detailSavedActionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
+  detailSavedButton: { flex: 1, minWidth: 140, borderRadius: 10 },
+  destinationActionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 },
+  destinationActionButton: { flexGrow: 1, flexBasis: 142, minWidth: 142, borderRadius: 10 },
   header: {
   position: 'absolute',
   left: 0,
@@ -2914,7 +3272,7 @@ const styles = StyleSheet.create({
   marginBottom: 8,
 },
 cardContent: {
-  paddingVertical: 10, // ✅ shrink tile vertically
+  paddingVertical: 14,
   paddingHorizontal: 12,
 },
 

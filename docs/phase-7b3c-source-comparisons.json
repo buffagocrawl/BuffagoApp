@@ -1,0 +1,86 @@
+{
+  "evidence": "buffago_phase7b3b_B01_B07_production_evidence_2026-10-10.md",
+  "scope": "safe body fingerprint correspondence only; not historical provenance or transitive behavior",
+  "results": [
+    {
+      "function": "submit_validated_crawl_rating",
+      "file": "20260724033000_referral_system_v1.sql",
+      "productionMD5": "eeb943e155e279fd937a05f0150ef622",
+      "rawMD5": "c9b7ab6282bb07b58a4e3f8c31a83189",
+      "lfMD5": "676260570c54f15f77cdef39273af739",
+      "match": "NO MATCH"
+    },
+    {
+      "function": "submit_validated_crawl_rating",
+      "file": "20260729120500_wing_shots_rating_provenance.sql",
+      "productionMD5": "eeb943e155e279fd937a05f0150ef622",
+      "rawMD5": "eeb943e155e279fd937a05f0150ef622",
+      "lfMD5": "a32bc34dd896dc75734a1b425147362a",
+      "match": "raw"
+    },
+    {
+      "function": "submit_validated_restaurant_rating",
+      "file": "20260729127000_wing_shots_home_rating.sql",
+      "productionMD5": "c81bf474e0ff7aed9e4cdb36098f381a",
+      "rawMD5": "c81bf474e0ff7aed9e4cdb36098f381a",
+      "lfMD5": "ea9b2a9975c30586e6f4f45bacb5d059",
+      "match": "raw"
+    },
+    {
+      "function": "submit_buffacoin_rating_v1",
+      "file": "20260729153000_serrano_trust_repair.sql",
+      "productionMD5": "bc00b094b62a76dd269dc3aca0a72213",
+      "rawMD5": "bc00b094b62a76dd269dc3aca0a72213",
+      "lfMD5": "345872be8c38659a96362f3f417f88b4",
+      "match": "raw"
+    },
+    {
+      "function": "withdraw_wing_submission",
+      "file": "20260729121000_wing_shots_security_rpc.sql",
+      "productionMD5": "e6d81c3254fab8d90fa119e596b0c21d",
+      "rawMD5": "e6d81c3254fab8d90fa119e596b0c21d",
+      "lfMD5": "611e5323bfec7ef722ce9f823fa2f1c2",
+      "match": "raw"
+    },
+    {
+      "function": "prepare_wing_account_media_cleanup",
+      "file": "20260729121000_wing_shots_security_rpc.sql",
+      "productionMD5": "7fb25452bff5a1911d85e41bd3b7dbed",
+      "rawMD5": "7fb25452bff5a1911d85e41bd3b7dbed",
+      "lfMD5": "b1a9306ff0b4f804f2e4e756f3e2de69",
+      "match": "raw"
+    },
+    {
+      "function": "complete_wing_account_media_cleanup",
+      "file": "20260729121000_wing_shots_security_rpc.sql",
+      "productionMD5": "bb59e829e4cf848befa9e9c90fb93801",
+      "rawMD5": "bb59e829e4cf848befa9e9c90fb93801",
+      "lfMD5": "b59ee6c63588fbab83b432f7aeb6eb69",
+      "match": "raw"
+    },
+    {
+      "function": "mango_clear_ineligible_priority",
+      "file": "20260729170000_mango_habanero_review_dashboard.sql",
+      "productionMD5": "e6afd97295efcd4fd14542212290b7f0",
+      "rawMD5": "0b716cf31e5d673c63e29ce753f46f68",
+      "lfMD5": "0b716cf31e5d673c63e29ce753f46f68",
+      "match": "NO MATCH"
+    },
+    {
+      "function": "enqueue_wing_photo_upload_derivatives",
+      "file": "20261008171906_wing_photo_derivative_recovery.sql",
+      "productionMD5": "c1ba55009a3532cdc7adfb2d18c5297b",
+      "rawMD5": "50e9c39732497eb06ba8e7432efbe75b",
+      "lfMD5": "c1ba55009a3532cdc7adfb2d18c5297b",
+      "match": "LF-normalized"
+    },
+    {
+      "function": "guard_wing_photo_approval",
+      "file": "20261008171906_wing_photo_derivative_recovery.sql",
+      "productionMD5": "fbe2738b657b8f835692585ba351b55c",
+      "rawMD5": "c46f9c8fd84a122dacdbfc859091a3ef",
+      "lfMD5": "fbe2738b657b8f835692585ba351b55c",
+      "match": "LF-normalized"
+    }
+  ]
+}

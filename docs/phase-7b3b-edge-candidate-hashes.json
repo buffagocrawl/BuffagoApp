@@ -1,0 +1,25 @@
+{
+  "status": "local-candidate-only; NOT verified deployed rollback bundles",
+  "files": [
+    {
+      "path": "crawl/supabase/functions/wing-jury-feed/index.ts",
+      "sha256": "2da361067dac54c72e7290df344b68aece2af9ceb2648f99ea702363b05a72b5"
+    },
+    {
+      "path": "crawl/supabase/functions/wing-jury-vote/index.ts",
+      "sha256": "9f27bf24f0d07dcc9b564d71a8e191a9719dedc30bc227e4e33c02399e89210a"
+    },
+    {
+      "path": "crawl/supabase/functions/wing-jury-reveal/index.ts",
+      "sha256": "45bb37d99cf71ff65f1caf0b35f648a19a44dfe8165ccc86476f176328d08bc9"
+    },
+    {
+      "path": "crawl/supabase/functions/_shared/wingJury.ts",
+      "sha256": "3d2cd9a5fa05a7093b2d2c9cea94684c632b2be2e2d761a3d68003719bca0087"
+    },
+    {
+      "path": "crawl/supabase/config.toml",
+      "sha256": "51c5b21c8a1edf2896c5cc10246083d0d38703c2df9f4ec98ca3e608a1841108"
+    }
+  ]
+}
