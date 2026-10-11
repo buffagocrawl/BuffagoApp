@@ -5,12 +5,14 @@ import fs from 'node:fs';
 const home = fs.readFileSync(new URL('../../app/(tabs)/home/index.jsx', import.meta.url), 'utf8');
 const dialog = fs.readFileSync(new URL('../../components/home/WeeklyMissionDialog.jsx', import.meta.url), 'utf8');
 
-test('Home keeps missions compact and has no restaurant-owner surface or request', () => {
-  assert.match(home, /testID="weekly-mission-entry"/);
+test('Home removes the weekly mission entry point without retiring shared mission infrastructure', () => {
+  assert.doesNotMatch(home, /weekly-mission-entry/);
+  assert.doesNotMatch(home, /WeeklyMissionDialog/);
+  assert.doesNotMatch(home, /loadWeeklyMission/);
+  assert.doesNotMatch(home, /missionRequestRef|missionSummary|missionDialogOpen/);
+  assert.match(home, /recordSavedRatingMission/);
   assert.doesNotMatch(home, /Restaurant tools|Claim or enroll|analytics_agent_restaurant_summary|restaurant_owner_claim/);
   assert.doesNotMatch(home, /missionSummary\.items\.map/);
-  assert.match(home, /loadWeeklyMission/);
-  assert.match(home, /missionRequestRef/);
 });
 
 test('mission dialog exposes focused tabs and all recoverable display states', () => {
@@ -31,17 +33,17 @@ test('Active mission makes the assigned title, description, progress, and friend
   assert.doesNotMatch(dialog, /goals complete/);
 });
 
-test('collapsed mission card identifies the assigned mission and its exact progress', () => {
-  assert.match(home, /missionSummary\.mission\.label/);
-  assert.match(home, /missionSummary\.mission\.current\} of \{missionSummary\.mission\.target\} complete/);
-  assert.match(home, /missionEntryMission/);
+test('Home reclaimed space contains the retained Wing Facts action', () => {
+  assert.match(home, /testID="quick-action-wing-facts"/);
+  assert.doesNotMatch(home, /missionEntry/);
 });
 
 test('Home clears the measured tab bar so Wing Facts remains reachable on compact Android screens', () => {
   assert.doesNotMatch(home, /useBottomTabBarHeight/);
   assert.match(home, /contentContainerStyle=\{\[styles\.scroll, \{ paddingBottom: 16 \}\]\}/);
   assert.match(home, /edges=\{\['top', 'left', 'right'\]\}/);
-  assert.match(home, /wingFactsAction: \{ flex: 1, minWidth: 148, minHeight: 80/);
+  assert.match(home, /wingFactsAction: \{ flex: 1, flexBasis: 0, minWidth: 148, minHeight: 80/);
+  assert.match(home, /wingJuryAction: \{ flex: 1, flexBasis: 0, minWidth: 148, minHeight: 80/);
   assert.match(home, /scroll: \{ paddingHorizontal: 16, paddingTop: 6, gap: 8 \}/);
 });
 

@@ -21,10 +21,11 @@ import * as Crypto from 'expo-crypto';
 import * as Location from 'expo-location';
 import WingmanAddDialog from '../../../components/WingmanAddDialog';
 import FeedbackState from '../../../components/ui/FeedbackState';
-import { PlayerProgressCard, StatCard, WingShotImage, ProgressBar } from '../../../components/ui/OperationUI';
+import { PlayerProgressCard, StatCard, WingShotImage } from '../../../components/ui/OperationUI';
 import { loadWingdexRestaurantGallery } from '../../../lib/wingdexGallery';
 import WelcomeWizard from '../../../components/WelcomeWizard';
 import { supabase } from '../../../lib/supabase.js';
+import { ratingRpcRetry } from '../../../lib/ratingRpcRetry.js';
 import DestinationPickerWizard from '../../../components/DestinationPickerWizard';
 import RatingWizardDialog from '../../../components/RatingWizardDialog';
 import RatingComparisonModal from '../../../components/RatingComparisonModal';
@@ -35,18 +36,9 @@ import { resolveRatingPhotoStep } from '../../../lib/photoWorkflowFlags.js';
 import { ratingSaveUserMessage } from '../../../lib/ratingErrors.js';
 import { averageBeforeSubmission } from '../../../lib/ratingComparison.js';
 import { trackEvent } from '../../../lib/analytics';
-import { loadWeeklyMission } from '../../../lib/weeklyMission';
-import {
-  dismissWeeklyChallenge,
-  loadWeeklyChallengeDismissal,
-} from '../../../lib/engagement/weeklyChallengeDismissal';
 import { recordSavedRatingMission, resolvedDeviceTimezone } from '../../../lib/engagement/ratingMissionTracking.js';
 import { currentWingDuelCompletion } from '../../../lib/home/monthlyWingDuel';
-import {
-  ENABLE_GROWTH_MISSIONS,
-  ENABLE_BUFFAVERSE_HOME,
-  ENABLE_BUFFAVERSE,
-} from '../../../config/features';
+import { ENABLE_BUFFAVERSE_HOME, ENABLE_BUFFAVERSE, ENABLE_WING_JURY } from '../../../config/features';
 
 import { useOnboardingGate } from '../../../hooks/useOnboardingGate';
 import { useWingShotsFeatureFlags } from '../../../hooks/useWingShotsFeatureFlags';
@@ -58,19 +50,16 @@ import { nyDateString } from '../../../utils/nyDate';
 import { useLegendaryFeed } from '../../../hooks/useLegendaryFeed';
 import { LegendaryHomeHero } from '../../../components/buffaverse/LegendarySurfaces';
 import BuffaverseHomeCard from '../../../components/buffaverse/BuffaverseHomeCard';
-import WeeklyMissionDialog from '../../../components/home/WeeklyMissionDialog';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   getSocialCommunityConfig,
   isSocialCommunityConfigured,
   openConfiguredSocialDestination,
 } from '../../../lib/socialCommunity';
+import { HOME_NEXT_SPOT_EVENT, HOME_NEXT_SPOT_KEY } from '../../../lib/destinationNavigation.js';
 
 const SEARCH_RADIUS_M = 160934; // 100 miles
 const MS_5_MIN = 30 * 1000;
-const HOME_NEXT_SPOT_KEY = 'buffago:homeNextSpot';
-const HOME_NEXT_SPOT_EVENT = 'buffago:home_next_spot_selected';
-
 const BUFFAGO_ORANGE = '#FF7A18';
 const clamp01 = (n) => Math.max(0, Math.min(1, Number(n) || 0));
 const fmt2 = (n) => {
@@ -466,40 +455,11 @@ export default function Home() {
     at: null,
     within24h: false,
   });
-  const [missionSummary, setMissionSummary] = useState(null);
-  const [missionLoading, setMissionLoading] = useState(ENABLE_GROWTH_MISSIONS);
-  const [missionError, setMissionError] = useState(false);
-  const [missionDismissed, setMissionDismissed] = useState(false);
-  const missionRequestRef = useRef(0);
-  const [missionDialogOpen, setMissionDialogOpen] = useState(false);
-  const [missionTab, setMissionTab] = useState('active');
   const [sendToFriendOpen, setSendToFriendOpen] = useState(false);
 
   const openWelcomeWizard = useCallback(() => {
     setWelcomeOpen(true);
   }, []);
-
-  const refreshMissionSummary = useCallback(async () => {
-    if (!ENABLE_GROWTH_MISSIONS) return;
-    if (!session?.user?.id) { setMissionSummary(null); setMissionLoading(false); return; }
-
-    const requestId = missionRequestRef.current + 1;
-    missionRequestRef.current = requestId;
-    setMissionLoading(true);
-    setMissionError(false);
-    try {
-      const summary = await loadWeeklyMission(supabase);
-      if (missionRequestRef.current !== requestId) return;
-      setMissionSummary(summary);
-    } catch (error) {
-      if (missionRequestRef.current !== requestId) return;
-      console.warn('[weekly-mission] load_failed', { category: error?.category || 'backend_unavailable' });
-      setMissionSummary(null);
-      setMissionError(true);
-    } finally { if (missionRequestRef.current === requestId) setMissionLoading(false); }
-  }, [session?.user?.id]);
-
-  useEffect(() => () => { missionRequestRef.current += 1; }, []);
 
   const onboardingRedirectedRef = useRef(false);
   useEffect(() => {
@@ -1053,20 +1013,9 @@ export default function Home() {
     }, [reloadPreferredFromStorage])
   );
 
-  useFocusEffect(
-    useCallback(() => {
-      void refreshMissionSummary().catch(() => {});
-      return undefined;
-    }, [refreshMissionSummary])
-  );
-
   useEffect(() => {
     if (status === 'granted' && coords) reloadPreferredFromStorage();
   }, [status, coords?.latitude, coords?.longitude, reloadPreferredFromStorage]);
-
-  useEffect(() => {
-    void refreshMissionSummary().catch(() => {});
-  }, [refreshMissionSummary]);
 
 
   useEffect(() => {
@@ -1078,35 +1027,6 @@ export default function Home() {
     }, MS_5_MIN);
     return () => clearInterval(id);
   }, [status, refreshPosition, refreshClosestDistanceOnly, reloadPreferredFromStorage]);
-
-  useEffect(() => {
-    let active = true;
-    setMissionDismissed(false);
-    if (missionSummary?.assignmentId && session?.user?.id) {
-      loadWeeklyChallengeDismissal(session.user.id, {
-        id: missionSummary.assignmentId,
-        expires_at: missionSummary.expiresAt,
-      }).then((dismissed) => {
-        if (active) setMissionDismissed(dismissed);
-      });
-    }
-    return () => {
-      active = false;
-    };
-  }, [missionSummary?.assignmentId, missionSummary?.expiresAt, session?.user?.id]);
-
-  const dismissCompletedMission = useCallback(async () => {
-    if (!missionSummary?.mission?.complete || !session?.user?.id || !missionSummary.assignmentId) return;
-    setMissionDismissed(true);
-    try {
-      await dismissWeeklyChallenge(session.user.id, {
-        id: missionSummary.assignmentId,
-        expires_at: missionSummary.expiresAt,
-      });
-    } catch {
-      // Keep the dismissal for this session if storage is unavailable.
-    }
-  }, [missionSummary, session?.user?.id]);
 
   // Refresh GPS button action: update coords, then update ONLY the distance text
   const refreshDistanceNow = useCallback(async () => {
@@ -1949,12 +1869,6 @@ export default function Home() {
     return y > 0 && Number.isFinite(x) ? clamp01(x / y) : 0;
   }, [hudStats.stateX, hudStats.stateY]);
 
-  const statesPct = useMemo(() => {
-    const x = Number(hudStats.statesX);
-    const y = Number(hudStats.statesY);
-    return y > 0 && Number.isFinite(x) ? clamp01(x / y) : 0;
-  }, [hudStats.statesX, hudStats.statesY]);
-
   const top50X = useMemo(() => {
     if (!top50Ids.length) return 0;
     const eaten = new Set(hudStats.usRatedDestinationIds || []);
@@ -2624,7 +2538,7 @@ export default function Home() {
           homeRatingOperationRef.current = operationId;
           if (draftImage) await wingShotDrafts.save({ userId: uid, destinationId: destId, flow: 'home-rating',
             ratingOperationId: operationId, lifecycle: 'rating', draft: draftImage });
-          const { data, error } = await supabase.rpc('submit_validated_restaurant_rating', {
+          const { data, error } = await ratingRpcRetry(supabase, 'submit_validated_restaurant_rating', {
             p_operation_id: operationId,
             p_destination_id: destId,
             p_latitude: verifiedCoords?.latitude ?? null,
@@ -2640,7 +2554,7 @@ export default function Home() {
             p_flavor_vibe: flavorVibe.length ? flavorVibe : null,
             p_spice_level: spiceLevel,
             p_would_order_again: wouldOrderAgain,
-          });
+          }, undefined, uid);
           if (error) throw error;
           crawlId = data?.crawl_id ?? crawlId;
           submittedRatingId = data?.rating_id ?? null;
@@ -2697,7 +2611,6 @@ export default function Home() {
           userId: uid,
           submittedRatingId,
           timezone: resolvedDeviceTimezone(),
-          refreshMissionSummary,
           onDiagnostic: async (diagnostic) => {
             await trackEvent({
               eventName: 'qualifying_action_failed', screen: 'home', userId: uid,
@@ -2854,7 +2767,6 @@ export default function Home() {
       wingShotFlags.prompt,
       wingShotFlags.photo,
       refreshHud,
-      refreshMissionSummary,
       openRestaurantPeek,
       saveGuestHomeRated,
       refreshHomeRatedForClosest,
@@ -3025,20 +2937,6 @@ export default function Home() {
     [closeRestaurantSearch, coords?.latitude, coords?.longitude, session?.user?.id]
   );
 
-  const openMissionAction = useCallback(async (mission) => {
-    if (!mission) return;
-    await trackEvent({ eventName: 'mission_next_action_selected', screen: 'home', userId: session?.user?.id ?? null, metadata: { source: 'weekly_mission_dialog', action_key: mission.key } });
-    setMissionDialogOpen(false);
-    if (mission.key === 'ratings' || mission.key === 'wingdex') { router.push('/(tabs)/ratings'); return; }
-    if (mission.key === 'referrals') { router.push('/referrals'); return; }
-    if (mission.key === 'crawl') router.push('/(tabs)/journey');
-  }, [router, session?.user?.id]);
-
-  const changeMissionTab = useCallback(async (nextTab) => {
-    setMissionTab(nextTab);
-    await trackEvent({ eventName: nextTab === 'rewards' ? 'mission_reward_viewed' : 'mission_tab_changed', screen: 'home', userId: session?.user?.id ?? null, metadata: { source: 'weekly_mission_dialog', tab: nextTab } });
-  }, [session?.user?.id]);
-
   const openSocialProfile = useCallback(async (platform) => {
     try {
       await openConfiguredSocialDestination(platform);
@@ -3187,7 +3085,6 @@ export default function Home() {
               <View style={styles.counterRow}>
                 <StatCard style={{ paddingVertical: 8, gap: 2, minWidth: 120 }} icon="map-marker" label={hudStats.stateAbbrev ? hudStats.stateAbbrev + ' Wingdex' : 'State Wingdex'} value={(hudStats.stateX ?? '?') + '/' + (hudStats.stateY ?? '?')} onPress={() => openStats('ct')} progress={statePct} />
                 <StatCard style={{ paddingVertical: 8, gap: 2, minWidth: 120 }} icon="trophy" label="Top 50 US" value={top50X + '/50'} onPress={() => openStats('us_top50')} progress={top50Pct} />
-                <StatCard style={{ paddingVertical: 8, gap: 2, minWidth: 120 }} icon="flag" label="States visited" value={(hudStats.statesX ?? '?') + '/' + (hudStats.statesY ?? '?')} onPress={() => openStats('states')} progress={statesPct} />
               </View>
             </>
           ) : null}
@@ -3344,39 +3241,18 @@ export default function Home() {
             )}
           </View>
 
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'stretch' }}>
-          {ENABLE_GROWTH_MISSIONS && !missionDismissed ? (
-            <View style={{ flex: 1, minWidth: 148 }}>
-              <Pressable
-                testID="weekly-mission-entry"
-                accessibilityRole="button"
-                accessibilityLabel={missionLoading ? 'Weekly mission loading' : missionSummary?.mission?.complete ? 'Weekly mission complete, celebrate your win' : missionSummary ? `Weekly mission, ${missionSummary.mission.label}, ${missionSummary.mission.current} of ${missionSummary.mission.target} complete` : 'View weekly missions'}
-                style={[styles.missionEntry, missionSummary?.mission?.complete && styles.missionEntryComplete]}
-                onPress={async () => {
-                  setMissionDialogOpen(true);
-                  await refreshMissionSummary();
-                  await trackEvent({ eventName: 'mission_entry_viewed', screen: 'home', userId: session?.user?.id ?? null, metadata: { source: 'home_compact_entry', mission_state: missionError ? 'error' : missionLoading ? 'loading' : missionSummary ? 'active' : 'empty' } });
-                }}
-              >
-                <Text style={styles.missionEntryIcon}>{missionSummary?.mission?.complete ? '🎉' : '🏆'}</Text>
-                <View style={styles.missionEntryCopy}><Text style={[styles.missionEntryTitle, { color: colors.onSurface }, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>{missionSummary?.mission?.complete ? 'Weekly Mission Complete!' : 'Weekly Mission'}</Text><Text style={[styles.missionEntryMission, { color: colors.onSurface }, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>{missionLoading ? 'Loading mission…' : missionSummary?.mission?.complete ? 'You crushed it — nice work!' : missionSummary?.mission?.label || 'Mission details are temporarily unavailable.'}</Text>{missionSummary ? <Text style={[styles.missionEntryDetail, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>{missionSummary.mission.current} of {missionSummary.mission.target} complete{missionSummary?.mission?.complete ? ' · Reward earned' : ''}</Text> : null}</View>
-                {missionSummary ? <ProgressBar progress={missionSummary.mission.target ? missionSummary.mission.current / missionSummary.mission.target : 0} style={{ width: 42 }} /> : null}
-                <Text style={[styles.missionEntryChevron, missionSummary?.mission?.complete && styles.missionEntryCompleteText]}>›</Text>
-              </Pressable>
-              {missionSummary?.mission?.complete ? (
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Hide completed weekly mission until next week"
-                  onPress={dismissCompletedMission}
-                  style={({ pressed }) => [styles.missionDismiss, pressed && styles.missionDismissPressed]}
-                >
-                  <Text style={styles.missionDismissText}>Hide until next week</Text>
-                </Pressable>
-              ) : null}
-            </View>
-          ) : null}
-
+          <View style={styles.homeFunRow}>
           <Pressable testID="quick-action-wing-facts" accessibilityRole="button" accessibilityLabel="Wing Facts, open a wing fact" onPress={openWingFacts} style={({ pressed }) => [styles.wingFactsAction, pressed && { opacity: 0.82 }]}><Text style={styles.wingFactsIcon}>🍗</Text><Text style={[styles.wingFactsLabel, { color: colors.onSurface }]}>Wing Facts</Text></Pressable>
+          {ENABLE_WING_JURY ? (
+            <Pressable testID="home-wing-jury-entry" accessibilityRole="button" accessibilityLabel="Wing Jury, start judging wing photos" onPress={() => router.push('/wing-jury')} style={({ pressed }) => [styles.wingJuryAction, pressed && { opacity: 0.82 }]}>
+              <MaterialCommunityIcons name="scale-balance" size={20} color={colors.primary} />
+              <View style={{ flex: 1, minWidth: 0 }}>
+                <Text style={[styles.wingFactsLabel, { color: colors.onSurface }]}>Wing Jury</Text>
+                <Text style={[styles.wingJuryCopy, { color: colors.onSurfaceVariant }]}>Be the judge.</Text>
+              </View>
+              <MaterialCommunityIcons name="chevron-right" size={18} color={colors.onSurfaceVariant} />
+            </Pressable>
+          ) : null}
           </View>
         </ScrollView>
 
@@ -3987,18 +3863,6 @@ export default function Home() {
           onPickDestination={pickSearchResult}
         />
 
-        <WeeklyMissionDialog
-          visible={missionDialogOpen}
-          onDismiss={() => { missionRequestRef.current += 1; setMissionDialogOpen(false); setMissionError(false); setMissionLoading(false); }}
-          summary={missionSummary}
-          loading={missionLoading}
-          error={missionError}
-          onRetry={refreshMissionSummary}
-          onAction={openMissionAction}
-          tab={missionTab}
-          onTabChange={changeMissionTab}
-        />
-
         <CoinRewardModal
           visible={coinRewardOpen}
           coins={COIN_REWARD_AMOUNT}
@@ -4105,7 +3969,10 @@ const styles = StyleSheet.create({
   wingdexFill: { position: 'absolute', top: 0, bottom: 0, opacity: 0.35 },
   wingdexContent: { alignItems: 'center' },
 
-  wingFactsAction: { flex: 1, minWidth: 148, minHeight: 80, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,122,24,0.30)', backgroundColor: 'rgba(255,255,255,0.035)', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  homeFunRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'stretch' },
+  wingFactsAction: { flex: 1, flexBasis: 0, minWidth: 148, minHeight: 80, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,122,24,0.30)', backgroundColor: 'rgba(255,255,255,0.035)', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  wingJuryAction: { flex: 1, flexBasis: 0, minWidth: 148, minHeight: 80, paddingHorizontal: 8, paddingVertical: 10, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,122,24,0.46)', backgroundColor: 'rgba(255,122,24,0.10)', flexDirection: 'row', alignItems: 'center', gap: 4 },
+  wingJuryCopy: { fontSize: 11, marginTop: 2 },
   wingFactsIcon: { fontSize: 17, lineHeight: 22 },
   wingFactsLabel: { fontSize: 14, lineHeight: 18, fontWeight: '900', color: 'rgba(255,255,255,0.96)' },
 
@@ -4135,18 +4002,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  missionEntry: { minHeight: 80, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,122,24,0.35)', backgroundColor: 'rgba(255,122,24,0.10)', paddingHorizontal: 12, paddingVertical: 8, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 4 },
-  missionEntryComplete: { borderColor: '#347F56', backgroundColor: '#14271D' },
-  missionEntryIcon: { fontSize: 18, marginBottom: 4 },
-  missionEntryCopy: { width: '100%', minWidth: 0 },
-  missionEntryTitle: { fontSize: 13, lineHeight: 18, fontWeight: '900', color: 'rgba(255,255,255,0.96)' },
-  missionEntryMission: { marginTop: 1, fontSize: 12, lineHeight: 16, fontWeight: '600', color: 'rgba(255,255,255,0.92)' },
-  missionEntryDetail: { marginTop: 2, fontSize: 11, opacity: 0.76 },
-  missionEntryChevron: { position: 'absolute', right: 6, bottom: 6, color: '#FFB36F', fontSize: 22, lineHeight: 22 },
-  missionEntryCompleteText: { color: '#86DDA4', opacity: 1 },
-  missionDismiss: { alignSelf: 'center', paddingHorizontal: 12, paddingVertical: 8 },
-  missionDismissPressed: { opacity: 0.7 },
-  missionDismissText: { color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: '800' },
   closestName: { fontSize: 18, fontWeight: '800', textAlign: 'left', color: 'rgba(255,255,255,0.95)' },
   addressRow: { marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 10 },
   closestAddr: { opacity: 0.8, textAlign: 'center' },

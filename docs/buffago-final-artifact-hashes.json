@@ -1,0 +1,456 @@
+{
+  "status": "REVIEW_ONLY_NOT_APPROVED",
+  "target": "vhfxnizaxdanmvmouuaf",
+  "inventory": [
+    {
+      "path": "crawl/scripts/phase7b3d-production-adapter.mjs",
+      "bytes": 12513,
+      "sha256": "cddbf54051b66e84cc5bf9e8cc88ee02051e330d14afd528957071a393652118"
+    },
+    {
+      "path": "crawl/scripts/phase7b3b-feature-executor.mjs",
+      "bytes": 14458,
+      "sha256": "c46bd8b15db8e3fa8dd38cce5facb03ed475ced700b8a6899cf93340e50021fe"
+    },
+    {
+      "path": "crawl/scripts/phase-final-adapter-attempt.mjs",
+      "bytes": 4046,
+      "sha256": "a75b0474b9737556d300e03455a27c2765b20948c8d751232336eba81ec45b4f"
+    },
+    {
+      "path": "crawl/scripts/phase-final-containment-candidate.mjs",
+      "bytes": 5759,
+      "sha256": "000925dd355670a020d87f113442cae9e835a4574cb5c0cbdbac54d82a64489b"
+    },
+    {
+      "path": "crawl/scripts/package-final-edge-candidates.mjs",
+      "bytes": 6391,
+      "sha256": "9052a36481a450e0520a4d1639a43d4b2ca81a2eb1fa23075168e98a787133a6"
+    },
+    {
+      "path": "crawl/supabase/local/phase-7b3a/supabase/migrations/20261010192747_wing_jury_saved_destinations_forward.sql",
+      "bytes": 47931,
+      "sha256": "f66c4585b7c0295579ca3b188bb4464815c84328f1b2ae71b4abe7354e6cfab3"
+    },
+    {
+      "path": "crawl/supabase/local/phase-7b3a/production-fingerprint-preflight.sql",
+      "bytes": 12670,
+      "sha256": "66ce48f694c2e458a5622d63fd737676a26380a7aa098e748614b5fb74ef299b"
+    },
+    {
+      "path": "crawl/deno.lock",
+      "bytes": 9697,
+      "sha256": "056c646907d3ed80aa8f8ee2fa9acc43d463913cb1ede3a5e104ae0060e8518e"
+    },
+    {
+      "path": "docs/buffago-final-edge-candidates.json",
+      "bytes": 5609,
+      "sha256": "1b7012814b91c5d1e089f9b0627bb92bdbbb9ccebfb073d0c6d1136880e54575"
+    },
+    {
+      "path": "docs/buffago-final-rating-containment-candidate.sql",
+      "bytes": 5685,
+      "sha256": "5df7d1298fb85c85a6bfb801e273a0f8861bd11c6bd1622bf24cd23767eb5008"
+    },
+    {
+      "path": "docs/phase-7b3c-history-exception-draft.json",
+      "bytes": 9220,
+      "sha256": "c1e0bd87b53354f208444fff05c1856ffb694f455491679de0e291c0418c61c9"
+    },
+    {
+      "path": "crawl/scripts/phase7b3d-native-postgres.mjs",
+      "bytes": 13497,
+      "sha256": "e6aa09d9ad65afec1b9ca0b038eb6449f79fbb816b15bad04c01deeb9db3236a"
+    },
+    {
+      "path": "crawl/tests/database/phase-final-compatibility-postgres.test.mjs",
+      "bytes": 12504,
+      "sha256": "9eec7ad50b6925de19054d87d743eb90230a16d3f56f02ceb40777cf75182b90"
+    },
+    {
+      "path": "crawl/tests/database/phase-final-adapter-e2e.test.mjs",
+      "bytes": 10163,
+      "sha256": "8242389642be7ef29d5d909fe1bd9b61d3267fddeeb0e76a19fce6292bc943bf"
+    },
+    {
+      "path": "crawl/tests/database/phase-final-adapter-scale.test.mjs",
+      "bytes": 5527,
+      "sha256": "92c5a074980f71e6ee0c08f58f7bac961d684d9fdbed17554ca028f4dea9b6cf"
+    },
+    {
+      "path": "crawl/tests/database/phase-final-scale-postgres.test.mjs",
+      "bytes": 10786,
+      "sha256": "b36b638686e36a88e6a82402466927791006d975cf9a99724d63eb0d579fcaeb"
+    },
+    {
+      "path": "crawl/tests/database/phase-final-history-consumers.test.mjs",
+      "bytes": 4656,
+      "sha256": "f1eb3f1eac44f26bbf943ae17cf544a5379a5c04868044dd0342a103990e4d8f"
+    },
+    {
+      "path": "crawl/tests/delete-account-edge-runtime.test.mjs",
+      "bytes": 11981,
+      "sha256": "f05846a379fcd23c4e678c8e5a4cbf84b1b2d3e3efc5398a567f3acd76a4c6c4"
+    },
+    {
+      "path": "crawl/tests/wing-jury-deno-runtime.test.mjs",
+      "bytes": 8907,
+      "sha256": "e84123531e08343ad220ae2a7d180e508d8db64523b7e6876c4284974c59b18a"
+    },
+    {
+      "path": "crawl/tests/wingdex-gallery-deno.test.mjs",
+      "bytes": 5732,
+      "sha256": "c314584dade330cf96b58b98613a152fc2717f5d984d0c1d02e4abdc1611b16d"
+    },
+    {
+      "path": "crawl/eslint.config.js",
+      "bytes": 436,
+      "sha256": "cce4a5c223a6a3546360cad6376aeed66723e9f6225908090ae3b9b17fc700c1"
+    },
+    {
+      "path": "crawl/tsconfig.json",
+      "bytes": 246,
+      "sha256": "20c41293f469bbab5dda981f822848470d590f63be05c130375dc4838b79078a"
+    },
+    {
+      "path": "crawl/types/deno-runtime.d.ts",
+      "bytes": 723,
+      "sha256": "4c70a96546ebb481f84745666aabc6261b96f39e7ea098cbdc4bc0346d73f98c"
+    },
+    {
+      "path": "docs/buffago-final-supabase-deployment-approval.md",
+      "bytes": 27322,
+      "sha256": "4fcefcebc7b7570afd48a23968fb4645af41f680bb2f15142eeb5d34ab7d3e5b"
+    },
+    {
+      "path": "docs/buffago-final-verification-accounting.json",
+      "bytes": 1780,
+      "sha256": "afa94d0ba145a2e083292f833bfb6c6740b5d0fe455b137d3a53a6ea81487871"
+    },
+    {
+      "path": "docs/buffago-final-independent-review.md",
+      "bytes": 13364,
+      "sha256": "ad40b224b3f67098bb0f7fca5420b34753fbcfb46a5a25a666c58666db486a0b"
+    },
+    {
+      "path": "docs/buffago-final-maintenance-and-recovery.md",
+      "bytes": 11211,
+      "sha256": "8c2244c3832cc7955eca850554c097aaeecd6168f7e0222387e7cf44f8446062"
+    },
+    {
+      "path": "docs/buffago-final-history-decision.md",
+      "bytes": 5423,
+      "sha256": "55039732d4461b04467c4897ed3d6b637ef50c609c71577a6dc7ee314997c3b8"
+    },
+    {
+      "path": "docs/buffago-final-behavior-evidence.md",
+      "bytes": 14964,
+      "sha256": "5035ab3da14c04b1571e0b1778a3cae5731875caee34174e07d5aa89e6c2e3fa"
+    },
+    {
+      "path": "docs/buffago-final-adapter-evidence.md",
+      "bytes": 8616,
+      "sha256": "ba45c57927574d83154d0ef3401a1a7833f03b048bc18430600a6bc958f5b4f8"
+    },
+    {
+      "path": "docs/buffago-final-application-evidence.md",
+      "bytes": 16638,
+      "sha256": "fcbc3cd74b87be0331968bc2ea37036fe72cfb737331426471001b4e5341d46b"
+    },
+    {
+      "path": "docs/buffago-final-behavior-readonly-request.sql",
+      "bytes": 4240,
+      "sha256": "c4e78bc211a5bbaa287a38d154ad5343f8597a097f9f74c5c2606a2a9eb9d494"
+    },
+    {
+      "path": "docs/buffago-final-account-contract-readonly.sql",
+      "bytes": 1909,
+      "sha256": "f7368c0655834193720973f68fb4055afc1fb8f66af31d575ed7ebc82a88b76e"
+    },
+    {
+      "path": "docs/buffago-production-readonly-evidence-2026-10-10.md",
+      "bytes": 7979,
+      "sha256": "ca895e6efef0f4d248b9394fbe65bb7038c1a3ce2262a30b685e2355e5efe7c0"
+    },
+    {
+      "path": "docs/buffago-final-production-correspondence-review.md",
+      "bytes": 14956,
+      "sha256": "307fa243bc9724f411d88403999dad234354ede89fafd20eee38745f4f54685b"
+    },
+    {
+      "path": "docs/buffago-final-readonly-correspondence.json",
+      "bytes": 24664,
+      "sha256": "85d94ab58bc1979d83a83cabe592f1dfddcab735f3d1b22fa3f42fa499463831"
+    },
+    {
+      "path": "docs/buffago-final-matched-test-results.json",
+      "bytes": 1242,
+      "sha256": "0cba0b872639614715739ee84da514e6ea4a0033d4cdfdc5073ce78467acd43a"
+    },
+    {
+      "path": "docs/buffago-final-minimal-r3-source-request.sql",
+      "bytes": 2769,
+      "sha256": "7e88d4a8f4b483cdbae0c8bd37c255c0dc43cbffc8a2c8f70f445bb32794a9c3"
+    },
+    {
+      "path": "crawl/scripts/final-readonly-correspondence.mjs",
+      "bytes": 3557,
+      "sha256": "a202174369410892a703d5b0ecd47a264e7ab2cbca0cd0646782d0e583e0c290"
+    },
+    {
+      "path": "crawl/scripts/final-readonly-matched-tests.mjs",
+      "bytes": 13851,
+      "sha256": "93c4deffc915337c05f2bfb9411c123407c126cd460ee10aa224053dd2723f73"
+    },
+    {
+      "path": "crawl/scripts/package-jury-review-only.mjs",
+      "bytes": 4608,
+      "sha256": "8515a6cb57a517ed9b0febf486c0b7e9a0fb612a411d778181de84eb25db893f"
+    },
+    {
+      "path": "crawl/scripts/verify-jury-review-artifacts.mjs",
+      "bytes": 3580,
+      "sha256": "d0d691200414ed517af913f7c3a5ef960d7f16e25f005cb55a877ca54ba90aba"
+    },
+    {
+      "path": "docs/buffago-final-jury-release-candidates.json",
+      "bytes": 4905,
+      "sha256": "4e36cd45cae22acfef729b387256f0c48e7094143cb7fdb0627427ae9714cffd"
+    },
+    {
+      "path": "docs/buffago-final-additional-source-request.sql",
+      "bytes": 1450,
+      "sha256": "ed94831cbd06257af5696d46eff2574ca59d36b9d28117c10c76905a8b0d9cdc"
+    },
+    {
+      "path": "docs/buffago-final-engineering-blockers.md",
+      "bytes": 9964,
+      "sha256": "8ac2bbdc2c240f3a33f22fefe4080f5d1a8c57b9b527146fa7185016b97a605e"
+    },
+    {
+      "path": "docs/buffago-final-engineering-verification.json",
+      "bytes": 4479,
+      "sha256": "b826ca1151c809a8477ffdd07f75441e3957508a56530a1d9ad4707118ca24c4"
+    },
+    {
+      "path": "docs/buffago-r3-production-evidence-summary.md",
+      "bytes": 5144,
+      "sha256": "3a602a2c223dd8a639e494797229ce530a9e7323d1080adbf8d285c2d0e1bf8e"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/adapter.log",
+      "bytes": 14172,
+      "sha256": "a4a8ba47e1f1fdb9c86e51fd107672d05bb54e2910a13c40399fad6de82080a4"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/artifacts.log",
+      "bytes": 662,
+      "sha256": "5bdb0e899d9f17b1ee5ac8c10a0a46acb9783f57ef7c67b092996ca1031bc045"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/compatibility.log",
+      "bytes": 14042,
+      "sha256": "dc29143cb2db97538e8d819d37beca263445799f4128b6bb75f30ed07e38ac99"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/edge.log",
+      "bytes": 33652,
+      "sha256": "fa050c3f25855d0ceec454e8d73bf29c2f9964aa70a7f95764400f5f491a3414"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/gallery-deno.log",
+      "bytes": 750,
+      "sha256": "4f22836889c5f91d4523742faa4610c739d2c09ec20a92b19d6e49bdbe2f6fe6"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/jury-packaging.log",
+      "bytes": 544,
+      "sha256": "ab26e6ecddbb0c711320dfc48e7ed28201777548982ad4ad7bac5415fdf25fc1"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/lint.log",
+      "bytes": 31508,
+      "sha256": "801f9af91b3cc19f6cdabbf9163bf8ae0b6b20206fbe0f4fe04fb069129447ac"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/matched-helpers.log",
+      "bytes": 10100,
+      "sha256": "81c6ac28e67a37e004a680d93f5488701c97af450836144a368b414bdfafbf73"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/new-tools-lint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/node-lint.log",
+      "bytes": 786,
+      "sha256": "e87a423f8872281a9d3b79c8e04196b78f8e70d7f0539fb8d63b2ea127d05f53"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/security-scan.log",
+      "bytes": 114,
+      "sha256": "30b728f3d2274e9d736719d176f89cfb68beeb83cb021567f2c43448375d65a2"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/source-request-parse.log",
+      "bytes": 990,
+      "sha256": "0303716e4aa9ccc4b4cd51d3ce5910aa7b2fe1578eb939bb169f16bbc52d95a0"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/typecheck.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/jury-only/deno.lock",
+      "bytes": 9697,
+      "sha256": "056c646907d3ed80aa8f8ee2fa9acc43d463913cb1ede3a5e104ae0060e8518e"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/jury-only/supabase/config.toml",
+      "bytes": 337,
+      "sha256": "b8d09f5bcb34e352460b3e54a539c2246dce3b7fdd58e397f06b9bc5e10f8006"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/jury-only/supabase/functions/wing-jury-feed/index.js",
+      "bytes": 1402953,
+      "sha256": "7f96b8a5b111d5440e74633ad58ea69ef29b2f5b57c959327d96015598e67287"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/jury-only/supabase/functions/wing-jury-reveal/index.js",
+      "bytes": 1400209,
+      "sha256": "43d1c43d330ff9c33774f4939fcb7e9e7945fc08c56f259f5e90f5844899625f"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/jury-only/supabase/functions/wing-jury-vote/index.js",
+      "bytes": 1398463,
+      "sha256": "5d58219e057ba313b395c91a0ea64257db23a7c104eb863e22efb7de628cba02"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/jury-only-665be695d8d7352b2a25dfc80c4f54c6d581c479961da7dcd840837560b90cb5.tar",
+      "bytes": 4216320,
+      "sha256": "665be695d8d7352b2a25dfc80c4f54c6d581c479961da7dcd840837560b90cb5"
+    },
+    {
+      "path": "docs/ui-review/screenshots/01-home.png",
+      "bytes": 47501,
+      "sha256": "acaf3c5a7e4e3dcfdfd289e2069836478a5d8d94f38f6610a2c374819adcf026"
+    },
+    {
+      "path": "docs/ui-review/screenshots/02-wingdex.png",
+      "bytes": 49540,
+      "sha256": "d6f09c23a13cbcb1922ac1672f12419a859c02e1e2b46ef51716bd5b74d7df20"
+    },
+    {
+      "path": "docs/ui-review/screenshots/03-journey.png",
+      "bytes": 40558,
+      "sha256": "eeb68d0ec91fbb49c7f245bab144fe46973b2dc08b0fd21d4021df48b33e4d9e"
+    },
+    {
+      "path": "docs/ui-review/screenshots/04-crawls.png",
+      "bytes": 35990,
+      "sha256": "19096e8db338eb2a6cd4b189cff79dd526ae5433512258eecee85e950f262925"
+    },
+    {
+      "path": "docs/ui-review/screenshots/05-social.png",
+      "bytes": 44938,
+      "sha256": "7bd8b22113e11e86026064d8d773c94f0e15aa6c6e9876a3e5298c5c34b05dce"
+    },
+    {
+      "path": "docs/ui-review/screenshots/06-wing-jury-voting.png",
+      "bytes": 154619,
+      "sha256": "b8bf3d0c4167ddeb23960f98647328a032d56b7a12e37e7bd6c79705af4f3ba3"
+    },
+    {
+      "path": "docs/ui-review/screenshots/07-wing-jury-reveal.png",
+      "bytes": 165159,
+      "sha256": "7055c2864c4d205939a40dbb79bda64d8d28c55cf134cbe81835fff4570dd923"
+    },
+    {
+      "path": "docs/ui-review/screenshots/08-favorites-populated.png",
+      "bytes": 42181,
+      "sha256": "8fa72102e8b5671b5e7dc442c95bf9b298283b8bfc08624110359256f51f6bc1"
+    },
+    {
+      "path": "docs/ui-review/screenshots/09-want-to-try-populated.png",
+      "bytes": 42993,
+      "sha256": "6943e663cce9a39bdd6471b4839270554ceba1945a48ccbd92681c6cfea6f1f5"
+    },
+    {
+      "path": "docs/ui-review/screenshots/10-home-wing-facts-jury.png",
+      "bytes": 38646,
+      "sha256": "a2d8a8f81021f4a4a4ac9d46e7745b741610b3b98562f450c7db9029f7bccbd3"
+    },
+    {
+      "path": "docs/ui-review/screenshots/11-journey-creator.png",
+      "bytes": 45839,
+      "sha256": "ac0761b93e5a3dc4f22dc52b80b30a1a714f270c8c2d74e3521737eb21492986"
+    },
+    {
+      "path": "docs/ui-review/screenshots/12-favorites-empty.png",
+      "bytes": 37694,
+      "sha256": "a5883ad9f1540c08a08bb467895c7cf338a58ee262bba540daf6c15a43efd39e"
+    },
+    {
+      "path": "docs/ui-review/screenshots/13-want-to-try-empty.png",
+      "bytes": 37806,
+      "sha256": "c5bf6d13a7754d200d3489d192489969c3125e7b05617ed5dc70ad662b72a33d"
+    },
+    {
+      "path": "docs/ui-review/screenshots/14-wing-jury-reveal-actions.png",
+      "bytes": 164339,
+      "sha256": "c9d1bcee1ec5342f6ddfeace14b76a9fe1b1b88ee4f69ae25a528d2f5e0458f7"
+    },
+    {
+      "path": "docs/ui-review/README.md",
+      "bytes": 3031,
+      "sha256": "c4a8aaa5d33e64dd574582ed37497c4c430aa57f85794de7ae8d0634acf3336e"
+    },
+    {
+      "path": "docs/ui-review/capture-report.json",
+      "bytes": 12824,
+      "sha256": "4271444e731c32dc725cea8af17cc996328283d6a512fe4c304ecc0bf843de26"
+    },
+    {
+      "path": "docs/ui-review/screenshot-hashes.json",
+      "bytes": 2439,
+      "sha256": "ffedc5e305c05933372f85f301872ec7668f08f6e6a23b3f56c7198afc1b203c"
+    },
+    {
+      "path": "crawl/scripts/ui-review-capture.py",
+      "bytes": 4452,
+      "sha256": "7fc66c336892d09433ce236153527812e1056488185fde3fc5c6ed5b7de150aa"
+    },
+    {
+      "path": "docs/buffago-wing-jury-go-live-handoff.md",
+      "bytes": 15877,
+      "sha256": "c5dc0db495ce07cd058898f9ee7636d5caae5aae0d722859c92640512ce8d22b"
+    },
+    {
+      "path": "docs/buffago-wing-jury-go-live-artifacts.json",
+      "bytes": 5253,
+      "sha256": "b9cfae138e321b42e35f755da897b60d2a82bf53d6cb288624c8065917aabcea"
+    },
+    {
+      "path": "docs/buffago-wing-jury-split-test-results.json",
+      "bytes": 1071,
+      "sha256": "24c46db82740d405e0f42733d2f3e1273eb540833db695551786be5831c8820a"
+    },
+    {
+      "path": "docs/buffago-production-account-rpc-evidence-2026-10-10.md",
+      "bytes": 4867,
+      "sha256": "5199a6ac47480061292326f8487b3ba66f27a90f324872377e34565cd30f6a7d"
+    },
+    {
+      "path": "crawl/tests/database/wing-jury-split-release.test.mjs",
+      "bytes": 10548,
+      "sha256": "d4aabd27d1e09040034b1df3879570f5cbf7ddc0ada69d27001c33297f4f7a69"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/split-release.log",
+      "bytes": 4790,
+      "sha256": "19ab12d71c606e6a11274fb4a252d95e0ca91400f96db18a518d18c3db259abd"
+    }
+  ]
+}

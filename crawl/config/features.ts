@@ -81,3 +81,18 @@ export const ENABLE_ONBOARDING_FIRST_VALUE_EXPERIMENT = parseBooleanFlag(
   process.env.EXPO_PUBLIC_ONBOARDING_FIRST_VALUE_EXPERIMENT,
   false
 );
+
+// Phase 3 saved lists remain disabled until the local foundation has an
+// authorized release migration and live RLS verification.
+export const ENABLE_SAVED_DESTINATIONS = parseBooleanFlag(
+  process.env.EXPO_PUBLIC_ENABLE_SAVED_DESTINATIONS,
+  false
+);
+
+// Wing Jury is independently gated from saved destinations. It remains off
+// until its Edge Functions, staged schema, and release security checks are
+// authorized together.
+export const ENABLE_WING_JURY = parseBooleanFlag(
+  process.env.EXPO_PUBLIC_ENABLE_WING_JURY,
+  false
+);

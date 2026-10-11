@@ -6,6 +6,14 @@
       "distribution": "internal",
       "environment": "development"
     },
+    "internal-testing": {
+      "extends": "production",
+      "channel": "internal-testing",
+      "env": {
+        "EXPO_PUBLIC_ENABLE_WING_JURY": "true",
+        "EXPO_PUBLIC_ENABLE_SAVED_DESTINATIONS": "true"
+      }
+    },
     "production": {
       "android": {
         "buildType": "app-bundle",
@@ -14,5 +22,10 @@
       "environment": "production"
     }
   },
-  "submit": { "production": {} }
+  "submit": {
+    "production": {},
+    "internal-testing": {
+      "android": { "track": "internal" }
+    }
+  }
 }

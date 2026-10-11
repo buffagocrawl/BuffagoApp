@@ -1,0 +1,145 @@
+{
+  "status": "ENGINEERING_PARTIAL_PRODUCTION_NO_GO",
+  "date": "2026-10-10",
+  "branch": "feat/wing-jury-favorites-want-to-try",
+  "focused_node_runs": [
+    {
+      "log": "crawl/.expo/final-engineering/adapter.log",
+      "pass": 21,
+      "fail": 0,
+      "skip": 0,
+      "exit_code": 0
+    },
+    {
+      "log": "crawl/.expo/final-engineering/compatibility.log",
+      "pass": 18,
+      "fail": 0,
+      "skip": 0,
+      "exit_code": 0
+    },
+    {
+      "log": "crawl/.expo/final-engineering/edge.log",
+      "pass": 62,
+      "fail": 0,
+      "skip": 1,
+      "exit_code": 0
+    },
+    {
+      "log": "crawl/.expo/final-engineering/gallery-deno.log",
+      "pass": 1,
+      "fail": 0,
+      "skip": 0,
+      "exit_code": 0
+    }
+  ],
+  "focused_distinct_passes": 102,
+  "unresolved_selected_skips": 0,
+  "skip_resolution": "Initial gallery environment skip resolved by explicit frozen-lock gallery-deno.log rerun.",
+  "actual_matched_helpers": {
+    "grouped_checks_pass": 13,
+    "actual_implementations": 11,
+    "log": "crawl/.expo/final-engineering/matched-helpers.log"
+  },
+  "historical_feature_checks": {
+    "pass": 409,
+    "fail": 0,
+    "legacy_skip": 1,
+    "rerun": false
+  },
+  "historical_assertions": {
+    "pass": 3,
+    "fail": 2,
+    "rerun": false
+  },
+  "typecheck": {
+    "exit_code": 0
+  },
+  "expo_lint": {
+    "errors": 0,
+    "warnings": 95
+  },
+  "scoped_node_lint": {
+    "errors": 0,
+    "warnings": 2
+  },
+  "new_tools_lint": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "limitations": [
+    "Reduced schemas and explicitly synthetic transitive prerequisites in compatibility tests.",
+    "Edge network tests mock Supabase HTTP; actual Storage/Auth/gateway service acceptance unavailable.",
+    "Actual production delete-account v15 and delete_account_data body unavailable.",
+    "Nine R3 body texts omitted from local supplied summaries; xp_level_for production MD5 mismatches checkout.",
+    "Mechanical artifact verification is not independent release endorsement.",
+    "Secret scan covers 2134 tracked files; it does not certify all untracked work."
+  ],
+  "logs": [
+    {
+      "path": "crawl/.expo/final-engineering/adapter.log",
+      "bytes": 14172,
+      "sha256": "a4a8ba47e1f1fdb9c86e51fd107672d05bb54e2910a13c40399fad6de82080a4"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/artifacts.log",
+      "bytes": 662,
+      "sha256": "5bdb0e899d9f17b1ee5ac8c10a0a46acb9783f57ef7c67b092996ca1031bc045"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/compatibility.log",
+      "bytes": 14042,
+      "sha256": "dc29143cb2db97538e8d819d37beca263445799f4128b6bb75f30ed07e38ac99"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/edge.log",
+      "bytes": 33652,
+      "sha256": "fa050c3f25855d0ceec454e8d73bf29c2f9964aa70a7f95764400f5f491a3414"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/gallery-deno.log",
+      "bytes": 750,
+      "sha256": "4f22836889c5f91d4523742faa4610c739d2c09ec20a92b19d6e49bdbe2f6fe6"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/jury-packaging.log",
+      "bytes": 544,
+      "sha256": "ab26e6ecddbb0c711320dfc48e7ed28201777548982ad4ad7bac5415fdf25fc1"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/lint.log",
+      "bytes": 31508,
+      "sha256": "801f9af91b3cc19f6cdabbf9163bf8ae0b6b20206fbe0f4fe04fb069129447ac"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/matched-helpers.log",
+      "bytes": 10100,
+      "sha256": "81c6ac28e67a37e004a680d93f5488701c97af450836144a368b414bdfafbf73"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/new-tools-lint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/node-lint.log",
+      "bytes": 786,
+      "sha256": "e87a423f8872281a9d3b79c8e04196b78f8e70d7f0539fb8d63b2ea127d05f53"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/security-scan.log",
+      "bytes": 114,
+      "sha256": "30b728f3d2274e9d736719d176f89cfb68beeb83cb021567f2c43448375d65a2"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/source-request-parse.log",
+      "bytes": 990,
+      "sha256": "0303716e4aa9ccc4b4cd51d3ce5910aa7b2fe1578eb939bb169f16bbc52d95a0"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/typecheck.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "production_touched": false
+}

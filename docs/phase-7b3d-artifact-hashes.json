@@ -1,0 +1,87 @@
+{
+  "status": "ENGINEERING_INVENTORY_NOT_APPROVAL",
+  "project": "vhfxnizaxdanmvmouuaf",
+  "version": "20261010192747",
+  "artifacts": [
+    {
+      "path": "crawl/supabase/local/phase-7b3a/supabase/migrations/20261010192747_wing_jury_saved_destinations_forward.sql",
+      "sha256": "f66c4585b7c0295579ca3b188bb4464815c84328f1b2ae71b4abe7354e6cfab3"
+    },
+    {
+      "path": "crawl/supabase/local/phase-7b3a/production-fingerprint-preflight.sql",
+      "sha256": "66ce48f694c2e458a5622d63fd737676a26380a7aa098e748614b5fb74ef299b"
+    },
+    {
+      "path": "crawl/supabase/local/phase-7b3a/draft-package.json",
+      "sha256": "8a4786557dd9fa270b9e91fb862e3401b4a24e6459646c4b280554ac2fa1bad0"
+    },
+    {
+      "path": "crawl/supabase/local/phase-7b3a/verify-package.mjs",
+      "sha256": "fc562ece64d52d545a39f3b7bae3c41dbfdb7f4dc0a6f67d8057ae4e7dc2e2d4"
+    },
+    {
+      "path": "crawl/scripts/phase7b3b-feature-executor.mjs",
+      "sha256": "c46bd8b15db8e3fa8dd38cce5facb03ed475ced700b8a6899cf93340e50021fe"
+    },
+    {
+      "path": "crawl/scripts/phase7b3d-production-adapter.mjs",
+      "sha256": "596d1a0f7e57cee1b2b7d536145a127c376b5801d2a85a69ffcf6afe3a2bba87"
+    },
+    {
+      "path": "crawl/scripts/phase7b3d-native-postgres.mjs",
+      "sha256": "724675d757228ba88f4583d60ceaa810ea16e0c830a320750b8c601d266fbd81"
+    },
+    {
+      "path": "crawl/scripts/phase7b25-postgres.mjs",
+      "sha256": "0c9b26727a4e3bebee766fea65eceb598a910648601764a82a792fbc50aaaaf3"
+    },
+    {
+      "path": "crawl/scripts/phase7b3d-closeout-inventory.mjs",
+      "sha256": "159e276d30266afe57a7de47730c9b8e4ec458f11a756513305ce15421d21f05"
+    },
+    {
+      "path": "crawl/lib/ratingRpcRetry.js",
+      "sha256": "dfacf94977f8e863e7bbc2b5cd99e1ed710af96d140e9ba71e5bb106cdf0a277"
+    },
+    {
+      "path": "crawl/lib/buffacoinRatingTransaction.js",
+      "sha256": "f43de50fc3babf7b8f8efc00db44cc2541dc8da672eb985f54d5111f90635069"
+    },
+    {
+      "path": "crawl/app/(tabs)/home/index.jsx",
+      "sha256": "68a563ff1d2d2f93eab5dcef05676329d4c1bc86fcb42ca9de80a60bb0d7a04c"
+    },
+    {
+      "path": "crawl/app/crawl/[id].jsx",
+      "sha256": "e1089fe6766c7a751b724778c862983775e636928e0babc5e407609bbee337e1"
+    },
+    {
+      "path": "crawl/tests/database/phase7b3d-adapter.test.mjs",
+      "sha256": "82f329e0a2e8a532bd5a96d9303988b5a7f9f7f6473a8845eff51be5fdfc338a"
+    },
+    {
+      "path": "crawl/tests/database/phase7b3d-behavior-postgres.test.mjs",
+      "sha256": "3f2b70cec564f7e0d854450e960332664da288bf0cb3f1959d7b2e2c4d018b6b"
+    },
+    {
+      "path": "crawl/tests/rating-rpc-retry.test.mjs",
+      "sha256": "7e06d91f2c88c49ebfd774992099a2273cf266f5fdfc7a399b8918a70f1f0581"
+    },
+    {
+      "path": "crawl/tests/rating-mission-tracking.test.mjs",
+      "sha256": "b03f5550a9414ad5d66f4c10f92838f3eb5ea44f2c3c3165ee3ecaa4adcc7470"
+    },
+    {
+      "path": "docs/phase-7b3c-history-exception-draft.json",
+      "sha256": "c1e0bd87b53354f208444fff05c1856ffb694f455491679de0e291c0418c61c9"
+    },
+    {
+      "path": "docs/phase-7b3b-catalog-snapshot-readonly.sql",
+      "sha256": "ed0c31103b81b9caf876f7f0522384299a03c6c4c9823c22cb76bb4265ae321d"
+    },
+    {
+      "path": "docs/phase-7b3d-approval-packet.md",
+      "sha256": "2d7965163a3157b88f1f112f92ad77a08d6a7c063efb7f0d0fe333221c667ebf"
+    }
+  ]
+}

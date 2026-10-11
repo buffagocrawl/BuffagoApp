@@ -32,6 +32,7 @@ function screenHarness(signIn, bootstrap = async () => ({ data: { username: 'qa'
     '../../lib/passwordSignInFlow': signInFlow, '../../lib/debugLog': { dbg: async () => {} },
     '../../lib/facebookOAuth': {}, '../../lib/socialAuthHelpers': { getSocialAuthButtonModels: () => [] },
     '../../config/features': { ENABLE_GOOGLE_AUTH: false }, '../../lib/analytics': { trackEvent: async () => {} },
+    '../../lib/savedDestinations.js': { claimSavedDestinationIntent: async () => null },
     '../../lib/buffacoinRatingTransaction': {} });
   const render = () => runtime.render(screen.default);
   byType(render(), 'SegmentedButtons').props.onValueChange('signin');

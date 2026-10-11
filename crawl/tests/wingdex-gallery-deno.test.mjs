@@ -6,6 +6,7 @@ import { mkdtemp,writeFile,rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { once } from 'node:events';
+import { fileURLToPath } from 'node:url';
 
 test('actual Deno handler and pinned Supabase SDK enforce asset fallback, fields and expiry',
   {skip:!process.env.WINGDEX_DENO,timeout:30000},async()=>{
@@ -45,7 +46,7 @@ test('actual Deno handler and pinned Supabase SDK enforce asset fallback, fields
     const dir=await mkdtemp(join(tmpdir(),'wingdex-deno-fixture-'));
     const wrapper=join(dir,'serve.mjs');
     await writeFile(wrapper,`const serve=Deno.serve; Deno.serve=(handler)=>serve({hostname:'127.0.0.1',port:${port}},handler); await import(${JSON.stringify(new URL('../supabase/functions/wing-public-gallery/index.ts',import.meta.url).href)});`);
-    const child=spawn(process.env.WINGDEX_DENO,['run','--no-config','--no-lock','--cached-only','--allow-net=127.0.0.1',
+    const child=spawn(process.env.WINGDEX_DENO,['run','--no-config',`--lock=${fileURLToPath(new URL('../deno.lock',import.meta.url))}`,'--frozen-lockfile','--cached-only','--allow-net=127.0.0.1',
       '--allow-env=SUPABASE_URL,SUPABASE_SERVICE_ROLE_KEY',wrapper],{env:{...process.env,
       SUPABASE_URL:`http://127.0.0.1:${backend.address().port}`,SUPABASE_SERVICE_ROLE_KEY:'local-fixture-only'}});
     let output='';child.stdout.on('data',x=>output+=x);child.stderr.on('data',x=>output+=x);

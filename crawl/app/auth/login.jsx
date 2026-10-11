@@ -43,6 +43,7 @@ import {
 } from '../../lib/socialAuthHelpers';
 import { ENABLE_GOOGLE_AUTH } from '../../config/features';
 import { trackEvent } from '../../lib/analytics';
+import { claimSavedDestinationIntent } from '../../lib/savedDestinations.js';
 import { submitBuffacoinRatingTransaction } from '../../lib/buffacoinRatingTransaction';
 
 // Handoff page (Netlify) includes trailing slash
@@ -131,16 +132,37 @@ export default function EmailAuthScreen() {
   const passwordRequestPendingRef = useRef(false);
   const navigatedRef = useRef(false);
   const cancelledRef = useRef(false);
+  const accountRevisionRef = useRef(0);
+  const accountIdentityRef = useRef(undefined);
+
+  const routeAfterAuth = (intent) => intent?.destinationId
+    ? {
+        pathname: '/(tabs)/ratings',
+        params: {
+          savedAction: intent.kind,
+          savedDestinationId: intent.destinationId,
+          savedActionState: intent.saved === false ? 'remove' : 'save',
+          savedActionUserId: intent.userId,
+        },
+      }
+    : '/(tabs)/home';
 
   const acceptSession = (user) => {
+    if (!user?.id || user.is_anonymous) return;
     if (!mountedRef.current || navigatedRef.current || cancelledRef.current) return;
     navigatedRef.current = true;
+    const revision = accountRevisionRef.current;
+    const isCurrent = () => mountedRef.current && revision === accountRevisionRef.current && !cancelledRef.current;
     setSnack({ open: false, msg: '' });
     setBusy(false);
-    router.replace('/(tabs)/home');
     // Bootstrap is detached from the auth timeout and screen lifetime. Retry
     // once after a transient failure, only while the same user is signed in.
     void Promise.resolve().then(async () => {
+      let intent = null;
+      try { intent = await claimSavedDestinationIntent({ client: supabase, userId: user.id, isCurrent }); } catch {}
+      const { data: currentAccount, error: accountError } = await supabase.auth.getUser();
+      if (!isCurrent() || accountError || currentAccount?.user?.id !== user.id || currentAccount.user.is_anonymous) return;
+      router.replace(routeAfterAuth(intent));
       try { await afterAuthSuccess(user); return; }
       catch { console.warn('[password-auth] profile bootstrap failed; retrying account setup'); }
       await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -155,6 +177,8 @@ export default function EmailAuthScreen() {
     mountedRef.current = true;
     // Never await Supabase work inside its auth listener (it holds the auth lock).
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const identity = session?.user?.id ? `${session.user.is_anonymous ? 'anonymous' : 'account'}:${session.user.id}` : 'guest';
+      if (identity !== accountIdentityRef.current) { accountIdentityRef.current = identity; accountRevisionRef.current += 1; }
       if (session?.user?.id) Promise.resolve().then(() => acceptSession(session.user));
     });
     return () => {
@@ -575,7 +599,7 @@ export default function EmailAuthScreen() {
       await applyOnboardingDestinationSuggestionIfAny(authedUser.id);
       await applyOnboardingSeedRatingIfAny(authedUser.id);
 
-      router.replace('/(tabs)/home');
+      acceptSession(authedUser);
     } catch (e) {
       show(e?.message || 'Sign-up failed');
     } finally {

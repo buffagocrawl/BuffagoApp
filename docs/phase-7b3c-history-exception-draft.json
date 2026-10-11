@@ -1,0 +1,181 @@
+{
+  "status": "DRAFT_NOT_APPROVED",
+  "project": "vhfxnizaxdanmvmouuaf",
+  "migrationVersion": "20261010192747",
+  "migrationSHA256": "f66c4585b7c0295579ca3b188bb4464815c84328f1b2ae71b4abe7354e6cfab3",
+  "preflightSHA256": "66ce48f694c2e458a5622d63fd737676a26380a7aa098e748614b5fb74ef299b",
+  "manifestSHA256": "ed1984353459575ccc6fefe54deeb2e58ddb5da59962d3cb1e1cf8ff032c6562",
+  "evidenceLogSHA256": "3f22f6334fba3ca0173b7743a4e210948a68878e57a2f2d739b429817ea46aa4",
+  "duplicates": [
+    {
+      "file": "20260729200000_duplicate_media_classification.sql",
+      "checkoutSHA256": "62a3f0c8db6afeb1561874337f4471a53fed570390ae3713c09ed230dc65de41",
+      "lfSHA256": "62a3f0c8db6afeb1561874337f4471a53fed570390ae3713c09ed230dc65de41",
+      "manifestSHA256": "62a3f0c8db6afeb1561874337f4471a53fed570390ae3713c09ed230dc65de41"
+    },
+    {
+      "file": "20260729200000_duplicate_media_classification_fixed.sql",
+      "checkoutSHA256": "bd91e8d532df7496e93f0231bc8e1377ee814339daacdd44202624d46f77d298",
+      "lfSHA256": "bd91e8d532df7496e93f0231bc8e1377ee814339daacdd44202624d46f77d298",
+      "manifestSHA256": null
+    }
+  ],
+  "checksumMismatches": [
+    {
+      "file": "20260729122000_wing_shots_creator_rewards.sql",
+      "checkoutSHA256": "6a94f22b2adfa5c88589b16ac23eab5b4a805b92d4657150cb12719a38ad331d",
+      "lfSHA256": "15443b11724a3c6c53dbb3fc25a9076e9f4147855ee968be0f2748e4870da867",
+      "manifestSHA256": "6f8fe2f0669957fca64019c7e0c18fc0a37a234f4ae08fbb0025cb7829f979ea"
+    },
+    {
+      "file": "20260729126000_wing_shots_notifications.sql",
+      "checkoutSHA256": "9b2edb26ed98cdc290c1eb6ba5d2d486a985d37647551845a97fd57c0962ec69",
+      "lfSHA256": "1b526a4fd911bdc11c3d9235b96ed6c5c30ae958ae6585e3153dfac0c039a3c6",
+      "manifestSHA256": "c1074cd6c7cdaaa3c146beb8af85a6c81bc9c0b85457d5cc94ad46c76949814c"
+    },
+    {
+      "file": "20260729132000_wing_creator_surfaces.sql",
+      "checkoutSHA256": "d35b05546307cce4ec95ffb625cd14beb78bc687fdbfb610bed40c5894a35921",
+      "lfSHA256": "e74efaaa3d6bc4d922e982e17c139060d3bcf51b45f3f99de021e47cb6d13837",
+      "manifestSHA256": "c14f309aa392e4c63c6237ead2e2f1c0b774ebb50b5a2e556e4bb523997be5c7"
+    },
+    {
+      "file": "20261007000241_image_workflow_rc_regression.sql",
+      "checkoutSHA256": "2432798764406bca36c35136ef149247bf9a4c5b5a4ba4b33ecd057cce61f379",
+      "lfSHA256": "436a18cfc1323acb7cd74ba7ca82a6b2c90190d61857be3f03c73e2a9ed49dc0",
+      "manifestSHA256": "4527dee61824d89a477400f0c62bde9b178b77c3b0d52aa638d7222df46b7f94"
+    },
+    {
+      "file": "20261008232910_wing_photo_vote_gallery_eligibility.sql",
+      "checkoutSHA256": "197f8356136dfa9755e87cf25cda86064780fcf97e23f8f8b4195a3ed50778cd",
+      "lfSHA256": "36bd302eab13cca841deb22e9c9e656b4079e4e4374f69e075c3d94c89a000d4",
+      "manifestSHA256": "d6b445a99e40fd92919ba76bd84a800f98858622141f636ed3802a052fb0168a"
+    }
+  ],
+  "unmanifested": [
+    {
+      "file": "20260729160000_wing_shot_rating_rule.sql",
+      "checkoutSHA256": "feb63ebfc0f9adff106f9a7c5963b5ba37dda71a6bc368ba3ddf00cbae7eb2a0",
+      "lfSHA256": "feb63ebfc0f9adff106f9a7c5963b5ba37dda71a6bc368ba3ddf00cbae7eb2a0",
+      "manifestSHA256": null
+    },
+    {
+      "file": "20260729170000_mango_habanero_review_dashboard.sql",
+      "checkoutSHA256": "fa2bba316a307a3c5ae455e68b24adbd1da12c22c4851fef9ea05e62d07f33eb",
+      "lfSHA256": "fa2bba316a307a3c5ae455e68b24adbd1da12c22c4851fef9ea05e62d07f33eb",
+      "manifestSHA256": null
+    },
+    {
+      "file": "20260729171000_mango_habanero_jalapeno_priority_selection.sql",
+      "checkoutSHA256": "b914b575949d2bc75a3fc9da2bfdb99b97a62163ed2cdc6b56f3bd515dbd1284",
+      "lfSHA256": "41bd15b0b92f37c7b0248c9f6f9923958737cdefb94679af1896fd8b2ae9b570",
+      "manifestSHA256": null
+    },
+    {
+      "file": "20260729172000_jalapeno_approved_queue_authority.sql",
+      "checkoutSHA256": "c41b9f697b1cdd65b8b5a0e7a3a853be235b306749f059265e3ce24da5806bfd",
+      "lfSHA256": "f20b5b6418b8c867ce51f2fa3e0574961c98d21afbaffb8982a4f9c731d9d785",
+      "manifestSHA256": null
+    },
+    {
+      "file": "20260729173000_jalapeno_social_attribution_and_location.sql",
+      "checkoutSHA256": "3a064f7f9f0d9565c3fd9d2d0e4f4b4b4ddbfe2f8f2e9b460d8b33945890fb7d",
+      "lfSHA256": "dfceaff4db1dbba904ba931508bf016bcbc13690ace6b09477722c587ab092fa",
+      "manifestSHA256": null
+    },
+    {
+      "file": "20260729200000_duplicate_media_classification_fixed.sql",
+      "checkoutSHA256": "bd91e8d532df7496e93f0231bc8e1377ee814339daacdd44202624d46f77d298",
+      "lfSHA256": "bd91e8d532df7496e93f0231bc8e1377ee814339daacdd44202624d46f77d298",
+      "manifestSHA256": null
+    },
+    {
+      "file": "20260729210000_wing_upload_retry_idempotency.sql",
+      "checkoutSHA256": "b406d81b24b4c67da2c7637454893f2d3105345f79db4c4e020ac0f0761acef9",
+      "lfSHA256": "b406d81b24b4c67da2c7637454893f2d3105345f79db4c4e020ac0f0761acef9",
+      "manifestSHA256": null
+    },
+    {
+      "file": "20260730120000_wing_shot_uploaded_object_validation.sql",
+      "checkoutSHA256": "45f67ddd34ac4e2e0e02b4bfdfd74d69b73b355a05b8774d20316a4d9cd85fec",
+      "lfSHA256": "45f67ddd34ac4e2e0e02b4bfdfd74d69b73b355a05b8774d20316a4d9cd85fec",
+      "manifestSHA256": null
+    },
+    {
+      "file": "20260730144324_wing_shot_staging_transport.sql",
+      "checkoutSHA256": "599b8e8741ccc27c8feb40715350aa43b818eb1d21d7ad686866ffc468387283",
+      "lfSHA256": "599b8e8741ccc27c8feb40715350aa43b818eb1d21d7ad686866ffc468387283",
+      "manifestSHA256": null
+    },
+    {
+      "file": "20260730145136_wing_shot_staging_cron.sql",
+      "checkoutSHA256": "24725d3294362250ba2af97b5a72d4bf99a6b6436d931079acda0c2e030a02ad",
+      "lfSHA256": "24725d3294362250ba2af97b5a72d4bf99a6b6436d931079acda0c2e030a02ad",
+      "manifestSHA256": null
+    },
+    {
+      "file": "20260730150000_wing_shot_completed_upload_rate_limit.sql",
+      "checkoutSHA256": "4c458972cc119e2dc24141848736bba217c03ba1084beedb6dfc48091f74b83d",
+      "lfSHA256": "4c458972cc119e2dc24141848736bba217c03ba1084beedb6dfc48091f74b83d",
+      "manifestSHA256": null
+    },
+    {
+      "file": "20260730214940_weekly_mission_rating_reconciliation.sql",
+      "checkoutSHA256": "1ddada02d56e68f9c0845036ed6664b1a349e877673adc5e27859004b78f4db2",
+      "lfSHA256": "1ddada02d56e68f9c0845036ed6664b1a349e877673adc5e27859004b78f4db2",
+      "manifestSHA256": null
+    },
+    {
+      "file": "20260730222132_wing_shot_finalize_legacy_compat.sql",
+      "checkoutSHA256": "a9225f1fd0e4792523c3defdd942443ecbbe04eb706fb88b9e4fa4d707a1155a",
+      "lfSHA256": "a9225f1fd0e4792523c3defdd942443ecbbe04eb706fb88b9e4fa4d707a1155a",
+      "manifestSHA256": null
+    },
+    {
+      "file": "20260730233913_wing_review_intake_lifecycle.sql",
+      "checkoutSHA256": "5bcaade7504b83fcecdde6a1e0693894f8aa8f205573a55b07f9731a7cd31b4f",
+      "lfSHA256": "aaf9208a24739574024b4c0da3af8d288bf0b25188b2d4d1de2f0888c4a3ce30",
+      "manifestSHA256": null
+    },
+    {
+      "file": "20260730235900_wing_review_intake_remove_legacy_finalizer.sql",
+      "checkoutSHA256": "10ecea98a11a261719f756b4cf8a9236858e2574886e722c69245f51d61789f7",
+      "lfSHA256": "10ecea98a11a261719f756b4cf8a9236858e2574886e722c69245f51d61789f7",
+      "manifestSHA256": null
+    },
+    {
+      "file": "20260731020000_wing_review_queue_processing_reconciliation.sql",
+      "checkoutSHA256": "a1d959d6958c693633883ab85692809fb9c7f52fba7e754ea319744174e7938e",
+      "lfSHA256": "dc8d64d02f2119bfae704a06221952661d0786d23cc94d2f3fb593ed896417c0",
+      "manifestSHA256": null
+    },
+    {
+      "file": "20260731030000_mango_habanero_review_contract_fix.sql",
+      "checkoutSHA256": "0c5e0b0ffd6360e8c293b7e1de648d91ea9ef5aad73708c5c172df8464349226",
+      "lfSHA256": "f75d02b7928b8d194e46b26a73a1caeefd772ffe49a22eb3ddf8962affe83040",
+      "manifestSHA256": null
+    }
+  ],
+  "unchangedFailingAssertions": [
+    "known current-schema migration is explicitly registered and checksum-stable",
+    "recovered Phase 1 migrations are present as unique root files"
+  ],
+  "unresolved": [
+    "remote/local SQL identity mappings including October manual/generated versions",
+    "missing legacy baseline JSON/runtime harness; no clean historical replay established"
+  ],
+  "allowedFutureScope": "Only exact new feature migration and, if independently approved, its atomic one-new-row custom ledger recording. NO historical replay/repair/marking/hash replacement/test suppression.",
+  "requiredDecisionFields": [
+    "accountable human name",
+    "decision date and expiry",
+    "explicit residual provenance risk acceptance",
+    "custom ledger representation/mechanism acceptance OR approved alternative",
+    "exact reviewed executor and target identity evidence",
+    "remediation owner and tracked follow-up",
+    "separate production write authorization (not granted by this exception)",
+    "actual production adapter hash after implementation and review; prototype hash is not adapter approval"
+  ],
+  "draftDate": "2026-10-10",
+  "executionIdentity": "session_user=current_user=postgres; nonsuper/BYPASSRLS; no SET ROLE or new membership",
+  "reviewedPrototypeSHA256": "b21c4a8b84818a3631258ec2c513c72b2a5114c5ebeb7a5d389660deb309b15a"
+}

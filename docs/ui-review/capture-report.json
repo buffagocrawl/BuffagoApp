@@ -1,0 +1,100 @@
+[
+  {
+    "file": "01-home.png",
+    "url": "http://localhost:8087/home",
+    "text": "\udb80\udefe\n\udb80\ude0c\n\udb81\ude25\n\udb80\udc09\nLevel 4 \u00b7 Wing Scout\n1250 / 1500 XP\n\ud83c\udf81\n+10 Daily XP\n\udb80\udf4e\n2/3\nNY Wingdex\n\udb81\udd38\n2/50\nTop 50 US\nNEARBY SPOT\nQA Harbor Wings\nView ratings and details\n\udb83\udedc\nNo Wing Shots yet\nBe the first to share a Wing Shot\nRate & share a Wing Shot\n\udb80\udc0f\n1 Fixture Street, Buffalo\n\udb86\udcf1\nYou are 0.1 miles away\nRate this spot\n\udb80\udf49\nFind Wings\n\ud83c\udf57\nWing Facts\n\udb81\uddd1\nWing Jury\nBe the judge.\n\udb80\udd42\n\udb80\udede\n\udb80\udede\nHome\n\udb83\udd20\n\udb83\udd20\nCrawls\n\udb85\udc1f\n\udb85\udc1f\nWingdex\n\udb82\udc49\n\udb82\udc49\nSocial\n\udb82\udfd3\n\udb82\udfd3\nJourney",
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "file": "02-wingdex.png",
+    "url": "http://localhost:8087/ratings",
+    "text": "Wingdex\n12345\n\udb80\udf4d\nMap\nShowing places within 5 mi \u00b7 sorted by overall score\n\udb80\udd8c\nDiscover\n\udb80\uded5\nFavorites\n\udb80\udcc3\nWant to Try\n\udb80\udf49\n\udb80\udd56\nAdd missing spots and rate past visits with coins.\nGot it\nLocation\n5 mi \u00b7 Filters 1\n5 mi\n10 mi\n25 mi\n50 mi\n100 mi\n250 mi\n\udb82\udd84\nChoose your state\n\udb80\udde7\nAll\n\udb80\udd42\nScore\nNear\nVotes\nPhotos\nMy ratings\n\udb80\udd42\nQA Harbor Wings\nLocation pending \u2022 0.07 mi\n96.73 overall\n1 rating\n\udb83\udedc\nBe the first to share a Wing Shot\nRate \u00b7 1\n\udb80\uded5\nRate to favorite\n\udb80\udcc0\nSaved\nQA Long Restaurant Name Buffalo Wing House & Grill\nLocation pending \u2022 0.14 mi\n95.73 overall\n1 rating\n\udb83\udedc\nBe the first to share a Wing Shot\nRate \u00b7 1\n\udb80\uded1\nFavorited\n\udb80\udcc3\nAlready rated\nQA Northside Wings\nLocation pending \u2022 0.21 mi\n94.73 overall\n1 rating\n\udb83\udedc\nBe the first to share a Wing Shot\nRate \u00b7 1\n\udb80\uded5\nFavorite\n\udb80\udcc3\nAlready rated\n\udb80\udede\n\udb80\udede\nHome\n\udb83\udd20\n\udb83\udd20\nCrawls\n\udb85\udc1f\n\udb85\udc1f\nWingdex\n\udb82\udc49\n\udb82\udc49\nSocial\n\udb82\udfd3\n\udb82\udfd3\nJourney",
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "file": "03-journey.png",
+    "url": "http://localhost:8087/journey",
+    "text": "Journey\nYour wings, milestones, and next adventure\nCrawls YTD\n0\nRated YTD\n2\nWings YTD\n24690\nLevel 4 \u00b7 Wing Scout\n1250 / 1500 XP\n\udb80\udeda\nRating history\nYour Stats\n\udb81\udcce\n95.73\nHighest rating\n\udb80\udd28\n95.23\nAverage rating\n\udb80\udf4e\n2\nTotal spots\n\udb85\udc1f\n24690\nTotal wings\nWing Creator\n\udb80\udefd\n12,345\nCreator Reputation\n123\nApproved\n12\nFeatured\nApproved Wing Shots build your Creator Reputation.\n\udb80\udd00\nWing Shot History\nWeekly Challenges\n12345 completed\n12 this week\n123-week streak\nBest: 234 weeks\nPersonal statistics \u00b7 details\nHighest Rated Destination\nQA Long Restaurant Name Buffalo Wing House & Grill \u00b7 95.73\nLowest Rated Destination\nQA Northside Wings \u00b7 94.73\nMost Rated Restaurant\nQA Long Restaurant Name Buffalo Wing House & Grill \u00b7 1 rating\nClosest Rating\nQA Long Restaurant Name Buffalo Wing House & Grill\nYou: 95.73\nEveryone: 95.73\nDifference: 0.00\nFarthest Rating\nQA Northside Wings\nYou: 94.73\nEveryone: 94.73\nDifference: 0.00\nYour Averages\nExperience: 9.00\nSauce: 9.00\nChicken Quality: 8.00\nCrispiness: 8.00\n\udb81\udd38\nBadges\nIn Progress Crawls\n\udb80\udede\n\udb80\udede\nHome\n\udb83\udd20\n\udb83\udd20\nCrawls\n\udb85\udc1f\n\udb85\udc1f\nWingdex\n\udb82\udc49\n\udb82\udc49\nSocial\n\udb82\udfd3\n\udb82\udfd3\nJourney",
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "file": "04-crawls.png",
+    "url": "http://localhost:8087/routes",
+    "text": "Crawls\n\udb82\udd82\n\udb81\udc15\nCreate crawl\nPlan. Explore. Conquer.\nNearby\nMy Crawls\nCompleted\nAll routes\nWalking\nWalk + drive\nDrivable\nNot started\n\udb80\udd42\nYour crawls & more\n1 routes / within 100 miles when distance is available\nQA Buffalo Classics\nActive\n3 stops\n / Walking\n / 0.1 mi to first stop\nStops rated\n0 / 3\n\udb81\udc0a\nResume crawl\nSubmit a Route\nSuggest up to five restaurants!\n\udb80\udede\n\udb80\udede\nHome\n\udb83\udd20\n\udb83\udd20\nCrawls\n\udb85\udc1f\n\udb85\udc1f\nWingdex\n\udb82\udc49\n\udb82\udc49\nSocial\n\udb82\udfd3\n\udb82\udfd3\nJourney",
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "file": "05-social.png",
+    "url": "http://localhost:8087/leaderboards",
+    "text": "Social\nFeed\nLeaderboard\nFriends\nSwipe for more options\nNew York\nAll\nFriends\nSwipe for more options\nLatest in New York\nQW\nQA Wing Scout\n96.7\nScore\nQA Harbor Wings \u00b7 Buffalo\nView Detailed Rating\nQW\nQA Wing Scout\n96.7\nScore\nQA Long Restaurant Name Buffalo Wing House & Grill \u00b7 Buffalo\nView Detailed Rating\nQW\nQA Wing Scout\n96.7\nScore\nQA Northside Wings \u00b7 Buffalo\nView Detailed Rating\nAll caught up\n\udb80\udede\n\udb80\udede\nHome\n\udb83\udd20\n\udb83\udd20\nCrawls\n\udb85\udc1f\n\udb85\udc1f\nWingdex\n\udb82\udc49\n\udb82\udc49\nSocial\n\udb82\udfd3\n\udb82\udfd3\nJourney",
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "file": "06-wing-jury-voting.png",
+    "url": "http://localhost:8087/wing-jury",
+    "text": "THE BLIND TEST\nWing Jury\n\udb80\udd56\nWhat's your verdict?\n\udb81\udd12\nDislike\n\udb80\udf77\nAverage\n\udb81\udd14\nLike",
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "file": "07-wing-jury-reveal.png",
+    "url": "http://localhost:8087/wing-jury",
+    "text": "THE BLIND TEST\nWing Jury\n\udb80\udd56\nWhat's your verdict?\nTHE REVEAL\nQA Long Restaurant Name Buffalo Wing House & Grill\n2 Fixture Street, Buffalo\n\udb81\udd14\nPhoto Likes\n12 Likes\n\udb81\udcd2\nWingdex Average\n91.4\nYour Last Rating: 94.2\n\udb80\uded1\nRemove from Favorites\nNext Photo\nClose",
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "file": "14-wing-jury-reveal-actions.png",
+    "url": "http://localhost:8087/wing-jury",
+    "text": "THE BLIND TEST\nWing Jury\n\udb80\udd56\nWhat's your verdict?\nTHE REVEAL\nQA Long Restaurant Name Buffalo Wing House & Grill\n2 Fixture Street, Buffalo\n\udb81\udd14\nPhoto Likes\n12 Likes\n\udb81\udcd2\nWingdex Average\n91.4\nYour Last Rating: 94.2\n\udb80\uded1\nRemove from Favorites\nNext Photo\nClose",
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "file": "08-favorites-populated.png",
+    "url": "http://localhost:8087/ratings",
+    "text": "Wingdex\n12345\n\udb80\udf4d\nMap\nShowing places within 5 mi \u00b7 sorted by overall score\n\udb80\udd8c\nDiscover\n\udb80\uded5\nFavorites\n\udb80\udcc3\nWant to Try\n\udb80\udf49\n\udb80\udd56\nAdd missing spots and rate past visits with coins.\nGot it\nLocation\n5 mi \u00b7 Filters 1\n5 mi\n10 mi\n25 mi\n50 mi\n100 mi\n250 mi\n\udb82\udd84\nChoose your state\n\udb80\udde7\nAll\n\udb80\udd42\nScore\nNear\nVotes\nPhotos\nMy ratings\n\udb80\udd42\nQA Long Restaurant Name Buffalo Wing House & Grill\nLocation pending \u2022 \u2014 mi\n\u2014 overall\nNo ratings yet\n\udb83\udedc\nBe the first to share a Wing Shot\nRate \u00b7 1\n\udb80\uded1\nFavorited\n\udb80\udcc3\nAlready rated\n\udb80\udede\n\udb80\udede\nHome\n\udb83\udd20\n\udb83\udd20\nCrawls\n\udb85\udc1f\n\udb85\udc1f\nWingdex\n\udb82\udc49\n\udb82\udc49\nSocial\n\udb82\udfd3\n\udb82\udfd3\nJourney",
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "file": "09-want-to-try-populated.png",
+    "url": "http://localhost:8087/ratings",
+    "text": "Wingdex\n12345\n\udb80\udf4d\nMap\nShowing places within 5 mi \u00b7 sorted by overall score\n\udb80\udd8c\nDiscover\n\udb80\uded5\nFavorites\n\udb80\udcc3\nWant to Try\n\udb80\udf49\n\udb80\udd56\nAdd missing spots and rate past visits with coins.\nGot it\nLocation\n5 mi \u00b7 Filters 1\n5 mi\n10 mi\n25 mi\n50 mi\n100 mi\n250 mi\n\udb82\udd84\nChoose your state\n\udb80\udde7\nAll\n\udb80\udd42\nScore\nNear\nVotes\nPhotos\nMy ratings\n\udb80\udd42\nQA Harbor Wings\nLocation pending \u2022 \u2014 mi\n\u2014 overall\nNo ratings yet\n\udb83\udedc\nBe the first to share a Wing Shot\nRate \u00b7 1\n\udb80\uded5\nRate to favorite\n\udb80\udcc0\nSaved\n\udb84\udefb\nSet Destination\n\udb86\udcf1\nTake Me There\n\udb80\udede\n\udb80\udede\nHome\n\udb83\udd20\n\udb83\udd20\nCrawls\n\udb85\udc1f\n\udb85\udc1f\nWingdex\n\udb82\udc49\n\udb82\udc49\nSocial\n\udb82\udfd3\n\udb82\udfd3\nJourney",
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "file": "12-favorites-empty.png",
+    "url": "http://localhost:8087/ratings",
+    "text": "Wingdex\n12345\n\udb80\udf4d\nMap\nShowing places within 5 mi \u00b7 sorted by overall score\n\udb80\udd8c\nDiscover\n\udb80\uded5\nFavorites\n\udb80\udcc3\nWant to Try\n\udb80\udf49\n\udb80\udd56\nAdd missing spots and rate past visits with coins.\nGot it\nLocation\n5 mi \u00b7 Filters 1\n5 mi\n10 mi\n25 mi\n50 mi\n100 mi\n250 mi\n\udb82\udd84\nChoose your state\n\udb80\udde7\nAll\n\udb80\udd42\nScore\nNear\nVotes\nPhotos\nMy ratings\n\udb80\udd42\n\udb80\uded5\nNo Favorites yet\nRate a restaurant, then save it here for an easy return.\n\udb80\udede\n\udb80\udede\nHome\n\udb83\udd20\n\udb83\udd20\nCrawls\n\udb85\udc1f\n\udb85\udc1f\nWingdex\n\udb82\udc49\n\udb82\udc49\nSocial\n\udb82\udfd3\n\udb82\udfd3\nJourney",
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "file": "13-want-to-try-empty.png",
+    "url": "http://localhost:8087/ratings",
+    "text": "Wingdex\n12345\n\udb80\udf4d\nMap\nShowing places within 5 mi \u00b7 sorted by overall score\n\udb80\udd8c\nDiscover\n\udb80\uded5\nFavorites\n\udb80\udcc3\nWant to Try\n\udb80\udf49\n\udb80\udd56\nAdd missing spots and rate past visits with coins.\nGot it\nLocation\n5 mi \u00b7 Filters 1\n5 mi\n10 mi\n25 mi\n50 mi\n100 mi\n250 mi\n\udb82\udd84\nChoose your state\n\udb80\udde7\nAll\n\udb80\udd42\nScore\nNear\nVotes\nPhotos\nMy ratings\n\udb80\udd42\n\udb80\udcc3\nNothing in Want to Try yet\nSave unrated restaurants here when you find wings worth trying.\n\udb80\udede\n\udb80\udede\nHome\n\udb83\udd20\n\udb83\udd20\nCrawls\n\udb85\udc1f\n\udb85\udc1f\nWingdex\n\udb82\udc49\n\udb82\udc49\nSocial\n\udb82\udfd3\n\udb82\udfd3\nJourney",
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "file": "10-home-wing-facts-jury.png",
+    "url": "http://localhost:8087/home",
+    "text": "\udb80\udefe\n\udb80\ude0c\n\udb81\ude25\n\udb80\udc09\nLevel 4 \u00b7 Wing Scout\n1250 / 1500 XP\n\ud83c\udf81\n+10 Daily XP\n\udb80\udf4e\n2/3\nNY Wingdex\n\udb81\udd38\n2/50\nTop 50 US\nNEARBY SPOT\nQA Harbor Wings\nView ratings and details\n\udb83\udedc\nNo Wing Shots yet\nBe the first to share a Wing Shot\nRate & share a Wing Shot\n\udb80\udc0f\n1 Fixture Street, Buffalo\n\udb86\udcf1\nYou are 0.1 miles away\nRate this spot\n\udb80\udf49\nFind Wings\n\ud83c\udf57\nWing Facts\n\udb81\uddd1\nWing Jury\nBe the judge.\n\udb80\udd42\n\udb80\udede\n\udb80\udede\nHome\n\udb83\udd20\n\udb83\udd20\nCrawls\n\udb85\udc1f\n\udb85\udc1f\nWingdex\n\udb82\udc49\n\udb82\udc49\nSocial\n\udb82\udfd3\n\udb82\udfd3\nJourney\nWing Fact\nClassic Buffalo sauce = cayenne pepper hot sauce + melted butter.\nClose\nNext",
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "file": "11-journey-creator.png",
+    "url": "http://localhost:8087/journey",
+    "text": "Journey\nYour wings, milestones, and next adventure\nCrawls YTD\n0\nRated YTD\n2\nWings YTD\n24690\nLevel 4 \u00b7 Wing Scout\n1250 / 1500 XP\n\udb80\udeda\nRating history\nYour Stats\n\udb81\udcce\n95.73\nHighest rating\n\udb80\udd28\n95.23\nAverage rating\n\udb80\udf4e\n2\nTotal spots\n\udb85\udc1f\n24690\nTotal wings\nWing Creator\n\udb80\udefd\n12,345\nCreator Reputation\n123\nApproved\n12\nFeatured\nApproved Wing Shots build your Creator Reputation.\n\udb80\udd00\nWing Shot History\nWeekly Challenges\n12345 completed\n12 this week\n123-week streak\nBest: 234 weeks\nPersonal statistics \u00b7 details\nHighest Rated Destination\nQA Long Restaurant Name Buffalo Wing House & Grill \u00b7 95.73\nLowest Rated Destination\nQA Northside Wings \u00b7 94.73\nMost Rated Restaurant\nQA Long Restaurant Name Buffalo Wing House & Grill \u00b7 1 rating\nClosest Rating\nQA Long Restaurant Name Buffalo Wing House & Grill\nYou: 95.73\nEveryone: 95.73\nDifference: 0.00\nFarthest Rating\nQA Northside Wings\nYou: 94.73\nEveryone: 94.73\nDifference: 0.00\nYour Averages\nExperience: 9.00\nSauce: 9.00\nChicken Quality: 8.00\nCrispiness: 8.00\n\udb81\udd38\nBadges\nIn Progress Crawls\n\udb80\udede\n\udb80\udede\nHome\n\udb83\udd20\n\udb83\udd20\nCrawls\n\udb85\udc1f\n\udb85\udc1f\nWingdex\n\udb82\udc49\n\udb82\udc49\nSocial\n\udb82\udfd3\n\udb82\udfd3\nJourney",
+    "errors": [],
+    "overflow": false
+  }
+]

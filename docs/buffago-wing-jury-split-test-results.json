@@ -1,0 +1,29 @@
+{
+  "decision": "A_SAFE_SPLIT_RELEASE",
+  "production_authorization": false,
+  "tests": {
+    "pass": 7,
+    "fail": 0,
+    "skip": 0,
+    "postgres": "17.6"
+  },
+  "test": {
+    "path": "crawl/tests/database/wing-jury-split-release.test.mjs",
+    "sha256": "d4aabd27d1e09040034b1df3879570f5cbf7ddc0ada69d27001c33297f4f7a69"
+  },
+  "log": {
+    "path": "crawl/.expo/final-engineering/split-release.log",
+    "sha256": "19ab12d71c606e6a11274fb4a252d95e0ca91400f96db18a518d18c3db259abd"
+  },
+  "actual_rpc_source_md5": "4f108f4b39ec1d613fd5b1ba6be97c82",
+  "actual_rpc_config_md5": "dcd2abd514173991611a622e71d06e6f",
+  "actual_pseudonym_source_md5": "de76b9c0f76f833db3712676d0cc1b60",
+  "fixture_limits": [
+    "Reduced production-shaped tables",
+    "Synthetic social/Badge/referral prerequisites",
+    "Auth deletion modeled by actual PostgreSQL DELETE, not hosted Auth transport",
+    "No Storage write, token revocation or worker race proof claimed"
+  ],
+  "hotfix": "Reported deployed by owner; source artifact unchanged; no replay",
+  "production_touched": false
+}

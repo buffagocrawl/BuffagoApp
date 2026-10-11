@@ -92,7 +92,11 @@ test('mission RPC failure is handled after save without refreshing or exposing r
   assert.doesNotMatch(JSON.stringify(diagnostics), /private backend detail/);
 });
 
-test('Home fetches authoritative mission progress on focus as well as after a qualifying action', () => {
-  assert.match(home, /useFocusEffect\([\s\S]*refreshMissionSummary\(\)/);
-  assert.match(home, /await recordSavedRatingMission\([\s\S]*refreshMissionSummary,/);
+test('Home preserves authoritative post-save mission recording after retiring its mission entry', () => {
+  // Wing Jury replaces the Home mission entry. Shared mission progression and
+  // rewards must still be recorded using the authoritative saved rating ID.
+  assert.match(home, /await recordSavedRatingMission\(\{\s*supabase,\s*userId: uid,\s*submittedRatingId,/);
+  assert.match(home, /timezone: resolvedDeviceTimezone\(\)/);
+  assert.match(home, /onDiagnostic:[\s\S]*eventName: 'qualifying_action_failed'/);
+  assert.doesNotMatch(home, /refreshMissionSummary|WeeklyMissionDialog|loadWeeklyMission/);
 });

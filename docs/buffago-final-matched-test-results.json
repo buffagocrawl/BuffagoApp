@@ -1,0 +1,21 @@
+{
+  "postgres": "17.6",
+  "checks": [
+    "all 11 installed functions have production source/config/definer fingerprints in PG17.6",
+    "actual social helper permits visible profile and denies opt-out/missing profile",
+    "actual referral profile gate rejects banned/deleted/missing accounts",
+    "actual settlement calls matched profile gate before rewards and rejects incomplete ratings",
+    "actual award helper returns existing ledger ID without double award",
+    "actual push helper respects preferences and deduplicates",
+    "actual settlement graph rolls back attribution/rewards/notifications on late push failure",
+    "actual settlement graph recovers existing XP receipts and produces exactly two rewards",
+    "actual badge helper awards once and removes below threshold",
+    "actual Auth deletion signal retains attribution and deduplicates signal",
+    "LF-normalized actual photo blocker checks owner, original and processing",
+    "actual transition validates approval actor and idempotent receipt",
+    "actual cleanup cancels present intents but does not persistently prohibit later intent writes"
+  ],
+  "limitations": [
+    "Reduced prerequisites; full reward graph and production upload bodies remain gated"
+  ]
+}

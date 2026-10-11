@@ -142,6 +142,17 @@ verify_jwt = false
 
 [functions.wing-public-gallery]
 verify_jwt = false
+
+# Local Wing Jury readiness: public reads still enforce public eligibility in
+# handlers; permanent votes require gateway JWT and verified nonanonymous user.
+[functions.wing-jury-feed]
+verify_jwt = false
+
+[functions.wing-jury-vote]
+verify_jwt = true
+
+[functions.wing-jury-reveal]
+verify_jwt = false
 # public = false
 # file_size_limit = "50MiB"
 # allowed_mime_types = ["image/png", "image/jpeg"]

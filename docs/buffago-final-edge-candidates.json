@@ -1,0 +1,148 @@
+{
+  "status": "REVIEW_CANDIDATES_ONLY_NO_DEPLOYMENT_AUTHORIZATION",
+  "target": "vhfxnizaxdanmvmouuaf",
+  "candidate_version": "final-C-v1",
+  "runtime": "deno 2.9.7 (stable, release, x86_64-pc-windows-msvc)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+  "packager": {
+    "path": "crawl/scripts/package-final-edge-candidates.mjs",
+    "bytes": 6391,
+    "sha256": "9052a36481a450e0520a4d1639a43d4b2ca81a2eb1fa23075168e98a787133a6"
+  },
+  "reviewed_runtime_executable": {
+    "path": "crawl/.expo/final-C-deno-runtime/deno.exe",
+    "bytes": 97462048,
+    "sha256": "e020f3e232bd16e33768dee528e5983349c962952051ced0a5d58ad42f5d9b33"
+  },
+  "source_inventory": [
+    {
+      "path": "crawl/supabase/functions/wing-jury-feed/index.ts",
+      "bytes": 5545,
+      "sha256": "0d3950e037a50571a2379eede476affb90dac394645ab0744f2b0cc0b1c133a6"
+    },
+    {
+      "path": "crawl/supabase/functions/wing-jury-vote/index.ts",
+      "bytes": 2393,
+      "sha256": "9f27bf24f0d07dcc9b564d71a8e191a9719dedc30bc227e4e33c02399e89210a"
+    },
+    {
+      "path": "crawl/supabase/functions/wing-jury-reveal/index.ts",
+      "bytes": 4076,
+      "sha256": "45bb37d99cf71ff65f1caf0b35f648a19a44dfe8165ccc86476f176328d08bc9"
+    },
+    {
+      "path": "crawl/supabase/functions/delete-account/index.ts",
+      "bytes": 8438,
+      "sha256": "ff7f2c1afe96afe7f0d5c853d5a84a17942badbf66cfbae77316e8dcd8846fb8"
+    },
+    {
+      "path": "crawl/supabase/functions/_shared/wingJury.ts",
+      "bytes": 8975,
+      "sha256": "b9440963027ec61f1764e99c0425388578cfd23a4c639f1c6656f5ff80acfbd0"
+    },
+    {
+      "path": "crawl/supabase/config.toml",
+      "bytes": 16965,
+      "sha256": "51c5b21c8a1edf2896c5cc10246083d0d38703c2df9f4ec98ca3e608a1841108"
+    },
+    {
+      "path": "crawl/deno.lock",
+      "bytes": 9697,
+      "sha256": "056c646907d3ed80aa8f8ee2fa9acc43d463913cb1ede3a5e104ae0060e8518e"
+    }
+  ],
+  "deployment_inventory": [
+    {
+      "path": "crawl/.expo/final-C-edge-candidate-v1/deno.lock",
+      "bytes": 9697,
+      "sha256": "056c646907d3ed80aa8f8ee2fa9acc43d463913cb1ede3a5e104ae0060e8518e"
+    },
+    {
+      "path": "crawl/.expo/final-C-edge-candidate-v1/supabase/config.toml",
+      "bytes": 433,
+      "sha256": "942b43c842460c2e63d95a4435898b8e3bf70f6c7dfb11277dee911d5f461014"
+    },
+    {
+      "path": "crawl/.expo/final-C-edge-candidate-v1/supabase/functions/delete-account/index.js",
+      "bytes": 1397861,
+      "sha256": "117b3c6241f4913b5996e643f64ab51b3a3b175855ef54bddd09b1be8c749dd7"
+    },
+    {
+      "path": "crawl/.expo/final-C-edge-candidate-v1/supabase/functions/wing-jury-feed/index.js",
+      "bytes": 1402953,
+      "sha256": "7f96b8a5b111d5440e74633ad58ea69ef29b2f5b57c959327d96015598e67287"
+    },
+    {
+      "path": "crawl/.expo/final-C-edge-candidate-v1/supabase/functions/wing-jury-reveal/index.js",
+      "bytes": 1400209,
+      "sha256": "43d1c43d330ff9c33774f4939fcb7e9e7945fc08c56f259f5e90f5844899625f"
+    },
+    {
+      "path": "crawl/.expo/final-C-edge-candidate-v1/supabase/functions/wing-jury-vote/index.js",
+      "bytes": 1398463,
+      "sha256": "5d58219e057ba313b395c91a0ea64257db23a7c104eb863e22efb7de628cba02"
+    }
+  ],
+  "archive": {
+    "path": "crawl/.expo/final-C-edge-candidate-v1.tar",
+    "bytes": 5615104,
+    "sha256": "03c8acfef8f1ebd619520c316bec51c300bd510cc9baa5fd470ff0c62a63e658"
+  },
+  "retained_immutable_archive": {
+    "path": "crawl/.expo/final-C-edge-candidate-03c8acfef8f1ebd619520c316bec51c300bd510cc9baa5fd470ff0c62a63e658.tar",
+    "bytes": 5615104,
+    "sha256": "03c8acfef8f1ebd619520c316bec51c300bd510cc9baa5fd470ff0c62a63e658"
+  },
+  "gateway": {
+    "wing-jury-feed": {
+      "verify_jwt": false
+    },
+    "wing-jury-vote": {
+      "verify_jwt": true
+    },
+    "wing-jury-reveal": {
+      "verify_jwt": false
+    },
+    "delete-account": {
+      "verify_jwt": true
+    }
+  },
+  "dependencies": {
+    "supabase_js": "2.58.0",
+    "integrity": "Frozen existing crawl/deno.lock verified by Deno; dependencies bundled into each index.js",
+    "shared": "Wing Jury source handlers import only _shared/wingJury.ts; SDK 2.58.0 pinned and fully bundled; delete-account separate reviewed repair candidate"
+  },
+  "reproducibility": "Each bundle built twice and SHA256 compared; deterministic USTAR with zero metadata timestamps; deployment JS needs no remote imports",
+  "prerequisites": [
+    "Human approval of exact Edge artifacts/config including separate delete-account correction",
+    "Read-only actual deployed predecessor bundle/config inventory and recovery disposition",
+    "Approved account media-write fence through Auth deletion and staged/unfinalized original cleanup acceptance",
+    "Approved distributed rate limiter and controlled live 429/retry checks",
+    "Verified actual production JWT gateway and Storage signing/expiry boundaries"
+  ],
+  "predecessor_inventory": {
+    "wing-jury-feed": {
+      "status": "UNAVAILABLE_EXTERNAL_READ_ONLY_EVIDENCE_REQUIRED",
+      "previous_version": null,
+      "bundle_sha256": null,
+      "verify_jwt": null
+    },
+    "wing-jury-vote": {
+      "status": "UNAVAILABLE_EXTERNAL_READ_ONLY_EVIDENCE_REQUIRED",
+      "previous_version": null,
+      "bundle_sha256": null,
+      "verify_jwt": null
+    },
+    "wing-jury-reveal": {
+      "status": "UNAVAILABLE_EXTERNAL_READ_ONLY_EVIDENCE_REQUIRED",
+      "previous_version": null,
+      "bundle_sha256": null,
+      "verify_jwt": null
+    },
+    "delete-account": {
+      "status": "UNAVAILABLE_EXTERNAL_READ_ONLY_EVIDENCE_REQUIRED",
+      "previous_version": null,
+      "bundle_sha256": null,
+      "verify_jwt": null
+    }
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "status": "FROZEN_SAFE_SPLIT_CANDIDATE_NOT_AUTHORIZED",
+  "target": "vhfxnizaxdanmvmouuaf",
+  "scope": [
+    "wing-jury-feed",
+    "wing-jury-vote",
+    "wing-jury-reveal"
+  ],
+  "delete_account": "EXCLUDED; production v15 retained; deployed ACL hotfix untouched; upload race tracked separately",
+  "runtime": "deno 2.9.7 (stable, release, x86_64-pc-windows-msvc)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+  "reviewed_runtime_executable": {
+    "path": "crawl/.expo/final-C-deno-runtime/deno.exe",
+    "bytes": 97462048,
+    "sha256": "e020f3e232bd16e33768dee528e5983349c962952051ced0a5d58ad42f5d9b33"
+  },
+  "packager": {
+    "path": "crawl/scripts/package-jury-review-only.mjs",
+    "bytes": 4608,
+    "sha256": "8515a6cb57a517ed9b0febf486c0b7e9a0fb612a411d778181de84eb25db893f"
+  },
+  "source_inventory": [
+    {
+      "path": "crawl/supabase/functions/wing-jury-feed/index.ts",
+      "bytes": 5545,
+      "sha256": "0d3950e037a50571a2379eede476affb90dac394645ab0744f2b0cc0b1c133a6"
+    },
+    {
+      "path": "crawl/supabase/functions/wing-jury-vote/index.ts",
+      "bytes": 2393,
+      "sha256": "9f27bf24f0d07dcc9b564d71a8e191a9719dedc30bc227e4e33c02399e89210a"
+    },
+    {
+      "path": "crawl/supabase/functions/wing-jury-reveal/index.ts",
+      "bytes": 4076,
+      "sha256": "45bb37d99cf71ff65f1caf0b35f648a19a44dfe8165ccc86476f176328d08bc9"
+    },
+    {
+      "path": "crawl/supabase/functions/_shared/wingJury.ts",
+      "bytes": 8975,
+      "sha256": "b9440963027ec61f1764e99c0425388578cfd23a4c639f1c6656f5ff80acfbd0"
+    },
+    {
+      "path": "crawl/supabase/config.toml",
+      "bytes": 16965,
+      "sha256": "51c5b21c8a1edf2896c5cc10246083d0d38703c2df9f4ec98ca3e608a1841108"
+    },
+    {
+      "path": "crawl/deno.lock",
+      "bytes": 9697,
+      "sha256": "056c646907d3ed80aa8f8ee2fa9acc43d463913cb1ede3a5e104ae0060e8518e"
+    }
+  ],
+  "deployment_inventory": [
+    {
+      "path": "crawl/.expo/final-engineering/jury-only/deno.lock",
+      "bytes": 9697,
+      "sha256": "056c646907d3ed80aa8f8ee2fa9acc43d463913cb1ede3a5e104ae0060e8518e"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/jury-only/supabase/config.toml",
+      "bytes": 337,
+      "sha256": "b8d09f5bcb34e352460b3e54a539c2246dce3b7fdd58e397f06b9bc5e10f8006"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/jury-only/supabase/functions/wing-jury-feed/index.js",
+      "bytes": 1402953,
+      "sha256": "7f96b8a5b111d5440e74633ad58ea69ef29b2f5b57c959327d96015598e67287"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/jury-only/supabase/functions/wing-jury-reveal/index.js",
+      "bytes": 1400209,
+      "sha256": "43d1c43d330ff9c33774f4939fcb7e9e7945fc08c56f259f5e90f5844899625f"
+    },
+    {
+      "path": "crawl/.expo/final-engineering/jury-only/supabase/functions/wing-jury-vote/index.js",
+      "bytes": 1398463,
+      "sha256": "5d58219e057ba313b395c91a0ea64257db23a7c104eb863e22efb7de628cba02"
+    }
+  ],
+  "archive": {
+    "path": "crawl/.expo/final-engineering/jury-only-665be695d8d7352b2a25dfc80c4f54c6d581c479961da7dcd840837560b90cb5.tar",
+    "bytes": 4216320,
+    "sha256": "665be695d8d7352b2a25dfc80c4f54c6d581c479961da7dcd840837560b90cb5"
+  },
+  "gateway": {
+    "wing-jury-feed": {
+      "verify_jwt": false,
+      "application_auth": "getUser token verification; public feed/guest reveal separately constrained"
+    },
+    "wing-jury-vote": {
+      "verify_jwt": true,
+      "application_auth": "getUser token verification; public feed/guest reveal separately constrained"
+    },
+    "wing-jury-reveal": {
+      "verify_jwt": false,
+      "application_auth": "getUser token verification; public feed/guest reveal separately constrained"
+    }
+  },
+  "predecessor_inventory": {
+    "wing-jury-feed": {
+      "status": "ABSENT_IN_SUPPLIED_R3_INVENTORY",
+      "previous_version": null,
+      "bundle_sha256": null,
+      "evidence": "docs/buffago-r3-production-evidence-summary.md; dated report, fresh window inventory still required"
+    },
+    "wing-jury-vote": {
+      "status": "ABSENT_IN_SUPPLIED_R3_INVENTORY",
+      "previous_version": null,
+      "bundle_sha256": null,
+      "evidence": "docs/buffago-r3-production-evidence-summary.md; dated report, fresh window inventory still required"
+    },
+    "wing-jury-reveal": {
+      "status": "ABSENT_IN_SUPPLIED_R3_INVENTORY",
+      "previous_version": null,
+      "bundle_sha256": null,
+      "evidence": "docs/buffago-r3-production-evidence-summary.md; dated report, fresh window inventory still required"
+    }
+  },
+  "reproducibility": "Exact previously twice-built and runtime-tested bundle bytes; offline deterministic USTAR, zero metadata timestamps; prior archive preserved",
+  "limitations": [
+    "No deployment authorization: owner decisions and scoped operational acceptance remain.",
+    "Current production DDL event-handler implementations are not locally available for actual-source deployment rehearsal.",
+    "Gateway rate limits and real approved-photo/auth/gateway smoke require operator acceptance.",
+    "Existing upload/deletion race is separate follow-up; no claim of Storage cleanup or token revocation."
+  ],
+  "decision": "A ? SAFE SPLIT RELEASE (account/upload interaction)",
+  "evidence": "docs/buffago-wing-jury-go-live-handoff.md"
+}

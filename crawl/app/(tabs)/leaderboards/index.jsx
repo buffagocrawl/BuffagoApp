@@ -28,8 +28,7 @@ import {
 import { useSocialBadges } from '../../../hooks/useSocialBadges';
 import FriendsPanel from '../../../components/FriendsPanel';
 import FeedbackState from '../../../components/ui/FeedbackState';
-import { SectionHeader, WingShotImage, LoadingSkeleton, FilterChips } from '../../../components/ui/OperationUI';
-import { loadWingdexRestaurantGallery } from '../../../lib/wingdexGallery';
+import { SectionHeader, LoadingSkeleton, FilterChips } from '../../../components/ui/OperationUI';
 import CreatorLeaderboardPanel from '../../../components/creator/CreatorLeaderboardPanel';
 import { ENABLE_EMPTY_FEED_LAUNCHPAD, ENABLE_SHARE_INVITE_LOOP } from '../../../config/features';
 
@@ -381,24 +380,6 @@ export default function Leaderboards() {
   const [feedLoading, setFeedLoading] = useState(false);
   const [feedError, setFeedError] = useState('');
   const [feedRows, setFeedRows] = useState([]);
-  const [restaurantShots, setRestaurantShots] = useState({});
-
-  // Only approved public restaurant media crosses this existing gallery boundary.
-  useEffect(() => {
-    if (mode !== 'feed') return;
-    const ids = Array.from(new Set(feedRows.map((row) => row.destination_id).filter(Boolean))).filter((id) => !(String(id) in restaurantShots));
-    if (!ids.length) return;
-    let cancelled = false;
-    Promise.all(ids.map(async (id) => {
-      try {
-        const gallery = await loadWingdexRestaurantGallery(id, supabase);
-        return [String(id), gallery.images?.[0]?.signed_url || null];
-      } catch { return [String(id), null]; }
-    })).then((entries) => {
-      if (!cancelled) setRestaurantShots((current) => ({ ...current, ...Object.fromEntries(entries) }));
-    });
-    return () => { cancelled = true; };
-  }, [feedRows, mode, restaurantShots]);
   const [feedPage, setFeedPage] = useState(0);
   const [feedHasMore, setFeedHasMore] = useState(true);
 
@@ -1163,7 +1144,6 @@ export default function Leaderboards() {
   const renderFeedRow = (row, idx) => {
     const uname = (row?.username || '').trim() || 'Winglet_' + String(row?.user_id || '').slice(0, 6);
     const score = typeof row?.weight_score === 'number' ? row.weight_score : null;
-    const shotUri = restaurantShots[String(row?.destination_id)];
     return (
       <Card key={String(row?.created_at || idx) + '-' + String(row?.user_id || idx) + '-' + String(row?.destination_id || idx)}
         mode="outlined" style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outlineVariant }]}
@@ -1176,7 +1156,6 @@ export default function Leaderboards() {
             </TouchableOpacity>
             <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
               <Text style={[styles.feedUser, { color: textColor }]}>{uname}</Text>
-              <Text style={[styles.feedTime, { color: theme.colors.onSurfaceVariant }]}>{fmtShortDate(row?.created_at)}</Text>
             </View>
             <View style={[styles.feedScorePill, { backgroundColor: theme.colors.surfaceVariant }]}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
@@ -1188,10 +1167,8 @@ export default function Leaderboards() {
           </View>
           <View style={{ gap: 6 }}>
             <Text variant="titleSmall" style={{ fontWeight: '700', color: textColor }}>{row?.destination_name || 'Unknown spot'}{row?.destination_city ? ` · ${row.destination_city}` : ''}</Text>
-            {shotUri ? <WingShotImage uri={shotUri} approved style={{ width: '100%', height: undefined, aspectRatio: 16 / 9, borderRadius: 12 }} /> : null}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
-              {shotUri ? <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>Restaurant Wing Shot</Text> : null}
-              <Text variant="labelSmall" style={{ color: theme.colors.primary }}>View rating</Text>
+              <Text variant="labelSmall" style={{ color: theme.colors.primary }}>View Detailed Rating</Text>
             </View>
           </View>
         </Card.Content>

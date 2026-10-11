@@ -18,6 +18,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { supabase } from '../../lib/supabase.js';
+import { ratingRpcRetry } from '../../lib/ratingRpcRetry.js';
 import { trackEvent } from '../../lib/analytics';
 import RatingWizardDialog from '../../components/RatingWizardDialog';
 import RatingComparisonModal from '../../components/RatingComparisonModal';
@@ -1226,7 +1227,7 @@ export default function CrawlScreen() {
       let submittedRatingId = null;
       if (userId) {
         const verifiedLocation = verifiedRatingLocationRef.current ?? coords;
-        const response = await supabase.rpc('submit_validated_crawl_rating', {
+        const response = await ratingRpcRetry(supabase, 'submit_validated_crawl_rating', {
           p_crawl_id: crawl.crawl_id,
           p_destination_id: activeDest.id,
           p_latitude: verifiedLocation?.latitude ?? null,
@@ -1242,7 +1243,7 @@ export default function CrawlScreen() {
           p_spice_level: payload.spice_level,
           p_would_order_again: payload.would_order_again,
           p_flavor_vibe: payload.flavor_vibe,
-        });
+        }, undefined, userId);
         const ratingResult = response.data;
         error = response.error;
         if (ratingResult?.accepted === false) throw new Error('Your rating could not be saved.');
