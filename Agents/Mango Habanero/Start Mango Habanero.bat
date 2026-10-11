@@ -39,6 +39,8 @@ if errorlevel 1 (
   pause
   exit /b 1
 )
+rem The dashboard proxy and this launcher use a fixed loopback API port.
+set "MANGO_API_PORT=4318"
 echo Starting backend on http://127.0.0.1:4318 ...
 start "Mango Habanero API" cmd /k "cd /d "%~dp0" && npm run server"
 echo Starting dashboard on http://127.0.0.1:4317 ...

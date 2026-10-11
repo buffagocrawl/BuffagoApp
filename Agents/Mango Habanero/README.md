@@ -12,6 +12,8 @@ Mango Habanero is BuffaGo's local Wing Shot human-review desk. It reads the exis
 
 The UI is `http://127.0.0.1:4317`. The service-only API listens on `http://127.0.0.1:4318`; neither binds to other interfaces.
 
+The `.bat` launcher pins the API to port 4318, and Vite requires port 4317 rather than silently choosing another port. Open `http://127.0.0.1:4317` after restarting both Mango processes. Frontend API URLs remain relative (`/api/...`); the development proxy preserves the browser's Host so it matches Origin at the API's local same-origin guard. Forwarded headers do not authorize requests. A foreign Origin, mismatched local Origin, or foreign Host remains rejected.
+
 ## Workflow
 
 Pending cards use the existing `in_review` state. Approve transitions to `approved`; reject transitions to `rejected` with a structured existing Wing Shots rejection category plus the reviewer note. The original upload is never deleted or moved. Approved, unposted cards can be made the one database-enforced `is_publish_priority`; posted or otherwise ineligible rows automatically lose that flag. Jalapeño selects that priority first, then chooses randomly from the complete eligible approved pool.
