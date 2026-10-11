@@ -70,6 +70,30 @@ def test_photo_repository_claim_passes_explicit_submission_scope():
                           'p_submission_id': str(target)})]
 
 
+def test_scoped_photo_repository_refuses_a_wrong_submission_claim():
+    client = FakeClient()
+    client.request = lambda *args, **kwargs: {'job_id': str(uuid4()), 'submission_id': str(uuid4()),
+                                             'job_kind': 'photo_process', 'claim_token': str(uuid4())}
+    repository = PhotoDerivativeRepository(client, submission_id=uuid4())
+    with pytest.raises(WorkerContractError):
+        repository.claim(worker_id='scoped-test')
+    assert repository.active_claim is None
+
+
+def test_reviewer_mode_refuses_already_approved_context_before_storage_io():
+    client = FakeClient()
+    submission = uuid4()
+    claim = ProcessingClaim(uuid4(), submission, JobKind.PHOTO, uuid4())
+    client.request = lambda *args, **kwargs: {'submission_id': str(submission), 'media_type': 'photo',
+        'bucket': 'wing-submissions', 'original_path': f'originals/{uuid4()}/{submission}/source',
+        'processed_path': f'processed/{submission}/primary', 'thumbnail_path': f'thumbnails/{submission}/preview',
+        'correlation_id': str(uuid4()), 'preserve_approval': True}
+    repository = PhotoDerivativeRepository(client, submission_id=submission, review_only=True)
+    with pytest.raises(WorkerContractError):
+        repository.begin(claim)
+    assert not client.uploads and not client._session.gets
+
+
 def test_processing_context_rejects_non_boolean_approval_flag():
     submission = uuid4()
     with pytest.raises(ValueError, match='approval preservation'):
@@ -118,6 +142,7 @@ class FakeClient:
     def __init__(self):
         self.calls = []
         self.uploads = []
+        self.objects = {}
         self.config = SimpleNamespace(
             url="https://project.supabase.co",
             timeout_seconds=30,
@@ -143,6 +168,18 @@ class FakeClient:
     def upload_storage_object(self, bucket, path, **kwargs):
         self.uploads.append((bucket, path, kwargs))
         return {}
+
+    def create_storage_object(self, bucket, path, **kwargs):
+        self.uploads.append((bucket, path, kwargs))
+        self.objects[path] = kwargs
+        return {}
+
+    def list_storage_objects(self, bucket, *, prefix):
+        return [{'name': path.rsplit('/', 1)[1], 'metadata': {'mimetype': value['content_type'], 'size': len(value['data'])}}
+                for path, value in self.objects.items() if path.rsplit('/', 1)[0] == prefix]
+
+    def download_storage_object(self, bucket, path, **kwargs):
+        return self.objects[path]['data']
 
 
 def test_repository_claims_through_real_rpc_name_and_private_signed_url(tmp_path):

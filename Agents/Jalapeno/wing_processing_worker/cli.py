@@ -69,6 +69,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--photo-drain", type=int, default=0, help="Process up to N queued photo derivative jobs")
     parser.add_argument("--photo-submission-id", type=UUID,
                         help="Claim photo jobs only for this submission")
+    parser.add_argument("--photo-review-only", action="store_true",
+                        help="For scoped reviewer preparation, refuse already-approved photos")
     parser.add_argument(
         "--drain",
         type=int,
@@ -92,6 +94,8 @@ def main(argv: list[str] | None = None) -> int:
         help="Validate required configuration without claiming a job",
     )
     args = parser.parse_args(argv)
+    if args.photo_review_only and not args.photo_submission_id:
+        parser.error("--photo-review-only requires --photo-submission-id")
     if args.photo_drain < 0 or args.photo_drain > 100:
         parser.error("--photo-drain must be between 0 and 100")
     if args.drain < 0 or args.drain > 100:
@@ -146,8 +150,11 @@ def main(argv: list[str] | None = None) -> int:
         outcome = worker.run_once()
         if outcome.status == "NO_JOB":
             break
+    photo_options = {"submission_id": args.photo_submission_id}
+    if args.photo_review_only:
+        photo_options["review_only"] = True
     photo_worker = WingProcessingWorker(
-        repository=PhotoDerivativeRepository(client, submission_id=args.photo_submission_id), processor=WingMediaProcessor(),
+        repository=PhotoDerivativeRepository(client, **photo_options), processor=WingMediaProcessor(),
         moderation_provider=provider, worker_id=_worker_id(),
     )
     photo_failed = False
