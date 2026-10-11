@@ -87,6 +87,19 @@ async function fixtureFetch(input, options = {}) {
   } else if (url.pathname.includes('/functions/v1/wing-jury-reveal')) {
     const destination = ratedJuryQA ? destinations[1] : destinations[0];
     payload = { ok: true, restaurant: destination, photo_like_count: 12, restaurant_rating: { average_weight_score: ratedJuryQA ? 91.4 : null, rating_count: ratedJuryQA ? 3 : 0 }, personal_rating: ratedJuryQA ? { weight_score: 94.2, created_at: now } : null, favorite: ratedJuryQA, want_to_try: !ratedJuryQA, save_action: guestQA ? 'sign_in_to_save' : (ratedJuryQA ? 'favorite' : 'want_to_try') };
+  } else if (url.pathname.includes('/functions/v1/wingman-intake')) {
+    // Only the invalid-host development fixture creates this in-memory spot.
+    const body = JSON.parse(options.body || '{}');
+    const name = body.restaurant || 'QA New Wingman Wings';
+    if (body.action === 'insertDestination') {
+      const destination = { id: 'fixture-wingman-created', destination_id: 'fixture-wingman-created',
+        name, city: 'Buffalo', state_id: 1, address: '4 Fixture Street', lat: 42.8874, lng: -78.8784 };
+      if (!destinations.some(row => row.id === destination.id)) destinations.push(destination);
+      payload = { destination };
+    } else payload = { normalized_name: name, city: 'Buffalo', state: 'NY',
+      address: '4 Fixture Street', lat: 42.8874, lng: -78.8784,
+      confidence: 0.99, is_real_restaurant: true, wings_probability: 0.99,
+      category: 'Restaurant', reasoning: 'Isolated QA fixture' };
   } else if (url.pathname.includes('/functions/v1/wing-public-gallery')) {
     const body = JSON.parse(options.body || '{}');
     const faultQA = typeof process !== 'undefined' && process.env.EXPO_PUBLIC_BUFFAGO_NATIVE_IMAGE_FAULT_QA === '1';
@@ -112,6 +125,7 @@ async function fixtureFetch(input, options = {}) {
     payload = tables[url.pathname.split('/').pop()] || [];
     for (const [key, val] of url.searchParams) {
       if (val.startsWith('eq.')) payload = payload.filter(row => String(row[key]) === val.slice(3));
+      if (val.startsWith('ilike.')) payload = payload.filter(row => String(row[key] || '').toLowerCase().includes(val.slice(6).replace(/%/g, '').toLowerCase()));
       if (val.startsWith('in.')) payload = payload.filter(row => val.slice(3).replace(/[()]/g, '').split(',').includes(String(row[key])));
     }
     const accept = new Headers(options.headers).get('Accept') || '';

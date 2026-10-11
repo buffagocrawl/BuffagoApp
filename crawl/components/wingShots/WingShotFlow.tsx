@@ -60,6 +60,8 @@ type Props = {
   submissionSource: 'rating' | 'onboarding' | 'buffacoin' | 'profile' | 'home_cta';
   draftMode?: boolean;
   draftResetSignal?: number;
+  draftFlowKey?: string;
+  addLaterReminder?: boolean;
   onDraftContinue?: (draft: {
     media: WingShotSelectedMedia;
     session: ReturnType<typeof createWingShotUploadSession>;
@@ -117,6 +119,8 @@ export function WingShotFlow({
   submissionSource,
   draftMode = false,
   draftResetSignal = 0,
+  draftFlowKey,
+  addLaterReminder = true,
   onDraftContinue,
   onClose,
   onSubmitted,
@@ -155,7 +159,7 @@ export function WingShotFlow({
   }
   const skipNavigationRef = useRef(false);
   const submitInFlightRef = useRef(false);
-  const draftFlow = analyticsContext?.crawlId ? `crawl-rating:${analyticsContext.crawlId}` : 'home-rating';
+  const draftFlow = draftFlowKey ?? (analyticsContext?.crawlId ? `crawl-rating:${analyticsContext.crawlId}` : 'home-rating');
   const disabled = phase === 'choosing' || phase === 'validating' || phase === 'submitting' || phase === 'cancelling';
   const networkAvailable =
     isOnline ??
@@ -1057,7 +1061,7 @@ export function WingShotFlow({
                 testID="wing-shot.skip-media"
               >
                 <Text style={styles.skipText} allowFontScaling>
-                  Skip for now — you can add a photo later from Rating History.
+                  {addLaterReminder ? 'Skip for now — you can add a photo later from Rating History.' : 'Skip photo — add it later from Journey / Rating History when available for this rating.'}
                 </Text>
               </Pressable>
             ) : null}

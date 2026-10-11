@@ -8,10 +8,13 @@ if (process.env.BUFFAGO_NATIVE_VISUAL_QA === '1') {
     const replacements = {
       [path.join(__dirname, 'lib', 'supabase.js')]: 'supabase.js',
       [path.join(__dirname, 'providers', 'LocationProvider.tsx')]: 'LocationProvider.jsx',
+      ...(process.env.EXPO_PUBLIC_BUFFAGO_NATIVE_GALLERY_QA === '1' ? { [path.join(__dirname, 'components', 'ui', 'OperationUI.jsx')]: 'OperationUI.jsx' } : {}),
       ...(process.env.BUFFAGO_NATIVE_VISUAL_PHOTO === '1' ? { [path.join(__dirname, 'tests', 'fixtures', 'native-visual', 'approvedPhoto.js')]: 'approvedPhoto.local.json' } : {}),
     };
     const replacement = replacements[resolved.filePath];
     if (!replacement) return resolved;
+    // The fixture adapter delegates every non-image export to the real module.
+    if (context.originModulePath === path.join(__dirname, 'tests', 'fixtures', 'native-visual', 'OperationUI.jsx')) return resolved;
     if (!context.dev) throw new Error('Native visual fixtures require a development bundle');
     return { type: 'sourceFile', filePath: path.join(__dirname, 'tests', 'fixtures', 'native-visual', replacement) };
   };

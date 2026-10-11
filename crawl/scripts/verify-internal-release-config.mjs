@@ -14,7 +14,7 @@ assert.equal(eas.build.production.android.autoIncrement, true);
 assert.equal(eas.cli.appVersionSource, 'remote');
 assert.equal(eas.submit['internal-testing'].android.track, 'internal');
 assert.equal(eas.build.production.env?.EXPO_PUBLIC_ENABLE_WING_JURY, 'true');
-assert.equal(eas.build.production.env?.EXPO_PUBLIC_ENABLE_SAVED_DESTINATIONS, undefined);
+assert.equal(eas.build.production.env?.EXPO_PUBLIC_ENABLE_SAVED_DESTINATIONS, 'true');
 
 process.env.EAS_BUILD_PLATFORM = 'android';
 const config = require('../app.config.js')({ config: {} });

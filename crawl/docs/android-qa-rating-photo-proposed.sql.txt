@@ -1,0 +1,80 @@
+-- RELEASE RECORD: owner reports manual SQL Editor deployment and verification. Missing migration-ledger entry; do not replay.
+begin;
+create or replace function public.wing_shot_rating_is_eligible(
+  p_rating_id uuid,
+  p_user_id uuid
+)
+returns boolean
+language sql
+stable
+security definer
+set search_path = pg_catalog, public
+as $$
+  select exists (
+    select 1
+      from public.destination_ratings rating
+     where rating.id = p_rating_id
+       and rating.user_id = p_user_id
+       and rating.crispiness between 1 and 10
+       and rating.sauce between 1 and 10
+       and rating.meat between 1 and 10
+       and rating.overall between 1 and 10
+       and not exists (
+         select 1
+           from public.wing_media_submissions submission
+          where submission.rating_id = rating.id
+       )
+       and not exists (
+         select 1
+           from public.wing_submission_upload_intents intent
+          where intent.rating_id = rating.id
+            and intent.status in ('reserved', 'finalized')
+       )
+  );
+$$;
+
+create or replace function public.wing_shot_rating_eligibility_reason(
+  p_rating_id uuid,
+  p_user_id uuid,
+  p_destination_id uuid
+)
+returns text
+language plpgsql
+stable
+security definer
+set search_path = pg_catalog, public
+as $$
+declare
+  v_rating public.destination_ratings%rowtype;
+begin
+  select *
+    into v_rating
+    from public.destination_ratings
+   where id = p_rating_id;
+
+  if not found then
+    return 'rating_not_found';
+  end if;
+  if v_rating.user_id is distinct from p_user_id then
+    return 'rating_not_owned';
+  end if;
+  if v_rating.destination_id is distinct from p_destination_id then
+    return 'destination_mismatch';
+  end if;
+  if v_rating.crispiness is null or v_rating.crispiness not between 1 and 10
+     or v_rating.sauce is null or v_rating.sauce not between 1 and 10
+     or v_rating.meat is null or v_rating.meat not between 1 and 10
+     or v_rating.overall is null or v_rating.overall not between 1 and 10 then
+    return 'incomplete_rating';
+  end if;
+
+  -- Duplicate active/finalized submissions are enforced by the reservation
+  -- RPC, which returns its more specific duplicate error. This function's
+  -- reason vocabulary intentionally describes the rating, not the upload
+  -- mutation state.
+  return 'eligible';
+end;
+$$;
+
+
+commit;

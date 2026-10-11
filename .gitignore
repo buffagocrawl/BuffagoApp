@@ -58,3 +58,33 @@ Agents/Chipotle/artifacts/last-run-result.json
 
 # Generated image-workflow regression evidence (source tests and fixtures live elsewhere).
 /artifacts/qa-image-regression/
+
+# Disposable Android QA evidence; selected release reference images are retained.
+/docs/android-qa-four-issues/**/*.xml
+/docs/android-qa-additional-five/**/*.xml
+/docs/android-qa-additional-five/screenshots/matrix-*.json
+/docs/android-qa-additional-five/*-results.txt
+/docs/android-qa-additional-five/*-results.json
+/docs/android-qa-additional-five/capture-*.txt
+/docs/android-qa-four-issues/verification-*.json
+/docs/android-qa-four-issues/screenshot-manifest.json
+/docs/android-qa-four-issues/early-bird-eligibility-preview.json
+/docs/android-qa-four-issues/screenshots/verification-*.json
+/docs/android-qa-four-issues/wingdex-ux-correction/
+/docs/android-qa-four-issues/screenshots/*.png
+!/docs/android-qa-four-issues/screenshots/signed-in-home-wing-jury-390dp.png
+!/docs/android-qa-four-issues/screenshots/signed-in-jury-390dp-font1.png
+!/docs/android-qa-four-issues/screenshots/guest-jury-390dp-font1.png
+!/docs/android-qa-four-issues/screenshots/welcome-notice-390dp.png
+!/docs/android-qa-four-issues/screenshots/early-bird-notice-390dp.png
+/docs/android-qa-additional-five/screenshots/*.png
+!/docs/android-qa-additional-five/screenshots/detail-photos-390dp-font1.png
+!/docs/android-qa-additional-five/screenshots/detail-no-photo-390dp-font1.png
+!/docs/android-qa-additional-five/screenshots/detail-saved-390dp-font1.png
+!/docs/android-qa-additional-five/screenshots/cards-390dp-font1.png
+!/docs/android-qa-additional-five/screenshots/cards-no-photo-390dp-font1.png
+!/docs/android-qa-additional-five/screenshots/buffacoin-optional-photo-390dp-font1.png
+!/docs/android-qa-additional-five/screenshots/wingman-created-optional-photo-390dp-font1.png
+!/docs/android-qa-additional-five/screenshots/wingman-prefill-390dp-font1.png
+!/docs/android-qa-additional-five/screenshots/cards-360dp-font1.3.png
+!/docs/android-qa-additional-five/screenshots/cards-no-photo-360dp-font1.3.png

@@ -82,8 +82,8 @@ export const ENABLE_ONBOARDING_FIRST_VALUE_EXPERIMENT = parseBooleanFlag(
   false
 );
 
-// Phase 3 saved lists remain disabled until the local foundation has an
-// authorized release migration and live RLS verification.
+// Saved lists are explicitly enabled by release profiles after the deployed
+// tables, owner-only RLS policies, and eligibility triggers were verified.
 export const ENABLE_SAVED_DESTINATIONS = parseBooleanFlag(
   process.env.EXPO_PUBLIC_ENABLE_SAVED_DESTINATIONS,
   false

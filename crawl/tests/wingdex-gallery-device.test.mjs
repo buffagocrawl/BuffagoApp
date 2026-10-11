@@ -35,6 +35,36 @@ test('active Wingdex tab has list and restaurant-detail picture affordances', ()
   const source = readFileSync(new URL('../app/(tabs)/ratings/index.jsx', import.meta.url), 'utf8');
   assert.match(source, /loadWingdexGallery/); assert.match(source, /setGalleryRestaurant\(item\)/);
   assert.match(source, /setGalleryRestaurant\(active\)/); assert.match(source, /key=\{galleryRestaurant\.destination_id\}/);
+  assert.match(source, /<WingdexPhotoGallery\s+key=\{`detail-\$\{active\.destination_id\}`\}\s+restaurant=\{active\}\s+embedded/);
+});
+
+test('restaurant detail embeds the shared gallery without a modal or a large empty placeholder', async () => {
+  const h = harness(async () => ({ count: 0, images: [] }));
+  h.props.embedded = true;
+  h.render(); await flush();
+  const tree = h.render();
+  assert.equal(elements(tree, 'portal').length, 0);
+  assert.equal(elements(tree, 'image').length, 0);
+  assert.ok(elements(tree, 'text').some((node) => node.props.children === 'No approved Wing Shots yet.'));
+  assert.equal(elements(tree, 'button').some((node) => node.props.children === 'Close'), false);
+  h.runtime.unmount();
+});
+
+test('embedded approved gallery preserves multiple-photo viewer selection and failure recovery', async () => {
+  const h = harness(async () => ({ count: 2, images: [
+    { submission_id: 'a', signed_url: 'https://image.test/a' },
+    { submission_id: 'b', signed_url: 'https://image.test/b' },
+  ] }));
+  h.props.embedded = true;
+  h.render(); await flush(); let tree = h.render();
+  assert.equal(elements(tree, 'image').length, 2);
+  elements(tree, 'image')[0].props.onError();
+  tree = h.render();
+  assert.equal(elements(tree, 'image').length, 1);
+  assert.ok(elements(tree, 'text').some((node) => node.props.children === 'Photo unavailable'));
+  elements(tree, 'pressable')[0].props.onPress();
+  assert.equal(elements(h.render(), 'viewer')[0].props.selectedId, 'b');
+  h.runtime.unmount();
 });
 test('approved image loads with correct restaurant identity', async () => {
   const h = harness(async () => ({ count: 1, images: [{ submission_id: 'photo-a', signed_url: 'https://image.test/a' }] }));
