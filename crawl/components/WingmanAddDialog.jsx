@@ -519,6 +519,7 @@ export default function WingmanAddDialog({
       </Text>
 
       <TextInput
+        testID="wingman-restaurant-name"
         mode="outlined"
         label="Restaurant name"
         value={restaurantName}

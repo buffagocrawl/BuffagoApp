@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getSavedDestinationState, mutateSavedDestination, SavedDestinationError } from '../lib/savedDestinations.js';
+import { getSavedDestinationState, getSavedDestinations, mutateSavedDestination, SavedDestinationError } from '../lib/savedDestinations.js';
 
 function queryResult(data, error = null) {
   const chain = {
@@ -15,14 +15,17 @@ function client({ user = { id: 'u1' }, ratings = [], favorites = [], wantToTry =
   return {
     auth: { getUser: async () => ({ data: { user }, error: null }), onAuthStateChange: () => ({ data: { subscription: { unsubscribe() {} } } }) },
     from(table) {
-      if (table === 'user_want_to_try' && writes) {
-        const result = queryResult(wantToTry);
+      if (['user_want_to_try', 'user_destination_favorites'].includes(table) && writes) {
+        const rows = table === 'user_want_to_try' ? wantToTry : favorites;
+        const result = queryResult(rows, errors[table] || null);
         result.upsert = async (payload, options) => {
           writes.push({ operation: 'upsert', payload, options });
+          if (!errors[table] && !rows.some((row) => row.destination_id === payload.destination_id)) rows.push(payload);
           return { data: null, error: errors[table] || null };
         };
         result.delete = () => {
           writes.push({ operation: 'delete' });
+          rows.splice(0, rows.length);
           return result;
         };
         return result;
@@ -42,6 +45,31 @@ test('state uses the authenticated user rating history, not global unrated data'
   assert.equal(state.ratedIds.has('d1'), true);
   assert.equal(state.ratedIds.has('d2'), false);
   assert.equal(state.favoriteIds.has('d1'), true);
+});
+
+test('Favorites and Want to Try reload persisted saves and removals in a fresh service read', async () => {
+  for (const kind of ['favorites', 'wantToTry']) {
+    const rows = [];
+    const options = { ratings: kind === 'favorites' ? [{ destination_id: 'd1' }] : [], [kind]: rows };
+    const firstSession = client(options);
+    await mutateSavedDestination({ client: firstSession, kind, destinationId: 'd1', saved: true });
+    await mutateSavedDestination({ client: firstSession, kind, destinationId: 'd1', saved: true });
+    assert.equal(rows.length, 1, 'repeated save stays idempotent');
+    const reopenedSession = client(options);
+    const list = await getSavedDestinations({ client: reopenedSession, kind });
+    assert.equal(list.rows.length, 1);
+    assert.equal(list.rows[0].destination_id, 'd1');
+    await mutateSavedDestination({ client: reopenedSession, kind, destinationId: 'd1', saved: false });
+    assert.equal((await getSavedDestinations({ client: client(options), kind })).rows.length, 0);
+  }
+});
+
+test('guest saved collections return an authentication state without querying tables', async () => {
+  const guest = client({ user: null });
+  guest.from = () => { throw new Error('guest must not read personal tables'); };
+  for (const kind of ['favorites', 'wantToTry']) {
+    assert.deepEqual(await getSavedDestinations({ client: guest, kind }), { status: 'guest', userId: null, rows: [] });
+  }
 });
 
 test('favorite mutation preflights personal eligibility and maps unavailable tables', async () => {

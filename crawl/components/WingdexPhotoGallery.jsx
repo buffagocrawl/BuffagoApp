@@ -8,7 +8,7 @@ import WingdexPhotoViewer from './WingdexPhotoViewer';
 import { createVoteController, loadOwnPhotoVotes } from '../lib/wingdexPhotos';
 import { useAuth } from '../providers/AuthProvider';
 
-export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange }) {
+export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange, embedded = false }) {
   const { user } = useAuth();
   const generation = useRef(0);
   const inFlight = useRef(false);
@@ -149,15 +149,22 @@ export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange
       }
     } catch (error) { if (active.current && accountRef.current === account) setVoteError(error.message); }
   };
-  return <Portal><Dialog visible={Boolean(restaurant)} onDismiss={onClose} style={{ borderRadius: 24 }}>
-    <Dialog.Title>{restaurant?.name || 'Pictures'}</Dialog.Title>
-    <Dialog.Content>
+  const Container = embedded ? View : Dialog;
+  const Content = embedded ? View : Dialog.Content;
+  const Actions = embedded ? View : Dialog.Actions;
+  const gallery = <Container {...(embedded ? { testID: 'restaurant-wing-shots' } : {
+    visible: Boolean(restaurant), onDismiss: onClose, style: { borderRadius: 24 },
+  })}>
+    {embedded ? <Text variant="titleMedium" style={{ marginBottom: 8 }}>Wing Shots</Text>
+      : <Dialog.Title>{restaurant?.name || 'Pictures'}</Dialog.Title>}
+    <Content>
       {state.error ? <View><Text>{state.error}</Text><Button onPress={() => void load()}>Retry pictures</Button></View> : null}
       {voteError ? <View><Text accessibilityRole="alert">{voteError}</Text>
         {votesReady ? null : <Button onPress={() => setVoteReload((n) => n + 1)}>Retry votes</Button>}</View> : null}
       {state.loading ? <ActivityIndicator /> : null}
-      {!state.loading && !state.error && !state.images.length ? <View style={{ alignItems: 'center', padding: 24 }}>
-        <Text variant="titleMedium">BUFFAGO</Text><Text>Be the first to add a photo</Text></View> : null}
+      {!state.loading && !state.error && !state.images.length ? <View style={{ alignItems: 'center', paddingVertical: embedded ? 12 : 24 }}>
+        {embedded ? <Text>No approved Wing Shots yet.</Text> : <Text variant="titleMedium">BUFFAGO</Text>}
+        <Text>Be the first to add a photo</Text></View> : null}
       <FlatList horizontal style={{ maxHeight: 340 }} data={state.images}
         keyExtractor={(image) => image.submission_id} initialNumToRender={3} maxToRenderPerBatch={5}
         windowSize={5} getItemLayout={(_, index) => ({ length: 248, offset: 248 * index, index })}
@@ -185,12 +192,13 @@ export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange
               onPress={() => void cast(image, -1)}>{image.dislike_count ?? 0}</Button>
           </View>
         </View>} />
-    </Dialog.Content>
-    <Dialog.Actions>
+    </Content>
+    <Actions>
       {state.offset < state.count ? <Button disabled={state.loading} onPress={() => void load(state.offset)}>More pictures</Button> : null}
-      <Button contentStyle={{ minHeight: 44 }} onPress={onClose}>Close</Button>
-    </Dialog.Actions>
-  </Dialog>{selectedId ? <WingdexPhotoViewer photos={state.images} selectedId={selectedId} restaurantName={restaurant.name}
+      {embedded ? null : <Button contentStyle={{ minHeight: 44 }} onPress={onClose}>Close</Button>}
+    </Actions>
+  </Container>;
+  return <>{embedded ? gallery : <Portal>{gallery}</Portal>}{selectedId ? <Portal><WingdexPhotoViewer photos={state.images} selectedId={selectedId} restaurantName={restaurant.name}
     voteController={vote} isVotePending={isVotePending} getVoteVersion={getVoteVersion} parentVotesReady={votesReady}
     onClose={() => { setSelectedId(null); setRefreshToken((n) => n + 1); }}
     totalCount={state.count} hasMore={state.offset < state.count} onMore={() => void load(state.offset)}
@@ -203,5 +211,5 @@ export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange
       setBusy((old) => ({ ...old, [updated.submission_id]: Boolean(pending) }));
       setState((old) => ({ ...old, images: old.images.map((p) => p.submission_id === updated.submission_id ? { ...p, ...updated, signed_url: p.signed_url } : p) }));
       if (!pending) onPhotoChange?.(updated);
-    }} /> : null}</Portal>;
+    }} /></Portal> : null}</>;
 }

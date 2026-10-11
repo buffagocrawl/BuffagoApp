@@ -37,6 +37,12 @@ import {
 } from 'react-native-paper';
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import RatingWizardDialog from '../../../components/RatingWizardDialog';
+import { WingShotFlow } from '../../../components/wingShots';
+import { useWingShotsFeatureFlags } from '../../../hooks/useWingShotsFeatureFlags';
+import { resolveRatingPhotoStep } from '../../../lib/photoWorkflowFlags.js';
+import { wingShotDrafts } from '../../../lib/wingShotDrafts';
+import { submitWingShot, wingShotUserMessage } from '../../../lib/wingShots.js';
+import { createRatingPhotoAttachment } from '../../../lib/ratingPhotoAttachment.js';
 import WingmanAddDialog from '../../../components/WingmanAddDialog';
 import FeedbackState from '../../../components/ui/FeedbackState';
 import { WingShotImage, LoadingSkeleton, SelectionChip as Chip } from '../../../components/ui/OperationUI';
@@ -553,6 +559,7 @@ export default function PublicRatingsScreen() {
   const [statePickerOpen, setStatePickerOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [wingmanOpen, setWingmanOpen] = useState(false);
+  const [wingmanInitialRestaurant, setWingmanInitialRestaurant] = useState('');
   const [wingmanStateCtx, setWingmanStateCtx] = useState(null);
 
   const [open, setOpen] = useState(false);
@@ -581,6 +588,8 @@ export default function PublicRatingsScreen() {
 
   // ✅ per-destination escalating cost (1 + # of my prior coin ratings for that destination)
   const [coinCostByDest, setCoinCostByDest] = useState({});
+  const coinCostByDestRef = useRef(coinCostByDest);
+  coinCostByDestRef.current = coinCostByDest;
   const [coinCostForActive, setCoinCostForActive] = useState(1);
 
   // Buffacoin dialogs + rating wizard
@@ -589,6 +598,58 @@ export default function PublicRatingsScreen() {
   const [coinRateOpen, setCoinRateOpen] = useState(false);
   const [coinRatingDest, setCoinRatingDest] = useState(null);
   const [coinSubmitting, setCoinSubmitting] = useState(false);
+  const { flags: coinPhotoFlags, refresh: refreshCoinPhotoFlags } = useWingShotsFeatureFlags(Boolean(user?.id));
+  const [coinPhotoOpen, setCoinPhotoOpen] = useState(false);
+  const [coinPhotoReset, setCoinPhotoReset] = useState(0);
+  const coinPhotoRef = useRef(null);
+  const coinStartRef = useRef(false);
+  const coinSubmitRef = useRef(false);
+  const attachCoinPhoto = useMemo(() => createRatingPhotoAttachment({ submit: submitWingShot,
+    drafts: wingShotDrafts, client: supabase, userId: user?.id, flow: 'wingdex-rating',
+    isCurrent: () => accountRef.current === user?.id }), [user?.id]);
+  const retryCoinPhoto = useCallback(async () => {
+    const epoch = accountScope.capture();
+    const pending = coinPhotoRef.current;
+    if (!pending?.ratingId) return;
+    try {
+      const result = await attachCoinPhoto(pending);
+      if (!accountScope.current(epoch)) return;
+      if (result && coinPhotoRef.current === pending) coinPhotoRef.current = null;
+    } catch (error) {
+      if (!accountScope.current(epoch)) return;
+      Alert.alert('Rating saved; photo needs attention', `${wingShotUserMessage(error)} Your rating is saved. Retrying the photo does not spend another BuffaCoin.`, [
+        { text: 'Later', style: 'cancel' }, { text: 'Retry photo', onPress: () => { void retryCoinPhoto(); } },
+      ]);
+    }
+  }, [attachCoinPhoto, accountScope]);
+  useEffect(() => {
+    let active = true;
+    if (!user?.id) return;
+    void wingShotDrafts.load({ userId: user.id, flow: 'wingdex-rating' }).then((saved) => {
+      if (!active || !saved || coinPhotoRef.current) return;
+      coinPhotoRef.current = { draft: saved.draft, destinationId: saved.destinationId,
+        ratingId: saved.ratingId, operationId: saved.ratingOperationId };
+      Alert.alert('Resume your Wing Shot', saved.ratingId ? 'Your rating is saved. Retry the photo without spending again.' : 'Continue your saved restaurant rating.', [
+        { text: 'Discard', style: 'cancel', onPress: () => {
+          void wingShotDrafts.clear(saved.correlationId);
+          coinPhotoRef.current = null;
+        } },
+        { text: 'Continue', onPress: async () => {
+          if (!active) return;
+          if (saved.ratingId) { void retryCoinPhoto(); return; }
+          const { data: row } = await supabase.from('destinations').select('id,name,state_id').eq('id', saved.destinationId).maybeSingle();
+          if (!active || !row) return;
+          const { data: state } = await supabase.from('states').select('state_code').eq('state_id', row.state_id).maybeSingle();
+          if (!active) return;
+          setCoinRatingDest({ destination_id: row.id, name: row.name, stateCode: state?.state_code });
+          buffacoinOperationRef.current = saved.ratingOperationId ?? Crypto.randomUUID();
+          setCoinCostForActive(Math.max(1, Number(coinCostByDestRef.current[String(row.id)] || 1)));
+          setCoinRateOpen(true);
+        } },
+      ]);
+    }).catch(() => {});
+    return () => { active = false; };
+  }, [user?.id, retryCoinPhoto]);
 
   useEffect(() => {
     let alive = true;
@@ -608,6 +669,7 @@ export default function PublicRatingsScreen() {
       setCoinRatingDest(null); setCoinRateOpen(false); setCoinCelebrateOpen(false);
       setPendingSummary(null); setPendingCoinBalance(null); setCoinSubmitting(false);
       buffacoinOperationRef.current = null;
+      coinPhotoRef.current = null; setCoinPhotoOpen(false); setCoinPhotoReset((value) => value + 1);
       pendingIntentRef.current = '';
       Promise.resolve().then(() => { if (alive) void fetchAllRef.current?.().catch(() => {}); });
     };
@@ -677,7 +739,7 @@ export default function PublicRatingsScreen() {
     };
   }, [currentState, stateCodeFilter]);
 
-  const openWingman = useCallback(async (source = 'wingdex') => {
+  const openWingman = useCallback(async (source = 'wingdex', initialRestaurant = '') => {
     trackEvent({
       eventName: 'add_restaurant_opened',
       screen: 'ratings',
@@ -689,6 +751,7 @@ export default function PublicRatingsScreen() {
       },
     });
     const ctx = await getWingmanStateContext();
+    setWingmanInitialRestaurant(initialRestaurant);
     setWingmanStateCtx(ctx);
     setWingmanOpen(true);
   }, [getWingmanStateContext, locationMode, user?.id]);
@@ -1304,6 +1367,23 @@ export default function PublicRatingsScreen() {
 
   const onPressCoinRate = useCallback(
     async (item) => {
+      if (coinStartRef.current || coinSubmitRef.current) return;
+      if (coinPhotoRef.current) {
+        Alert.alert('Finish your saved photo', 'A photo is saved for another rating. Resume or discard it before starting another.', [
+          { text: 'Keep photo', style: 'cancel' },
+          ...(coinPhotoRef.current.ratingId ? [{ text: 'Retry photo', onPress: () => { void retryCoinPhoto(); } }] : []),
+          ...(!coinPhotoRef.current.ratingId && coinRatingDest?.destination_id === coinPhotoRef.current.destinationId
+            ? [{ text: 'Continue rating', onPress: () => setCoinRateOpen(true) }] : []),
+          { text: 'Discard photo', onPress: async () => {
+            await wingShotDrafts.clear(coinPhotoRef.current?.draft.session.correlationId);
+            coinPhotoRef.current = null; buffacoinOperationRef.current = null;
+          } },
+        ]);
+        return;
+      }
+      coinStartRef.current = true;
+      const epoch = accountScope.capture();
+      try {
       try {
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       } catch {}
@@ -1350,9 +1430,17 @@ export default function PublicRatingsScreen() {
         destinationId: item.destination_id,
         metadata: { source: 'wingdex_buffacoin', coin_cost: cost },
       });
-      setCoinRateOpen(true);
+      const offerPhoto = await resolveRatingPhotoStep(refreshCoinPhotoFlags);
+      if (!accountScope.current(epoch)) return;
+      buffacoinOperationRef.current = Crypto.randomUUID();
+      setCoinPhotoReset((value) => value + 1);
+      setCoinPhotoOpen(offerPhoto);
+      setCoinRateOpen(!offerPhoto);
+      } catch (error) {
+        Alert.alert('Rating could not start', error?.message || 'Please try again.');
+      } finally { coinStartRef.current = false; }
     },
-    [user?.id, buffacoinBalance, coinCostByDest, myCoinRated]
+    [user?.id, buffacoinBalance, coinCostByDest, myCoinRated, accountScope, refreshCoinPhotoFlags, retryCoinPhoto, coinRatingDest?.destination_id]
   );
 
   const shareRating = useCallback(async (item) => {
@@ -1608,7 +1696,7 @@ export default function PublicRatingsScreen() {
 
 
   const submitCoinRating = useCallback(async (payload) => {
-  if (!user?.id || !coinRatingDest?.destination_id) return;
+  if (!user?.id || !coinRatingDest?.destination_id || coinSubmitRef.current) return;
   const epoch = accountScope.capture();
   const isCurrent = () => accountScope.current(epoch) && accountRef.current === user.id;
   if (!isCurrent()) return;
@@ -1624,7 +1712,9 @@ export default function PublicRatingsScreen() {
     return;
   }
 
+  coinSubmitRef.current = true;
   setCoinSubmitting(true);
+  let committedReceipt = null;
   try {
     const spendTimes = Math.max(1, Number(coinCostForActive || 1));
     const operationId = buffacoinOperationRef.current || Crypto.randomUUID();
@@ -1677,8 +1767,20 @@ export default function PublicRatingsScreen() {
       coinCost: spendTimes,
       rating: ratingPayload,
     });
+    committedReceipt = committed;
     if (!isCurrent()) return;
     const crawlId = committed.crawl_id;
+    if (coinPhotoRef.current?.draft) {
+      coinPhotoRef.current = { ...coinPhotoRef.current, ratingId: committed.rating_id,
+        destinationId: coinRatingDest.destination_id, operationId };
+      // Persist the committed receipt before any optional photo network work.
+      // An upload failure must never rerun the rating/debit transaction.
+      const pending = coinPhotoRef.current;
+      await wingShotDrafts.save({ userId: user.id, flow: 'wingdex-rating',
+        destinationId: pending.destinationId, ratingId: pending.ratingId,
+        ratingOperationId: operationId, lifecycle: 'attaching', draft: pending.draft });
+    }
+    setCoinRateOpen(false);
     setBuffacoinBalance(committed.new_balance);
     playCoinDelta(`-${spendTimes}`);
     buffacoinOperationRef.current = null;
@@ -1836,8 +1938,21 @@ export default function PublicRatingsScreen() {
       overall: Number(finalScores.overall),
     });
     setCoinCelebrateOpen(true);
+    if (coinPhotoRef.current?.ratingId) void retryCoinPhoto();
   } catch (error) {
     if (!isCurrent()) return;
+    if (committedReceipt) {
+      // UI refresh, analytics, or draft storage can fail after a successful
+      // transaction. Never present that committed rating as a retryable debit.
+      setCoinRateOpen(false);
+      setBuffacoinBalance(committedReceipt.new_balance);
+      buffacoinOperationRef.current = null;
+      Alert.alert('Rating saved', 'Your rating and BuffaCoin payment are complete. The photo or screen refresh needs attention.', [
+        { text: 'Done' },
+        ...(coinPhotoRef.current?.ratingId ? [{ text: 'Retry photo', onPress: () => { void retryCoinPhoto(); } }] : []),
+      ]);
+      return;
+    }
     await trackEvent({
       eventName: 'rating_transaction_failed',
       screen: 'ratings',
@@ -1859,6 +1974,7 @@ export default function PublicRatingsScreen() {
       'Nothing will be retried through the old path. Try again to safely check this same operation.'
     );
   } finally {
+    coinSubmitRef.current = false;
     if (isCurrent()) setCoinSubmitting(false);
   }
 }, [
@@ -1873,6 +1989,7 @@ export default function PublicRatingsScreen() {
   fetchRecentRatingsForDestination,
   playCoinDelta,
   saved,
+  retryCoinPhoto,
 ]);
 
 
@@ -1914,19 +2031,9 @@ export default function PublicRatingsScreen() {
       >
       <Card.Content style={styles.cardContent}>
         {approvedThumbnails[destIdStr] ? <WingShotImage approved uri={approvedThumbnails[destIdStr]} style={{ width: '100%', height: undefined, aspectRatio: 16 / 9, borderRadius: 12, marginBottom: 10 }} /> : null}
-        <View style={styles.compactRestaurantRow}>
-          <View style={styles.restaurantIdentity}>
-            <Text variant="titleSmall" style={styles.nameCentered}>{item.name}</Text>
-            <Text variant="bodySmall" numberOfLines={2} style={[styles.locationLine, { opacity: 1, color: dark ? colors.onSurface : colors.onSurfaceVariant }]}>
-              {[item.town, item.stateCode].filter(Boolean).join(', ') || 'Location pending'}{distText}
-            </Text>
-            <View style={styles.restaurantMetrics}>
-              <Text style={[styles.compactScore, { color: dark ? tokens.colors.orange : '#9B3B00', backgroundColor: colors.surface, borderRadius: 6, paddingHorizontal: 4 }]}>{displayAvg} <Text style={[styles.compactMetric, { color: dark ? colors.onSurface : colors.onSurfaceVariant }]}>overall</Text></Text>
-              <Text style={[styles.compactMetric, { color: dark ? colors.onSurface : colors.onSurfaceVariant }]}>{ratingsLabel}</Text>
-            </View>
-          </View>
-        </View>
-        <View style={styles.restaurantActions}>
+        <View style={styles.restaurantHeader}>
+          <Text variant="titleSmall" style={[styles.nameCentered, styles.restaurantCardName]}>{item.name}</Text>
+          <View style={styles.restaurantPhotoCount}>
           {pictureCountsStatus === 'loading' ? (
             <Button icon="image-multiple-outline" compact disabled contentStyle={{ minHeight: 44 }} labelStyle={styles.compactMetric}>Checking photos…</Button>
           ) : pictureCountsStatus === 'error' ? (
@@ -1934,7 +2041,7 @@ export default function PublicRatingsScreen() {
               event?.stopPropagation?.(); setGalleryRestaurant(item);
             }}>Photos unavailable</Button>
           ) : (pictureCounts[destIdStr] || 0) > 0 ? (
-            <Button icon="image-multiple-outline" compact labelStyle={[styles.compactMetric, { color: dark ? colors.onSurface : colors.onSurfaceVariant }]} contentStyle={{ minHeight: 44 }} onPress={(event) => {
+            <Button icon="image-multiple-outline" compact accessibilityLabel={`${pictureCounts[destIdStr]} ${pictureCounts[destIdStr] === 1 ? 'photo' : 'photos'} for ${item.name}`} labelStyle={[styles.compactMetric, { color: dark ? colors.onSurface : colors.onSurfaceVariant }]} contentStyle={{ minHeight: 44 }} onPress={(event) => {
               event?.stopPropagation?.(); setGalleryRestaurant(item);
             }}>{pictureCounts[destIdStr]} {pictureCounts[destIdStr] === 1 ? 'photo' : 'photos'}</Button>
           ) : (
@@ -1943,7 +2050,7 @@ export default function PublicRatingsScreen() {
               compact
               contentStyle={{ minHeight: 44 }}
               labelStyle={[styles.compactMetric, { color: dark ? colors.onSurface : colors.onSurfaceVariant, fontSize: 11 }]}
-              accessibilityLabel={`Share the first Wing Shot for ${item.name}`}
+              accessibilityLabel={`0 photos. Add a photo for ${item.name}`}
               accessibilityHint={ratedByMe ? 'Opens Journey to attach a photo to your existing rating' : 'Selects this restaurant on Home so you can rate it and share a Wing Shot'}
               onPress={(event) => {
                 event?.stopPropagation?.();
@@ -1951,9 +2058,19 @@ export default function PublicRatingsScreen() {
                 else void pickAsHomeNextSpot(item);
               }}
             >
-              Add a photo
+              0 photos
             </Button>
           )}
+          </View>
+        </View>
+            <Text variant="bodySmall" numberOfLines={2} style={[styles.locationLine, { opacity: 1, color: dark ? colors.onSurface : colors.onSurfaceVariant }]}>
+              {[item.town, item.stateCode].filter(Boolean).join(', ') || 'Location pending'}{distText}
+            </Text>
+        <View style={styles.restaurantActions}>
+            <View style={styles.restaurantMetrics}>
+              <Text style={[styles.compactScore, { color: dark ? tokens.colors.orange : '#9B3B00', backgroundColor: colors.surface, borderRadius: 6, paddingHorizontal: 4 }]}>{displayAvg} <Text style={[styles.compactMetric, { color: dark ? colors.onSurface : colors.onSurfaceVariant }]}>overall</Text></Text>
+              <Text style={[styles.compactMetric, { color: dark ? colors.onSurface : colors.onSurfaceVariant }]}>{ratingsLabel}</Text>
+            </View>
           {showCoinRate ? (
             <Button mode="contained" icon={({ size }) => <TokenIcon size={size + 4} />}
               onPress={(event) => { event?.stopPropagation?.(); onPressCoinRate(item); }}
@@ -2169,19 +2286,19 @@ export default function PublicRatingsScreen() {
         {savedFeatureEnabled ? (
           <View style={styles.savedDestinationRail} accessibilityRole="tablist">
             {[
-              ['discover', 'Discover', 'compass-outline'],
-              ['favorites', 'Favorites', 'heart-outline'],
-              ['wantToTry', 'Want to Try', 'bookmark-outline'],
-            ].map(([value, label, icon]) => (
+              ['discover', 'Discover'],
+              ['favorites', 'Favorites'],
+              ['wantToTry', 'Want to Try'],
+            ].map(([value, label]) => (
               <Chip
                 key={value}
                 selected={savedView === value}
-                icon={icon}
                 accessibilityRole="tab"
                 accessibilityState={{ selected: savedView === value }}
                 accessibilityLabel={`Show ${label}`}
                 onPress={() => setSavedView(value)}
                 style={styles.savedDestinationChip}
+                textStyle={{ fontSize: 12 }}
               >
                 {label}
               </Chip>
@@ -2220,6 +2337,7 @@ export default function PublicRatingsScreen() {
         </View>
       ) : (
         <Animated.FlatList
+          style={{ flex: 1, marginTop: headerHeight }}
           data={displayedRows}
           viewabilityConfig={{ itemVisiblePercentThreshold: 20 }}
           keyExtractor={(it) => String(it.destination_id)}
@@ -2227,12 +2345,21 @@ export default function PublicRatingsScreen() {
           contentContainerStyle={{
             padding: 16,
             paddingBottom: 24,
-            paddingTop: headerHeight,
+            paddingTop: 12,
           }}
           ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           ListEmptyComponent={
-            savedView !== 'discover' && saved.listStatus === 'error' ? (
+            savedView !== 'discover' && saved.listStatus === 'guest' ? (
+              <FeedbackState
+                style={styles.emptyState}
+                icon="account-outline"
+                title="Sign in to view saved restaurants"
+                body="Keep Favorites and Want to Try together in your account."
+                actionLabel="Sign In / Create Account"
+                onAction={() => router.push('/auth/login')}
+              />
+            ) : savedView !== 'discover' && saved.listStatus === 'error' ? (
               <FeedbackState
                 style={styles.emptyState}
                 icon="cloud-alert-outline"
@@ -2273,7 +2400,7 @@ export default function PublicRatingsScreen() {
                       selected_tag_id: selectedTagId ?? null,
                     },
                   });
-                  openWingman('wingdex_empty_state');
+                  openWingman('wingdex_empty_state', query);
                 }}
                 secondaryLabel={locationMode === 'radius' ? 'Expand radius' : 'View all'}
                 onSecondary={() => {
@@ -2330,6 +2457,8 @@ export default function PublicRatingsScreen() {
             >
             <Pressable
               onPress={() => setOpen(false)}
+              accessibilityRole="button"
+              accessibilityLabel="Close restaurant details"
               hitSlop={10}
               style={styles.drillBackBtn}
             >
@@ -2363,6 +2492,12 @@ export default function PublicRatingsScreen() {
                   setOpen(false);
                   onPressCoinRate(active);
                 }}
+              />
+
+              <WingdexPhotoGallery
+                key={`detail-${active.destination_id}`}
+                restaurant={active}
+                embedded
               />
 
               <ScoreHeader
@@ -2911,8 +3046,39 @@ export default function PublicRatingsScreen() {
         onFinalize={submitCoinRating}
       />
 
+      {coinRatingDest?.destination_id ? (
+        <WingShotFlow
+          visible={coinPhotoOpen}
+          destinationId={coinRatingDest.destination_id}
+          submissionSource="buffacoin"
+          draftMode
+          draftFlowKey="wingdex-rating"
+          draftResetSignal={coinPhotoReset}
+          addLaterReminder={false}
+          allowPhoto={coinPhotoFlags.photo}
+          analyticsContext={{ screen: 'ratings', userId: user?.id, destinationId: coinRatingDest.destination_id }}
+          onDraftContinue={async (draft) => {
+            const epoch = accountScope.capture();
+            if (!user?.id || accountRef.current !== user.id) return;
+            const savedDraft = await wingShotDrafts.save({ userId: user?.id,
+              destinationId: coinRatingDest.destination_id, flow: 'wingdex-rating',
+              ratingOperationId: buffacoinOperationRef.current, lifecycle: 'validated', draft });
+            if (!savedDraft) throw new Error('This photo draft has been replaced.');
+            if (!accountScope.current(epoch)) return;
+            coinPhotoRef.current = { draft, destinationId: coinRatingDest.destination_id,
+              ratingId: null, operationId: buffacoinOperationRef.current };
+            setCoinPhotoOpen(false); setCoinRateOpen(true);
+          }}
+          onClose={() => {
+            if (!user?.id || accountRef.current !== user.id) return;
+            setCoinPhotoOpen(false); setCoinRateOpen(true);
+          }}
+        />
+      ) : null}
+
       <WingmanAddDialog
         visible={wingmanOpen}
+        initialRestaurant={wingmanInitialRestaurant}
         onDismiss={() => setWingmanOpen(false)}
         initialStateId={wingmanStateCtx?.stateId ?? null}
         initialStateCode={wingmanStateCtx?.stateCode ?? null}
@@ -2933,15 +3099,17 @@ export default function PublicRatingsScreen() {
 
 /* ---------------- styles ---------------- */
 const styles = StyleSheet.create({
-  compactRestaurantRow: { flexDirection: 'row', gap: 12, alignItems: 'center' },
+  restaurantHeader: { flexDirection: 'row', flexWrap: 'wrap', columnGap: 6, alignItems: 'center', justifyContent: 'space-between' },
+  restaurantCardName: { flexGrow: 1, flexShrink: 1, flexBasis: 140, minWidth: 0 },
+  restaurantPhotoCount: { flexShrink: 0, maxWidth: '100%' },
   restaurantBackdrop: { ...StyleSheet.absoluteFillObject, width: '100%', height: '100%', borderRadius: 12 },
   restaurantScrim: { ...StyleSheet.absoluteFillObject, borderRadius: 12, backgroundColor: 'rgba(9,10,12,0.86)' },
-  restaurantMetrics: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center', marginTop: 6 },
+  restaurantMetrics: { flexDirection: 'row', flexWrap: 'wrap', flexGrow: 1, flexShrink: 1, flexBasis: 132, gap: 6, alignItems: 'center' },
   compactScore: { color: tokens.colors.orange, fontWeight: '800', fontSize: 16 },
   compactMetric: { fontSize: 12, color: tokens.colors.muted },
-  restaurantActions: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 10 },
+  restaurantActions: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 6, marginTop: 4 },
   savedDestinationRail: { flexDirection: 'row', gap: 6, marginTop: 8, marginBottom: 2 },
-  savedDestinationChip: { flex: 1, minHeight: 40, justifyContent: 'center' },
+  savedDestinationChip: { flex: 1, minHeight: 44, paddingHorizontal: 8, justifyContent: 'center' },
   savedActionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
   savedActionButton: { flexGrow: 1, flexBasis: 132, minWidth: 132, borderRadius: 10 },
   savedActionContent: { minHeight: 44 },
@@ -3261,7 +3429,7 @@ const styles = StyleSheet.create({
   marginBottom: 8,
 },
 cardContent: {
-  paddingVertical: 14,
+  paddingVertical: 10,
   paddingHorizontal: 12,
 },
 
