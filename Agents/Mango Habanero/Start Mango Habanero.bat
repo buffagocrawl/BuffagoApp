@@ -25,13 +25,19 @@ if not exist ".env" (
   pause
   exit /b 1
 )
-for %%V in (SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY MANGO_REVIEWER_ID) do (
+for %%V in (SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY MANGO_REVIEWER_ID MANGO_PYTHON_EXECUTABLE) do (
   findstr /B /C:"%%V=" ".env" >nul 2>nul
   if errorlevel 1 (
     echo ERROR: Required environment variable %%V is missing from .env.
     pause
     exit /b 1
   )
+)
+node server/preflight.mjs
+if errorlevel 1 (
+  echo ERROR: Photo preparation prerequisites failed. No jobs were claimed.
+  pause
+  exit /b 1
 )
 echo Starting backend on http://127.0.0.1:4318 ...
 start "Mango Habanero API" cmd /k "cd /d "%~dp0" && npm run server"

@@ -23,6 +23,11 @@ class WorkerContractError(WorkerError):
     public_reason = "The processing job did not satisfy its server contract."
 
 
+class ExistingDerivativeConflict(WorkerContractError):
+    code = "EXISTING_DERIVATIVE_INCOMPATIBLE"
+    public_reason = "An existing derivative does not match the current source and processing contract. It was preserved."
+
+
 class ProviderConfigurationError(WorkerError):
     code = "MODERATION_PROVIDER_UNCONFIGURED"
     public_reason = "The live moderation provider is not configured."

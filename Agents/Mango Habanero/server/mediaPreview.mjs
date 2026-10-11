@@ -1,5 +1,6 @@
 // Readiness comes from the service-only moderation RPC, not a browser request.
 export function selectWingPreviewPath(row) {
+  if (row.status === 'in_review' && row.original_storage_path && row.original_object_exists !== false) return row.original_storage_path;
   for (const [path, exists] of [
     [row.processed_storage_path, row.processed_object_exists],
     [row.thumbnail_storage_path, row.thumbnail_object_exists],

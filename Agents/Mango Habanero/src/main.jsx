@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 
@@ -9,16 +9,24 @@ const visibleIn = (tab, item) => tab === 'pending' ? pendingStatuses.has(item.st
 const formatDate = (value) => value ? new Date(value).toLocaleString() : '—';
 const jobFor = (item, platform) => item.publishing?.find((job) => job.platform === platform) || {};
 
-function App() {
+export function App() {
   const [items, setItems] = useState([]); const [tab, setTab] = useState('pending'); const [busy, setBusy] = useState(''); const [error, setError] = useState(''); const [toast, setToast] = useState(''); const [rejecting, setRejecting] = useState(null); const [reason, setReason] = useState(''); const [note, setNote] = useState(''); const [refreshed, setRefreshed] = useState(null);
+  const actionLock = useRef(false); const [progress, setProgress] = useState('');
   const load = async () => { setError(''); try { const response = await fetch('/api/submissions'); if (!response.ok) throw new Error(); const data = await response.json(); setItems(data.submissions || []); setRefreshed(data.refreshedAt); } catch { setError('Could not reach Mango Habanero. Check the backend terminal and retry.'); } };
   useEffect(() => { load(); }, []); useEffect(() => { if (!toast) return undefined; const timer = setTimeout(() => setToast(''), 3000); return () => clearTimeout(timer); }, [toast]);
   const visible = useMemo(() => items.filter((item) => visibleIn(tab, item)).sort((a, b) => new Date(b.created_at) - new Date(a.created_at)), [items, tab]);
-  const act = async (id, url, options = {}) => { setBusy(id); setError(''); try { const response = await fetch(url, { method: options.method || 'POST', headers: {'Content-Type':'application/json'}, body: options.body ? JSON.stringify(options.body) : undefined }); const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Action failed'); await load(); setToast(options.toast || 'Saved.'); } catch (caught) { setError(caught.message); } finally { setBusy(''); } };
-  const approve = (id) => { const reviewReason = window.prompt('Review reason: standard_acceptable or documented_override', 'standard_acceptable'); if (!['standard_acceptable', 'documented_override'].includes(reviewReason)) return; const reviewNote = window.prompt('Required review notes (at least 8 characters)', 'Processed media reviewed and acceptable.'); if (!reviewNote || reviewNote.trim().length < 8) return; return act(id, `/api/submissions/${id}/review`, { body: { action: 'approve', reasonCategory: reviewReason, reviewerNote: reviewNote }, toast: 'Approved for the next Jalapeño publishing run.' }); };
-  const reject = async () => { if (!reason) return; const id = rejecting; setRejecting(null); await act(id, `/api/submissions/${id}/review`, { body: { action: 'reject', reasonCategory: reason, reviewerNote: note }, toast: 'Rejected with an audit reason.' }); setReason(''); setNote(''); };
+  const act = async (id, url, options = {}) => {
+    if (actionLock.current) return;
+    actionLock.current = true; setBusy(id); setError(''); setProgress(options.body?.action === 'approve' ? 'Checking review…' : 'Saving…');
+    const timer = setInterval(async () => { try { const response = await fetch(`/api/submissions/${id}/progress`); const data = await response.json(); if (data.phase) setProgress(data.phase); } catch { /* final request reports failures */ } }, 400);
+    try { const response = await fetch(url, { method: options.method || 'POST', headers: {'Content-Type':'application/json'}, body: options.body ? JSON.stringify(options.body) : undefined }); const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Action failed'); await load(); setToast(options.toast || 'Saved.'); }
+    catch (caught) { await load(); setError(caught.message || 'Review response was interrupted. Refresh and retry to reconcile.'); }
+    finally { clearInterval(timer); actionLock.current = false; setBusy(''); setProgress(''); }
+  };
+  const approve = (id) => act(id, `/api/submissions/${id}/review`, { body: { action: 'approve', reasonCategory: 'standard_acceptable', reviewerNote: 'Original photo reviewed and acceptable.' }, toast: 'Photo approved.' });
+  const reject = async () => { if (!reason || note.trim().length < 8 || actionLock.current) return; const id = rejecting; setRejecting(null); await act(id, `/api/submissions/${id}/review`, { body: { action: 'reject', reasonCategory: reason, reviewerNote: note }, toast: 'Rejected with an audit reason.' }); setReason(''); setNote(''); };
   const priority = items.find((item) => item.is_publish_priority && item.status === 'approved' && !item.featured_at); const counts = Object.fromEntries(tabs.map(([key]) => [key, items.filter((item) => visibleIn(key, item)).length]));
-  return <div className="app"><header><div className="brand-mark">🔥</div><div><p className="eyebrow">BUFFAGO / INTERNAL REVIEW</p><h1>Mango Habanero</h1><p className="subtitle">Approved Queue for Jalapeño social publishing</p></div><button className="refresh" onClick={load}>↻ Refresh</button></header><main><section className="statusbar"><div><strong>Review desk</strong><span className="muted">Private media · service-authorized previews</span></div><span className="last">{refreshed ? `Last refreshed ${formatDate(refreshed)}` : 'Loading queue…'}</span></section><nav>{tabs.map(([key, label]) => <button key={key} className={tab === key ? 'active' : ''} onClick={() => setTab(key)}>{label}<span>{counts[key]}</span></button>)}</nav>{priority && <div className="priority-banner"><span>⚡ Make Next</span><strong>{priority.restaurant?.name || 'Selected submission'}</strong><button onClick={() => act(priority.submission_id, `/api/submissions/${priority.submission_id}/priority`, { method: 'DELETE', toast: 'Make Next cleared.' })}>Clear</button></div>}{error && <div className="error"><strong>Something needs attention.</strong> {error}<button onClick={load}>Retry</button></div>}{!error && !visible.length && <div className="empty"><div>🌶️</div><h2>Nothing in {tabs.find((entry) => entry[0] === tab)?.[1]}</h2><p>New Wing Shots and completed reviews will appear here.</p></div>}<div className="grid">{visible.map((item) => <Card key={item.submission_id} item={item} tab={tab} busy={busy === item.submission_id} approve={approve} reject={() => { setRejecting(item.submission_id); setReason(''); setNote(''); }} prioritize={() => act(item.submission_id, `/api/submissions/${item.submission_id}/priority`, { toast: 'Marked as the next Jalapeño priority.' })} retry={(id) => act(id, `/api/submissions/${id}/retry`, { toast: 'Retry requested.' })} />)}</div></main>{rejecting && <div className="modal-backdrop"><div className="modal"><h2>Reject Wing Shot</h2><p>Select the reason that best explains the decision.</p><select value={reason} onChange={(event) => setReason(event.target.value)}><option value="">Choose a reason…</option>{reasons.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select><textarea value={note} onChange={(event) => setNote(event.target.value)} placeholder="Optional reviewer note" maxLength="2000"/><div className="modal-actions"><button className="quiet" onClick={() => setRejecting(null)}>Cancel</button><button className="danger" disabled={!reason} onClick={reject}>Confirm rejection</button></div></div></div>}{toast && <div className="toast">✓ {toast}</div>}</div>;
+  return <div className="app"><header><div className="brand-mark">🔥</div><div><p className="eyebrow">BUFFAGO / INTERNAL REVIEW</p><h1>Mango Habanero</h1><p className="subtitle">Approved Queue for Jalapeño social publishing</p></div><button className="refresh" onClick={load}>↻ Refresh</button></header><main><section className="statusbar"><div><strong>Review desk</strong><span className="muted">Private media · service-authorized previews</span></div><span className="last">{refreshed ? `Last refreshed ${formatDate(refreshed)}` : 'Loading queue…'}</span></section><nav>{tabs.map(([key, label]) => <button key={key} className={tab === key ? 'active' : ''} onClick={() => setTab(key)}>{label}<span>{counts[key]}</span></button>)}</nav>{priority && <div className="priority-banner"><span>⚡ Make Next</span><strong>{priority.restaurant?.name || 'Selected submission'}</strong><button onClick={() => act(priority.submission_id, `/api/submissions/${priority.submission_id}/priority`, { method: 'DELETE', toast: 'Make Next cleared.' })}>Clear</button></div>}{error && <div className="error"><strong>Something needs attention.</strong> {error}<button onClick={load}>Retry</button></div>}{!error && !visible.length && <div className="empty"><div>🌶️</div><h2>Nothing in {tabs.find((entry) => entry[0] === tab)?.[1]}</h2><p>New Wing Shots and completed reviews will appear here.</p></div>}<div className="grid">{visible.map((item) => <Card key={item.submission_id} item={item} tab={tab} busy={Boolean(busy)} progress={busy === item.submission_id ? progress : ''} approve={approve} reject={() => { setRejecting(item.submission_id); setReason(''); setNote(''); }} prioritize={() => act(item.submission_id, `/api/submissions/${item.submission_id}/priority`, { toast: 'Marked as the next Jalapeño priority.' })} retry={(id) => act(id, `/api/submissions/${id}/retry`, { toast: 'Retry requested.' })} />)}</div></main>{rejecting && <div className="modal-backdrop"><div className="modal"><h2>Reject Wing Shot</h2><p>Select the reason that best explains the decision.</p><select value={reason} onChange={(event) => setReason(event.target.value)}><option value="">Choose a reason…</option>{reasons.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select><textarea value={note} onChange={(event) => setNote(event.target.value)} placeholder="Required reviewer note (at least 8 characters)" maxLength="2000"/><div className="modal-actions"><button className="quiet" onClick={() => setRejecting(null)}>Cancel</button><button className="danger" disabled={!reason || note.trim().length < 8 || Boolean(busy)} onClick={reject}>Confirm rejection</button></div></div></div>}{toast && <div className="toast">✓ {toast}</div>}</div>;
 }
 
 function ProcessingSummary({ item }) { const duplicate = item.processing?.some((job) => job.last_error_code === 'DUPLICATE_MEDIA'); return duplicate ? <div className="publishing-summary"><strong>Status: Duplicate media</strong><span>Exact duplicate detected</span><span>Processing stopped</span><span>No publication occurred</span></div> : null; }
@@ -56,7 +64,7 @@ function PublishingSummary({ item }) {
   );
 }
 
-function Card({ item, tab, busy, approve, reject, prioritize, retry }) {
+function Card({ item, tab, busy, progress, approve, reject, prioritize, retry }) {
   const [url, setUrl] = useState('');
   const [previewBusy, setPreviewBusy] = useState(false);
   const preview = async () => {
@@ -106,7 +114,7 @@ function Card({ item, tab, busy, approve, reject, prioritize, retry }) {
           <>
             {tab === 'pending' && (
               <>
-                <button className="approve" disabled={busy || !readyForReview} onClick={() => approve(item.submission_id)}>{readyForReview ? (busy ? 'Saving…' : 'Approve') : 'Original media unavailable'}</button>
+                <button className="approve" disabled={busy || !readyForReview} onClick={() => approve(item.submission_id)}>{readyForReview ? (busy ? (progress || 'Review in progress…') : 'Approve') : 'Original media unavailable'}</button>
                 <button className="reject" disabled={busy} onClick={reject}>Reject</button>
               </>
             )}
@@ -124,4 +132,5 @@ function Card({ item, tab, busy, approve, reject, prioritize, retry }) {
     </article>
   );
 }
-createRoot(document.getElementById('root')).render(<App />);
+const rootElement = document.getElementById('root');
+if (rootElement) createRoot(rootElement).render(<App />);

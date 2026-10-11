@@ -1,6 +1,11 @@
 import { expect, it } from 'vitest';
 import { selectWingPreviewPath } from '../server/mediaPreview.mjs';
 
+it('pending review always previews the available original', () => {
+  expect(selectWingPreviewPath({ status:'in_review', original_storage_path:'original', original_object_exists:true,
+    processed_storage_path:'processed', processed_object_exists:true })).toBe('original');
+});
+
 it('falls back to the original when generated variants are missing', () => {
   expect(selectWingPreviewPath({ processed_storage_path: 'missing-processed', processed_object_exists: false,
     thumbnail_storage_path: 'missing-thumbnail', thumbnail_object_exists: false,
