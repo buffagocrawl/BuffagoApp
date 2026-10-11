@@ -1,5 +1,8 @@
 {
-  "cli": { "version": ">= 3.0.0", "appVersionSource": "remote" },
+  "cli": {
+    "version": ">= 3.0.0",
+    "appVersionSource": "remote"
+  },
   "build": {
     "development": {
       "developmentClient": true,
@@ -19,13 +22,18 @@
         "buildType": "app-bundle",
         "autoIncrement": true
       },
-      "environment": "production"
+      "environment": "production",
+      "env": {
+        "EXPO_PUBLIC_ENABLE_WING_JURY": "true"
+      }
     }
   },
   "submit": {
     "production": {},
     "internal-testing": {
-      "android": { "track": "internal" }
+      "android": {
+        "track": "internal"
+      }
     }
   }
 }

@@ -200,28 +200,6 @@ const upsertProfileFromAuth = async (user) => {
   }
 };
 
-// Grants exactly 1 coin for onboarding seed bonus, only once per user
-const grantOnboardingSeedCoinIfNeeded = async (userId) => {
-  if (!userId) return;
-
-  const { data: existing, error: checkErr } = await supabase
-    .from('buffacoin_ledger')
-    .select('id')
-    .eq('user_id', userId)
-    .eq('reason', 'onboarding_seed_bonus')
-    .limit(1);
-
-  if (checkErr) return;
-  if (Array.isArray(existing) && existing.length > 0) return;
-
-  await supabase.from('buffacoin_ledger').insert({
-    user_id: userId,
-    delta: 1,
-    reason: 'onboarding_seed_bonus',
-    created_at: new Date().toISOString(),
-  });
-};
-
 const applyOnboardingDestinationSuggestionIfAny = async (userId) => {
   try {
     const raw = await AsyncStorage.getItem(ONBOARDING_DEST_SUGGESTION_KEY);
@@ -287,8 +265,6 @@ const applyOnboardingSeedRatingIfAny = async (userId) => {
     }
 
     if (!stateCode) return;
-
-    await grantOnboardingSeedCoinIfNeeded(userId);
 
     const operationId = seed?.operation_id || Crypto.randomUUID();
     if (!seed?.operation_id) {

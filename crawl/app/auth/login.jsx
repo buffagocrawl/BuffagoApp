@@ -276,34 +276,6 @@ export default function EmailAuthScreen() {
     throw new Error('Could not set username. Please choose a username manually.');
   };
 
-  // Grants exactly 1 coin for onboarding seed bonus, only once per user
-  const grantOnboardingSeedCoinIfNeeded = async (userId) => {
-    if (!userId) return;
-
-    const { data: existing, error: checkErr } = await supabase
-      .from('buffacoin_ledger')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('reason', 'onboarding_seed_bonus')
-      .limit(1);
-
-    if (checkErr) {
-      console.warn('seed coin check failed', checkErr?.message || checkErr);
-      return;
-    }
-
-    if (Array.isArray(existing) && existing.length > 0) return;
-
-    const { error: insErr } = await supabase.from('buffacoin_ledger').insert({
-      user_id: userId,
-      delta: 1,
-      reason: 'onboarding_seed_bonus',
-      created_at: new Date().toISOString(),
-    });
-
-    if (insErr) console.warn('seed coin insert failed', insErr?.message || insErr);
-  };
-
   const applyOnboardingDestinationSuggestionIfAny = async (userId) => {
     try {
       const raw = await AsyncStorage.getItem(ONBOARDING_DEST_SUGGESTION_KEY);
@@ -376,9 +348,7 @@ export default function EmailAuthScreen() {
         return;
       }
 
-      // Make sure user can spend one coin right away
-      await grantOnboardingSeedCoinIfNeeded(userId);
-
+      // Welcome coins are initialized by the server before signup commits.
       const operationId = seed?.operation_id || Crypto.randomUUID();
       if (!seed?.operation_id) {
         seed = { ...seed, operation_id: operationId };

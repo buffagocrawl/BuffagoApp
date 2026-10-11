@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { Image } from 'react-native';
 import approvedSample from './approvedPhoto';
 if (!__DEV__) throw new Error('Development fixtures only');
 const uid = '00000000-0000-4000-8000-000000000001';
@@ -11,7 +12,7 @@ const ratedJuryQA = !(typeof process !== 'undefined' && process.env.EXPO_PUBLIC_
 const exhaustedJuryQA = typeof process !== 'undefined' && process.env.EXPO_PUBLIC_BUFFAGO_NATIVE_JURY_EXHAUSTED_QA === '1';
 const wingPhotoAsset = require('../../../assets/wing-user.png');
 const logoPhotoAsset = require('../../../assets/logo/BuffaGo-master.png');
-const assetUri = (asset) => typeof asset === 'string' ? asset : asset?.uri || asset?.default?.uri || asset?.default || null;
+const assetUri = (asset) => typeof asset === 'number' ? Image.resolveAssetSource(asset)?.uri : typeof asset === 'string' ? asset : asset?.uri || asset?.default?.uri || asset?.default || null;
 const session = { access_token: token, refresh_token: 'fixture-only', expires_at: 2000000000, expires_in: 86400, token_type: 'bearer', user };
 let saved = JSON.stringify(session);
 const destinations = ['QA Harbor Wings', 'QA Long Restaurant Name Buffalo Wing House & Grill', 'QA Northside Wings'].map((name, i) => ({ id: `fixture-spot-${i}`, destination_id: `fixture-spot-${i}`, name, city: 'Buffalo', state_id: 1, state_code: 'NY', address: `${i + 1} Fixture Street`, lat: 42.8874 + i * .001, lng: -78.8784 }));
@@ -50,6 +51,15 @@ const tables = {
   user_destination_favorites: savedFavorites,
   user_want_to_try: savedWantToTry,
 };
+// Four-issue bonus screenshots: synthetic committed ledger rows only.
+const bonusQA = process.env.EXPO_PUBLIC_BUFFAGO_NATIVE_BONUS_QA;
+if (['welcome', 'early-bird'].includes(bonusQA)) {
+  const welcome = bonusQA === 'welcome';
+  tables.buffacoin_ledger = [{ id: `fixture-${bonusQA}-bonus`, user_id: uid,
+    delta: welcome ? 100 : 250,
+    reason: welcome ? 'Welcome Bonus — 100 BuffaCoins' : 'Early Bird Bonus — 250 BuffaCoins' }];
+  tables.buffacoin_wallets[0].balance = welcome ? 100 : 12595;
+}
 const rpc = {
   get_public_challenge_stats: [{ total_completed: 12345, this_week_completed: 12, current_weekly_streak: 123, best_weekly_streak: 234 }],
   get_wing_creator_stats: [{ creator_xp: 12345, approved_submissions: 123, featured_submissions: 12 }],

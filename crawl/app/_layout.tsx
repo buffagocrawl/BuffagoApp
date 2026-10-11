@@ -39,6 +39,7 @@ import {
 } from '../lib/facebookOAuth';
 import { installAppLifecycleTracking, rotateAnalyticsSession, trackEvent, trackScreenViewed } from '../lib/analytics';
 import ReferralAttributionBridge from '../components/ReferralAttributionBridge';
+import CoinBonusNotice from '../components/CoinBonusNotice';
 import { ROOT_RETRY_LIMIT, ROOT_RETRY_SESSION_KEY, canRetryInSession, nextRetryCount } from '../lib/errorRecovery';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -437,6 +438,7 @@ function AppShell() {
           <StatusBar style="light" />
           <XpToastProvider>
             <ReferralAttributionBridge />
+            <CoinBonusNotice />
             <Stack
               initialRouteName="(tabs)"
               screenOptions={{

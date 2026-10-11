@@ -1,0 +1,29 @@
+﻿[
+    {
+        "id":  "59c0a574-f3b4-418c-8cd2-250de4c98201",
+        "status":  "FINISHED",
+        "buildProfile":  "production",
+        "appVersion":  "1.0.5",
+        "appBuildVersion":  "124",
+        "gitCommitHash":  "c5e7bc429827860393978d74e146c029088d8063",
+        "createdAt":  "2026-10-11T03:18:05.855Z"
+    },
+    {
+        "id":  "090dd9be-3f34-4324-ad66-193d63cebc2b",
+        "status":  "FINISHED",
+        "buildProfile":  "production",
+        "appVersion":  "1.0.5",
+        "appBuildVersion":  "123",
+        "gitCommitHash":  "f879b9747e932cf7edc4568b2a821d9bb145edbf",
+        "createdAt":  "2026-10-08T13:27:53.217Z"
+    },
+    {
+        "id":  "3624bfbe-d1f1-42e1-91fc-7e556655bd8f",
+        "status":  "FINISHED",
+        "buildProfile":  "production",
+        "appVersion":  "1.0.5",
+        "appBuildVersion":  "122",
+        "gitCommitHash":  "3e64df0055f08b4e0a3f2978da4df57fe56d141e",
+        "createdAt":  "2026-10-07T22:55:39.753Z"
+    }
+]

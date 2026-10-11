@@ -1,3 +1,4 @@
+import { ENABLE_WING_JURY } from '../../../config/features';
 // app/ratings/index.jsx
 // BuffaGo — Public Ratings (Wingdex) + Buffacoins (token-based rating in current state)
 
@@ -60,7 +61,6 @@ import {
   LegendaryMapMarker,
 } from '../../../components/buffaverse/LegendarySurfaces';
 
-const WINGDEX_HINT_DISMISSED_KEY = 'buffago:wingdex_hint_dismissed';
 
 /* ---------------- helpers ---------------- */
 const fmt2 = (n) => {
@@ -551,6 +551,7 @@ export default function PublicRatingsScreen() {
   const [stateCodeFilter, setStateCodeFilter] = useState(null);
 
   const [statePickerOpen, setStatePickerOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [wingmanOpen, setWingmanOpen] = useState(false);
   const [wingmanStateCtx, setWingmanStateCtx] = useState(null);
 
@@ -588,7 +589,6 @@ export default function PublicRatingsScreen() {
   const [coinRateOpen, setCoinRateOpen] = useState(false);
   const [coinRatingDest, setCoinRatingDest] = useState(null);
   const [coinSubmitting, setCoinSubmitting] = useState(false);
-  const [wingdexHintVisible, setWingdexHintVisible] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -615,32 +615,6 @@ export default function PublicRatingsScreen() {
     const { data } = supabase.auth.onAuthStateChange((_event, session) => { revision += 1; accept(session?.user || null); });
     return () => { alive = false; accountScope.dispose(); data?.subscription?.unsubscribe?.(); };
   }, [accountScope]);
-
-  useEffect(() => {
-    let alive = true;
-
-    (async () => {
-      try {
-        const dismissed = await AsyncStorage.getItem(WINGDEX_HINT_DISMISSED_KEY);
-        if (alive && dismissed !== 'true') setWingdexHintVisible(true);
-      } catch {
-        if (alive) setWingdexHintVisible(true);
-      }
-    })();
-
-    return () => {
-      alive = false;
-    };
-  }, [user?.id]);
-
-  const dismissWingdexHint = useCallback(async () => {
-    setWingdexHintVisible(false);
-    try {
-      await AsyncStorage.setItem(WINGDEX_HINT_DISMISSED_KEY, 'true');
-    } catch {
-      // Non-critical. The hint can show again if persistence fails.
-    }
-  }, []);
 
   const openSavedAuthPrompt = useCallback(async (item, kind) => {
     const epoch = accountScope.capture();
@@ -1962,7 +1936,7 @@ export default function PublicRatingsScreen() {
           ) : (pictureCounts[destIdStr] || 0) > 0 ? (
             <Button icon="image-multiple-outline" compact labelStyle={[styles.compactMetric, { color: dark ? colors.onSurface : colors.onSurfaceVariant }]} contentStyle={{ minHeight: 44 }} onPress={(event) => {
               event?.stopPropagation?.(); setGalleryRestaurant(item);
-            }}>{pictureCounts[destIdStr]} photos</Button>
+            }}>{pictureCounts[destIdStr]} {pictureCounts[destIdStr] === 1 ? 'photo' : 'photos'}</Button>
           ) : (
             <Button
               icon="camera-plus-outline"
@@ -1977,7 +1951,7 @@ export default function PublicRatingsScreen() {
                 else void pickAsHomeNextSpot(item);
               }}
             >
-              Be the first to share a Wing Shot
+              Add a photo
             </Button>
           )}
           {showCoinRate ? (
@@ -2071,13 +2045,6 @@ export default function PublicRatingsScreen() {
     );
   };
 
-  const sortLabel =
-    selectedTagId === 'my'
-      ? 'your ratings (highest first)'
-      : typeof selectedTagId === 'number'
-      ? 'overall score for tag'
-      : 'overall score';
-  
   const locationLabel = useMemo(() => {
     if (locationMode === 'all') return 'All locations';
     if (locationMode === 'state' && stateCodeFilter) return `State: ${stateCodeFilter}`;
@@ -2092,13 +2059,6 @@ export default function PublicRatingsScreen() {
     if (locationMode !== 'all') count += 1;
     return count;
   }, [locationMode, query, selectedTagId]);
-
-  const wingdexContextLabel = useMemo(() => {
-    if (locationMode === 'all') return 'Showing all places';
-    if (locationMode === 'state' && stateCodeFilter) return `Showing ${stateCodeFilter}`;
-    if (locationMode === 'radius') return `Showing places within ${radiusMiles} mi`;
-    return 'Showing Wingdex places';
-  }, [locationMode, radiusMiles, stateCodeFilter]);
 
   const dashboardMetrics = useMemo(() => {
     const visibleCount = filtered.length;
@@ -2154,6 +2114,12 @@ export default function PublicRatingsScreen() {
             },
           ]}
         >
+        <ScrollView
+          nestedScrollEnabled
+          style={{ maxHeight: Math.max(240, viewportHeight - insets.top - insets.bottom - 120) }}
+          contentContainerStyle={{ paddingBottom: 4 }}
+          accessibilityLabel="Wingdex search and filters"
+        >
         <View style={styles.headerTopRow}>
           <View style={{ flex: 1, minWidth: 140 }}>
             <Text variant="titleLarge" style={styles.title}>
@@ -2199,7 +2165,6 @@ export default function PublicRatingsScreen() {
             Map
           </Button>}
         </View>
-        <Text variant="bodySmall" style={styles.subtitle}>{wingdexContextLabel} · sorted by {discoverySort === 'overall' ? sortLabel : discoverySort === 'nearest' ? 'nearest' : discoverySort === 'ratings' ? 'most ratings' : 'most photos'}</Text>
 
         {savedFeatureEnabled ? (
           <View style={styles.savedDestinationRail} accessibilityRole="tablist">
@@ -2232,95 +2197,21 @@ export default function PublicRatingsScreen() {
           inputStyle={{ minHeight: 0 }}
         />
 
-        {wingdexHintVisible ? <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <Text variant="bodySmall" style={{ flex: 1, color: colors.onSurfaceVariant }}>Add missing spots and rate past visits with coins.</Text>
-          <Button compact onPress={dismissWingdexHint}>Got it</Button>
-        </View> : null}
-        <View style={styles.filterSectionHeader}>
-          <Text style={styles.filterSectionTitle}>Location</Text>
-          <Text style={styles.filterSectionSub}>
-            {locationLabel}{activeFilterCount ? ` · Filters ${activeFilterCount}` : ''}
-          </Text>
-        </View>
-
-        <View style={[styles.filterRail, { marginTop: 8 }]}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginRight: 60 }} contentContainerStyle={{ paddingRight: 60 }}>
-          {RADIUS_OPTIONS.map((mi) => (
-            <Chip
-              key={mi}
-              selected={locationMode === 'radius' && radiusMiles === mi}
-              maxFontSizeMultiplier={1}
-              accessibilityLabel={`${mi} miles`}
-              onPress={() => {
-                setRadiusMiles(mi);
-                setLocationMode('radius');
-                setStateCodeFilter(null);
-              }}
-              style={[styles.chip, styles.filterChip, styles.radiusChip]}
-              textStyle={styles.radiusChipText}
-            >
-              {mi} mi
-            </Chip>
-          ))}
-
-          {currentState && (
-            <Chip
-              selected={locationMode === 'state' && stateCodeFilter === currentState}
-              maxFontSizeMultiplier={1}
-              accessibilityLabel={`Current state: ${currentState}`}
-              onPress={() => {
-                setLocationMode('state');
-                setStateCodeFilter(currentState);
-              }}
-              style={[styles.chip, styles.filterChip]}
-            >
-              {`Current state: ${currentState}`}
-            </Chip>
-          )}
-
-          <Chip
-            selected={locationMode === 'state' && stateCodeFilter && stateCodeFilter !== currentState}
-            maxFontSizeMultiplier={1}
-            accessibilityLabel="Choose your state"
-            onPress={() => setStatePickerOpen(true)}
-            style={[styles.chip, styles.filterChip]}
-            icon="map-search"
-          >
-            Choose your state
-          </Chip>
-
-          <Chip
-            selected={locationMode === 'all'}
-            maxFontSizeMultiplier={1}
-            accessibilityLabel="All locations"
-            onPress={() => {
-              setLocationMode('all');
-              setStateCodeFilter(null);
-            }}
-            style={[styles.chip, styles.filterChip]}
-            icon="earth"
-          >
-            All
-          </Chip>
-        </ScrollView>
-        <LinearGradient pointerEvents="none" colors={[colors.background, colors.background]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.filterRailHint}>
-          <MaterialCommunityIcons name="chevron-right" size={20} color={colors.onSurfaceVariant} />
-        </LinearGradient>
-        </View>
-
-        <View style={[styles.filterRail, { marginTop: 4 }]}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginRight: 60 }} contentContainerStyle={{ paddingVertical: 6, paddingRight: 60 }}>
-          {[['overall', 'Score', 'Overall score'], ['nearest', 'Near', 'Nearest'], ['ratings', 'Votes', 'Most ratings'], ['photos', 'Photos', 'Most photos']].map(([value, label, accessibilityLabel]) => (
-            <Chip key={value} maxFontSizeMultiplier={1} accessibilityLabel={accessibilityLabel} selected={discoverySort === value} onPress={() => setDiscoverySort(value)} style={[styles.chip, styles.filterChip]}>{label}</Chip>
-          ))}
-          <Chip maxFontSizeMultiplier={1} accessibilityLabel="Rated by you" selected={selectedTagId === 'my'} onPress={() => setSelectedTagId(selectedTagId === 'my' ? null : 'my')} style={[styles.chip, styles.filterChip]}>My ratings</Chip>
-          {tagsForFilter.map((tag) => <Chip key={tag.id} maxFontSizeMultiplier={1} accessibilityLabel={tag.name} selected={selectedTagId === tag.id} onPress={() => setSelectedTagId(selectedTagId === tag.id ? null : tag.id)} style={[styles.chip, styles.filterChip]}>{tag.name}</Chip>)}
-        </ScrollView>
-        <LinearGradient pointerEvents="none" colors={[colors.background, colors.background]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.filterRailHint}>
-          <MaterialCommunityIcons name="chevron-right" size={20} color={colors.onSurfaceVariant} />
-        </LinearGradient>
+        <View style={styles.discoveryToolbar}>
+          <Pressable accessibilityRole="button" accessibilityLabel={`Filters, ${activeFilterCount} active`} testID="wingdex-filters-entry" onPress={() => setFiltersOpen(true)} style={[styles.toolbarAction, { backgroundColor: colors.surfaceVariant }]}>
+            <MaterialCommunityIcons name="tune-variant" size={18} color={colors.primary} />
+            <Text style={styles.toolbarLabel}>Filters{activeFilterCount ? ` (${activeFilterCount})` : ''}</Text>
+          </Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel={`Sort: ${discoverySort}`} onPress={() => setFiltersOpen(true)} style={[styles.toolbarAction, { backgroundColor: colors.surfaceVariant }]}>
+            <Text style={styles.toolbarLabel}>{({ overall: 'Score', nearest: 'Near', ratings: 'Votes', photos: 'Photos' })[discoverySort]}</Text>
+            <MaterialCommunityIcons name="chevron-down" size={16} color={colors.onSurface} />
+          </Pressable>
+          {ENABLE_WING_JURY ? <Pressable testID="wingdex-wing-jury-entry" accessibilityRole="button" accessibilityLabel="Wing Jury" onPress={() => router.push('/wing-jury')} style={[styles.toolbarAction, { borderWidth: 1, borderColor: colors.primary }]}>
+            <Text style={[styles.toolbarLabel, { color: colors.primary }]}>Wing Jury</Text>
+          </Pressable> : null}
         </View>
         <Divider style={{ marginTop: 10, marginBottom: 6 }} />
+        </ScrollView>
       </Animated.View>
 
       {loading || (savedView !== 'discover' && saved.listStatus === 'loading' && displayedRows.length === 0) ? (
@@ -2672,6 +2563,97 @@ export default function PublicRatingsScreen() {
           </View>
         </Modal>
       </Portal>
+      <Portal>
+        <Dialog visible={filtersOpen} onDismiss={() => setFiltersOpen(false)} style={[styles.dialog, { maxHeight: viewportHeight - insets.top - insets.bottom - 32 }]}>
+          <Dialog.Title>Filters & sorting</Dialog.Title>
+          <Dialog.ScrollArea style={{ paddingHorizontal: 16 }}>
+            <ScrollView contentContainerStyle={{ paddingBottom: 16 }}>
+                <View style={styles.filterSectionHeader}>
+                  <Text style={styles.filterSectionTitle}>Location</Text>
+                  <Text style={styles.filterSectionSub}>
+                    {locationLabel}{activeFilterCount ? ` · Filters ${activeFilterCount}` : ''}
+                  </Text>
+                </View>
+
+                <View style={[styles.filterRail, { marginTop: 8 }]}>
+                <View style={styles.filterControls}>
+                  {RADIUS_OPTIONS.map((mi) => (
+                    <Chip
+                      key={mi}
+                      selected={locationMode === 'radius' && radiusMiles === mi}
+                      maxFontSizeMultiplier={2}
+                      accessibilityLabel={`${mi} miles`}
+                      onPress={() => {
+                        setRadiusMiles(mi);
+                        setLocationMode('radius');
+                        setStateCodeFilter(null);
+                      }}
+                      style={[styles.chip, styles.filterChip, styles.radiusChip]}
+                      textStyle={styles.radiusChipText}
+                    >
+                      {mi} mi
+                    </Chip>
+                  ))}
+
+                  {currentState && (
+                    <Chip
+                      selected={locationMode === 'state' && stateCodeFilter === currentState}
+                      maxFontSizeMultiplier={2}
+                      accessibilityLabel={`Current state: ${currentState}`}
+                      onPress={() => {
+                        setLocationMode('state');
+                        setStateCodeFilter(currentState);
+                      }}
+                      style={[styles.chip, styles.filterChip]}
+                    >
+                      {`Current state: ${currentState}`}
+                    </Chip>
+                  )}
+
+                  <Chip
+                    selected={locationMode === 'state' && stateCodeFilter && stateCodeFilter !== currentState}
+                    maxFontSizeMultiplier={2}
+                    accessibilityLabel="Choose your state"
+                    onPress={() => { setFiltersOpen(false); setStatePickerOpen(true); }}
+                    style={[styles.chip, styles.filterChip]}
+                    icon="map-search"
+                  >
+                    Choose your state
+                  </Chip>
+
+                  <Chip
+                    selected={locationMode === 'all'}
+                    maxFontSizeMultiplier={2}
+                    accessibilityLabel="All locations"
+                    onPress={() => {
+                      setLocationMode('all');
+                      setStateCodeFilter(null);
+                    }}
+                    style={[styles.chip, styles.filterChip]}
+                    icon="earth"
+                  >
+                    All
+                  </Chip>
+                </View>
+                </View>
+
+                <Text style={[styles.filterSectionTitle, { marginTop: 16 }]}>Sort & ratings</Text>
+                <View style={[styles.filterRail, { marginTop: 4 }]}>
+                <View style={styles.filterControls}>
+                  {[['overall', 'Score', 'Overall score'], ['nearest', 'Near', 'Nearest'], ['ratings', 'Votes', 'Most ratings'], ['photos', 'Photos', 'Most photos']].map(([value, label, accessibilityLabel]) => (
+                    <Chip key={value} maxFontSizeMultiplier={2} accessibilityLabel={accessibilityLabel} selected={discoverySort === value} onPress={() => setDiscoverySort(value)} style={[styles.chip, styles.filterChip]}>{label}</Chip>
+                  ))}
+                  <Chip maxFontSizeMultiplier={2} accessibilityLabel="Rated by you" selected={selectedTagId === 'my'} onPress={() => setSelectedTagId(selectedTagId === 'my' ? null : 'my')} style={[styles.chip, styles.filterChip]}>My ratings</Chip>
+                  {tagsForFilter.map((tag) => <Chip key={tag.id} maxFontSizeMultiplier={2} accessibilityLabel={tag.name} textStyle={{ flexShrink: 1 }} selected={selectedTagId === tag.id} onPress={() => setSelectedTagId(selectedTagId === tag.id ? null : tag.id)} style={[styles.chip, styles.filterChip]}>{tag.name}</Chip>)}
+                </View>
+                </View>
+            </ScrollView>
+          </Dialog.ScrollArea>
+          <Dialog.Actions>
+            <Button mode="contained" onPress={() => setFiltersOpen(false)} contentStyle={{ minHeight: 48 }}>Show restaurants</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
       {/* Choose state dialog */}
       <Portal>
         <Dialog visible={statePickerOpen} onDismiss={() => setStatePickerOpen(false)} style={styles.dialog}>
@@ -2690,6 +2672,8 @@ export default function PublicRatingsScreen() {
                       setStatePickerOpen(false);
                     }}
                     style={styles.stateChip}
+                    textStyle={{ flexShrink: 1 }}
+                    accessibilityLabel={`${s.name} (${s.code})`}
                   >
                     {s.name} ({s.code})
                   </Chip>
@@ -2974,8 +2958,11 @@ const styles = StyleSheet.create({
   paddingHorizontal: 16,
   paddingBottom: 0,
 },
-  filterRail: { position: 'relative' },
-  filterRailHint: { position: 'absolute', top: 0, right: 0, bottom: 0, width: 60, alignItems: 'center', justifyContent: 'center' },
+  discoveryToolbar: { flexDirection: 'row', gap: 6, marginTop: 8 },
+  toolbarAction: { flex: 1, minHeight: 48, flexDirection: 'row', gap: 4, alignItems: 'center', justifyContent: 'center', borderRadius: 12, paddingHorizontal: 4, paddingVertical: 8 },
+  toolbarLabel: { fontSize: 12, fontWeight: '700', flexShrink: 1 },
+  filterRail: { width: '100%' },
+  filterControls: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingVertical: 6 },
   headerTopRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, alignItems: 'center', justifyContent: 'space-between' },
   title: { fontWeight: '900', letterSpacing: 0 },
   subtitle: { opacity: 0.68, marginTop: 2, lineHeight: 17 },
@@ -3088,6 +3075,8 @@ const styles = StyleSheet.create({
 
   filterSectionHeader: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
     alignItems: 'baseline',
     justifyContent: 'space-between',
     marginTop: 12,
@@ -3184,12 +3173,12 @@ const styles = StyleSheet.create({
   dialog: { alignSelf: 'center', width: '92%', maxWidth: 520, borderRadius: 16, maxHeight: '90%' },
 
   chip: { marginRight: 8, borderRadius: 999 },
-  filterChip: { flexShrink: 0 },
+  filterChip: { flexShrink: 0, minHeight: 48, justifyContent: 'center', marginRight: 0, maxWidth: '100%' },
   radiusChip: { minWidth: 68, alignItems: 'center' },
   radiusChipText: { fontSize: 12, fontWeight: '700' },
 
   stateGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  stateChip: { borderRadius: 999 },
+  stateChip: { borderRadius: 999, minHeight: 48, maxWidth: '100%' },
 
   scoreHeader: { alignItems: 'center', paddingVertical: 10, borderRadius: 12 },
   scoreHeaderLabel: { fontWeight: '700', letterSpacing: 0.3 },
