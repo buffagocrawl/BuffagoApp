@@ -21,7 +21,7 @@ import * as Crypto from 'expo-crypto';
 import * as Location from 'expo-location';
 import WingmanAddDialog from '../../../components/WingmanAddDialog';
 import FeedbackState from '../../../components/ui/FeedbackState';
-import { PlayerProgressCard, StatCard, WingShotImage } from '../../../components/ui/OperationUI';
+import { StatCard, WingShotImage } from '../../../components/ui/OperationUI';
 import { loadWingdexRestaurantGallery } from '../../../lib/wingdexGallery';
 import WelcomeWizard from '../../../components/WelcomeWizard';
 import { supabase } from '../../../lib/supabase.js';
@@ -3079,9 +3079,11 @@ export default function Home() {
 
           {isSignedIn ? (
             <>
-              <PlayerProgressCard level={hudStats.level} title={shownTitle} xp={hudStats.xp} target={hudStats.xpMax} progress={hudStats.levelPct ?? 0}
-                onTitlePress={titleIsClickable ? openTitlePicker : undefined}
-                action={<DailyGiftPill claimed={!!dailyGift.claimedToday} claiming={!!dailyGift.claiming} onPress={() => claimDaily(session.user.id)} />} />
+              {!dailyGift.claimedToday ? (
+                <View style={{ alignItems: 'flex-end' }}>
+                  <DailyGiftPill claimed={!!dailyGift.claimedToday} claiming={!!dailyGift.claiming} onPress={() => claimDaily(session.user.id)} />
+                </View>
+              ) : null}
               <View style={styles.counterRow}>
                 <StatCard style={{ paddingVertical: 8, gap: 2, minWidth: 120 }} icon="map-marker" label={hudStats.stateAbbrev ? hudStats.stateAbbrev + ' Wingdex' : 'State Wingdex'} value={(hudStats.stateX ?? '?') + '/' + (hudStats.stateY ?? '?')} onPress={() => openStats('ct')} progress={statePct} />
                 <StatCard style={{ paddingVertical: 8, gap: 2, minWidth: 120 }} icon="trophy" label="Top 50 US" value={top50X + '/50'} onPress={() => openStats('us_top50')} progress={top50Pct} />
@@ -3127,16 +3129,16 @@ export default function Home() {
                         <Text style={{ color: colors.onSurfaceVariant, fontSize: 12 }}>Be the first to share a Wing Shot</Text>
                       </View>
                     </View>
-                    <Button
+                    {alreadyRatedThis ? <Button
                       mode="contained-tonal"
-                      onPress={() => alreadyRatedThis ? router.push('/(tabs)/journey') : openHomeRatingWizard()}
-                      accessibilityHint={alreadyRatedThis ? 'Opens Journey to add a Wing Shot to your existing rating' : 'Starts the existing rating flow for this restaurant'}
+                      onPress={() => router.push('/(tabs)/journey')}
+                      accessibilityHint="Opens Journey to add a Wing Shot to your existing rating"
                       contentStyle={{ minHeight: 44 }}
                       labelStyle={{ fontSize: 11, marginHorizontal: 4 }}
                       uppercase={false}
                     >
-                      {alreadyRatedThis ? 'Add a Wing Shot' : 'Rate & share a Wing Shot'}
-                    </Button>
+                      Add a Wing Shot
+                    </Button> : null}
                   </View>
                 )}
                 </View>
@@ -3248,7 +3250,6 @@ export default function Home() {
               <MaterialCommunityIcons name="scale-balance" size={20} color={colors.primary} />
               <View style={{ flex: 1, minWidth: 0 }}>
                 <Text style={[styles.wingFactsLabel, { color: colors.onSurface }]}>Wing Jury</Text>
-                <Text style={[styles.wingJuryCopy, { color: colors.onSurfaceVariant }]}>Be the judge.</Text>
               </View>
               <MaterialCommunityIcons name="chevron-right" size={18} color={colors.onSurfaceVariant} />
             </Pressable>
@@ -3969,10 +3970,9 @@ const styles = StyleSheet.create({
   wingdexFill: { position: 'absolute', top: 0, bottom: 0, opacity: 0.35 },
   wingdexContent: { alignItems: 'center' },
 
-  homeFunRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'stretch' },
-  wingFactsAction: { flex: 1, flexBasis: 0, minWidth: 148, minHeight: 80, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,122,24,0.30)', backgroundColor: 'rgba(255,255,255,0.035)', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
-  wingJuryAction: { flex: 1, flexBasis: 0, minWidth: 148, minHeight: 80, paddingHorizontal: 8, paddingVertical: 10, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,122,24,0.46)', backgroundColor: 'rgba(255,122,24,0.10)', flexDirection: 'row', alignItems: 'center', gap: 4 },
-  wingJuryCopy: { fontSize: 11, marginTop: 2 },
+  homeFunRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, alignItems: 'stretch' },
+  wingFactsAction: { flex: 1, flexBasis: 0, minWidth: 148, minHeight: 56, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,122,24,0.30)', backgroundColor: 'rgba(255,255,255,0.035)', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  wingJuryAction: { flex: 1, flexBasis: 0, minWidth: 148, minHeight: 56, paddingHorizontal: 8, paddingVertical: 10, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,122,24,0.46)', backgroundColor: 'rgba(255,122,24,0.10)', flexDirection: 'row', alignItems: 'center', gap: 4 },
   wingFactsIcon: { fontSize: 17, lineHeight: 22 },
   wingFactsLabel: { fontSize: 14, lineHeight: 18, fontWeight: '900', color: 'rgba(255,255,255,0.96)' },
 

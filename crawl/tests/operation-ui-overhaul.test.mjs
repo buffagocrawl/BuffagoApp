@@ -93,12 +93,15 @@ test('Journey displays missing averages as unavailable while preserving actual z
  for(const value of [null,undefined,'',NaN,Infinity])assert.equal(format(value),'\u2014');
  assert.equal(format(0),'0.00');assert.equal(format('0'),'0.00');assert.equal(format(8.25),'8.25');
 });
-test('Wingdex absolute header honors Android safe-area insets and filter rails expose horizontal overflow',()=>{
+test('Wingdex absolute header honors Android safe-area insets and collapsed toolbar opens filter dialog',()=>{
  const source=readFileSync(new URL('../app/(tabs)/ratings/index.jsx',import.meta.url),'utf8');
  assert.match(source,/top: insets\.top/);
- assert.match(source,/filterRailHint/);
+ assert.match(source,/const \[filtersOpen, setFiltersOpen\] = useState\(false\)/);
+ assert.match(source,/testID="wingdex-filters-entry" onPress=\{\(\) => setFiltersOpen\(true\)\}/);
+ assert.match(source,/<Dialog visible=\{filtersOpen\}/);
+ assert.match(source,/<Dialog.Title>Filters & sorting<\/Dialog.Title>/);
  assert.match(source,/pictureCountsStatus === 'error'/);
- assert.match(source,/Share the first Wing Shot for \$\{item\.name\}/);
+ assert.match(source,/0 photos\. Add a photo for \$\{item\.name\}/);
  assert.match(source,/if \(ratedByMe\) router\.push\('\/\(tabs\)\/journey'\);\s*else void pickAsHomeNextSpot\(item\)/);
 });
 

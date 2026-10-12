@@ -2,6 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mobileModule, hookRuntime, findElement } from './helpers/mobile-runtime.mjs';
 import * as boundary from '../lib/accountBoundary.js';
+import * as coinOperations from '../lib/buffacoinOperationStore.js';
+import * as coinUi from '../lib/buffacoinRatingUi.js';
+import * as coinPricing from '../lib/buffacoinPricing.js';
 const deferred = () => { let resolve, reject; const promise = new Promise((a,b) => {resolve=a;reject=b;}); return {promise,resolve,reject}; };
 const flush = async () => { for(let i=0;i<40;i++) await Promise.resolve(); };
 function auth(initial) {
@@ -32,7 +35,7 @@ test('actual saved hook preserves same-account token refresh and rejects unmount
 function gameHarness(initial) {
  const runtime=hookRuntime(),a=auth(initial),feeds=[],votes=[],reveals=[];
  const service={createGuestJurySession:()=>({clear(){}}),getWingJuryPhotoBatch:()=>{let d=deferred();feeds.push(d);return d.promise;},recordWingJuryVerdict:()=>{let d=deferred();votes.push(d);return d.promise;},getWingJuryReveal:()=>{let d=deferred();reveals.push(d);return d.promise;}};
- const imports={'react':runtime.react,'react/jsx-runtime':runtime.jsx,'react-native':{StyleSheet:{create:s=>s},View:'view',Image:'image',Pressable:'pressable',ScrollView:'scroll',ActivityIndicator:'spinner',Alert:{alert(){}}},'react-native-paper':{Button:'button',Card:'card',Dialog:'dialog',Divider:'divider',Portal:'portal',Text:'text',useTheme:()=>({colors:{}})},'expo-router':{useRouter:()=>({canGoBack:()=>true,back(){}}),useLocalSearchParams:()=>({})},'@expo/vector-icons':{MaterialCommunityIcons:'icon'},'../providers/LocationProvider':{useLocationCtx:()=>({coords:null})},'../config/features':{ENABLE_WING_JURY:true,ENABLE_SAVED_DESTINATIONS:true},'../lib/supabase.js':{supabase:{auth:a}},'../lib/wingJuryService.js':service,'../hooks/useSavedDestinations':{useSavedDestinations:()=>({})},'../lib/savedDestinations.js':{saveSavedDestinationIntent:async()=>true},'@react-native-async-storage/async-storage':{},'./ui/FeedbackState':'feedback','../lib/accountBoundary.js':boundary,'../assets/wing-user.png':'image'};
+ const imports={'react':runtime.react,'react/jsx-runtime':runtime.jsx,'react-native-safe-area-context':{useSafeAreaInsets:()=>({top:0,bottom:0})},'react-native':{useWindowDimensions:()=>({width:390,height:844,fontScale:1}),StyleSheet:{create:s=>s,hairlineWidth:1},View:'view',Image:'image',Pressable:'pressable',ScrollView:'scroll',ActivityIndicator:'spinner',Alert:{alert(){}}},'react-native-paper':{Button:'button',Card:'card',Dialog:'dialog',Divider:'divider',Portal:'portal',Text:'text',useTheme:()=>({colors:{}})},'expo-router':{useRouter:()=>({canGoBack:()=>true,back(){}}),useLocalSearchParams:()=>({})},'@expo/vector-icons':{MaterialCommunityIcons:'icon'},'../providers/LocationProvider':{useLocationCtx:()=>({coords:null})},'../config/features':{ENABLE_WING_JURY:true,ENABLE_SAVED_DESTINATIONS:true},'../lib/supabase.js':{supabase:{auth:a}},'../lib/wingJuryService.js':service,'../hooks/useSavedDestinations':{useSavedDestinations:()=>({})},'../lib/savedDestinations.js':{saveSavedDestinationIntent:async()=>true},'@react-native-async-storage/async-storage':{},'./ui/FeedbackState':'feedback','../lib/accountBoundary.js':boundary,'../assets/wing-user.png':'image'};
  const component=mobileModule('components/WingJuryGame.jsx',imports).default;return {runtime,a,feeds,votes,reveals,render:()=>runtime.render(component)};
 }
 const batch=(id)=>({photos:[{submission_id:id,signed_url:'https://image'}],hasMore:false});
@@ -73,17 +76,68 @@ function ratingsHarness(initial, options={}) {
  const runtime=hookRuntime(),a=auth(initial),pending=[];
  const noop=()=>{};const imports={react:runtime.react,'react/jsx-runtime':runtime.jsx,'react-native':{View:'view',ScrollView:'scroll',StyleSheet:{create:s=>s},useWindowDimensions:()=>({width:400,height:800,fontScale:1}),Animated:{Value:class {setValue(){} interpolate(){return 0;}},parallel:()=>({start(){}}),timing:()=>({start(){}})},Alert:{alert:noop}},'react-native-paper':{useTheme:()=>({colors:{},dark:true}),Text:'text',Button:'button',Card:Object.assign('card',{Content:'content'}),Dialog:{},Portal:'portal',Searchbar:'search'},'expo-router':{useRouter:()=>({setParams:noop}),useFocusEffect:noop,useLocalSearchParams:()=>options.params||{}},'react-native-safe-area-context':{useSafeAreaInsets:()=>({top:0,bottom:0}),SafeAreaView:'safe'},'@react-native-async-storage/async-storage':{getItem:async()=>null},'../../../providers/LocationProvider':{useLocationCtx:()=>({coords:null,status:'denied'})},'../../../hooks/useLegendaryFeed':{useLegendaryFeed:()=>({byRestaurant:{}})},'../../../hooks/useSavedDestinations':{useSavedDestinations:()=>({loadList:noop,ratedIds:new Set(),favoriteIds:new Set(),wantToTryIds:new Set(),isPending:()=>false,mutate:options.mutate||noop})},'../../../config/features':{ENABLE_SAVED_DESTINATIONS:!!options.params},'../../../src/theme/operationTokens':{operationTokens:{colors:{},radius:{}}},'../../../lib/accountBoundary.js':boundary,'../../../lib/analytics':{trackEvent:async()=>{}},'../../../lib/wingdexGallery':{loadWingdexGallery:async()=>({})}};
  const empty=['@expo/vector-icons','expo-linear-gradient','expo-haptics','expo-crypto','@react-native-community/slider','../../../components/RatingWizardDialog','../../../components/WingmanAddDialog','../../../components/ui/FeedbackState','../../../components/ui/OperationUI','../../../lib/buffacoinRatingTransaction','../../../lib/platformMap','../../../lib/mapSafety','../../../components/WingdexPhotoGallery','../../../lib/savedDestinations.js','../../../lib/destinationNavigation.js','../../../lib/homeDestination.js','../../../components/buffaverse/LegendarySurfaces'];for(const name of empty)imports[name]={};
- const client={auth:a,from(table){let chain={select(){return chain;},eq(){return chain;},maybeSingle:async()=>({data:{balance:5}}),then(resolve,reject){if(table==='destination_ratings'){const d=deferred();pending.push(d);return d.promise.then(resolve,reject);}return Promise.resolve({data:[]}).then(resolve,reject);}};return chain;}};
+ const client={auth:a,from(table){let chain={select(){return chain;},eq(){return chain;},maybeSingle:async()=>({data:{balance:options.balance?.() ?? 5}}),then(resolve,reject){if(table==='destination_ratings' && !options.coinRpc){const d=deferred();pending.push(d);return d.promise.then(resolve,reject);}return Promise.resolve({data:table==='destination_ratings' ? options.coinRows?.() || [] : []}).then(resolve,reject);}};for(const name of ['order','limit','in','or','not','neq','gte','lte'])chain[name]=()=>chain;return chain;}};
+ if(options.storage) imports['@react-native-async-storage/async-storage']=options.storage;
+ if(options.coinRpc){a.getSession=async()=>({data:{session:{user:(await a.getUser()).data.user,access_token:'fixture-token'}}});client.rpc=(name,args)=>({setHeader:()=>name==='get_my_buffacoin_rating_costs' ? Promise.resolve({data:args.p_destination_ids.map(destination_id=>({destination_id,coin_cost:options.quoteCost?.() ?? 1}))}) : options.coinRpc(name,args)});let seq=0;imports['expo-crypto']={randomUUID:()=>`fixture-operation-${++seq}`};imports['react-native'].Alert={alert:options.alert || noop};imports['../../../hooks/useSavedDestinations'].useSavedDestinations=()=>({loadList:noop,invalidateAfterRating:async()=>{},ratedIds:new Set(),favoriteIds:new Set(),wantToTryIds:new Set(),isPending:()=>false});}
  imports['../../../components/wingShots']={WingShotFlow:'wing-shot'};
  imports['../../../hooks/useWingShotsFeatureFlags']={useWingShotsFeatureFlags:()=>({flags:{photo:false},refresh:async()=>({prompt:false,photo:false})})};
  imports['../../../lib/photoWorkflowFlags.js']={resolveRatingPhotoStep:async()=>false};
  imports['../../../lib/wingShotDrafts']={wingShotDrafts:{load:async()=>null,save:async()=>true,clear:async()=>{}}};
  imports['../../../lib/wingShots.js']={submitWingShot:async()=>({}),wingShotUserMessage:()=>''};
  imports['../../../lib/ratingPhotoAttachment.js']={createRatingPhotoAttachment:()=>async()=>null};
+ if(options.photoDraft) imports['../../../lib/wingShotDrafts']={wingShotDrafts:{load:async()=>options.photoDraft,save:options.photoSave || (async()=>true),clear:async()=>{}}};
+ if(options.photoAttach) imports['../../../lib/ratingPhotoAttachment.js']={createRatingPhotoAttachment:()=>options.photoAttach};
+ imports['../../../lib/wingdexRadius.js']=mobileModule('lib/wingdexRadius.js',{});
+ imports['../../../lib/buffacoinOperationStore']=coinOperations;
+ imports['../../../lib/buffacoinRatingUi']=coinUi;
+ imports['../../../lib/buffacoinPricing.js']=coinPricing;
  imports['../../../lib/supabase.js']={supabase:client};const component=mobileModule('app/(tabs)/ratings/index.jsx',imports).default;return {runtime,a,pending,render:()=>runtime.render(component)};
 }
 test('actual ratings aggregate drops old account result after account switch',async()=>{
  const h=ratingsHarness({id:'A'});h.render();await flush();assert.ok(h.pending.length);h.a.change({id:'B'});await flush();h.pending[0].resolve({data:[{destination_id:'A-private',user_id:'A',weight_score:90,is_buffacoin:true,destinations:{name:'Private A'}}]});await flush();h.render();assert.equal(h.runtime.hooks.some(v=>Array.isArray(v)&&v.some(row=>row?.destination_id==='A-private')),false);h.runtime.unmount();
+});
+
+function callback(h, fragment) { return h.runtime.hooks.find(value => typeof value?.value === 'function' && value.value.toString().includes(fragment))?.value; }
+test('actual paid rating screen persists before dispatch, reconciles a lost receipt, and ignores repeated stale submits', async () => {
+ const disk=new Map(), receipts=new Map(), alerts=[];let balance=5, calls=0, debits=0;
+ const storage={getItem:async key=>disk.get(key),setItem:async(key,value)=>disk.set(key,value),removeItem:async key=>disk.delete(key)};
+ const rpc=async(name,args)=>{
+  assert.equal(name,'submit_buffacoin_rating_v1');calls++;
+  const pending=await coinOperations.createBuffacoinOperationStore(storage).load('A');assert.equal(pending.operationId,args.p_operation_id,'persist original ID before dispatch');
+  if(!receipts.has(args.p_operation_id)){balance-=args.p_coin_cost;debits++;receipts.set(args.p_operation_id,{operation_id:args.p_operation_id,rating_id:'rating-1',crawl_id:'crawl-1',new_balance:balance});throw new Error('response lost after commit');}
+  return {data:receipts.get(args.p_operation_id)};
+ };
+ const h=ratingsHarness({id:'A'},{storage,coinRpc:rpc,balance:()=>balance,alert:(...args)=>alerts.push(args)});
+ h.render();await flush();h.render();await flush();h.render();
+ const open=callback(h,'primary_cta_clicked');assert.ok(open);await open({destination_id:'dest-1',name:'Fixture Wings',stateCode:'NY'});h.render();
+ const submit=callback(h,'coinOperationStore.prepare');assert.ok(submit);
+ const payload={scores:{sauce:8,crispiness:8,meat:8,overall:8},wouldOrderAgain:true};
+ await Promise.all([submit(payload),submit(payload)]);h.render();await flush();
+ assert.equal(calls,1);assert.equal(debits,1);assert.equal(receipts.size,1);
+ const alert=alerts.find(args=>args[0]==='Checking your rating');assert.ok(alert);assert.ok(findElement(h.render(),'buffacoin-check-status'));
+ await alert[2].find(button=>button.text==='Check Rating Status').onPress();await flush();h.render();await flush();
+ // The check handler is async and the alert delegates without awaiting it.
+ for(let i=0;i<8 && await coinOperations.createBuffacoinOperationStore(storage).load('A');i++){await flush();h.render();}
+ assert.equal(await coinOperations.createBuffacoinOperationStore(storage).load('A'),null);
+ assert.equal(calls,2);assert.equal(debits,1);assert.equal(balance,4);assert.equal(receipts.size,1);
+ await submit(payload);assert.equal(calls,2,'retained callbacks cannot create a second paid operation after confirmation');
+ h.runtime.unmount();
+});
+
+test('actual restart check binds the optional photo only to a verified receipt and refreshes the current wallet', async () => {
+ const disk=new Map(), saved=[];let photos=0,rpcCalls=0;
+ const storage={getItem:async key=>disk.get(key),setItem:async(key,value)=>disk.set(key,value),removeItem:async key=>disk.delete(key)};
+ const request={userId:'A',operationId:'restored-operation',destinationId:'dest-1',stateCode:'NY',coinCost:1,rating:{sauce:8,crispiness:8,meat:8,overall:8,would_order_again:true,tag_id:null,wings_eaten:null,sauce_style:null,flavor_vibe:null,spice_level:null}};
+ await coinOperations.createBuffacoinOperationStore(storage).prepare(request);
+ await coinOperations.createBuffacoinOperationStore(storage).update({userId:'A',operationId:request.operationId,status:'ambiguous'});
+ const h=ratingsHarness({id:'A'},{storage,balance:()=>3,photoDraft:{ratingOperationId:request.operationId,destinationId:'dest-1',draft:{session:{correlationId:'photo-operation'}}},photoSave:async value=>{saved.push(value);return true;},photoAttach:async pending=>{assert.equal(pending.ratingId,'verified-rating');photos++;return {submissionId:'photo-1'};},coinRpc:async(_name,args)=>{rpcCalls++;assert.equal(args.p_operation_id,request.operationId);return {data:{operation_id:request.operationId,rating_id:'verified-rating',crawl_id:'crawl-1',new_balance:4}};}});
+ h.render();await flush();h.render();await flush();const tree=h.render();
+ const check=findElement(tree,'buffacoin-check-status');assert.ok(check);check.props.onPress();
+ for(let i=0;i<12;i++){await flush();h.render();}
+ assert.equal(rpcCalls,1);assert.equal(photos,1);assert.equal(saved[0].ratingId,'verified-rating');
+ assert.ok(h.runtime.hooks.some(value=>value===3),'wallet read supersedes the older receipt balance');
+ assert.equal(await coinOperations.createBuffacoinOperationStore(storage).load('A'),null);
+ h.runtime.unmount();
 });
 function elementWhere(tree,predicate){if(!tree)return null;if(Array.isArray(tree))return tree.map(v=>elementWhere(v,predicate)).find(Boolean)||null;if(predicate(tree))return tree;return elementWhere(tree.props?.children,predicate);}
 test('actual game prevents broken-photo skipping during deferred vote and reveal',async()=>{
@@ -149,4 +203,28 @@ for(const mode of ['account','cancel'])test(`OAuth handoff helper discards pendi
 test('actual account-bound RPC pins A token through delayed Buffacoin transaction dispatch',async()=>{
  const dispatch=deferred();let actorToken='A-token',sentHeader;const client={auth:{getSession:async()=>({data:{session:{user:{id:'A'},access_token:actorToken}}})},rpc(){let header;return {setHeader(_name,value){header=value;return this;},then(resolve,reject){return dispatch.promise.then(()=>{sentHeader=header||`Bearer ${actorToken}`;return {data:{operation_id:'op',rating_id:'r',crawl_id:'c',new_balance:4}};}).then(resolve,reject);}};}};
  const bound=await boundary.accountBoundRpc(client,'A',()=>true);const {submitBuffacoinRatingTransaction}=await import('../lib/buffacoinRatingTransaction.js');const pending=submitBuffacoinRatingTransaction({supabase:bound,operationId:'op',destinationId:'d',stateCode:'NY',coinCost:1,rating:{}});actorToken='B-token';dispatch.resolve();await pending;assert.equal(sentHeader,'Bearer A-token');
+});
+test('actual paid rating confirmation refreshes price and a server mismatch requires consent before one charge',async()=>{
+ const disk=new Map(),alerts=[],attempts=[];let quoted=1,balance=10,debits=0;
+ const storage={getItem:async key=>disk.get(key),setItem:async(key,value)=>disk.set(key,value),removeItem:async key=>disk.delete(key)};
+ const h=ratingsHarness({id:'A'},{storage,quoteCost:()=>quoted,balance:()=>balance,alert:(...args)=>alerts.push(args),coinRpc:async(name,args)=>{
+  assert.equal(name,'submit_buffacoin_rating_v1');attempts.push(args);
+  if(attempts.length===1){quoted=3;return {error:{code:'P0001',message:'coin_cost_mismatch'}};}
+  debits++;balance-=args.p_coin_cost;
+  return {data:{operation_id:args.p_operation_id,rating_id:'rating-1',crawl_id:'crawl-1',new_balance:balance}};
+ }});
+ h.render();await flush();h.render();await flush();h.render();
+ await callback(h,'primary_cta_clicked')({destination_id:'dest-1',name:'Fixture Wings',stateCode:'NY'});
+ h.render();const staleSubmit=callback(h,'coinOperationStore.prepare');quoted=2;
+ const wizard=elementWhere(h.render(),node=>!!node.props?.onBeforeConfirmation);
+ assert.ok(wizard);assert.equal(await wizard.props.onBeforeConfirmation(),true);h.render();
+ const payload={scores:{sauce:8,crispiness:8,meat:8,overall:8},wouldOrderAgain:true};
+ await staleSubmit(payload);assert.equal(attempts.length,0,'changed quote never automatically charges');
+ h.render();await callback(h,'coinOperationStore.prepare')(payload);h.render();
+ assert.equal(attempts.length,1);assert.equal(debits,0);assert.equal(await coinOperations.createBuffacoinOperationStore(storage).load('A'),null);
+ assert.ok(alerts.some(args=>args[0]==='BuffaCoin price updated'));
+ await callback(h,'coinOperationStore.prepare')(payload);await flush();h.render();
+ assert.equal(attempts.length,2);assert.equal(attempts[0].p_coin_cost,2);assert.equal(attempts[1].p_coin_cost,3);
+ assert.equal(attempts[0].p_operation_id,attempts[1].p_operation_id,'proved rollback permits reconsent under the same operation ID');
+ assert.equal(debits,1);assert.equal(balance,7);h.runtime.unmount();
 });

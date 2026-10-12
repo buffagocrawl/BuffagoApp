@@ -12,7 +12,7 @@ import fs from 'node:fs';
 function mockClient(user = null, calls = []) {
   return {
     auth: { getUser: async () => ({ data: { user }, error: null }) },
-    functions: { invoke: async (name, options) => { calls.push({ name, options }); return { data: { ok: true, photos: [{ submission_id: 'p1', signed_url: 'https://img/p1', destination_id: 'secret', restaurant_name: 'Secret Wings' }] }, error: null }; } },
+    functions: { invoke: async (name, options) => { calls.push({ name, options }); return { data: { ok: true, feed_version: 2, photos: [{ submission_id: 'p1', signed_url: 'https://img/p1', destination_id: 'secret', restaurant_name: 'Secret Wings' }] }, error: null }; } },
   };
 }
 
@@ -60,7 +60,7 @@ test('trusted Edge Function contracts preserve eligibility, pagination, and vote
   const sql = fs.readFileSync(new URL('../supabase/local/phase-2b/20261009_local_phase2b_foundation.sql', import.meta.url), 'utf8');
   assert.match(feed, /CANDIDATE_PAGE = 120/);
   assert.match(feed, /MAX_CANDIDATE_PAGES = 10/);
-  assert.match(feed, /rpc\('wing_jury_feed_candidates'/);
+  assert.match(feed, /rpc\(randomized \? 'wing_jury_randomized_feed_candidates' : 'wing_jury_feed_candidates'/);
   assert.match(sql, /asin\(sqrt\(least/);
   assert.match(sql, /from public\.wing_jury_votes verdict/);
   assert.match(feed, /submission_id: photo\.id, signed_url/);

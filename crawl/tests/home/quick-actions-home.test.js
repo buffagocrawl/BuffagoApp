@@ -4,7 +4,7 @@ import fs from 'node:fs';
 
 const home = fs.readFileSync(new URL('../../app/(tabs)/home/index.jsx', import.meta.url), 'utf8');
 
-test('Home uses the compact layout without removing content', () => {
+test('Home uses the compact layout and keeps discovery actions', () => {
   assert.match(home, /scroll: \{ paddingHorizontal: 16, paddingTop: 6, gap: 8 \}/);
   assert.match(home, /contentContainerStyle=\{\[styles\.scroll, \{ paddingBottom: 16 \}\]\}/);
   assert.match(home, /edges=\{\['top', 'left', 'right'\]\}/);
@@ -12,7 +12,8 @@ test('Home uses the compact layout without removing content', () => {
   assert.match(home, /logo: \{\s*position: 'absolute',[\s\S]*?height: 44/);
   assert.match(home, /closestCard:[\s\S]*?paddingHorizontal: 12,\s*paddingVertical: 10/);
   assert.doesNotMatch(home, /missionEntry/);
-  assert.match(home, /PlayerProgressCard level=\{hudStats.level\}/);
+  assert.doesNotMatch(home, /PlayerProgressCard/);
+  assert.match(home, /DailyGiftPill claimed=\{!!dailyGift.claimedToday\}[\s\S]*?onPress=\{\(\) => claimDaily\(session.user.id\)\}/);
   assert.match(home, /loadWingdexRestaurantGallery\(closest.id, supabase\)/);
   assert.match(home, /WingShotImage approved uri=/);
   assert.match(home, /restaurantIconButton: \{ width: 40, height: 40/);
@@ -32,9 +33,9 @@ test('Home removes Sauce Duel and keeps Wing Facts as one compact secondary acti
   assert.match(home, /testID="quick-action-wing-facts"/);
   assert.doesNotMatch(home, /testID="quick-action-wing-duel"/);
   assert.doesNotMatch(home, /title="Wing Duel"/);
-  assert.match(home, /wingFactsAction: \{ flex: 1, flexBasis: 0, minWidth: 148, minHeight: 80/);
-  assert.match(home, /wingJuryAction: \{ flex: 1, flexBasis: 0, minWidth: 148, minHeight: 80/);
-  assert.match(home, /homeFunRow: \{ flexDirection: 'row', flexWrap: 'wrap', gap: 8/);
+  assert.match(home, /wingFactsAction: \{ flex: 1, flexBasis: 0, minWidth: 148, minHeight: 56/);
+  assert.match(home, /wingJuryAction: \{ flex: 1, flexBasis: 0, minWidth: 148, minHeight: 56/);
+  assert.match(home, /homeFunRow: \{ flexDirection: 'row', flexWrap: 'wrap', gap: 6/);
   assert.match(home, /wingFactsLabel: \{ fontSize: 14, lineHeight: 18/);
   assert.doesNotMatch(home, /quick-action-share-wing-spot/);
   assert.doesNotMatch(home, /Share a Wing Spot/);
@@ -51,11 +52,13 @@ test('Home keeps discovery in Nearby Spot and removes the extra map shortcuts', 
   assert.doesNotMatch(home, /<Button[^>]*>\s*Find wings\s*<\/Button>/i);
 });
 
-test('Home distinguishes empty, loading, and unavailable Wing Shot states and routes both CTAs to existing flows', () => {
+test('Home distinguishes empty, loading, and unavailable Wing Shot states and retains the existing rated-photo action', () => {
   assert.match(home, /featuredPhotoLoading/);
   assert.match(home, /No Wing Shots yet/);
   assert.match(home, /Wing Shots are temporarily unavailable/);
-  assert.match(home, /alreadyRatedThis \? router\.push\('\/(?:\(tabs\)\/journey)'\) : openHomeRatingWizard\(\)/);
+  assert.doesNotMatch(home, /Rate & share a Wing Shot/);
+  assert.match(home, /alreadyRatedThis \? <Button[\s\S]*?router\.push\('\/\(tabs\)\/journey'\)[\s\S]*?Add a Wing Shot/);
+  assert.match(home, /onPress=\{openHomeRatingWizard\}/);
 });
 
 test('Send to Friend is inside the restaurant card and never uses the native share sheet', () => {

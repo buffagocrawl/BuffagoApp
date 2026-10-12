@@ -253,7 +253,7 @@ function DialogHeaderArrow({ title, onBack }) {
  * }
  */
 /** @typedef {{id: number|string, label?: string, tag?: string}} RatingTagOption */
-/** @param {{visible: boolean, destinationName?: string, tagOptions?: RatingTagOption[], saving?: boolean, onDismiss?: () => void, onFinalize?: (payload: unknown) => void|Promise<void>, finalizeLabel?: string, flowVariant?: string}} props */
+/** @param {{visible: boolean, destinationName?: string, tagOptions?: RatingTagOption[], saving?: boolean, onDismiss?: () => void, onBeforeConfirmation?: () => Promise<boolean>, onFinalize?: (payload: unknown) => void|Promise<void>, finalizeLabel?: string, flowVariant?: string}} props */
 export default function RatingWizardDialog({
   visible,
   destinationName,
@@ -261,6 +261,7 @@ export default function RatingWizardDialog({
   saving = false,
   onDismiss,
   onFinalize,
+  onBeforeConfirmation,
   finalizeLabel = 'Finalize',
   flowVariant = FULL_RATING_FLOW_VARIANT,
 }) {
@@ -330,6 +331,11 @@ export default function RatingWizardDialog({
   const goNext = async () => {
     if (saving || finalizeInFlightRef.current) return;
     if (step < totalSteps - 1) {
+      if (step === totalSteps - 2 && onBeforeConfirmation) {
+        finalizeInFlightRef.current = true;
+        try { if (!await onBeforeConfirmation()) return; }
+        finally { finalizeInFlightRef.current = false; }
+      }
       setStep((s) => Math.min(totalSteps - 1, s + 1));
       return;
     }

@@ -248,7 +248,7 @@ test('blind feed cursor does not disclose the hidden destination identity', asyn
 test('real signed-out Supabase session can fetch the guest feed', async () => {
   const client = {
     auth: { getUser: async () => ({ data: { user: null }, error: { name: 'AuthSessionMissingError', message: 'Auth session missing!' } }) },
-    functions: { invoke: async () => ({ data: { ok: true, photos: [] }, error: null }) },
+    functions: { invoke: async () => ({ data: { ok: true, feed_version: 2, photos: [] }, error: null }) },
   };
   await getWingJuryPhotoBatch({ client, enabled: true });
 });
@@ -276,7 +276,7 @@ test('anonymous-auth gameplay sends its in-memory judged IDs to the guest feed',
     auth: { getUser: async () => ({ data: { user: { id: userId, is_anonymous: true } }, error: null }) },
     functions: { invoke: async (_name, options) => {
       assert.deepEqual(options.body.judged_submission_ids, [photoId]);
-      return { data: { ok: true, photos: [] }, error: null };
+      return { data: { ok: true, feed_version: 2, photos: [] }, error: null };
     } },
   };
   await getWingJuryPhotoBatch({ client, guestSession: session, enabled: true });

@@ -6,11 +6,11 @@ import ts from 'typescript';
 import { createClient } from '@supabase/supabase-js';
 const source=readFileSync(new URL('./fixtures/native-visual/supabase.js',import.meta.url),'utf8');
 const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,esModuleInterop:true}}).outputText;
-function fixture(dev, { sample = null, fault = false, fetch } = {}) {
+function fixture(dev, { sample = null, fault = false, round3 = false, guest = false, coin = '', fixtureStorage, fetch } = {}) {
   let options;
   vm.runInNewContext(code,{exports:{},__DEV__:dev,URL,Response,Headers,btoa,fetch,
-    process: { env: { EXPO_PUBLIC_BUFFAGO_NATIVE_IMAGE_FAULT_QA: fault ? '1' : '0' } },
-    require:name=>name==='./approvedPhoto'?{__esModule:true,default:sample}:({createClient:(_url,_key,value)=>{options=value;return {};}})});
+    process: { env: { EXPO_PUBLIC_BUFFAGO_NATIVE_IMAGE_FAULT_QA: fault ? '1' : '0', EXPO_PUBLIC_BUFFAGO_NATIVE_ROUND3_QA: round3 ? '1' : '0', EXPO_PUBLIC_BUFFAGO_NATIVE_GUEST_QA: guest ? '1' : '0', EXPO_PUBLIC_BUFFAGO_NATIVE_COIN_QA: coin } },
+    require:name=>name==='@react-native-async-storage/async-storage'?{__esModule:true,default:fixtureStorage}:name==='./approvedPhoto'?{__esModule:true,default:sample}:({createClient:(_url,_key,value)=>{options=value;return {};}})});
   return options;
 }
 
@@ -31,6 +31,33 @@ test('opt-in image faults use only local processed-fixture URLs and preserve wri
   assert.equal((await options.global.fetch('https://native-fixture.invalid/rest/v1/wing_media_photo_votes', { method: 'POST' })).status, 403);
 });
 test('native fixture refuses release execution',()=>assert.throws(()=>fixture(false),/Development fixtures only/));
+
+test('Round 3 save fixture mutates only owner collections and rejects guests and live hosts', async () => {
+  const { global: { fetch } } = fixture(true, { round3: true });
+  const url = 'https://native-fixture.invalid/rest/v1/user_destination_favorites';
+  const row = { user_id: '00000000-0000-4000-8000-000000000001', destination_id: 'fixture-spot-2' };
+  assert.equal((await fetch(url, { method: 'POST', body: JSON.stringify(row) })).status, 204);
+  assert.equal((await (await fetch(`${url}?destination_id=eq.fixture-spot-2`)).json()).length, 1);
+  assert.equal((await fetch(url, { method: 'POST', body: JSON.stringify({ ...row, user_id: 'other' }) })).status, 403);
+  assert.equal((await fetch('https://native-fixture.invalid/rest/v1/destination_ratings', { method: 'POST', body: '{}' })).status, 403);
+  const guest = fixture(true, { round3: true, guest: true });
+  assert.equal((await guest.global.fetch(url, { method: 'POST', body: JSON.stringify(row) })).status, 403);
+  await assert.rejects(fetch('https://production.example/rest/v1/user_destination_favorites', { method: 'POST', body: JSON.stringify(row) }), /network boundary blocked/);
+});
+
+test('synthetic paid fixture keeps one receipt and debit across lost response and fixture restart', async () => {
+  const disk=new Map();const fixtureStorage={getItem:async key=>disk.get(key),setItem:async(key,value)=>disk.set(key,value)};
+  const url='https://native-fixture.invalid/rest/v1/rpc/submit_buffacoin_rating_v1';
+  const body=JSON.stringify({p_operation_id:'synthetic-operation',p_destination_id:'fixture-spot-0',p_coin_cost:1,p_rating:{overall:8}});
+  const first=fixture(true,{round3:true,coin:'lost-response',fixtureStorage});
+  await assert.rejects(first.global.fetch(url,{method:'POST',body}), /lost after commit/);
+  const restarted=fixture(true,{round3:true,coin:'lost-response',fixtureStorage});
+  const receipt=(await (await restarted.global.fetch(url,{method:'POST',body})).json())[0];
+  assert.equal(receipt.new_balance,12344);assert.equal(receipt.operation_id,'synthetic-operation');
+  const records=JSON.parse([...disk.values()][0]);assert.equal(Object.keys(records.receipts).length,1);assert.equal(records.paidRows.length,1);
+  const guest=fixture(true,{round3:true,coin:'lost-response',guest:true,fixtureStorage});
+  assert.equal((await guest.global.fetch(url,{method:'POST',body})).status,403);
+});
 test('native fixture blocks live hosts and table writes',async()=>{
   const {global:{fetch}}=fixture(true);
   await assert.rejects(fetch('https://production.example/rest/v1/destinations'),/network boundary blocked/);

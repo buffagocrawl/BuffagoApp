@@ -45,7 +45,19 @@ export function normalizeWingJuryFeedResponse(payload) {
 export function createGuestJurySession() {
   const judged = new Set();
   const verdicts = new Map();
+  let feedSession = null;
   return {
+    feedSession: (location = null) => {
+      if (!feedSession) feedSession = {
+        // Session IDs are correlation identifiers, not authorization tokens.
+        id: globalThis.crypto?.randomUUID?.() || 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+          const value = Math.floor(Math.random() * 16); return (c === 'x' ? value : (value & 3) | 8).toString(16);
+        }),
+        feedMode: 'preferred',
+        location: location ? { latitude: location.latitude, longitude: location.longitude } : null,
+      };
+      return feedSession;
+    },
     hasJudged: (submissionId) => judged.has(String(submissionId)),
     register: (submissionId, vote) => {
       const id = String(submissionId);
@@ -56,7 +68,7 @@ export function createGuestJurySession() {
       return { duplicate: false, vote, submission_id: id };
     },
     judgedIds: () => Array.from(judged),
-    clear: () => { judged.clear(); verdicts.clear(); },
+    clear: () => { judged.clear(); verdicts.clear(); feedSession = null; },
   };
 }
 
@@ -96,9 +108,12 @@ export async function getWingJuryPhotoBatch({ client, location = null, cursor = 
   const user = await getUser(client, expectedUserId, isCurrent);
   const hasLocation = typeof location?.latitude === 'number' && Number.isFinite(location.latitude) && Math.abs(location.latitude) <= 90
     && typeof location?.longitude === 'number' && Number.isFinite(location.longitude) && Math.abs(location.longitude) <= 180;
+  const session = guestSession?.feedSession?.(hasLocation ? location : null);
   const body = {
-    latitude: hasLocation ? location.latitude : null,
-    longitude: hasLocation ? location.longitude : null,
+    ...(session ? { feed_session_id: session.id } : {}),
+    feed_mode: 'randomized_v2',
+    latitude: session ? session.location?.latitude ?? null : hasLocation ? location.latitude : null,
+    longitude: session ? session.location?.longitude ?? null : hasLocation ? location.longitude : null,
     cursor: cursor || null,
     limit: Math.max(1, Math.min(24, Number(limit) || 12)),
     judged_submission_ids: accountUserId(user) ? [] : (guestSession?.judgedIds?.() || []).slice(-500),
@@ -108,12 +123,28 @@ export async function getWingJuryPhotoBatch({ client, location = null, cursor = 
   // The request carries a bounded hint; the full guest session is authoritative
   // locally. Empty server work-budget pages must not look like exhaustion.
   let nextCursor = body.cursor;
+  let feedMode = session?.feedMode || 'preferred';
   for (let page = 0; page < 4; page += 1) {
     requireCurrent(user, expectedUserId, isCurrent);
-    const { data, error } = await client.functions.invoke(WING_JURY_FUNCTIONS.feed, { body: { ...body, cursor: nextCursor }, ...(headers ? { headers } : {}) });
+    const requestBody = { ...body, cursor: nextCursor };
+    if (feedMode === 'legacy') {
+      delete requestBody.feed_mode;
+      delete requestBody.feed_session_id;
+    }
+    const { data, error } = await client.functions.invoke(WING_JURY_FUNCTIONS.feed, { body: requestBody, ...(headers ? { headers } : {}) });
     requireCurrent(user, expectedUserId, isCurrent);
+    const functionError = error?.context?.clone ? await error.context.clone().json().catch(() => null) : null;
+    requireCurrent(user, expectedUserId, isCurrent);
+    if (data?.error === 'feed_session_expired' || functionError?.error === 'feed_session_expired') throw new WingJuryError('FEED_SESSION_EXPIRED', 'This Wing Jury session has expired. Close Wing Jury and reopen it to start a new session.');
     if (error || data?.ok === false) throw new WingJuryError('FEED_UNAVAILABLE', 'Wing Jury photos are temporarily unavailable. Try again.', error || data?.error);
-    const result = normalizeWingJuryFeedResponse(data);
+    const responseMode = data?.feed_version === 2 ? 'randomized' : (data?.feed_version === 1 || data?.feed_version === undefined) ? 'legacy' : null;
+    if (!responseMode || !Array.isArray(data?.photos) || (feedMode !== 'preferred' && feedMode !== responseMode))
+      throw new WingJuryError('FEED_UNAVAILABLE', 'Wing Jury could not continue this feed. Close Wing Jury and reopen it to start a new session.');
+    // Negotiate once per game. A deployed legacy response remains usable, but
+    // its cursor is never mixed with randomized pages after a server update.
+    feedMode = responseMode;
+    if (session) session.feedMode = feedMode;
+    const result = { ...normalizeWingJuryFeedResponse(data), feedMode, feedVersion: responseMode === 'randomized' ? 2 : 1 };
     if (!accountUserId(user)) result.photos = result.photos.filter((photo) => !guestSession?.hasJudged?.(photo.submission_id));
     if (result.hasMore && (!result.nextCursor || result.nextCursor === nextCursor)) {
       throw new WingJuryError('FEED_UNAVAILABLE', 'Wing Jury could not continue this feed. Try again.');

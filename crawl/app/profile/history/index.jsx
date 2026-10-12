@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PlayerProgressCard, SectionHeader, LoadingSkeleton, StatCard, SurfaceCard } from '../../../components/ui/OperationUI';
 import { operationTokens as tokens } from '../../../src/theme/operationTokens';
 import ProfileWelcomeWizard from '../../../components/ProfileWelcomeWizard';
-import { View, FlatList, StyleSheet, ScrollView, RefreshControl, Alert, TouchableOpacity } from 'react-native';
+import { View, FlatList, StyleSheet, ScrollView, RefreshControl, Alert, TouchableOpacity, BackHandler } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card, Text, Button, Divider, ProgressBar, useTheme } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -14,7 +14,6 @@ import { supabase } from '../../../lib/supabase.js';
 import { trackEvent } from '../../../lib/analytics';
 import FriendProfileActions from '../../../components/FriendProfileActions';
 import ScreenHeader from '../../../components/ScreenHeader';
-import WeeklyChallengeStats from '../../../components/WeeklyChallengeStats';
 import WingCreatorSummaryCard from '../../../components/creator/WingCreatorSummaryCard';
 import { WingShotFlow } from '../../../components/wingShots';
 import { useWingShotsFeatureFlags } from '../../../hooks/useWingShotsFeatureFlags';
@@ -133,6 +132,14 @@ export default function HistoryIndex({ onOpenBuffaverse } = {}) {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState('completed');
+  useFocusEffect(useCallback(() => {
+    if (!dialogOpen || dialogMode !== 'ratings') return;
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      setDialogOpen(false);
+      return true;
+    });
+    return () => subscription.remove();
+  }, [dialogOpen, dialogMode]));
 
   const [wizardChecked, setWizardChecked] = useState(false);
   const [wizardVisible, setWizardVisible] = useState(false);
@@ -687,7 +694,6 @@ export default function HistoryIndex({ onOpenBuffaverse } = {}) {
     : 'Stats and averages across this winglet’s ratings';
 
   const hasCompletedCrawls = completedCrawls.length > 0;
-  const hasRatings = ratings.length > 0;
 
   useFocusEffect(
     useCallback(() => {
@@ -1032,7 +1038,10 @@ export default function HistoryIndex({ onOpenBuffaverse } = {}) {
               </TouchableOpacity>
 
               <TouchableOpacity
-                activeOpacity={hasRatings ? 0.7 : 1}
+                accessibilityRole="button"
+                accessibilityLabel="Rated YTD, open rating history"
+                accessibilityHint="View ratings and add photos"
+                activeOpacity={0.7}
                 onPress={async () => {
                   if (viewUserId) await fetchAll(viewUserId);
                   setDialogMode('ratings');
@@ -1074,7 +1083,6 @@ export default function HistoryIndex({ onOpenBuffaverse } = {}) {
               {playerProgress ? <PlayerProgressCard {...playerProgress} /> : null}
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
                 {onOpenBuffaverse ? <Button icon="trophy-outline" mode="outlined" onPress={onOpenBuffaverse} contentStyle={{ minHeight: 44 }}>Achievements & objectives</Button> : null}
-                <Button icon="history" mode="contained-tonal" onPress={() => { setDialogMode('ratings'); setDialogOpen(true); }} contentStyle={{ minHeight: 44 }}>Rating history</Button>
               </View>
             </View> : null}
             <SurfaceCard style={{ marginVertical: 8 }}>
@@ -1087,12 +1095,6 @@ export default function HistoryIndex({ onOpenBuffaverse } = {}) {
               </View>
             </SurfaceCard>
             {isViewingSelf ? <WingCreatorSummaryCard refreshKey={ratings.length} /> : null}
-
-            <WeeklyChallengeStats
-              client={supabase}
-              userId={viewUserId}
-              isPublic={!isViewingSelf}
-            />
 
             <SectionHeader title="Personal statistics · details" />
             <View style={styles.metricsRow}>
@@ -1302,6 +1304,8 @@ export default function HistoryIndex({ onOpenBuffaverse } = {}) {
               <View style={styles.dialogHeader}>
                 <TouchableOpacity
                   onPress={() => setDialogOpen(false)}
+                  accessibilityRole="button"
+                  accessibilityLabel="Back to Journey"
                   activeOpacity={0.7}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   style={styles.dialogBackBtn}

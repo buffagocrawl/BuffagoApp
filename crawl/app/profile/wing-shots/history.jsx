@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActivityIndicator, Button, Card, IconButton, Text, useTheme } from 'react-native-paper';
@@ -8,6 +8,7 @@ import SubmissionStatusChip from '../../../components/creator/SubmissionStatusCh
 import { loadMyWingShotHistory } from '../../../lib/wingCreator';
 import { formatWingShotRejectionReason } from '../../../lib/wingShotCopy';
 import { supabase } from '../../../lib/supabase';
+import { WING_SHOT_HISTORY_TABS, wingShotHistoryCollection } from '../../../lib/wingShotHistory';
 
 function formatDate(value) {
   const date = value ? new Date(value) : null;
@@ -25,32 +26,50 @@ export default function WingShotHistoryScreen() {
   const theme = useTheme();
   const [authReady, setAuthReady] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
+  const [accountId, setAccountId] = useState(null);
+  const accountVersion = useRef(0);
+  const accountIdentity = useRef(null);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [error, setError] = useState(null);
+  const [collection, setCollection] = useState('review');
 
   useEffect(() => {
     let active = true;
+    const initialVersion = accountVersion.current;
     supabase.auth.getSession().then(({ data }) => {
-      if (!active) return;
-      setSignedIn(Boolean(data?.session?.user?.id));
+      if (!active || initialVersion !== accountVersion.current) return;
+      const user = data?.session?.user;
+      accountIdentity.current = user?.id || null;
+      setSignedIn(Boolean(user?.id && !user.is_anonymous));
+      setAccountId(user?.id || null);
       setAuthReady(true);
     });
     const { data: authSubscription } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!active) return;
-      setSignedIn(Boolean(session?.user?.id));
+      const nextAccountId = session?.user?.id || null;
+      if (accountIdentity.current !== nextAccountId) {
+        accountVersion.current += 1;
+        accountIdentity.current = nextAccountId;
+        setRows([]);
+        setHasMore(false);
+      }
+      setSignedIn(Boolean(session?.user?.id && !session.user.is_anonymous));
+      setAccountId(session?.user?.id || null);
       setAuthReady(true);
     });
     return () => {
       active = false;
+      accountVersion.current += 1;
       authSubscription?.subscription?.unsubscribe?.();
     };
   }, []);
 
   const load = useCallback(async ({ append = false } = {}) => {
+    const version = accountVersion.current;
     if (!signedIn) {
       setLoading(false);
       return;
@@ -61,6 +80,7 @@ export default function WingShotHistoryScreen() {
     try {
       const before = append && rows.length ? rows[rows.length - 1].created_at : null;
       const nextRows = await loadMyWingShotHistory({ before });
+      if (version !== accountVersion.current) return;
       setRows((current) => {
         if (!append) return nextRows;
         const existing = new Set(current.map((row) => row.submission_id));
@@ -68,11 +88,14 @@ export default function WingShotHistoryScreen() {
       });
       setHasMore(nextRows.length === 25);
     } catch (loadError) {
+      if (version !== accountVersion.current) return;
       setError(loadError?.message || 'Could not load Wing Shot history.');
     } finally {
-      setLoading(false);
-      setLoadingMore(false);
-      setRefreshing(false);
+      if (version === accountVersion.current) {
+        setLoading(false);
+        setLoadingMore(false);
+        setRefreshing(false);
+      }
     }
   }, [rows, signedIn]);
 
@@ -80,7 +103,7 @@ export default function WingShotHistoryScreen() {
     if (signedIn) load({ append: false });
     // Refresh on focus without changing the existing data source or status logic.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [signedIn]));
+  }, [signedIn, accountId]));
 
   const refresh = useCallback(() => {
     setRefreshing(true);
@@ -94,6 +117,8 @@ export default function WingShotHistoryScreen() {
       subtitle="Your private submission history"
     />
   );
+  const selectedTab = WING_SHOT_HISTORY_TABS.find((tab) => tab.value === collection);
+  const visibleRows = rows.filter((row) => wingShotHistoryCollection(row) === collection);
 
   if (!authReady || (signedIn && loading && rows.length === 0)) {
     return <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]} edges={['top', 'bottom']}>
@@ -114,8 +139,22 @@ export default function WingShotHistoryScreen() {
 
   return <SafeAreaView testID="creator.history" style={[styles.safe, { backgroundColor: theme.colors.background }]} edges={['top', 'bottom']}>
     {header}
+    <View>
+      <View style={styles.tabs}>
+        {WING_SHOT_HISTORY_TABS.map((tab) => <Button
+          key={tab.value}
+          testID={`creator.history.tab.${tab.value}`}
+          mode={collection === tab.value ? 'contained' : 'outlined'}
+          onPress={() => setCollection(tab.value)}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: collection === tab.value }}
+          contentStyle={{ minHeight: 44 }}
+        >{tab.label}{!hasMore ? ` (${rows.filter((row) => wingShotHistoryCollection(row) === tab.value).length})` : ''}</Button>)}
+      </View>
+    </View>
+    {error && rows.length > 0 ? <View style={styles.centerBlock}><Text style={{ color: theme.colors.error }}>{error}</Text><Button onPress={refresh}>Retry</Button></View> : null}
     <FlatList
-      data={rows}
+      data={visibleRows}
       keyExtractor={(item) => item.submission_id}
       contentContainerStyle={styles.list}
       refreshing={refreshing}
@@ -124,7 +163,7 @@ export default function WingShotHistoryScreen() {
       ListEmptyComponent={error ? (
         <View testID="creator.history.error" style={styles.centerBlock}><Text style={{ color: theme.colors.error, textAlign: 'center' }}>{error}</Text><Button onPress={() => load({ append: false })}>Retry</Button></View>
       ) : (
-        <View testID="creator.history.empty" style={styles.centerBlock}><Text variant="titleMedium" style={styles.emptyTitle}>No Wing Shots yet</Text><Text style={styles.emptyBody}>You can optionally share a photo from any restaurant.</Text></View>
+        <View testID="creator.history.empty" style={styles.centerBlock}><Text variant="titleMedium" style={styles.emptyTitle}>{selectedTab.empty}</Text><Text style={styles.emptyBody}>{selectedTab.body}{hasMore ? ' Load more to check older submissions.' : ''}</Text></View>
       )}
       renderItem={({ item, index }) => (
         <Card
@@ -141,6 +180,7 @@ export default function WingShotHistoryScreen() {
               <SubmissionStatusChip status={item.display_status} />
             </View>
             {(item.display_status === 'Rejected' || item.display_status === 'Duplicate video') && item.rejection_category ? <Text variant="bodySmall" style={styles.rejection}>{formatWingShotRejectionReason(item.rejection_category)}</Text> : null}
+            {collection === 'approved' && item.media_type === 'photo' ? <Text testID="creator.history.likes" variant="bodyMedium">{item.jury_counts ? `${item.jury_counts.likes} Wing Jury likes received` : 'Wing Jury likes temporarily unavailable'}</Text> : null}
           </Card.Content>
         </Card>
       )}
@@ -152,6 +192,7 @@ export default function WingShotHistoryScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
+  tabs: { paddingHorizontal: 16, paddingVertical: 8, gap: 8, flexDirection: 'row', flexWrap: 'wrap' },
   list: { padding: 16, paddingTop: 8, paddingBottom: 32 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
   centerBlock: { alignItems: 'center', padding: 28, gap: 8 },

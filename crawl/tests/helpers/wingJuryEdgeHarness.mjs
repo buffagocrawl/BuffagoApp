@@ -23,7 +23,10 @@ function networkClient(tables = {}, overrides = {}) {
     calls, writes, signedPaths,
     rpc: async (name, args) => {
       calls.push({ rpc: name, args });
-      if (name === 'wing_jury_feed_candidates') {
+      if (name === 'wing_jury_randomized_session_snapshot') {
+        return overrides.sessionSnapshotQuery ? overrides.sessionSnapshotQuery(args) : {data:null,error:null};
+      }
+      if (name === 'wing_jury_feed_candidates' || name === 'wing_jury_randomized_feed_candidates') {
         if (overrides.feedError) return { data: null, error: { message: 'private feed detail' } };
         if (overrides.feedQuery) return overrides.feedQuery(args);
         const distance = (destination) => {

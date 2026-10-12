@@ -82,11 +82,11 @@ export const ENABLE_ONBOARDING_FIRST_VALUE_EXPERIMENT = parseBooleanFlag(
   false
 );
 
-// Saved lists are explicitly enabled by release profiles after the deployed
-// tables, owner-only RLS policies, and eligibility triggers were verified.
+// Saved lists use the deployed owner-only tables in every runtime. An explicit
+// false flag remains available as a release rollback switch.
 export const ENABLE_SAVED_DESTINATIONS = parseBooleanFlag(
   process.env.EXPO_PUBLIC_ENABLE_SAVED_DESTINATIONS,
-  false
+  true
 );
 
 // Wing Jury is independently gated from saved destinations. It remains off

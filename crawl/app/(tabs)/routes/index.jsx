@@ -1,9 +1,8 @@
 // app/(tabs)/routes/index.jsx
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { View, FlatList, RefreshControl, StyleSheet, ScrollView, Alert, Pressable } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, FlatList, RefreshControl, StyleSheet, ScrollView, Alert, Pressable, useWindowDimensions } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import {
   ActivityIndicator,
   IconButton,
@@ -75,6 +74,9 @@ export default function RoutesIndex() {
   }, [openRouteIdParam]);
 
   const { colors, dark } = useTheme();
+  const { height: viewportHeight } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // ---------------- prevents double-taps ----------------
   const [selectingRoute, setSelectingRoute] = useState(false);
@@ -938,42 +940,18 @@ export default function RoutesIndex() {
 
 
 
-        <View style={[styles.discoverySegments, { backgroundColor: colors.surfaceVariant }]}>
-          {[[null, 'Nearby'], ['in_progress', 'My Crawls'], ['completed', 'Completed']].map(([value, label]) => (
-            <Pressable key={label} accessibilityRole="button" accessibilityState={{ selected: selectedStatus === value }}
-              onPress={() => setSelectedStatus(value)}
-              style={[styles.segment, { backgroundColor: selectedStatus === value ? colors.primary : 'transparent' }]}>
-              <Text variant="labelMedium" style={{ textAlign: 'center', color: selectedStatus === value ? colors.onPrimary : colors.onSurface }}>{label}</Text>
-            </Pressable>
-          ))}
-        </View>
-        <View style={[styles.filterRail, { marginTop: 10 }]}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginRight: 36 }} contentContainerStyle={{ paddingRight: 36 }}>
-          <Chip selected={!selectedTag} maxFontSizeMultiplier={1.2} accessibilityLabel="All routes" onPress={() => setSelectedTag(null)} style={styles.chip}>
-            All routes
-          </Chip>
-
-          {tags.map((t) => (
-            <Chip
-              key={t.id}
-              selected={!!selectedTag && selectedTag.key === 'id' && selectedTag.id === t.id}
-              maxFontSizeMultiplier={1.2}
-              accessibilityLabel={t.travel}
-              onPress={() =>
-                setSelectedTag(
-                  selectedTag?.key === 'id' && selectedTag.id === t.id ? null : { key: 'id', id: t.id, label: t.travel }
-                )
-              }
-              style={styles.chip}
-            >
-              {t.travel === 'Walkable and Short Drive' ? 'Walk + drive' : t.travel}
-            </Chip>
-          ))}
-          <Chip selected={selectedStatus === 'not_started'} maxFontSizeMultiplier={1.2} accessibilityLabel="Not started" onPress={() => setSelectedStatus(selectedStatus === 'not_started' ? null : 'not_started')} style={styles.chip}>Not started</Chip>
-        </ScrollView>
-        <LinearGradient pointerEvents="none" colors={['transparent', colors.background]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.filterRailHint}>
-          <MaterialCommunityIcons name="chevron-right" size={20} color={colors.onSurfaceVariant} />
-        </LinearGradient>
+        <View style={styles.discoveryToolbar}>
+          <Pressable testID="crawls-filters-entry" accessibilityRole="button"
+            accessibilityLabel={`Filters, ${Number(!!selectedTag) + Number(!!selectedStatus)} active`}
+            onPress={() => setFiltersOpen(true)} style={[styles.toolbarAction, { backgroundColor: colors.surfaceVariant }]}>
+            <MaterialCommunityIcons name="tune-variant" size={18} color={colors.primary} />
+            <Text style={styles.toolbarLabel}>Filters{selectedTag || selectedStatus ? ` (${Number(!!selectedTag) + Number(!!selectedStatus)})` : ''}</Text>
+          </Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel="Sort: Nearest first"
+            onPress={() => setFiltersOpen(true)} style={[styles.toolbarAction, { backgroundColor: colors.surfaceVariant }]}>
+            <Text style={styles.toolbarLabel}>Nearest</Text>
+            <MaterialCommunityIcons name="chevron-down" size={16} color={colors.onSurface} />
+          </Pressable>
         </View>
       </View>
     );
@@ -981,6 +959,39 @@ export default function RoutesIndex() {
 
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={{ flex: 1, backgroundColor: colors.background }}>
+      <Portal>
+        <Dialog testID="crawls-filters-dialog" visible={filtersOpen} onDismiss={() => setFiltersOpen(false)}
+          style={[styles.dialog, { maxHeight: viewportHeight - insets.top - insets.bottom - 32 }]}>
+          <Dialog.Title>Filters & sorting</Dialog.Title>
+          <Dialog.ScrollArea style={{ paddingHorizontal: 16 }}>
+            <ScrollView contentContainerStyle={{ paddingBottom: 16, gap: 12 }}>
+              <Text variant="titleSmall">Crawl status</Text>
+              <View style={styles.filterControls}>
+                {[[null, 'Nearby'], ['in_progress', 'My Crawls'], ['completed', 'Completed'], ['not_started', 'Not started']].map(([value, label]) => (
+                  <Chip key={label} testID={`crawls-status-${value ?? 'all'}`} selected={selectedStatus === value}
+                    accessibilityLabel={label} onPress={() => setSelectedStatus(value)} style={styles.chip}>{label}</Chip>
+                ))}
+              </View>
+              <Text variant="titleSmall">Travel style</Text>
+              <View style={styles.filterControls}>
+                <Chip testID="crawls-tag-all" selected={!selectedTag} onPress={() => setSelectedTag(null)} style={styles.chip}>All routes</Chip>
+                {tags.map((tag) => (
+                  <Chip key={tag.id} testID={`crawls-tag-${tag.id}`} selected={selectedTag?.id === tag.id}
+                    accessibilityLabel={tag.travel} onPress={() => setSelectedTag(selectedTag?.id === tag.id ? null : { key: 'id', id: tag.id, label: tag.travel })}
+                    style={styles.chip}>{tag.travel === 'Walkable and Short Drive' ? 'Walk + drive' : tag.travel}</Chip>
+                ))}
+              </View>
+              <Text variant="titleSmall">Sort</Text>
+              <Text variant="bodyMedium">Nearest first, based on the first stop. Crawls without a known distance appear last.</Text>
+            </ScrollView>
+          </Dialog.ScrollArea>
+          <Dialog.Actions style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
+            <Button onPress={() => { setSelectedStatus(null); setSelectedTag(null); }} contentStyle={{ minHeight: 48 }}>Clear filters</Button>
+            <Button testID="crawls-show-results" mode="contained" onPress={() => setFiltersOpen(false)} contentStyle={{ minHeight: 48 }}>Show crawls</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+
       {/* Welcome wizard */}
       {authReady && welcomeChecked && welcomeVisible && (
         <RoutesWelcomeWizard visible onDone={markRouteWelcomeSeen} onSkip={markRouteWelcomeSeen} />
@@ -1300,14 +1311,14 @@ export default function RoutesIndex() {
 
 /* ---------------- styles ---------------- */
 const styles = StyleSheet.create({
-  filterRail: { position: 'relative' },
-  filterRailHint: { position: 'absolute', top: 0, right: 0, bottom: 0, width: 36, alignItems: 'center', justifyContent: 'center' },
+  discoveryToolbar: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 },
+  toolbarAction: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, minHeight: 48 },
+  toolbarLabel: { fontSize: 13, fontWeight: '700' },
+  filterControls: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   header: { paddingTop: 8, paddingBottom: 16 },
   featureHeading: { paddingHorizontal: 14, paddingTop: 12, paddingBottom: 8 },
   featureContent: { paddingVertical: 12, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', gap: 10 },
   featureMeta: { marginTop: 5, marginBottom: 6, opacity: 0.8 },
-  discoverySegments: { marginTop: 14, borderRadius: 14, flexDirection: 'row', padding: 3, gap: 3 },
-  segment: { flex: 1, borderRadius: 12, minHeight: 44, justifyContent: 'center', paddingHorizontal: 3, paddingVertical: 8 },
   headerTopRow: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 6, alignItems: 'center', justifyContent: 'space-between' },
   title: { fontWeight: '800' },
   subtitle: { opacity: 0.7, marginTop: 2 },

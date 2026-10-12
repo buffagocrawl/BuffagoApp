@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Button, Card, Dialog, Divider, Portal, Text, useTheme } from 'react-native-paper';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -15,6 +15,7 @@ import {
 import { useSavedDestinations } from '../hooks/useSavedDestinations';
 import { saveSavedDestinationIntent } from '../lib/savedDestinations.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FeedbackState from './ui/FeedbackState';
 import { accountUserId, createAccountScope, lookupAccount } from '../lib/accountBoundary.js';
 
@@ -47,6 +48,8 @@ function RevealStat({ label, value, icon }) {
 export default function WingJuryGame() {
   const theme = useTheme();
   const router = useRouter();
+  const { height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const { preview } = useLocalSearchParams();
   const previewMode = String(preview || '');
   const visualPreview = __DEV__ && ['blind', 'rated', 'unrated', 'guest', 'exhausted'].includes(previewMode);
@@ -312,14 +315,21 @@ export default function WingJuryGame() {
       return;
     }
     if (!ENABLE_SAVED_DESTINATIONS) {
-      Alert.alert('Saving is not available yet', 'Saved restaurants are enabled only in the controlled local preview right now.');
+      Alert.alert('Saving is temporarily unavailable', 'Saved restaurants are currently disabled. Please try again later.');
       return;
     }
     const kind = action === 'favorite' ? 'favorites' : 'wantToTry';
     const savedValue = action === 'favorite' ? !reveal.favorite : !reveal.want_to_try;
     try {
-      await saved.mutate({ kind, destinationId, saved: savedValue });
+      const result = await saved.mutate({ kind, destinationId, saved: savedValue, expectedUserId: accountRef.current });
       if (!isCurrent()) return;
+      if (result.status !== 'signed_in') {
+        if (result.status === 'guest' || result.requiresAuth) {
+          authIntentRef.current = { destinationId, kind, saved: savedValue, epoch };
+          setAuthPromptVisible(true);
+        }
+        return;
+      }
       setReveal((current) => current ? { ...current, favorite: kind === 'favorites' ? savedValue : current.favorite, want_to_try: kind === 'wantToTry' ? savedValue : current.want_to_try } : current);
     } catch (nextError) {
       if (!isCurrent()) return;
@@ -362,19 +372,19 @@ export default function WingJuryGame() {
   const wingdexAverage = reveal?.restaurant_rating?.average_weight_score;
 
   return (
-    <>
-    <ScrollView style={{ backgroundColor: theme.colors.background }} contentContainerStyle={styles.screen} testID="wing-jury-screen">
+    <View style={[styles.root, { backgroundColor: theme.colors.background }]} >
+    <ScrollView style={styles.scroller} contentContainerStyle={[styles.screen, isRevealed && styles.revealedScreen]} testID="wing-jury-screen">
       <View style={styles.headerRow}>
         <View>
-          <Text variant="labelLarge" style={{ color: theme.colors.primary, letterSpacing: 1.5 }}>THE BLIND TEST</Text>
-          <Text variant="headlineMedium" style={styles.title}>Wing Jury</Text>
+          {!isRevealed ? <Text variant="labelLarge" style={{ color: theme.colors.primary, letterSpacing: 1.5 }}>THE BLIND TEST</Text> : null}
+          <Text variant={isRevealed ? "titleLarge" : "headlineMedium"} style={styles.title}>Wing Jury</Text>
         </View>
         <Pressable accessibilityRole="button" accessibilityLabel="Close Wing Jury" onPress={close} style={styles.closeButton} hitSlop={8}>
           <MaterialCommunityIcons name="close" size={24} color={theme.colors.onSurface} />
         </Pressable>
       </View>
 
-      <Text style={styles.prompt}>What&apos;s your verdict?</Text>
+      {!isRevealed ? <Text style={styles.prompt}>What&apos;s your verdict?</Text> : null}
       <Card style={styles.photoCard} mode="contained">
         {imageFailed ? (
           <View style={styles.imageError} testID="wing-jury-image-error">
@@ -386,7 +396,7 @@ export default function WingJuryGame() {
           <Image
             key={currentPhoto.submission_id}
             source={{ uri: currentPhoto.signed_url }}
-            style={styles.photo}
+            style={[styles.photo, isRevealed && { height: Math.max(120, Math.min(180, height * 0.23)) }]}
             resizeMode="cover"
             accessibilityLabel="Wing photo to judge"
             onError={() => { if (accountScope.current(imageEpoch) && currentPhotoRef.current === currentPhoto.submission_id) setImageFailed(true); }}
@@ -425,23 +435,24 @@ export default function WingJuryGame() {
 
       {status === 'REVEALED' && reveal ? (
         <Card style={styles.revealCard} mode="contained" testID="wing-jury-reveal">
-          <Text variant="labelLarge" style={{ color: theme.colors.primary, letterSpacing: 1.2 }}>THE REVEAL</Text>
-          <Text variant="headlineSmall" style={styles.restaurantName}>{revealedRestaurant.name || 'Wing spot'}</Text>
+          <Text variant="titleLarge" style={styles.restaurantName}>{revealedRestaurant.name || 'Wing spot'}</Text>
           {(revealedRestaurant.address || revealedRestaurant.city) ? <Text style={styles.address}>{[revealedRestaurant.address, revealedRestaurant.city].filter(Boolean).join(', ')}</Text> : null}
           <Divider style={styles.divider} />
           <View style={styles.statsRow}>
             <RevealStat label="Photo Likes" value={`${readableNumber(reveal.photo_like_count)} Likes`} icon="thumb-up-outline" />
-            <RevealStat label="Wingdex Average" value={wingdexAverage == null ? 'Not rated yet' : readableNumber(wingdexAverage)} icon="star-outline" />
+            <RevealStat label="Wingdex Average" value={wingdexAverage == null || !Number.isFinite(Number(wingdexAverage)) ? 'Not rated yet' : Number(wingdexAverage).toFixed(2)} icon="star-outline" />
           </View>
           {personalRating != null ? <Text style={styles.personalRating}>Your Last Rating: {readableNumber(personalRating)}</Text> : null}
           <Button mode="outlined" icon={reveal?.favorite ? 'heart' : reveal?.want_to_try ? 'bookmark-check' : 'bookmark-plus-outline'} onPress={saveRestaurant} loading={saved.isPending?.(reveal?.save_action === 'favorite' ? 'favorites' : 'wantToTry', revealedRestaurant.id)} contentStyle={styles.buttonContent} style={styles.revealAction}>{revealSaveLabel}</Button>
-          <View style={styles.revealButtons}>
-            <Button mode="contained" onPress={nextPhoto} contentStyle={styles.buttonContent} style={styles.revealButton}>Next Photo</Button>
-            <Button mode="outlined" onPress={close} contentStyle={styles.buttonContent} style={styles.revealButton}>Close</Button>
-          </View>
         </Card>
       ) : null}
     </ScrollView>
+    {status === 'REVEALED' && reveal ? (
+      <View style={[styles.revealButtons, { backgroundColor: theme.colors.background, paddingBottom: Math.max(12, insets.bottom) }]} testID="wing-jury-reveal-footer">
+        <Button mode="outlined" onPress={close} contentStyle={styles.buttonContent} style={styles.revealButton}>Close</Button>
+        <Button mode="contained" onPress={nextPhoto} contentStyle={styles.buttonContent} style={styles.revealButton}>Next Photo</Button>
+      </View>
+    ) : null}
     <Portal>
       <Dialog visible={authPromptVisible} onDismiss={() => { authIntentRef.current = null; setAuthPromptVisible(false); }} testID="wing-jury-auth-prompt">
         <Dialog.Title>Save this restaurant</Dialog.Title>
@@ -460,11 +471,14 @@ export default function WingJuryGame() {
         </Dialog.Actions>
       </Dialog>
     </Portal>
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  root: { flex: 1 },
+  scroller: { flex: 1 },
+  revealedScreen: { paddingTop: 10, paddingBottom: 12, gap: 10 },
   screen: { padding: 16, paddingTop: 22, paddingBottom: 32, gap: 14 },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   title: { fontWeight: '900', letterSpacing: 0.3 },
@@ -480,15 +494,15 @@ const styles = StyleSheet.create({
   disabled: { opacity: 0.45 },
   progressRow: { minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
   revealCard: { borderRadius: 20, padding: 16, backgroundColor: 'rgba(255,255,255,0.055)' },
-  restaurantName: { fontWeight: '900', marginTop: 8, flexShrink: 1 },
-  address: { opacity: 0.72, marginTop: 8, lineHeight: 20 },
-  divider: { marginVertical: 14 },
+  restaurantName: { fontWeight: '900', marginTop: 0, flexShrink: 1 },
+  address: { opacity: 0.72, marginTop: 4, lineHeight: 20 },
+  divider: { marginVertical: 8 },
   statsRow: { flexDirection: 'row', gap: 8 },
-  stat: { flex: 1, minHeight: 86, borderRadius: 14, padding: 10, backgroundColor: 'rgba(255,255,255,0.05)', gap: 3 },
+  stat: { flex: 1, minHeight: 72, borderRadius: 14, padding: 8, backgroundColor: 'rgba(255,255,255,0.05)', gap: 3 },
   statValue: { fontWeight: '900' },
-  personalRating: { marginTop: 12, fontWeight: '800' },
-  revealAction: { marginTop: 16, borderRadius: 14 },
-  revealButtons: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 12, marginTop: 16 },
+  personalRating: { marginTop: 8, fontWeight: '800' },
+  revealAction: { marginTop: 10, borderRadius: 14 },
+  revealButtons: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingTop: 10, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: 'rgba(128,128,128,0.25)' },
   revealButton: { flexGrow: 1, minWidth: 112, borderRadius: 14 },
   authActions: { flexDirection: 'column', alignItems: 'stretch', gap: 8, paddingHorizontal: 24, paddingBottom: 20 },
   authPrimary: { borderRadius: 14 },

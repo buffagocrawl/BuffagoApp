@@ -114,7 +114,7 @@ function cursorContext(user: any, latitude: number | null, longitude: number | n
 }
 export async function encodeJuryCursor(position: any, user: any, latitude: number | null, longitude: number | null) {
   const iv = crypto.getRandomValues(new Uint8Array(12));
-  const data = new TextEncoder().encode(JSON.stringify({ ...position, expires_at: Date.now() + CURSOR_LIFETIME_MS }));
+  const data = new TextEncoder().encode(JSON.stringify({ ...position, expires_at: Date.now() + (position.version === 2 ? 24 * 60 * 60 * 1000 : CURSOR_LIFETIME_MS) }));
   const encrypted = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: cursorContext(user, latitude, longitude) }, await cursorKey(), data));
   const bytes = new Uint8Array(iv.length + encrypted.length); bytes.set(iv); bytes.set(encrypted, iv.length);
   return btoa(String.fromCharCode(...bytes));
@@ -127,6 +127,15 @@ export async function decodeJuryCursor(value: unknown, user: any, latitude: numb
     if (bytes.length < 29) throw new Error('invalid_cursor');
     const clear = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes.slice(0, 12), additionalData: cursorContext(user, latitude, longitude) }, await cursorKey(), bytes.slice(12));
     const cursor = JSON.parse(new TextDecoder().decode(clear));
+    if (cursor.version === 2) {
+      if (!UUID.test(cursor.session_id)
+        || typeof cursor.snapshot_at !== 'string' || !Number.isFinite(Date.parse(cursor.snapshot_at))
+        || Date.parse(cursor.snapshot_at) > Date.now()
+        || !Number.isInteger(cursor.page_number) || cursor.page_number < 1
+        || typeof cursor.expires_at !== 'number' || cursor.expires_at <= Date.now()
+        || cursor.expires_at > Date.now() + 24 * 60 * 60 * 1000) throw new Error('invalid_cursor');
+      return cursor;
+    }
     if (!UUID.test(cursor.destination_id) || !UUID.test(cursor.submission_id)
       || typeof cursor.created_at !== 'string' || !Number.isFinite(Date.parse(cursor.created_at))
       || !(cursor.distance === null || (typeof cursor.distance === 'number' && Number.isFinite(cursor.distance) && cursor.distance >= 0))

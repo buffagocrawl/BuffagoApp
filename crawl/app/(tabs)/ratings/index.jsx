@@ -1,4 +1,5 @@
 import { ENABLE_WING_JURY } from '../../../config/features';
+import { WINGDEX_RADIUS_OPTIONS, nextWingdexRadius, wingdexRadiusMessage } from '../../../lib/wingdexRadius.js';
 // app/ratings/index.jsx
 // BuffaGo — Public Ratings (Wingdex) + Buffacoins (token-based rating in current state)
 
@@ -49,7 +50,9 @@ import { WingShotImage, LoadingSkeleton, SelectionChip as Chip } from '../../../
 import { operationTokens as tokens } from '../../../src/theme/operationTokens';
 import { supabase } from '../../../lib/supabase.js';
 import { trackEvent } from '../../../lib/analytics';
-import { submitBuffacoinRatingTransaction } from '../../../lib/buffacoinRatingTransaction';
+import { createBuffacoinOperationStore, reconcileBuffacoinOperation } from '../../../lib/buffacoinOperationStore';
+import { loadBuffacoinRatingCosts, refreshBuffacoinRatingQuote } from '../../../lib/buffacoinPricing.js';
+import { buffacoinWizardPayload, buffacoinFailureMessage } from '../../../lib/buffacoinRatingUi';
 import { useLocationCtx } from '../../../providers/LocationProvider';
 import MapView, { Marker, PROVIDER_GOOGLE } from '../../../lib/platformMap';
 import { mapCoordinate } from '../../../lib/mapSafety';
@@ -429,11 +432,12 @@ export default function PublicRatingsScreen() {
     if (!isCurrent()) return;
     if (error) {
       console.warn('buffacoin_wallets fetch failed', error.message || error);
-      setBuffacoinBalance(0);
-      return;
+      return null;
     }
 
-    setBuffacoinBalance(Number(data?.balance ?? 0));
+    const balance = Number(data?.balance ?? 0);
+    setBuffacoinBalance(balance);
+    return balance;
   }, [accountScope]);
 
   const refreshCoins = useCallback(async () => {
@@ -546,7 +550,7 @@ export default function PublicRatingsScreen() {
   const [myCoinRated, setMyCoinRated] = useState(new Set());
 
 
-  const RADIUS_OPTIONS = [5, 10, 25, 50, 100, 250];
+  const RADIUS_OPTIONS = WINGDEX_RADIUS_OPTIONS;
   const [radiusMiles, setRadiusMiles] = useState(5); // default 5mi
 
   // location filtering modes:
@@ -585,12 +589,14 @@ export default function PublicRatingsScreen() {
   const [user, setUser] = useState(null);
   const [buffacoinBalance, setBuffacoinBalance] = useState(0);
   const buffacoinOperationRef = useRef(null);
+  const confirmedCoinDestinations = useRef(new Set());
+  const coinOperationStore = useMemo(() => createBuffacoinOperationStore(AsyncStorage), []);
+  const [pendingCoinOperation, setPendingCoinOperation] = useState(null);
+  const checkCoinRatingRef = useRef(null);
 
   // ✅ per-destination escalating cost (1 + # of my prior coin ratings for that destination)
   const [coinCostByDest, setCoinCostByDest] = useState({});
-  const coinCostByDestRef = useRef(coinCostByDest);
-  coinCostByDestRef.current = coinCostByDest;
-  const [coinCostForActive, setCoinCostForActive] = useState(1);
+  const [coinCostForActive, setCoinCostForActive] = useState(null);
 
   // Buffacoin dialogs + rating wizard
   const [coinInfoOpen, setCoinInfoOpen] = useState(false);
@@ -604,6 +610,29 @@ export default function PublicRatingsScreen() {
   const coinPhotoRef = useRef(null);
   const coinStartRef = useRef(false);
   const coinSubmitRef = useRef(false);
+  useEffect(() => {
+    let active = true;
+    const epoch = accountScope.capture();
+    setPendingCoinOperation(null);
+    if (!user?.id) return;
+    void coinOperationStore.load(user.id).then((record) => {
+      if (!active || !accountScope.current(epoch)) return;
+      if (record?.status === 'definitive_failure') {
+        void coinOperationStore.clear({ userId: user.id, operationId: record.operationId }).catch(() => {
+          if (active && accountScope.current(epoch)) setPendingCoinOperation({ recoveryBlocked: true });
+        });
+      } else if (record) {
+        setPendingCoinOperation(record);
+        buffacoinOperationRef.current = record.operationId;
+      }
+    }).catch(() => {
+      if (active && accountScope.current(epoch)) {
+        setPendingCoinOperation({ recoveryBlocked: true });
+        Alert.alert('Rating status needs attention', 'Your saved rating status could not be read. Please reopen the app before starting another BuffaCoin rating.');
+      }
+    });
+    return () => { active = false; };
+  }, [user?.id, accountScope, coinOperationStore]);
   const attachCoinPhoto = useMemo(() => createRatingPhotoAttachment({ submit: submitWingShot,
     drafts: wingShotDrafts, client: supabase, userId: user?.id, flow: 'wingdex-rating',
     isCurrent: () => accountRef.current === user?.id }), [user?.id]);
@@ -643,7 +672,11 @@ export default function PublicRatingsScreen() {
           if (!active) return;
           setCoinRatingDest({ destination_id: row.id, name: row.name, stateCode: state?.state_code });
           buffacoinOperationRef.current = saved.ratingOperationId ?? Crypto.randomUUID();
-          setCoinCostForActive(Math.max(1, Number(coinCostByDestRef.current[String(row.id)] || 1)));
+          try {
+            const cost=await refreshBuffacoinRatingQuote({supabase,userId:user.id,destinationId:row.id,isCurrent:()=>active});
+            if (!active) return;
+            setCoinCostForActive(cost);
+          } catch { if(active) Alert.alert('Price unavailable','We could not verify the BuffaCoin price. Please try again.'); return; }
           setCoinRateOpen(true);
         } },
       ]);
@@ -665,10 +698,12 @@ export default function PublicRatingsScreen() {
       recentRequestRef.current += 1;
       setRows([]); setMyRated(new Set()); setMyCoinRated(new Set());
       setRecentRatings([]); setRecentRatingsLoading(false); setActive(null); setOpen(false);
-      setBuffacoinBalance(0); setCoinCostByDest({}); setCoinCostForActive(1);
+      setBuffacoinBalance(0); setCoinCostByDest({}); setCoinCostForActive(null);
       setCoinRatingDest(null); setCoinRateOpen(false); setCoinCelebrateOpen(false);
       setPendingSummary(null); setPendingCoinBalance(null); setCoinSubmitting(false);
+      setPendingCoinOperation(null);
       buffacoinOperationRef.current = null;
+      confirmedCoinDestinations.current = new Set();
       coinPhotoRef.current = null; setCoinPhotoOpen(false); setCoinPhotoReset((value) => value + 1);
       pendingIntentRef.current = '';
       Promise.resolve().then(() => { if (alive) void fetchAllRef.current?.().catch(() => {}); });
@@ -1037,7 +1072,6 @@ export default function PublicRatingsScreen() {
     if (error) throw error;
 
     if (!isCurrent()) return;
-    const coinCountsByDest = new Map();
     const myCoinRatedSet = new Set();
     
     for (const r of data || []) {
@@ -1048,8 +1082,6 @@ export default function PublicRatingsScreen() {
     
       // ✅ count ONLY *my* prior buffacoin ratings for this destination
       if (isMine && r.is_buffacoin === true) {
-        const key = String(id);
-        coinCountsByDest.set(key, (coinCountsByDest.get(key) ?? 0) + 1);
         myCoinRatedSet.add(id); // keep as raw uuid (same type as myRated uses)
       }
     }
@@ -1212,15 +1244,16 @@ export default function PublicRatingsScreen() {
       }
     }
 
-    // ✅ build "next cost" map: 1 + my coin rating count for that destination
-    const nextCostObj = {};
-    for (const [destId, cnt] of coinCountsByDest.entries()) {
-      nextCostObj[String(destId)] = 1 + Number(cnt || 0);
-    }
-    setCoinCostByDest(nextCostObj);
-
-
+    // Load exact server quotes independently of the public ratings list.
     const list = [...ratedList, ...unratedList];
+    let exactCosts = {};
+    if (accountUserId(u)) {
+      try { exactCosts = await loadBuffacoinRatingCosts({ supabase, userId: u.id,
+        destinationIds: list.map(row => row.destination_id), isCurrent }); }
+      catch { /* No guessed prices when the authoritative quote is unavailable. */ }
+    }
+    if (!isCurrent()) return;
+    setCoinCostByDest(exactCosts);
     setRows(list);
     setMyRated(myRatedSet);
 
@@ -1368,6 +1401,25 @@ export default function PublicRatingsScreen() {
   const onPressCoinRate = useCallback(
     async (item) => {
       if (coinStartRef.current || coinSubmitRef.current) return;
+      if (confirmedCoinDestinations.current.has(item?.destination_id)) return;
+      const pendingEpoch = accountScope.capture();
+      try {
+        const operation = user?.id ? await coinOperationStore.load(user.id) : null;
+        if (!accountScope.current(pendingEpoch)) return;
+        if (operation && operation.status !== 'definitive_failure') {
+          setPendingCoinOperation(operation);
+          Alert.alert('Finish checking your rating', "Check your previous rating before starting another. Your BuffaCoins won't be charged twice.", [
+            { text: 'Later', style: 'cancel' },
+            { text: 'Check Rating Status', onPress: () => { if (accountScope.current(pendingEpoch)) void checkCoinRatingRef.current?.(operation); } },
+          ]);
+          return;
+        }
+        if (operation) await coinOperationStore.clear({ userId: user.id, operationId: operation.operationId });
+      } catch {
+        if (accountScope.current(pendingEpoch)) Alert.alert('Rating status needs attention', 'Your saved rating status could not be read. Please reopen the app before starting another BuffaCoin rating.');
+        return;
+      }
+      if (!accountScope.current(pendingEpoch) || coinStartRef.current || coinSubmitRef.current) return;
       if (coinPhotoRef.current) {
         Alert.alert('Finish your saved photo', 'A photo is saved for another rating. Resume or discard it before starting another.', [
           { text: 'Keep photo', style: 'cancel' },
@@ -1388,9 +1440,11 @@ export default function PublicRatingsScreen() {
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       } catch {}
 
-      // compute next cost for this destination for this user
+      // Get the exact account-scoped price before opening the rating.
       const destId = item?.destination_id ? String(item.destination_id) : null;
-      const cost = Math.max(1, Number(destId ? coinCostByDest[destId] : 1) || 1);
+      const cost = user?.id ? await refreshBuffacoinRatingQuote({ supabase,
+        destinationId: destId, userId: user.id, isCurrent: () => accountScope.current(epoch) }) : null;
+      if (!accountScope.current(epoch)) return;
 
       if (item?.destination_id && myCoinRated.has(item.destination_id)) {
         // Shouldn't happen because button is hidden, but keep it safe.
@@ -1440,7 +1494,7 @@ export default function PublicRatingsScreen() {
         Alert.alert('Rating could not start', error?.message || 'Please try again.');
       } finally { coinStartRef.current = false; }
     },
-    [user?.id, buffacoinBalance, coinCostByDest, myCoinRated, accountScope, refreshCoinPhotoFlags, retryCoinPhoto, coinRatingDest?.destination_id]
+    [user?.id, buffacoinBalance, myCoinRated, accountScope, coinOperationStore, refreshCoinPhotoFlags, retryCoinPhoto, coinRatingDest?.destination_id]
   );
 
   const shareRating = useCallback(async (item) => {
@@ -1574,14 +1628,21 @@ export default function PublicRatingsScreen() {
     [fetchRecentRatingsForDestination, fetchRoutesForDestination, user?.id]
   );
 
-  const expandRadius = useCallback(() => {
-    const currentIndex = RADIUS_OPTIONS.findIndex((mi) => mi === radiusMiles);
-    const nextRadius = RADIUS_OPTIONS[Math.min(RADIUS_OPTIONS.length - 1, Math.max(0, currentIndex) + 1)];
-
-    setRadiusMiles(nextRadius ?? 25);
-    setLocationMode('radius');
-    setStateCodeFilter(null);
-  }, [RADIUS_OPTIONS, radiusMiles]);
+  const nextRadius = nextWingdexRadius(radiusMiles);
+  const expandRadius = useCallback(async () => {
+    const target = nextWingdexRadius(radiusMiles);
+    if (target === null || loading) return;
+    // Reapply the radius to fresh server data, preserving the query and other filters.
+    setRadiusMiles(target);
+    setLoading(true);
+    try {
+      await fetchAll();
+    } catch (_error) {
+      Alert.alert('Could not refresh Wingdex', 'Check your connection and try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchAll, loading, radiusMiles]);
 
   const handleWingmanPickDestination = useCallback(
     async (row) => {
@@ -1695,8 +1756,28 @@ export default function PublicRatingsScreen() {
   }, [setHomeDestination]);
 
 
-  const submitCoinRating = useCallback(async (payload) => {
-  if (!user?.id || !coinRatingDest?.destination_id || coinSubmitRef.current) return;
+  const refreshCoinConfirmationQuote = useCallback(async () => {
+    if (!user?.id || !coinRatingDest?.destination_id || coinSubmitRef.current) return false;
+    const epoch = accountScope.capture();
+    const isCurrent = () => accountScope.current(epoch) && accountRef.current === user.id;
+    setCoinSubmitting(true);
+    try {
+      const cost = await refreshBuffacoinRatingQuote({ supabase, userId:user.id,
+        destinationId:coinRatingDest.destination_id, isCurrent });
+      if (!isCurrent()) return false;
+      setCoinCostForActive(cost);
+      setCoinCostByDest(current => ({...current,[coinRatingDest.destination_id]:cost}));
+      return true;
+    } catch {
+      if (isCurrent()) Alert.alert('Price unavailable', 'We could not verify the BuffaCoin price. Please try again.');
+      return false;
+    } finally { if (isCurrent()) setCoinSubmitting(false); }
+  }, [accountScope, user?.id, coinRatingDest?.destination_id]);
+
+  const submitCoinRating = useCallback(async (payload, existingOperation = null) => {
+  const destination = existingOperation?.request ? { destination_id: existingOperation.request.destinationId, stateCode: existingOperation.request.stateCode } : coinRatingDest;
+  if (!user?.id || !destination?.destination_id || coinSubmitRef.current) return;
+  if (!existingOperation && confirmedCoinDestinations.current.has(destination.destination_id)) return;
   const epoch = accountScope.capture();
   const isCurrent = () => accountScope.current(epoch) && accountRef.current === user.id;
   if (!isCurrent()) return;
@@ -1706,7 +1787,7 @@ export default function PublicRatingsScreen() {
     return;
   }
 
-  const stateCode = coinRatingDest?.stateCode || currentState || stateCodeFilter || null;
+  const stateCode = destination?.stateCode || currentState || stateCodeFilter || null;
   if (!stateCode) {
     Alert.alert('Missing state', 'We couldn’t determine your current state for this rating.');
     return;
@@ -1715,16 +1796,30 @@ export default function PublicRatingsScreen() {
   coinSubmitRef.current = true;
   setCoinSubmitting(true);
   let committedReceipt = null;
+  let confirmedBalance = null;
   try {
-    const spendTimes = Math.max(1, Number(coinCostForActive || 1));
-    const operationId = buffacoinOperationRef.current || Crypto.randomUUID();
+    const spendTimes = existingOperation?.request?.coinCost ?? coinCostForActive;
+    if (!existingOperation) {
+      let quote;
+      try { quote = await refreshBuffacoinRatingQuote({ supabase, userId:user.id,
+        destinationId:destination.destination_id, isCurrent }); }
+      catch { if (isCurrent()) Alert.alert('Price unavailable', 'We could not verify the BuffaCoin price. Please try again.'); return; }
+      if (!isCurrent()) return;
+      if (quote !== spendTimes) {
+        setCoinCostForActive(quote);
+        setCoinCostByDest(current => ({...current,[destination.destination_id]:quote}));
+        Alert.alert('BuffaCoin price updated', 'Your rating has not been submitted. Review the updated price and confirm again.');
+        return;
+      }
+    }
+    const operationId = existingOperation?.operationId || buffacoinOperationRef.current || Crypto.randomUUID();
     buffacoinOperationRef.current = operationId;
     const startedAt = Date.now();
     await trackEvent({
       eventName: 'rating_submission_started',
       screen: 'ratings',
       userId: user.id,
-      destinationId: coinRatingDest.destination_id,
+      destinationId: destination.destination_id,
       metadata: {
         event_id: Crypto.randomUUID(),
         operation_id: operationId,
@@ -1759,20 +1854,67 @@ export default function PublicRatingsScreen() {
     if (!isCurrent()) return;
     const transactionClient = await accountBoundRpc(supabase, user.id, isCurrent);
     if (!isCurrent()) return;
-    const committed = await submitBuffacoinRatingTransaction({
-      supabase: transactionClient,
-      operationId,
-      destinationId: coinRatingDest.destination_id,
-      stateCode,
-      coinCost: spendTimes,
-      rating: ratingPayload,
-    });
+    const prepared = await coinOperationStore.prepare({ userId: user.id, operationId,
+      destinationId: destination.destination_id, stateCode, coinCost: spendTimes, rating: ratingPayload });
+    if (!isCurrent()) return;
+    setPendingCoinOperation(prepared);
+    const outcome = await reconcileBuffacoinOperation({ store: coinOperationStore, supabase: transactionClient,
+      userId: user.id, isCurrent });
+    if (!isCurrent()) return;
+    if (outcome.status !== 'committed') {
+      if (outcome.status === 'definitive_failure' && outcome.error?.message === 'coin_cost_mismatch') {
+        // The server checks receipts before repricing: this operation did not charge.
+        // Keep the same operation ID (and photo association), refresh, and require consent.
+        await coinOperationStore.clear({ userId:user.id, operationId });
+        if (!isCurrent()) return;
+        setPendingCoinOperation(null);
+        try {
+          const quote = await refreshBuffacoinRatingQuote({supabase,userId:user.id,destinationId:destination.destination_id,isCurrent});
+          if (!isCurrent()) return;
+          setCoinCostForActive(quote);
+          setCoinCostByDest(current => ({...current,[destination.destination_id]:quote}));
+        } catch {
+          if (!isCurrent()) return;
+          setCoinCostForActive(null);
+          Alert.alert('Price unavailable', 'No coins were deducted. Please try again to check the current price.');
+          return;
+        }
+        Alert.alert('BuffaCoin price updated', 'Your rating has not been submitted and no coins were deducted. Review the price and confirm again.');
+        return;
+      }
+      setCoinRateOpen(false);
+      if (outcome.status === 'definitive_failure') {
+        await coinOperationStore.clear({ userId: user.id, operationId });
+        if (!isCurrent()) return;
+        setPendingCoinOperation(null); buffacoinOperationRef.current = null;
+        Alert.alert('Rating not submitted', buffacoinFailureMessage(outcome));
+      } else {
+        setPendingCoinOperation(outcome.record);
+        Alert.alert('Checking your rating', buffacoinFailureMessage(outcome), [
+          { text: 'Later', style: 'cancel' },
+          { text: 'Check Rating Status', onPress: () => { if (isCurrent()) void checkCoinRatingRef.current?.(outcome.record); } },
+        ]);
+      }
+      return;
+    }
+    const committed = outcome.receipt;
     committedReceipt = committed;
     if (!isCurrent()) return;
     const crawlId = committed.crawl_id;
+    confirmedCoinDestinations.current.add(destination.destination_id);
+    setMyCoinRated((current) => new Set([...current, destination.destination_id]));
+    setMyRated((current) => new Set([...current, destination.destination_id]));
+    confirmedBalance = await fetchBuffacoinBalance(user);
+    if (!isCurrent()) return;
+    if (!coinPhotoRef.current) {
+      const photoDraft = await wingShotDrafts.load({ userId: user.id, flow: 'wingdex-rating' });
+      if (!isCurrent()) return;
+      if (photoDraft?.ratingOperationId === operationId) coinPhotoRef.current = { draft: photoDraft.draft,
+        destinationId: destination.destination_id, operationId, ratingId: committed.rating_id };
+    }
     if (coinPhotoRef.current?.draft) {
       coinPhotoRef.current = { ...coinPhotoRef.current, ratingId: committed.rating_id,
-        destinationId: coinRatingDest.destination_id, operationId };
+        destinationId: destination.destination_id, operationId };
       // Persist the committed receipt before any optional photo network work.
       // An upload failure must never rerun the rating/debit transaction.
       const pending = coinPhotoRef.current;
@@ -1781,14 +1923,17 @@ export default function PublicRatingsScreen() {
         ratingOperationId: operationId, lifecycle: 'attaching', draft: pending.draft });
     }
     setCoinRateOpen(false);
-    setBuffacoinBalance(committed.new_balance);
+    setBuffacoinBalance(confirmedBalance ?? committed.new_balance);
     playCoinDelta(`-${spendTimes}`);
+    await coinOperationStore.clear({ userId: user.id, operationId });
+    if (!isCurrent()) return;
+    setPendingCoinOperation(null);
     buffacoinOperationRef.current = null;
     await trackEvent({
       eventName: 'rating_transaction_succeeded',
       screen: 'ratings',
       userId: user.id,
-      destinationId: coinRatingDest.destination_id,
+      destinationId: destination.destination_id,
       crawlId,
       metadata: {
         event_id: Crypto.randomUUID(),
@@ -1807,7 +1952,7 @@ export default function PublicRatingsScreen() {
       eventName: 'rating_completed',
       screen: 'ratings',
       userId: user.id,
-      destinationId: coinRatingDest.destination_id,
+      destinationId: destination.destination_id,
       crawlId,
       metadata: {
         source: 'wingdex_buffacoin',
@@ -1822,7 +1967,7 @@ export default function PublicRatingsScreen() {
       eventName: 'rating_submitted',
       screen: 'ratings',
       userId: user.id,
-      destinationId: coinRatingDest.destination_id,
+      destinationId: destination.destination_id,
       crawlId,
       metadata: {
         source: 'wingdex_buffacoin',
@@ -1837,18 +1982,18 @@ export default function PublicRatingsScreen() {
     if (!isCurrent()) return;
     setMyCoinRated((prev) => {
       const next = new Set(prev);
-      next.add(coinRatingDest.destination_id);
+      next.add(destination.destination_id);
       return next;
     });
     
     setMyRated((prev) => {
       const next = new Set(prev);
-      next.add(coinRatingDest.destination_id);
+      next.add(destination.destination_id);
       return next;
     });
     
     // ✅ optimistic rating update (list + drilldown) so it feels instant
-    const destId = coinRatingDest.destination_id;
+    const destId = destination.destination_id;
     // The database trigger is authoritative for Want to Try cleanup; refresh the
     // client cache only after the rating transaction has committed.
     await saved.invalidateAfterRating(destId);
@@ -1856,7 +2001,7 @@ export default function PublicRatingsScreen() {
     if (!isCurrent()) return;
     
     setRows((prev) =>
-      (prev || []).map((r) => {
+      existingOperation ? prev : (prev || []).map((r) => {
         if (r.destination_id !== destId) return r;
     
         const prevCount = Number(r.count ?? 0);
@@ -1886,7 +2031,7 @@ export default function PublicRatingsScreen() {
     );
     
     setActive((prev) => {
-      if (!prev || prev.destination_id !== destId) return prev;
+      if (existingOperation || !prev || prev.destination_id !== destId) return prev;
     
       const prevCount = Number(prev.count ?? 0);
       const nextCount = prevCount + 1;
@@ -1917,13 +2062,13 @@ export default function PublicRatingsScreen() {
     // ✅ hide Rate button immediately for this destination
     setMyCoinRated((prev) => {
       const next = new Set(prev);
-      next.add(coinRatingDest.destination_id);
+      next.add(destination.destination_id);
       return next;
     });
 
 
     // 5) Determine new balance (don’t apply yet; show celebration first)
-    const safeNewBal = committed.new_balance;
+    const safeNewBal = confirmedBalance ?? committed.new_balance;
 
     // 6) Close wizard immediately
     setCoinRateOpen(false);
@@ -1937,6 +2082,8 @@ export default function PublicRatingsScreen() {
       meat: Number(finalScores.meat),
       overall: Number(finalScores.overall),
     });
+    await fetchAll();
+    if (!isCurrent()) return;
     setCoinCelebrateOpen(true);
     if (coinPhotoRef.current?.ratingId) void retryCoinPhoto();
   } catch (error) {
@@ -1945,9 +2092,9 @@ export default function PublicRatingsScreen() {
       // UI refresh, analytics, or draft storage can fail after a successful
       // transaction. Never present that committed rating as a retryable debit.
       setCoinRateOpen(false);
-      setBuffacoinBalance(committedReceipt.new_balance);
+      setBuffacoinBalance(confirmedBalance ?? committedReceipt.new_balance);
       buffacoinOperationRef.current = null;
-      Alert.alert('Rating saved', 'Your rating and BuffaCoin payment are complete. The photo or screen refresh needs attention.', [
+      Alert.alert('Rating submitted!', 'Your rating and BuffaCoin payment are complete. The photo or screen refresh needs attention.', [
         { text: 'Done' },
         ...(coinPhotoRef.current?.ratingId ? [{ text: 'Retry photo', onPress: () => { void retryCoinPhoto(); } }] : []),
       ]);
@@ -1957,7 +2104,7 @@ export default function PublicRatingsScreen() {
       eventName: 'rating_transaction_failed',
       screen: 'ratings',
       userId: user.id,
-      destinationId: coinRatingDest.destination_id,
+      destinationId: destination.destination_id,
       metadata: {
         event_id: Crypto.randomUUID(),
         operation_id: buffacoinOperationRef.current || 'not_created',
@@ -1965,32 +2112,44 @@ export default function PublicRatingsScreen() {
         result_code: error?.message || 'transaction_failed',
         rating_id_present: false,
         crawl_id_present: false,
-        debit_committed: false,
+        debit_committed: null,
       },
     });
     if (!isCurrent()) return;
-    Alert.alert(
-      'Rating not confirmed',
-      'Nothing will be retried through the old path. Try again to safely check this same operation.'
-    );
+    let pending = null;
+    try { pending = await coinOperationStore.load(user.id); } catch { /* Preserve unreadable records. */ }
+    if (!isCurrent()) return;
+    setCoinRateOpen(false);
+    setPendingCoinOperation(pending || { recoveryBlocked: true });
+    Alert.alert('Checking your rating', "We're checking your rating. Your BuffaCoins won't be charged twice.", [
+      { text: 'Later', style: 'cancel' },
+      ...(pending ? [{ text: 'Check Rating Status', onPress: () => { if (isCurrent()) void checkCoinRatingRef.current?.(pending); } }] : []),
+    ]);
   } finally {
     coinSubmitRef.current = false;
     if (isCurrent()) setCoinSubmitting(false);
   }
 }, [
   accountScope,
-  user?.id,
-  coinRatingDest?.destination_id,
+  user,
+  coinRatingDest,
   currentState,
   stateCodeFilter,
-  coinRatingDest?.stateCode,
   coinCostForActive,
   computeWeightScoreFromScores,
   fetchRecentRatingsForDestination,
   playCoinDelta,
   saved,
   retryCoinPhoto,
+  coinOperationStore,
+  fetchBuffacoinBalance,
+  fetchAll,
 ]);
+
+  checkCoinRatingRef.current = (record) => {
+    if (record?.userId !== accountRef.current || !record?.request || coinSubmitRef.current) return;
+    return submitCoinRating(buffacoinWizardPayload(record.request), record);
+  };
 
 
   /* ---------- RENDER ---------- */
@@ -2013,7 +2172,7 @@ export default function PublicRatingsScreen() {
     const ratedWithCoin = myCoinRated.has(item.destination_id);
 
     const destIdStr = String(item.destination_id);
-    const coinCost = Math.max(1, Number(coinCostByDest?.[destIdStr] ?? 1));
+    const coinCost = coinCostByDest?.[destIdStr] ?? null;
 
     return (
       <Card
@@ -2048,9 +2207,9 @@ export default function PublicRatingsScreen() {
             <Button
               icon="camera-plus-outline"
               compact
+              accessibilityLabel={`0 photos. Add a photo for ${item.name}`}
               contentStyle={{ minHeight: 44 }}
               labelStyle={[styles.compactMetric, { color: dark ? colors.onSurface : colors.onSurfaceVariant, fontSize: 11 }]}
-              accessibilityLabel={`0 photos. Add a photo for ${item.name}`}
               accessibilityHint={ratedByMe ? 'Opens Journey to attach a photo to your existing rating' : 'Selects this restaurant on Home so you can rate it and share a Wing Shot'}
               onPress={(event) => {
                 event?.stopPropagation?.();
@@ -2075,7 +2234,7 @@ export default function PublicRatingsScreen() {
             <Button mode="contained" icon={({ size }) => <TokenIcon size={size + 4} />}
               onPress={(event) => { event?.stopPropagation?.(); onPressCoinRate(item); }}
               style={styles.rateBtnInline} contentStyle={styles.rateBtnInlineContent} labelStyle={styles.rateBtnInlineLabel}>
-              {'Rate · ' + coinCost}
+              {coinCost == null ? 'Rate \u00b7 Check price' : 'Rate \u00b7 ' + coinCost}
             </Button>
           ) : ratedByMe ? (
             <View style={[styles.ratedInlineChip, { backgroundColor: themed.ratedChipBg }]}>
@@ -2328,12 +2487,26 @@ export default function PublicRatingsScreen() {
           </Pressable> : null}
         </View>
         <Divider style={{ marginTop: 10, marginBottom: 6 }} />
+        {pendingCoinOperation ? <Button
+          testID="buffacoin-check-status"
+          mode="contained-tonal"
+          icon="clock-check-outline"
+          loading={coinSubmitting}
+          disabled={coinSubmitting || pendingCoinOperation.recoveryBlocked}
+          contentStyle={{ minHeight: 48 }}
+          onPress={() => { void checkCoinRatingRef.current?.(pendingCoinOperation); }}
+        >{coinSubmitting ? 'Checking your rating…' : pendingCoinOperation.recoveryBlocked ? 'Rating status needs attention' : 'Check Rating Status'}</Button> : null}
         </ScrollView>
       </Animated.View>
 
       {loading || (savedView !== 'discover' && saved.listStatus === 'loading' && displayedRows.length === 0) ? (
         <View style={styles.center}>
           <LoadingSkeleton rows={3} style={{ width: "90%", paddingTop: headerHeight }} />
+          {loading && locationMode === 'radius' ? (
+            <Text accessibilityLiveRegion="polite" style={{ marginTop: 12, textAlign: 'center' }}>
+              Searching within {radiusMiles} miles?
+            </Text>
+          ) : null}
         </View>
       ) : (
         <Animated.FlatList
@@ -2382,7 +2555,9 @@ export default function PublicRatingsScreen() {
                 style={styles.emptyState}
                 icon="map-search-outline"
                 title={locationMode === 'radius' ? 'No wing spots in this radius' : 'No Wingdex matches'}
-                body="Broaden the search, jump to a state, or add the missing restaurant so your local Wingdex gets better."
+                body={locationMode === 'radius'
+                  ? wingdexRadiusMessage(radiusMiles)
+                  : 'Broaden the search, jump to a state, or add the missing restaurant so your local Wingdex gets better.'}
                 actionLabel="Add restaurant"
                 onAction={() => {
                   trackEvent({
@@ -2402,10 +2577,10 @@ export default function PublicRatingsScreen() {
                   });
                   openWingman('wingdex_empty_state', query);
                 }}
-                secondaryLabel={locationMode === 'radius' ? 'Expand radius' : 'View all'}
+                secondaryLabel={locationMode === 'radius' ? (nextRadius === null ? undefined : `Expand to ${nextRadius} miles →`) : 'View all'}
                 onSecondary={() => {
                   if (locationMode === 'radius') {
-                    expandRadius();
+                    void expandRadius();
                     return;
                   }
                   setLocationMode('all');
@@ -2999,14 +3174,14 @@ export default function PublicRatingsScreen() {
 
       <Portal>
         <Dialog visible={coinCelebrateOpen} onDismiss={() => setCoinCelebrateOpen(false)} style={styles.dialog}>
-          <Dialog.Title style={{ textAlign: 'center' }}>Added to your Wingdex</Dialog.Title>
+          <Dialog.Title style={{ textAlign: 'center' }}>Rating submitted!</Dialog.Title>
           <Dialog.Content>
             <View style={[styles.successScorePanel, { backgroundColor: colors.surfaceVariant }]}>
               <Text style={styles.successScoreLabel}>BuffaGo Score</Text>
               <Text style={styles.successScoreValue}>{fmt2(pendingSummary?.weightScore)}</Text>
             </View>
             <Text style={{ opacity: 0.78, textAlign: 'center', marginTop: 12 }}>
-              Your rating was saved and your Buffacoin balance is now {pendingCoinBalance ?? buffacoinBalance}.
+              Your rating is saved. Last confirmed BuffaCoin balance: {pendingCoinBalance ?? buffacoinBalance}.
             </Text>
           </Dialog.Content>
           <Dialog.Actions style={{ justifyContent: 'space-between' }}>
@@ -3039,10 +3214,11 @@ export default function PublicRatingsScreen() {
         destinationName={coinRatingDest?.name ? `Rate • ${coinRatingDest.name}` : 'Rate'}
         tagOptions={ratingTagOptions}
         saving={coinSubmitting}
-        finalizeLabel={`Spend ${Math.max(1, Number(coinCostForActive || 1))} 🪙 & Submit`}
+        finalizeLabel={coinCostForActive == null ? 'Check price' : `Spend ${coinCostForActive} \u{1FA99} & Submit`}
         onDismiss={() => {
           if (!coinSubmitting) setCoinRateOpen(false);
         }}
+        onBeforeConfirmation={refreshCoinConfirmationQuote}
         onFinalize={submitCoinRating}
       />
 

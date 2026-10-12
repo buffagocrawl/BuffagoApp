@@ -1,4 +1,4 @@
-﻿    import React, { useEffect, useState } from 'react';
+    import React, { useEffect, useState } from 'react';
     import { Tabs } from 'expo-router';
     import { Text, View } from 'react-native';
     import { useTheme } from 'react-native-paper';
@@ -80,6 +80,23 @@
           />
 
           <Tabs.Screen
+            name="ratings/index"
+            options={{
+              title: 'Wingdex',
+              tabBarLabel: tabLabel('Wingdex'),
+              tabBarButtonTestID: 'nav.wingdex',
+              tabBarAccessibilityLabel: 'Wingdex navigation',
+              tabBarIcon: ({ color }) => (
+                <MaterialCommunityIcons
+                  name="food-drumstick"
+                  color={color}
+                  size={iconSize}
+                />
+              ),
+            }}
+          />
+
+          <Tabs.Screen
             name="routes/index"
             options={{
               title: 'Crawls',
@@ -97,15 +114,15 @@
           />
 
           <Tabs.Screen
-            name="ratings/index"
+            name="journey/index"
             options={{
-              title: 'Wingdex',
-              tabBarLabel: tabLabel('Wingdex'),
-              tabBarButtonTestID: 'nav.wingdex',
-              tabBarAccessibilityLabel: 'Wingdex navigation',
+              title: signedIn ? 'Your Journey' : 'Sign In',
+              tabBarLabel: tabLabel(signedIn ? 'Journey' : 'Sign In'),
+              tabBarButtonTestID: 'nav.profile',
+              tabBarAccessibilityLabel: signedIn ? 'Profile navigation' : 'Sign in navigation',
               tabBarIcon: ({ color }) => (
                 <MaterialCommunityIcons
-                  name="food-drumstick"
+                  name={signedIn ? 'timeline-text' : 'login-variant'}
                   color={color}
                   size={iconSize}
                 />
@@ -125,23 +142,6 @@
               tabBarIcon: ({ color }) => (
                 <MaterialCommunityIcons
                   name="account-group"
-                  color={color}
-                  size={iconSize}
-                />
-              ),
-            }}
-          />
-
-          <Tabs.Screen
-            name="journey/index"
-            options={{
-              title: signedIn ? 'Your Journey' : 'Sign In',
-              tabBarLabel: tabLabel(signedIn ? 'Journey' : 'Sign In'),
-              tabBarButtonTestID: 'nav.profile',
-              tabBarAccessibilityLabel: signedIn ? 'Profile navigation' : 'Sign in navigation',
-              tabBarIcon: ({ color }) => (
-                <MaterialCommunityIcons
-                  name={signedIn ? 'timeline-text' : 'login-variant'}
                   color={color}
                   size={iconSize}
                 />

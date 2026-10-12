@@ -1,5 +1,6 @@
 import * as Crypto from 'expo-crypto';
 import { supabase } from './supabase';
+import { loadWingShotJuryCounts } from './wingShotHistory';
 
 const HISTORY_PAGE_SIZE = 25;
 const WITHDRAWABLE_STATUSES = new Set([
@@ -79,7 +80,7 @@ export async function loadMyWingShotHistory({
     p_before: before,
   });
   if (error) throw rpcError(error, 'Could not load Wing Shot history.');
-  return data || [];
+  return loadWingShotJuryCounts(data || [], client);
 }
 
 export async function loadMyWingShotDetail(submissionId, client = supabase) {
@@ -90,7 +91,8 @@ export async function loadMyWingShotDetail(submissionId, client = supabase) {
   if (error) throw rpcError(error, 'Could not load this Wing Shot.');
   const detail = firstRow(data);
   if (!detail) throw new Error('This Wing Shot is not available.');
-  return detail;
+  const [enriched] = await loadWingShotJuryCounts([detail], client);
+  return enriched;
 }
 
 export async function withdrawMyWingShot(

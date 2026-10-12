@@ -1,6 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import ts from 'typescript';
 import { getSavedDestinationState, getSavedDestinations, mutateSavedDestination, SavedDestinationError } from '../lib/savedDestinations.js';
+
+test('saved destinations are enabled locally and in every release profile, with an explicit rollback switch', () => {
+  const source = fs.readFileSync(new URL('../config/features.ts', import.meta.url), 'utf8');
+  const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
+  const enabled = (env) => {
+    const exports = {};
+    vm.runInNewContext(code, { exports, process: { env } });
+    return exports.ENABLE_SAVED_DESTINATIONS;
+  };
+  assert.equal(enabled({}), true);
+  assert.equal(enabled({ EXPO_PUBLIC_ENABLE_SAVED_DESTINATIONS: 'false' }), false);
+  const profiles = JSON.parse(fs.readFileSync(new URL('../eas.json', import.meta.url), 'utf8')).build;
+  for (const name of ['development', 'internal-testing', 'production']) {
+    assert.equal(enabled(profiles[name].env), true, name);
+  }
+});
 
 function queryResult(data, error = null) {
   const chain = {
@@ -91,6 +110,21 @@ test('guest mutation never reaches a saved-list table', async () => {
   const result = await mutateSavedDestination({ client: guest, kind: 'wantToTry', destinationId: 'd1', saved: true });
   assert.deepEqual(result, { status: 'guest', requiresAuth: true, saved: false, destinationId: 'd1' });
   assert.equal(writes, 0);
+});
+
+test('anonymous-auth guests cannot read or write personal saved collections', async () => {
+  const guest = client({ user: { id: 'anonymous', is_anonymous: true } });
+  guest.from = () => { throw new Error('anonymous guest must not reach personal tables'); };
+  assert.equal((await getSavedDestinationState({ client: guest })).status, 'guest');
+  assert.equal((await getSavedDestinations({ client: guest, kind: 'favorites' })).status, 'guest');
+  assert.equal((await mutateSavedDestination({ client: guest, kind: 'wantToTry', destinationId: 'd1', saved: true })).requiresAuth, true);
+});
+
+test('network failures reject the save instead of reporting success', async () => {
+  await assert.rejects(
+    mutateSavedDestination({ client: client({ errors: { user_want_to_try: { message: 'Failed to fetch' } } }), kind: 'wantToTry', destinationId: 'd1', saved: true }),
+    (error) => error.code === 'SAVED_DESTINATION_REQUEST_FAILED'
+  );
 });
 
 test('Want to Try is personal, idempotent, and rejects a personally rated restaurant', async () => {

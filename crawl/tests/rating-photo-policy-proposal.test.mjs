@@ -10,7 +10,7 @@ test('review-only eligibility proposal changes only the two coin exclusions',()=
  const expected=functions.replace(/^\s*and not coalesce\(rating\.is_buffacoin, false\)\r?\n/m,'')
    .replace(/  if coalesce\(v_rating\.is_buffacoin, false\) then\r?\n    return 'buffacoin_rating';\r?\n  end if;\r?\n/,'');
  const actual=proposal.slice(proposal.indexOf('create or replace function'),proposal.lastIndexOf('commit;'));
- assert.equal(actual.trim(),expected.trim());
+ assert.equal(actual.replace(/\r\n/g, '\n').trim(),expected.replace(/\r\n/g, '\n').trim());
 });
 test('proposed SQL accepts coin photos while retaining owner, restaurant, score and duplicate guards locally',async()=>{
  const db=new PGlite();

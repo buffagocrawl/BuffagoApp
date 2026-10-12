@@ -20,9 +20,10 @@ test('Crawls hook render supports an opened active route without temporal initia
   for (const match of source.matchAll(/from\s+['"]([^'"]+)['"]/g)) imports[match[1]] = inert;
   imports.react = { ...react, default: react, __esModule: true };
   imports['react/jsx-runtime'] = runtime.jsx;
-  imports['react-native'] = { View: 'view', FlatList: 'list', RefreshControl: 'refresh', ScrollView: 'scroll', Alert: {}, StyleSheet: { create: (value) => value } };
+  imports['react-native'] = { View: 'view', FlatList: 'list', RefreshControl: 'refresh', ScrollView: 'scroll', Alert: {}, useWindowDimensions: () => ({ height: 844, width: 390 }), StyleSheet: { create: (value) => value } };
   imports['react-native-paper'] = { ...Object.fromEntries(['ActivityIndicator', 'Card', 'Text', 'Portal', 'Dialog', 'Button', 'Divider', 'ProgressBar', 'TextInput', 'HelperText', 'IconButton'].map((name) => [name, inert])), useTheme: () => ({ colors: {}, dark: true }) };
   imports['../../../providers/LocationProvider'] = { useLocationCtx: () => ({ coords: null, status: 'undetermined' }) };
+  imports['react-native-safe-area-context'] = { SafeAreaView: 'safe', useSafeAreaInsets: () => ({ top: 24, bottom: 24 }) };
   imports['expo-router'] = { useRouter: () => ({}), useLocalSearchParams: () => ({}) };
   imports['../../../lib/routePreview'] = { featuredRecommendation };
   const { default: Crawls } = mobileModule('app/(tabs)/routes/index.jsx', imports);

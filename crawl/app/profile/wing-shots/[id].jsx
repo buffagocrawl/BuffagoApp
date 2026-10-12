@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Alert, Linking, ScrollView, StyleSheet, View } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActivityIndicator, Button, Card, Text, useTheme } from 'react-native-paper';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import ScreenHeader from '../../../components/ScreenHeader';
 import SubmissionStatusChip from '../../../components/creator/SubmissionStatusChip';
 import { formatWingShotRejectionReason } from '../../../lib/wingShotRejection';
@@ -15,6 +15,7 @@ import {
   withdrawMyWingShot,
 } from '../../../lib/wingCreator';
 import { trackEvent } from '../../../lib/analytics';
+import { useAuth } from '../../../providers/AuthProvider';
 
 function single(value) {
   return Array.isArray(value) ? value[0] : value;
@@ -54,6 +55,12 @@ export default function WingShotDetailScreen() {
   const router = useRouter();
   const theme = useTheme();
   const submissionId = single(params.id);
+  const { user, initializing } = useAuth();
+  const accountId = user?.id && !user.is_anonymous ? user.id : null;
+  const currentAccount = useRef(accountId);
+  currentAccount.current = accountId;
+  const loadVersion = useRef(0);
+  const [detailAccountId, setDetailAccountId] = useState(null);
   const [detail, setDetail] = useState(null);
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -62,27 +69,37 @@ export default function WingShotDetailScreen() {
   const [reviewRequested, setReviewRequested] = useState(false);
 
   const load = useCallback(async () => {
+    if (!accountId || currentAccount.current !== accountId) return;
+    const version = ++loadVersion.current;
+    const isCurrent = () => version === loadVersion.current && currentAccount.current === accountId;
     setLoading(true);
     setError(null);
+    setDetail(null);
+    setPreview(null);
+    setReviewRequested(false);
     try {
       const nextDetail = await loadMyWingShotDetail(submissionId);
+      if (!isCurrent()) return;
       setDetail(nextDetail);
+      setDetailAccountId(accountId);
       setPreview(null);
       if (nextDetail.preview_available) {
         requestWingShotPreview(submissionId)
-          .then(setPreview)
-          .catch(() => setPreview(null));
+          .then((nextPreview) => { if (isCurrent()) setPreview(nextPreview); })
+          .catch(() => { if (isCurrent()) setPreview(null); });
       }
     } catch (loadError) {
+      if (!isCurrent()) return;
       setError(loadError?.message || 'Could not load this Wing Shot.');
     } finally {
-      setLoading(false);
+      if (isCurrent()) setLoading(false);
     }
-  }, [submissionId]);
+  }, [submissionId, accountId]);
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
     load();
-  }, [load]);
+    return () => { loadVersion.current += 1; };
+  }, [load]));
 
   const withdraw = useCallback(() => {
     if (!detail || !canWithdrawWingShot(detail.internal_status)) return;
@@ -163,7 +180,11 @@ export default function WingShotDetailScreen() {
     await Linking.openURL(detail.external_permalink);
   }, [detail]);
 
-  if (loading) {
+  if (!initializing && !accountId) {
+    return <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}><ScreenHeader title="Wing Shot" subtitle="Private submission detail" /><View style={styles.center}><Text>Sign in to view your Wing Shot.</Text><Button mode="contained" onPress={() => router.push('/auth/login')}>Sign In</Button><Button onPress={() => router.back()}>Back</Button></View></SafeAreaView>;
+  }
+
+  if (initializing || loading || (detail && detailAccountId !== accountId)) {
     return (
       <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
         <View testID="creator.detail.loading" style={styles.center}>
@@ -242,6 +263,20 @@ export default function WingShotDetailScreen() {
             ) : null}
           </Card.Content>
         </Card>
+
+        {detail.media_type === 'photo' && ['Approved', 'Featured', 'Not Selected Yet'].includes(detail.display_status) ? (
+          <Card testID="creator.detail.jury-votes" style={styles.card}>
+            <Card.Content style={styles.content}>
+              <Text variant="titleMedium" style={styles.sectionTitle}>Wing Jury votes</Text>
+              {detail.jury_counts ? <>
+                <Text>Likes: {detail.jury_counts.likes}</Text>
+                <Text>Dislikes: {detail.jury_counts.dislikes}</Text>
+                <Text>Passes: {detail.jury_counts.passes}</Text>
+                {detail.jury_counts.likes + detail.jury_counts.dislikes + detail.jury_counts.passes === 0 ? <Text style={styles.muted}>No Wing Jury votes yet.</Text> : null}
+              </> : <><Text>Vote counts are temporarily unavailable.</Text><Button onPress={load}>Refresh votes</Button></>}
+            </Card.Content>
+          </Card>
+        ) : null}
 
         {detail.display_status === 'Approved' ||
         detail.display_status === 'Not Selected Yet' ? (

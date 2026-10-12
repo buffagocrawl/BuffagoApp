@@ -68,7 +68,7 @@ export default function WingCreatorSummaryCard({ refreshKey = 0 }) {
 
   const stats = state.summary?.stats;
   const badges = state.summary?.badges || [];
-  const visibleBadges = badges.filter((badge) => badge.badge_code !== 'wing_shot_first');
+  const visibleBadges = badges.filter((badge) => !['wing_shot_first', 'wing_photographer', 'crawl_cameraperson'].includes(badge.badge_code) && !['Wing Photographer', 'Crawl Cameraperson'].includes(badge.badge_name));
 
   return (
     <Card
