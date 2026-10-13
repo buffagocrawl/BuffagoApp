@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { EventEmitter } from 'node:events';
-import { createApprovalService, workerInvocation, validateReview, runWorker, localRequestsOnly } from '../server/approval.mjs';
+import { createApprovalService, workerInvocation, validateReview, runWorker, localRequestsOnly, safeReviewError } from '../server/approval.mjs';
 
 const id = '11111111-1111-4111-8111-111111111111';
 const reviewer = '22222222-2222-4222-8222-222222222222';
@@ -15,7 +15,7 @@ function fixture(ready = false) {
     from(table) {
       const filters = []; const query = {
         select() { return query; }, eq(k, v) { filters.push([k,v]); return query; }, is() { return query; }, in() { return query; }, maybeSingle() { return query; },
-        then(resolve) { state.calls.push({ table, filters }); return Promise.resolve({ data: table === 'app_user_roles' ? (state.authorized ? [{ role: 'wing_reviewer' }] : []) : table === 'wing_media_submissions' ? s : table === 'wing_photo_derivative_jobs' ? [job] : table === 'wing_admin_actions' ? state.receipt : [], error: null }).then(resolve); }
+        then(resolve) { state.calls.push({ table, filters }); if (table === 'wing_admin_actions' && state.confirmationError) return Promise.resolve({ data: null, error: { code: '08006', message: 'secret confirmation details' }, status: 503 }).then(resolve); return Promise.resolve({ data: table === 'app_user_roles' ? (state.authorized ? [{ role: 'wing_reviewer' }] : []) : table === 'wing_media_submissions' ? s : table === 'wing_photo_derivative_jobs' ? [job] : table === 'wing_admin_actions' ? state.receipt : [], error: null }).then(resolve); }
       }; return query;
     },
     storage: { from: () => ({ list: (prefix, { search }) => Promise.resolve({ data: state.objects.has(`${prefix}/${search}`) ? [{ name: search, id: 'object', metadata: { mimetype: 'image/jpeg', size: 100 } }] : [], error: null }) }) },
@@ -23,16 +23,17 @@ function fixture(ready = false) {
       if (name === 'wing_photo_processing_blocker') return Promise.resolve({ data: state.blocker, error: null });
       state.calls.push({ name, args });
       return { abortSignal: async () => {
-        if (state.approvalError) return { error: { message: 'secret backend details' } };
+        if (state.approvalError) return { error: state.approvalError === true ? { message: 'secret backend details' } : state.approvalError, status: 400 };
         s.status = args.p_action === 'approve' ? 'approved' : 'rejected'; s.reviewed_by = reviewer; s.reviewer_notes = args.p_reviewer_note.trim();
         state.receipt = { actor_id: reviewer, action: args.p_action, reason_category: args.p_reason_category, notes: args.p_reviewer_note.trim() };
         if (state.ambiguous) throw new Error('timeout secret');
-        return { data: { status: s.status }, error: null };
+        return { data: state.unexpectedResponse ? [{ status: s.status }] : { status: s.status }, error: null, status: 200 };
       } };
     }
   };
   const prepare = vi.fn(async target => { expect(target).toBe(id); makeReady(); });
-  return { s, job, state, prepare, makeReady, service: createApprovalService({ backend, reviewer, prepare }) };
+  const log = vi.fn();
+  return { s, job, state, prepare, makeReady, log, service: createApprovalService({ backend, reviewer, prepare, log }) };
 }
 const approvals = f => f.state.calls.filter(c => c.name === 'mango_review_wing_submission');
 describe('selected photo approval', () => {
@@ -44,6 +45,35 @@ describe('selected photo approval', () => {
   it('locks concurrent requests before the first asynchronous authorization', async () => { const f = fixture(); let finish; f.prepare.mockImplementation(() => new Promise(resolve => { finish = () => { f.makeReady(); resolve(); }; })); const first = f.service.review(id,input); await vi.waitFor(() => expect(f.service.progress(id)).toBe('Preparing photo…')); await expect(f.service.review(id,input)).rejects.toThrow('already running'); finish(); await first; expect(approvals(f)).toHaveLength(1); });
   it('processing success followed by approval failure reuses media', async () => { const f = fixture(); f.state.approvalError = true; await expect(f.service.review(id,input)).rejects.toThrow('not confirmed'); f.state.approvalError = false; await f.service.review(id,input); expect(f.prepare).toHaveBeenCalledTimes(1); expect(approvals(f)[0].args.p_idempotency_key).toBe(approvals(f)[1].args.p_idempotency_key); });
   it('reconciles an ambiguous approval and prevents another moderation effect', async () => { const f = fixture(true); f.state.ambiguous = true; expect(await f.service.review(id,input)).toMatchObject({ status: 'approved', reconciled: true }); await f.service.review(id,input); expect(approvals(f)).toHaveLength(1); });
+  it('reports the demonstrated reward rejection without reprocessing or leaking details', async () => {
+    const f = fixture(); f.state.approvalError = { code: 'P0001', message: 'creator_reward_rating_ineligible', details: 'https://secret.invalid/?token=secret' };
+    await expect(f.service.review(id,input)).rejects.toThrow('creator-reward eligibility');
+    expect(f.s.status).toBe('in_review'); expect(f.state.receipt).toBeUndefined();
+    expect(f.log).toHaveBeenCalledWith('review_rpc_failed', expect.objectContaining({ submission_id: id, stage: 'moderation_rpc', http_status: 400, database_error_code: 'P0001', error_detail: 'creator_reward_rating_ineligible' }));
+    await expect(f.service.review(id,input)).rejects.toThrow('creator-reward eligibility');
+    expect(f.prepare).toHaveBeenCalledTimes(1); expect(approvals(f)[0].args.p_idempotency_key).toBe(approvals(f)[1].args.p_idempotency_key);
+    expect(JSON.stringify(f.log.mock.calls)).not.toContain('secret');
+  });
+  it('reconciles an unexpected successful RPC response shape', async () => {
+    const f = fixture(true); f.state.unexpectedResponse = true;
+    expect(await f.service.review(id,input)).toMatchObject({ status: 'approved', reconciled: true });
+    expect(f.log).toHaveBeenCalledWith('review_rpc_unexpected_response', expect.objectContaining({ http_status: 200, response_shape: 'array' }));
+    await f.service.review(id,input); expect(approvals(f)).toHaveLength(1);
+  });
+  it('success followed by failed confirmation is reconciled on retry without duplicate moderation', async () => {
+    const f = fixture(true); f.state.ambiguous = true; f.state.confirmationError = true;
+    await expect(f.service.review(id,input)).rejects.toThrow('Backend verification unavailable');
+    expect(f.s.status).toBe('approved');
+    expect(f.log).toHaveBeenCalledWith('review_verification_failed', expect.objectContaining({ stage: 'confirmation_receipt', http_status: 503, database_error_code: '08006' }));
+    f.state.confirmationError = false;
+    expect(await f.service.review(id,input)).toMatchObject({ status: 'approved', reconciled: true });
+    expect(approvals(f)).toHaveLength(1); expect(f.prepare).not.toHaveBeenCalled();
+    expect(JSON.stringify(f.log.mock.calls)).not.toContain('secret');
+  });
+  it('redacts arbitrary errors, tokens, URLs and user records', () => {
+    expect(safeReviewError({ code: 'token=secret', message: 'https://example.invalid?token=secret', details: { user: 'private' } })).toEqual({ database_error_code: null, error_detail: 'details_redacted' });
+    expect(safeReviewError({ name: 'TimeoutError' }).error_detail).toBe('request_timeout');
+  });
   it('rechecks readiness after a worker timeout with completed settlement', async () => { const f = fixture(); f.prepare.mockImplementation(async () => { f.makeReady(); throw new Error('timed out'); }); await f.service.review(id,input); expect(approvals(f)).toHaveLength(1); });
   it('worker timeout without settlement prevents approval', async () => { const f = fixture(); f.prepare.mockRejectedValue(new Error('Photo preparation timed out.')); await expect(f.service.review(id,input)).rejects.toThrow('timed out'); expect(approvals(f)).toHaveLength(0); });
   it.each(['rejected','withdrawn','cancelled'])('concurrent %s prevents approval', async status => { const f = fixture(); f.prepare.mockImplementation(async () => { f.makeReady(); f.s.status = status; }); await expect(f.service.review(id,input)).rejects.toThrow('changed'); expect(approvals(f)).toHaveLength(0); });

@@ -28,6 +28,8 @@ Photo derivatives are insert-only. Existing objects must have the correct JPEG m
 
 ## Troubleshooting
 
+- Approval failures now emit structured `review_rpc_failed` and verification/confirmation events with the submission ID, stage, HTTP status and sanitized database error. Never share `.env` or signed preview URLs. A `creator_reward_rating_ineligible` rollback requires the separately reviewed database proposal in `diagnosis/README.md`; restarting Mango only enables the new diagnostics.
+
 - “Could not reach Mango Habanero”: check both child terminal windows, confirm Node is installed, and press Retry.
 - “wing_reviewer_role_required”: verify `MANGO_REVIEWER_ID` is a UUID with an active `wing_reviewer` or `wing_admin` role.
 - “No preview media”: processing has not produced a private derivative yet; the card will show processing warnings returned by the existing worker tables.
