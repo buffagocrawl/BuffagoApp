@@ -68,42 +68,61 @@ export function runWorker(id, env = process.env, spawnChild = spawn) {
   });
 }
 
-export function createApprovalService({ backend, reviewer, prepare = runWorker }) {
+// Only known contract errors are safe to print. Database details can contain
+// submitted text, credentials or URLs, so never serialize the error object.
+export function safeReviewError(error) {
+  const known = new Set(['creator_reward_rating_ineligible', 'processed_photo_required_for_approval',
+    'wing_reviewer_role_required', 'review_submission_not_ready', 'original_media_required_for_review',
+    'unsafe_or_failed_media_cannot_be_approved', 'idempotency_key_conflict']);
+  return {
+    database_error_code: /^(?:[0-9A-Z]{5}|PGRST\d{3})$/.test(error?.code || '') ? error.code : null,
+    error_detail: known.has(error?.message) ? error.message
+      : ['AbortError', 'TimeoutError'].includes(error?.name) ? 'request_timeout' : 'details_redacted'
+  };
+}
+
+export function createApprovalService({ backend, reviewer, prepare = runWorker, log = () => {} }) {
   if (typeof reviewer === 'string') reviewer = reviewer.toLowerCase();
   const active = new Map(); let processing = false;
-  const check = async result => {
-    try { const { data, error } = await result; if (error) throw new Error(); return data; }
-    catch { throw new Error('Backend verification unavailable. Refresh and retry.'); }
+  const emit = (event, fields) => { try { log(event, fields); } catch { /* logging must not change review outcomes */ } };
+  const check = async (result, id, stage) => {
+    let status = null;
+    try { const response = await result; status = response.status || null; if (response.error) throw response.error; return response.data; }
+    catch (error) {
+      emit('review_verification_failed', { submission_id: id, stage, http_status: status, ...safeReviewError(error) });
+      throw new Error('Backend verification unavailable. Refresh and retry.');
+    }
   };
-  const authorize = async () => {
+  const authorize = async id => {
     if (!uuid.test(reviewer || '')) throw new Error('Reviewer configuration is invalid.');
-    const roles = await check(backend.from('app_user_roles').select('role').eq('user_id', reviewer).eq('active', true).is('revoked_at', null).in('role', ['wing_reviewer','wing_admin']));
+    const roles = await check(backend.from('app_user_roles').select('role').eq('user_id', reviewer).eq('active', true).is('revoked_at', null).in('role', ['wing_reviewer','wing_admin']), id, 'authorization');
     if (!roles?.length) throw new Error('Reviewer authorization is missing or revoked.');
   };
   const row = async id => {
-    const value = await check(backend.from('wing_media_submissions').select('*').eq('id', id).maybeSingle());
+    const value = await check(backend.from('wing_media_submissions').select('*').eq('id', id).maybeSingle(), id, 'submission_read');
     if (!value) throw new Error('Submission not found.'); return value;
   };
-  const object = async path => {
+  const object = async (path, id) => {
     const [prefix, name] = [path.slice(0, path.lastIndexOf('/')), path.slice(path.lastIndexOf('/') + 1)];
-    const objects = await check(backend.storage.from('wing-submissions').list(prefix, { search: name, limit: 100 }));
+    const objects = await check(backend.storage.from('wing-submissions').list(prefix, { search: name, limit: 100 }), id, 'derivative_metadata');
     return objects?.some(o => o.name === name && o.id &&
       (o.metadata?.mimetype || o.metadata?.contentType)?.toLowerCase() === 'image/jpeg' && Number(o.metadata?.size) > 0);
   };
   const readiness = async (id, s) => {
-    const blocker = await check(backend.rpc('wing_photo_processing_blocker', { p_submission_id: id }));
+    const blocker = await check(backend.rpc('wing_photo_processing_blocker', { p_submission_id: id }), id, 'readiness_blocker');
     if (blocker) throw new Error(`Photo cannot be approved: ${String(blocker).replace(/[^a-z_]/g, '').slice(0, 80)}.`);
-    const jobs = await check(backend.from('wing_photo_derivative_jobs').select('*').eq('submission_id', id));
-    const legacy = await check(backend.from('wing_processing_jobs').select('status').eq('submission_id', id).eq('job_kind','photo_process'));
+    const jobs = await check(backend.from('wing_photo_derivative_jobs').select('*').eq('submission_id', id), id, 'derivative_jobs');
+    const legacy = await check(backend.from('wing_processing_jobs').select('status').eq('submission_id', id).eq('job_kind','photo_process'), id, 'legacy_jobs');
     const ready = s.processed_storage_path === `processed/${id}/primary` && s.thumbnail_storage_path === `thumbnails/${id}/preview`
       && [...(jobs || []), ...(legacy || [])].some(j => j.status === 'succeeded')
-      && await object(s.processed_storage_path) && await object(s.thumbnail_storage_path);
+      && await object(s.processed_storage_path, id) && await object(s.thumbnail_storage_path, id);
+    emit('review_readiness_checked', { submission_id: id, stage: 'readiness', ready, job_status: jobs?.[0]?.status || null });
     return { ready, job: jobs?.[0] };
   };
   const completed = async (s, input, key) => {
     if (s.status !== (input.action === 'approve' ? 'approved' : 'rejected') || s.reviewed_by !== reviewer || s.reviewer_notes !== input.reviewerNote.trim()) return false;
     const receipt = await check(backend.from('wing_admin_actions').select('actor_id,action,reason_category,notes')
-      .eq('submission_id', s.id).eq('idempotency_key', `mango:${key}`).maybeSingle());
+      .eq('submission_id', s.id).eq('idempotency_key', `mango:${key}`).maybeSingle(), s.id, 'confirmation_receipt');
     return receipt?.actor_id === reviewer && receipt.action === input.action && receipt.reason_category === input.reasonCategory && receipt.notes === input.reviewerNote.trim();
   };
   return {
@@ -114,7 +133,8 @@ export function createApprovalService({ backend, reviewer, prepare = runWorker }
       const operation = { phase: 'Checking review…' }; active.set(id, operation);
       const key = `mango-${crypto.createHash('sha256').update(JSON.stringify([id, reviewer, input.action, input.reasonCategory, input.reviewerNote.trim()])).digest('hex')}`;
       try {
-        await authorize(); let s = await row(id);
+        emit('review_started', { submission_id: id, stage: 'authorization', action: input.action });
+        await authorize(id); let s = await row(id);
         if (await completed(s, input, key)) return { status: s.status, reconciled: true };
         if (s.status !== 'in_review') throw new Error('Submission is no longer awaiting review.');
         if (input.action === 'approve' && s.media_type === 'photo') {
@@ -127,28 +147,47 @@ export function createApprovalService({ backend, reviewer, prepare = runWorker }
             if (processing) throw new Error('Another photo is being prepared. Try again shortly.');
             processing = true; operation.phase = 'Preparing photo…';
             let preparationError;
-            try { await prepare(id); } catch (error) { preparationError = error; } finally { processing = false; }
-            await authorize(); s = await row(id);
+            emit('review_preparation_started', { submission_id: id, stage: 'preparation' });
+            try { await prepare(id); } catch (error) { preparationError = error; emit('review_preparation_failed', { submission_id: id, stage: 'preparation', http_status: null, ...safeReviewError(error) }); } finally { processing = false; }
+            await authorize(id); s = await row(id);
             if (s.status !== 'in_review') throw new Error('Submission changed during preparation. Refresh the queue.');
             state = await readiness(id, s);
             if (!state.ready) throw new Error(preparationFailure(state.job) || preparationError?.message || 'Photo preparation did not produce verified derivatives.');
           }
-          await authorize(); s = await row(id);
+          await authorize(id); s = await row(id);
           if (s.status !== 'in_review' || !(await readiness(id, s)).ready) throw new Error('Photo is no longer ready for approval.');
-        } else { await authorize(); s = await row(id); if (s.status !== 'in_review') throw new Error('Submission is no longer awaiting review.'); }
+        } else { await authorize(id); s = await row(id); if (s.status !== 'in_review') throw new Error('Submission is no longer awaiting review.'); }
         operation.phase = input.action === 'approve' ? 'Approving…' : 'Rejecting…';
+        let rpcStatus = null;
         try {
-          const { data, error } = await backend.rpc('mango_review_wing_submission', { p_submission_id: id, p_action: input.action,
+          emit('review_rpc_started', { submission_id: id, stage: 'moderation_rpc' });
+          const { data, error, status } = await backend.rpc('mango_review_wing_submission', { p_submission_id: id, p_action: input.action,
             p_reason_category: input.reasonCategory, p_reviewer_note: input.reviewerNote, p_reviewer_id: reviewer,
             p_idempotency_key: key, p_correlation_id: crypto.randomUUID() }).abortSignal(AbortSignal.timeout(20000));
-          if (error || data?.status !== (input.action === 'approve' ? 'approved' : 'rejected')) throw new Error();
+          rpcStatus = status || null;
+          if (error) throw error;
+          if (data?.status !== (input.action === 'approve' ? 'approved' : 'rejected')) {
+            emit('review_rpc_unexpected_response', { submission_id: id, stage: 'moderation_response', http_status: rpcStatus, response_shape: Array.isArray(data) ? 'array' : data === null ? 'null' : typeof data });
+            throw new Error();
+          }
+          emit('review_confirmed', { submission_id: id, stage: 'moderation_response', http_status: rpcStatus, status: data.status });
           return data;
-        } catch {
-          await authorize(); const current = await row(id);
-          if (await completed(current, input, key)) return { status: current.status, reconciled: true };
+        } catch (error) {
+          emit('review_rpc_failed', { submission_id: id, stage: 'moderation_rpc', http_status: rpcStatus, ...safeReviewError(error) });
+          emit('review_confirmation_started', { submission_id: id, stage: 'confirmation' });
+          await authorize(id); const current = await row(id);
+          if (await completed(current, input, key)) {
+            emit('review_confirmed', { submission_id: id, stage: 'confirmation', status: current.status, reconciled: true });
+            return { status: current.status, reconciled: true };
+          }
+          emit('review_not_confirmed', { submission_id: id, stage: 'confirmation', status: current.status });
           if (current.status === 'in_review' && input.action === 'approve' && current.media_type === 'photo' && !(await readiness(id, current)).ready) throw new Error('Photo readiness changed during approval. Refresh before retrying.');
+          if (current.status === 'in_review' && error?.message === 'creator_reward_rating_ineligible') throw new Error('Approval was rolled back by the database creator-reward eligibility check. An operator database fix is required before retrying; verified derivatives will be reused.');
           throw new Error(current.status === 'in_review' ? (input.action === 'approve' ? 'Approval was not confirmed. Refresh and retry; prepared media will be reused.' : 'Rejection was not confirmed. Refresh and retry.') : 'Submission changed; review was not confirmed. Refresh the queue.');
         }
+      } catch (error) {
+        emit('review_failed', { submission_id: id, stage: operation.phase === 'Preparing photo…' ? 'preparation' : operation.phase === 'Checking review…' ? 'preflight' : 'confirmation', http_status: 409, ...safeReviewError(error) });
+        throw error;
       } finally { active.delete(id); }
     }
   };
