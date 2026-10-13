@@ -1,0 +1,26 @@
+{
+  "branch": "feature/buffago-app-polish",
+  "verdict": "NOT_READY_FOR_BACKEND_DEPLOYMENT",
+  "acceptance": "not run; stopped at missing validated application schema baseline",
+  "isolated_project": "buffago-polish-acceptance",
+  "isolated_container": "absent: supabase_db_buffago-polish-acceptance",
+  "prepared_input": "crawl/supabase/local/app-polish-acceptance/supabase/config.toml only",
+  "existing_stack_inspection": {
+    "container": "supabase_db_crawl",
+    "database": "postgres",
+    "mode": "transaction read only; catalog metadata only",
+    "required_app_tables_present_of_seven": 0,
+    "required_worker_rpcs_present_of_six": 0,
+    "schema_or_data_changed": false
+  },
+  "missing_input": "reviewed full schema-only app prerequisite package including actual Auth/Storage integration, upload/processing/cleanup RPCs, private helpers and grants/RLS/triggers; synthetic fixtures separately",
+  "existing_reduced_fixtures_accepted_as_full_baseline": false,
+  "checks_not_performed": ["real authentication", "real PostgREST old/new voting acceptance", "four proposed Edge Function integration", "real Storage uploads/signing/deletion", "real photo worker queue/retries/derivatives", "independent rollout phases"],
+  "mock_results_substituted": false,
+  "production_access_this_attempt": false,
+  "services_started_or_deployed": false,
+  "broad_suites_repeated": false,
+  "logs": ["staging-acceptance-status-check.log", "staging-existing-schema-check.log"],
+  "setup_owner": "backend/release engineer",
+  "physical_android_native_iphone": "outstanding; isolated QA builds/target required"
+}

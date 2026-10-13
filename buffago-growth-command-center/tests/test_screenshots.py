@@ -27,6 +27,7 @@ class DashboardTests(unittest.TestCase):
         cls.root.attributes("-topmost", True)
         cls.dashboard = Dashboard(cls.root)
         cls.demo = json.loads((BASE / "data/demo_snapshot.json").read_text(encoding="utf-8"))
+        cls.demo["product_pulse"]["pending_restaurants"] = {"total": 13}
 
     @classmethod
     def tearDownClass(cls):
@@ -204,6 +205,8 @@ class DashboardTests(unittest.TestCase):
     def test_zero_action_counts_use_normal_tile_style(self):
         empty = json.loads(json.dumps(self.demo))
         empty["product_pulse"]["pending_photos"] = {"total": 0}
+        empty["product_pulse"]["pending_restaurants"] = {"total": 0}
+        empty["product_pulse"]["feedback"] = {"open_total": 0}
         empty["product_pulse"]["open_work"] = {"total": 0}
         self.root.geometry("1280x720+0+0")
         self.root.update()
@@ -215,6 +218,16 @@ class DashboardTests(unittest.TestCase):
                     if self.dashboard.type(item) == "rectangle"]
         self.assertNotIn(dashboard_module.ALERT_BG, fills)
         self.assertNotIn(dashboard_module.ALERT, outlines)
+
+    def test_restaurant_action_label_stays_inside_its_card(self):
+        for width, height in ((800, 480), (1280, 720), (1600, 900)):
+            self.render(width, height)
+            label = next(item for item in self.dashboard.find_all()
+                         if self.dashboard.type(item) == "text"
+                         and self.dashboard.itemcget(item, "text") == "PENDING RESTAURANTS")
+            box = self.dashboard.bbox(label)
+            self.assertLessEqual(box[2], 392 * width / 1600)
+            self.assertLessEqual(box[3], 707 * height / 900)
 
     def test_dashboard_fits_and_captures_supported_displays(self):
         try:
@@ -229,7 +242,7 @@ class DashboardTests(unittest.TestCase):
                 for title in ("Unique Device Opens", "Last 24 Hours", "Total Wing Ratings",
                               "Total Restaurants", "Total Users Created", "Monthly MAU", "Unique Mobile Devices",
                               "Wing Ratings", "New Accounts", "Jun", "Oct",
-                              "PENDING PHOTOS", "OPEN WORK", "MARKETING SCORE",
+                              "PENDING PHOTOS", "PENDING RESTAURANTS", "OPEN FEEDBACK", "OPEN WORK", "MARKETING SCORE",
                               "Growth & Business Health", "MONTHLY GROWTH TRENDS"):
                     self.assertIn(title, texts)
                 self.assertEqual(sum(text == "App-open tracking began in Jun 2026" for text in texts), 1)

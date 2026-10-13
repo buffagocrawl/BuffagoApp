@@ -1,0 +1,26 @@
+{
+  "indexEmpty": true,
+  "trackedDeletions": [],
+  "diffWhitespacePassed": true,
+  "brokenMarkdownLinks": [],
+  "missingReleasePaths": [],
+  "missingImports": [],
+  "conflictMarkers": [],
+  "existingWholeFileTrailingWhitespace": [
+    "crawl/app/(tabs)/ratings/index.jsx",
+    "crawl/app/_layout.tsx",
+    "crawl/supabase/functions/wingman-intake/index.ts"
+  ],
+  "ignoreChecks": {
+    "crawl/.expo/app-polish-acceptance-local-credentials.json": true,
+    "crawl/.expo/app-polish-staging-fixtures.json": true,
+    "crawl/supabase/local/app-polish-acceptance/supabase/functions/wing-jury-vote/index.ts": true,
+    "crawl/supabase/local/app-polish-acceptance/supabase/.branches/_current_branch": true,
+    ".env.local": true,
+    ".secrets/hygiene-probe.json": true,
+    "artifacts/app-polish/release-qa/sort-filters/generated.xml": true
+  },
+  "requiredFilesVisible": true,
+  "secretPatternScan": "No credential/JWT patterns found in visible untracked text; secret values never printed",
+  "sourceFilesChangedByCleanup": false
+}

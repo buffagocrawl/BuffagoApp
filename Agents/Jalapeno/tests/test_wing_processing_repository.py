@@ -269,4 +269,4 @@ def test_cleanup_delete_uses_only_claimed_exact_private_path():
     assert repository.delete_cleanup_object(claim) == "deleted"
     endpoint, request = client._session.deletes[0]
     assert endpoint.endswith(claim.object_path)
-    assert request == {"timeout": 30}
+    assert request == {"timeout": 30, "headers": {"Content-Type": None}}

@@ -255,14 +255,18 @@ class Dashboard(tk.Canvas):
 
     def _draw_actions(self, p: Painter, s: Snapshot) -> None:
         p.label(40, 635, "Action Required")
-        for x, title, value in ((40, 'PENDING PHOTOS', s.pending_photos),
-                                (222, 'OPEN WORK', s.open_work)):
+        for index, (title, value) in enumerate((('PENDING PHOTOS', s.pending_photos),
+                                                ('PENDING RESTAURANTS', s.pending_restaurants),
+                                                ('OPEN FEEDBACK', s.feedback_open),
+                                                ('OPEN WORK', s.open_work))):
+            x = 40 + (index % 2) * 182
+            y = 660 + (index // 2) * 95
             alert = value is not None and value >= 1
-            self._card(p, x, 660, 170, 95, alert=alert)
-            p.text(x + 12, 671, title, 11, ALERT if alert else theme.MUTED, 'bold')
-            p.text(x + 12, 689, fmt_number(value), 32, ALERT if alert else theme.TEXT, 'bold')
-            detail = 'Needs attention' if alert else 'All clear' if value == 0 else 'Unavailable'
-            p.text(x + 12, 736, detail, 10, theme.MUTED)
+            self._card(p, x, y, 170, 94, alert=alert)
+            p.text(x + 10, y + 6, title, 10, ALERT if alert else theme.MUTED, 'bold', width=150)
+            p.text(x + 10, y + 47, fmt_number(value), 20, ALERT if alert else theme.TEXT, 'bold')
+            detail = 'Needs review' if alert else 'All clear' if value == 0 else 'Unavailable'
+            p.text(x + 10, y + 74, detail, 9, theme.MUTED)
 
     def _draw_activity(self, p: Painter, s: Snapshot, now: datetime) -> None:
         x, w = 412, 658

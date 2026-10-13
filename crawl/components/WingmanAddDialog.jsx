@@ -1,32 +1,19 @@
+import { bounded, errorBody, wingmanError, wingmanRequest } from '../lib/wingmanAsync';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, ScrollView, Pressable, Alert } from 'react-native';
+import { View, ScrollView, Pressable, Alert, Modal, Keyboard, KeyboardAvoidingView, Platform } from 'react-native';
 import { Dialog, Portal, Text, Button, TextInput, ActivityIndicator } from 'react-native-paper';
+import { scheduleWingmanFocus } from '../lib/wingmanFocus';
+import { canApproveWingman, formatWingmanConfidence, sameWingmanLocation, wingmanPlaceNameMatches } from '../supabase/functions/_shared/wingmanConfidence';
 import { supabase } from '../lib/supabase.js';
 import { WingmanService } from '../lib/Wingman/WingmanService.ts';
 
-async function formatWingmanFunctionError(error) {
-  const fallback = error?.message || String(error || 'Wingman could not add that restaurant.');
-  const response = error?.context;
+const formatWingmanFunctionError = wingmanError;
 
-  if (!response || typeof response.clone !== 'function') return fallback;
-  if (response.status === 429) return 'Too many requests. Give it a little time and try again.';
-
-  try {
-    const body = await response.clone().json();
-    if (response.status === 429 || String(body?.error || '').toLowerCase().includes('too many requests')) {
-      return 'Too many requests. Give it a little time and try again.';
-    }
-    if (body?.error) return body.details ? `${body.error} ${body.details}` : String(body.error);
-  } catch {
-    try {
-      const text = await response.clone().text();
-      if (text.trim()) return text.trim();
-    } catch {
-      return fallback;
-    }
-  }
-
-  return fallback;
+function canAddWingmanResult(result) {
+  return canApproveWingman({ matchConfidence: result?.ai?.confidence, wingConfidence: result?.ai?.wingsProbability,
+    verifiedRestaurant: result?.success === true && result?.place?.found === true && result?.ai?.verifiedPlace === true && result?.ai?.isRealRestaurant === true,
+    locationStatus: result?.ai?.locationStatus, needsCity: result?.decision === 'needs_city',
+    needsMoreInfo: result?.decision === 'needs_more_info', wingEvidenceStatus: result?.ai?.wingEvidenceStatus });
 }
 
 /** @param {{visible: boolean, onDismiss?: () => void, initialRestaurant?: string, initialStateId?: number|null, initialStateCode?: string|null, userId?: string|null, onPickDestination?: (destination: {id: string, name: string|null, address: string|null, city: string|null, lat?: number|null, lng?: number|null}) => void, onManualReviewQueued?: (suggestion: unknown) => void, manualReviewQueuedMessage?: string, showCloseOnResultMessage?: boolean}} props */
@@ -58,6 +45,38 @@ export default function WingmanAddDialog({
   const insertInFlightRef = useRef(false);
   const verifyInFlightRef = useRef(false);
   const wasVisibleRef = useRef(false);
+  const selectionInFlightRef = useRef(false);
+  const lifecycle = useRef(new AbortController());
+  useEffect(() => {
+    lifecycle.current = new AbortController();
+    if (!visible) lifecycle.current.abort();
+    return () => lifecycle.current.abort();
+  }, [visible]);
+  // Capture a dialog generation. Late completions cannot change a reopened dialog.
+  const operation = () => {
+    const controller = lifecycle.current;
+    const current = () => !controller.signal.aborted && lifecycle.current === controller;
+    const guarded = setter => value => { if (current()) setter(value); };
+    return { current, signal: controller.signal, wait: promise => bounded(promise, 45000, controller.signal),
+      setLoading: guarded(setLoading), setMessage: guarded(setMessage),
+      setStep: guarded(setStep), setCandidate: guarded(setCandidate) };
+  };
+  const dismiss = useCallback(() => {
+    lifecycle.current.abort();
+    setLoading(false);
+    onDismiss?.();
+  }, [onDismiss]);
+  const nameInput = useRef(null);
+  const cityInput = useRef(null);
+  const extraInput = useRef(null);
+  const [modalReady, setModalReady] = useState(false);
+  const focusInput = useCallback(() => step === 'city' ? cityInput.current
+    : step === 'extra' ? extraInput.current : step === 'state' ? nameInput.current : null, [step]);
+  useEffect(() => {
+    if (!visible) { setModalReady(false); return; }
+    if (!modalReady || loading) return;
+    return scheduleWingmanFocus(focusInput);
+  }, [visible, modalReady, loading, focusInput]);
 
   useEffect(() => {
     const justOpened = visible && !wasVisibleRef.current;
@@ -75,6 +94,8 @@ export default function WingmanAddDialog({
     searchInFlightRef.current = false;
     insertInFlightRef.current = false;
     verifyInFlightRef.current = false;
+    setLoading(false);
+    selectionInFlightRef.current = false;
     setStep('state');
   }, [visible, initialRestaurant, initialStateId, initialStateCode]);
 
@@ -85,16 +106,16 @@ export default function WingmanAddDialog({
     (async () => {
       setLoadingStates(true);
       try {
-        const { data, error } = await supabase
+        const { data, error } = await bounded(supabase
           .from('states')
           .select('state_id, state_code, state_name')
-          .order('state_name', { ascending: true });
+          .order('state_name', { ascending: true }), 15000, lifecycle.current.signal);
 
         if (error) throw error;
         if (alive) setStates(data || []);
       } catch (e) {
         console.warn('load states failed:', e?.message || e);
-        if (alive) setStates([]);
+        if (alive) { setStates([]); setMessage('Could not load states. Close and reopen to retry.'); }
       } finally {
         if (alive) setLoadingStates(false);
       }
@@ -124,79 +145,55 @@ export default function WingmanAddDialog({
     (step !== 'extra' || !!extraInfo.trim());
 
   const findExistingDestinationCandidate = useCallback(async ({ ai, stateId: sid }) => {
+    const { wait } = operation();
     const normalizedName = String(ai?.normalizedName || '').trim();
     const cityName = String(ai?.city || city || '').trim();
 
     if (!normalizedName || !sid) return null;
 
     try {
-      if (cityName) {
-        const { data: cityMatches, error: cityErr } = await supabase
-          .from('destinations')
-          .select('id, name, address, city, lat, lng, state_id')
-          .eq('state_id', sid)
-          .ilike('name', `%${normalizedName}%`)
-          .ilike('city', `%${cityName}%`)
-          .limit(25);
-
-        if (cityErr) throw cityErr;
-
-        if (cityMatches?.length) {
-          const exactish = cityMatches.find((d) => {
-            const dbName = String(d?.name || '').toLowerCase();
-            const dbCity = String(d?.city || '').toLowerCase();
-            const base = normalizedName.toLowerCase();
-            const cityLc = cityName.toLowerCase();
-
-            return dbCity === cityLc && (
-              dbName === base ||
-              dbName.includes(base) ||
-              base.includes(dbName)
-            );
-          });
-
-          return exactish || cityMatches[0];
-        }
+      if (ai?.existingDestinationId) {
+        const { data, error } = await wait(supabase.from('destinations').select('id,name,address,city,lat,lng,state_id')
+          .eq('id',ai.existingDestinationId).eq('state_id',sid).maybeSingle());
+        if (error) throw error;
+        return data || null;
       }
-
-      const { data: nameMatches, error: nameErr } = await supabase
-        .from('destinations')
-        .select('id, name, address, city, lat, lng, state_id')
-        .eq('state_id', sid)
-        .ilike('name', `%${normalizedName}%`)
-        .limit(25);
-
-      if (nameErr) throw nameErr;
-      if (!nameMatches?.length) return null;
-
-      const exactish = nameMatches.find((d) => {
-        const dbName = String(d?.name || '').toLowerCase();
-        const base = normalizedName.toLowerCase();
-        const dbCity = String(d?.city || '').toLowerCase();
-        const cityLc = cityName.toLowerCase();
-
-        if (cityName && dbCity === cityLc && dbName.includes(base)) return true;
-        if (dbName === base) return true;
-        if (dbName.includes(base)) return true;
-        if (base.includes(dbName)) return true;
-        return false;
-      });
-
-      return exactish || nameMatches[0];
+      const { data, error } = await wait(supabase.from('destinations')
+        .select('id,name,address,city,lat,lng,state_id').eq('state_id',sid)
+        .ilike('name',`%${normalizedName}%`).limit(25));
+      if (error) throw error;
+      const matches = (data || []).filter(row => wingmanPlaceNameMatches(normalizedName,row.name)
+        && sameWingmanLocation(row,{city:cityName,address:ai?.address}));
+      return matches.length === 1 ? matches[0] : null;
     } catch (e) {
       console.warn('findExistingDestinationCandidate failed:', e?.message || e);
-      return null;
+      throw e;
     }
   }, [city]);
 
   const handleUseDestination = useCallback(async (row) => {
-    if (!row?.id) return;
-    await onPickDestination?.(row);
-    onDismiss?.();
+    if (!row?.id || selectionInFlightRef.current) return false;
+    const { current, signal, wait, setLoading, setMessage, setStep } = operation();
+    selectionInFlightRef.current = true;
+    setLoading(true);
+    try {
+      await wait(Promise.resolve(onPickDestination?.(row, { signal })));
+      if (!current()) return false;
+      onDismiss?.();
+      return true;
+    } catch (error) {
+      setMessage(await wingmanError(error));
+      setStep('result');
+      return false;
+    } finally {
+      setLoading(false);
+      if (current()) selectionInFlightRef.current = false;
+    }
   }, [onPickDestination, onDismiss]);
 
   const insertWingmanDestination = useCallback(async (row) => {
-    if (!row?.name || !stateId) return;
+    const { current, signal, wait, setLoading, setMessage, setStep, setCandidate } = operation();
+    if (!current() || !row?.name || !stateId) return;
     if (insertInFlightRef.current) return;
 
     insertInFlightRef.current = true;
@@ -204,7 +201,8 @@ export default function WingmanAddDialog({
     setMessage('Wingman is adding that restaurant.');
 
     try {
-      const { data: inserted, error: insertErr } = await supabase.functions.invoke('wingman-intake', {
+      const { data: inserted, error: insertErr } = await wait(wingmanRequest(requestSignal => supabase.functions.invoke('wingman-intake', {
+        signal: requestSignal,
         body: {
           action: 'insertDestination',
           restaurant: row.name,
@@ -221,78 +219,104 @@ export default function WingmanAddDialog({
             lng: row.lng ?? null,
           },
         },
-      });
+      }), 45000, signal));
 
-      if (insertErr) throw insertErr;
+      if (insertErr) {
+        if (insertErr.context?.status === 422 && typeof insertErr.context.clone === 'function') {
+          const rejected = await wait(errorBody(insertErr));
+          return { reviewRequired: true, result: { ai: rejected?.result ? new WingmanService().parseAssessment(rejected.result) : null,
+            place: rejected?.result ? { name: rejected.result.normalized_name, address: rejected.result.address,
+              city: rejected.result.city, lat: rejected.result.lat, lng: rejected.result.lng } : null,
+            decisionReason: rejected?.review_reason || 'manual_review_required' } };
+        }
+        throw insertErr;
+      }
 
       const insertedRow = inserted?.destination;
       if (!insertedRow?.id) {
-        setMessage('Wingman added it, but could not load it back yet.');
+        setMessage('Wingman could not confirm the saved restaurant. Please retry.');
         setStep('result');
         return;
       }
 
-      await handleUseDestination(insertedRow);
-      return insertedRow;
+      // Retain the authoritative row if local selection fails, so retry selects
+      // it without another verification/creation request.
+      setCandidate({ type: 'existing', row: insertedRow });
+      if (await wait(handleUseDestination(insertedRow))) return insertedRow;
     } catch (e) {
       console.warn('insertWingmanDestination failed:', e);
       setMessage(await formatWingmanFunctionError(e));
       setStep('result');
     } finally {
       setLoading(false);
-      insertInFlightRef.current = false;
+      if (current()) insertInFlightRef.current = false;
     }
   }, [city, extraInfo, handleUseDestination, stateCode, stateId]);
 
   const sendManualReview = useCallback(async (result, row) => {
+    const { current, signal, wait, setLoading, setMessage, setStep, setCandidate } = operation();
+    if (!current()) return;
     const suggestionPayload = {
       state_id: stateId ? Number(stateId) : null,
       restaurant_name:
         result?.suggestionInsert?.restaurantName ||
         row?.name ||
         restaurantName.trim(),
-      address: result?.suggestionInsert?.address ?? row?.address ?? null,
+      address: result?.suggestionInsert?.address ?? result?.place?.address ?? row?.address ?? null,
     };
 
     if (!userId || !stateId) {
       setCandidate(null);
-      setMessage(manualReviewQueuedMessage);
+      if (!onManualReviewQueued) throw new Error('Sign in to submit this restaurant for review.');
+      await wait(Promise.resolve(onManualReviewQueued(suggestionPayload, { signal })));
+      setMessage('Saved on this device for submission after sign-in. Pick an existing restaurant to continue onboarding.');
       setStep('result');
-      onManualReviewQueued?.(suggestionPayload);
       return;
     }
 
-    const { error: suggestionErr } = await supabase
+    const { error: suggestionErr } = await wait(supabase
       .from('destination_suggestions')
       .insert({
         user_id: userId,
         state_id: suggestionPayload.state_id,
         restaurant_name: suggestionPayload.restaurant_name,
         address: suggestionPayload.address,
-      });
+        verification_evidence: {
+          source: 'wingman',
+          decisionReason: result?.decisionReason ?? null,
+          ai: result?.ai ?? null,
+          place: result?.place ?? null,
+          submittedDetails: { name: suggestionPayload.restaurant_name, address: suggestionPayload.address, state_id: suggestionPayload.state_id, city: result?.place?.city ?? result?.ai?.city ?? row?.city ?? city?.trim() ?? null, lat: result?.place?.lat ?? result?.ai?.lat ?? row?.lat ?? null, lng: result?.place?.lng ?? result?.ai?.lng ?? row?.lng ?? null, extraInfo: extraInfo?.trim() || null },
+        },
+      }));
 
     if (suggestionErr) throw suggestionErr;
 
     setCandidate(null);
     setMessage(manualReviewQueuedMessage);
     setStep('result');
-    onManualReviewQueued?.(suggestionPayload);
-  }, [manualReviewQueuedMessage, onManualReviewQueued, restaurantName, stateId, userId]);
+    await wait(Promise.resolve(onManualReviewQueued?.(suggestionPayload, { signal })));
+  }, [city, extraInfo, manualReviewQueuedMessage, onManualReviewQueued, restaurantName, stateId, userId]);
 
   const verifyWingsAndAdd = useCallback(async (row) => {
-    if (!row?.name || !stateId || !stateCode) return;
-    if (verifyInFlightRef.current) return;
+    const { current, signal, wait, setLoading, setMessage, setStep, setCandidate } = operation();
+    if (!current() || !row?.name || !stateId || !stateCode) return;
+    if (verifyInFlightRef.current || insertInFlightRef.current || selectionInFlightRef.current || searchInFlightRef.current) return;
 
     verifyInFlightRef.current = true;
     setLoading(true);
-    const firstPassScore = candidate?.result?.ai?.wingsProbability ?? 0;
-
-    if (firstPassScore >= 0.75) {
+    if (canAddWingmanResult(candidate?.result)) {
       try {
-        await insertWingmanDestination(row);
+        const inserted = await insertWingmanDestination(row);
+        if (inserted?.reviewRequired) await sendManualReview(inserted.result, row);
+        return;
+      } catch (error) {
+        setMessage(await wingmanError(error));
+        setStep('result');
         return;
       } finally {
-        verifyInFlightRef.current = false;
+        setLoading(false);
+        if (current()) verifyInFlightRef.current = false;
       }
     }
 
@@ -300,9 +324,10 @@ export default function WingmanAddDialog({
 
     try {
       const wingman = new WingmanService();
-      const result = await wingman.run({
+      const result = await wait(wingman.run({
         rawInput: [row.name, row.city, row.address].filter(Boolean).join(' '),
         restaurantName: row.name,
+        candidateAddress: row.address ?? null,
         city: row.city ?? city?.trim() ?? null,
         extraInfo: [
           row.address ? `Confirmed address: ${row.address}` : null,
@@ -314,17 +339,16 @@ export default function WingmanAddDialog({
         stateCode: String(stateCode),
         userId,
         wingVerification: true,
-      });
+      }));
 
-      const wingsProbability = result?.ai?.wingsProbability ?? 0;
-
+      if (result?.error) throw new Error(result.error);
       if (String(result?.error || '').toLowerCase().includes('too many requests')) {
         setMessage('Too many requests. Give it a little time and try again.');
         setStep('result');
         return;
       }
 
-      if (wingsProbability >= 0.75 && result?.place?.found) {
+      if (canAddWingmanResult(result)) {
         const added = await insertWingmanDestination({
           ...row,
           name: result.place?.name || result.ai?.normalizedName || row.name,
@@ -333,12 +357,13 @@ export default function WingmanAddDialog({
           lat: result.place?.lat ?? result.ai?.lat ?? row.lat ?? null,
           lng: result.place?.lng ?? result.ai?.lng ?? row.lng ?? null,
         });
-        if (added?.id) {
+        if (added?.id && current()) {
           Alert.alert(
             'Wings confirmed',
             'Wingman was able to confirm they have wings on the menu. It has been added.'
           );
         }
+        if (added?.reviewRequired) await sendManualReview(added.result, row);
         return;
       }
 
@@ -354,11 +379,11 @@ export default function WingmanAddDialog({
       setStep('result');
     } finally {
       setLoading(false);
-      verifyInFlightRef.current = false;
+      if (current()) verifyInFlightRef.current = false;
     }
   }, [
     city,
-    candidate?.result?.ai?.wingsProbability,
+    candidate?.result,
     extraInfo,
     insertWingmanDestination,
     sendManualReview,
@@ -368,7 +393,8 @@ export default function WingmanAddDialog({
   ]);
 
   const runWingman = useCallback(async () => {
-    if (searchInFlightRef.current) return;
+    const { current, signal, wait, setLoading, setMessage, setStep, setCandidate } = operation();
+    if (searchInFlightRef.current || verifyInFlightRef.current || insertInFlightRef.current || selectionInFlightRef.current) return;
 
     const rawInput = buildRawInput();
 
@@ -394,7 +420,7 @@ export default function WingmanAddDialog({
         onStatus: setMessage,
       });
 
-      const result = await wingman.run({
+      const result = await wait(wingman.run({
         rawInput,
         restaurantName: restaurantName.trim(),
         city: city?.trim() || null,
@@ -403,7 +429,7 @@ export default function WingmanAddDialog({
         stateCode: String(stateCode),
         userId,
         deferWingVerification: true,
-      });
+      }));
 
       const isLowConfidence =
         result?.decision === 'rejected' &&
@@ -411,9 +437,25 @@ export default function WingmanAddDialog({
           result?.decisionReason === 'invalid_ai_response' ||
           result?.decisionReason === 'place_not_found');
 
+      if (result?.error) throw new Error(result.error);
       if (String(result?.error || '').toLowerCase().includes('too many requests')) {
         setMessage('Too many requests. Give it a little time and try again.');
         setStep('result');
+        return;
+      }
+
+      if (result?.decision === 'needs_city' && !city?.trim()) {
+        setMessage(result.userMessage);
+        setStep('city');
+        return;
+      }
+      if (['needs_city', 'needs_more_info'].includes(result?.decision)) {
+        if (!extraInfo?.trim()) {
+          setMessage(result.userMessage);
+          setStep('extra');
+        } else {
+          await sendManualReview(result, null);
+        }
         return;
       }
 
@@ -430,14 +472,12 @@ export default function WingmanAddDialog({
           return;
         }
 
-        setMessage(result?.error || result?.userMessage || 'Wingman could not figure this one out.');
-        setStep('result');
+        await sendManualReview(result, null);
         return;
       }
 
       if (isLowConfidence && (city?.trim() || extraInfo?.trim())) {
-        setMessage(result?.userMessage || 'Wingman could not validate that restaurant.');
-        setStep('result');
+        await sendManualReview(result, null);
         return;
       }
 
@@ -499,7 +539,7 @@ export default function WingmanAddDialog({
       setStep('result');
     } finally {
       setLoading(false);
-      searchInFlightRef.current = false;
+      if (current()) searchInFlightRef.current = false;
     }
   }, [
     buildRawInput,
@@ -510,6 +550,7 @@ export default function WingmanAddDialog({
     city,
     extraInfo,
     findExistingDestinationCandidate,
+    sendManualReview,
   ]);
 
   const renderStateStep = () => (
@@ -519,6 +560,7 @@ export default function WingmanAddDialog({
       </Text>
 
       <TextInput
+        ref={nameInput}
         testID="wingman-restaurant-name"
         mode="outlined"
         label="Restaurant name"
@@ -565,6 +607,9 @@ export default function WingmanAddDialog({
   const renderCityStep = () => (
     <>
       <TextInput
+        ref={cityInput}
+        testID="wingman-city"
+        showSoftInputOnFocus
         mode="outlined"
         label="Town or city"
         value={city}
@@ -581,6 +626,9 @@ export default function WingmanAddDialog({
       </Text>
 
       <TextInput
+        ref={extraInput}
+        testID="wingman-extra-info"
+        showSoftInputOnFocus
         mode="outlined"
         label="More details"
         value={extraInfo}
@@ -602,7 +650,7 @@ export default function WingmanAddDialog({
           {showCloseOnResultMessage && !candidate?.row ? (
             <Button
               mode="contained"
-              onPress={onDismiss}
+              onPress={dismiss}
               style={{ marginTop: 14, alignSelf: 'center' }}
             >
               Close
@@ -627,11 +675,10 @@ export default function WingmanAddDialog({
             {(candidate.row.address || '').trim()}
             {candidate.row.city ? `${candidate.row.address ? ', ' : ''}${candidate.row.city}` : ''}
           </Text>
-          {candidate?.result?.ai?.wingsProbability != null ? (
-            <Text style={{ opacity: 0.75 }}>
-              Wings on Menu Confidence {Math.round(candidate.result.ai.wingsProbability * 100)}%
-            </Text>
-          ) : null}
+          {candidate?.result?.ai ? <>
+            <Text style={{ opacity: 0.75 }}>Restaurant-match confidence: {formatWingmanConfidence(candidate.result.ai.confidence)}</Text>
+            <Text style={{ opacity: 0.75 }}>Wing confidence: {formatWingmanConfidence(candidate.result.ai.wingsProbability)}</Text>
+          </> : null}
           <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
             <Button
               mode="contained"
@@ -639,11 +686,10 @@ export default function WingmanAddDialog({
               disabled={loading}
               onPress={() => {
                 if (candidate.type === 'existing') {
-                  handleUseDestination(candidate.row);
-                  return;
+                  return handleUseDestination(candidate.row);
                 }
 
-                verifyWingsAndAdd(candidate.row);
+                return verifyWingsAndAdd(candidate.row);
               }}
             >
               Yes
@@ -673,16 +719,21 @@ export default function WingmanAddDialog({
 
   return (
     <Portal>
+    <Modal visible={visible} transparent animationType="fade"
+      onShow={() => { Keyboard.dismiss(); setModalReady(true); }}
+      onRequestClose={dismiss}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <Dialog
         visible={visible}
-        onDismiss={loading ? undefined : onDismiss}
+        onDismiss={dismiss}
         style={{ borderRadius: 18, alignSelf: 'center', width: '92%', maxWidth: 520 }}
       >
         <Dialog.Title style={{ textAlign: 'center', fontWeight: '900' }}>
           Wingman
         </Dialog.Title>
 
-        <Dialog.Content>
+        <Dialog.ScrollArea style={{ maxHeight: '70%', paddingHorizontal: 0 }}>
+        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: 24 }}>
           {loading ? (
             <View style={{ paddingVertical: 18, alignItems: 'center' }}>
               <ActivityIndicator />
@@ -704,11 +755,12 @@ export default function WingmanAddDialog({
               ) : null}
             </>
           )}
-        </Dialog.Content>
+        </ScrollView>
+        </Dialog.ScrollArea>
 
         <Dialog.Actions style={{ justifyContent: 'space-between' }}>
           {showCloseOnResultMessage && step === 'result' && !candidate?.row ? null : (
-            <Button onPress={onDismiss} disabled={loading}>
+            <Button onPress={dismiss}>
               Close
             </Button>
           )}
@@ -722,23 +774,23 @@ export default function WingmanAddDialog({
             >
               Search
             </Button>
-          ) : showCloseOnResultMessage && !candidate?.row ? null : (
+          ) : (
             <Button
               mode="outlined"
+              disabled={loading}
               onPress={() => {
-                setRestaurantName('');
-                setCity('');
-                setExtraInfo('');
                 setMessage('');
                 setCandidate(null);
                 setStep('state');
               }}
             >
-              Add a different restaurant
+              Retry search
             </Button>
           )}
         </Dialog.Actions>
       </Dialog>
+      </KeyboardAvoidingView>
+    </Modal>
     </Portal>
   );
 }

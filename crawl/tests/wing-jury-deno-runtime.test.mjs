@@ -55,7 +55,9 @@ async function fixture(name) {
   const reserve = createServer(); await new Promise(resolve => reserve.listen(0, '127.0.0.1', resolve));
   const port = reserve.address().port; await new Promise(resolve => reserve.close(resolve));
   const wrapper = new URL(`../.expo/final-C-${name}-serve.mjs`, import.meta.url);
-  const entry = new URL(`../.expo/final-C-edge-candidate-v1/supabase/functions/${name}/index.js`, import.meta.url);
+  const entry = new URL(process.env.BUFFAGO_APP_POLISH_DENO === '1'
+    ? `../.expo/app-polish-edge/${name}/index.js`
+    : `../.expo/final-C-edge-candidate-v1/supabase/functions/${name}/index.js`, import.meta.url);
   await readFile(entry); // Missing reviewed candidate is a failure, never a synthetic substitute.
   await writeFile(wrapper, `const serve = Deno.serve; Deno.serve = handler => serve({hostname:'127.0.0.1',port:${port}}, handler); await import(${JSON.stringify(entry.href)});`);
   const child = spawn(process.env.FINAL_EDGE_DENO, ['run', '--no-config', '--no-lock', '--allow-net=127.0.0.1',
@@ -91,14 +93,20 @@ for (const name of ['wing-jury-feed', 'wing-jury-vote', 'wing-jury-reveal', 'del
         f.state.public = false; assert.equal((await (await f.call({}, false)).json()).photos.length, 0);
       } else if (name === 'wing-jury-vote') {
         assert.equal((await f.call({ submission_id: photoId, vote: 0 }, false)).status, 401);
-        assert.equal((await f.call({ submission_id: photoId, vote: 0 })).status, 200);
+        const recorded=await f.call({ submission_id: photoId, vote: 0 });assert.equal(recorded.status, 200);
+        if(process.env.BUFFAGO_APP_POLISH_DENO==='1'){
+          const body=await recorded.json();assert.equal(body.dislike_count,0);assert.equal(body.neutral_count,0);
+        }
         const insert = f.calls.find(call => call.path === '/rest/v1/wing_jury_votes' && call.method === 'POST');
         assert.equal(insert.headers.authorization, 'Bearer fixture-user-jwt'); assert.equal(insert.headers.apikey, 'fixture-anon');
         assert.deepEqual(insert.body, { submission_id: photoId, user_id: userId, vote: 0 });
       } else if (name === 'wing-jury-reveal') {
         assert.equal((await f.call({ submission_id: photoId, guest_verdict_registered: true })).status, 403);
         f.state.voted = true; const response = await f.call({ submission_id: photoId }); assert.equal(response.status, 200);
-        assert.equal(response.headers.get('cache-control'), 'no-store'); assert.equal((await response.json()).restaurant.name, 'Synthetic Wings');
+        assert.equal(response.headers.get('cache-control'), 'no-store');const reveal=await response.json();assert.equal(reveal.restaurant.name, 'Synthetic Wings');
+        if(process.env.BUFFAGO_APP_POLISH_DENO==='1'){
+          assert.equal(reveal.photo_dislike_count,0);assert.equal(reveal.photo_neutral_count,0);
+        }
         for (const table of ['destination_ratings', 'user_destination_favorites', 'user_want_to_try']) {
           assert.equal(f.calls.find(call => call.path === `/rest/v1/${table}`).search.get('user_id'), `eq.${userId}`);
         }

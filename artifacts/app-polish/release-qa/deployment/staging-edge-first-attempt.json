@@ -1,0 +1,15 @@
+{
+  "target": "http://127.0.0.1:55321",
+  "nativeGatewayAuthRESTStorage": true,
+  "receipts": [
+    {
+      "name": "vote-only candidate phase preserves old reveal/gallery and adds authoritative counts",
+      "status": "PASS"
+    },
+    {
+      "name": "reveal candidate phase follows RPC change and preserves guest privacy",
+      "status": "FAIL",
+      "error": "TypeError: fetch failed"
+    }
+  ]
+}

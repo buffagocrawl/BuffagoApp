@@ -1,0 +1,859 @@
+{
+  "workspace": "C:\\Users\\Brand\\repo\\BuffagoApp",
+  "entries": [
+    {
+      "path": "artifacts-app-polish-all.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts-app-polish-all.log",
+      "directory": false,
+      "reason": "Confirmed task-generated superseded preliminary log; final consolidated evidence retained",
+      "bytes": 218174
+    },
+    {
+      "path": "artifacts-app-polish-concurrency.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts-app-polish-concurrency.log",
+      "directory": false,
+      "reason": "Confirmed task-generated superseded preliminary log; final consolidated evidence retained",
+      "bytes": 2018
+    },
+    {
+      "path": "artifacts-app-polish-current-jury-deno.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts-app-polish-current-jury-deno.log",
+      "directory": false,
+      "reason": "Confirmed task-generated superseded preliminary log; final consolidated evidence retained",
+      "bytes": 1234
+    },
+    {
+      "path": "artifacts-app-polish-deno.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts-app-polish-deno.log",
+      "directory": false,
+      "reason": "Confirmed task-generated superseded preliminary log; final consolidated evidence retained",
+      "bytes": 2744
+    },
+    {
+      "path": "artifacts-app-polish-exports.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts-app-polish-exports.log",
+      "directory": false,
+      "reason": "Confirmed task-generated superseded preliminary log; final consolidated evidence retained",
+      "bytes": 14802
+    },
+    {
+      "path": "artifacts-app-polish-final-tests.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts-app-polish-final-tests.log",
+      "directory": false,
+      "reason": "Confirmed task-generated superseded preliminary log; final consolidated evidence retained",
+      "bytes": 222718
+    },
+    {
+      "path": "artifacts-app-polish-focused.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts-app-polish-focused.log",
+      "directory": false,
+      "reason": "Confirmed task-generated superseded preliminary log; final consolidated evidence retained",
+      "bytes": 24276
+    },
+    {
+      "path": "artifacts-app-polish-framing-tests.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts-app-polish-framing-tests.log",
+      "directory": false,
+      "reason": "Confirmed task-generated superseded preliminary log; final consolidated evidence retained",
+      "bytes": 9980
+    },
+    {
+      "path": "artifacts-app-polish-gallery-test.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts-app-polish-gallery-test.log",
+      "directory": false,
+      "reason": "Confirmed task-generated superseded preliminary log; final consolidated evidence retained",
+      "bytes": 9896
+    },
+    {
+      "path": "artifacts-app-polish-jury-deno.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts-app-polish-jury-deno.log",
+      "directory": false,
+      "reason": "Confirmed task-generated superseded preliminary log; final consolidated evidence retained",
+      "bytes": 2210
+    },
+    {
+      "path": "artifacts-app-polish-lint.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts-app-polish-lint.log",
+      "directory": false,
+      "reason": "Confirmed task-generated superseded preliminary log; final consolidated evidence retained",
+      "bytes": 32412
+    },
+    {
+      "path": "artifacts-app-polish-regression.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts-app-polish-regression.log",
+      "directory": false,
+      "reason": "Confirmed task-generated superseded preliminary log; final consolidated evidence retained",
+      "bytes": 48116
+    },
+    {
+      "path": "artifacts-app-polish-test.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts-app-polish-test.log",
+      "directory": false,
+      "reason": "Confirmed task-generated superseded preliminary log; final consolidated evidence retained",
+      "bytes": 23788
+    },
+    {
+      "path": "artifacts-app-polish-typecheck.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts-app-polish-typecheck.log",
+      "directory": false,
+      "reason": "Confirmed task-generated superseded preliminary log; final consolidated evidence retained",
+      "bytes": 92
+    },
+    {
+      "path": "artifacts-app-polish-upload.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts-app-polish-upload.log",
+      "directory": false,
+      "reason": "Confirmed task-generated superseded preliminary log; final consolidated evidence retained",
+      "bytes": 7628
+    },
+    {
+      "path": "artifacts/app-polish/confidence-lint.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\confidence-lint.log",
+      "directory": false,
+      "reason": "Superseded task-generated log; current release-qa evidence retained",
+      "bytes": 32412
+    },
+    {
+      "path": "artifacts/app-polish/confidence-tests.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\confidence-tests.log",
+      "directory": false,
+      "reason": "Superseded task-generated log; current release-qa evidence retained",
+      "bytes": 15842
+    },
+    {
+      "path": "artifacts/app-polish/final-regression.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\final-regression.log",
+      "directory": false,
+      "reason": "Superseded task-generated log; current release-qa evidence retained",
+      "bytes": 236032
+    },
+    {
+      "path": "artifacts/app-polish/lint-final.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\lint-final.log",
+      "directory": false,
+      "reason": "Superseded task-generated log; current release-qa evidence retained",
+      "bytes": 32412
+    },
+    {
+      "path": "artifacts/app-polish/mango-build.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\mango-build.log",
+      "directory": false,
+      "reason": "Superseded task-generated log; current release-qa evidence retained",
+      "bytes": 824
+    },
+    {
+      "path": "artifacts/app-polish/mango-database-regression.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\mango-database-regression.log",
+      "directory": false,
+      "reason": "Superseded task-generated log; current release-qa evidence retained",
+      "bytes": 4770
+    },
+    {
+      "path": "artifacts/app-polish/mango-focused-final.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\mango-focused-final.log",
+      "directory": false,
+      "reason": "Superseded task-generated log; current release-qa evidence retained",
+      "bytes": 1122
+    },
+    {
+      "path": "artifacts/app-polish/mango-ui-regression.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\mango-ui-regression.log",
+      "directory": false,
+      "reason": "Superseded task-generated log; current release-qa evidence retained",
+      "bytes": 2300
+    },
+    {
+      "path": "artifacts/app-polish/native-exports-final.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native-exports-final.log",
+      "directory": false,
+      "reason": "Superseded task-generated log; current release-qa evidence retained",
+      "bytes": 12120
+    },
+    {
+      "path": "artifacts/app-polish/native-focus-final.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native-focus-final.log",
+      "directory": false,
+      "reason": "Superseded task-generated log; current release-qa evidence retained",
+      "bytes": 1290
+    },
+    {
+      "path": "artifacts/app-polish/typecheck-final.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\typecheck-final.log",
+      "directory": false,
+      "reason": "Superseded task-generated log; current release-qa evidence retained",
+      "bytes": 92
+    },
+    {
+      "path": "artifacts/app-polish/wingman-deno-check.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\wingman-deno-check.log",
+      "directory": false,
+      "reason": "Superseded task-generated log; current release-qa evidence retained",
+      "bytes": 800
+    },
+    {
+      "path": "artifacts/app-polish/wingman-final.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\wingman-final.log",
+      "directory": false,
+      "reason": "Superseded task-generated log; current release-qa evidence retained",
+      "bytes": 13484
+    },
+    {
+      "path": "artifacts/app-polish/native/detail-withdrawal-synchronized.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\detail-withdrawal-synchronized.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 21194
+    },
+    {
+      "path": "artifacts/app-polish/native/framing-confirmed-frame.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\framing-confirmed-frame.png",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 252138
+    },
+    {
+      "path": "artifacts/app-polish/native/framing-confirmed-frame.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\framing-confirmed-frame.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 5629
+    },
+    {
+      "path": "artifacts/app-polish/native/framing-confirmed-preview.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\framing-confirmed-preview.png",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 254517
+    },
+    {
+      "path": "artifacts/app-polish/native/framing-confirmed-preview.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\framing-confirmed-preview.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 7391
+    },
+    {
+      "path": "artifacts/app-polish/native/framing-dragged.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\framing-dragged.png",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 252129
+    },
+    {
+      "path": "artifacts/app-polish/native/framing-dragged.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\framing-dragged.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 5629
+    },
+    {
+      "path": "artifacts/app-polish/native/framing-initial.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\framing-initial.png",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 258272
+    },
+    {
+      "path": "artifacts/app-polish/native/framing-initial.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\framing-initial.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 5629
+    },
+    {
+      "path": "artifacts/app-polish/native/framing-reset.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\framing-reset.png",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 258272
+    },
+    {
+      "path": "artifacts/app-polish/native/framing-reset.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\framing-reset.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 5629
+    },
+    {
+      "path": "artifacts/app-polish/native/inline-first.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\inline-first.png",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 1231472
+    },
+    {
+      "path": "artifacts/app-polish/native/inline-first.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\inline-first.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 15163
+    },
+    {
+      "path": "artifacts/app-polish/native/inline-swiped.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\inline-swiped.png",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 1562356
+    },
+    {
+      "path": "artifacts/app-polish/native/inline-swiped.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\inline-swiped.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 15163
+    },
+    {
+      "path": "artifacts/app-polish/native/inline-vote-synchronized.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\inline-vote-synchronized.png",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 1519025
+    },
+    {
+      "path": "artifacts/app-polish/native/inline-vote-synchronized.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\inline-vote-synchronized.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 15159
+    },
+    {
+      "path": "artifacts/app-polish/native/jury-vote-changed.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\jury-vote-changed.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 17385
+    },
+    {
+      "path": "artifacts/app-polish/native/jury-vote-withdrawn.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\jury-vote-withdrawn.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 17386
+    },
+    {
+      "path": "artifacts/app-polish/native/jury-vote.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\jury-vote.png",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 975090
+    },
+    {
+      "path": "artifacts/app-polish/native/jury-vote.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\jury-vote.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 17385
+    },
+    {
+      "path": "artifacts/app-polish/native/restaurant-detail-synchronized.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\restaurant-detail-synchronized.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 21601
+    },
+    {
+      "path": "artifacts/app-polish/native/viewer-tapped-second.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\viewer-tapped-second.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 11628
+    },
+    {
+      "path": "artifacts/app-polish/native/viewer-vote.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\viewer-vote.png",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 1397627
+    },
+    {
+      "path": "artifacts/app-polish/native/viewer-vote.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\viewer-vote.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 11624
+    },
+    {
+      "path": "artifacts/app-polish/native/wingdex-inline-swiped.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\wingdex-inline-swiped.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 36368
+    },
+    {
+      "path": "artifacts/app-polish/native/wingdex-inline.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\wingdex-inline.png",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 711111
+    },
+    {
+      "path": "artifacts/app-polish/native/wingdex-inline.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\wingdex-inline.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 36368
+    },
+    {
+      "path": "artifacts/app-polish/native/wingman-confidence-50.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\wingman-confidence-50.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 8491
+    },
+    {
+      "path": "artifacts/app-polish/native/wingman-details-keyboard.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\wingman-details-keyboard.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 6737
+    },
+    {
+      "path": "artifacts/app-polish/native/wingman-entered-details.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\wingman-entered-details.png",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 330492
+    },
+    {
+      "path": "artifacts/app-polish/native/wingman-entered-details.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\wingman-entered-details.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 6732
+    },
+    {
+      "path": "artifacts/app-polish/native/wingman-town-keyboard.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\wingman-town-keyboard.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 6298
+    },
+    {
+      "path": "artifacts/app-polish/native/wingman-verification-retry.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\wingman-verification-retry.png",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 518973
+    },
+    {
+      "path": "artifacts/app-polish/native/wingman-verification-retry.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\wingman-verification-retry.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 4845
+    },
+    {
+      "path": "artifacts/app-polish/native/320dp-font1.3/wingman-details-keyboard.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\320dp-font1.3\\wingman-details-keyboard.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 6722
+    },
+    {
+      "path": "artifacts/app-polish/native/320dp-font1.3/wingman-entered-details.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\320dp-font1.3\\wingman-entered-details.png",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 217228
+    },
+    {
+      "path": "artifacts/app-polish/native/320dp-font1.3/wingman-entered-details.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\320dp-font1.3\\wingman-entered-details.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 6717
+    },
+    {
+      "path": "artifacts/app-polish/native/320dp-font1.3/wingman-town-keyboard.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\320dp-font1.3\\wingman-town-keyboard.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 6281
+    },
+    {
+      "path": "artifacts/app-polish/native/320dp-font1.3/wingman-verification-retry.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\320dp-font1.3\\wingman-verification-retry.png",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 191072
+    },
+    {
+      "path": "artifacts/app-polish/native/320dp-font1.3/wingman-verification-retry.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\native\\320dp-font1.3\\wingman-verification-retry.xml",
+      "directory": false,
+      "reason": "Superseded/duplicate task-generated capture; representative final flow screenshots retained",
+      "bytes": 4833
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/pinch-after.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\native\\pinch-after.xml",
+      "directory": false,
+      "reason": "Duplicate gesture/status-bar capture or temporary hierarchy; final comparison screenshots retained",
+      "bytes": 5629
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/pinch-and-drag-confirmed-preview.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\native\\pinch-and-drag-confirmed-preview.xml",
+      "directory": false,
+      "reason": "Duplicate gesture/status-bar capture or temporary hierarchy; final comparison screenshots retained",
+      "bytes": 7391
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/pinch-before.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\native\\pinch-before.png",
+      "directory": false,
+      "reason": "Duplicate gesture/status-bar capture or temporary hierarchy; final comparison screenshots retained",
+      "bytes": 253829
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/pinch-before.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\native\\pinch-before.xml",
+      "directory": false,
+      "reason": "Duplicate gesture/status-bar capture or temporary hierarchy; final comparison screenshots retained",
+      "bytes": 5629
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/statusbar-after-dismissal.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\native\\statusbar-after-dismissal.xml",
+      "directory": false,
+      "reason": "Duplicate gesture/status-bar capture or temporary hierarchy; final comparison screenshots retained",
+      "bytes": 16293
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/statusbar-app-foreground.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\native\\statusbar-app-foreground.png",
+      "directory": false,
+      "reason": "Duplicate gesture/status-bar capture or temporary hierarchy; final comparison screenshots retained",
+      "bytes": 1054252
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/statusbar-app-foreground.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\native\\statusbar-app-foreground.xml",
+      "directory": false,
+      "reason": "Duplicate gesture/status-bar capture or temporary hierarchy; final comparison screenshots retained",
+      "bytes": 16293
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/statusbar-modal-foreground.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\native\\statusbar-modal-foreground.xml",
+      "directory": false,
+      "reason": "Duplicate gesture/status-bar capture or temporary hierarchy; final comparison screenshots retained",
+      "bytes": 5629
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/statusbar-modal-open.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\native\\statusbar-modal-open.png",
+      "directory": false,
+      "reason": "Duplicate gesture/status-bar capture or temporary hierarchy; final comparison screenshots retained",
+      "bytes": 259297
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/statusbar-modal-open.xml",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\native\\statusbar-modal-open.xml",
+      "directory": false,
+      "reason": "Duplicate gesture/status-bar capture or temporary hierarchy; final comparison screenshots retained",
+      "bytes": 5629
+    },
+    {
+      "path": "artifacts/app-polish/derivatives/confirmed-upload.jpg",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\derivatives\\confirmed-upload.jpg",
+      "directory": false,
+      "reason": "Superseded synthetic crop experiment; latest pinch JPEG, canonical derivatives and comparison retained",
+      "bytes": 23421
+    },
+    {
+      "path": "artifacts/app-polish/derivatives/fixture-normalized.jpg",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\derivatives\\fixture-normalized.jpg",
+      "directory": false,
+      "reason": "Superseded synthetic crop experiment; latest pinch JPEG, canonical derivatives and comparison retained",
+      "bytes": 10641
+    },
+    {
+      "path": "artifacts/app-polish/derivatives/fixture-portrait.jpg",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\derivatives\\fixture-portrait.jpg",
+      "directory": false,
+      "reason": "Superseded synthetic crop experiment; latest pinch JPEG, canonical derivatives and comparison retained",
+      "bytes": 15564
+    },
+    {
+      "path": "artifacts/app-polish/derivatives/fixture-square.jpg",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\derivatives\\fixture-square.jpg",
+      "directory": false,
+      "reason": "Superseded synthetic crop experiment; latest pinch JPEG, canonical derivatives and comparison retained",
+      "bytes": 12274
+    },
+    {
+      "path": "artifacts/app-polish/derivatives/fixture-thumbnail.jpg",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\derivatives\\fixture-thumbnail.jpg",
+      "directory": false,
+      "reason": "Superseded synthetic crop experiment; latest pinch JPEG, canonical derivatives and comparison retained",
+      "bytes": 3238
+    },
+    {
+      "path": "artifacts/app-polish/derivatives/native-confirmed-normalized.jpg",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\derivatives\\native-confirmed-normalized.jpg",
+      "directory": false,
+      "reason": "Superseded synthetic crop experiment; latest pinch JPEG, canonical derivatives and comparison retained",
+      "bytes": 78236
+    },
+    {
+      "path": "artifacts/app-polish/derivatives/native-confirmed-portrait.jpg",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\derivatives\\native-confirmed-portrait.jpg",
+      "directory": false,
+      "reason": "Superseded synthetic crop experiment; latest pinch JPEG, canonical derivatives and comparison retained",
+      "bytes": 85086
+    },
+    {
+      "path": "artifacts/app-polish/derivatives/native-confirmed-square.jpg",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\derivatives\\native-confirmed-square.jpg",
+      "directory": false,
+      "reason": "Superseded synthetic crop experiment; latest pinch JPEG, canonical derivatives and comparison retained",
+      "bytes": 80133
+    },
+    {
+      "path": "artifacts/app-polish/derivatives/native-confirmed-thumbnail.jpg",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\derivatives\\native-confirmed-thumbnail.jpg",
+      "directory": false,
+      "reason": "Superseded synthetic crop experiment; latest pinch JPEG, canonical derivatives and comparison retained",
+      "bytes": 27796
+    },
+    {
+      "path": "artifacts/app-polish/derivatives/native-confirmed-upload.jpg",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\derivatives\\native-confirmed-upload.jpg",
+      "directory": false,
+      "reason": "Superseded synthetic crop experiment; latest pinch JPEG, canonical derivatives and comparison retained",
+      "bytes": 98511
+    },
+    {
+      "path": "artifacts/app-polish/derivatives/native-confirmed-verification.json",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\derivatives\\native-confirmed-verification.json",
+      "directory": false,
+      "reason": "Superseded synthetic crop experiment; latest pinch JPEG, canonical derivatives and comparison retained",
+      "bytes": 465
+    },
+    {
+      "path": "artifacts/app-polish/derivatives/synthetic-original.png",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\derivatives\\synthetic-original.png",
+      "directory": false,
+      "reason": "Superseded synthetic crop experiment; latest pinch JPEG, canonical derivatives and comparison retained",
+      "bytes": 10310
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/app-final-regression.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\app-final-regression.log",
+      "directory": false,
+      "reason": "Superseded targeted run covered by final compatibility suite",
+      "bytes": 238162
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/bridge-tests.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\bridge-tests.log",
+      "directory": false,
+      "reason": "Superseded targeted run covered by final compatibility suite",
+      "bytes": 3572
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/database-final.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\database-final.log",
+      "directory": false,
+      "reason": "Superseded targeted run covered by final compatibility suite",
+      "bytes": 6424
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/focused-final.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\focused-final.log",
+      "directory": false,
+      "reason": "Superseded targeted run covered by final compatibility suite",
+      "bytes": 16606
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/wingman-v17-regression.log",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\wingman-v17-regression.log",
+      "directory": false,
+      "reason": "Superseded targeted run covered by final compatibility suite",
+      "bytes": 14240
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployed/wing-jury-vote/handler.js",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\deployed\\wing-jury-vote\\handler.js",
+      "directory": false,
+      "reason": "Temporary handler extraction; exact deployed bundles and AST regression retained",
+      "bytes": 2424
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployed/wing-jury-vote/candidate-handler.js",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\deployed\\wing-jury-vote\\candidate-handler.js",
+      "directory": false,
+      "reason": "Temporary handler extraction; exact deployed bundles and AST regression retained",
+      "bytes": 2553
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployed/wing-jury-reveal/handler.js",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\deployed\\wing-jury-reveal\\handler.js",
+      "directory": false,
+      "reason": "Temporary handler extraction; exact deployed bundles and AST regression retained",
+      "bytes": 4168
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployed/wing-jury-reveal/candidate-handler.js",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\deployed\\wing-jury-reveal\\candidate-handler.js",
+      "directory": false,
+      "reason": "Temporary handler extraction; exact deployed bundles and AST regression retained",
+      "bytes": 4232
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/edge-metadata.json",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\edge-metadata.json",
+      "directory": false,
+      "reason": "Duplicate metadata; current production contract and deployment manifest retained",
+      "bytes": 606
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/vote-constraints.json",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\vote-constraints.json",
+      "directory": false,
+      "reason": "Duplicate metadata; current production contract and deployment manifest retained",
+      "bytes": 540
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/vote-permissions.json",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\vote-permissions.json",
+      "directory": false,
+      "reason": "Duplicate metadata; current production contract and deployment manifest retained",
+      "bytes": 510
+    },
+    {
+      "path": "artifacts/app-polish/wingman-protected-baseline.json",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\wingman-protected-baseline.json",
+      "directory": false,
+      "reason": "Obsolete local-only limiter baseline; authoritative deployed-v17 source/checks retained",
+      "bytes": 95
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/android-pinch",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\android-pinch",
+      "directory": true,
+      "reason": "Generated debug gesture APK/class/dex; harness source and successful injection evidence retained",
+      "bytes": 22556
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/processed/pinch-square.jpg",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\native\\processed\\pinch-square.jpg",
+      "directory": false,
+      "reason": "Temporary social derivative experiment; confirmed upload, primary and thumbnail retained",
+      "bytes": 53526
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/processed/pinch-portrait.jpg",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\artifacts\\app-polish\\release-qa\\native\\processed\\pinch-portrait.jpg",
+      "directory": false,
+      "reason": "Temporary social derivative experiment; confirmed upload, primary and thumbnail retained",
+      "bytes": 56664
+    },
+    {
+      "path": "crawl/output/app-polish-android",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\crawl\\output\\app-polish-android",
+      "directory": true,
+      "reason": "Confirmed task-generated temporary Expo export; source and successful export log retained",
+      "bytes": 18937410
+    },
+    {
+      "path": "crawl/output/app-polish-ios",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\crawl\\output\\app-polish-ios",
+      "directory": true,
+      "reason": "Confirmed task-generated temporary Expo export; source and successful export log retained",
+      "bytes": 18938328
+    },
+    {
+      "path": "crawl/output/app-polish-native-final",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\crawl\\output\\app-polish-native-final",
+      "directory": true,
+      "reason": "Confirmed task-generated temporary Expo export; source and successful export log retained",
+      "bytes": 27199424
+    },
+    {
+      "path": "crawl/output/app-polish-release-qa",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\crawl\\output\\app-polish-release-qa",
+      "directory": true,
+      "reason": "Confirmed task-generated temporary Expo export; source and successful export log retained",
+      "bytes": 27205620
+    },
+    {
+      "path": "crawl/.expo/phase7b3d-native17-minimal/fixtures/835e048b-96b0-474a-b011-08ee32a489fb",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\crawl\\.expo\\phase7b3d-native17-minimal\\fixtures\\835e048b-96b0-474a-b011-08ee32a489fb",
+      "directory": true,
+      "reason": "Confirmed task-created disposable PostgreSQL cluster, stopped; harness source, binary fingerprints and final test log retained",
+      "bytes": 91989150
+    },
+    {
+      "path": "crawl/.expo/phase7b3d-native17-minimal/fixtures/26a7ee55-715b-4dcb-a246-12375646e532",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\crawl\\.expo\\phase7b3d-native17-minimal\\fixtures\\26a7ee55-715b-4dcb-a246-12375646e532",
+      "directory": true,
+      "reason": "Confirmed task-created disposable PostgreSQL cluster, stopped; harness source, binary fingerprints and final test log retained",
+      "bytes": 91989150
+    },
+    {
+      "path": "crawl/.expo/phase7b3d-native17-minimal/fixtures/98be8e6d-26ac-4246-9ed1-669ec3022124",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\crawl\\.expo\\phase7b3d-native17-minimal\\fixtures\\98be8e6d-26ac-4246-9ed1-669ec3022124",
+      "directory": true,
+      "reason": "Confirmed task-created disposable PostgreSQL cluster, stopped; harness source, binary fingerprints and final test log retained",
+      "bytes": 91989150
+    },
+    {
+      "path": "crawl/.expo/phase7b3d-native17-minimal/fixtures/416b8cdb-43f8-488f-a7f9-9e2a197f800c",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\crawl\\.expo\\phase7b3d-native17-minimal\\fixtures\\416b8cdb-43f8-488f-a7f9-9e2a197f800c",
+      "directory": true,
+      "reason": "Confirmed task-created disposable PostgreSQL cluster, stopped; harness source, binary fingerprints and final test log retained",
+      "bytes": 91989150
+    },
+    {
+      "path": "crawl/.expo/phase7b3d-native17-minimal/fixtures/0f24a8f0-73a8-428b-842a-c4c59eb5ef89",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\crawl\\.expo\\phase7b3d-native17-minimal\\fixtures\\0f24a8f0-73a8-428b-842a-c4c59eb5ef89",
+      "directory": true,
+      "reason": "Confirmed task-created disposable PostgreSQL cluster, stopped; harness source, binary fingerprints and final test log retained",
+      "bytes": 57666357
+    },
+    {
+      "path": "crawl/.expo/phase7b3d-native17-minimal/fixtures/98247424-6415-4d75-be35-4788a96cd60f",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\crawl\\.expo\\phase7b3d-native17-minimal\\fixtures\\98247424-6415-4d75-be35-4788a96cd60f",
+      "directory": true,
+      "reason": "Confirmed task-created disposable PostgreSQL cluster, stopped; harness source, binary fingerprints and final test log retained",
+      "bytes": 178467685
+    },
+    {
+      "path": "crawl/.expo/phase7b3d-native17-minimal/fixtures/8fdc1ef8-0dbd-4055-96e4-0c27d930b9d2",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\crawl\\.expo\\phase7b3d-native17-minimal\\fixtures\\8fdc1ef8-0dbd-4055-96e4-0c27d930b9d2",
+      "directory": true,
+      "reason": "Confirmed task-created disposable PostgreSQL cluster, stopped; harness source, binary fingerprints and final test log retained",
+      "bytes": 169706711
+    },
+    {
+      "path": "crawl/.expo/phase7b3d-native17-minimal/fixtures/0cccdd77-d8c6-48b1-8b79-321c4e7eeb36",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\crawl\\.expo\\phase7b3d-native17-minimal\\fixtures\\0cccdd77-d8c6-48b1-8b79-321c4e7eeb36",
+      "directory": true,
+      "reason": "Confirmed task-created disposable PostgreSQL cluster, stopped; harness source, binary fingerprints and final test log retained",
+      "bytes": 91989150
+    },
+    {
+      "path": "crawl/.expo/phase7b3d-native17-minimal/fixtures/bbbc2954-0e7a-4cce-a23f-e3eabd038804",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\crawl\\.expo\\phase7b3d-native17-minimal\\fixtures\\bbbc2954-0e7a-4cce-a23f-e3eabd038804",
+      "directory": true,
+      "reason": "Confirmed task-created disposable PostgreSQL cluster, stopped; harness source, binary fingerprints and final test log retained",
+      "bytes": 57666357
+    },
+    {
+      "path": "crawl/.expo/phase7b3d-native17-minimal/fixtures/61e6a9ce-9da2-4c76-9073-bbe400eaeb3c",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\crawl\\.expo\\phase7b3d-native17-minimal\\fixtures\\61e6a9ce-9da2-4c76-9073-bbe400eaeb3c",
+      "directory": true,
+      "reason": "Confirmed task-created disposable PostgreSQL cluster, stopped; harness source, binary fingerprints and final test log retained",
+      "bytes": 178467680
+    },
+    {
+      "path": "crawl/.expo/phase7b3d-native17-minimal/fixtures/135f3650-3d04-4d3d-9afb-2eb53af6d10e",
+      "absolute_path": "C:\\Users\\Brand\\repo\\BuffagoApp\\crawl\\.expo\\phase7b3d-native17-minimal\\fixtures\\135f3650-3d04-4d3d-9afb-2eb53af6d10e",
+      "directory": true,
+      "reason": "Confirmed task-created disposable PostgreSQL cluster, stopped; harness source, binary fingerprints and final test log retained",
+      "bytes": 57666357
+    }
+  ]
+}

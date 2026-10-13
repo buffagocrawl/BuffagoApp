@@ -1,0 +1,920 @@
+[
+  {
+    "schema": "public",
+    "table_name": "badge_catalog",
+    "name": "badge_catalog_read",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "(is_active = true)",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "buffacoin_ledger",
+    "name": "ledger_insert_own",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(user_id = auth.uid())"
+  },
+  {
+    "schema": "public",
+    "table_name": "buffacoin_ledger",
+    "name": "ledger_select_own",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "(user_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "buffacoin_wallets",
+    "name": "wallet_select_own",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "(user_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "buffacoin_wallets",
+    "name": "wallets_select_own",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "crawls",
+    "name": "crawls_delete",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "DELETE",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "crawls",
+    "name": "crawls_insert",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(auth.uid() = user_id)"
+  },
+  {
+    "schema": "public",
+    "table_name": "crawls",
+    "name": "crawls_insert_guest",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "anon"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(user_id IS NULL)"
+  },
+  {
+    "schema": "public",
+    "table_name": "crawls",
+    "name": "crawls_insert_host",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(user_id = auth.uid())"
+  },
+  {
+    "schema": "public",
+    "table_name": "crawls",
+    "name": "crawls_insert_self",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(user_id = auth.uid())"
+  },
+  {
+    "schema": "public",
+    "table_name": "crawls",
+    "name": "crawls_owner_may_detach",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "UPDATE",
+    "qual": "(user_id = auth.uid())",
+    "with_check": "((user_id IS NULL) OR (user_id = auth.uid()))"
+  },
+  {
+    "schema": "public",
+    "table_name": "crawls",
+    "name": "crawls_select",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "crawls",
+    "name": "crawls_select_guest",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "anon"
+    ],
+    "cmd": "SELECT",
+    "qual": "(user_id IS NULL)",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "crawls",
+    "name": "crawls_select_self",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "(user_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "crawls",
+    "name": "crawls_update",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "UPDATE",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": "(auth.uid() = user_id)"
+  },
+  {
+    "schema": "public",
+    "table_name": "crawls",
+    "name": "crawls_update_host",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "UPDATE",
+    "qual": "(user_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "crawls",
+    "name": "crawls_update_self",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "UPDATE",
+    "qual": "(user_id = auth.uid())",
+    "with_check": "(user_id = auth.uid())"
+  },
+  {
+    "schema": "public",
+    "table_name": "crawls",
+    "name": "public read for crawl_public",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "anon",
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "crawls",
+    "name": "user can read own crawls",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "destination_ratings",
+    "name": "auth can manage own ratings",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "ALL",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": "(auth.uid() = user_id)"
+  },
+  {
+    "schema": "public",
+    "table_name": "destination_ratings",
+    "name": "destination_ratings_insert_own",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(user_id = auth.uid())"
+  },
+  {
+    "schema": "public",
+    "table_name": "destination_ratings",
+    "name": "guests can insert guest ratings",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "anon"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(user_id IS NULL)"
+  },
+  {
+    "schema": "public",
+    "table_name": "destination_ratings",
+    "name": "guests can read guest ratings",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "anon"
+    ],
+    "cmd": "SELECT",
+    "qual": "(user_id IS NULL)",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "destination_ratings",
+    "name": "public read ratings",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "destination_ratings",
+    "name": "user can read own ratings",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "destination_tags",
+    "name": "public read tags",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "destinations",
+    "name": "destinations_public_read",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "destinations",
+    "name": "destinations_write_by_creator",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(created_by = auth.uid())",
+    "with_check": "(created_by = auth.uid())"
+  },
+  {
+    "schema": "public",
+    "table_name": "destinations",
+    "name": "public read destinations",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "engagement_feature_flags",
+    "name": "engagement_flags_authenticated_read",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "friendships",
+    "name": "friendships_select_participant",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "((auth.uid() = requester_id) OR (auth.uid() = addressee_id))",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "lb_user_badges_counts",
+    "name": "lb_counts_everyone_select",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "anon",
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "notification_outbox",
+    "name": "notification_outbox_own_read",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "(user_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "notification_preferences",
+    "name": "notification_preferences_own_read",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "(user_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "referral_codes",
+    "name": "referral_codes_owner_read",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "(user_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "routes",
+    "name": "public read routes for stop counts",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "anon",
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "routes",
+    "name": "routes_public_read",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "(is_public = true)",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "routes",
+    "name": "routes_write_by_creator",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(created_by = auth.uid())",
+    "with_check": "(created_by = auth.uid())"
+  },
+  {
+    "schema": "public",
+    "table_name": "user_badges",
+    "name": "user_badges insert own",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(user_id = auth.uid())"
+  },
+  {
+    "schema": "public",
+    "table_name": "user_badges",
+    "name": "user_badges select own",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "(user_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "user_badges",
+    "name": "user_badges_insert_block",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "false"
+  },
+  {
+    "schema": "public",
+    "table_name": "user_badges",
+    "name": "user_badges_insert_own",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(user_id = auth.uid())"
+  },
+  {
+    "schema": "public",
+    "table_name": "user_badges",
+    "name": "user_badges_insert_self",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(user_id = auth.uid())"
+  },
+  {
+    "schema": "public",
+    "table_name": "user_badges",
+    "name": "user_badges_select_own",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "(user_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "user_badges",
+    "name": "user_badges_select_self",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "(user_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "user_badges",
+    "name": "users can insert their own badges",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(user_id = auth.uid())"
+  },
+  {
+    "schema": "public",
+    "table_name": "user_badges",
+    "name": "users can select their own badges",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "(user_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "user_blocks",
+    "name": "blocks_select_owner",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "(auth.uid() = blocker_id)",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "user_destination_favorites",
+    "name": "user_destination_favorites_own_delete",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "DELETE",
+    "qual": "((user_id = ( SELECT auth.uid() AS uid)) AND (COALESCE(( SELECT (auth.jwt() ->> 'is_anonymous'::text)), 'false'::text) = 'false'::text))",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "user_destination_favorites",
+    "name": "user_destination_favorites_own_insert",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "((user_id = ( SELECT auth.uid() AS uid)) AND (COALESCE(( SELECT (auth.jwt() ->> 'is_anonymous'::text)), 'false'::text) = 'false'::text))"
+  },
+  {
+    "schema": "public",
+    "table_name": "user_destination_favorites",
+    "name": "user_destination_favorites_own_select",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "((user_id = ( SELECT auth.uid() AS uid)) AND (COALESCE(( SELECT (auth.jwt() ->> 'is_anonymous'::text)), 'false'::text) = 'false'::text))",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "user_events",
+    "name": "user_events_insert_own_or_anonymous",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "anon",
+      "authenticated"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(((auth.uid() IS NULL) AND (user_id IS NULL) AND (anonymous_id IS NOT NULL)) OR ((auth.uid() IS NOT NULL) AND ((user_id = auth.uid()) OR (user_id IS NULL)) AND (anonymous_id IS NOT NULL)))"
+  },
+  {
+    "schema": "public",
+    "table_name": "user_want_to_try",
+    "name": "user_want_to_try_own_delete",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "DELETE",
+    "qual": "((user_id = ( SELECT auth.uid() AS uid)) AND (COALESCE(( SELECT (auth.jwt() ->> 'is_anonymous'::text)), 'false'::text) = 'false'::text))",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "user_want_to_try",
+    "name": "user_want_to_try_own_insert",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "((user_id = ( SELECT auth.uid() AS uid)) AND (COALESCE(( SELECT (auth.jwt() ->> 'is_anonymous'::text)), 'false'::text) = 'false'::text))"
+  },
+  {
+    "schema": "public",
+    "table_name": "user_want_to_try",
+    "name": "user_want_to_try_own_select",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "((user_id = ( SELECT auth.uid() AS uid)) AND (COALESCE(( SELECT (auth.jwt() ->> 'is_anonymous'::text)), 'false'::text) = 'false'::text))",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "users",
+    "name": "public read basic user profile",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "anon",
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "users",
+    "name": "users self read",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "users",
+    "name": "users self update",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "UPDATE",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": "(auth.uid() = user_id)"
+  },
+  {
+    "schema": "public",
+    "table_name": "users",
+    "name": "users_insert_own",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "public"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(auth.uid() = user_id)"
+  },
+  {
+    "schema": "public",
+    "table_name": "users",
+    "name": "users_rw_self",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "ALL",
+    "qual": "(user_id = auth.uid())",
+    "with_check": "(user_id = auth.uid())"
+  },
+  {
+    "schema": "public",
+    "table_name": "users",
+    "name": "users_select_own",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "users",
+    "name": "users_update_own",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "UPDATE",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": "(auth.uid() = user_id)"
+  },
+  {
+    "schema": "public",
+    "table_name": "wing_jury_photo_vote_counts",
+    "name": "wing_jury_photo_vote_counts_public_select",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "((( SELECT auth.uid() AS uid) IS NOT NULL) AND (COALESCE(( SELECT (auth.jwt() ->> 'is_anonymous'::text)), 'false'::text) = 'false'::text) AND private.is_public_wing_jury_photo(submission_id))",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "wing_jury_votes",
+    "name": "wing_jury_votes_own_insert",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "((user_id = ( SELECT auth.uid() AS uid)) AND (COALESCE(( SELECT (auth.jwt() ->> 'is_anonymous'::text)), 'false'::text) = 'false'::text))"
+  },
+  {
+    "schema": "public",
+    "table_name": "wing_jury_votes",
+    "name": "wing_jury_votes_own_select",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "((user_id = ( SELECT auth.uid() AS uid)) AND (COALESCE(( SELECT (auth.jwt() ->> 'is_anonymous'::text)), 'false'::text) = 'false'::text))",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "wing_media_photo_votes",
+    "name": "photo_votes_delete_own",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "DELETE",
+    "qual": "(( SELECT auth.uid() AS uid) = user_id)",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "wing_media_photo_votes",
+    "name": "photo_votes_insert_own",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(( SELECT auth.uid() AS uid) = user_id)"
+  },
+  {
+    "schema": "public",
+    "table_name": "wing_media_photo_votes",
+    "name": "photo_votes_select_own",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "(( SELECT auth.uid() AS uid) = user_id)",
+    "with_check": null
+  },
+  {
+    "schema": "public",
+    "table_name": "wing_media_photo_votes",
+    "name": "photo_votes_update_own",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "UPDATE",
+    "qual": "(( SELECT auth.uid() AS uid) = user_id)",
+    "with_check": "(( SELECT auth.uid() AS uid) = user_id)"
+  },
+  {
+    "schema": "public",
+    "table_name": "xp_ledger",
+    "name": "xp_ledger_select_own",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": null
+  },
+  {
+    "schema": "storage",
+    "table_name": "objects",
+    "name": "Auth delete badge icons",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "DELETE",
+    "qual": "(bucket_id = 'badge_icons'::text)",
+    "with_check": null
+  },
+  {
+    "schema": "storage",
+    "table_name": "objects",
+    "name": "Auth update badge icons",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "UPDATE",
+    "qual": "(bucket_id = 'badge_icons'::text)",
+    "with_check": null
+  },
+  {
+    "schema": "storage",
+    "table_name": "objects",
+    "name": "Auth write badge icons",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(bucket_id = 'badge_icons'::text)"
+  },
+  {
+    "schema": "storage",
+    "table_name": "objects",
+    "name": "Public read badge icons",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "anon",
+      "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "(bucket_id = 'badge_icons'::text)",
+    "with_check": null
+  },
+  {
+    "schema": "storage",
+    "table_name": "objects",
+    "name": "wing_shot_staging_delete",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "DELETE",
+    "qual": "((bucket_id = 'wing-shot-staging'::text) AND (name ~~ ((auth.uid())::text || '/%'::text)))",
+    "with_check": null
+  },
+  {
+    "schema": "storage",
+    "table_name": "objects",
+    "name": "wing_submissions_original_insert",
+    "permissive": "PERMISSIVE",
+    "roles": [
+      "authenticated"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "((bucket_id = 'wing-submissions'::text) AND (owner_id = (auth.uid())::text) AND (split_part(name, '/'::text, 1) = 'originals'::text) AND (split_part(name, '/'::text, 2) = (auth.uid())::text) AND (split_part(name, '/'::text, 3) ~ '^[0-9a-f-]{36}$'::text) AND (split_part(name, '/'::text, 4) = 'source'::text) AND (split_part(name, '/'::text, 5) = ''::text) AND wing_can_upload_reserved_original(name))"
+  }
+]

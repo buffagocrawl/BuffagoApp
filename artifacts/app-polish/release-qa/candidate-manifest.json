@@ -1,0 +1,50 @@
+{
+  "branch": "feature/buffago-app-polish",
+  "prepared_only": true,
+  "files": [
+    {
+      "path": "crawl/supabase/proposals/app-polish-shared-photo-votes.sql",
+      "sha256": "af205fd5094b02c6eac541c7b0e9e62f9ebe78fc20ee01ebd00863d9ead57601"
+    },
+    {
+      "path": "crawl/supabase/functions/wingman-intake/index.ts",
+      "sha256": "afae677c309d84d7fc345181b0898fd88c18b1de8921452e8f9e1267386f259f"
+    },
+    {
+      "path": "crawl/supabase/functions/_shared/wingmanConfidence.ts",
+      "sha256": "1666c9edbb79c08cfe09293e58c2bbb04123ecb08e081c45f731faebc98b9bc3"
+    },
+    {
+      "path": "crawl/supabase/functions/_shared/wingmanMenuEvidence.ts",
+      "sha256": "3e4d74d70cc4bbe6be4306ef303660ad70e5c94e44af899d4515c75ce612efc3"
+    },
+    {
+      "path": "crawl/supabase/functions/wing-public-gallery/index.ts",
+      "sha256": "a3d6065bfd5679dfc885bfd6e024ffa94bae150feb0b773be779351d0e173231"
+    },
+    {
+      "path": "crawl/supabase/functions/wing-jury-vote/index.ts",
+      "sha256": "46f767b37602f86552948bdc541a81ec3e7550b9067be34786169f15be1df6f6"
+    },
+    {
+      "path": "crawl/supabase/functions/wing-jury-reveal/index.ts",
+      "sha256": "60819520fc47024e90459ccec162c61ec8d53ab2e2ec84d3799091337b5d0b6c"
+    },
+    {
+      "path": "crawl/supabase/functions/_shared/wingJury.ts",
+      "sha256": "e452d78f9b975e086ae8c6be6beab6f03cf13e07b34ebb346a647e5c2d6af883"
+    },
+    {
+      "path": "crawl/app/_layout.tsx",
+      "sha256": "ddcf128f7d46320006e32fbc1c643a2c36b7cfd1ef44a04433df699f51cfd282"
+    },
+    {
+      "path": "crawl/components/AppStatusBar.jsx",
+      "sha256": "cadd7a1e86b96f1a7619d211a2c1ece0935148d9538d2443cd05054a146605cc"
+    },
+    {
+      "path": "crawl/lib/statusBarPolicy.js",
+      "sha256": "13e87c80c881176e1fb58b7169c5304447b8a75abd19a38bc4973bcc88916b78"
+    }
+  ]
+}

@@ -22,10 +22,9 @@ test('Wing Jury route uses the dedicated game surface', () => {
 
 test('pre-vote UI contains only blind photo and verdict controls', () => {
   assert.match(game, /accessibilityLabel="Wing photo to judge"/);
-  assert.match(game, /wing-jury-verdict-\$\{verdict\.value\}/);
-  assert.match(game, /Dislike/);
-  assert.match(game, /Average/);
-  assert.match(game, /Like/);
+  assert.match(game, /<PhotoVoteControls photo=\{currentPhoto\} showCounts=\{false\} testPrefix="wing-jury-verdict"/);
+  const controls = fs.readFileSync(new URL('../components/PhotoVoteControls.jsx', import.meta.url), 'utf8');
+  for (const label of ['Dislike', 'Average', 'Like']) assert.ok(controls.includes(label));
   const preVote = game.slice(game.indexOf('{!isRevealed'), game.indexOf("status === 'SUBMITTING'"));
   assert.doesNotMatch(preVote, /restaurant_name|photo_like_count|Wingdex Average|Favorite|Want to Try|restaurant\.name/);
 });

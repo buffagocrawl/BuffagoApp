@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: result=two-pointer pinch injected
+INSTRUMENTATION_CODE: 0

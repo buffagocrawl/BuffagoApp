@@ -1,0 +1,5 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.buffago.polishqa">
+  <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="36" />
+  <application android:label="Local BuffaGo gesture QA" android:debuggable="true" />
+  <instrumentation android:name="com.buffago.polishqa.PinchInstrumentation" android:targetPackage="com.buffago.polishqa" />
+</manifest>

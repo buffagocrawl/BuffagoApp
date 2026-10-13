@@ -1,0 +1,27 @@
+{
+  "deployed": false,
+  "verify_jwt": true,
+  "schemaChangesRequired": false,
+  "files": [
+    {
+      "path": "crawl/supabase/config.toml",
+      "sha256": "efc0f59955c777328620d95dc8f448bafb25d11da82a7e02c268cdb36bd9c735"
+    },
+    {
+      "path": "crawl/supabase/functions/wingman-intake/index.ts",
+      "sha256": "6cfcfa473fbcab3dfdba3c54aade4c53cf88e3879d5b2b39da4941cff00133ce"
+    },
+    {
+      "path": "crawl/supabase/functions/_shared/wingmanDeadline.ts",
+      "sha256": "0c340c0029fc9e296fdc39f8bdba344e5eccd456a65b101b38a503d548c4d8a1"
+    },
+    {
+      "path": "crawl/supabase/functions/_shared/wingmanConfidence.ts",
+      "sha256": "1666c9edbb79c08cfe09293e58c2bbb04123ecb08e081c45f731faebc98b9bc3"
+    },
+    {
+      "path": "crawl/supabase/functions/_shared/wingmanMenuEvidence.ts",
+      "sha256": "3e4d74d70cc4bbe6be4306ef303660ad70e5c94e44af899d4515c75ce612efc3"
+    }
+  ]
+}

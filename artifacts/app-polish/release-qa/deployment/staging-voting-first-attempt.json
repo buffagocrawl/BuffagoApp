@@ -1,0 +1,25 @@
+{
+  "target": "http://127.0.0.1:55321",
+  "realAuthRESTStorage": true,
+  "results": [
+    {
+      "name": "baseline captured gallery v3 uses real Storage and excludes failed photo",
+      "status": "PASS",
+      "signedDownload": "real Storage token; local kong hostname mapped to published acceptance port",
+      "pictures": 4
+    },
+    {
+      "name": "single SQL bridge transaction reconciles approved pairs and preserves both audit stores",
+      "status": "PASS"
+    },
+    {
+      "name": "SQL-only phase remains compatible with captured old gallery and canonical counts",
+      "status": "PASS"
+    },
+    {
+      "name": "actual old/new controllers share changes, neutral and withdrawals over real PostgREST",
+      "status": "FAIL",
+      "error": "Cannot coerce the result to a single JSON object"
+    }
+  ]
+}

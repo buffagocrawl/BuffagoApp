@@ -12,9 +12,10 @@ const make=(n, likes=0, dislikes=0, extra={}) => ({ id:id(n), destination_id:res
   user_id:id(999),owner_deleted_at:null,withdrawn_at:null,consent_version:'v1',consented_at:'2026-01-01T00:00:00Z',attribution_preference:'anonymous',
   created_at:'2026-01-01T00:00:00Z', like_count:likes, dislike_count:dislikes,
   thumbnail_storage_path:thumbnail(n), processed_storage_path:processed(n), ...extra });
-function server(rows, { missing=[], fail=false, signFail=false, throwSign=false }={}) {
+function server(rows, { missing=[], fail=false, signFail=false, throwSign=false, juryCounts=null }={}) {
   let handler; const reads=[]; const signs=[];
   const admin={ from(table) {
+    if (table === 'wing_jury_photo_vote_counts') return { select() { return this; }, in(_key, ids) { return Promise.resolve({ data: juryCounts ? juryCounts.filter(row=>ids.includes(row.submission_id)) : rows.filter((row) => ids.includes(row.id)).map((row) => ({ submission_id: row.id, like_count: row.like_count, dislike_count: row.dislike_count, neutral_count: 0 })), error: null }); } };
     assert.equal(table,'wing_media_submissions'); let selected=rows; const orders=[];
     return { select(fields) { assert.ok(!fields.includes('original')); return this; },
       in(k,values) { selected=selected.filter((p)=>values.includes(p[k])); return this; },
@@ -41,16 +42,16 @@ test('server selects community winner and rejects all non-approved photos/videos
   const s=server([make(1,3,0),make(2,8,4),make(3,8,1),
     ...['pending','processing','in_review','rejected','withdrawn','posted'].map((status,n)=>make(10+n,100,0,{status})),make(20,100,0,{media_type:'video'})]);
   const response=await s.call({include_covers:true}); const r=response.data.restaurants[0];
-  assert.equal(r.picture_count,3); assert.equal(r.images.length,1); assert.equal(r.images[0].submission_id,id(3));
-  assert.equal(r.images[0].signed_url,`https://signed.test/${thumbnail(3)}`); assert.equal(r.images[0].like_count,8);
+  assert.equal(r.picture_count,3); assert.equal(r.images.length,1); assert.equal(r.images[0].submission_id,id(2));
+  assert.equal(r.images[0].signed_url,`https://signed.test/${thumbnail(2)}`); assert.equal(r.images[0].like_count,8);
   assert.deepEqual(s.reads,[[0,999]]); assert.equal(s.signs.length,2);
   assert.ok(!JSON.stringify(response).includes('storage_path'));
 });
 test('server date then ID tie ordering, missing thumbnails use processed asset',async()=>{
   const s=server([make(2),make(1),make(3,0,0,{created_at:'2026-02-01'})],{missing:[thumbnail(1)]});
   const response=await s.call({include_images:true}); const images=response.data.restaurants[0].images;
-  assert.deepEqual(images.map((p)=>p.submission_id),[id(1),id(2),id(3)]);
-  assert.equal(images[0].signed_url,`https://signed.test/${processed(1)}`);
+  assert.deepEqual(images.map((p)=>p.submission_id),[id(3),id(1),id(2)]);
+  assert.equal(images[1].signed_url,`https://signed.test/${processed(1)}`);
 });
 test('full viewer signs only selected processed asset and revalidates approval/destination',async()=>{
   const s=server([make(1),make(2)]); let response=await s.call({submission_id:id(2)});
@@ -102,8 +103,8 @@ test('unavailable highest-liked photo falls back to the best usable runner-up',a
   const s=server([make(1,100),make(2,20,3),make(3,20,1)],{missing:[thumbnail(1),processed(1),thumbnail(3)]});
   const r=(await s.call({include_covers:true})).data.restaurants[0];
   assert.equal(r.approved_submission_count,3); assert.equal(r.picture_count,2);
-  assert.equal(r.images[0].submission_id,id(3));
-  assert.equal(r.images[0].signed_url,`https://signed.test/${processed(3)}`);
+  assert.equal(r.images[0].submission_id,id(2));
+  assert.equal(r.images[0].signed_url,`https://signed.test/${thumbnail(2)}`);
 });
 
 test('null derivative paths and missing objects count as approvals but not displayable photos',async()=>{
@@ -162,7 +163,7 @@ test('actual Edge responses satisfy cover, gallery and full-photo client contrac
   assert.equal(cover.count,2); assert.equal(cover.approvedSubmissionCount,2);
   assert.equal(gallery.images.length,2); assert.equal(full.signed_url,`https://signed.test/${processed(1)}`);
   for (const photo of [cover.images[0],gallery.images[0],full]) {
-    assert.deepEqual(Object.keys(photo).sort(),['submission_id','destination_id','media_type','status','signed_url','expires_at','like_count','dislike_count','created_at'].sort());
+    assert.deepEqual(Object.keys(photo).sort(),['submission_id','destination_id','media_type','status','signed_url','expires_at','like_count','dislike_count','neutral_count','created_at'].sort());
     assert.equal(photo.destination_id,restaurant); assert.equal(photo.media_type,'photo'); assert.equal(photo.status,'approved');
     assert.equal(photo.like_count,4); assert.equal(photo.dislike_count,2);
     assert.ok(Date.parse(photo.expires_at)-Date.now()>295000 && Date.parse(photo.expires_at)-Date.now()<=300000);
@@ -200,4 +201,17 @@ test('approved rows cannot cause the public service key to sign originals or ano
     assert.deepEqual(viewer.images,[]);
   }
   assert.deepEqual(s.signs,[[processed(3)]]);
+});
+
+
+test('public gallery ranks and displays Jury counts even when legacy counters disagree',async()=>{
+  const s=server([make(1,999,0),make(2,0,99)],{juryCounts:[
+    {submission_id:id(1),like_count:1,dislike_count:7,neutral_count:2},
+    {submission_id:id(2),like_count:12,dislike_count:3,neutral_count:4},
+  ]});
+  const r=(await s.call({include_images:true})).data.restaurants[0];
+  assert.deepEqual(r.images.map(photo=>photo.submission_id),[id(2),id(1)]);
+  assert.equal(r.images[0].like_count,12);assert.equal(r.images[0].dislike_count,3);assert.equal(r.images[0].neutral_count,4);
+  const noVotes=(await server([make(1,999,0)],{juryCounts:[]}).call({include_images:true})).data.restaurants[0];
+  assert.equal(noVotes.images[0].like_count,0,'No fallback to a separate legacy counter');
 });

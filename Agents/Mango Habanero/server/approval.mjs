@@ -4,8 +4,8 @@ import crypto from 'node:crypto';
 
 export const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const rejectReasons = ['poor_media_quality','inappropriate_content','not_related_to_rating','duplicate_submission','copyright_or_ownership','restaurant_or_attribution','other'];
-export function localRequestsOnly(port) {
-  const allowed = new Set([`127.0.0.1:${port}`, `localhost:${port}`, '127.0.0.1:4317', 'localhost:4317']);
+export function localRequestsOnly(port, frontendPort = 4317) {
+  const allowed = new Set([`127.0.0.1:${port}`, `localhost:${port}`, `127.0.0.1:${frontendPort}`, `localhost:${frontendPort}`]);
   return (req, res, next) => {
     const deny = () => res.status(403).json({ error: 'Local same-origin requests only.' });
     if (!allowed.has(req.headers.host) || (req.headers['sec-fetch-site'] && !['same-origin','same-site','none'].includes(req.headers['sec-fetch-site']))) return deny();

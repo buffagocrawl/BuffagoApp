@@ -1,0 +1,8 @@
+{
+  "inspection": "2026-10-13 read-only aggregate; no identities or mutations",
+  "jury_rows": 122,
+  "legacy_rows": 9,
+  "eligible_legacy": 8,
+  "conflicting_pairs": 3,
+  "eligible_jury_only": 110
+}

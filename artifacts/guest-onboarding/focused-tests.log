@@ -1,0 +1,710 @@
+TAP version 13
+# runWingman failed: Error: Sign in to submit this restaurant for review.
+#     at evalmachine.<anonymous>:301:23
+#     at Object.onPress (evalmachine.<anonymous>:492:23)
+# (node:51400) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Brand/repo/BuffagoApp/crawl/lib/wingmanFocus.js is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to C:\\Users\\Brand\\repo\\BuffagoApp\\crawl\\package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: focus retries after transitions, avoids refocusing typing, and cancels stale steps
+ok 1 - focus retries after transitions, avoids refocusing typing, and cancels stale steps
+  ---
+  duration_ms: 2.3102
+  type: 'test'
+  ...
+# Subtest: Wingman native modal focuses town then details and preserves both in verification retries
+ok 2 - Wingman native modal focuses town then details and preserves both in verification retries
+  ---
+  duration_ms: 412.7339
+  type: 'test'
+  ...
+# Subtest: confirmed square cannot expose blank pixels, including rounding and extreme pans
+ok 3 - confirmed square cannot expose blank pixels, including rounding and extreme pans
+  ---
+  duration_ms: 1.9639
+  type: 'test'
+  ...
+# Subtest: framing preview resets, cancels, and confirms the actual crop once
+ok 4 - framing preview resets, cancels, and confirms the actual crop once
+  ---
+  duration_ms: 36.9679
+  type: 'test'
+  ...
+# Subtest: the upload adapter bakes the crop before resizing and retains its original source
+ok 5 - the upload adapter bakes the crop before resizing and retains its original source
+  ---
+  duration_ms: 47.2616
+  type: 'test'
+  ...
+# Subtest: Wingman creation rejects missing authentication before lookups or writes
+ok 6 - Wingman creation rejects missing authentication before lookups or writes
+  ---
+  duration_ms: 240.5843
+  type: 'test'
+  ...
+# Subtest: Wingman creation rejects invalid authentication before lookups or writes
+ok 7 - Wingman creation rejects invalid authentication before lookups or writes
+  ---
+  duration_ms: 101.685
+  type: 'test'
+  ...
+# Subtest: mobile manual review saves the assessment, place and submitted evidence on the suggestion
+ok 8 - mobile manual review saves the assessment, place and submitted evidence on the suggestion
+  ---
+  duration_ms: 4.8917
+  type: 'test'
+  ...
+# Subtest: restaurant queue, atomic moderation, duplicate reuse and service-only access
+    # Subtest: count is the exact pending queue and snapshot retains existing metrics
+    ok 1 - count is the exact pending queue and snapshot retains existing metrics
+      ---
+      duration_ms: 9.7112
+      type: 'test'
+      ...
+    # Subtest: approval creates one destination and leaves original submission
+    ok 2 - approval creates one destination and leaves original submission
+      ---
+      duration_ms: 14.8506
+      type: 'test'
+      ...
+    # Subtest: identical retry returns same receipt; conflicting decision fails
+    ok 3 - identical retry returns same receipt; conflicting decision fails
+      ---
+      duration_ms: 9.3223
+      type: 'test'
+      ...
+    # Subtest: second suggestion and automated flow reuse destination
+    ok 4 - second suggestion and automated flow reuse destination
+      ---
+      duration_ms: 9.3168
+      type: 'test'
+      ...
+    # Subtest: rejection persists reason and removes only selected pending entry
+    ok 5 - rejection persists reason and removes only selected pending entry
+      ---
+      duration_ms: 3.5649
+      type: 'test'
+      ...
+    # Subtest: invalid location, wrong state and ambiguous address roll back
+    ok 6 - invalid location, wrong state and ambiguous address roll back
+      ---
+      duration_ms: 10.1635
+      type: 'test'
+      ...
+    # Subtest: unknown, inactive and unauthorized reviewer rejected
+    ok 7 - unknown, inactive and unauthorized reviewer rejected
+      ---
+      duration_ms: 7.0808
+      type: 'test'
+      ...
+    # Subtest: anon and authenticated cannot read queue or execute review/create/count
+    ok 8 - anon and authenticated cannot read queue or execute review/create/count
+      ---
+      duration_ms: 11.2439
+      type: 'test'
+      ...
+    1..8
+ok 9 - restaurant queue, atomic moderation, duplicate reuse and service-only access
+  ---
+  duration_ms: 1929.5573
+  type: 'test'
+  ...
+# RATE LIMIT DEPENDENCY ERROR: 42883
+# RATE LIMIT DEPENDENCY ERROR: invalid_rate_limit_response
+# RATE LIMIT DEPENDENCY ERROR: invalid_rate_limit_response
+# RATE LIMIT DEPENDENCY ERROR: 42883
+# Subtest: shared approval: wing score 0.499
+ok 10 - shared approval: wing score 0.499
+  ---
+  duration_ms: 3.9927
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score 0.5
+ok 11 - shared approval: wing score 0.5
+  ---
+  duration_ms: 0.5317
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score 0.501
+ok 12 - shared approval: wing score 0.501
+  ---
+  duration_ms: 0.1967
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score null
+ok 13 - shared approval: wing score null
+  ---
+  duration_ms: 0.1544
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score undefined
+ok 14 - shared approval: wing score undefined
+  ---
+  duration_ms: 0.2446
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score 50%
+ok 15 - shared approval: wing score 50%
+  ---
+  duration_ms: 0.2552
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score 50
+ok 16 - shared approval: wing score 50
+  ---
+  duration_ms: 0.1585
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score NaN
+ok 17 - shared approval: wing score NaN
+  ---
+  duration_ms: 0.1689
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score Infinity
+ok 18 - shared approval: wing score Infinity
+  ---
+  duration_ms: 0.8607
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score true
+ok 19 - shared approval: wing score true
+  ---
+  duration_ms: 0.8946
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score 
+ok 20 - shared approval: wing score 
+  ---
+  duration_ms: 0.5074
+  type: 'test'
+  ...
+# Subtest: a wing score cannot replace match, location, verification, or contradictory evidence
+ok 21 - a wing score cannot replace match, location, verification, or contradictory evidence
+  ---
+  duration_ms: 0.5522
+  type: 'test'
+  ...
+# Subtest: mobile decision at 0.499
+ok 22 - mobile decision at 0.499
+  ---
+  duration_ms: 169.8633
+  type: 'test'
+  ...
+# Subtest: mobile decision at 0.5
+ok 23 - mobile decision at 0.5
+  ---
+  duration_ms: 83.4946
+  type: 'test'
+  ...
+# Subtest: mobile decision at 0.501
+ok 24 - mobile decision at 0.501
+  ---
+  duration_ms: 73.697
+  type: 'test'
+  ...
+# Subtest: mobile decision at null
+ok 25 - mobile decision at null
+  ---
+  duration_ms: 83.8253
+  type: 'test'
+  ...
+# Subtest: second pass never replaces missing scores and preserves conflicting evidence/location
+ok 26 - second pass never replaces missing scores and preserves conflicting evidence/location
+  ---
+  duration_ms: 139.8217
+  type: 'test'
+  ...
+# Subtest: existing destination lookup does not invent confidence or authorize new creation
+ok 27 - existing destination lookup does not invent confidence or authorize new creation
+  ---
+  duration_ms: 49.4085
+  type: 'test'
+  ...
+# Subtest: authoritative insertion at 0.499
+ok 28 - authoritative insertion at 0.499
+  ---
+  duration_ms: 151.1408
+  type: 'test'
+  ...
+# Subtest: authoritative insertion at 0.5
+ok 29 - authoritative insertion at 0.5
+  ---
+  duration_ms: 89.8422
+  type: 'test'
+  ...
+# Subtest: authoritative insertion at 0.501
+ok 30 - authoritative insertion at 0.501
+  ---
+  duration_ms: 70.8093
+  type: 'test'
+  ...
+# Subtest: authoritative insertion at null
+ok 31 - authoritative insertion at null
+  ---
+  duration_ms: 64.0456
+  type: 'test'
+  ...
+# Subtest: insertion blocked: missingMatch
+ok 32 - insertion blocked: missingMatch
+  ---
+  duration_ms: 72.6471
+  type: 'test'
+  ...
+# Subtest: insertion blocked: lowMatch
+ok 33 - insertion blocked: lowMatch
+  ---
+  duration_ms: 63.1814
+  type: 'test'
+  ...
+# Subtest: insertion blocked: notRestaurant
+ok 34 - insertion blocked: notRestaurant
+  ---
+  duration_ms: 56.7572
+  type: 'test'
+  ...
+# Subtest: insertion blocked: ambiguity
+ok 35 - insertion blocked: ambiguity
+  ---
+  duration_ms: 51.0247
+  type: 'test'
+  ...
+# Subtest: insertion blocked: modelConflict
+ok 36 - insertion blocked: modelConflict
+  ---
+  duration_ms: 58.6874
+  type: 'test'
+  ...
+# Subtest: insertion blocked: unavailable
+ok 37 - insertion blocked: unavailable
+  ---
+  duration_ms: 67.7334
+  type: 'test'
+  ...
+# Subtest: insertion blocked: conflicting
+ok 38 - insertion blocked: conflicting
+  ---
+  duration_ms: 50.8369
+  type: 'test'
+  ...
+# Subtest: insertion blocked: negativeMenu
+ok 39 - insertion blocked: negativeMenu
+  ---
+  duration_ms: 49.0225
+  type: 'test'
+  ...
+# Subtest: insertion blocked: negativeDetails
+ok 40 - insertion blocked: negativeDetails
+  ---
+  duration_ms: 42.2852
+  type: 'test'
+  ...
+# Subtest: insertion blocked: wrongState
+ok 41 - insertion blocked: wrongState
+  ---
+  duration_ms: 31.4362
+  type: 'test'
+  ...
+# Subtest: insertion blocked: failedPlaces
+ok 42 - insertion blocked: failedPlaces
+  ---
+  duration_ms: 42.2911
+  type: 'test'
+  ...
+# Subtest: insertion blocked: ambiguousPlaces
+ok 43 - insertion blocked: ambiguousPlaces
+  ---
+  duration_ms: 39.3838
+  type: 'test'
+  ...
+# Subtest: existing unique destination is reused before external calls; conflicting city is not a match
+ok 44 - existing unique destination is reused before external calls; conflicting city is not a match
+  ---
+  duration_ms: 78.848
+  type: 'test'
+  ...
+# Subtest: deployed rate-limit repair is byte-equivalent and still blocks before provider work
+ok 45 - deployed rate-limit repair is byte-equivalent and still blocks before provider work
+  ---
+  duration_ms: 76.0622
+  type: 'test'
+  ...
+# Subtest: menu negative evidence ignores scripts and ingredient claims
+ok 46 - menu negative evidence ignores scripts and ingredient claims
+  ---
+  duration_ms: 0.2546
+  type: 'test'
+  ...
+# Subtest: menu retrieval keeps official excerpts and rejects private DNS and foreign redirects
+ok 47 - menu retrieval keeps official excerpts and rejects private DNS and foreign redirects
+  ---
+  duration_ms: 9.946
+  type: 'test'
+  ...
+# Subtest: atomic limiter fails closed on dependency errors or malformed results
+ok 48 - atomic limiter fails closed on dependency errors or malformed results
+  ---
+  duration_ms: 77.5356
+  type: 'test'
+  ...
+# Subtest: verified creation preserves caller ownership: fixture-token
+ok 49 - verified creation preserves caller ownership: fixture-token
+  ---
+  duration_ms: 43.7821
+  type: 'test'
+  ...
+# Subtest: verified creation preserves caller ownership: synthetic-secret
+ok 50 - verified creation preserves caller ownership: synthetic-secret
+  ---
+  duration_ms: 41.1936
+  type: 'test'
+  ...
+# Subtest: invalid caller cannot downgrade to guest: null
+ok 51 - invalid caller cannot downgrade to guest: null
+  ---
+  duration_ms: 22.3979
+  type: 'test'
+  ...
+# Subtest: invalid caller cannot downgrade to guest: expired
+ok 52 - invalid caller cannot downgrade to guest: expired
+  ---
+  duration_ms: 17.6833
+  type: 'test'
+  ...
+# Subtest: invalid caller cannot downgrade to guest: forged
+ok 53 - invalid caller cannot downgrade to guest: forged
+  ---
+  duration_ms: 32.1087
+  type: 'test'
+  ...
+# Subtest: invalid caller cannot downgrade to guest: device-id
+ok 54 - invalid caller cannot downgrade to guest: device-id
+  ---
+  duration_ms: 36.0935
+  type: 'test'
+  ...
+# Subtest: guest still fails closed on limiter, missing IP and unverified location
+ok 55 - guest still fails closed on limiter, missing IP and unverified location
+  ---
+  duration_ms: 191.7608
+  type: 'test'
+  ...
+# Subtest: invalid input returns 400 before providers: {"action":"arbitrary"}
+ok 56 - invalid input returns 400 before providers: {"action":"arbitrary"}
+  ---
+  duration_ms: 47.4529
+  type: 'test'
+  ...
+# Subtest: invalid input returns 400 before providers: {"stateId":1.5}
+ok 57 - invalid input returns 400 before providers: {"stateId":1.5}
+  ---
+  duration_ms: 40.27
+  type: 'test'
+  ...
+# Subtest: invalid input returns 400 before providers: {"stateId":-1}
+ok 58 - invalid input returns 400 before providers: {"stateId":-1}
+  ---
+  duration_ms: 50.2481
+  type: 'test'
+  ...
+# Subtest: invalid input returns 400 before providers: {"restaurant":42}
+ok 59 - invalid input returns 400 before providers: {"restaurant":42}
+  ---
+  duration_ms: 34.5728
+  type: 'test'
+  ...
+# Subtest: invalid input returns 400 before providers: {"extraInfo":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ok 60 - invalid input returns 400 before providers: {"extraInfo":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  ---
+  duration_ms: 35.5833
+  type: 'test'
+  ...
+# Subtest: backend dependency timeout returns a response: auth
+ok 61 - backend dependency timeout returns a response: auth
+  ---
+  duration_ms: 76.6089
+  type: 'test'
+  ...
+# Subtest: backend dependency timeout returns a response: state
+ok 62 - backend dependency timeout returns a response: state
+  ---
+  duration_ms: 67.5699
+  type: 'test'
+  ...
+# Subtest: backend dependency timeout returns a response: limiter
+ok 63 - backend dependency timeout returns a response: limiter
+  ---
+  duration_ms: 61.1381
+  type: 'test'
+  ...
+# Subtest: backend dependency timeout returns a response: create
+ok 64 - backend dependency timeout returns a response: create
+  ---
+  duration_ms: 94.0335
+  type: 'test'
+  ...
+# Subtest: backend dependency timeout returns a response: model-fetch
+ok 65 - backend dependency timeout returns a response: model-fetch
+  ---
+  duration_ms: 94.6997
+  type: 'test'
+  ...
+# Subtest: backend dependency timeout returns a response: model-body
+ok 66 - backend dependency timeout returns a response: model-body
+  ---
+  duration_ms: 92.7346
+  type: 'test'
+  ...
+# Subtest: rate-limit bucket ignores a spoofed first forwarded IP
+ok 67 - rate-limit bucket ignores a spoofed first forwarded IP
+  ---
+  duration_ms: 62.1697
+  type: 'test'
+  ...
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 401, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 429, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 500, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 401, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 429, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 500, clone: [Function: clone] }
+# }
+# Subtest: whole-operation timeout, cancellation and stalled error body are bounded
+ok 68 - whole-operation timeout, cancellation and stalled error body are bounded
+  ---
+  duration_ms: 2053.4591
+  type: 'test'
+  ...
+# Subtest: search/add/select succeeds and repeated taps are suppressed: null
+ok 69 - search/add/select succeeds and repeated taps are suppressed: null
+  ---
+  duration_ms: 173.576
+  type: 'test'
+  ...
+# Subtest: search/add/select succeeds and repeated taps are suppressed: signed-in
+ok 70 - search/add/select succeeds and repeated taps are suppressed: signed-in
+  ---
+  duration_ms: 134.2433
+  type: 'test'
+  ...
+# Subtest: HTTP 401 (null) exits loading and preserves restaurant for retry
+ok 71 - HTTP 401 (null) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 103.6126
+  type: 'test'
+  ...
+# Subtest: HTTP 429 (null) exits loading and preserves restaurant for retry
+ok 72 - HTTP 429 (null) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 76.9444
+  type: 'test'
+  ...
+# Subtest: HTTP 422 (null) exits loading and preserves restaurant for retry
+ok 73 - HTTP 422 (null) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 72.1213
+  type: 'test'
+  ...
+# Subtest: HTTP 500 (null) exits loading and preserves restaurant for retry
+ok 74 - HTTP 500 (null) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 69.134
+  type: 'test'
+  ...
+# Subtest: HTTP 401 (signed-in) exits loading and preserves restaurant for retry
+ok 75 - HTTP 401 (signed-in) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 69.4463
+  type: 'test'
+  ...
+# Subtest: HTTP 429 (signed-in) exits loading and preserves restaurant for retry
+ok 76 - HTTP 429 (signed-in) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 84.3237
+  type: 'test'
+  ...
+# Subtest: HTTP 422 (signed-in) exits loading and preserves restaurant for retry
+ok 77 - HTTP 422 (signed-in) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 67.3388
+  type: 'test'
+  ...
+# Subtest: HTTP 500 (signed-in) exits loading and preserves restaurant for retry
+ok 78 - HTTP 500 (signed-in) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 54.3634
+  type: 'test'
+  ...
+# Subtest: 422 with stalled parsing exits loading and defers guest review locally
+ok 79 - 422 with stalled parsing exits loading and defers guest review locally
+  ---
+  duration_ms: 76.163
+  type: 'test'
+  ...
+# runWingman failed: Error: Wingman took too long. Please try again; your details are still here.
+#     at Timeout.<anonymous> (evalmachine.<anonymous>:12:60)
+#     at listOnTimeout (node:internal/timers:588:17)
+#     at process.processTimers (node:internal/timers:523:7)
+# Subtest: search failure/timeout leaves loading
+ok 80 - search failure/timeout leaves loading
+  ---
+  duration_ms: 76.5413
+  type: 'test'
+  ...
+# verifyWingsAndAdd failed: Error: Wingman took too long. Please try again; your details are still here.
+#     at Timeout.<anonymous> (evalmachine.<anonymous>:12:60)
+#     at listOnTimeout (node:internal/timers:588:17)
+#     at process.processTimers (node:internal/timers:523:7)
+# Subtest: verification failure/timeout leaves loading
+ok 81 - verification failure/timeout leaves loading
+  ---
+  duration_ms: 78.4648
+  type: 'test'
+  ...
+# insertWingmanDestination failed: Error: Wingman took too long. Please try again; your details are still here.
+#     at Timeout.<anonymous> (evalmachine.<anonymous>:12:60)
+#     at listOnTimeout (node:internal/timers:588:17)
+#     at process.processTimers (node:internal/timers:523:7)
+# Subtest: insert failure/timeout leaves loading
+ok 82 - insert failure/timeout leaves loading
+  ---
+  duration_ms: 76.8502
+  type: 'test'
+  ...
+# Subtest: selection failure/timeout leaves loading
+ok 83 - selection failure/timeout leaves loading
+  ---
+  duration_ms: 107.321
+  type: 'test'
+  ...
+# runWingman failed: Error: Network disconnected
+#     at file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/wingman-guest-onboarding.test.mjs:72:81
+#     at WingmanService.run (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/wingman-guest-onboarding.test.mjs:33:107)
+#     at Object.onPress (evalmachine.<anonymous>:445:47)
+#     at Object.press (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/wingman-guest-onboarding.test.mjs:45:154)
+#     at TestContext.<anonymous> (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/wingman-guest-onboarding.test.mjs:74:11)
+#     at Test.runInAsyncScope (node:async_hooks:214:14)
+#     at Test.run (node:internal/test_runner/test:1047:25)
+#     at Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+#     at Test.postRun (node:internal/test_runner/test:1173:19)
+#     at Test.run (node:internal/test_runner/test:1101:12)
+# load states failed: Wingman request cancelled.
+# runWingman failed: Error: Wingman request cancelled.
+#     at AbortSignal.cancel (evalmachine.<anonymous>:11:50)
+#     at [nodejs.internal.kHybridDispatch] (node:internal/event_target:827:20)
+#     at AbortSignal.dispatchEvent (node:internal/event_target:762:26)
+#     at runAbort (node:internal/abort_controller:486:10)
+#     at abortSignal (node:internal/abort_controller:457:3)
+#     at AbortController.abort (node:internal/abort_controller:505:5)
+#     at Object.cleanup (evalmachine.<anonymous>:76:40)
+#     at file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/helpers/mobile-runtime.mjs:45:44
+#     at Object.render (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/helpers/mobile-runtime.mjs:50:114)
+#     at Object.render (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/wingman-guest-onboarding.test.mjs:43:32)
+# runWingman failed: Error: Wingman request cancelled.
+#     at AbortSignal.cancel (evalmachine.<anonymous>:11:50)
+#     at [nodejs.internal.kHybridDispatch] (node:internal/event_target:827:20)
+#     at AbortSignal.dispatchEvent (node:internal/event_target:762:26)
+#     at runAbort (node:internal/abort_controller:486:10)
+#     at abortSignal (node:internal/abort_controller:457:3)
+#     at AbortController.abort (node:internal/abort_controller:505:5)
+#     at Object.cleanup (evalmachine.<anonymous>:76:40)
+#     at Object.unmount (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/helpers/mobile-runtime.mjs:51:58)
+#     at TestContext.<anonymous> (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/wingman-guest-onboarding.test.mjs:86:42)
+#     at async Test.run (node:internal/test_runner/test:1054:7)
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 401, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 401, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 401, clone: [Function: clone] }
+# }
+# Subtest: review failure/timeout leaves loading
+ok 84 - review failure/timeout leaves loading
+  ---
+  duration_ms: 76.7393
+  type: 'test'
+  ...
+# Subtest: network failure/timeout leaves loading
+ok 85 - network failure/timeout leaves loading
+  ---
+  duration_ms: 52.5744
+  type: 'test'
+  ...
+# Subtest: signed-in rejection writes a real suggestion and guest local save errors do not claim success
+ok 86 - signed-in rejection writes a real suggestion and guest local save errors do not claim success
+  ---
+  duration_ms: 103.4089
+  type: 'test'
+  ...
+# Subtest: dismiss/reopen and unmount cancel pending search and ignore late completion
+ok 87 - dismiss/reopen and unmount cancel pending search and ignore late completion
+  ---
+  duration_ms: 49.4954
+  type: 'test'
+  ...
+# Subtest: installed iOS build source: ordinary 401 clears loading; stalled error-body parsing reproduces persistent spinner
+ok 88 - installed iOS build source: ordinary 401 clears loading; stalled error-body parsing reproduces persistent spinner
+  ---
+  duration_ms: 168.6872
+  type: 'test'
+  ...
+# Subtest: pre-cancelled operations observe rejections and never start a request
+ok 89 - pre-cancelled operations observe rejections and never start a request
+  ---
+  duration_ms: 0.6348
+  type: 'test'
+  ...
+# Subtest: fixed 401 does not wait for a stalled error body
+ok 90 - fixed 401 does not wait for a stalled error body
+  ---
+  duration_ms: 41.5786
+  type: 'test'
+  ...
+# Subtest: actual onboarding selection advances despite stalled analytics and stops on storage failure/cancellation
+ok 91 - actual onboarding selection advances despite stalled analytics and stops on storage failure/cancellation
+  ---
+  duration_ms: 72.6217
+  type: 'test'
+  ...
+# Subtest: Wingdex opens Wingman with the exact search and default launches clear it
+ok 92 - Wingdex opens Wingman with the exact search and default launches clear it
+  ---
+  duration_ms: 3.2715
+  type: 'test'
+  ...
+# Subtest: Wingman resets on opening, preserves edits while visible and never auto-searches
+ok 93 - Wingman resets on opening, preserves edits while visible and never auto-searches
+  ---
+  duration_ms: 1.8114
+  type: 'test'
+  ...
+1..93
+# tests 101
+# suites 0
+# pass 101
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4907.9672

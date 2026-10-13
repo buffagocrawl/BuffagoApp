@@ -1,0 +1,24 @@
+TAP version 13
+# {"disposableNative":true,"version":"17.6","data":"C:\\\\Users\\\\Brand\\\\repo\\\\BuffagoApp\\\\crawl\\\\.expo\\\\phase7b3d-native17-minimal\\\\fixtures\\\\14eb7802-ba17-46a6-8b84-97729fab799d","port":62804,"listen":"127.0.0.1","serviceInstalled":false,"archiveSHA256":"d378882abd001a186735acd6f6ba716bca6ccd192e800412d4fd15ed25376b3e","psqlSHA256":"dd76d288073bd17cca68d67a03127af6a6f0b235d3fac8f2cb28d0292a76e803","retained":true}
+# Subtest: version 17 limiter allows exactly ten simultaneous signed-in requests and denies client execution
+ok 1 - version 17 limiter allows exactly ten simultaneous signed-in requests and denies client execution
+  ---
+  duration_ms: 11051.3166
+  type: 'test'
+  ...
+# {"disposableNative":true,"version":"17.6","data":"C:\\\\Users\\\\Brand\\\\repo\\\\BuffagoApp\\\\crawl\\\\.expo\\\\phase7b3d-native17-minimal\\\\fixtures\\\\a315cb9f-ac83-4cad-90f1-f9ccef422447","port":62805,"listen":"127.0.0.1","serviceInstalled":false,"archiveSHA256":"d378882abd001a186735acd6f6ba716bca6ccd192e800412d4fd15ed25376b3e","psqlSHA256":"dd76d288073bd17cca68d67a03127af6a6f0b235d3fac8f2cb28d0292a76e803","retained":true}
+# Subtest: real PostgreSQL shared RPC supports null creator, concurrent retries and service-only permissions
+ok 2 - real PostgreSQL shared RPC supports null creator, concurrent retries and service-only permissions
+  ---
+  duration_ms: 12270.0903
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 12591.6872

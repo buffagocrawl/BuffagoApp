@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "realStorageDownloads": true,
+  "originalSHA256": "7bb23df27c6e18da1f96a3032bd2485b573e36b7a88b138bc57a8b5640f5eb14",
+  "originalSize": [
+    533,
+    533
+  ],
+  "derivatives": [
+    {
+      "kind": "primary",
+      "size": [
+        533,
+        533
+      ],
+      "meanChannelError": 0.7244
+    },
+    {
+      "kind": "thumbnail",
+      "size": [
+        512,
+        512
+      ],
+      "meanChannelError": 1.1874
+    }
+  ],
+  "scope": "confirmed Android-emulator fixture through real HTTP upload/worker/storage; no physical gestures or native iPhone acceptance"
+}

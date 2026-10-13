@@ -1,0 +1,11 @@
+[
+  {
+    "name": "wing-media-stage-authorize",
+    "version": 13,
+    "verifyJwt": false,
+    "bundleHash": "efb1ef6e8a9028a0af63a32caf1eac638aa146345f35e6421eec22590dc1f3e1",
+    "files": [
+      "wing-media-stage-authorize/index.ts"
+    ]
+  }
+]

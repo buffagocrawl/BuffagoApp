@@ -1,0 +1,57 @@
+{
+  "inspectedOn": "2026-10-13",
+  "projectRef": "vhfxnizaxdanmvmouuaf",
+  "function": {
+    "slug": "wingman-intake",
+    "version": 17,
+    "verify_jwt": true,
+    "bundle_sha256": "58c0c274c6548dd3e7476a9d121cd4ced3b72016c35a25a71ebac59f7e984e7d"
+  },
+  "database": {
+    "wingman_create_destination": {
+      "security_definer": false,
+      "strict": false,
+      "execute_roles": [
+        "postgres",
+        "service_role"
+      ],
+      "null_creator_supported": true,
+      "duplicate_check": "SHARE ROW EXCLUSIVE table lock; same state/name/address reused; conflicting city/name address rejected"
+    },
+    "wingman_consume_rate_limit": {
+      "security_definer": false,
+      "execute_roles": [
+        "postgres",
+        "service_role"
+      ],
+      "guest": {
+        "hour": 3,
+        "day": 10
+      },
+      "signedIn": {
+        "hour": 10,
+        "day": 30
+      }
+    },
+    "destinations": {
+      "created_by_nullable": true,
+      "service_role_table_privileges": [
+        "INSERT",
+        "SELECT",
+        "UPDATE",
+        "DELETE",
+        "TRUNCATE",
+        "REFERENCES",
+        "TRIGGER"
+      ],
+      "user_triggers": []
+    }
+  },
+  "sqlQueries": [
+    "select p.proname,p.prosecdef,p.proisstrict,p.proacl::text,pg_get_functiondef(p.oid) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and p.proname in ('wingman_create_destination','wingman_consume_rate_limit')",
+    "select column_name,is_nullable from information_schema.columns where table_schema='public' and table_name='destinations' and column_name='created_by'",
+    "select grantee,privilege_type from information_schema.role_table_grants where table_schema='public' and table_name='destinations' and grantee='service_role'",
+    "select tgname from pg_trigger where tgrelid='public.destinations'::regclass and not tgisinternal"
+  ],
+  "writesPerformed": false
+}

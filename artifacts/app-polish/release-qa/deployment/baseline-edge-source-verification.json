@@ -1,0 +1,198 @@
+{
+  "readOnlyProductionInspection": true,
+  "productionDeploymentPerformedByThisSession": false,
+  "results": [
+    {
+      "name": "wing-public-gallery",
+      "deployedVersion": 3,
+      "verifyJwt": false,
+      "files": [
+        {
+          "deployedPath": "index.ts",
+          "comparedPath": "artifacts/app-polish/release-qa/deployed/wing-public-gallery/index.ts",
+          "deployedSHA256": "72c164258b07ecf2e0aeffbc0876935ab9d5887462333c3f55158bd4a66701fe",
+          "retainedSHA256": "99f9eb72be3738d079802d104434cd1605a52eb215ee2ed80fe82ee8e2a02305",
+          "byteIdentical": false,
+          "sourceMatches": true,
+          "difference": "CRLF/LF or added final LF only; no source-token changes"
+        }
+      ],
+      "assessment": "retained baseline matches deployed"
+    },
+    {
+      "name": "wing-jury-vote",
+      "deployedVersion": 1,
+      "verifyJwt": true,
+      "files": [
+        {
+          "deployedPath": "wing-jury-vote/index.js",
+          "comparedPath": "artifacts/app-polish/release-qa/deployed/wing-jury-vote/index.js",
+          "deployedSHA256": "5d58219e057ba313b395c91a0ea64257db23a7c104eb863e22efb7de628cba02",
+          "retainedSHA256": "cf303564c0aa103c0c00b4576c61ad9064face52a8bb5f521dc2e16a728328ce",
+          "byteIdentical": false,
+          "sourceMatches": true,
+          "difference": "CRLF/LF or added final LF only; no source-token changes"
+        }
+      ],
+      "assessment": "retained baseline matches deployed"
+    },
+    {
+      "name": "wing-jury-reveal",
+      "deployedVersion": 1,
+      "verifyJwt": false,
+      "files": [
+        {
+          "deployedPath": "wing-jury-reveal/index.js",
+          "comparedPath": "artifacts/app-polish/release-qa/deployed/wing-jury-reveal/index.js",
+          "deployedSHA256": "43d1c43d330ff9c33774f4939fcb7e9e7945fc08c56f259f5e90f5844899625f",
+          "retainedSHA256": "afc36fa00de30f86c97ba06c681ed8cf2144964ae7c339fef1bbdceb8a222040",
+          "byteIdentical": false,
+          "sourceMatches": true,
+          "difference": "CRLF/LF or added final LF only; no source-token changes"
+        }
+      ],
+      "assessment": "retained baseline matches deployed"
+    },
+    {
+      "name": "wingman-intake",
+      "deployedVersion": 18,
+      "verifyJwt": true,
+      "files": [
+        {
+          "deployedPath": "functions/wingman-intake/index.ts",
+          "comparedPath": "crawl/supabase/functions/wingman-intake/index.ts",
+          "deployedSHA256": "6cfcfa473fbcab3dfdba3c54aade4c53cf88e3879d5b2b39da4941cff00133ce",
+          "retainedSHA256": "6cfcfa473fbcab3dfdba3c54aade4c53cf88e3879d5b2b39da4941cff00133ce",
+          "byteIdentical": true,
+          "sourceMatches": true,
+          "difference": null
+        },
+        {
+          "deployedPath": "functions/_shared/wingmanDeadline.ts",
+          "comparedPath": "crawl/supabase/functions/_shared/wingmanDeadline.ts",
+          "deployedSHA256": "0c340c0029fc9e296fdc39f8bdba344e5eccd456a65b101b38a503d548c4d8a1",
+          "retainedSHA256": "0c340c0029fc9e296fdc39f8bdba344e5eccd456a65b101b38a503d548c4d8a1",
+          "byteIdentical": true,
+          "sourceMatches": true,
+          "difference": null
+        },
+        {
+          "deployedPath": "functions/_shared/wingmanConfidence.ts",
+          "comparedPath": "crawl/supabase/functions/_shared/wingmanConfidence.ts",
+          "deployedSHA256": "1666c9edbb79c08cfe09293e58c2bbb04123ecb08e081c45f731faebc98b9bc3",
+          "retainedSHA256": "1666c9edbb79c08cfe09293e58c2bbb04123ecb08e081c45f731faebc98b9bc3",
+          "byteIdentical": true,
+          "sourceMatches": true,
+          "difference": null
+        },
+        {
+          "deployedPath": "functions/_shared/wingmanMenuEvidence.ts",
+          "comparedPath": "crawl/supabase/functions/_shared/wingmanMenuEvidence.ts",
+          "deployedSHA256": "3e4d74d70cc4bbe6be4306ef303660ad70e5c94e44af899d4515c75ce612efc3",
+          "retainedSHA256": "3e4d74d70cc4bbe6be4306ef303660ad70e5c94e44af899d4515c75ce612efc3",
+          "byteIdentical": true,
+          "sourceMatches": true,
+          "difference": null
+        }
+      ],
+      "assessment": "candidate already deployed externally; retained v17 is historical rollback, not current baseline"
+    },
+    {
+      "name": "wing-media-stage-authorize",
+      "deployedVersion": 13,
+      "verifyJwt": false,
+      "files": [
+        {
+          "deployedPath": "wing-media-stage-authorize/index.ts",
+          "comparedPath": "crawl/supabase/local/app-polish-acceptance/baseline/edge/wing-media-stage-authorize/index.ts",
+          "deployedSHA256": "dc4cccc9fb68c3efff1a02332f563b4cba7e870583aa1c68643f79464d2d9060",
+          "retainedSHA256": "5e42728c4026041ce0e8fb1b70e3616bf7f72ab93f6bb7c06d3a28b5f2376e9f",
+          "byteIdentical": false,
+          "sourceMatches": true,
+          "difference": "CRLF/LF or added final LF only; no source-token changes"
+        }
+      ],
+      "assessment": "retained baseline matches deployed"
+    },
+    {
+      "name": "wing-media-validate",
+      "deployedVersion": 14,
+      "verifyJwt": false,
+      "files": [
+        {
+          "deployedPath": "functions/wing-media-validate/index.ts",
+          "comparedPath": "crawl/supabase/local/app-polish-acceptance/baseline/edge/wing-media-validate/index.ts",
+          "deployedSHA256": "c47b51d2b57f4cec2e1de33bcf5cf5895bb79075ee6e054126fc1f7b9931e7b6",
+          "retainedSHA256": "ea60dc2feef06eb44dbea57292baa5a01fa5fec1a33d9c5697b1465eae9933dd",
+          "byteIdentical": false,
+          "sourceMatches": true,
+          "difference": "CRLF/LF or added final LF only; no source-token changes"
+        },
+        {
+          "deployedPath": "functions/_shared/wingShotResponse.ts",
+          "comparedPath": "crawl/supabase/local/app-polish-acceptance/baseline/edge/_shared/wingShotResponse.ts",
+          "deployedSHA256": "8ad7409e13134178d4775b64fa14b9b64b1cb8320c6fe7da720b197487e18a80",
+          "retainedSHA256": "985336aae8b61bf5f4ab55a4610c4398071f3001fa40fdd882ce71e2cfe0ab8f",
+          "byteIdentical": false,
+          "sourceMatches": true,
+          "difference": "CRLF/LF or added final LF only; no source-token changes"
+        }
+      ],
+      "assessment": "retained baseline matches deployed"
+    },
+    {
+      "name": "wing-media-promote",
+      "deployedVersion": 14,
+      "verifyJwt": false,
+      "files": [
+        {
+          "deployedPath": "functions/wing-media-promote/index.ts",
+          "comparedPath": "crawl/supabase/local/app-polish-acceptance/baseline/edge/wing-media-promote/index.ts",
+          "deployedSHA256": "e6944d625ee221b7bd790792002c3e7e4c33d85d0ce1d80093cb19602e7b62d9",
+          "retainedSHA256": "55ab50dd4bf1e034ec8c3de705c481b7d14afac20b25249cc0db64d84a0df229",
+          "byteIdentical": false,
+          "sourceMatches": true,
+          "difference": "CRLF/LF or added final LF only; no source-token changes"
+        },
+        {
+          "deployedPath": "functions/_shared/wingShotResponse.ts",
+          "comparedPath": "crawl/supabase/local/app-polish-acceptance/baseline/edge/_shared/wingShotResponse.ts",
+          "deployedSHA256": "8ad7409e13134178d4775b64fa14b9b64b1cb8320c6fe7da720b197487e18a80",
+          "retainedSHA256": "985336aae8b61bf5f4ab55a4610c4398071f3001fa40fdd882ce71e2cfe0ab8f",
+          "byteIdentical": false,
+          "sourceMatches": true,
+          "difference": "CRLF/LF or added final LF only; no source-token changes"
+        }
+      ],
+      "assessment": "retained baseline matches deployed"
+    },
+    {
+      "name": "wing-media-staging-cleanup",
+      "deployedVersion": 9,
+      "verifyJwt": false,
+      "files": [
+        {
+          "deployedPath": "functions/wing-media-staging-cleanup/index.ts",
+          "comparedPath": "crawl/supabase/local/app-polish-acceptance/baseline/edge/wing-media-staging-cleanup/index.ts",
+          "deployedSHA256": "ce1a2adb3959c07283c763f2f7db84981081c6319074d03a577c144533625f39",
+          "retainedSHA256": "7d3f15d2ba0e92b638551775eae17584c43e12eb63b86e31eefea1519d7158d6",
+          "byteIdentical": false,
+          "sourceMatches": true,
+          "difference": "CRLF/LF or added final LF only; no source-token changes"
+        },
+        {
+          "deployedPath": "functions/_shared/wingShotResponse.ts",
+          "comparedPath": "crawl/supabase/local/app-polish-acceptance/baseline/edge/_shared/wingShotResponse.ts",
+          "deployedSHA256": "8ad7409e13134178d4775b64fa14b9b64b1cb8320c6fe7da720b197487e18a80",
+          "retainedSHA256": "985336aae8b61bf5f4ab55a4610c4398071f3001fa40fdd882ce71e2cfe0ab8f",
+          "byteIdentical": false,
+          "sourceMatches": true,
+          "difference": "CRLF/LF or added final LF only; no source-token changes"
+        }
+      ],
+      "assessment": "retained baseline matches deployed"
+    }
+  ],
+  "allComparedBytesMatch": false,
+  "allSourcesMatch": true
+}

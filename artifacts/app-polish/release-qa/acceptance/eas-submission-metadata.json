@@ -1,0 +1,193 @@
+{
+  "source": "read-only EAS SubmissionQuery; submissions do not prove present store/tester availability",
+  "rows": [
+    {
+      "id": "f5a2d82d-9627-4d03-8fee-8c695380717c",
+      "status": "FINISHED",
+      "platform": "IOS",
+      "androidConfig": null,
+      "iosAppId": "6757644594"
+    },
+    {
+      "id": "1af34ed5-5deb-4a1b-b77a-15e29a0985c4",
+      "status": "ERRORED",
+      "platform": "ANDROID",
+      "androidConfig": {
+        "applicationIdentifier": null,
+        "track": "internal",
+        "releaseStatus": "COMPLETED",
+        "rollout": null,
+        "__typename": "AndroidSubmissionConfig"
+      },
+      "errorCode": "SUBMISSION_SERVICE_ANDROID_SERVICE_ACCOUNT_IS_MISSING_PERMISSIONS"
+    },
+    {
+      "id": "90e9b5e1-5ebf-4117-bb5b-068197a55550",
+      "status": "FINISHED",
+      "platform": "IOS",
+      "androidConfig": null,
+      "iosAppId": "6757644594"
+    },
+    {
+      "id": "b2f8cc2e-a3c0-4ad6-865c-0cc008a4a00d",
+      "status": "FINISHED",
+      "platform": "IOS",
+      "androidConfig": null,
+      "iosAppId": "6757644594"
+    },
+    {
+      "id": "b5d991d1-87d4-4015-a0fc-d0e2fe6d47bb",
+      "status": "FINISHED",
+      "platform": "IOS",
+      "androidConfig": null,
+      "iosAppId": "6757644594"
+    },
+    {
+      "id": "7a567a43-9459-48a5-9512-56d88884c8ed",
+      "status": "ERRORED",
+      "platform": "IOS",
+      "androidConfig": null,
+      "iosAppId": "6757644594"
+    },
+    {
+      "id": "25458d4f-299e-471c-b4fa-2f8c69e85b23",
+      "status": "ERRORED",
+      "platform": "IOS",
+      "androidConfig": null,
+      "iosAppId": "6757644594"
+    },
+    {
+      "id": "5384c43e-116e-4333-aeff-054816cf8974",
+      "status": "FINISHED",
+      "platform": "IOS",
+      "androidConfig": null,
+      "iosAppId": "6757644594"
+    },
+    {
+      "id": "dc85509d-950c-47c1-94bf-847cbefc9fdd",
+      "status": "FINISHED",
+      "platform": "IOS",
+      "androidConfig": null,
+      "iosAppId": "6757644594"
+    },
+    {
+      "id": "84cab21d-5d84-4689-b17a-3ebdbde58912",
+      "status": "ERRORED",
+      "platform": "IOS",
+      "androidConfig": null,
+      "iosAppId": "6757644594",
+      "errorCode": "SUBMISSION_SERVICE_IOS_OLD_APP_VERSION"
+    },
+    {
+      "id": "93735575-304a-4507-9ef4-972767fd4406",
+      "status": "FINISHED",
+      "platform": "IOS",
+      "androidConfig": null,
+      "iosAppId": "6757644594"
+    },
+    {
+      "id": "9920f5bf-d63f-422b-a4d9-fa2faf22dd9c",
+      "status": "FINISHED",
+      "platform": "IOS",
+      "androidConfig": null,
+      "iosAppId": "6757644594"
+    },
+    {
+      "id": "bb26b97f-40b0-472a-a52a-e0904dbe5d33",
+      "status": "FINISHED",
+      "platform": "IOS",
+      "androidConfig": null,
+      "iosAppId": "6757644594"
+    },
+    {
+      "id": "cbb6eac3-93af-48e7-9144-990655585431",
+      "status": "FINISHED",
+      "platform": "IOS",
+      "androidConfig": null,
+      "iosAppId": "6757644594"
+    },
+    {
+      "id": "c6100567-5ad2-4130-b024-ff1f85af8d97",
+      "status": "ERRORED",
+      "platform": "IOS",
+      "androidConfig": null,
+      "iosAppId": "6757644594",
+      "errorCode": "SUBMISSION_SERVICE_IOS_OLD_BUILD_NUMBER"
+    },
+    {
+      "id": "583665c6-ae7d-4c05-ad5c-d6b421d62aa6",
+      "status": "ERRORED",
+      "platform": "IOS",
+      "androidConfig": null,
+      "iosAppId": "6757644594",
+      "errorCode": "SUBMISSION_SERVICE_IOS_OLD_BUILD_NUMBER"
+    },
+    {
+      "id": "312e2d8a-fdb4-495c-b820-24ac459294a1",
+      "status": "ERRORED",
+      "platform": "IOS",
+      "androidConfig": null,
+      "iosAppId": "6757644594",
+      "errorCode": "SUBMISSION_SERVICE_IOS_OLD_BUILD_NUMBER"
+    },
+    {
+      "id": "c8d9c368-716b-491b-b6c2-6009be189b93",
+      "status": "FINISHED",
+      "platform": "IOS",
+      "androidConfig": null,
+      "iosAppId": "6757644594"
+    },
+    {
+      "id": "c1ce7c8f-570b-44ad-9c31-87dd309ee7cf",
+      "status": "ERRORED",
+      "platform": "ANDROID",
+      "androidConfig": {
+        "applicationIdentifier": null,
+        "track": "internal",
+        "releaseStatus": "COMPLETED",
+        "rollout": null,
+        "__typename": "AndroidSubmissionConfig"
+      },
+      "errorCode": "SUBMISSION_SERVICE_ANDROID_SERVICE_ACCOUNT_IS_MISSING_PERMISSIONS"
+    },
+    {
+      "id": "ec7fa975-924c-4b38-a0ee-93902f25ede2",
+      "status": "ERRORED",
+      "platform": "ANDROID",
+      "androidConfig": {
+        "applicationIdentifier": null,
+        "track": "internal",
+        "releaseStatus": "COMPLETED",
+        "rollout": null,
+        "__typename": "AndroidSubmissionConfig"
+      },
+      "errorCode": "SUBMISSION_SERVICE_ANDROID_SERVICE_ACCOUNT_IS_MISSING_PERMISSIONS"
+    },
+    {
+      "id": "52c1fe74-d94a-4d40-9411-ac84f2ef902e",
+      "status": "ERRORED",
+      "platform": "ANDROID",
+      "androidConfig": {
+        "applicationIdentifier": null,
+        "track": "internal",
+        "releaseStatus": "COMPLETED",
+        "rollout": null,
+        "__typename": "AndroidSubmissionConfig"
+      },
+      "errorCode": "SUBMISSION_SERVICE_ANDROID_FIRST_UPLOAD_ERROR"
+    },
+    {
+      "id": "bea9d0bd-0e78-4db8-beb9-c2add9fba07c",
+      "status": "ERRORED",
+      "platform": "ANDROID",
+      "androidConfig": {
+        "applicationIdentifier": null,
+        "track": "internal",
+        "releaseStatus": "COMPLETED",
+        "rollout": null,
+        "__typename": "AndroidSubmissionConfig"
+      },
+      "errorCode": "SUBMISSION_SERVICE_ANDROID_UNKNOWN_ERROR"
+    }
+  ]
+}

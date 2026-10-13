@@ -1,0 +1,32 @@
+[
+  {
+    "name": "wing-media-validate",
+    "version": 14,
+    "verifyJwt": false,
+    "bundleHash": "3111a29da7100a6a5ad7bcbf64b59c025e5b228e8b0fe0c619ccb6cc1d35d6a1",
+    "files": [
+      "wing-media-validate/index.ts",
+      "_shared/wingShotResponse.ts"
+    ]
+  },
+  {
+    "name": "wing-media-promote",
+    "version": 14,
+    "verifyJwt": false,
+    "bundleHash": "b2492cd47a52206f5bc14dfdd0af848da3d69ffbe82333603156346be42e7543",
+    "files": [
+      "wing-media-promote/index.ts",
+      "_shared/wingShotResponse.ts"
+    ]
+  },
+  {
+    "name": "wing-media-staging-cleanup",
+    "version": 9,
+    "verifyJwt": false,
+    "bundleHash": "192841b7f4d5570b2871f680ae455cc9b89fe16e3ce9b06b776711111301c6eb",
+    "files": [
+      "wing-media-staging-cleanup/index.ts",
+      "_shared/wingShotResponse.ts"
+    ]
+  }
+]

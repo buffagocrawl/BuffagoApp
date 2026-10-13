@@ -1,0 +1,2 @@
+PASS: 23 manifest/source/rollback/config/document paths and SHA256 values verified; exactly two ordered SQL inputs and four functions.
+PASS: no SQL marked executable; gateway flags match; isolated services enabled, migration/seed replay disabled; no production ref in config.

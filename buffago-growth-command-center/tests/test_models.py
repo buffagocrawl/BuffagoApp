@@ -26,6 +26,12 @@ class ModelTests(unittest.TestCase):
         self.assertIsNone(snapshot.wing_total)
         self.assertEqual(snapshot.wing.direction, "flat")
 
+    def test_pending_restaurants_optional_count(self):
+        self.assertIsNone(Snapshot.from_payload({}).pending_restaurants)
+        self.assertEqual(Snapshot.from_payload({"product_pulse": {"pending_restaurants": {"total": 0}}}).pending_restaurants, 0)
+        self.assertEqual(Snapshot.from_payload({"product_pulse": {"pending_restaurants": {"total": 9}}}).pending_restaurants, 9)
+        self.assertIsNone(Snapshot.from_payload({"product_pulse": {"pending_restaurants": {"total": "unknown"}}}).pending_restaurants)
+
     def test_feedback_age(self):
         snapshot = Snapshot.from_payload({"product_pulse": {"feedback": {"oldest_open_at": "2026-01-01T00:00:00Z"}}})
         self.assertEqual(snapshot.oldest_feedback_age(datetime(2026, 1, 3, tzinfo=timezone.utc)), "2d old")

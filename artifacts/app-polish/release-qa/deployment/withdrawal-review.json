@@ -1,0 +1,53 @@
+{
+  "source": "read-only production catalog and vote rows; 2026-10-13",
+  "ledger": [
+    {
+      "name": "mango_restaurant_review",
+      "version": "20261013011230"
+    },
+    {
+      "name": "wingman_rate_limit_repair",
+      "version": "20261013022806"
+    }
+  ],
+  "conflicts": [
+    {
+      "status": "approved",
+      "user_id": "23898359-306a-4dd3-91f0-da66da19ccfc",
+      "jury_vote": -1,
+      "legacy_vote": 1,
+      "submission_id": "189f18c1-3955-41bd-94aa-e0d7918039ae",
+      "jury_created_at": "2026-10-11T19:59:23.129031+00:00",
+      "legacy_created_at": "2026-10-11T14:26:26.27651+00:00",
+      "legacy_updated_at": "2026-10-11T14:26:26.27651+00:00",
+      "currently_eligible": true
+    },
+    {
+      "status": "failed",
+      "user_id": "23898359-306a-4dd3-91f0-da66da19ccfc",
+      "jury_vote": 0,
+      "legacy_vote": 1,
+      "submission_id": "c1c6e647-b925-4d2d-b0b2-bbef5b9df15e",
+      "jury_created_at": "2026-10-11T19:59:05.979572+00:00",
+      "legacy_created_at": "2026-10-11T14:26:46.559983+00:00",
+      "legacy_updated_at": "2026-10-11T14:26:46.559983+00:00",
+      "currently_eligible": false
+    },
+    {
+      "status": "approved",
+      "user_id": "23898359-306a-4dd3-91f0-da66da19ccfc",
+      "jury_vote": 1,
+      "legacy_vote": -1,
+      "submission_id": "f686c20e-4a9d-476b-b01b-fd42e2f44ea1",
+      "jury_created_at": "2026-10-11T20:01:07.666547+00:00",
+      "legacy_created_at": "2026-10-11T20:35:35.215217+00:00",
+      "legacy_updated_at": "2026-10-11T20:35:35.215217+00:00",
+      "currently_eligible": true
+    }
+  ],
+  "cohort": {
+    "eligible_jury_only_pairs": 110,
+    "distinct_voters": 4
+  },
+  "conclusion": "Both approved conflicting pairs retain both rows; no unresolved current Gallery withdrawal in those pairs under deployed upsert/delete semantics. Jury-only absence has no tombstone and cannot establish never-voted versus withdrawn intent; owner decision required before mirroring that cohort."
+}

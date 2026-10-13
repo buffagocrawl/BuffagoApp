@@ -1,0 +1,28 @@
+{
+  "environment": "Android emulator, injected two-pointer gesture, synthetic asset only",
+  "crop": {
+    "originX": 862,
+    "originY": 562,
+    "width": 533,
+    "height": 533
+  },
+  "upload_bytes": 23356,
+  "upload_size": [
+    533,
+    533
+  ],
+  "source_crop_mean_channel_error": 1.55,
+  "preview_mean_channel_error": 2.378,
+  "primary_size": [
+    533,
+    533
+  ],
+  "primary_mean_channel_error": 0.724,
+  "thumbnail_size": [
+    512,
+    512
+  ],
+  "thumbnail_mean_channel_error": 1.187,
+  "retained_upload_original": true,
+  "network_upload_performed": false
+}

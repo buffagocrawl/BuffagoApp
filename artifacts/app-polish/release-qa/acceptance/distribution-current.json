@@ -1,0 +1,28 @@
+{
+  "inspected": "2026-10-13",
+  "app_store_us": {
+    "source": "https://apps.apple.com/us/app/buffago/id6757644594",
+    "version": "1.0.6",
+    "public_release_observed": true,
+    "build_number": "unknown from public listing",
+    "note": "Fresh direct page supersedes cached search result showing 1.0.5. EAS maps latest iOS 1.0.6/build 1.0.3 to FINISHED submission, but storefront alone does not prove this binary's build number or availability in all countries."
+  },
+  "play_testing": {
+    "available_version_codes": "unknown",
+    "eas_latest_completed": "Android 1.0.5/code 127; no associated EAS submission",
+    "eas_internal_attempt": "Android 1.0.5/code 125; ERRORED: SUBMISSION_SERVICE_ANDROID_SERVICE_ACCOUNT_IS_MISSING_PERMISSIONS",
+    "note": "No authenticated Play console/browser access; other manual submissions or existing tester releases cannot be ruled out."
+  },
+  "testflight": {
+    "assigned_active_builds_groups_expiry": "unknown",
+    "eas_latest_submission": "iOS 1.0.6/build 1.0.3 FINISHED; submission is not tester assignment evidence"
+  },
+  "ota": {
+    "eas_project": "f08e790e-af47-4fc1-ba5e-707a0a15f7be",
+    "channels_currentPage": [],
+    "updates_currentPage": [],
+    "source": "authenticated read-only eas channel:list and eas update:list --all",
+    "note": "No EAS channels/update groups returned for this project. No updates URL is configured in current app.config.js. Installed binary update config/alternate custom server remains unverified; no claim that all installs run their embedded bundle."
+  },
+  "browser_inventory": "No enabled browsers or apps returned by cua.getState; no authenticated store console session available"
+}

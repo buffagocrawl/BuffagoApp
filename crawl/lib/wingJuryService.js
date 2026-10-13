@@ -1,4 +1,5 @@
 import { accountUserId, lookupAccount } from './accountBoundary.js';
+import { publishPhotoVote } from './photoVoteEvents.js';
 
 export const WING_JURY_FUNCTIONS = Object.freeze({
   feed: 'wing-jury-feed',
@@ -166,10 +167,16 @@ export async function recordWingJuryVerdict({ client, photo, vote, guestSession,
   }
   const headers = await requestHeaders(client, user, expectedUserId, isCurrent);
   requireCurrent(user, expectedUserId, isCurrent);
+  const voterId = user.id;
   const { data, error } = await client.functions.invoke(WING_JURY_FUNCTIONS.vote, {
     body: { submission_id: submissionId, vote: normalizedVote },
     ...(headers ? { headers } : {}),
   });
+  // A committed vote still invalidates other screens if the player closed
+  // Jury while the request was in flight. Selected votes remain account-scoped.
+  if (!error && data?.ok !== false && data?.submission_id === submissionId) {
+    publishPhotoVote(voterId, { ...data, current_vote: data.vote });
+  }
   requireCurrent(user, expectedUserId, isCurrent);
   if (error || data?.ok === false) {
     const code = data?.error === 'existing_vote' ? 'EXISTING_VOTE' : 'VOTE_FAILED';

@@ -1,0 +1,94 @@
+[
+  {
+    "path": "artifacts/app-polish/release-qa/deployed/wing-jury-reveal/index.js",
+    "sha256": "afc36fa00de30f86c97ba06c681ed8cf2144964ae7c339fef1bbdceb8a222040"
+  },
+  {
+    "path": "artifacts/app-polish/release-qa/deployed/wing-jury-vote/index.js",
+    "sha256": "cf303564c0aa103c0c00b4576c61ad9064face52a8bb5f521dc2e16a728328ce"
+  },
+  {
+    "path": "artifacts/app-polish/release-qa/deployed/wing-public-gallery/index.ts",
+    "sha256": "99f9eb72be3738d079802d104434cd1605a52eb215ee2ed80fe82ee8e2a02305"
+  },
+  {
+    "path": "artifacts/app-polish/release-qa/deployment/20261013022806_wingman_rate_limit_repair.deployed.sql",
+    "sha256": "72958888c40abb2bca17816c695b5f9e45e303d9f8a26204cf77b51278f79e69"
+  },
+  {
+    "path": "artifacts/app-polish/release-qa/wingman-intake-v17.ts",
+    "sha256": "83b8c9779ee98464109dbc13c1339ff7ffe5418bec8d5c5ed72d8b1a6280f96c"
+  },
+  {
+    "path": "crawl/supabase/functions/_shared/wingJury.ts",
+    "sha256": "e452d78f9b975e086ae8c6be6beab6f03cf13e07b34ebb346a647e5c2d6af883"
+  },
+  {
+    "path": "crawl/supabase/functions/_shared/wingmanConfidence.ts",
+    "sha256": "1666c9edbb79c08cfe09293e58c2bbb04123ecb08e081c45f731faebc98b9bc3"
+  },
+  {
+    "path": "crawl/supabase/functions/_shared/wingmanMenuEvidence.ts",
+    "sha256": "3e4d74d70cc4bbe6be4306ef303660ad70e5c94e44af899d4515c75ce612efc3"
+  },
+  {
+    "path": "crawl/supabase/functions/wing-jury-reveal/index.ts",
+    "sha256": "60819520fc47024e90459ccec162c61ec8d53ab2e2ec84d3799091337b5d0b6c"
+  },
+  {
+    "path": "crawl/supabase/functions/wing-jury-vote/index.ts",
+    "sha256": "46f767b37602f86552948bdc541a81ec3e7550b9067be34786169f15be1df6f6"
+  },
+  {
+    "path": "crawl/supabase/functions/wing-public-gallery/index.ts",
+    "sha256": "a3d6065bfd5679dfc885bfd6e024ffa94bae150feb0b773be779351d0e173231"
+  },
+  {
+    "path": "crawl/supabase/functions/wingman-intake/index.ts",
+    "sha256": "afae677c309d84d7fc345181b0898fd88c18b1de8921452e8f9e1267386f259f"
+  },
+  {
+    "path": "crawl/supabase/local/app-polish-acceptance/README.md",
+    "sha256": "2b65e6e600579dd046c4790ced36f0789e4888bbc6a7149646cc8d0ce101e4f6"
+  },
+  {
+    "path": "crawl/supabase/local/app-polish-acceptance/supabase/config.toml",
+    "sha256": "d11a4d58b30e2764cfcf9eddf89dd9953c7bf8dc8452cd6c8ca858c6cdf79138"
+  },
+  {
+    "path": "crawl/supabase/local/phase-7b3a/supabase/migrations/20261010192747_wing_jury_saved_destinations_forward.sql",
+    "sha256": "322377eca0934ff28a9ce11ce43e17d0370affc965ead10a17ae91ada2a7de6b"
+  },
+  {
+    "path": "crawl/supabase/migrations/20261013011230_mango_restaurant_review.sql",
+    "sha256": "f19101514c07bec3ace012e6695ad9f661a5aa99510c4f89e8d1fc878cefc5e0"
+  },
+  {
+    "path": "crawl/supabase/proposals/android-qa-round-3-randomized-jury-feed.sql",
+    "sha256": "2b702abdd62e9d8ce2183929340c0018dd7eb793068925968e19518ae75e9960"
+  },
+  {
+    "path": "crawl/supabase/proposals/app-polish-shared-photo-votes.sql",
+    "sha256": "f93474fbceb1756700b43989de21abc8b0e2259078d97c486447fdb610eb513c"
+  },
+  {
+    "path": "crawl/supabase/proposals/app-polish-vote-conflict-review.sql",
+    "sha256": "12e496c16bf3b31399ca65411d5656808d2210696580bc5bdfa82002cd946d4b"
+  },
+  {
+    "path": "crawl/tests/app-polish-withdrawal-history.test.mjs",
+    "sha256": "78adf00f25cefbe1298292fd709fdec32120a63023c571daab94c09eaeac56eb"
+  },
+  {
+    "path": "docs/buffago-app-polish-release-plan.md",
+    "sha256": "f803d5c51833ce5dc3e05f36fcaa2c2eb5c5fcb294fb1c4196d29ca9ff9537d2"
+  },
+  {
+    "path": "docs/buffago-app-polish.md",
+    "sha256": "fbc531e50c78343777a2e83e552dc5a349ad8a46fe1f621d059ea2587fea49d9"
+  },
+  {
+    "path": "docs\\buffago-app-polish-deployment-manifest.json",
+    "sha256": "f853ffc1c4cc5a033de04bc01217b2d4b8e463fc69acb8f9743668731f441a2f"
+  }
+]

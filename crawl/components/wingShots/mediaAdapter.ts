@@ -2,6 +2,8 @@ import { File as ExpoFile } from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { Platform } from 'react-native';
+import { confirmedWingShotCrop } from '../../lib/wingShotFraming';
+import { WING_SHOT_PHOTO_MAX_BYTES } from '../../lib/wingShotLimits';
 
 export type WingShotMediaKind = 'photo';
 
@@ -15,6 +17,7 @@ export type WingShotSelectedMedia = {
   width?: number;
   height?: number;
   thumbnailUri?: string;
+  originalUri?: string;
   getUploadBody: (signal?: AbortSignal) => Promise<ArrayBuffer | Uint8Array | Blob>;
 };
 
@@ -50,7 +53,7 @@ function abortIfNeeded(signal?: AbortSignal) {
   }
 }
 
-async function selectedMediaFromAsset(
+export async function selectedMediaFromAsset(
   asset: ImagePicker.ImagePickerAsset,
 ): Promise<WingShotSelectedMedia> {
   if (asset.type !== 'image') {
@@ -60,14 +63,11 @@ async function selectedMediaFromAsset(
     );
   }
   const kind: WingShotMediaKind = 'photo';
-  // Decode and normalize camera/library photos before preview and upload.
-  // Native photos commonly exceed the server's 2048px edge limit.
+  // Decode orientation before framing, preserving source pixels for zoomed
+  // crops. Apply the 2048px upload limit after the user confirms the frame.
   const context = ImageManipulator.manipulate(asset.uri);
-  if (Math.max(asset.width, asset.height) > 2048) {
-    context.resize(asset.width >= asset.height ? { width: 2048 } : { height: 2048 });
-  }
   const rendered = await context.renderAsync();
-  const prepared = await rendered.saveAsync({ format: SaveFormat.JPEG, compress: 0.9 });
+  const prepared = await rendered.saveAsync({ format: SaveFormat.JPEG, compress: 1 });
   const nativeFile = Platform.OS === 'web' ? null : new ExpoFile(prepared.uri);
   const webFile = Platform.OS === 'web' ? await (await fetch(prepared.uri)).blob() : null;
   const sizeBytes = nativeFile?.size ?? webFile?.size ?? 0;
@@ -86,6 +86,7 @@ async function selectedMediaFromAsset(
   }
   return {
     uri: prepared.uri,
+    originalUri: asset.uri,
     fileName: 'wing-shot.jpg',
     kind,
     mimeType: mimeType.toLowerCase(),
@@ -147,7 +148,7 @@ export const expoWingShotMediaAdapter: WingShotMediaAdapter = {
           mediaTypes: ['images'],
           cameraType: ImagePicker.CameraType.back,
           allowsEditing: false,
-          quality: 0.9,
+          quality: 1,
           exif: false,
           base64: false,
         }),
@@ -166,7 +167,7 @@ export const expoWingShotMediaAdapter: WingShotMediaAdapter = {
           allowsMultipleSelection: false,
           selectionLimit: 1,
           allowsEditing: false,
-          quality: 0.9,
+          quality: 1,
           exif: false,
           base64: false,
         }),
@@ -176,6 +177,35 @@ export const expoWingShotMediaAdapter: WingShotMediaAdapter = {
     }
   },
 };
+
+/** Bake the confirmed crop into the original upload used by validation and
+ * derivatives. The workflow retains that uploaded original as before. */
+export async function frameWingShotMedia(media: WingShotSelectedMedia, rect: { originX: number; originY: number; width: number; height: number }): Promise<WingShotSelectedMedia> {
+  const crop = confirmedWingShotCrop(rect, media.width, media.height);
+  const context = ImageManipulator.manipulate(media.uri);
+  context.crop(crop);
+  if (crop.width > 2048) context.resize({ width: 2048 });
+  const rendered = await context.renderAsync();
+  const prepared = await rendered.saveAsync({ format: SaveFormat.JPEG, compress: 0.95 });
+  if (__DEV__ && process.env.EXPO_PUBLIC_BUFFAGO_APP_POLISH_QA === '1') {
+    console.debug('[AppPolishFixture] confirmed crop', JSON.stringify({crop, uri:prepared.uri, width:prepared.width, height:prepared.height}));
+  }
+  const nativeFile = Platform.OS === 'web' ? null : new ExpoFile(prepared.uri);
+  const webFile = Platform.OS === 'web' ? await (await fetch(prepared.uri)).blob() : null;
+  const sizeBytes = nativeFile?.size ?? webFile?.size ?? 0;
+  if (sizeBytes < 1 || sizeBytes > WING_SHOT_PHOTO_MAX_BYTES) throw new WingShotMediaAdapterError('invalid_media_size', 'The framed photo exceeds upload limits.');
+  return {
+    ...media, uri: prepared.uri, thumbnailUri: prepared.uri, originalUri: media.originalUri || media.uri,
+    width: prepared.width, height: prepared.height, sizeBytes, mimeType: 'image/jpeg', fileName: 'wing-shot.jpg',
+    getUploadBody: async (signal) => {
+      abortIfNeeded(signal);
+      if (!webFile) throw new WingShotMediaAdapterError('media_reader_unavailable', 'Native media is uploaded directly from its local URI.');
+      const body = await webFile.arrayBuffer();
+      abortIfNeeded(signal);
+      return body;
+    },
+  };
+}
 
 const unavailable = async (): Promise<never> => {
   throw new WingShotMediaAdapterError(

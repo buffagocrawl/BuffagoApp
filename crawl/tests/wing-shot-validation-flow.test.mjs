@@ -8,7 +8,8 @@ const flow = fs.readFileSync(new URL('../components/wingShots/WingShotFlow.tsx',
 test('camera and library selections start one guarded validation pass', () => {
   assert.match(flow, /await mediaAdapter\.takePhoto\(\)/);
   assert.match(flow, /await mediaAdapter\.chooseFromLibrary/);
-  assert.match(flow, /acceptMedia\(selected\)/);
+  assert.match(flow, /setFramingMedia\(selected\)/);
+  assert.match(flow, /acceptMedia\(framed\)/);
   assert.match(flow, /void validateSelectedMedia\(selected\)/);
   assert.match(flow, /validationAbortRef\.current\?\.abort\(\)/);
   assert.match(flow, /sequence !== validationSequenceRef\.current/);

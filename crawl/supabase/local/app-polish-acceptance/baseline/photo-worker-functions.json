@@ -1,0 +1,50 @@
+[
+  {
+    "schema": "public",
+    "name": "begin_wing_photo_derivative_job",
+    "oid": "229727",
+    "definition": "CREATE OR REPLACE FUNCTION public.begin_wing_photo_derivative_job(p_job_id uuid, p_claim_token uuid)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\ndeclare j public.wing_photo_derivative_jobs%rowtype; s public.wing_media_submissions%rowtype; reason text;\nbegin\n  if auth.role() is distinct from 'service_role' then raise exception 'service_role_required' using errcode='42501'; end if;\n  select * into j from public.wing_photo_derivative_jobs where id=p_job_id;\n  select * into s from public.wing_media_submissions where id=j.submission_id for update;\n  select * into j from public.wing_photo_derivative_jobs where id=p_job_id for update;\n  if j.id is null or j.status<>'claimed' or j.claim_token is distinct from p_claim_token or j.lease_expires_at<=now() then raise exception 'invalid_or_expired_job_claim'; end if;\n  reason:=public.wing_photo_processing_blocker(j.submission_id);\n  if s.id is null or reason is not null then raise exception 'photo_processing_blocked:%',coalesce(reason,'submission_missing'); end if;\n  return jsonb_build_object('submission_id',s.id,'media_type','photo','bucket','wing-submissions',\n    'original_path',s.original_storage_path,'processed_path','processed/'||s.id::text||'/primary',\n    'thumbnail_path','thumbnails/'||s.id::text||'/preview','correlation_id',j.correlation_id,\n    'preserve_approval',s.status='approved');\nend;\n$function$\n",
+    "grants": [
+      {
+        "role": "postgres",
+        "privilege": "EXECUTE"
+      },
+      {
+        "role": "service_role",
+        "privilege": "EXECUTE"
+      }
+    ]
+  },
+  {
+    "schema": "public",
+    "name": "claim_wing_photo_derivative_job",
+    "oid": "229726",
+    "definition": "CREATE OR REPLACE FUNCTION public.claim_wing_photo_derivative_job(p_worker text, p_lease_seconds integer DEFAULT 300, p_submission_id uuid DEFAULT NULL::uuid)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\ndeclare j public.wing_photo_derivative_jobs%rowtype; token uuid:=gen_random_uuid();\nbegin\n  if auth.role() is distinct from 'service_role' then raise exception 'service_role_required' using errcode='42501'; end if;\n  if char_length(coalesce(p_worker,'')) not between 3 and 120 or p_lease_seconds not between 30 and 900 then raise exception 'invalid_worker_lease'; end if;\n  -- Expired lease receipts survive crashes. SKIP LOCKED keeps concurrent workers independent.\n  for j in select * from public.wing_photo_derivative_jobs where status='claimed' and lease_expires_at<=now()\n    and (p_submission_id is null or submission_id=p_submission_id) for update skip locked loop\n    insert into public.wing_photo_derivative_receipts(submission_id,job_id,attempt_number,event,error_code,correlation_id)\n      values(j.submission_id,j.id,j.attempt_count,'lease_expired','STALE_LEASE',j.correlation_id);\n    update public.wing_photo_derivative_jobs set status=case when attempt_count>=max_attempts then 'dead' else 'retry' end,\n      claim_token=null,claimed_by=null,lease_expires_at=null,available_at=now(),last_error_code='STALE_LEASE',updated_at=now() where id=j.id;\n  end loop;\n  select * into j from public.wing_photo_derivative_jobs where status in ('pending','retry') and available_at<=now()\n    and (p_submission_id is null or submission_id=p_submission_id)\n    and attempt_count<max_attempts order by available_at,created_at,id for update skip locked limit 1;\n  if not found then return null; end if;\n  update public.wing_photo_derivative_jobs set status='claimed',attempt_count=attempt_count+1,\n    claim_token=token,claimed_by=p_worker,lease_expires_at=now()+make_interval(secs=>p_lease_seconds),updated_at=now() where id=j.id;\n  insert into public.wing_photo_derivative_receipts(submission_id,job_id,attempt_number,event,correlation_id)\n    values(j.submission_id,j.id,j.attempt_count+1,'claimed',j.correlation_id);\n  return jsonb_build_object('job_id',j.id,'submission_id',j.submission_id,'job_kind','photo_process','claim_token',token);\nend;\n$function$\n",
+    "grants": [
+      {
+        "role": "postgres",
+        "privilege": "EXECUTE"
+      },
+      {
+        "role": "service_role",
+        "privilege": "EXECUTE"
+      }
+    ]
+  },
+  {
+    "schema": "public",
+    "name": "settle_wing_photo_derivative_job",
+    "oid": "229728",
+    "definition": "CREATE OR REPLACE FUNCTION public.settle_wing_photo_derivative_job(p_job_id uuid, p_claim_token uuid, p_succeeded boolean, p_retryable boolean, p_processed_path text DEFAULT NULL::text, p_thumbnail_path text DEFAULT NULL::text, p_perceptual_hash text DEFAULT NULL::text, p_error_code text DEFAULT NULL::text, p_error_reason text DEFAULT NULL::text)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'public', 'storage'\nAS $function$\ndeclare j public.wing_photo_derivative_jobs%rowtype; s public.wing_media_submissions%rowtype;\n  reason text; state text; processed text; thumbnail text;\nbegin\n  if auth.role() is distinct from 'service_role' then raise exception 'service_role_required' using errcode='42501'; end if;\n  if p_succeeded is null or p_retryable is null then raise exception 'invalid_settlement'; end if;\n  select * into j from public.wing_photo_derivative_jobs where id=p_job_id;\n  select * into s from public.wing_media_submissions where id=j.submission_id for update;\n  select * into j from public.wing_photo_derivative_jobs where id=p_job_id for update;\n  if j.id is null then raise exception 'job_missing'; end if;\n  -- Network retry of a settled result is idempotent, but only for its exact lease.\n  if j.status in ('succeeded','dead','retry','cancelled') and j.claim_token=p_claim_token then\n    return jsonb_build_object('job_status',j.status,'submission_status',s.status); end if;\n  if j.status<>'claimed' or j.claim_token is distinct from p_claim_token or j.lease_expires_at<=now() then raise exception 'invalid_or_expired_job_claim'; end if;\n  reason:=coalesce(public.wing_photo_processing_blocker(j.submission_id),case when s.id is null then 'submission_missing' end);\n  processed:='processed/'||j.submission_id::text||'/primary'; thumbnail:='thumbnails/'||j.submission_id::text||'/preview';\n  if reason is not null then state:='cancelled';\n  elsif p_succeeded then\n    if p_processed_path is distinct from processed or p_thumbnail_path is distinct from thumbnail then raise exception 'processed_media_path_mismatch'; end if;\n    if not exists(select 1 from storage.objects o where o.bucket_id='wing-submissions' and o.name=processed and\n        lower(coalesce(o.metadata->>'mimetype',o.metadata->>'contentType',''))='image/jpeg' and (o.metadata->>'size')::bigint>0)\n      or not exists(select 1 from storage.objects o where o.bucket_id='wing-submissions' and o.name=thumbnail and\n        lower(coalesce(o.metadata->>'mimetype',o.metadata->>'contentType',''))='image/jpeg' and (o.metadata->>'size')::bigint>0)\n    then raise exception 'processed_media_not_found'; end if;\n    if p_perceptual_hash is not null and char_length(p_perceptual_hash) not between 16 and 256 then raise exception 'invalid_perceptual_hash'; end if;\n    update public.wing_media_submissions set processed_storage_path=processed,thumbnail_storage_path=thumbnail,\n      perceptual_hash=p_perceptual_hash,updated_at=now() where id=s.id;\n    state:='succeeded';\n  else state:=case when p_retryable and j.attempt_count<j.max_attempts then 'retry' else 'dead' end; end if;\n  update public.wing_photo_derivative_jobs set status=state,lease_expires_at=null,claimed_by=null,\n    available_at=case when state='retry' then now()+least(interval '30 minutes',interval '30 seconds'*(2^greatest(j.attempt_count-1,0))) else available_at end,\n    last_error_code=case when state='succeeded' then null else coalesce(reason,left(p_error_code,100),'PROCESSING_FAILED') end,updated_at=now() where id=j.id;\n  insert into public.wing_photo_derivative_receipts(submission_id,job_id,attempt_number,event,error_code,correlation_id)\n    values(j.submission_id,j.id,j.attempt_count,state,case when state='succeeded' then null else coalesce(reason,left(p_error_code,100),'PROCESSING_FAILED') end,j.correlation_id);\n  return jsonb_build_object('job_id',j.id,'submission_id',s.id,'job_status',state,'submission_status',s.status);\nend;\n$function$\n",
+    "grants": [
+      {
+        "role": "postgres",
+        "privilege": "EXECUTE"
+      },
+      {
+        "role": "service_role",
+        "privilege": "EXECUTE"
+      }
+    ]
+  }
+]

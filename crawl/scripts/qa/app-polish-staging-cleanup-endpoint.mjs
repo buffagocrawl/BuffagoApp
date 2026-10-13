@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import {randomUUID} from 'node:crypto';
+import {readFileSync} from 'node:fs';
+import {admin,client,check,readJSON,localPath,credentials,saveEvidence} from './app-polish-staging-common.mjs';
+const f=readJSON('.expo/app-polish-staging-fixtures.json'),actor=f.actors.voter;
+const user=check(await admin.auth.admin.getUserById(actor.id)).user;
+const link=check(await admin.auth.admin.generateLink({type:'magiclink',email:user.email}));
+const token=check(await client().auth.verifyOtp({token_hash:link.properties.hashed_token,type:'magiclink'})).session.access_token;
+const correlationId=randomUUID(),objectPath=`${actor.id}/${correlationId}/cleanup-fixture.jpg`,bucket='wing-shot-staging';
+check(await admin.storage.from(bucket).upload(objectPath,readFileSync(localPath('../artifacts/app-polish/release-qa/staging/worker-original.jpg')),{contentType:'image/jpeg'}));
+async function call(body,bearer){const r=await fetch(credentials.API_URL+'/functions/v1/wing-media-staging-cleanup',{method:'POST',signal:AbortSignal.timeout(20000),headers:{Connection:'close',apikey:credentials.ANON_KEY,'content-type':'application/json',...(bearer?{Authorization:`Bearer ${bearer}`}:{})},body:JSON.stringify(body)});return {status:r.status,body:await r.json()};}
+const input={bucket,objectPath,correlationId};
+const guest=await call(input);assert.equal(guest.status,401);
+const forbidden=await call({...input,objectPath:`${f.actors.owner.id}/${correlationId}/cleanup-fixture.jpg`},token);assert.equal(forbidden.status,403);
+check(await admin.storage.from(bucket).download(objectPath));
+const owned=await call(input,token);assert.equal(owned.status,200,JSON.stringify(owned.body));assert.equal(owned.body.deleted,true);
+assert.ok((await admin.storage.from(bucket).download(objectPath)).error);
+const retry=await call(input,token);assert.equal(retry.status,200);assert.equal(retry.body.deleted,true);
+saveEvidence('staging-cleanup-endpoint-acceptance.json',{status:'PASS',target:credentials.API_URL,realServices:true,syntheticOnly:true,guest,forbidden,owned,retry,deleted:true});
+console.log('Real deployed staging-cleanup endpoint guest/ownership rejection, deletion and idempotent retry passed.');

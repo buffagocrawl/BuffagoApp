@@ -1,3 +1,4 @@
+import { selectWingdexCollection, matchesWingdexRestaurant, wingdexEmptyState, readAllWingdexRows, WINGDEX_SELECTION_DEFAULTS } from '../../../lib/wingdexCollection.js';
 import { ENABLE_WING_JURY } from '../../../config/features';
 import { WINGDEX_RADIUS_OPTIONS, nextWingdexRadius, wingdexRadiusMessage } from '../../../lib/wingdexRadius.js';
 // app/ratings/index.jsx
@@ -46,7 +47,7 @@ import { submitWingShot, wingShotUserMessage } from '../../../lib/wingShots.js';
 import { createRatingPhotoAttachment } from '../../../lib/ratingPhotoAttachment.js';
 import WingmanAddDialog from '../../../components/WingmanAddDialog';
 import FeedbackState from '../../../components/ui/FeedbackState';
-import { WingShotImage, LoadingSkeleton, SelectionChip as Chip } from '../../../components/ui/OperationUI';
+import { LoadingSkeleton, SelectionChip as Chip } from '../../../components/ui/OperationUI';
 import { operationTokens as tokens } from '../../../src/theme/operationTokens';
 import { supabase } from '../../../lib/supabase.js';
 import { trackEvent } from '../../../lib/analytics';
@@ -562,6 +563,7 @@ export default function PublicRatingsScreen() {
 
   const [statePickerOpen, setStatePickerOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
   const [wingmanOpen, setWingmanOpen] = useState(false);
   const [wingmanInitialRestaurant, setWingmanInitialRestaurant] = useState('');
   const [wingmanStateCtx, setWingmanStateCtx] = useState(null);
@@ -824,49 +826,11 @@ export default function PublicRatingsScreen() {
     router.setParams({ map: undefined });
   }, [requestedMap, openRestaurantsMap, router]);
 
-  const applyLocationFilter = useCallback(
-    (dataIn) => {
-      let data = dataIn;
-
-      // state mode
-      if (locationMode === 'state' && stateCodeFilter) {
-        return data.filter((r) => r.stateCode === stateCodeFilter);
-      }
-
-      // radius mode
-      if (
-        locationMode === 'radius' &&
-        coords?.latitude &&
-        coords?.longitude &&
-        Number.isFinite(Number(radiusMiles))
-      ) {
-        return data.filter((r) =>
-          Number.isFinite(Number(r.distanceMi)) ? r.distanceMi <= radiusMiles : true
-        );
-      }
-
-      // all mode => no filter
-      return data;
-    },
-    [locationMode, stateCodeFilter, radiusMiles, coords?.latitude, coords?.longitude]
-  );
-
-  /* ---------- FACET PIPELINE ---------- */
-  const rowsForFacetCounts = useMemo(() => {
-    let data = applyLocationFilter(rows);
-
-    // search
-    const q = query.trim().toLowerCase();
-    if (q) data = data.filter((r) => (r.name || '').toLowerCase().includes(q));
-
-    // apply numeric tag only (avoid “my” affecting facet counts)
-    if (typeof selectedTagId === 'number') {
-      const tagIdStr = String(selectedTagId);
-      data = data.filter((r) => r.countsByTag && Number(r.countsByTag[tagIdStr]) > 0);
-    }
-
-    return data;
-  }, [rows, applyLocationFilter, query, selectedTagId]);
+  /* Facets use the same predicates without the My ratings restriction. */
+  const rowsForFacetCounts = useMemo(() => rows.filter(row => matchesWingdexRestaurant(row,
+    { query, selectedTagId: selectedTagId === 'my' ? null : selectedTagId, locationMode, radiusMiles, stateCodeFilter },
+    { hasCoordinates: coords?.latitude != null && coords?.longitude != null })),
+    [rows, query, selectedTagId, locationMode, radiusMiles, stateCodeFilter, coords?.latitude, coords?.longitude]);
 
   const tagsForFilter = useMemo(() => {
     const mapSets = new Map();
@@ -889,77 +853,25 @@ export default function PublicRatingsScreen() {
       .slice(0, 25);
   }, [rowsForFacetCounts, tagNameById]);
 
-  /* ---------- MAIN LIST (FILTER + SORT) ---------- */
-  const filtered = useMemo(() => {
-    let data = applyLocationFilter(rows);
-
-    // search
-    const q = query.trim().toLowerCase();
-    if (q) data = data.filter((r) => (r.name || '').toLowerCase().includes(q));
-
-    // "Rated by you"
-    if (selectedTagId === 'my') {
-      return data
-        .filter((r) => r.ratedByMe)
-        .slice()
-        .sort((a, b) => (b.myAvgWeight ?? b.avgWeight ?? 0) - (a.myAvgWeight ?? a.avgWeight ?? 0));
-    }
-
-    // concrete tag
-    if (typeof selectedTagId === 'number') {
-      const tagIdStr = String(selectedTagId);
-      return data
-        .filter((r) => r.countsByTag && Number(r.countsByTag[tagIdStr]) > 0)
-        .slice()
-        .sort((a, b) => (b.avgWeight ?? 0) - (a.avgWeight ?? 0));
-    }
-
-    // default: rated spots first by score; then unrated by distance
-    return data.slice().sort((a, b) => {
-      const aHas = (a.count ?? 0) > 0;
-      const bHas = (b.count ?? 0) > 0;
-
-      if (aHas && !bHas) return -1;
-      if (!aHas && bHas) return 1;
-
-      if (aHas && bHas) return (b.avgWeight ?? 0) - (a.avgWeight ?? 0);
-
-      const aDist = Number.isFinite(Number(a.distanceMi)) ? a.distanceMi : Infinity;
-      const bDist = Number.isFinite(Number(b.distanceMi)) ? b.distanceMi : Infinity;
-      return aDist - bDist;
+  /* Shared selection survives savedView changes; pipeline precedes virtualization. */
+  const selection = useMemo(() => ({ sort: discoverySort, query, selectedTagId, locationMode, radiusMiles, stateCodeFilter }), [discoverySort, query, selectedTagId, locationMode, radiusMiles, stateCodeFilter]);
+  const collectionContext = useMemo(() => ({ pictureCounts, hasCoordinates: coords?.latitude != null && coords?.longitude != null }), [pictureCounts, coords?.latitude, coords?.longitude]);
+  const filtered = useMemo(() => selectWingdexCollection(rows, selection, collectionContext), [rows, selection, collectionContext]);
+  const discoveryRows = filtered;
+  const savedRows = useMemo(() => {
+    const complete = new Map(rows.map(row => [row.destination_id, row]));
+    return (saved.listRows || []).map(row => {
+      const enriched = { ...row, ...complete.get(row.destination_id) };
+      const distanceMi = collectionContext.hasCoordinates && enriched.lat != null && enriched.lng != null
+        ? haversineM(coords.latitude, coords.longitude, enriched.lat, enriched.lng) / 1609.34 : null;
+      return { ...enriched, stateCode: enriched.stateCode || deriveStateCode(enriched.address), town: enriched.town || deriveTown(enriched.address), distanceMi };
     });
-  }, [rows, applyLocationFilter, query, selectedTagId]);
-
-  const discoveryRows = useMemo(() => {
-    if (discoverySort === 'overall') return filtered;
-    return filtered.slice().sort((a, b) => {
-      if (discoverySort === 'nearest') {
-        const distance = (row) => row.distanceMi != null && Number.isFinite(Number(row.distanceMi)) ? Number(row.distanceMi) : Infinity;
-        return distance(a) - distance(b);
-      }
-      if (discoverySort === 'photos') return (pictureCounts[String(b.destination_id)] || 0) - (pictureCounts[String(a.destination_id)] || 0);
-      return (b.count || 0) - (a.count || 0);
-    });
-  }, [filtered, discoverySort, pictureCounts]);
-
-  const savedRows = useMemo(() => (saved.listRows || []).map((row) => ({
-    ...row,
-    stateCode: row.stateCode || deriveStateCode(row.address),
-    town: row.town || deriveTown(row.address),
-    distanceMi: null,
-  })), [saved.listRows]);
-
-  const savedVisibleRows = useMemo(() => {
-    const text = query.trim().toLowerCase();
-    return savedRows.filter((row) => {
-      if (!text) return true;
-      return [row.name, row.address, row.town, row.stateCode]
-        .filter(Boolean)
-        .some((value) => String(value).toLowerCase().includes(text));
-    });
-  }, [query, savedRows]);
-
+  }, [saved.listRows, rows, collectionContext.hasCoordinates, coords?.latitude, coords?.longitude]);
+  const savedVisibleRows = useMemo(() => selectWingdexCollection(savedRows, selection, collectionContext), [savedRows, selection, collectionContext]);
   const displayedRows = savedView === 'discover' ? discoveryRows : savedVisibleRows;
+  const filteredEmpty = wingdexEmptyState((savedView === 'discover' ? rows : savedRows).length, selection) === 'filtered';
+  const clearFilters = () => { setQuery(''); setSelectedTagId(null); setLocationMode('all'); setStateCodeFilter(null); };
+  const resetSelections = () => { setDiscoverySort(WINGDEX_SELECTION_DEFAULTS.sort); setRadiusMiles(WINGDEX_SELECTION_DEFAULTS.radiusMiles); setLocationMode(WINGDEX_SELECTION_DEFAULTS.locationMode); setQuery(''); setSelectedTagId(null); setStateCodeFilter(null); };
 
   useEffect(() => {
     filteredRef.current = filtered;
@@ -1063,12 +975,12 @@ export default function PublicRatingsScreen() {
     setTagNameById(tagNameMapObj);
 
     // ratings
-    const { data, error } = await supabase.from('destination_ratings').select(`
+    const { data, error } = await readAllWingdexRows(() => supabase.from('destination_ratings').select(`
       destination_id,
       user_id,
       crispiness, sauce, meat, overall, weight_score, tag_id, is_buffacoin,
       destinations!destination_ratings_destination_id_fkey ( name, lat, lng, address )
-    `);
+    `).order('id'), { isCurrent });
     if (error) throw error;
 
     if (!isCurrent()) return;
@@ -1199,11 +1111,12 @@ export default function PublicRatingsScreen() {
     }
 
     // unrated destinations
-    const { data: allDest, error: destErr } = await supabase
+    const { data: allDest, error: destErr } = await readAllWingdexRows(() => supabase
       .from('destinations')
-      .select('id, name, lat, lng, address');
+      .select('id, name, lat, lng, address').order('id'), { isCurrent });
 
     if (!isCurrent()) return;
+    if (destErr) throw destErr;
     const unratedList = [];
     if (!destErr && Array.isArray(allDest)) {
       for (const d of allDest) {
@@ -2163,7 +2076,8 @@ export default function PublicRatingsScreen() {
     const distText =
       locationMode === 'radius' && Number.isFinite(Number(item.distanceMi))
         ? ` • ${fmt2(item.distanceMi)} mi`
-        : '';    const ratingsLabel = hasRatings
+        : '';
+    const ratingsLabel = hasRatings
       ? `${item.count} rating${item.count === 1 ? '' : 's'}`
       : 'No ratings yet';
 
@@ -2189,7 +2103,7 @@ export default function PublicRatingsScreen() {
         onPress={() => openDestinationDetail(item)}
       >
       <Card.Content style={styles.cardContent}>
-        {approvedThumbnails[destIdStr] ? <WingShotImage approved uri={approvedThumbnails[destIdStr]} style={{ width: '100%', height: undefined, aspectRatio: 16 / 9, borderRadius: 12, marginBottom: 10 }} /> : null}
+        {approvedThumbnails[destIdStr] ? <WingdexPhotoGallery key={destIdStr} restaurant={item} embedded compact onPhotoChange={() => setPhotoRevision((n) => n + 1)} /> : null}
         <View style={styles.restaurantHeader}>
           <Text variant="titleSmall" style={[styles.nameCentered, styles.restaurantCardName]}>{item.name}</Text>
           <View style={styles.restaurantPhotoCount}>
@@ -2376,7 +2290,8 @@ export default function PublicRatingsScreen() {
         <Animated.View
           collapsable={false}
           onLayout={(e) => {
-            const h = e?.nativeEvent?.layout?.height ?? 0;            if (h && h !== headerHeight) setHeaderHeight(h);
+            const h = e?.nativeEvent?.layout?.height ?? 0;
+            if (h && h !== headerHeight) setHeaderHeight(h);
           }}
           style={[
             styles.header,
@@ -2478,14 +2393,20 @@ export default function PublicRatingsScreen() {
             <MaterialCommunityIcons name="tune-variant" size={18} color={colors.primary} />
             <Text style={styles.toolbarLabel}>Filters{activeFilterCount ? ` (${activeFilterCount})` : ''}</Text>
           </Pressable>
-          <Pressable accessibilityRole="button" accessibilityLabel={`Sort: ${discoverySort}`} onPress={() => setFiltersOpen(true)} style={[styles.toolbarAction, { backgroundColor: colors.surfaceVariant }]}>
-            <Text style={styles.toolbarLabel}>{({ overall: 'Score', nearest: 'Near', ratings: 'Votes', photos: 'Photos' })[discoverySort]}</Text>
+          <Pressable accessibilityRole="button" accessibilityLabel={`Sort: ${discoverySort}`} testID="wingdex-sort-entry" onPress={() => setSortOpen(true)} style={[styles.toolbarAction, { backgroundColor: colors.surfaceVariant }]}>
+            <Text style={styles.toolbarLabel}>Sort: {({ overall: 'Score', nearest: 'Near', ratings: 'Votes', photos: 'Photos' })[discoverySort]}</Text>
             <MaterialCommunityIcons name="chevron-down" size={16} color={colors.onSurface} />
           </Pressable>
           {ENABLE_WING_JURY ? <Pressable testID="wingdex-wing-jury-entry" accessibilityRole="button" accessibilityLabel="Wing Jury" onPress={() => router.push('/wing-jury')} style={[styles.toolbarAction, { borderWidth: 1, borderColor: colors.primary }]}>
             <Text style={[styles.toolbarLabel, { color: colors.primary }]}>Wing Jury</Text>
           </Pressable> : null}
         </View>
+        {activeFilterCount ? <View style={[styles.filterControls, { marginTop: 8 }]} accessibilityLabel="Active filters">
+          {locationMode !== 'all' ? <Text>{locationLabel}</Text> : null}
+          {selectedTagId != null ? <Text>{selectedTagId === 'my' ? 'My ratings' : tagNameById[selectedTagId] || 'Rating tag'}</Text> : null}
+          {query.trim() ? <Text>Search: {query.trim()}</Text> : null}
+          <Button compact onPress={clearFilters}>Clear filters</Button>
+        </View> : null}
         <Divider style={{ marginTop: 10, marginBottom: 6 }} />
         {pendingCoinOperation ? <Button
           testID="buffacoin-check-status"
@@ -2499,7 +2420,7 @@ export default function PublicRatingsScreen() {
         </ScrollView>
       </Animated.View>
 
-      {loading || (savedView !== 'discover' && saved.listStatus === 'loading' && displayedRows.length === 0) ? (
+      {loading || (savedView !== 'discover' && (saved.listStatus === 'loading' || saved.listKind !== savedView)) ? (
         <View style={styles.center}>
           <LoadingSkeleton rows={3} style={{ width: "90%", paddingTop: headerHeight }} />
           {loading && locationMode === 'radius' ? (
@@ -2541,6 +2462,9 @@ export default function PublicRatingsScreen() {
                 actionLabel="Try again"
                 onAction={() => void saved.loadList(savedView)}
               />
+            ) : filteredEmpty ? (
+              <FeedbackState style={styles.emptyState} icon="filter-off-outline" title="No restaurants match your filters"
+                body="Your restaurants are still here. Clear filters to see the full list." actionLabel="Clear filters" onAction={clearFilters} />
             ) : savedView !== 'discover' ? (
               <FeedbackState
                 style={styles.emptyState}
@@ -2875,7 +2799,7 @@ export default function PublicRatingsScreen() {
       </Portal>
       <Portal>
         <Dialog visible={filtersOpen} onDismiss={() => setFiltersOpen(false)} style={[styles.dialog, { maxHeight: viewportHeight - insets.top - insets.bottom - 32 }]}>
-          <Dialog.Title>Filters & sorting</Dialog.Title>
+          <Dialog.Title>Filters</Dialog.Title>
           <Dialog.ScrollArea style={{ paddingHorizontal: 16 }}>
             <ScrollView contentContainerStyle={{ paddingBottom: 16 }}>
                 <View style={styles.filterSectionHeader}>
@@ -2947,12 +2871,10 @@ export default function PublicRatingsScreen() {
                 </View>
                 </View>
 
-                <Text style={[styles.filterSectionTitle, { marginTop: 16 }]}>Sort & ratings</Text>
+                <Text style={[styles.filterSectionTitle, { marginTop: 16 }]}>Ratings</Text>
                 <View style={[styles.filterRail, { marginTop: 4 }]}>
                 <View style={styles.filterControls}>
-                  {[['overall', 'Score', 'Overall score'], ['nearest', 'Near', 'Nearest'], ['ratings', 'Votes', 'Most ratings'], ['photos', 'Photos', 'Most photos']].map(([value, label, accessibilityLabel]) => (
-                    <Chip key={value} maxFontSizeMultiplier={2} accessibilityLabel={accessibilityLabel} selected={discoverySort === value} onPress={() => setDiscoverySort(value)} style={[styles.chip, styles.filterChip]}>{label}</Chip>
-                  ))}
+
                   <Chip maxFontSizeMultiplier={2} accessibilityLabel="Rated by you" selected={selectedTagId === 'my'} onPress={() => setSelectedTagId(selectedTagId === 'my' ? null : 'my')} style={[styles.chip, styles.filterChip]}>My ratings</Chip>
                   {tagsForFilter.map((tag) => <Chip key={tag.id} maxFontSizeMultiplier={2} accessibilityLabel={tag.name} textStyle={{ flexShrink: 1 }} selected={selectedTagId === tag.id} onPress={() => setSelectedTagId(selectedTagId === tag.id ? null : tag.id)} style={[styles.chip, styles.filterChip]}>{tag.name}</Chip>)}
                 </View>
@@ -2960,8 +2882,21 @@ export default function PublicRatingsScreen() {
             </ScrollView>
           </Dialog.ScrollArea>
           <Dialog.Actions>
+            <Button onPress={clearFilters}>Clear filters</Button>
+            <Button onPress={resetSelections}>Reset all</Button>
             <Button mode="contained" onPress={() => setFiltersOpen(false)} contentStyle={{ minHeight: 48 }}>Show restaurants</Button>
           </Dialog.Actions>
+        </Dialog>
+      </Portal>
+      <Portal>
+        <Dialog visible={sortOpen} onDismiss={() => setSortOpen(false)} style={styles.dialog}>
+          <Dialog.Title>Sort</Dialog.Title>
+          <Dialog.Content><View style={styles.filterControls}>
+                  {[['overall', 'Score', 'Overall score'], ['nearest', 'Near', 'Nearest'], ['ratings', 'Votes', 'Most ratings'], ['photos', 'Photos', 'Most photos']].map(([value, label, accessibilityLabel]) => (
+                    <Chip key={value} maxFontSizeMultiplier={2} accessibilityLabel={accessibilityLabel} selected={discoverySort === value} onPress={() => setDiscoverySort(value)} style={[styles.chip, styles.filterChip]}>{label}</Chip>
+                  ))}
+          </View></Dialog.Content>
+          <Dialog.Actions><Button onPress={resetSelections}>Reset all</Button><Button mode="contained" onPress={() => setSortOpen(false)}>Done</Button></Dialog.Actions>
         </Dialog>
       </Portal>
       {/* Choose state dialog */}

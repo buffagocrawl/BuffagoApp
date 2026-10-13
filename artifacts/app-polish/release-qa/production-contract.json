@@ -1,0 +1,462 @@
+{
+  "tables": [
+    {
+      "acl": [
+        "postgres=arwdDxtm/postgres",
+        "service_role=r/postgres",
+        "authenticated=r/postgres"
+      ],
+      "rls": true,
+      "name": "wing_jury_photo_vote_counts"
+    },
+    {
+      "acl": [
+        "postgres=arwdDxtm/postgres",
+        "service_role=r/postgres",
+        "authenticated=ar/postgres"
+      ],
+      "rls": true,
+      "name": "wing_jury_votes"
+    },
+    {
+      "acl": [
+        "postgres=arwdDxtm/postgres",
+        "service_role=arwdDxtm/postgres",
+        "authenticated=arwd/postgres"
+      ],
+      "rls": true,
+      "name": "wing_media_photo_votes"
+    },
+    {
+      "acl": [
+        "postgres=arwdDxtm/postgres",
+        "service_role=arwdDxtm/postgres"
+      ],
+      "rls": true,
+      "name": "wing_media_submissions"
+    }
+  ],
+  "policies": [
+    {
+      "cmd": "INSERT",
+      "qual": null,
+      "roles": [
+        "authenticated"
+      ],
+      "tablename": "destination_suggestions",
+      "permissive": "PERMISSIVE",
+      "policyname": "destination_suggestions_insert_own",
+      "schemaname": "public",
+      "with_check": "(auth.uid() = user_id)"
+    },
+    {
+      "cmd": "SELECT",
+      "qual": "(auth.uid() = user_id)",
+      "roles": [
+        "authenticated"
+      ],
+      "tablename": "destination_suggestions",
+      "permissive": "PERMISSIVE",
+      "policyname": "destination_suggestions_select_own",
+      "schemaname": "public",
+      "with_check": null
+    },
+    {
+      "cmd": "DELETE",
+      "qual": "(( SELECT auth.uid() AS uid) = user_id)",
+      "roles": [
+        "authenticated"
+      ],
+      "tablename": "wing_media_photo_votes",
+      "permissive": "PERMISSIVE",
+      "policyname": "photo_votes_delete_own",
+      "schemaname": "public",
+      "with_check": null
+    },
+    {
+      "cmd": "INSERT",
+      "qual": null,
+      "roles": [
+        "authenticated"
+      ],
+      "tablename": "wing_media_photo_votes",
+      "permissive": "PERMISSIVE",
+      "policyname": "photo_votes_insert_own",
+      "schemaname": "public",
+      "with_check": "(( SELECT auth.uid() AS uid) = user_id)"
+    },
+    {
+      "cmd": "SELECT",
+      "qual": "(( SELECT auth.uid() AS uid) = user_id)",
+      "roles": [
+        "authenticated"
+      ],
+      "tablename": "wing_media_photo_votes",
+      "permissive": "PERMISSIVE",
+      "policyname": "photo_votes_select_own",
+      "schemaname": "public",
+      "with_check": null
+    },
+    {
+      "cmd": "UPDATE",
+      "qual": "(( SELECT auth.uid() AS uid) = user_id)",
+      "roles": [
+        "authenticated"
+      ],
+      "tablename": "wing_media_photo_votes",
+      "permissive": "PERMISSIVE",
+      "policyname": "photo_votes_update_own",
+      "schemaname": "public",
+      "with_check": "(( SELECT auth.uid() AS uid) = user_id)"
+    },
+    {
+      "cmd": "INSERT",
+      "qual": null,
+      "roles": [
+        "authenticated"
+      ],
+      "tablename": "wing_jury_votes",
+      "permissive": "PERMISSIVE",
+      "policyname": "wing_jury_votes_own_insert",
+      "schemaname": "public",
+      "with_check": "((user_id = ( SELECT auth.uid() AS uid)) AND (COALESCE(( SELECT (auth.jwt() ->> 'is_anonymous'::text)), 'false'::text) = 'false'::text))"
+    },
+    {
+      "cmd": "SELECT",
+      "qual": "((user_id = ( SELECT auth.uid() AS uid)) AND (COALESCE(( SELECT (auth.jwt() ->> 'is_anonymous'::text)), 'false'::text) = 'false'::text))",
+      "roles": [
+        "authenticated"
+      ],
+      "tablename": "wing_jury_votes",
+      "permissive": "PERMISSIVE",
+      "policyname": "wing_jury_votes_own_select",
+      "schemaname": "public",
+      "with_check": null
+    },
+    {
+      "cmd": "SELECT",
+      "qual": "((( SELECT auth.uid() AS uid) IS NOT NULL) AND (COALESCE(( SELECT (auth.jwt() ->> 'is_anonymous'::text)), 'false'::text) = 'false'::text) AND private.is_public_wing_jury_photo(submission_id))",
+      "roles": [
+        "authenticated"
+      ],
+      "tablename": "wing_jury_photo_vote_counts",
+      "permissive": "PERMISSIVE",
+      "policyname": "wing_jury_photo_vote_counts_public_select",
+      "schemaname": "public",
+      "with_check": null
+    }
+  ],
+  "triggers": [
+    {
+      "name": "wing_jury_votes_enforce_immutability",
+      "table": "wing_jury_votes",
+      "definition": "CREATE TRIGGER wing_jury_votes_enforce_immutability BEFORE DELETE OR UPDATE ON public.wing_jury_votes FOR EACH ROW EXECUTE FUNCTION private.enforce_wing_jury_vote_immutability()"
+    },
+    {
+      "name": "wing_jury_votes_refresh_counts",
+      "table": "wing_jury_votes",
+      "definition": "CREATE TRIGGER wing_jury_votes_refresh_counts AFTER INSERT OR DELETE ON public.wing_jury_votes FOR EACH ROW EXECUTE FUNCTION private.refresh_wing_jury_photo_vote_counts()"
+    },
+    {
+      "name": "wing_jury_votes_validate_insert",
+      "table": "wing_jury_votes",
+      "definition": "CREATE TRIGGER wing_jury_votes_validate_insert BEFORE INSERT ON public.wing_jury_votes FOR EACH ROW EXECUTE FUNCTION private.validate_wing_jury_vote_insert()"
+    },
+    {
+      "name": "trg_refresh_wing_media_photo_vote_counts",
+      "table": "wing_media_photo_votes",
+      "definition": "CREATE TRIGGER trg_refresh_wing_media_photo_vote_counts AFTER INSERT OR DELETE OR UPDATE ON public.wing_media_photo_votes FOR EACH ROW EXECUTE FUNCTION private.refresh_wing_media_photo_vote_counts()"
+    },
+    {
+      "name": "trg_validate_wing_media_photo_vote",
+      "table": "wing_media_photo_votes",
+      "definition": "CREATE TRIGGER trg_validate_wing_media_photo_vote BEFORE INSERT OR UPDATE ON public.wing_media_photo_votes FOR EACH ROW EXECUTE FUNCTION private.validate_wing_media_photo_vote()"
+    },
+    {
+      "name": "mango_clear_ineligible_priority",
+      "table": "wing_media_submissions",
+      "definition": "CREATE TRIGGER mango_clear_ineligible_priority BEFORE UPDATE OF status, featured_at, is_publish_priority ON public.wing_media_submissions FOR EACH ROW EXECUTE FUNCTION mango_clear_ineligible_priority()"
+    },
+    {
+      "name": "wing_media_submissions_owner_pseudonymization",
+      "table": "wing_media_submissions",
+      "definition": "CREATE TRIGGER wing_media_submissions_owner_pseudonymization BEFORE UPDATE OF user_id ON public.wing_media_submissions FOR EACH ROW EXECUTE FUNCTION wing_apply_owner_pseudonymization()"
+    },
+    {
+      "name": "wing_photo_approval_guard",
+      "table": "wing_media_submissions",
+      "definition": "CREATE TRIGGER wing_photo_approval_guard BEFORE UPDATE OF status ON public.wing_media_submissions FOR EACH ROW EXECUTE FUNCTION guard_wing_photo_approval()"
+    },
+    {
+      "name": "wing_photo_upload_derivatives",
+      "table": "wing_media_submissions",
+      "definition": "CREATE TRIGGER wing_photo_upload_derivatives AFTER INSERT ON public.wing_media_submissions FOR EACH ROW EXECUTE FUNCTION enqueue_wing_photo_upload_derivatives()"
+    }
+  ],
+  "functions": [
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "args": "",
+      "name": "get_buffago_growth_snapshot",
+      "owner": "postgres",
+      "schema": "public",
+      "definition": "CREATE OR REPLACE FUNCTION public.get_buffago_growth_snapshot()\n RETURNS jsonb\n LANGUAGE sql\n SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$\nwith\nclock as (\n  select\n    now() as ts,\n    (now() at time zone 'America/New_York')::date as local_today\n),\nrating_counts as (\n  select\n    count(*)::int as total,\n    count(*) filter (\n      where created_at >= (select ts from clock) - interval '24 hours'\n    )::int as current_24h,\n    count(*) filter (\n      where created_at >= (select ts from clock) - interval '48 hours'\n        and created_at < (select ts from clock) - interval '24 hours'\n    )::int as previous_24h,\n    count(*) filter (\n      where created_at >= (select ts from clock) - interval '7 days'\n    )::int as current_7d,\n    count(*) filter (\n      where created_at >= (select ts from clock) - interval '14 days'\n        and created_at < (select ts from clock) - interval '7 days'\n    )::int as previous_7d\n  from public.destination_ratings\n),\nactive_counts as (\n  select\n    count(distinct coalesce(user_id::text, anonymous_id)) filter (\n      where event_name = 'app_opened'\n        and occurred_at >= (select ts from clock) - interval '24 hours'\n        and coalesce(user_id::text, anonymous_id) is not null\n    )::int as current_24h,\n    count(distinct coalesce(user_id::text, anonymous_id)) filter (\n      where event_name = 'app_opened'\n        and occurred_at >= (select ts from clock) - interval '48 hours'\n        and occurred_at < (select ts from clock) - interval '24 hours'\n        and coalesce(user_id::text, anonymous_id) is not null\n    )::int as previous_24h,\n    count(distinct coalesce(user_id::text, anonymous_id)) filter (\n      where event_name = 'app_opened'\n        and occurred_at >= (select ts from clock) - interval '7 days'\n        and coalesce(user_id::text, anonymous_id) is not null\n    )::int as current_7d,\n    count(distinct coalesce(user_id::text, anonymous_id)) filter (\n      where event_name = 'app_opened'\n        and occurred_at >= (select ts from clock) - interval '14 days'\n        and occurred_at < (select ts from clock) - interval '7 days'\n        and coalesce(user_id::text, anonymous_id) is not null\n    )::int as previous_7d\n  from buffago_growth_internal.external_mobile_opens\n),\nnew_user_counts as (\n  select\n    count(*) filter (\n      where created_at >= (select ts from clock) - interval '7 days'\n    )::int as current_7d,\n    count(*) filter (\n      where created_at >= (select ts from clock) - interval '14 days'\n        and created_at < (select ts from clock) - interval '7 days'\n    )::int as previous_7d\n  from public.users\n),\nfeedback_counts as (\n  select\n    count(*) filter (\n      where coalesce(lower(status), 'open') not in ('closed','resolved','done')\n    )::int as open_total,\n    count(*) filter (\n      where coalesce(lower(status), 'open') not in ('closed','resolved','done')\n        and created_at >= (select ts from clock) - interval '24 hours'\n    )::int as new_open_24h,\n    min(created_at) filter (\n      where coalesce(lower(status), 'open') not in ('closed','resolved','done')\n    ) as oldest_open_at\n  from public.user_feedback\n),\nios_latest as (\n  select downloads_total, downloads_daily, store_rating, store_rating_count, metric_date, fetched_at\n  from public.buffago_store_metrics_daily\n  where platform = 'ios'\n  order by metric_date desc, fetched_at desc\n  limit 1\n),\nandroid_latest as (\n  select downloads_total, downloads_daily, store_rating, store_rating_count, metric_date, fetched_at\n  from public.buffago_store_metrics_daily\n  where platform = 'android'\n  order by metric_date desc, fetched_at desc\n  limit 1\n),\nstore_windows as (\n  select\n    platform,\n    count(downloads_daily) filter (\n      where metric_date between (select local_today from clock) - 6 and (select local_today from clock)\n    )::int as current_days_available,\n    sum(downloads_daily) filter (\n      where metric_date between (select local_today from clock) - 6 and (select local_today from clock)\n    )::bigint as current_7d,\n    count(downloads_daily) filter (\n      where metric_date between (select local_today from clock) - 13 and (select local_today from clock) - 7\n    )::int as previous_days_available,\n    sum(downloads_daily) filter (\n      where metric_date between (select local_today from clock) - 13 and (select local_today from clock) - 7\n    )::bigint as previous_7d\n  from public.buffago_store_metrics_daily\n  where metric_date between (select local_today from clock) - 13 and (select local_today from clock)\n  group by platform\n),\ndays as (\n  select generate_series(\n    (select local_today from clock) - 13,\n    (select local_today from clock),\n    interval '1 day'\n  )::date as day\n),\ndaily_ratings as (\n  select\n    (created_at at time zone 'America/New_York')::date as day,\n    count(*)::int as value\n  from public.destination_ratings\n  where created_at >= ((select local_today from clock) - 13)::timestamp at time zone 'America/New_York'\n  group by 1\n),\ndaily_active as (\n  select\n    day,\n    count(distinct actor)::int as value\n  from (\n    select\n      (occurred_at at time zone 'America/New_York')::date as day,\n      coalesce(user_id::text, anonymous_id) as actor\n    from buffago_growth_internal.external_mobile_opens\n    where event_name = 'app_opened'\n      and occurred_at >= ((select local_today from clock) - 13)::timestamp at time zone 'America/New_York'\n      and coalesce(user_id::text, anonymous_id) is not null\n  ) x\n  group by day\n),\ndaily_new_users as (\n  select\n    (created_at at time zone 'America/New_York')::date as day,\n    count(*)::int as value\n  from public.users\n  where created_at >= ((select local_today from clock) - 13)::timestamp at time zone 'America/New_York'\n  group by 1\n),\ndaily_store as (\n  select\n    metric_date as day,\n    max(downloads_daily) filter (where platform='ios')::int as ios_downloads,\n    max(downloads_daily) filter (where platform='android')::int as android_downloads\n  from public.buffago_store_metrics_daily\n  where metric_date between (select local_today from clock) - 13 and (select local_today from clock)\n  group by metric_date\n),\nhistory as (\n  select jsonb_agg(\n    jsonb_build_object(\n      'date', d.day,\n      'wing_ratings', coalesce(r.value, 0),\n      'active_users', coalesce(a.value, 0),\n      'new_users', coalesce(u.value, 0),\n      'ios_downloads', s.ios_downloads,\n      'android_downloads', s.android_downloads\n    )\n    order by d.day\n  ) as items\n  from days d\n  left join daily_ratings r on r.day = d.day\n  left join daily_active a on a.day = d.day\n  left join daily_new_users u on u.day = d.day\n  left join daily_store s on s.day = d.day\n)\nselect jsonb_build_object(\n  'generated_at', (select ts from clock), 'recent_activity', public.buffago_growth_recent_activity(), 'marketing_weekly_goal', public.buffago_growth_weekly_goal(),\n  'timezone', 'America/New_York',\n  'product_pulse', public.buffago_product_pulse_operations() || jsonb_build_object('pending_restaurants', jsonb_build_object('total', public.mango_restaurant_pending_count())) || (public.buffago_growth_command_center_redesign()->'product_pulse') || jsonb_build_object(\n    'wing_ratings', jsonb_build_object(\n      'total', r.total,\n      'last_24h', r.current_24h,\n      'previous_24h', r.previous_24h,\n      'change_pct',\n        case\n          when r.previous_24h = 0 then null\n          else round(((r.current_24h - r.previous_24h)::numeric / r.previous_24h::numeric) * 100, 1)\n        end,\n      'direction',\n        case\n          when r.current_24h > r.previous_24h then 'up'\n          when r.current_24h < r.previous_24h then 'down'\n          else 'flat'\n        end\n    ),\n    'active_users', jsonb_build_object(\n      'definition', 'External mobile distinct coalesce(user_id, anonymous_id) app_opened in rolling 24h; internal users and historical devices excluded',\n      'last_24h', a.current_24h,\n      'previous_24h', a.previous_24h,\n      'change_pct',\n        case\n          when a.previous_24h = 0 then null\n          else round(((a.current_24h - a.previous_24h)::numeric / a.previous_24h::numeric) * 100, 1)\n        end,\n      'direction',\n        case\n          when a.current_24h > a.previous_24h then 'up'\n          when a.current_24h < a.previous_24h then 'down'\n          else 'flat'\n        end\n    ),\n    'feedback', jsonb_build_object(\n      'open_total', f.open_total,\n      'new_open_24h', f.new_open_24h,\n      'oldest_open_at', f.oldest_open_at\n    ),\n    'store', jsonb_build_object(\n      'ios', jsonb_build_object(\n        'downloads_total', i.downloads_total,\n        'downloads_daily', i.downloads_daily,\n        'store_rating', i.store_rating,\n        'store_rating_count', i.store_rating_count,\n        'metric_date', i.metric_date,\n        'fetched_at', i.fetched_at\n      ),\n      'android', jsonb_build_object(\n        'downloads_total', d.downloads_total,\n        'downloads_daily', d.downloads_daily,\n        'store_rating', d.store_rating,\n        'store_rating_count', d.store_rating_count,\n        'metric_date', d.metric_date,\n        'fetched_at', d.fetched_at\n      )\n    )\n  ),\n  'marketing', public.buffago_growth_command_center_redesign()->'marketing', 'growth_7d', jsonb_build_object(\n    'window', 'rolling_7d_vs_previous_7d',\n    'wing_ratings', jsonb_build_object(\n      'current', r.current_7d,\n      'previous', r.previous_7d,\n      'change_pct',\n        case\n          when r.previous_7d = 0 then null\n          else round(((r.current_7d - r.previous_7d)::numeric / r.previous_7d::numeric) * 100, 1)\n        end,\n      'direction',\n        case\n          when r.current_7d > r.previous_7d then 'up'\n          when r.current_7d < r.previous_7d then 'down'\n          else 'flat'\n        end\n    ),\n    'active_users', jsonb_build_object(\n      'current', a.current_7d,\n      'previous', a.previous_7d,\n      'change_pct',\n        case\n          when a.previous_7d = 0 then null\n          else round(((a.current_7d - a.previous_7d)::numeric / a.previous_7d::numeric) * 100, 1)\n        end,\n      'direction',\n        case\n          when a.current_7d > a.previous_7d then 'up'\n          when a.current_7d < a.previous_7d then 'down'\n          else 'flat'\n        end\n    ),\n    'new_users', jsonb_build_object(\n      'current', n.current_7d,\n      'previous', n.previous_7d,\n      'change_pct',\n        case\n          when n.previous_7d = 0 then null\n          else round(((n.current_7d - n.previous_7d)::numeric / n.previous_7d::numeric) * 100, 1)\n        end,\n      'direction',\n        case\n          when n.current_7d > n.previous_7d then 'up'\n          when n.current_7d < n.previous_7d then 'down'\n          else 'flat'\n        end\n    ),\n    'downloads', jsonb_build_object(\n      'ios', jsonb_build_object(\n        'current', iw.current_7d,\n        'previous', iw.previous_7d,\n        'current_days_available', coalesce(iw.current_days_available, 0),\n        'previous_days_available', coalesce(iw.previous_days_available, 0),\n        'change_pct',\n          case\n            when iw.previous_7d is null or iw.previous_7d = 0 or iw.current_7d is null then null\n            else round(((iw.current_7d - iw.previous_7d)::numeric / iw.previous_7d::numeric) * 100, 1)\n          end\n      ),\n      'android', jsonb_build_object(\n        'current', aw.current_7d,\n        'previous', aw.previous_7d,\n        'current_days_available', coalesce(aw.current_days_available, 0),\n        'previous_days_available', coalesce(aw.previous_days_available, 0),\n        'change_pct',\n          case\n            when aw.previous_7d is null or aw.previous_7d = 0 or aw.current_7d is null then null\n            else round(((aw.current_7d - aw.previous_7d)::numeric / aw.previous_7d::numeric) * 100, 1)\n          end\n      )\n    )\n  ),\n  'history_14d', h.items\n)\nfrom rating_counts r\ncross join active_counts a\ncross join new_user_counts n\ncross join feedback_counts f\ncross join history h\nleft join ios_latest i on true\nleft join android_latest d on true\nleft join store_windows iw on iw.platform = 'ios'\nleft join store_windows aw on aw.platform = 'android';\n$function$\n"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "args": "",
+      "name": "buffago_product_pulse_operations",
+      "owner": "postgres",
+      "schema": "public",
+      "definition": "CREATE OR REPLACE FUNCTION public.buffago_product_pulse_operations()\n RETURNS jsonb\n LANGUAGE sql\n STABLE\n SET search_path TO 'public', 'pg_temp'\nAS $function$\nwith windows(name, starts_at, ends_at) as (\n  values ('all_time', null::timestamptz, null::timestamptz),\n         ('last_24h', now() - interval '24 hours', null::timestamptz),\n         ('previous_24h', now() - interval '48 hours', now() - interval '24 hours')\n), counts as (\n  select w.name,\n    jsonb_build_object(\n      'total', count(distinct e.anonymous_id),\n      'ios', count(distinct e.anonymous_id) filter (where e.platform = 'ios'),\n      'android', count(distinct e.anonymous_id) filter (where e.platform = 'android')\n    ) as metrics\n  from windows w left join public.user_events e\n    on e.event_name = 'app_opened'\n    and (w.starts_at is null or e.occurred_at >= w.starts_at)\n    and (w.ends_at is null or e.occurred_at < w.ends_at)\n  group by w.name\n)\nselect jsonb_build_object(\n  'device_opens', (select jsonb_object_agg(name, metrics) from counts),\n  'pending_photos', jsonb_build_object('total', (\n    select count(*) from public.wing_media_submissions\n    where media_type = 'photo' and status = 'in_review'\n  ))\n);\n$function$\n"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "args": "",
+      "name": "validate_wing_media_photo_vote",
+      "owner": "postgres",
+      "schema": "private",
+      "definition": "CREATE OR REPLACE FUNCTION private.validate_wing_media_photo_vote()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_photo public.wing_media_submissions%rowtype;\n  -- Match JavaScript String.trim in the gallery, including non-ASCII whitespace.\n  v_consent_whitespace constant text := U&'\\0009\\000a\\000b\\000c\\000d\\0020\\00a0\\1680\\2000\\2001\\2002\\2003\\2004\\2005\\2006\\2007\\2008\\2009\\200a\\2028\\2029\\202f\\205f\\3000\\feff';\nbegin\n  if tg_op = 'UPDATE' and (new.submission_id is distinct from old.submission_id\n                           or new.user_id is distinct from old.user_id) then\n    raise exception 'photo vote identity cannot change' using errcode = '42501';\n  end if;\n\n  if new.user_id is distinct from (select auth.uid())\n     or coalesce((auth.jwt()->>'is_anonymous')::boolean, false) then\n    raise exception 'photo vote requires a signed-in user' using errcode = '42501';\n  end if;\n\n  select * into v_photo\n  from public.wing_media_submissions\n  where id = new.submission_id;\n\n  if not found or v_photo.media_type is distinct from 'photo'\n     or v_photo.status is distinct from 'approved'\n     or v_photo.user_id is null or v_photo.owner_deleted_at is not null\n     or v_photo.withdrawn_at is not null\n     or nullif(pg_catalog.btrim(v_photo.consent_version, v_consent_whitespace), '') is null\n     or v_photo.consented_at is null or v_photo.consented_at > now()\n     or v_photo.attribution_preference not in ('username', 'display_name', 'anonymous')\n     or v_photo.processed_storage_path is distinct from\n        'processed/' || v_photo.id::text || '/primary'\n     or not exists (\n       select 1 from storage.objects object\n       where object.bucket_id = 'wing-submissions'\n         and object.name = v_photo.processed_storage_path\n     ) then\n    raise exception 'photo is not eligible for voting' using errcode = '42501';\n  end if;\n\n  new.updated_at := now();\n  return new;\nend;\n$function$\n"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "args": "",
+      "name": "refresh_wing_media_photo_vote_counts",
+      "owner": "postgres",
+      "schema": "private",
+      "definition": "CREATE OR REPLACE FUNCTION private.refresh_wing_media_photo_vote_counts()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_submission_id uuid;\n  -- Keep the post-lock eligibility check identical to the validation above.\n  v_consent_whitespace constant text := U&'\\0009\\000a\\000b\\000c\\000d\\0020\\00a0\\1680\\2000\\2001\\2002\\2003\\2004\\2005\\2006\\2007\\2008\\2009\\200a\\2028\\2029\\202f\\205f\\3000\\feff';\nbegin\n  v_submission_id := coalesce(new.submission_id, old.submission_id);\n  perform pg_catalog.pg_advisory_xact_lock(\n    pg_catalog.hashtextextended('wing-photo-votes:' || v_submission_id::text, 0)\n  );\n\n  update public.wing_media_submissions s\n  set like_count = (\n        select count(*)::integer from public.wing_media_photo_votes v\n        where v.submission_id = v_submission_id and v.vote = 1\n      ),\n      dislike_count = (\n        select count(*)::integer from public.wing_media_photo_votes v\n        where v.submission_id = v_submission_id and v.vote = -1\n      )\n  where s.id = v_submission_id\n    and (tg_op = 'DELETE' or (\n      s.media_type = 'photo' and s.status = 'approved'\n      and s.user_id is not null and s.owner_deleted_at is null\n      and s.withdrawn_at is null\n      and nullif(pg_catalog.btrim(s.consent_version, v_consent_whitespace), '') is not null\n      and s.consented_at <= now()\n      and s.attribution_preference in ('username', 'display_name', 'anonymous')\n      and s.processed_storage_path = 'processed/' || s.id::text || '/primary'\n      and exists (\n        select 1 from storage.objects object\n        where object.bucket_id = 'wing-submissions'\n          and object.name = s.processed_storage_path\n      )\n    ));\n  if not found and tg_op <> 'DELETE' then\n    raise exception 'photo is not eligible for voting' using errcode = '42501';\n  end if;\n\n  return coalesce(new, old);\nend;\n$function$\n"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "args": "",
+      "name": "require_authenticated_user",
+      "owner": "postgres",
+      "schema": "private",
+      "definition": "CREATE OR REPLACE FUNCTION private.require_authenticated_user()\n RETURNS uuid\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO 'pg_catalog'\nAS $function$\r\ndeclare\r\n  v_user_id uuid := auth.uid();\r\n  v_anonymous boolean := coalesce((auth.jwt()->>'is_anonymous')::boolean, false);\r\nbegin\r\n  if v_user_id is null or v_anonymous then\r\n    raise exception 'authentication_required' using errcode = '42501';\r\n  end if;\r\n  return v_user_id;\r\nend;\r\n$function$\n"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres"
+      ],
+      "args": "p_submission_id uuid",
+      "name": "is_public_wing_jury_photo",
+      "owner": "postgres",
+      "schema": "private",
+      "definition": "CREATE OR REPLACE FUNCTION private.is_public_wing_jury_photo(p_submission_id uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'pg_catalog'\nAS $function$\r\n  select exists (\r\n    select 1\r\n      from public.wing_media_submissions photo\r\n     where photo.id = p_submission_id\r\n       and photo.media_type = 'photo'\r\n       and photo.status = 'approved'\r\n       and photo.user_id is not null\r\n       and photo.owner_deleted_at is null\r\n       and photo.withdrawn_at is null\r\n       -- Match JavaScript trim and the fingerprint-matched gallery boundary.\r\n       and nullif(btrim(photo.consent_version, U&'\\0009\\000a\\000b\\000c\\000d\\0020\\00a0\\1680\\2000\\2001\\2002\\2003\\2004\\2005\\2006\\2007\\2008\\2009\\200a\\2028\\2029\\202f\\205f\\3000\\feff'), '') is not null\r\n       and photo.consented_at <= now()\r\n       and photo.attribution_preference in ('username', 'display_name', 'anonymous')\r\n       and photo.processed_storage_path = 'processed/' || photo.id::text || '/primary'\r\n       and exists (\r\n         select 1 from storage.objects object\r\n          where object.bucket_id = 'wing-submissions'\r\n            and object.name = photo.processed_storage_path\r\n            and object.archived_at is null\r\n            and object.is_delete_marker = false\r\n       )\r\n  );\r\n$function$\n"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "args": "",
+      "name": "validate_wing_jury_vote_insert",
+      "owner": "postgres",
+      "schema": "private",
+      "definition": "CREATE OR REPLACE FUNCTION private.validate_wing_jury_vote_insert()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog'\nAS $function$\r\ndeclare\r\n  v_user_id uuid := private.require_authenticated_user();\r\nbegin\r\n  if new.user_id is distinct from v_user_id then\r\n    raise exception 'wing_jury_vote_owner_mismatch' using errcode = '42501';\r\n  end if;\r\n  -- Hold eligibility metadata steady until the vote and its counts commit.\r\n  perform 1 from public.wing_media_submissions photo\r\n   where photo.id = new.submission_id for share;\r\n  perform 1 from storage.objects object\r\n   where object.bucket_id = 'wing-submissions'\r\n     and object.name = 'processed/' || new.submission_id::text || '/primary'\r\n   for share;\r\n  if not private.is_public_wing_jury_photo(new.submission_id) then\r\n    raise exception 'photo_is_not_eligible_for_wing_jury' using errcode = '42501';\r\n  end if;\r\n  return new;\r\nend;\r\n$function$\n"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "args": "",
+      "name": "refresh_wing_jury_photo_vote_counts",
+      "owner": "postgres",
+      "schema": "private",
+      "definition": "CREATE OR REPLACE FUNCTION private.refresh_wing_jury_photo_vote_counts()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog'\nAS $function$\r\ndeclare\r\n  v_submission_id uuid := new.submission_id;\r\nbegin\r\n  -- Atomic row arithmetic serializes concurrent changes without recounting a\r\n  -- potentially stale statement snapshot. DELETE is limited to parent cascades.\r\n  if tg_op = 'DELETE' then\r\n    -- During media cascade the count row is also deleted; do not recreate it\r\n    -- or depend on FK-trigger ordering. Auth cascade retains media and decrements.\r\n    if not exists(select 1 from public.wing_media_submissions where id=old.submission_id) then\r\n      return old;\r\n    end if;\r\n    update public.wing_jury_photo_vote_counts set\r\n      like_count = like_count - (old.vote = 1)::integer,\r\n      neutral_count = neutral_count - (old.vote = 0)::integer,\r\n      dislike_count = dislike_count - (old.vote = -1)::integer,\r\n      updated_at = now()\r\n    where submission_id = old.submission_id;\r\n    return old;\r\n  end if;\r\n  insert into public.wing_jury_photo_vote_counts (\r\n    submission_id, like_count, neutral_count, dislike_count, updated_at\r\n  )\r\n  values (v_submission_id, (new.vote = 1)::integer,\r\n    (new.vote = 0)::integer, (new.vote = -1)::integer, now())\r\n  on conflict (submission_id) do update set\r\n    like_count = public.wing_jury_photo_vote_counts.like_count + excluded.like_count,\r\n    neutral_count = public.wing_jury_photo_vote_counts.neutral_count + excluded.neutral_count,\r\n    dislike_count = public.wing_jury_photo_vote_counts.dislike_count + excluded.dislike_count,\r\n    updated_at = excluded.updated_at;\r\n  return new;\r\nend;\r\n$function$\n"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "args": "",
+      "name": "enforce_wing_jury_vote_immutability",
+      "owner": "postgres",
+      "schema": "private",
+      "definition": "CREATE OR REPLACE FUNCTION private.enforce_wing_jury_vote_immutability()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog'\nAS $function$\r\nbegin\r\n  -- Account or media parent disappearance permits only its FK-driven cascade.\r\n  -- Withdrawal retains immutable votes; direct verdict edits remain forbidden.\r\n  if tg_op = 'DELETE' and not exists (\r\n    select 1 from auth.users account where account.id = old.user_id\r\n  ) then\r\n    return old;\r\n  end if;\r\n  if tg_op = 'DELETE' and not exists (\r\n    select 1 from public.wing_media_submissions photo where photo.id = old.submission_id\r\n  ) then return old; end if;\r\n  raise exception 'wing_jury_vote_is_immutable' using errcode = '42501';\r\nend;\r\n$function$\n"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "args": "p_submission_id uuid",
+      "name": "is_public_wing_jury_photo",
+      "owner": "postgres",
+      "schema": "public",
+      "definition": "CREATE OR REPLACE FUNCTION public.is_public_wing_jury_photo(p_submission_id uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'pg_catalog'\nAS $function$\r\n  select private.is_public_wing_jury_photo(p_submission_id);\r\n$function$\n"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "args": "p_destination_id uuid",
+      "name": "wing_jury_restaurant_rating_summary",
+      "owner": "postgres",
+      "schema": "public",
+      "definition": "CREATE OR REPLACE FUNCTION public.wing_jury_restaurant_rating_summary(p_destination_id uuid)\n RETURNS jsonb\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'pg_catalog'\nAS $function$\r\n  select jsonb_build_object(\r\n    'average_weight_score', avg(rating.weight_score),\r\n    'rating_count', count(rating.weight_score)\r\n  )\r\n  from public.destination_ratings rating\r\n  where rating.destination_id = p_destination_id;\r\n$function$\n"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "args": "p_latitude double precision, p_longitude double precision, p_user_id uuid, p_judged_submission_ids uuid[], p_after_distance double precision, p_after_destination_id uuid, p_after_created_at timestamp with time zone, p_after_submission_id uuid, p_limit integer",
+      "name": "wing_jury_feed_candidates",
+      "owner": "postgres",
+      "schema": "public",
+      "definition": "CREATE OR REPLACE FUNCTION public.wing_jury_feed_candidates(p_latitude double precision, p_longitude double precision, p_user_id uuid, p_judged_submission_ids uuid[], p_after_distance double precision, p_after_destination_id uuid, p_after_created_at timestamp with time zone, p_after_submission_id uuid, p_limit integer)\n RETURNS TABLE(id uuid, destination_id uuid, user_id uuid, media_type text, status text, processed_storage_path text, owner_deleted_at timestamp with time zone, withdrawn_at timestamp with time zone, consent_version text, consented_at timestamp with time zone, attribution_preference text, created_at text, distance double precision)\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO 'pg_catalog'\nAS $function$\r\nbegin\r\n  if p_limit is null or p_limit < 1 or p_limit > 120 then\r\n    raise exception 'invalid_feed_limit' using errcode = '22023';\r\n  end if;\r\n  if (p_latitude is null) <> (p_longitude is null)\r\n     or (p_latitude is not null and not (p_latitude between -90 and 90\r\n       and p_longitude between -180 and 180)) then\r\n    raise exception 'invalid_feed_location' using errcode = '22023';\r\n  end if;\r\n  if cardinality(p_judged_submission_ids) > 500\r\n     or array_position(p_judged_submission_ids, null) is not null then\r\n    raise exception 'invalid_feed_exclusions' using errcode = '22023';\r\n  end if;\r\n  if (p_after_destination_id is null and (p_after_created_at is not null\r\n       or p_after_submission_id is not null or p_after_distance is not null))\r\n     or (p_after_destination_id is not null and (p_after_created_at is null\r\n       or p_after_submission_id is null))\r\n     or (p_after_distance is not null and not (p_after_distance >= 0\r\n       and p_after_distance <= pi() * 6371000))\r\n     or (p_latitude is null and p_after_distance is not null)\r\n     or (p_after_created_at is not null and not isfinite(p_after_created_at)) then\r\n    raise exception 'invalid_feed_position' using errcode = '22023';\r\n  end if;\r\n  return query\r\n    with candidates as (\r\n      select photo.*,\r\n        case when p_latitude is not null\r\n          and destination.lat between -90 and 90\r\n          and destination.lng between -180 and 180\r\n        then 2 * 6371000 * asin(sqrt(least(1::double precision, greatest(0::double precision,\r\n          power(sin(radians(destination.lat::double precision - p_latitude) / 2), 2)\r\n          + cos(radians(p_latitude)) * cos(radians(destination.lat::double precision))\r\n          * power(sin(radians(destination.lng::double precision - p_longitude) / 2), 2)\r\n        )))) else null::double precision end as feed_distance\r\n      from public.wing_media_submissions photo\r\n      join public.destinations destination on destination.id = photo.destination_id\r\n      where photo.media_type = 'photo' and photo.status = 'approved'\r\n        and photo.processed_storage_path is not null\r\n        and photo.owner_deleted_at is null and photo.withdrawn_at is null\r\n        and photo.created_at is not null and isfinite(photo.created_at)\r\n        and private.is_public_wing_jury_photo(photo.id)\r\n        and (p_user_id is null or not exists (\r\n          select 1 from public.wing_jury_votes verdict\r\n          where verdict.submission_id = photo.id and verdict.user_id = p_user_id\r\n        ))\r\n        and (p_user_id is not null or not (photo.id = any(coalesce(p_judged_submission_ids, '{}'::uuid[]))))\r\n    )\r\n    select candidate.id, candidate.destination_id, candidate.user_id,\r\n      candidate.media_type::text, candidate.status::text,\r\n      candidate.processed_storage_path::text, candidate.owner_deleted_at,\r\n      candidate.withdrawn_at, candidate.consent_version::text, candidate.consented_at,\r\n      candidate.attribution_preference::text,\r\n      to_char(candidate.created_at at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS.US\"Z\"'),\r\n      candidate.feed_distance\r\n    from candidates candidate\r\n    where p_after_destination_id is null or\r\n      (coalesce(candidate.feed_distance, 'Infinity'::double precision),\r\n        candidate.destination_id, candidate.created_at, candidate.id) >\r\n      (coalesce(p_after_distance, 'Infinity'::double precision),\r\n        p_after_destination_id, p_after_created_at, p_after_submission_id)\r\n    order by candidate.feed_distance nulls last,\r\n      candidate.destination_id, candidate.created_at, candidate.id\r\n    limit p_limit;\r\nend;\r\n$function$\n"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "args": "p_latitude double precision, p_longitude double precision, p_user_id uuid, p_judged_submission_ids uuid[], p_session_id uuid, p_snapshot_at timestamp with time zone, p_after_page integer, p_limit integer",
+      "name": "wing_jury_randomized_feed_candidates",
+      "owner": "postgres",
+      "schema": "public",
+      "definition": "CREATE OR REPLACE FUNCTION public.wing_jury_randomized_feed_candidates(p_latitude double precision, p_longitude double precision, p_user_id uuid, p_judged_submission_ids uuid[], p_session_id uuid, p_snapshot_at timestamp with time zone, p_after_page integer, p_limit integer)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog'\nAS $function$\r\nDECLARE\r\n  v_session private.wing_jury_feed_sessions%rowtype;\r\n  v_selected uuid[] := '{}'::uuid[];\r\n  v_choice record;\r\n  v_tier integer;\r\n  v_count integer;\r\n  v_now timestamptz;\r\n  v_page integer := coalesce(p_after_page,0)+1;\r\nBEGIN\r\n  IF p_limit IS NULL OR p_limit < 1 OR p_limit > 24 THEN RAISE EXCEPTION 'invalid_feed_limit'; END IF;\r\n  IF p_session_id IS NULL OR p_snapshot_at IS NULL OR NOT isfinite(p_snapshot_at)\r\n    OR p_snapshot_at > clock_timestamp()\r\n    OR p_after_page IS NULL OR p_after_page < 0 THEN RAISE EXCEPTION 'invalid_feed_session'; END IF;\r\n  IF (p_latitude IS NULL) <> (p_longitude IS NULL) OR\r\n    (p_latitude IS NOT NULL AND NOT(p_latitude BETWEEN -90 AND 90 AND p_longitude BETWEEN -180 AND 180)) THEN RAISE EXCEPTION 'invalid_feed_location'; END IF;\r\n  IF cardinality(p_judged_submission_ids)>500 OR array_position(p_judged_submission_ids,NULL) IS NOT NULL THEN RAISE EXCEPTION 'invalid_feed_exclusions'; END IF;\r\n  -- Serialize allocation and retry for a session without exposing private tables.\r\n  PERFORM pg_advisory_xact_lock(hashtextextended(p_session_id::text,0));\r\n  -- Explicit expiry checks below enforce TTL independently of housekeeping.\r\n  -- Bounded TTL cleanup; unfinished sessions cannot grow indefinitely over time.\r\n  DELETE FROM private.wing_jury_feed_sessions expired WHERE expired.id IN (\r\n    SELECT session.id FROM private.wing_jury_feed_sessions session WHERE session.expires_at<clock_timestamp() ORDER BY session.expires_at LIMIT 20 FOR UPDATE SKIP LOCKED\r\n  );\r\n  SELECT * INTO v_session FROM private.wing_jury_feed_sessions session WHERE session.id=p_session_id FOR UPDATE;\r\n  IF NOT FOUND THEN\r\n    IF p_after_page<>0 OR p_snapshot_at<=clock_timestamp()-interval '15 minutes' THEN RAISE EXCEPTION 'expired_feed_session'; END IF;\r\n    -- Dedicated private creation log. Serialize count/insert\r\n    -- across all new sessions; no client IP, guest ID or session ID is a rate key.\r\n    PERFORM pg_advisory_xact_lock(hashtextextended('wing_jury_randomized_creation',0));\r\n    v_now:=clock_timestamp();\r\n    DELETE FROM private.wing_jury_session_creation_log WHERE id IN (\r\n      SELECT id FROM private.wing_jury_session_creation_log WHERE created_at<v_now-interval '1 hour' ORDER BY created_at LIMIT 200 FOR UPDATE SKIP LOCKED\r\n    );\r\n    IF (SELECT count(*) FROM private.wing_jury_session_creation_log WHERE created_at>=v_now-interval '1 minute')>=120\r\n      OR (SELECT count(*) FROM private.wing_jury_session_creation_log)>=1000\r\n      OR (SELECT count(*) FROM private.wing_jury_session_creation_log WHERE principal IS NOT DISTINCT FROM p_user_id AND created_at>=v_now-interval '1 minute')>=(CASE WHEN p_user_id IS NULL THEN 30 ELSE 10 END)\r\n      OR (SELECT count(*) FROM private.wing_jury_session_creation_log WHERE principal IS NOT DISTINCT FROM p_user_id AND created_at>=v_now-interval '1 hour')>=(CASE WHEN p_user_id IS NULL THEN 300 ELSE 60 END)\r\n      OR (SELECT count(*) FROM private.wing_jury_feed_sessions)>=1000 THEN\r\n      -- Return instead of raising so bounded housekeeping commits on rejection.\r\n      RETURN jsonb_build_object('error','feed_rate_limited');\r\n    END IF;\r\n    INSERT INTO private.wing_jury_session_creation_log(principal,created_at)\r\n      VALUES(p_user_id,v_now);\r\n    INSERT INTO private.wing_jury_feed_sessions(id,principal,latitude,longitude,snapshot_at,expires_at)\r\n      VALUES(p_session_id,p_user_id,p_latitude,p_longitude,p_snapshot_at,p_snapshot_at+interval '15 minutes') RETURNING * INTO v_session;\r\n    INSERT INTO private.wing_jury_feed_manifest(session_id,submission_id,destination_id,tier,shuffle_key)\r\n      WITH candidates AS (\r\n        SELECT photo.id,photo.destination_id,\r\n          CASE WHEN p_latitude IS NOT NULL AND destination.lat BETWEEN -90 AND 90 AND destination.lng BETWEEN -180 AND 180\r\n          THEN 2*6371000*asin(sqrt(least(1::double precision,greatest(0::double precision,\r\n            power(sin(radians(destination.lat::double precision-p_latitude)/2),2)\r\n            +cos(radians(p_latitude))*cos(radians(destination.lat::double precision))*power(sin(radians(destination.lng::double precision-p_longitude)/2),2))))) ELSE NULL END AS distance\r\n        FROM public.wing_media_submissions photo JOIN public.destinations destination ON destination.id=photo.destination_id\r\n        WHERE photo.created_at<=p_snapshot_at AND private.is_public_wing_jury_photo(photo.id)\r\n          AND (p_user_id IS NULL OR NOT EXISTS(SELECT 1 FROM public.wing_jury_votes vote WHERE vote.submission_id=photo.id AND vote.user_id=p_user_id))\r\n          AND (p_user_id IS NOT NULL OR NOT(photo.id=ANY(coalesce(p_judged_submission_ids,'{}'::uuid[]))))\r\n      )\r\n      SELECT p_session_id,candidate.id,candidate.destination_id,\r\n        CASE WHEN candidate.distance IS NULL THEN 4 WHEN candidate.distance<=25*1609.344 THEN 0\r\n          WHEN candidate.distance<=50*1609.344 THEN 1 WHEN candidate.distance<=100*1609.344 THEN 2\r\n          WHEN candidate.distance<=250*1609.344 THEN 3 ELSE 4 END,\r\n        md5(p_session_id::text||candidate.id::text) FROM candidates candidate LIMIT 10001;\r\n    GET DIAGNOSTICS v_count = ROW_COUNT;\r\n    IF v_count>10000 OR (SELECT count(*) FROM private.wing_jury_feed_manifest)>250000 THEN\r\n      DELETE FROM private.wing_jury_feed_sessions WHERE id=p_session_id;\r\n      RETURN jsonb_build_object('error','feed_capacity_exceeded');\r\n    END IF;\r\n  ELSIF v_session.expires_at<=clock_timestamp() THEN\r\n    RAISE EXCEPTION 'expired_feed_session';\r\n  ELSIF v_session.snapshot_at IS DISTINCT FROM p_snapshot_at THEN\r\n    RAISE EXCEPTION 'invalid_feed_snapshot';\r\n  ELSIF v_session.principal IS DISTINCT FROM p_user_id OR v_session.latitude IS DISTINCT FROM p_latitude\r\n    OR v_session.longitude IS DISTINCT FROM p_longitude\r\n    THEN RAISE EXCEPTION 'invalid_feed_session'; END IF;\r\n  UPDATE private.wing_jury_feed_sessions session SET expires_at=least(session.snapshot_at+interval '24 hours',clock_timestamp()+interval '24 hours') WHERE session.id=p_session_id;\r\n  SELECT page.submission_ids INTO v_selected FROM private.wing_jury_feed_pages page WHERE page.session_id=p_session_id AND page.page_number=v_page;\r\n  IF NOT FOUND THEN\r\n    IF v_page>10001 OR (SELECT count(*) FROM private.wing_jury_feed_pages)>=250000 THEN RETURN jsonb_build_object('error','feed_capacity_exceeded'); END IF;\r\n    IF p_after_page<>v_session.last_page THEN RAISE EXCEPTION 'invalid_feed_page'; END IF;\r\n    -- Discard new withdrawals/votes without renumbering the remaining snapshot.\r\n    UPDATE private.wing_jury_feed_manifest manifest SET consumed=true\r\n      WHERE manifest.session_id=p_session_id AND NOT manifest.consumed AND (\r\n        NOT private.is_public_wing_jury_photo(manifest.submission_id)\r\n        OR (p_user_id IS NOT NULL AND EXISTS(SELECT 1 FROM public.wing_jury_votes vote WHERE vote.submission_id=manifest.submission_id AND vote.user_id=p_user_id))\r\n        OR (p_user_id IS NULL AND manifest.submission_id=ANY(coalesce(p_judged_submission_ids,'{}'::uuid[])))\r\n      );\r\n    v_selected:='{}'::uuid[];\r\n    FOR photo_number IN 1..p_limit LOOP\r\n      SELECT min(manifest.tier) INTO v_tier FROM private.wing_jury_feed_manifest manifest WHERE manifest.session_id=p_session_id AND NOT manifest.consumed;\r\n      EXIT WHEN v_tier IS NULL;\r\n      SELECT manifest.submission_id,manifest.destination_id INTO v_choice\r\n        FROM private.wing_jury_feed_manifest manifest WHERE manifest.session_id=p_session_id AND NOT manifest.consumed AND manifest.tier=v_tier\r\n        ORDER BY (manifest.destination_id IS NOT DISTINCT FROM v_session.last_destination_id),manifest.shuffle_key,manifest.submission_id LIMIT 1;\r\n      UPDATE private.wing_jury_feed_manifest manifest SET consumed=true WHERE manifest.session_id=p_session_id AND manifest.submission_id=v_choice.submission_id;\r\n      v_selected:=array_append(v_selected,v_choice.submission_id);\r\n      v_session.last_destination_id:=v_choice.destination_id;\r\n    END LOOP;\r\n    INSERT INTO private.wing_jury_feed_pages VALUES(p_session_id,v_page,v_selected);\r\n    UPDATE private.wing_jury_feed_sessions session SET last_page=v_page,last_destination_id=v_session.last_destination_id WHERE session.id=p_session_id;\r\n  END IF;\r\n  RETURN jsonb_build_object(\r\n    'page_number',v_page,\r\n    'snapshot_at',to_char(v_session.snapshot_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.US\"Z\"'),\r\n    'has_more',EXISTS(SELECT 1 FROM private.wing_jury_feed_manifest manifest WHERE manifest.session_id=p_session_id AND NOT manifest.consumed)\r\n      OR EXISTS(SELECT 1 FROM private.wing_jury_feed_pages page WHERE page.session_id=p_session_id AND page.page_number>v_page),\r\n    'candidates',coalesce((\r\n      SELECT jsonb_agg(jsonb_build_object(\r\n        'id',photo.id,'destination_id',photo.destination_id,'user_id',photo.user_id,\r\n        'media_type',photo.media_type,'status',photo.status,'processed_storage_path',photo.processed_storage_path,\r\n        'owner_deleted_at',photo.owner_deleted_at,'withdrawn_at',photo.withdrawn_at,'consent_version',photo.consent_version,\r\n        'consented_at',photo.consented_at,'attribution_preference',photo.attribution_preference,\r\n        'created_at',to_char(photo.created_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.US\"Z\"'),'page_number',v_page\r\n      ) ORDER BY selected.ordinal)\r\n      FROM unnest(v_selected) WITH ORDINALITY selected(id,ordinal) JOIN public.wing_media_submissions photo ON photo.id=selected.id\r\n      WHERE private.is_public_wing_jury_photo(photo.id)\r\n        AND (p_user_id IS NULL OR NOT EXISTS(SELECT 1 FROM public.wing_jury_votes vote WHERE vote.submission_id=photo.id AND vote.user_id=p_user_id))\r\n        AND (p_user_id IS NOT NULL OR NOT(photo.id=ANY(coalesce(p_judged_submission_ids,'{}'::uuid[]))))\r\n    ),'[]'::jsonb)\r\n  );\r\nEND;\r\n$function$\n"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "args": "p_session_id uuid, p_user_id uuid, p_latitude double precision, p_longitude double precision",
+      "name": "wing_jury_randomized_session_snapshot",
+      "owner": "postgres",
+      "schema": "public",
+      "definition": "CREATE OR REPLACE FUNCTION public.wing_jury_randomized_session_snapshot(p_session_id uuid, p_user_id uuid, p_latitude double precision, p_longitude double precision)\n RETURNS text\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog'\nAS $function$\r\nDECLARE v_session private.wing_jury_feed_sessions%rowtype;\r\nBEGIN\r\n  SELECT * INTO v_session FROM private.wing_jury_feed_sessions WHERE id=p_session_id;\r\n  IF NOT FOUND THEN RETURN NULL; END IF;\r\n  IF v_session.expires_at<=clock_timestamp() THEN RAISE EXCEPTION 'expired_feed_session'; END IF;\r\n  IF v_session.principal IS DISTINCT FROM p_user_id OR v_session.latitude IS DISTINCT FROM p_latitude\r\n    OR v_session.longitude IS DISTINCT FROM p_longitude THEN RAISE EXCEPTION 'invalid_feed_session'; END IF;\r\n  RETURN to_char(v_session.snapshot_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.US\"Z\"');\r\nEND; $function$\n"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "args": "p_destination jsonb, p_created_by uuid",
+      "name": "wingman_create_destination",
+      "owner": "postgres",
+      "schema": "public",
+      "definition": "CREATE OR REPLACE FUNCTION public.wingman_create_destination(p_destination jsonb, p_created_by uuid)\n RETURNS jsonb\n LANGUAGE plpgsql\n SET search_path TO ''\nAS $function$\r\ndeclare\r\n n text := btrim(p_destination->>'name'); a text := btrim(p_destination->>'address');\r\n c text := btrim(p_destination->>'city'); st integer := (p_destination->>'state_id')::integer;\r\n latitude numeric := nullif(p_destination->>'lat','')::numeric;\r\n longitude numeric := nullif(p_destination->>'lng','')::numeric;\r\n d public.destinations; matches integer;\r\nbegin\r\n if n is null or n='' or a is null or a='' or c is null or c='' or st is null\r\n   or latitude is null or longitude is null or latitude not between -90 and 90 or longitude not between -180 and 180\r\n then raise exception 'restaurant_location_required'; end if;\r\n -- Serialize with all destination writes, including old clients, while looking\r\n -- for an existing identity. Held only during this short database transaction.\r\n lock table public.destinations in share row exclusive mode;\r\n select count(*) into matches from public.destinations x\r\n where x.state_id=st and lower(btrim(x.name))=lower(n)\r\n and (lower(btrim(x.address))=lower(a) or lower(btrim(x.city))=lower(c));\r\n if matches>1 then raise exception 'restaurant_match_ambiguous'; end if;\r\n if matches=1 then\r\n   select * into d from public.destinations x where x.state_id=st and lower(btrim(x.name))=lower(n)\r\n   and (lower(btrim(x.address))=lower(a) or lower(btrim(x.city))=lower(c));\r\n   -- Same name/city with a different address might be another branch. Do not\r\n   -- silently merge it or create a likely duplicate; require operator resolution.\r\n   if lower(btrim(coalesce(d.address,'')))<>lower(a) then raise exception 'restaurant_match_ambiguous'; end if;\r\n else\r\n   insert into public.destinations(name,address,city,state_id,lat,lng,created_by)\r\n   values(n,a,c,st,latitude,longitude,p_created_by) returning * into d;\r\n end if;\r\n return to_jsonb(d);\r\nend;\r\n$function$\n"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "args": "p_suggestion_id uuid, p_reviewer_id uuid, p_action text, p_note text, p_destination jsonb",
+      "name": "mango_review_restaurant",
+      "owner": "postgres",
+      "schema": "public",
+      "definition": "CREATE OR REPLACE FUNCTION public.mango_review_restaurant(p_suggestion_id uuid, p_reviewer_id uuid, p_action text, p_note text, p_destination jsonb DEFAULT NULL::jsonb)\n RETURNS jsonb\n LANGUAGE plpgsql\n SET search_path TO ''\nAS $function$\r\ndeclare s public.destination_suggestions; r public.restaurant_suggestion_reviews; d jsonb;\r\nbegin\r\n if not exists (select 1 from public.app_user_roles where user_id=p_reviewer_id and active and revoked_at is null\r\n and role in ('wing_reviewer','wing_admin')) then raise exception 'restaurant_reviewer_required'; end if;\r\n if p_action is null or p_action not in ('approve','reject') or p_note is null or length(btrim(p_note)) not between 8 and 2000\r\n then raise exception 'restaurant_review_invalid'; end if;\r\n select * into s from public.destination_suggestions where id=p_suggestion_id for update;\r\n if not found then raise exception 'restaurant_suggestion_not_found'; end if;\r\n select * into r from public.restaurant_suggestion_reviews where suggestion_id=s.id;\r\n if found then\r\n   if r.action=p_action and r.reviewer_id=p_reviewer_id and r.reviewer_note=btrim(p_note)\r\n      and r.destination_details is not distinct from (case when p_action='approve' then p_destination else null end)\r\n   then return to_jsonb(r); end if;\r\n   raise exception 'restaurant_already_reviewed';\r\n end if;\r\n if p_action='approve' then\r\n   if (p_destination->>'state_id')::integer is distinct from s.state_id then raise exception 'restaurant_state_mismatch'; end if;\r\n   d := public.wingman_create_destination(p_destination,s.user_id);\r\n end if;\r\n insert into public.restaurant_suggestion_reviews(suggestion_id,action,reviewer_id,reviewer_note,destination_id,destination_details)\r\n values(s.id,p_action,p_reviewer_id,btrim(p_note),(d->>'id')::uuid,case when p_action='approve' then p_destination else null end)\r\n returning * into r;\r\n return to_jsonb(r);\r\nend;\r\n$function$\n"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "args": "",
+      "name": "mango_restaurant_pending_count",
+      "owner": "postgres",
+      "schema": "public",
+      "definition": "CREATE OR REPLACE FUNCTION public.mango_restaurant_pending_count()\n RETURNS bigint\n LANGUAGE sql\n STABLE\n SET search_path TO ''\nAS $function$\r\n select count(*) from public.mango_pending_restaurants;\r\n$function$\n"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "args": "p_user_id uuid, p_ip_address text",
+      "name": "wingman_consume_rate_limit",
+      "owner": "postgres",
+      "schema": "public",
+      "definition": "CREATE OR REPLACE FUNCTION public.wingman_consume_rate_limit(p_user_id uuid, p_ip_address text)\n RETURNS boolean\n LANGUAGE plpgsql\n SET search_path TO ''\nAS $function$\ndeclare\n ip text := coalesce(nullif(btrim(p_ip_address),''),'unknown'); ts timestamptz;\n hourly integer := case when p_user_id is null then 3 else 10 end;\n daily integer := case when p_user_id is null then 10 else 30 end;\n hour_count bigint; day_count bigint;\nbegin\n if length(ip)>200 then raise exception 'invalid_rate_limit_actor'; end if;\n -- Preserve existing anonymous semantics: it counts all calls from the IP,\n -- including signed-in calls. Acquire IP first, then user, in a fixed order.\n perform pg_advisory_xact_lock(hashtextextended('wingman-rate-ip:'||ip,0));\n if p_user_id is not null then\n   perform pg_advisory_xact_lock(hashtextextended('wingman-rate-user:'||p_user_id::text,0));\n end if;\n ts := clock_timestamp();\n select count(*) filter(where created_at >= ts-interval '1 hour'),count(*)\n into hour_count,day_count from public.api_rate_limits\n where feature='wingman' and created_at >= ts-interval '24 hours'\n and ((p_user_id is not null and user_id=p_user_id) or (p_user_id is null and ip_address=ip));\n if hour_count>=hourly or day_count>=daily then return false; end if;\n insert into public.api_rate_limits(user_id,ip_address,feature,created_at)\n values(p_user_id,ip,'wingman',ts);\n return true;\nend;\n$function$\n"
+    }
+  ],
+  "constraints": [
+    {
+      "name": "wing_jury_photo_vote_counts_dislike_count_check",
+      "table": "wing_jury_photo_vote_counts",
+      "definition": "CHECK ((dislike_count >= 0))"
+    },
+    {
+      "name": "wing_jury_photo_vote_counts_like_count_check",
+      "table": "wing_jury_photo_vote_counts",
+      "definition": "CHECK ((like_count >= 0))"
+    },
+    {
+      "name": "wing_jury_photo_vote_counts_neutral_count_check",
+      "table": "wing_jury_photo_vote_counts",
+      "definition": "CHECK ((neutral_count >= 0))"
+    },
+    {
+      "name": "wing_jury_photo_vote_counts_pkey",
+      "table": "wing_jury_photo_vote_counts",
+      "definition": "PRIMARY KEY (submission_id)"
+    },
+    {
+      "name": "wing_jury_photo_vote_counts_submission_id_fkey",
+      "table": "wing_jury_photo_vote_counts",
+      "definition": "FOREIGN KEY (submission_id) REFERENCES wing_media_submissions(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "wing_jury_photo_vote_counts_total_nonnegative",
+      "table": "wing_jury_photo_vote_counts",
+      "definition": "CHECK ((((like_count + neutral_count) + dislike_count) >= 0))"
+    },
+    {
+      "name": "wing_jury_votes_pkey",
+      "table": "wing_jury_votes",
+      "definition": "PRIMARY KEY (submission_id, user_id)"
+    },
+    {
+      "name": "wing_jury_votes_submission_id_fkey",
+      "table": "wing_jury_votes",
+      "definition": "FOREIGN KEY (submission_id) REFERENCES wing_media_submissions(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "wing_jury_votes_user_id_fkey",
+      "table": "wing_jury_votes",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "wing_jury_votes_vote_check",
+      "table": "wing_jury_votes",
+      "definition": "CHECK ((vote = ANY (ARRAY['-1'::integer, 0, 1])))"
+    },
+    {
+      "name": "wing_media_photo_votes_pkey",
+      "table": "wing_media_photo_votes",
+      "definition": "PRIMARY KEY (submission_id, user_id)"
+    },
+    {
+      "name": "wing_media_photo_votes_submission_id_fkey",
+      "table": "wing_media_photo_votes",
+      "definition": "FOREIGN KEY (submission_id) REFERENCES wing_media_submissions(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "wing_media_photo_votes_user_id_fkey",
+      "table": "wing_media_photo_votes",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "wing_media_photo_votes_vote_check",
+      "table": "wing_media_photo_votes",
+      "definition": "CHECK ((vote = ANY (ARRAY['-1'::integer, 1])))"
+    }
+  ]
+}

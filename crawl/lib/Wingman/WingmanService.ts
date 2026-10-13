@@ -1,3 +1,5 @@
+import { bounded, wingmanError, wingmanRequest } from '../wingmanAsync';
+import { canApproveWingman, normalizeWingmanConfidence, WING_CONFIDENCE_APPROVAL_THRESHOLD, sameWingmanLocation, wingmanPlaceNameMatches } from '../../supabase/functions/_shared/wingmanConfidence';
 import { supabase } from '../supabase';
 import type {
   WingmanAIExtraction,
@@ -21,6 +23,12 @@ type OpenAIResponseShape = {
   reasoning?: unknown;
   needs_city?: unknown;
   needs_more_info?: unknown;
+  verified_place?: unknown;
+  location_status?: unknown;
+  wing_evidence_status?: unknown;
+  wing_evidence?: unknown;
+  menu_evidence?: unknown;
+  existing_destination_id?: unknown;
 };
 
 type WingmanServiceOptions = {
@@ -29,11 +37,9 @@ type WingmanServiceOptions = {
 
 export class WingmanService {
   private readonly edgeFunctionName = 'wingman-intake';
-  private readonly approveConfidenceThreshold = 0.8;
-  private readonly approveWingsThreshold = 0.7;
-  private readonly wingVerificationThreshold = 0.75;
+  private readonly approveWingsThreshold = WING_CONFIDENCE_APPROVAL_THRESHOLD;
+  private readonly wingVerificationThreshold = WING_CONFIDENCE_APPROVAL_THRESHOLD;
   private readonly suggestionConfidenceThreshold = 0.5;
-  private readonly suggestionWingsThreshold = 0.4;
 
   constructor(private readonly options: WingmanServiceOptions = {}) {}
 
@@ -45,7 +51,7 @@ export class WingmanService {
     try {
       aiRawResponse = await this.callOpenAI(input);
 
-      let ai = this.parseAIResponse(aiRawResponse);
+      let ai = this.parseAssessment(aiRawResponse);
       const place = this.buildPlaceCandidate(ai);
       let finalRawResponse = aiRawResponse;
 
@@ -58,31 +64,33 @@ export class WingmanService {
         this.options.onStatus?.('Wingman is making another call to check whether they have wings.');
         const verificationRaw = await this.callOpenAI({
           ...input,
+          candidateAddress: place.address || input.candidateAddress,
           wingVerification: true,
           extraInfo: [
             input.extraInfo?.trim(),
-            'Second pass: verify specifically whether this restaurant serves wings or is clearly a wing-friendly sports bar/bar-and-grill.',
+            'Second pass: assess the supplied menu evidence for chicken wings at the exact verified location. Do not substitute category assumptions or a default score.',
           ]
             .filter(Boolean)
             .join(' '),
         });
-        const verificationAI = this.parseAIResponse(verificationRaw);
+        const verificationAI = this.parseAssessment(verificationRaw);
 
+        const samePlace = sameWingmanLocation(ai, verificationAI)
+          && (!ai.normalizedName || !verificationAI.normalizedName || wingmanPlaceNameMatches(ai.normalizedName,verificationAI.normalizedName));
+        const blockedEvidence = [ai.wingEvidenceStatus,verificationAI.wingEvidenceStatus].find(status=>status==='unavailable'||status==='conflicting');
         ai = {
-          ...ai,
-          ...verificationAI,
+          ...ai, ...verificationAI,
           normalizedName: verificationAI.normalizedName ?? ai.normalizedName,
-          city: verificationAI.city ?? ai.city,
-          state: verificationAI.state ?? ai.state,
-          address: verificationAI.address ?? ai.address,
-          lat: verificationAI.lat ?? ai.lat,
-          lng: verificationAI.lng ?? ai.lng,
-          wingsProbability:
-            verificationAI.wingsProbability ?? ai.wingsProbability,
-          reasoning:
-            verificationAI.reasoning ??
-            ai.reasoning ??
-            'Wingman completed a second wing verification pass.',
+          city: verificationAI.city ?? ai.city, state: verificationAI.state ?? ai.state,
+          address: verificationAI.address ?? ai.address, lat: verificationAI.lat ?? ai.lat, lng: verificationAI.lng ?? ai.lng,
+          // A missing second-pass score remains missing; never reuse a prior
+          // approving score or discard conflicting evidence/location details.
+          wingsProbability: verificationAI.wingsProbability,
+          verifiedPlace: ai.verifiedPlace === true && verificationAI.verifiedPlace === true && samePlace,
+          locationStatus: samePlace ? verificationAI.locationStatus : 'conflicting',
+          needsMoreInfo: !samePlace || verificationAI.needsMoreInfo,
+          wingEvidenceStatus: blockedEvidence || verificationAI.wingEvidenceStatus,
+          menuEvidence: [...(ai.menuEvidence || []),...(verificationAI.menuEvidence || [])],
         };
         finalRawResponse = {
           firstPass: aiRawResponse,
@@ -122,7 +130,7 @@ export class WingmanService {
 
       return result;
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown Wingman error';
+      const message = error && typeof error === 'object' && 'message' in error ? String(error.message) : 'Unknown Wingman error';
       const isRateLimited = message.toLowerCase().includes('too many requests');
 
       const errorResult: WingmanResult = {
@@ -180,7 +188,8 @@ export class WingmanService {
     const restaurantForPrompt =
       input.restaurantName?.trim() || input.rawInput.trim();
 
-    const { data, error } = await supabase.functions.invoke(this.edgeFunctionName, {
+    const { data, error } = await wingmanRequest(signal => supabase.functions.invoke(this.edgeFunctionName, {
+      signal,
       body: {
         restaurant: restaurantForPrompt,
         rawInput: input.rawInput.trim(),
@@ -188,9 +197,10 @@ export class WingmanService {
         stateCode: input.stateCode ?? null,
         city: input.city ?? null,
         extraInfo: input.extraInfo ?? null,
+        candidateAddress: input.candidateAddress ?? null,
         wingVerification: input.wingVerification === true,
       },
-    });
+    }));
 
     if (error) {
       const detail = await this.formatFunctionError(error);
@@ -205,50 +215,10 @@ export class WingmanService {
   }
 
   private async formatFunctionError(error: unknown): Promise<string> {
-    const fallback = error instanceof Error ? error.message : String(error);
-    const response = (error as { context?: unknown } | null)?.context;
-
-    if (!response || typeof (response as Response).clone !== 'function') {
-      return fallback;
-    }
-
-    if ((response as Response).status === 429) {
-      return 'Too many requests. Give it a little time and try again.';
-    }
-
-    try {
-      const body = await (response as Response).clone().json();
-
-      if (body && typeof body === 'object') {
-        const record = body as Record<string, unknown>;
-        const message =
-          typeof record.error === 'string' && record.error.trim()
-            ? record.error.trim()
-            : fallback;
-        const details =
-          typeof record.details === 'string' && record.details.trim()
-            ? record.details.trim()
-            : null;
-
-        if ((response as Response).status === 429 || message.toLowerCase().includes('too many requests')) {
-          return 'Too many requests. Give it a little time and try again.';
-        }
-
-        return details ? `${message} ${details}` : message;
-      }
-    } catch {
-      try {
-        const text = await (response as Response).clone().text();
-        if (text.trim()) return text.trim();
-      } catch {
-        // Keep the Supabase error message when the response body is unreadable.
-      }
-    }
-
-    return fallback;
+    return wingmanError(error);
   }
 
-  private parseAIResponse(raw: unknown): WingmanAIExtraction & {
+  parseAssessment(raw: unknown): WingmanAIExtraction & {
     needsCity?: boolean;
     needsMoreInfo?: boolean;
   } {
@@ -262,13 +232,19 @@ export class WingmanService {
       address: this.asNullableString(obj.address),
       lat: this.asNullableNumber(obj.lat),
       lng: this.asNullableNumber(obj.lng),
-      confidence: this.asNullableNumber(obj.confidence),
+      confidence: normalizeWingmanConfidence(obj.confidence),
       isRealRestaurant: this.asNullableBoolean(obj.is_real_restaurant),
-      wingsProbability: this.asNullableNumber(obj.wings_probability),
+      wingsProbability: normalizeWingmanConfidence(obj.wings_probability),
       category: this.asNullableString(obj.category),
       reasoning: this.asNullableString(obj.reasoning),
       needsCity: this.asNullableBoolean(obj.needs_city) ?? false,
       needsMoreInfo: this.asNullableBoolean(obj.needs_more_info) ?? false,
+      verifiedPlace: obj.verified_place === true,
+      locationStatus: ['verified','needs_city','needs_more_info','conflicting','unverified'].includes(String(obj.location_status)) ? obj.location_status as NonNullable<WingmanAIExtraction['locationStatus']> : 'unverified' as const,
+      wingEvidenceStatus: ['supports','unknown','unavailable','conflicting'].includes(String(obj.wing_evidence_status)) ? obj.wing_evidence_status as NonNullable<WingmanAIExtraction['wingEvidenceStatus']> : 'unknown' as const,
+      wingEvidence: this.asNullableString(obj.wing_evidence),
+      menuEvidence: Array.isArray(obj.menu_evidence) ? obj.menu_evidence.filter((item: any)=>typeof item?.url==='string' && typeof item?.text==='string').map((item: any)=>({url:item.url,text:item.text,explicitUnavailable:item.explicitUnavailable===true})) : [],
+      existingDestinationId: this.asNullableString(obj.existing_destination_id),
     };
 
     return {
@@ -278,13 +254,16 @@ export class WingmanService {
       address: parsed.address,
       lat: parsed.lat,
       lng: parsed.lng,
-      confidence: this.clampNullable(parsed.confidence, 0, 1),
+      confidence: parsed.confidence,
       isRealRestaurant: parsed.isRealRestaurant,
-      wingsProbability: this.clampNullable(parsed.wingsProbability, 0, 1),
+      wingsProbability: parsed.wingsProbability,
       category: parsed.category,
       reasoning: parsed.reasoning,
       needsCity: parsed.needsCity,
       needsMoreInfo: parsed.needsMoreInfo,
+      verifiedPlace: parsed.verifiedPlace, locationStatus: parsed.locationStatus,
+      wingEvidenceStatus: parsed.wingEvidenceStatus, wingEvidence: parsed.wingEvidence,
+      menuEvidence: parsed.menuEvidence, existingDestinationId: parsed.existingDestinationId,
     };
   }
 
@@ -299,7 +278,7 @@ export class WingmanService {
       state: ai.state,
       lat: ai.lat ?? null,
       lng: ai.lng ?? null,
-      source: found && (ai.address || ai.lat != null || ai.lng != null) ? 'google_places' : found ? 'openai' : 'none',
+      source: found && ai.verifiedPlace === true ? 'google_places' : found ? 'openai' : 'none',
     };
   }
 
@@ -327,7 +306,13 @@ export class WingmanService {
     const hasName = Boolean(ai.normalizedName);
     const hasUserId = Boolean(input.userId);
 
-    if (ai.needsCity) {
+    if (ai.existingDestinationId && ai.verifiedPlace) {
+      return { decision: 'candidate_selection', decisionReason: 'manual_review_required',
+        userMessage: 'Wingman found an existing BuffaGo restaurant.', shouldInsertDestination: false,
+        shouldInsertSuggestion: false, destinationInsert: null, suggestionInsert: null };
+    }
+
+    if (ai.needsCity || ai.locationStatus === 'needs_city') {
       return {
         decision: 'needs_city',
         decisionReason: 'needs_city_for_disambiguation',
@@ -339,7 +324,7 @@ export class WingmanService {
       };
     }
 
-    if (ai.needsMoreInfo) {
+    if (ai.needsMoreInfo || ['needs_more_info','conflicting'].includes(ai.locationStatus || '')) {
       return {
         decision: 'needs_more_info',
         decisionReason: 'needs_more_info_for_disambiguation',
@@ -364,7 +349,7 @@ export class WingmanService {
       };
     }
 
-    if (ai.isRealRestaurant === false || confidence < this.suggestionConfidenceThreshold) {
+    if (ai.isRealRestaurant === false || (!ai.verifiedPlace && confidence < this.suggestionConfidenceThreshold)) {
       return {
         decision: 'rejected',
         decisionReason: ai.isRealRestaurant === false ? 'place_not_found' : 'low_confidence_ai',
@@ -390,11 +375,11 @@ export class WingmanService {
       };
     }
 
-    if (
-      ai.isRealRestaurant === true &&
-      confidence >= this.approveConfidenceThreshold &&
-      wingsProbability >= this.approveWingsThreshold
-    ) {
+    if (canApproveWingman({ matchConfidence: ai.confidence, wingConfidence: ai.wingsProbability,
+      verifiedRestaurant: ai.verifiedPlace === true && ai.isRealRestaurant === true,
+      locationStatus: ai.locationStatus ?? null, needsCity: ai.needsCity, needsMoreInfo: ai.needsMoreInfo,
+      wingEvidenceStatus: ai.wingEvidenceStatus,
+    })) {
       return {
         decision: 'approved',
         decisionReason: 'high_confidence_match_with_wings',
@@ -416,9 +401,7 @@ export class WingmanService {
 
     if (
       ai.isRealRestaurant === true &&
-      confidence >= this.suggestionConfidenceThreshold &&
-      (wingsProbability >= this.suggestionWingsThreshold ||
-        wingsProbability < this.approveWingsThreshold)
+      (ai.verifiedPlace === true || confidence >= this.suggestionConfidenceThreshold)
     ) {
       return {
         decision: 'suggestion',
@@ -508,7 +491,7 @@ export class WingmanService {
 
   private async insertLogSafe(log: WingmanLogInsert): Promise<void> {
     try {
-      await this.insertLog(log);
+      await bounded(this.insertLog(log), 2000);
     } catch (error) {
       console.warn('[Wingman] Log insert failed', error);
     }
@@ -592,14 +575,6 @@ export class WingmanService {
     }
 
     return null;
-  }
-
-  private clampNullable(value: number | null, min: number, max: number): number | null {
-    if (value == null || !Number.isFinite(value)) {
-      return null;
-    }
-
-    return Math.min(max, Math.max(min, value));
   }
 
   private getWingsConfidenceLabel(value: number | null): string | null {

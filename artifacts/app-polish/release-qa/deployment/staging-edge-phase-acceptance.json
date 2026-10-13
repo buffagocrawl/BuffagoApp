@@ -1,0 +1,28 @@
+{
+  "target": "http://127.0.0.1:55321",
+  "nativeGatewayAuthRESTStorage": true,
+  "receipts": [
+    {
+      "name": "vote-only candidate phase preserves old reveal/gallery and adds authoritative counts",
+      "status": "PASS"
+    },
+    {
+      "name": "reveal candidate phase follows RPC change and preserves guest privacy",
+      "status": "PASS"
+    },
+    {
+      "name": "gallery candidate phase matches canonical counts, ordering and failed-photo exclusion",
+      "status": "PASS"
+    },
+    {
+      "name": "Wingman candidate gateway/config fails closed; external-provider success remains blocked",
+      "status": "PASS",
+      "coverage": "native JWT gateway + missing-config failure only",
+      "outstanding": "successful verification/insertion requires separate non-production OpenAI/Places credentials and permitted provider acceptance; no provider responses mocked"
+    },
+    {
+      "name": "real PostgREST atomic Wingman limiter retains signed/anonymous limits and service-only access",
+      "status": "PASS"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "readOnlyLocalInspection": true,
+  "baselineTablesPresent": 56,
+  "tableACLsCompared": 56,
+  "baselineFunctions": 92,
+  "unchangedFunctionDefinitionsCompared": 89,
+  "expectedBridgeFunctionChanges": [
+    "enforce_wing_jury_vote_immutability",
+    "refresh_wing_media_photo_vote_counts",
+    "validate_wing_jury_vote_insert"
+  ],
+  "policiesCompared": 76,
+  "failures": [],
+  "priorTableColumnConstraintRLSValidation": "schema-baseline-validation.json (56 tables, pre-bridge)",
+  "scope": "dependency closure, not the entire production database; no platform auth/storage schema replay"
+}

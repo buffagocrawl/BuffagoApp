@@ -43,3 +43,7 @@ The service-role key is read only by `server/index.mjs`; Vite receives no secret
 ## Local validation
 
 Run `npm test` and `npm run build` in this directory. Tests use isolated Supabase/storage fixtures and mock fetch responses to render and exercise the actual React UI in jsdom; they do not load `.env`. For manual browser verification with invented data only, run `npm run build` followed by `node tests/mockUi.mjs`, then open `http://127.0.0.1:4327`. This fixture never creates a Supabase client or invokes a worker.
+
+## Pending Restaurants
+
+Restaurant suggestions can be reviewed in the Pending Restaurants tab. See [restaurant review rollout](../../docs/mango-restaurant-review.md) for the required migration, shared creation flow, evidence limitations and Pi update order.

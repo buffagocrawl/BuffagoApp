@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "environment": "Android API 36.1 emulator, com.buffago.app development client, isolated Metro8086 synthetic fixture",
+  "backend": "native-fixture.invalid (mocked UI fixtures only; not backend staging acceptance)",
+  "checks": [
+    "separate dialogs",
+    "nearest preserved across saved tabs",
+    "My ratings preserved",
+    "filtered Want to Try empty does not imply missing saves",
+    "clear filters restores saved item",
+    "reset restores Score and 5mi defaults"
+  ],
+  "physicalDevice": false,
+  "nativeIOS": false
+}

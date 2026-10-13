@@ -1,0 +1,82 @@
+{
+  "status": "INCOMPLETE_BASELINE_NOT_APPLIED",
+  "scope": "static dependency audit of supplied DDL and actual worker call sites; not runtime or staging acceptance",
+  "source": "crawl/supabase/local/app-polish-acceptance/baseline/provided-media-voting.sql",
+  "source_sha256": "93080a98f9cdb771bac5ff7477aec1aec07b91255b00332f46687c88eddd591e",
+  "supplied_tables": [
+    "public.wing_jury_photo_vote_counts",
+    "public.wing_jury_votes",
+    "public.wing_media_photo_votes",
+    "public.wing_media_submissions"
+  ],
+  "supplied_index_count": 13,
+  "supplied_trigger_count": 9,
+  "referenced_parent_tables": [
+    "auth.users",
+    "destination_ratings",
+    "destinations",
+    "wing_media_submissions"
+  ],
+  "missing_app_parent_definitions": [
+    "public.destinations",
+    "public.destination_ratings"
+  ],
+  "platform_bootstrap_dependency": "auth.users and real GoTrue/Auth JWT helpers; must be supplied by isolated Supabase, not a stub",
+  "missing_trigger_function_definitions_in_export": [
+    "enqueue_wing_photo_upload_derivatives",
+    "guard_wing_photo_approval",
+    "mango_clear_ineligible_priority",
+    "private.enforce_wing_jury_vote_immutability",
+    "private.refresh_wing_jury_photo_vote_counts",
+    "private.refresh_wing_media_photo_vote_counts",
+    "private.validate_wing_jury_vote_insert",
+    "private.validate_wing_media_photo_vote",
+    "wing_apply_owner_pseudonymization"
+  ],
+  "missing_index_function_definition": "public.wing_media_is_public_status(text)",
+  "retained_trigger_definition_references": [
+    "private.enforce_wing_jury_vote_immutability",
+    "private.refresh_wing_jury_photo_vote_counts",
+    "private.refresh_wing_media_photo_vote_counts",
+    "private.validate_wing_jury_vote_insert",
+    "private.validate_wing_media_photo_vote"
+  ],
+  "retained_references_limitation": "Some actual deployed voting functions are captured locally; no full upload/worker/storage baseline or installed schema is established by these references.",
+  "worker_rpcs_not_defined_in_export": [
+    "begin_wing_processing_job",
+    "claim_wing_media_cleanup_job",
+    "claim_wing_processing_job",
+    "enqueue_wing_media_cleanup",
+    "enqueue_wing_processing_backlog",
+    "finish_wing_media_cleanup_job",
+    "get_wing_fingerprint_candidates",
+    "record_wing_ai_moderation",
+    "record_wing_fingerprint",
+    "register_wing_exact_media",
+    "settle_wing_processing_job"
+  ],
+  "upload_rpcs_not_defined_in_export": [
+    "reserve_wing_submission_upload",
+    "finalize_wing_submission_upload"
+  ],
+  "additional_baseline_contracts": [
+    "review_wing_submission_v2",
+    "wingman_consume_rate_limit",
+    "wingman_create_destination",
+    "private.require_authenticated_user",
+    "private.is_public_wing_jury_photo"
+  ],
+  "rls_enable_statements_in_export": 0,
+  "create_policy_statements_in_export": 0,
+  "grant_or_revoke_statements_in_export": 0,
+  "storage_missing": [
+    "wing-submissions bucket configuration",
+    "custom storage.objects RLS policies/grants",
+    "actual Storage upload/sign/delete integration"
+  ],
+  "missing_transitive_dependencies": "Full definitions/tables/config/types/extensions used by the missing upload/processing/cleanup/moderation/approval functions must be included and validated; cannot infer them from table declarations.",
+  "fixtures_status": "synthetic fixture plan prepared; no Auth users or database/storage records created",
+  "production_access": false,
+  "sql_applied": false,
+  "staging_acceptance_passed": false
+}

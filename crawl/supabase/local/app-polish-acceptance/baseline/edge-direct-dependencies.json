@@ -1,0 +1,25 @@
+{
+  "source": "read-only schema closure for direct four-Edge SDK table/RPC dependencies",
+  "tables": [],
+  "functions": [
+    {
+      "schema": "public",
+      "name": "wing_jury_restaurant_rating_summary",
+      "oid": "229832",
+      "definition": "CREATE OR REPLACE FUNCTION public.wing_jury_restaurant_rating_summary(p_destination_id uuid)\n RETURNS jsonb\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'pg_catalog'\nAS $function$\r\n  select jsonb_build_object(\r\n    'average_weight_score', avg(rating.weight_score),\r\n    'rating_count', count(rating.weight_score)\r\n  )\r\n  from public.destination_ratings rating\r\n  where rating.destination_id = p_destination_id;\r\n$function$\n",
+      "grants": [
+        {
+          "role": "postgres",
+          "privilege": "EXECUTE"
+        },
+        {
+          "role": "service_role",
+          "privilege": "EXECUTE"
+        }
+      ]
+    }
+  ],
+  "triggers": [],
+  "policies": [],
+  "types": []
+}

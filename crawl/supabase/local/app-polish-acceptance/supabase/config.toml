@@ -1,0 +1,84 @@
+# Prepared local acceptance environment ONLY. No production credentials/data.
+# Intentionally no migration replay/seed. Reviewed baseline is a release gate.
+project_id = "buffago-polish-acceptance"
+
+[api]
+enabled = true
+port = 55321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 55322
+shadow_port = 55320
+major_version = 17
+
+[db.migrations]
+enabled = false
+
+[db.seed]
+enabled = false
+
+[db.pooler]
+enabled = false
+port = 55329
+
+[realtime]
+enabled = false
+
+[studio]
+enabled = false
+port = 55323
+
+[inbucket]
+enabled = false
+port = 55324
+
+[storage]
+enabled = true
+file_size_limit = "50MiB"
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:55321"
+additional_redirect_urls = []
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+
+[edge_runtime]
+enabled = true
+policy = "per_worker"
+inspector_port = 55383
+
+[analytics]
+enabled = false
+port = 55327
+
+# Match the four inspected gateway settings. Baseline/candidate source bundles
+# must be supplied deliberately per acceptance phase; no automatic deployment.
+[functions.wing-public-gallery]
+verify_jwt = false
+
+[functions.wing-jury-vote]
+verify_jwt = true
+
+[functions.wing-jury-reveal]
+verify_jwt = false
+
+[functions.wingman-intake]
+verify_jwt = true
+
+# Captured, unchanged deployed upload baseline; no production deployment.
+[functions.wing-media-stage-authorize]
+verify_jwt = false
+[functions.wing-media-validate]
+verify_jwt = false
+[functions.wing-media-promote]
+verify_jwt = false
+[functions.wing-media-staging-cleanup]
+verify_jwt = false

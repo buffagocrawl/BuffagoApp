@@ -1,0 +1,12 @@
+{
+  "status": "fulfilled",
+  "value": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"branches\":[{\"id\":\"df40d3e1-931b-4647-a0cf-be6e4f799a8b\",\"name\":\"main\",\"project_ref\":\"vhfxnizaxdanmvmouuaf\",\"is_default\":true,\"persistent\":false,\"status\":\"FUNCTIONS_DEPLOYED\",\"created_at\":\"2026-07-24T13:42:02.503601+00:00\",\"updated_at\":\"2026-07-24T13:42:02.503601+00:00\",\"parent_project_ref\":\"vhfxnizaxdanmvmouuaf\",\"with_data\":false,\"preview_project_status\":\"ACTIVE_HEALTHY\"}]}"
+      }
+    ],
+    "isError": false
+  }
+}

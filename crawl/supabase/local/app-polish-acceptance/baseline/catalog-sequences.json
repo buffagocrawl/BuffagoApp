@@ -1,0 +1,307 @@
+[
+  {
+    "schema": "public",
+    "name": "states_state_id_seq",
+    "start": 1,
+    "increment": 1,
+    "min": 1,
+    "max": 2147483647,
+    "cache": 1,
+    "cycle": false,
+    "type": "integer",
+    "grants": [
+      {
+        "role": "postgres",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "postgres",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "postgres",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "anon",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "anon",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "anon",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "authenticated",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "authenticated",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "authenticated",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "service_role",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "service_role",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "service_role",
+        "privilege": "USAGE"
+      }
+    ]
+  },
+  {
+    "schema": "public",
+    "name": "daily_xp_claims_id_seq",
+    "start": 1,
+    "increment": 1,
+    "min": 1,
+    "max": "9223372036854775807",
+    "cache": 1,
+    "cycle": false,
+    "type": "bigint",
+    "grants": [
+      {
+        "role": "postgres",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "postgres",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "postgres",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "anon",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "anon",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "anon",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "authenticated",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "authenticated",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "authenticated",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "service_role",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "service_role",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "service_role",
+        "privilege": "USAGE"
+      }
+    ]
+  },
+  {
+    "schema": "public",
+    "name": "wing_battle_options_id_seq",
+    "start": 1,
+    "increment": 1,
+    "min": 1,
+    "max": "9223372036854775807",
+    "cache": 1,
+    "cycle": false,
+    "type": "bigint",
+    "grants": [
+      {
+        "role": "postgres",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "postgres",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "postgres",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "anon",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "anon",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "anon",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "authenticated",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "authenticated",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "authenticated",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "service_role",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "service_role",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "service_role",
+        "privilege": "USAGE"
+      }
+    ]
+  },
+  {
+    "schema": "public",
+    "name": "destination_tags_id_seq",
+    "start": 1,
+    "increment": 1,
+    "min": 1,
+    "max": "9223372036854775807",
+    "cache": 1,
+    "cycle": false,
+    "type": "bigint",
+    "grants": [
+      {
+        "role": "postgres",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "postgres",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "postgres",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "anon",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "anon",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "anon",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "authenticated",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "authenticated",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "authenticated",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "service_role",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "service_role",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "service_role",
+        "privilege": "USAGE"
+      }
+    ]
+  },
+  {
+    "schema": "public",
+    "name": "badge_catalog_id_seq",
+    "start": 1,
+    "increment": 1,
+    "min": 1,
+    "max": "9223372036854775807",
+    "cache": 1,
+    "cycle": false,
+    "type": "bigint",
+    "grants": [
+      {
+        "role": "postgres",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "postgres",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "postgres",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "anon",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "anon",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "anon",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "authenticated",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "authenticated",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "authenticated",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "service_role",
+        "privilege": "SELECT"
+      },
+      {
+        "role": "service_role",
+        "privilege": "UPDATE"
+      },
+      {
+        "role": "service_role",
+        "privilege": "USAGE"
+      }
+    ]
+  }
+]

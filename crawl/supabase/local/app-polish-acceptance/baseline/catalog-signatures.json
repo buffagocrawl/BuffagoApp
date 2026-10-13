@@ -1,0 +1,354 @@
+[
+  {
+    "oid": "127283",
+    "arguments": ""
+  },
+  {
+    "oid": "227138",
+    "arguments": "p_user_id uuid"
+  },
+  {
+    "oid": "44978",
+    "arguments": ""
+  },
+  {
+    "oid": "224585",
+    "arguments": "user_id uuid"
+  },
+  {
+    "oid": "45114",
+    "arguments": ""
+  },
+  {
+    "oid": "45116",
+    "arguments": ""
+  },
+  {
+    "oid": "45118",
+    "arguments": ""
+  },
+  {
+    "oid": "224632",
+    "arguments": "p_amount integer, p_source text, p_reason text, p_user_id uuid, p_idempotency_key text, p_destination_id uuid, p_crawl_id uuid, p_route_id uuid, p_badge_id bigint, p_battle_id bigint, p_challenge_id uuid, p_referral_id uuid, p_metadata jsonb"
+  },
+  {
+    "oid": "224631",
+    "arguments": "p_xp integer"
+  },
+  {
+    "oid": "128598",
+    "arguments": ""
+  },
+  {
+    "oid": "34170",
+    "arguments": "p_user uuid, p_amount integer, p_reason text"
+  },
+  {
+    "oid": "34171",
+    "arguments": "p_user uuid, p_code text"
+  },
+  {
+    "oid": "151417",
+    "arguments": ""
+  },
+  {
+    "oid": "34194",
+    "arguments": ""
+  },
+  {
+    "oid": "227139",
+    "arguments": "p_user_id uuid"
+  },
+  {
+    "oid": "227140",
+    "arguments": ""
+  },
+  {
+    "oid": "227141",
+    "arguments": ""
+  },
+  {
+    "oid": "227144",
+    "arguments": ""
+  },
+  {
+    "oid": "44914",
+    "arguments": ""
+  },
+  {
+    "oid": "226839",
+    "arguments": ""
+  },
+  {
+    "oid": "226841",
+    "arguments": ""
+  },
+  {
+    "oid": "144295",
+    "arguments": ""
+  },
+  {
+    "oid": "227345",
+    "arguments": ""
+  },
+  {
+    "oid": "227728",
+    "arguments": ""
+  },
+  {
+    "oid": "228365",
+    "arguments": ""
+  },
+  {
+    "oid": "226858",
+    "arguments": ""
+  },
+  {
+    "oid": "226901",
+    "arguments": "p_user_id uuid"
+  },
+  {
+    "oid": "228119",
+    "arguments": "p_submission_id uuid, p_action text, p_reason_category text, p_notes text, p_idempotency_key text, p_correlation_id uuid"
+  },
+  {
+    "oid": "228375",
+    "arguments": ""
+  },
+  {
+    "oid": "229479",
+    "arguments": "p_status text"
+  },
+  {
+    "oid": "226520",
+    "arguments": ""
+  },
+  {
+    "oid": "224755",
+    "arguments": "p_user_a uuid, p_user_b uuid"
+  },
+  {
+    "oid": "229623",
+    "arguments": ""
+  },
+  {
+    "oid": "229625",
+    "arguments": ""
+  },
+  {
+    "oid": "227972",
+    "arguments": "p_object_name text"
+  },
+  {
+    "oid": "229715",
+    "arguments": ""
+  },
+  {
+    "oid": "229720",
+    "arguments": ""
+  },
+  {
+    "oid": "229717",
+    "arguments": "p_submission_id uuid"
+  },
+  {
+    "oid": "229724",
+    "arguments": ""
+  },
+  {
+    "oid": "229722",
+    "arguments": ""
+  },
+  {
+    "oid": "227971",
+    "arguments": "p_flag_key text"
+  },
+  {
+    "oid": "227967",
+    "arguments": ""
+  },
+  {
+    "oid": "227970",
+    "arguments": "p_role text"
+  },
+  {
+    "oid": "227973",
+    "arguments": "p_submission_id uuid, p_to_status text, p_expected_from_status text, p_actor_type text, p_actor_id uuid, p_trigger_source text, p_idempotency_key text, p_correlation_id uuid, p_metadata jsonb"
+  },
+  {
+    "oid": "229823",
+    "arguments": "p_user_id uuid, p_destination_id uuid"
+  },
+  {
+    "oid": "229824",
+    "arguments": ""
+  },
+  {
+    "oid": "229825",
+    "arguments": ""
+  },
+  {
+    "oid": "229826",
+    "arguments": ""
+  },
+  {
+    "oid": "229827",
+    "arguments": ""
+  },
+  {
+    "oid": "229829",
+    "arguments": ""
+  },
+  {
+    "oid": "229830",
+    "arguments": "p_submission_id uuid"
+  },
+  {
+    "oid": "229835",
+    "arguments": ""
+  },
+  {
+    "oid": "229837",
+    "arguments": ""
+  },
+  {
+    "oid": "229828",
+    "arguments": ""
+  },
+  {
+    "oid": "229836",
+    "arguments": ""
+  },
+  {
+    "oid": "228115",
+    "arguments": "p_submission_id uuid, p_media_type text, p_algorithm text, p_algorithm_version text, p_fingerprint text, p_nearest_submission_id uuid, p_similarity numeric, p_idempotency_key text, p_correlation_id uuid"
+  },
+  {
+    "oid": "228116",
+    "arguments": "p_worker text, p_lease_seconds integer"
+  },
+  {
+    "oid": "228117",
+    "arguments": "p_job_id uuid, p_claim_token uuid, p_succeeded boolean, p_retryable boolean, p_error_code text, p_error_reason text"
+  },
+  {
+    "oid": "229831",
+    "arguments": "p_submission_id uuid"
+  },
+  {
+    "oid": "228113",
+    "arguments": "p_submission_id uuid, p_result jsonb, p_idempotency_key text, p_correlation_id uuid"
+  },
+  {
+    "oid": "228313",
+    "arguments": ""
+  },
+  {
+    "oid": "228421",
+    "arguments": ""
+  },
+  {
+    "oid": "228615",
+    "arguments": ""
+  },
+  {
+    "oid": "229882",
+    "arguments": ""
+  },
+  {
+    "oid": "228484",
+    "arguments": ""
+  },
+  {
+    "oid": "229884",
+    "arguments": ""
+  },
+  {
+    "oid": "228316",
+    "arguments": "p_user_id uuid, p_trigger_submission_id uuid, p_correlation_id uuid"
+  },
+  {
+    "oid": "228318",
+    "arguments": "p_submission_id uuid, p_reward_kind text, p_transition_id uuid, p_idempotency_key text"
+  },
+  {
+    "oid": "228320",
+    "arguments": "p_submission_id uuid, p_reason text, p_idempotency_key text, p_transition_id uuid"
+  },
+  {
+    "oid": "228369",
+    "arguments": ""
+  },
+  {
+    "oid": "228367",
+    "arguments": ""
+  },
+  {
+    "oid": "228990",
+    "arguments": ""
+  },
+  {
+    "oid": "228493",
+    "arguments": "p_worker text, p_lease_seconds integer"
+  },
+  {
+    "oid": "228377",
+    "arguments": "p_submission_id uuid, p_action text, p_reason_category text, p_notes text, p_idempotency_key text, p_correlation_id uuid"
+  },
+  {
+    "oid": "228490",
+    "arguments": "p_submission_id uuid, p_media_type text, p_algorithm text, p_algorithm_version text, p_limit integer"
+  },
+  {
+    "oid": "228492",
+    "arguments": "p_limit integer"
+  },
+  {
+    "oid": "228494",
+    "arguments": "p_job_id uuid, p_claim_token uuid, p_object_outcome text, p_retryable boolean, p_error_code text"
+  },
+  {
+    "oid": "228547",
+    "arguments": "p_rating_id uuid, p_user_id uuid, p_destination_id uuid"
+  },
+  {
+    "oid": "228740",
+    "arguments": "p_rating_id uuid, p_media_type text, p_expected_mime_type text, p_expected_size_bytes bigint, p_consent_version text, p_attribution_preference text, p_user_caption text, p_idempotency_key text, p_correlation_id uuid, p_destination_id uuid, p_submission_source text"
+  },
+  {
+    "oid": "228321",
+    "arguments": ""
+  },
+  {
+    "oid": "230074",
+    "arguments": "p_destination jsonb, p_created_by uuid"
+  },
+  {
+    "oid": "228737",
+    "arguments": "p_submission_id uuid, p_media_type text, p_sha256 text, p_size_bytes bigint"
+  },
+  {
+    "oid": "228748",
+    "arguments": "p_rating_id uuid, p_media_type text, p_expected_mime_type text, p_expected_size_bytes bigint, p_consent_version text, p_attribution_preference text, p_user_caption text, p_idempotency_key text, p_correlation_id uuid, p_destination_id uuid, p_submission_source text"
+  },
+  {
+    "oid": "230092",
+    "arguments": "p_user_id uuid, p_ip_address text"
+  },
+  {
+    "oid": "227977",
+    "arguments": "p_submission_id uuid, p_idempotency_key text, p_correlation_id uuid"
+  },
+  {
+    "oid": "228489",
+    "arguments": "p_job_id uuid, p_claim_token uuid"
+  },
+  {
+    "oid": "228491",
+    "arguments": "p_job_id uuid, p_claim_token uuid, p_succeeded boolean, p_retryable boolean, p_processed_path text, p_thumbnail_path text, p_perceptual_hash text, p_error_code text, p_error_reason text"
+  },
+  {
+    "oid": "228488",
+    "arguments": "p_limit integer"
+  }
+]
