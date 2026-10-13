@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "realServices": true,
+  "localOnly": true,
+  "first": "Worker exit: 0\r\n{\"event\": \"wing_cleanup_completed\", \"job_id\": \"82c83e9f-7d0e-48f2-9d67-96da002c706d\", \"status\": \"SUCCEEDED\"}\r\n\r\n",
+  "retry": "Worker exit: 0\r\n{\"event\": \"wing_cleanup_idle\", \"status\": \"NO_JOB\"}\r\n\r\n",
+  "settled": {
+    "status": "succeeded",
+    "attempt_count": 2
+  },
+  "originalDeleted": true,
+  "derivativesRetained": true,
+  "repair": "omit inherited Content-Type for bodyless exact-object DELETE",
+  "syntheticJobReopened": true
+}

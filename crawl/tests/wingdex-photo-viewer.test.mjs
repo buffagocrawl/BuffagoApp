@@ -1,3 +1,6 @@
+import { photoControlsRuntime } from './helpers/photo-controls-runtime.mjs';
+import { subscribePhotoVotes } from '../lib/photoVoteEvents.js';
+import { orderWingdexPhotos } from '../lib/wingdexGallery.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mobileModule, hookRuntime, findElement } from './helpers/mobile-runtime.mjs';
@@ -8,16 +11,24 @@ const all = (tree, type) => !tree ? [] : Array.isArray(tree) ? tree.flatMap((n) 
 function harness({ fullPhoto, mutation, ownVotes, insets = { top: 0, bottom: 0 }, sharedController = false } = {}) {
   const runtime = hookRuntime(); const auth = { user: { id: 'user' } }; const signed = []; const votes = []; const changed = []; let closed = 0; let onAppState;
   const photos = ['a','b','c'].map((id) => ({ submission_id: id, destination_id: 'restaurant', like_count: 3, dislike_count: 0, signed_url: 'https://thumb/'+id }));
-  const client = { auth: { getUser: async () => ({ data: auth, error: null }) }, from: () => ({ upsert: async (row) => {
-    votes.push(row); return mutation ? mutation(row) : { error: null };
-  }, delete() {
-    const row = { vote: null };
-    return { eq(k,v) { row[k]=v; return this; }, then(resolve,reject) {
-      votes.push(row); return Promise.resolve(mutation ? mutation(row) : { error: null }).then(resolve,reject);
+  const saved = new Map();
+  const client = { auth: { getUser: async () => ({ data: auth, error: null }) },
+    rpc: async (_name, args) => {
+      const row = { submission_id: args.p_submission_id, vote: args.p_vote, user_id: auth.user.id };
+      votes.push(row);
+      const result = mutation ? await mutation(row) : { error: null };
+      if (result.error) return result;
+      const previous = saved.get(row.submission_id) ?? null;
+      saved.set(row.submission_id, row.vote);
+      const source = photos.find((p) => p.submission_id === row.submission_id);
+      return { error: null, data: { submission_id: row.submission_id, vote: row.vote,
+        like_count: (source.like_count ?? 0) + Number(row.vote === 1),
+        dislike_count: (source.dislike_count ?? 0) + Number(row.vote === -1), neutral_count: Number(row.vote === 0) } };
     } };
-  } }) };
+
   const { default: Viewer } = mobileModule('components/WingdexPhotoViewer.jsx', {
     react: runtime.react, 'react/jsx-runtime': runtime.jsx,
+    './PhotoVoteControls': photoControlsRuntime(runtime), '../lib/photoVoteEvents': { subscribePhotoVotes },
     'react-native': { AppState: { addEventListener: (_event, callback) => { onAppState = callback; return { remove() {} }; } }, Modal: 'modal', View: 'view', StyleSheet: { create: (s) => s } },
     'expo-image': { Image: 'image' }, 'react-native-paper': { ActivityIndicator: 'spinner', Button: 'button', IconButton: 'icon', Text: 'text' },
     'react-native-gesture-handler': { GestureHandlerRootView: 'root' }, 'react-native-zoom-toolkit': { ResumableZoom: 'zoom' },
@@ -47,7 +58,7 @@ test('shared viewer refreshes server totals without changing the parent vote sel
   h.props.photos[1].current_vote = 1;
   h.props.getVoteVersion = () => 0;
   h.render(); await flush(); h.render();
-  assert.deepEqual({ ...h.changed.at(-1) }, { submission_id: 'b', like_count: 7, dislike_count: 0 });
+  assert.deepEqual({ ...h.changed.at(-1) }, { submission_id: 'b', like_count: 7, dislike_count: 0, neutral_count: undefined });
   assert.equal(Object.hasOwn(h.changed.at(-1), 'current_vote'), false);
   count = 9; h.resume(); h.render(); await flush(); h.render();
   assert.equal(h.changed.at(-1).like_count, 9);

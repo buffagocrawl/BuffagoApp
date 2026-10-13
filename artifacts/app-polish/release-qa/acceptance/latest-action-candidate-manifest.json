@@ -1,0 +1,38 @@
+{
+  "policy": "latest valid surviving recorded action, not invented complete history",
+  "deployment": "none; local proposal only",
+  "files": [
+    {
+      "path": "crawl/supabase/proposals/app-polish-shared-photo-votes.sql",
+      "sha256": "f93474fbceb1756700b43989de21abc8b0e2259078d97c486447fdb610eb513c"
+    },
+    {
+      "path": "crawl/supabase/proposals/app-polish-vote-conflict-review.sql",
+      "sha256": "d6871ae5fb88effd0d9294819723b428f08d1448196fabf31d12aca7ce2315a8"
+    },
+    {
+      "path": "crawl/tests/app-polish-conflict-reconciliation.test.mjs",
+      "sha256": "a42a81791298e9221003cd48107d09ffac220fa45661a6162db5a5658f6094ed"
+    },
+    {
+      "path": "crawl/tests/app-polish-latest-action-postgres.test.mjs",
+      "sha256": "7a783a9f922f43a7998f3bd0f85cc529ac9a5fade4648ad1cc81faff0dff194c"
+    },
+    {
+      "path": "crawl/tests/app-polish-vote-bridge.test.mjs",
+      "sha256": "402285d0c4735c70494ed9bca8b9a588e8771c5ecd7a3fbf31324e1c9514dcc9"
+    },
+    {
+      "path": "crawl/scripts/qa/read-eas-submissions.cjs",
+      "sha256": "c2f07c7f12396c3651f1d7a7ecdee4c2ebde2b666f110327152c253dce426e94"
+    },
+    {
+      "path": "docs/buffago-app-polish-release-plan.md",
+      "sha256": "28e7d649c473d48d952673c189146a419708f5f13edc796f1ff0024706353ee3"
+    },
+    {
+      "path": "docs/buffago-app-polish.md",
+      "sha256": "2358e2a74e66631fcc340d2369409c01fa67e35b160d7248d849ab0f244fd8c0"
+    }
+  ]
+}

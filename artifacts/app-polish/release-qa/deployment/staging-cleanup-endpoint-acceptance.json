@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "target": "http://127.0.0.1:55321",
+  "realServices": true,
+  "syntheticOnly": true,
+  "guest": {
+    "status": 401,
+    "body": {
+      "ok": false,
+      "code": "authentication_required",
+      "message": "Please sign in again to manage this upload.",
+      "stage": "staging_cleanup",
+      "retryable": false,
+      "correlationId": "fed1c10e-6fc4-4c9b-a0cc-33549687ba49"
+    }
+  },
+  "forbidden": {
+    "status": 403,
+    "body": {
+      "ok": false,
+      "code": "staging_object_forbidden",
+      "message": "This staged object is not owned by the signed-in user.",
+      "stage": "staging_cleanup",
+      "retryable": false,
+      "correlationId": "fed1c10e-6fc4-4c9b-a0cc-33549687ba49"
+    }
+  },
+  "owned": {
+    "status": 200,
+    "body": {
+      "ok": true,
+      "deleted": true,
+      "stage": "staging_cleanup",
+      "correlationId": "fed1c10e-6fc4-4c9b-a0cc-33549687ba49"
+    }
+  },
+  "retry": {
+    "status": 200,
+    "body": {
+      "ok": true,
+      "deleted": true,
+      "stage": "staging_cleanup",
+      "correlationId": "fed1c10e-6fc4-4c9b-a0cc-33549687ba49"
+    }
+  },
+  "deleted": true
+}

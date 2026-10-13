@@ -1,3 +1,15 @@
+import { subscribePhotoVotes } from './photoVoteEvents.js';
+
+export function orderWingdexPhotos(photos) {
+  return [...photos].sort((a, b) => (Number(b.like_count) || 0) - (Number(a.like_count) || 0)
+    || (Date.parse(b.created_at) || 0) - (Date.parse(a.created_at) || 0)
+    || String(a.submission_id).localeCompare(String(b.submission_id)));
+}
+
+const galleryCaches = new WeakMap();
+let cacheRevision = 0;
+subscribePhotoVotes(() => { cacheRevision += 1; });
+
 /**
  * Wingdex's public media boundary. The Edge Function owns the moderation and
  * storage checks; this helper only normalizes its safe response for the UI.
@@ -14,7 +26,7 @@ export function normalizeWingdexGalleryResponse(payload) {
         ? Math.max(0, Number(row.picture_count)) : images.length,
       approvedSubmissionCount: Number.isFinite(Number(row.approved_submission_count)) && row.approved_submission_count != null
         ? Math.max(0, Number(row.approved_submission_count)) : null,
-      images,
+      images: orderWingdexPhotos(images),
     };
     return result;
   }, {});
@@ -52,9 +64,20 @@ export async function loadWingdexFullPhoto(photo, client) {
 
 export async function loadWingdexRestaurantGallery(destinationId, client, { offset = 0 } = {}) {
   if (!destinationId) return { count: 0, images: [] };
-  const { data, error } = await client.functions.invoke('wing-public-gallery', {
-    body: { destination_ids: [String(destinationId)], include_images: true, offset },
-  });
-  if (error || data?.ok === false) throw error || new Error('Pictures are temporarily unavailable.');
-  return normalizeWingdexGalleryResponse(data)[String(destinationId)] || { count: 0, images: [] };
+  if (!galleryCaches.has(client)) galleryCaches.set(client, new Map());
+  const cache = galleryCaches.get(client);
+  const key = `${destinationId}:${offset}`;
+  const cached = cache.get(key);
+  if (cached && cached.revision === cacheRevision && cached.expires > Date.now()) return cached.promise;
+  const entry = { revision: cacheRevision, expires: Date.now() + 30000, promise: null };
+  entry.promise = (async () => {
+    const { data, error } = await client.functions.invoke('wing-public-gallery', {
+      body: { destination_ids: [String(destinationId)], include_images: true, offset },
+    });
+    if (error || data?.ok === false) throw error || new Error('Pictures are temporarily unavailable.');
+    return normalizeWingdexGalleryResponse(data)[String(destinationId)] || { count: 0, images: [] };
+  })();
+  cache.set(key, entry);
+  try { return await entry.promise; }
+  catch (error) { if (cache.get(key) === entry) cache.delete(key); throw error; }
 }

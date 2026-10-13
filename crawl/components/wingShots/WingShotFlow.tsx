@@ -28,6 +28,8 @@ import {
   wingShotUserMessage,
   wingShotProcessingCopy,
 } from '../../lib/wingShots';
+import { WingShotFramingPreview } from './WingShotFramingPreview';
+import { acquireDarkModalStatusBar, refreshStatusBarPolicy } from '../../lib/statusBarPolicy';
 import { WingShotMediaPreview } from './WingShotMediaPreview';
 import {
   expoWingShotMediaAdapter,
@@ -45,6 +47,7 @@ type Attribution = 'username' | 'display_name' | 'anonymous';
 type Phase =
   | 'empty'
   | 'choosing'
+  | 'framing'
   | 'validating'
   | 'valid'
   | 'submitting'
@@ -132,7 +135,10 @@ export function WingShotFlow({
   validationTransport,
   analyticsContext,
 }: Props) {
+  useEffect(()=>visible ? acquireDarkModalStatusBar() : undefined,[visible]);
   const [media, setMedia] = useState<WingShotSelectedMedia | null>(null);
+  const [framingMedia, setFramingMedia] = useState<WingShotSelectedMedia | null>(null);
+  const framingRef = useRef<WingShotSelectedMedia | null>(null);
   const [phase, setPhase] = useState<Phase>('empty');
   const [consentAccepted, setConsentAccepted] = useState(false);
   const [attribution, setAttribution] = useState<Attribution | null>(null);
@@ -187,6 +193,8 @@ export function WingShotFlow({
     });
     if (sessionRef.current.staging) void cleanupWingShotStaging({ client: supabaseClient, staging: sessionRef.current.staging, correlationId: sessionRef.current.correlationId }).catch(() => undefined);
     void wingShotDrafts.clear(sessionRef.current.correlationId);
+    framingRef.current = null;
+    setFramingMedia(null);
     setMedia(null);
     setConsentAccepted(false);
     setAttribution(null);
@@ -256,11 +264,14 @@ export function WingShotFlow({
     resetWingShotForm('rating_cancelled');
   }, [draftResetSignal, resetWingShotForm]);
 
-  useEffect(() => () => {
-    mountedRef.current = false;
-    validationAbortRef.current?.abort();
-    validationProgressControllerRef.current?.stop();
-    abortRef.current?.abort();
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      validationAbortRef.current?.abort();
+      validationProgressControllerRef.current?.stop();
+      abortRef.current?.abort();
+    };
   }, []);
 
   useEffect(() => {
@@ -521,7 +532,7 @@ export function WingShotFlow({
 
   const chooseMedia = useCallback(
     async (source: 'photo' | 'library') => {
-      if (['choosing', 'validating', 'submitting', 'cancelling'].includes(phaseRef.current)) return;
+      if (['choosing', 'framing', 'validating', 'submitting', 'cancelling'].includes(phaseRef.current)) return;
       const selectionSequence = ++validationSequenceRef.current;
       trackEvent({
         eventName: 'wing_shot_capture_started',
@@ -538,7 +549,11 @@ export function WingShotFlow({
           ? await mediaAdapter.takePhoto()
           : await mediaAdapter.chooseFromLibrary({ allowedMediaKinds: ['photo'] });
         if (!mountedRef.current || selectionSequence !== validationSequenceRef.current) return;
-        acceptMedia(selected);
+        if (selected) {
+          framingRef.current = selected;
+          setFramingMedia(selected);
+          setPhaseSafely('framing');
+        } else acceptMedia(null);
       } catch (error) {
         if (!mountedRef.current || selectionSequence !== validationSequenceRef.current) return;
         const message = wingShotUserMessage(error, { ratingSaved: !draftMode });
@@ -557,6 +572,8 @@ export function WingShotFlow({
 
   const removeMedia = useCallback(() => {
     if (sessionRef.current.staging) void cleanupWingShotStaging({ client: supabaseClient, staging: sessionRef.current.staging, correlationId: sessionRef.current.correlationId }).catch(() => undefined);
+    framingRef.current = null;
+    setFramingMedia(null);
     setMedia(null);
     setConsentAccepted(false);
     setErrorMessage('');
@@ -572,6 +589,8 @@ export function WingShotFlow({
 
   const replaceMedia = useCallback(() => {
     if (sessionRef.current.staging) void cleanupWingShotStaging({ client: supabaseClient, staging: sessionRef.current.staging, correlationId: sessionRef.current.correlationId }).catch(() => undefined);
+    framingRef.current = null;
+    setFramingMedia(null);
     setMedia(null);
     setConsentAccepted(false);
     setErrorMessage('');
@@ -760,6 +779,7 @@ export function WingShotFlow({
 
   return (
     <Modal
+      onShow={refreshStatusBarPolicy}
       animationType="none"
       onRequestClose={disabled ? undefined : closeFlow}
       presentationStyle="fullScreen"
@@ -785,12 +805,20 @@ export function WingShotFlow({
           </View>
 
           <ScrollView
+            scrollEnabled={!framingMedia}
             contentContainerStyle={styles.content}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator
             testID="wing-shot.scroll"
           >
             <View style={styles.contentGroup}>
+            {framingMedia ? <WingShotFramingPreview media={framingMedia}
+              onCancel={() => { framingRef.current = null; setFramingMedia(null); setPhaseSafely('empty'); }}
+              onConfirm={(framed) => {
+                if (!mountedRef.current || framingRef.current !== framingMedia) return;
+                framingRef.current = null; setFramingMedia(null); acceptMedia(framed);
+              }} /> : <>
+
               <View style={styles.headerCopy}>
                 <Text style={styles.eyebrow} allowFontScaling>
                   {draftMode ? 'OPTIONAL · ADD A PHOTO BEFORE RATING' : 'OPTIONAL · YOUR RATING HAS ALREADY SAVED'}
@@ -1078,6 +1106,7 @@ export function WingShotFlow({
                 </Text>
               </Pressable>
             ) : null}
+            </> }
             </View>
           </ScrollView>
         </KeyboardAvoidingView>

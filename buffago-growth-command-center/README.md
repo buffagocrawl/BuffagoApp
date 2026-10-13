@@ -245,3 +245,7 @@ No deployment or production restart was performed during development. When ready
 4. Run `python3 -m unittest discover -s tests` from the reviewed source directory in a desktop session with Tk available. The screenshot capture test uses optional developer Pillow; the application does not require it.
 5. At a time you choose, restart only the display: `sudo systemctl restart buffago-growth.service`. Check `systemctl status buffago-growth.service` and `journalctl -u buffago-growth.service -n 50`. The control service needs no update for this feature.
 6. Open the mission, confirm one platform, reopen and correct it, then undo the trial confirmation. Verify weekly progress, existing metrics and charts. For a restart persistence check, confirm a real completed mission, restart the display manually and check that the confirmation remains.
+
+## Pending restaurants
+
+Action Required includes pending restaurant suggestions from the same queue Mango reviews, alongside photos, feedback and open work. See [restaurant review rollout](../docs/mango-restaurant-review.md). A missing backend field displays unavailable until the migration is applied.

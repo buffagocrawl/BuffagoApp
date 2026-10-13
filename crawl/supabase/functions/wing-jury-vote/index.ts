@@ -25,8 +25,9 @@ Deno.serve(async (request) => {
       if (prior.error || !prior.data) return respond(409, { ok: false, error: 'existing_vote_unavailable' });
       row = prior.data; existing = true;
     }
-    const counts = await authClient.from('wing_jury_photo_vote_counts').select('like_count').eq('submission_id', submissionId).maybeSingle();
+    const counts = await authClient.from('wing_jury_photo_vote_counts').select('like_count,dislike_count,neutral_count').eq('submission_id', submissionId).maybeSingle();
     if (counts.error) return respond(503, { ok: false, error: 'vote_count_unavailable' });
-    return respond(200, { ok: true, existing_vote: existing, submission_id: row.submission_id, vote: row.vote, created_at: row.created_at, like_count: Number(counts.data?.like_count || 0) });
+    return respond(200, { ok: true, existing_vote: existing, submission_id: row.submission_id, vote: row.vote, created_at: row.created_at,
+      like_count: Number(counts.data?.like_count || 0), dislike_count: Number(counts.data?.dislike_count || 0), neutral_count: Number(counts.data?.neutral_count || 0) });
   } catch { return respond(503, { ok: false, error: 'vote_unavailable' }); }
 });

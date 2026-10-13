@@ -24,9 +24,10 @@ test('public gallery enforces strict approved processed media at server boundary
   assert.match(fn, /createSignedUrls/);
   assert.doesNotMatch(fn, /original_storage_path/);
   assert.doesNotMatch(fn, /getPublicUrl/);
-  assert.match(fn, /order\('like_count', \{ ascending: false \}\)/);
-  assert.match(fn, /order\('dislike_count', \{ ascending: true \}\)/);
-  assert.match(fn, /order\('created_at', \{ ascending: true \}\)/);
+  assert.match(fn, /wing_jury_photo_vote_counts/);
+  assert.match(fn, /candidates\.sort/);
+  assert.doesNotMatch(fn, /order\('dislike_count'/);
+  assert.match(fn, /order\('created_at', \{ ascending: false \}\)/);
   assert.match(fn, /order\('id', \{ ascending: true \}\)/);
   assert.match(helper, /include_covers: true/);
 });

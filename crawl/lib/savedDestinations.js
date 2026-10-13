@@ -1,3 +1,4 @@
+import { readAllWingdexRows } from './wingdexCollection.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { accountUserId, createAccountScope, lookupAccount } from './accountBoundary.js';
 
@@ -73,11 +74,11 @@ function mapDatabaseError(error) {
 }
 
 async function personalRatingIds(client, userId, destinationIds = null) {
-  let query = client.from('destination_ratings').select('destination_id').eq('user_id', userId);
-  if (Array.isArray(destinationIds) && destinationIds.length) query = query.in('destination_id', destinationIds);
-  const { data, error } = await query;
+  const { data, error } = await readAllWingdexRows(() => client.from('destination_ratings')
+    .select('destination_id').eq('user_id', userId).order('id'));
   if (error) throw mapDatabaseError(error);
-  return new Set((data || []).map((row) => row?.destination_id).filter(Boolean));
+  const allowed = destinationIds?.length ? new Set(destinationIds) : null;
+  return new Set((data || []).map(row => row?.destination_id).filter(id => id && (!allowed || allowed.has(id))));
 }
 
 export async function getSavedDestinationState({ client, destinationIds = [], expectedUserId, isCurrent } = {}) {
@@ -89,11 +90,11 @@ export async function getSavedDestinationState({ client, destinationIds = [], ex
 
   const ids = Array.from(new Set(destinationIds.filter(Boolean)));
   const load = async (kind) => {
-    let query = client.from(tableFor(kind)).select('destination_id, created_at').eq('user_id', user.id);
-    if (ids.length) query = query.in('destination_id', ids);
-    const { data, error } = await query;
+    const { data, error } = await readAllWingdexRows(() => client.from(tableFor(kind))
+      .select('destination_id, created_at').eq('user_id', user.id).order('destination_id'), { isCurrent });
     if (error) throw mapDatabaseError(error);
-    return new Set((data || []).map((row) => row?.destination_id).filter(Boolean));
+    const allowed = ids.length ? new Set(ids) : null;
+    return new Set((data || []).map(row => row?.destination_id).filter(id => id && (!allowed || allowed.has(id))));
   };
 
   const [ratedIds, favoriteIds, wantToTryIds] = await Promise.all([
@@ -110,11 +111,9 @@ export async function getSavedDestinations({ client, kind, expectedUserId, isCur
   const user = await currentUser(client, expectedUserId, isCurrent);
   if (!user?.id) return { status: 'guest', userId: null, rows: [] };
 
-  const { data: saved, error: savedError } = await client
-    .from(tableFor(kind))
-    .select('destination_id, created_at')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
+  const { data: saved, error: savedError } = await readAllWingdexRows(() => client
+    .from(tableFor(kind)).select('destination_id, created_at').eq('user_id', user.id)
+    .order('created_at', { ascending: false }).order('destination_id'), { isCurrent });
   requireCurrent(user, expectedUserId, isCurrent);
   if (savedError) throw mapDatabaseError(savedError);
 
@@ -122,12 +121,20 @@ export async function getSavedDestinations({ client, kind, expectedUserId, isCur
   const ids = savedRows.map((row) => row.destination_id).filter(Boolean);
   if (!ids.length) return { status: 'signed_in', userId: user.id, rows: [] };
 
-  const [{ data: destinations, error: destinationError }, ratedIds] = await Promise.all([
-    client.from('destinations').select('id, name, lat, lng, address').in('id', ids),
-    personalRatingIds(client, user.id, ids),
-  ]);
+  const destinations = [];
+  // Bounded ID batches keep the URL below gateway limits for large saved lists.
+  for (let start = 0; start < ids.length; start += 200) {
+    const { data, error } = await readAllWingdexRows(() => client.from('destinations')
+      .select('id, name, lat, lng, address').in('id', ids.slice(start, start + 200)).order('id'), { isCurrent });
+    requireCurrent(user, expectedUserId, isCurrent);
+    if (error) throw mapDatabaseError(error);
+    destinations.push(...(data || []));
+  }
+  const { data: ratings, error: ratingError } = await readAllWingdexRows(() => client.from('destination_ratings')
+    .select('destination_id').eq('user_id', user.id).order('id'), { isCurrent });
   requireCurrent(user, expectedUserId, isCurrent);
-  if (destinationError) throw mapDatabaseError(destinationError);
+  if (ratingError) throw mapDatabaseError(ratingError);
+  const ratedIds = new Set((ratings || []).map(row => row.destination_id));
 
   const byId = new Map((destinations || []).map((destination) => [destination.id, destination]));
   return {

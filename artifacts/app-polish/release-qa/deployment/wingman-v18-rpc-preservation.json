@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "readOnlyProductionSchemaInspection": true,
+  "rows": [
+    {
+      "name": "wingman_consume_rate_limit",
+      "definitionUnchangedFromValidatedBaseline": true
+    },
+    {
+      "name": "wingman_create_destination",
+      "definitionUnchangedFromValidatedBaseline": true
+    }
+  ]
+}

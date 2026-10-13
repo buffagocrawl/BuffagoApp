@@ -34,13 +34,13 @@ Deno.serve(async (request) => {
       : { data: [], error: null };
     if (personalResult.error) return respond(503, { ok: false, error: 'reveal_unavailable' });
     const personal = personalResult.data?.[0] || null;
-    const counts = await admin.from('wing_jury_photo_vote_counts').select('like_count').eq('submission_id', submissionId).maybeSingle();
+    const counts = await admin.from('wing_jury_photo_vote_counts').select('like_count,dislike_count,neutral_count').eq('submission_id', submissionId).maybeSingle();
     if (counts.error) return respond(503, { ok: false, error: 'reveal_unavailable' });
     const [favorite, want] = authenticated ? await Promise.all([
       admin.from('user_destination_favorites').select('destination_id').eq('user_id', user.id).eq('destination_id', photo.destination_id).maybeSingle(),
       admin.from('user_want_to_try').select('destination_id').eq('user_id', user.id).eq('destination_id', photo.destination_id).maybeSingle(),
     ]) : [{ data: null, error: null }, { data: null, error: null }];
     if (favorite.error || want.error) return respond(503, { ok: false, error: 'reveal_unavailable' });
-    return respond(200, { ok: true, restaurant: destination.data, photo_like_count: Number(counts.data?.like_count || 0), restaurant_rating: { average_weight_score: summary.average_weight_score, rating_count: summary.rating_count }, personal_rating: personal ? { weight_score: personal.weight_score, created_at: personal.created_at } : null, favorite: Boolean(favorite.data), want_to_try: Boolean(want.data), save_action: authenticated ? (personal ? 'favorite' : 'want_to_try') : 'sign_in_to_save' });
+    return respond(200, { ok: true, restaurant: destination.data, photo_like_count: Number(counts.data?.like_count || 0), photo_dislike_count: Number(counts.data?.dislike_count || 0), photo_neutral_count: Number(counts.data?.neutral_count || 0), restaurant_rating: { average_weight_score: summary.average_weight_score, rating_count: summary.rating_count }, personal_rating: personal ? { weight_score: personal.weight_score, created_at: personal.created_at } : null, favorite: Boolean(favorite.data), want_to_try: Boolean(want.data), save_action: authenticated ? (personal ? 'favorite' : 'want_to_try') : 'sign_in_to_save' });
   } catch { return respond(503, { ok: false, error: 'reveal_unavailable' }); }
 });

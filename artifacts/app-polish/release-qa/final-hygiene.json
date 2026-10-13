@@ -1,0 +1,2236 @@
+{
+  "branch": "feature/buffago-app-polish",
+  "base": "1cb2ba52ef7369436e2e73ec40f93876119e8409",
+  "removed": [
+    {
+      "path": "artifacts/app-polish/release-qa/android-pinch.log",
+      "bytes": 1356,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/bridge-concurrency.log",
+      "bytes": 3558,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/crop-comparison.log",
+      "bytes": 1200,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deno-check.log",
+      "bytes": 802,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/jury-only-owner-policy-test.log",
+      "bytes": 776,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/local-stack-start.log",
+      "bytes": 5895,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/local-staging-config-final-check.log",
+      "bytes": 1268,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/provided-export-dependency-audit-final.log",
+      "bytes": 476,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/provided-export-dependency-audit.log",
+      "bytes": 2702,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/schema-baseline-application.log",
+      "bytes": 62436,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/schema-baseline-final-validation.log",
+      "bytes": 524,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-cleanup-acceptance.log",
+      "bytes": 182,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-cleanup-endpoint-acceptance.log",
+      "bytes": 212,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-edge-phase-acceptance.log",
+      "bytes": 2118,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-edge-phase-final.log",
+      "bytes": 268,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-edge-phase-resume.log",
+      "bytes": 2138,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-fixture-setup-after-storage-fix.log",
+      "bytes": 1970,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-fixture-setup-final.log",
+      "bytes": 212,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-fixture-setup-retry.log",
+      "bytes": 1990,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-fixture-setup.log",
+      "bytes": 1880,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-functions-runtime.log",
+      "bytes": 62644,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-old-jury-http-acceptance.log",
+      "bytes": 2354,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-old-jury-http-final.log",
+      "bytes": 2386,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-old-jury-http-loopback.log",
+      "bytes": 2364,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-old-jury-http-native-routing.log",
+      "bytes": 184,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-storage-cascade-acceptance-final.log",
+      "bytes": 208,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-storage-cascade-acceptance.log",
+      "bytes": 2170,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-upload-acceptance.log",
+      "bytes": 186,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-voting-acceptance.log",
+      "bytes": 3656,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-voting-resume.log",
+      "bytes": 184,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/wingdex-sort-filters-lint-final.log",
+      "bytes": 4498,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/wingdex-sort-filters-lint.log",
+      "bytes": 5558,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/wingdex-sort-filters-native-reset.log",
+      "bytes": 150,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/wingdex-sort-filters-native.log",
+      "bytes": 3052,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/wingdex-sort-filters-tests.log",
+      "bytes": 9238,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/wingdex-sort-filters-typecheck-final.log",
+      "bytes": 0,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/wingdex-sort-filters-typecheck.log",
+      "bytes": 3266,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/mango-build.log",
+      "bytes": 824,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/mango-lint.log",
+      "bytes": 126,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native-exports.log",
+      "bytes": 12776,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/discover-controls.xml",
+      "bytes": 34850,
+      "reason": "Disposable UI hierarchy capture; final screenshots and acceptance receipts retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/favorites-reset-defaults.xml",
+      "bytes": 31416,
+      "reason": "Disposable UI hierarchy capture; final screenshots and acceptance receipts retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/favorites-shared-filters.xml",
+      "bytes": 31773,
+      "reason": "Disposable UI hierarchy capture; final screenshots and acceptance receipts retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/filter-options.xml",
+      "bytes": 48149,
+      "reason": "Disposable UI hierarchy capture; final screenshots and acceptance receipts retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/sort-options.xml",
+      "bytes": 41315,
+      "reason": "Disposable UI hierarchy capture; final screenshots and acceptance receipts retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/want-to-try-cleared.xml",
+      "bytes": 36362,
+      "reason": "Disposable UI hierarchy capture; final screenshots and acceptance receipts retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/want-to-try-filtered-empty.xml",
+      "bytes": 24557,
+      "reason": "Disposable UI hierarchy capture; final screenshots and acceptance receipts retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/statusbar-native.log",
+      "bytes": 1552,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/statusbar-tests.log",
+      "bytes": 6892,
+      "reason": "Unreferenced generated execution log; final receipts and referenced validation logs retained"
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/pinch-after.png",
+      "bytes": 231693,
+      "reason": "Intermediate pinch screenshot superseded by confirmed frame and preview"
+    },
+    {
+      "path": "artifacts/app-polish/derivatives",
+      "bytes": 0,
+      "reason": "Empty generated derivative output directory"
+    },
+    {
+      "path": ".tmp/app-polish-hygiene-inventory.cjs",
+      "bytes": 3434,
+      "reason": "Temporary audit helper or intermediate export generated during final hygiene; final report retained"
+    },
+    {
+      "path": ".tmp/app-polish-hygiene-inventory.json",
+      "bytes": 96933,
+      "reason": "Temporary audit helper or intermediate export generated during final hygiene; final report retained"
+    },
+    {
+      "path": ".tmp/app-polish-hygiene-removals.json",
+      "bytes": 16105,
+      "reason": "Temporary audit helper or intermediate export generated during final hygiene; final report retained"
+    },
+    {
+      "path": ".tmp/app-polish-hygiene-report.cjs",
+      "bytes": 10486,
+      "reason": "Temporary audit helper or intermediate export generated during final hygiene; final report retained"
+    },
+    {
+      "path": ".tmp/app-polish-hygiene-validate.cjs",
+      "bytes": 3654,
+      "reason": "Temporary audit helper or intermediate export generated during final hygiene; final report retained"
+    },
+    {
+      "path": ".tmp/app-polish-deployment-receipt.json",
+      "bytes": 1231,
+      "reason": "Temporary audit helper or intermediate export generated during final hygiene; final report retained"
+    }
+  ],
+  "removedCount": 57,
+  "removedBytes": 828189,
+  "inventory": [
+    {
+      "path": "artifacts/app-polish/native/320dp-font1.3/wingman-details-keyboard.png",
+      "bytes": 209318,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/native/320dp-font1.3/wingman-town-keyboard.png",
+      "bytes": 181303,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/native/detail-withdrawal-synchronized.png",
+      "bytes": 1725533,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/native/jury-vote-changed.png",
+      "bytes": 975871,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/native/jury-vote-withdrawn.png",
+      "bytes": 972645,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/native/restaurant-detail-synchronized.png",
+      "bytes": 1744070,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/native/viewer-tapped-second.png",
+      "bytes": 1394436,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/native/wingdex-inline-swiped.png",
+      "bytes": 1028500,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/native/wingman-confidence-50.png",
+      "bytes": 487551,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/native/wingman-details-keyboard.png",
+      "bytes": 325669,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/native/wingman-town-keyboard.png",
+      "bytes": 322839,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/android-build-contract-test.log",
+      "bytes": 820,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/android-build-voting-source.js",
+      "bytes": 2989,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/bridge-contract-tests.log",
+      "bytes": 6602,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/conflict-tests.log",
+      "bytes": 1536,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/conflicts-http-tests.log",
+      "bytes": 1314,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/conflicts-readonly.json",
+      "bytes": 1487,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/distribution-current.json",
+      "bytes": 1682,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/eas-build-inventory.json",
+      "bytes": 20666,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/eas-submission-build-mapping.json",
+      "bytes": 10601,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/eas-submission-metadata.json",
+      "bytes": 5450,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/http-focused-tests.log",
+      "bytes": 1542,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/ios-build-contract-test.log",
+      "bytes": 820,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/ios-build-voting-source.js",
+      "bytes": 2989,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/latest-action-audit-tests.log",
+      "bytes": 3522,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/latest-action-candidate-manifest.json",
+      "bytes": 1474,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/latest-action-pg17-tests.log",
+      "bytes": 1654,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/latest-action-policy-tests.log",
+      "bytes": 4084,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/ota-channels.json",
+      "bytes": 56,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/ota-updates.json",
+      "bytes": 56,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/prior-prototype-history-guard-tests.log",
+      "bytes": 734,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/staging-branch-discovery.json",
+      "bytes": 512,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/staging-project-discovery.json",
+      "bytes": 986,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/vote-timestamp-contract-readonly.json",
+      "bytes": 10883,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/acceptance/worker-tests.log",
+      "bytes": 204,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/android-pinch.log",
+      "bytes": 1356,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/branch-inventory.json",
+      "bytes": 23483,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/bridge-concurrency.log",
+      "bytes": 3558,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/candidate-manifest.json",
+      "bytes": 1880,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/cleanup-focused-tests.log",
+      "bytes": 17376,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/cleanup-manifest.json",
+      "bytes": 45117,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/cleanup-results.json",
+      "bytes": 60799,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/crop-comparison.log",
+      "bytes": 1200,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deno-check.log",
+      "bytes": 802,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployed/wing-jury-reveal/index.js",
+      "bytes": 1400210,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployed/wing-jury-vote/index.js",
+      "bytes": 1398464,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployed/wing-public-gallery/index.ts",
+      "bytes": 8467,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployed/wingman-intake/index.ts",
+      "bytes": 21930,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployed-contract-tests.log",
+      "bytes": 2172,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployed-edge-manifest.json",
+      "bytes": 1231,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployed-function-definitions.json",
+      "bytes": 6833,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/20261013022806_wingman_rate_limit_repair.deployed.sql",
+      "bytes": 2712,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/baseline-edge-source-verification.json",
+      "bytes": 9100,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/file-hashes.json",
+      "bytes": 3874,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/jury-only-owner-policy-preflight-test.log",
+      "bytes": 784,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/jury-only-owner-policy-test.log",
+      "bytes": 776,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/local-stack-start.log",
+      "bytes": 5895,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/local-staging-config-check.log",
+      "bytes": 1268,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/local-staging-config-final-check.log",
+      "bytes": 1268,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/manifest-validation.log",
+      "bytes": 278,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/provided-export-dependency-audit-final.log",
+      "bytes": 476,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/provided-export-dependency-audit.log",
+      "bytes": 2702,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/schema-baseline-application.log",
+      "bytes": 62436,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/schema-baseline-final-validation.log",
+      "bytes": 524,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/schema-baseline-validation.json",
+      "bytes": 282,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-acceptance-status-check.log",
+      "bytes": 1268,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-branches-current.json",
+      "bytes": 568,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-catalog-completeness.json",
+      "bytes": 629,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-cleanup-acceptance.json",
+      "bytes": 564,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-cleanup-acceptance.log",
+      "bytes": 182,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-cleanup-delete-response.json",
+      "bytes": 72,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-cleanup-endpoint-acceptance.json",
+      "bytes": 1139,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-cleanup-endpoint-acceptance.log",
+      "bytes": 212,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-cleanup-initial-failure.json",
+      "bytes": 961,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-derivative-agreement.json",
+      "bytes": 619,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-edge-first-attempt.json",
+      "bytes": 404,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-edge-phase-acceptance.json",
+      "bytes": 1041,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-edge-phase-acceptance.log",
+      "bytes": 2118,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-edge-phase-final.log",
+      "bytes": 268,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-edge-phase-resume.log",
+      "bytes": 2138,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-existing-schema-check.log",
+      "bytes": 232,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-fixture-setup-after-storage-fix.log",
+      "bytes": 1970,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-fixture-setup-final.log",
+      "bytes": 212,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-fixture-setup-retry.log",
+      "bytes": 1990,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-fixture-setup.log",
+      "bytes": 1880,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-fixtures-summary.json",
+      "bytes": 583,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-functions-runtime.log",
+      "bytes": 62644,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-old-jury-http-acceptance.log",
+      "bytes": 2354,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-old-jury-http-final.log",
+      "bytes": 2386,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-old-jury-http-loopback.log",
+      "bytes": 2364,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-old-jury-http-native-routing.log",
+      "bytes": 184,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-projects-current.json",
+      "bytes": 1042,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-readiness-blocker.json",
+      "bytes": 1602,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-real-cleanup-worker.log",
+      "bytes": 52,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-real-worker.log",
+      "bytes": 393,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-storage-cascade-acceptance-final.log",
+      "bytes": 208,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-storage-cascade-acceptance.json",
+      "bytes": 1291,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-storage-cascade-acceptance.log",
+      "bytes": 2170,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-upload-acceptance.json",
+      "bytes": 735,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-upload-acceptance.log",
+      "bytes": 186,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-voting-acceptance.json",
+      "bytes": 1152,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-voting-acceptance.log",
+      "bytes": 3656,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-voting-first-attempt.json",
+      "bytes": 822,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-voting-resume.log",
+      "bytes": 184,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/staging-wingman-provider-credential-gate.json",
+      "bytes": 680,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/wingdex-sort-filters-lint-final.log",
+      "bytes": 4498,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/wingdex-sort-filters-lint.log",
+      "bytes": 5558,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/wingdex-sort-filters-native-reset.log",
+      "bytes": 150,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/wingdex-sort-filters-native.log",
+      "bytes": 3052,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/wingdex-sort-filters-tests.log",
+      "bytes": 9238,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/wingdex-sort-filters-typecheck-final.log",
+      "bytes": 0,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/wingdex-sort-filters-typecheck.log",
+      "bytes": 3266,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/wingman-v18-rpc-preservation.json",
+      "bytes": 321,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/withdrawal-history-test.log",
+      "bytes": 796,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/deployment/withdrawal-review.json",
+      "bytes": 1963,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/edge-runtime.log",
+      "bytes": 1990,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/final-compatibility-tests.log",
+      "bytes": 246974,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/lint.log",
+      "bytes": 32412,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/mango-build.log",
+      "bytes": 824,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/mango-compatibility.json",
+      "bytes": 646,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/mango-full.log",
+      "bytes": 1384,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/mango-lint.log",
+      "bytes": 126,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/pinch-after.png",
+      "bytes": 231693,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/pinch-and-drag-confirmed-frame.png",
+      "bytes": 228439,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/pinch-and-drag-confirmed-frame.xml",
+      "bytes": 5629,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/pinch-and-drag-confirmed-preview.png",
+      "bytes": 250794,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/pinch-confirmed-upload.jpg",
+      "bytes": 23356,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/pinch-crop-verification.json",
+      "bytes": 597,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/pinch-crop.json",
+      "bytes": 318,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/pinch-injection.txt",
+      "bytes": 84,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/processed/pinch-normalized.jpg",
+      "bytes": 17937,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/processed/pinch-thumbnail.jpg",
+      "bytes": 16494,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/statusbar-after-dismissal.png",
+      "bytes": 1055078,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native/statusbar-modal-foreground.png",
+      "bytes": 259297,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/native-exports.log",
+      "bytes": 12776,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/production-columns-views-ledger.json",
+      "bytes": 5469,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/production-contract.json",
+      "bytes": 59598,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/production-vote-inventory.json",
+      "bytes": 200,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/acceptance.json",
+      "bytes": 550,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/discover-controls.png",
+      "bytes": 705344,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/discover-controls.xml",
+      "bytes": 34850,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/favorites-reset-defaults.png",
+      "bytes": 209028,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/favorites-reset-defaults.xml",
+      "bytes": 31416,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/favorites-shared-filters.png",
+      "bytes": 217623,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/favorites-shared-filters.xml",
+      "bytes": 31773,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/filter-options.png",
+      "bytes": 196942,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/filter-options.xml",
+      "bytes": 48149,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/sort-options.png",
+      "bytes": 307382,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/sort-options.xml",
+      "bytes": 41315,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/want-to-try-cleared.png",
+      "bytes": 706568,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/want-to-try-cleared.xml",
+      "bytes": 36362,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/want-to-try-filtered-empty.png",
+      "bytes": 189260,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/sort-filters/want-to-try-filtered-empty.xml",
+      "bytes": 24557,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/staging/worker-original.jpg",
+      "bytes": 23356,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/staging/worker-primary.jpg",
+      "bytes": 17937,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/staging/worker-thumbnail.jpg",
+      "bytes": 16494,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/statusbar-native.log",
+      "bytes": 1552,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/statusbar-tests.log",
+      "bytes": 6892,
+      "retained": false
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/typecheck.log",
+      "bytes": 92,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/wingman-intake-v17.ts",
+      "bytes": 21930,
+      "retained": true
+    },
+    {
+      "path": "artifacts/app-polish/release-qa/wingman-v17-comparison.json",
+      "bytes": 814,
+      "retained": true
+    }
+  ],
+  "sourceReview": [
+    {
+      "path": "Agents/Jalapeno/tests/test_wing_processing_repository.py",
+      "lines": 273,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "Agents/Jalapeno/wing_processing_worker/repository.py",
+      "lines": 400,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "Agents/Mango Habanero/server/approval.mjs",
+      "lines": 195,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "Agents/Mango Habanero/server/index.mjs",
+      "lines": 47,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "Agents/Mango Habanero/src/main.jsx",
+      "lines": 139,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "Agents/Mango Habanero/tests/approval.test.js",
+      "lines": 107,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "Agents/Mango Habanero/tests/localOrigin.test.js",
+      "lines": 63,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "buffago-growth-command-center/models.py",
+      "lines": 653,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "buffago-growth-command-center/tests/test_models.py",
+      "lines": 101,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "buffago-growth-command-center/tests/test_screenshots.py",
+      "lines": 267,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "buffago-growth-command-center/ui/dashboard.py",
+      "lines": 452,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/app/(tabs)/ratings/index.jsx",
+      "lines": 3757,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/app/_layout.tsx",
+      "lines": 576,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/components/OnboardingFlow.tsx",
+      "lines": 2088,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/components/WingJuryGame.jsx",
+      "lines": 530,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/components/WingdexPhotoGallery.jsx",
+      "lines": 248,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/components/WingdexPhotoViewer.jsx",
+      "lines": 213,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/components/WingmanAddDialog.jsx",
+      "lines": 798,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/components/wingShots/WingShotFlow.tsx",
+      "lines": 1321,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/components/wingShots/WingShotMediaPreview.tsx",
+      "lines": 37,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/components/wingShots/mediaAdapter.ts",
+      "lines": 225,
+      "debug": true,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/lib/Wingman/WingmanService.ts",
+      "lines": 616,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/lib/Wingman/types.ts",
+      "lines": 165,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/lib/savedDestinations.js",
+      "lines": 277,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/lib/wingJuryService.js",
+      "lines": 206,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/lib/wingdexGallery.js",
+      "lines": 84,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/lib/wingdexPhotos.js",
+      "lines": 66,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/metro.config.js",
+      "lines": 27,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/supabase/config.toml",
+      "lines": 453,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/supabase/functions/wing-jury-reveal/index.ts",
+      "lines": 47,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/supabase/functions/wing-jury-vote/index.ts",
+      "lines": 34,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/supabase/functions/wing-public-gallery/index.ts",
+      "lines": 149,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/supabase/functions/wingman-intake/index.ts",
+      "lines": 700,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/fixtures/native-visual/approvedPhoto.js",
+      "lines": 22,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/fixtures/native-visual/supabase.js",
+      "lines": 223,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/image-workflow-mobile-runtime.test.mjs",
+      "lines": 226,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/saved-destinations-service.test.mjs",
+      "lines": 162,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/wing-jury-deno-runtime.test.mjs",
+      "lines": 122,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/wing-jury-service.test.mjs",
+      "lines": 90,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/wing-jury-ui.test.mjs",
+      "lines": 56,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/wing-shot-validation-flow.test.mjs",
+      "lines": 57,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/wingdex-gallery-contract.test.mjs",
+      "lines": 49,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/wingdex-gallery-deno.test.mjs",
+      "lines": 77,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/wingdex-gallery-device.test.mjs",
+      "lines": 350,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/wingdex-photo-server.test.mjs",
+      "lines": 218,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/wingdex-photo-viewer.test.mjs",
+      "lines": 280,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/wingdex-photo-voting.test.mjs",
+      "lines": 74,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/wingman-search-prefill.test.mjs",
+      "lines": 65,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/types/deno-runtime.d.ts",
+      "lines": 20,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/types/wingdexPhotos.ts",
+      "lines": 16,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "Agents/Mango Habanero/server/restaurantEvidence.mjs",
+      "lines": 28,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "Agents/Mango Habanero/server/restaurants.mjs",
+      "lines": 71,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "Agents/Mango Habanero/src/RestaurantQueue.jsx",
+      "lines": 54,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "Agents/Mango Habanero/tests/restaurantEvidence.test.js",
+      "lines": 10,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "Agents/Mango Habanero/tests/restaurantUi.test.jsx",
+      "lines": 75,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "Agents/Mango Habanero/tests/restaurants.test.js",
+      "lines": 32,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/app/dev-app-polish.jsx",
+      "lines": 41,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/components/AppStatusBar.jsx",
+      "lines": 12,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/components/PhotoVoteControls.jsx",
+      "lines": 24,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/components/wingShots/WingShotFramingPreview.tsx",
+      "lines": 50,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/lib/photoVoteEvents.js",
+      "lines": 10,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/lib/statusBarPolicy.js",
+      "lines": 20,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/lib/wingShotFraming.js",
+      "lines": 15,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/lib/wingdexCollection.js",
+      "lines": 46,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/lib/wingmanAsync.ts",
+      "lines": 39,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/lib/wingmanFocus.js",
+      "lines": 11,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/app-polish-native-qa.mjs",
+      "lines": 93,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/app-polish-baseline-edge-audit.py",
+      "lines": 31,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/app-polish-local-api-proxy.ts",
+      "lines": 10,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/app-polish-release-documentation.py",
+      "lines": 49,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/app-polish-run-real-worker.py",
+      "lines": 22,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/app-polish-runtime-routing.py",
+      "lines": 32,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/app-polish-stage-functions.py",
+      "lines": 34,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/app-polish-staging-catalog-audit.py",
+      "lines": 33,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/app-polish-staging-cleanup-endpoint.mjs",
+      "lines": 21,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/app-polish-staging-cleanup.mjs",
+      "lines": 21,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/app-polish-staging-common.mjs",
+      "lines": 14,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/app-polish-staging-derivatives.py",
+      "lines": 21,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/app-polish-staging-edges.mjs",
+      "lines": 47,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/app-polish-staging-fixtures.mjs",
+      "lines": 60,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/app-polish-staging-refresh-auth.mjs",
+      "lines": 11,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/app-polish-staging-storage-cascades.mjs",
+      "lines": 46,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/app-polish-staging-upload.mjs",
+      "lines": 35,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/app-polish-staging-votes.mjs",
+      "lines": 77,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/capture-synthetic-crop.mjs",
+      "lines": 23,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/guest-onboarding-checks.mjs",
+      "lines": 35,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/read-eas-submissions.cjs",
+      "lines": 25,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/verify-framing.py",
+      "lines": 53,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/scripts/qa/wingdex-sort-filters-native.mjs",
+      "lines": 29,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/supabase/functions/_shared/wingmanConfidence.ts",
+      "lines": 56,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/supabase/functions/_shared/wingmanDeadline.ts",
+      "lines": 11,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/supabase/functions/_shared/wingmanMenuEvidence.ts",
+      "lines": 86,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/supabase/local/app-polish-acceptance/supabase/config.toml",
+      "lines": 85,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/app-polish-conflict-reconciliation.test.mjs",
+      "lines": 70,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/app-polish-deployed-contract.test.mjs",
+      "lines": 46,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/app-polish-focus-framing.test.mjs",
+      "lines": 97,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/app-polish-gallery-cache.test.mjs",
+      "lines": 34,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/app-polish-latest-action-postgres.test.mjs",
+      "lines": 30,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/app-polish-statusbar.test.mjs",
+      "lines": 14,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/app-polish-vote-bridge.test.mjs",
+      "lines": 89,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/app-polish-vote-concurrency.test.mjs",
+      "lines": 87,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/app-polish-votes-postgres.test.mjs",
+      "lines": 48,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/app-polish-withdrawal-history.test.mjs",
+      "lines": 52,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/fixtures/legacy-photo-voting.js",
+      "lines": 55,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/fixtures/native-visual/WingmanService.ts",
+      "lines": 12,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/fixtures/native-visual/wingShotStaging.ts",
+      "lines": 6,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/helpers/photo-controls-runtime.mjs",
+      "lines": 15,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/helpers/photo-vote-compatibility-fixture.mjs",
+      "lines": 20,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/mango-restaurant-concurrency.test.mjs",
+      "lines": 39,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/mango-restaurant-intake.test.mjs",
+      "lines": 31,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/mango-restaurant-postgres.test.mjs",
+      "lines": 79,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/wingdex-sort-filters.test.mjs",
+      "lines": 50,
+      "debug": false,
+      "fixtureOrLocal": false,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/wingman-atomic-rate-limit.test.mjs",
+      "lines": 20,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/wingman-confidence.test.mjs",
+      "lines": 131,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/wingman-guest-onboarding.test.mjs",
+      "lines": 121,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    },
+    {
+      "path": "crawl/tests/wingman-guest-postgres.test.mjs",
+      "lines": 53,
+      "debug": false,
+      "fixtureOrLocal": true,
+      "conflictMarkers": false
+    }
+  ],
+  "retainedDuplicateImages": [
+    [
+      "artifacts/app-polish/release-qa/native/pinch-confirmed-upload.jpg",
+      "artifacts/app-polish/release-qa/staging/worker-original.jpg"
+    ],
+    [
+      "artifacts/app-polish/release-qa/native/processed/pinch-normalized.jpg",
+      "artifacts/app-polish/release-qa/staging/worker-primary.jpg"
+    ],
+    [
+      "artifacts/app-polish/release-qa/native/processed/pinch-thumbnail.jpg",
+      "artifacts/app-polish/release-qa/staging/worker-thumbnail.jpg"
+    ]
+  ],
+  "intendedSourceFiles": [
+    ".gitignore",
+    "Agents/Jalapeno/tests/test_wing_processing_repository.py",
+    "Agents/Jalapeno/wing_processing_worker/repository.py",
+    "crawl/app/(tabs)/ratings/index.jsx",
+    "crawl/app/_layout.tsx",
+    "crawl/app/dev-app-polish.jsx",
+    "crawl/components/AppStatusBar.jsx",
+    "crawl/components/PhotoVoteControls.jsx",
+    "crawl/components/WingJuryGame.jsx",
+    "crawl/components/WingdexPhotoGallery.jsx",
+    "crawl/components/WingdexPhotoViewer.jsx",
+    "crawl/components/WingmanAddDialog.jsx",
+    "crawl/components/wingShots/WingShotFlow.tsx",
+    "crawl/components/wingShots/WingShotFramingPreview.tsx",
+    "crawl/components/wingShots/WingShotMediaPreview.tsx",
+    "crawl/components/wingShots/mediaAdapter.ts",
+    "crawl/lib/Wingman/WingmanService.ts",
+    "crawl/lib/Wingman/types.ts",
+    "crawl/lib/photoVoteEvents.js",
+    "crawl/lib/savedDestinations.js",
+    "crawl/lib/statusBarPolicy.js",
+    "crawl/lib/wingJuryService.js",
+    "crawl/lib/wingShotFraming.js",
+    "crawl/lib/wingdexCollection.js",
+    "crawl/lib/wingdexGallery.js",
+    "crawl/lib/wingdexPhotos.js",
+    "crawl/lib/wingmanAsync.ts",
+    "crawl/lib/wingmanFocus.js",
+    "crawl/metro.config.js",
+    "crawl/scripts/app-polish-native-qa.mjs",
+    "crawl/scripts/qa/android-pinch/AndroidManifest.xml",
+    "crawl/scripts/qa/android-pinch/PinchInstrumentation.java",
+    "crawl/scripts/qa/android-pinch/build.ps1",
+    "crawl/scripts/qa/app-polish-baseline-edge-audit.py",
+    "crawl/scripts/qa/app-polish-local-api-proxy.ts",
+    "crawl/scripts/qa/app-polish-local-main.sh",
+    "crawl/scripts/qa/app-polish-release-documentation.py",
+    "crawl/scripts/qa/app-polish-run-real-worker.py",
+    "crawl/scripts/qa/app-polish-runtime-routing.py",
+    "crawl/scripts/qa/app-polish-stage-functions.py",
+    "crawl/scripts/qa/app-polish-staging-catalog-audit.py",
+    "crawl/scripts/qa/app-polish-staging-cleanup-endpoint.mjs",
+    "crawl/scripts/qa/app-polish-staging-cleanup.mjs",
+    "crawl/scripts/qa/app-polish-staging-common.mjs",
+    "crawl/scripts/qa/app-polish-staging-derivatives.py",
+    "crawl/scripts/qa/app-polish-staging-edges.mjs",
+    "crawl/scripts/qa/app-polish-staging-fixtures.mjs",
+    "crawl/scripts/qa/app-polish-staging-refresh-auth.mjs",
+    "crawl/scripts/qa/app-polish-staging-storage-cascades.mjs",
+    "crawl/scripts/qa/app-polish-staging-upload.mjs",
+    "crawl/scripts/qa/app-polish-staging-votes.mjs",
+    "crawl/scripts/qa/capture-synthetic-crop.mjs",
+    "crawl/scripts/qa/verify-framing.py",
+    "crawl/scripts/qa/wingdex-sort-filters-native.mjs",
+    "crawl/supabase/config.toml",
+    "crawl/supabase/functions/_shared/wingmanConfidence.ts",
+    "crawl/supabase/functions/_shared/wingmanDeadline.ts",
+    "crawl/supabase/functions/_shared/wingmanMenuEvidence.ts",
+    "crawl/supabase/functions/wing-jury-reveal/index.ts",
+    "crawl/supabase/functions/wing-jury-vote/index.ts",
+    "crawl/supabase/functions/wing-public-gallery/index.ts",
+    "crawl/supabase/functions/wingman-intake/index.ts",
+    "crawl/supabase/local/app-polish-acceptance/.gitignore",
+    "crawl/supabase/local/app-polish-acceptance/README.md",
+    "crawl/supabase/local/app-polish-acceptance/baseline/audit_dependencies.py",
+    "crawl/supabase/local/app-polish-acceptance/baseline/build_schema.py",
+    "crawl/supabase/local/app-polish-acceptance/baseline/catalog-buckets.json",
+    "crawl/supabase/local/app-polish-acceptance/baseline/catalog-policies-normalized.json",
+    "crawl/supabase/local/app-polish-acceptance/baseline/catalog-schemas.json",
+    "crawl/supabase/local/app-polish-acceptance/baseline/catalog-sequences.json",
+    "crawl/supabase/local/app-polish-acceptance/baseline/catalog-signatures.json",
+    "crawl/supabase/local/app-polish-acceptance/baseline/catalog-source.json",
+    "crawl/supabase/local/app-polish-acceptance/baseline/catalog-staging-bucket.json",
+    "crawl/supabase/local/app-polish-acceptance/baseline/catalog-views.json",
+    "crawl/supabase/local/app-polish-acceptance/baseline/dependency-audit.json",
+    "crawl/supabase/local/app-polish-acceptance/baseline/edge-direct-dependencies.json",
+    "crawl/supabase/local/app-polish-acceptance/baseline/edge/_shared/wingShotResponse.ts",
+    "crawl/supabase/local/app-polish-acceptance/baseline/edge/fresh-deployed-source-capture.json",
+    "crawl/supabase/local/app-polish-acceptance/baseline/edge/manifest.json",
+    "crawl/supabase/local/app-polish-acceptance/baseline/edge/transport-manifest.json",
+    "crawl/supabase/local/app-polish-acceptance/baseline/edge/wing-media-promote/index.ts",
+    "crawl/supabase/local/app-polish-acceptance/baseline/edge/wing-media-stage-authorize/index.ts",
+    "crawl/supabase/local/app-polish-acceptance/baseline/edge/wing-media-staging-cleanup/index.ts",
+    "crawl/supabase/local/app-polish-acceptance/baseline/edge/wing-media-validate/index.ts",
+    "crawl/supabase/local/app-polish-acceptance/baseline/fresh-wingman-rpc-definitions.json",
+    "crawl/supabase/local/app-polish-acceptance/baseline/photo-worker-functions.json",
+    "crawl/supabase/local/app-polish-acceptance/baseline/platform-storage-column-definitions.json",
+    "crawl/supabase/local/app-polish-acceptance/baseline/platform-storage-columns.json",
+    "crawl/supabase/local/app-polish-acceptance/baseline/platform-storage-prerequisites.sql",
+    "crawl/supabase/local/app-polish-acceptance/baseline/provided-media-voting.sql",
+    "crawl/supabase/local/app-polish-acceptance/baseline/schema-baseline.sql",
+    "crawl/supabase/local/app-polish-acceptance/baseline/validate_schema.py",
+    "crawl/supabase/local/app-polish-acceptance/supabase/config.toml",
+    "crawl/supabase/migrations/20261013011230_mango_restaurant_review.sql",
+    "crawl/supabase/proposals/app-polish-shared-photo-votes.sql",
+    "crawl/supabase/proposals/app-polish-vote-conflict-review.sql",
+    "crawl/tests/app-polish-conflict-reconciliation.test.mjs",
+    "crawl/tests/app-polish-deployed-contract.test.mjs",
+    "crawl/tests/app-polish-focus-framing.test.mjs",
+    "crawl/tests/app-polish-gallery-cache.test.mjs",
+    "crawl/tests/app-polish-latest-action-postgres.test.mjs",
+    "crawl/tests/app-polish-statusbar.test.mjs",
+    "crawl/tests/app-polish-vote-bridge.test.mjs",
+    "crawl/tests/app-polish-vote-concurrency.test.mjs",
+    "crawl/tests/app-polish-votes-postgres.test.mjs",
+    "crawl/tests/app-polish-withdrawal-history.test.mjs",
+    "crawl/tests/fixtures/legacy-photo-voting.js",
+    "crawl/tests/fixtures/native-visual/WingmanService.ts",
+    "crawl/tests/fixtures/native-visual/approvedPhoto.js",
+    "crawl/tests/fixtures/native-visual/framing-landscape.png",
+    "crawl/tests/fixtures/native-visual/supabase.js",
+    "crawl/tests/fixtures/native-visual/wingShotStaging.ts",
+    "crawl/tests/helpers/photo-controls-runtime.mjs",
+    "crawl/tests/helpers/photo-vote-compatibility-fixture.mjs",
+    "crawl/tests/image-workflow-mobile-runtime.test.mjs",
+    "crawl/tests/saved-destinations-service.test.mjs",
+    "crawl/tests/wing-jury-deno-runtime.test.mjs",
+    "crawl/tests/wing-jury-service.test.mjs",
+    "crawl/tests/wing-jury-ui.test.mjs",
+    "crawl/tests/wing-shot-validation-flow.test.mjs",
+    "crawl/tests/wingdex-gallery-contract.test.mjs",
+    "crawl/tests/wingdex-gallery-deno.test.mjs",
+    "crawl/tests/wingdex-gallery-device.test.mjs",
+    "crawl/tests/wingdex-photo-server.test.mjs",
+    "crawl/tests/wingdex-photo-viewer.test.mjs",
+    "crawl/tests/wingdex-photo-voting.test.mjs",
+    "crawl/tests/wingdex-sort-filters.test.mjs",
+    "crawl/tests/wingman-atomic-rate-limit.test.mjs",
+    "crawl/tests/wingman-confidence.test.mjs",
+    "crawl/tests/wingman-search-prefill.test.mjs",
+    "crawl/tsconfig.json",
+    "crawl/types/deno-runtime.d.ts",
+    "crawl/types/wingdexPhotos.ts",
+    "docs/buffago-app-polish-deployment-manifest.json",
+    "docs/buffago-app-polish-release-plan.md",
+    "docs/buffago-app-polish-staging-acceptance.md",
+    "docs/buffago-app-polish.md"
+  ],
+  "preservedIndependentFiles": [
+    "Agents/Jalapeno/__pycache__/supabase_client.cpython-312.pyc",
+    "Agents/Mango Habanero/README.md",
+    "Agents/Mango Habanero/server/approval.mjs",
+    "Agents/Mango Habanero/server/index.mjs",
+    "Agents/Mango Habanero/server/restaurantEvidence.mjs",
+    "Agents/Mango Habanero/server/restaurants.mjs",
+    "Agents/Mango Habanero/src/RestaurantQueue.jsx",
+    "Agents/Mango Habanero/src/main.jsx",
+    "Agents/Mango Habanero/src/styles.css",
+    "Agents/Mango Habanero/tests/approval.test.js",
+    "Agents/Mango Habanero/tests/localOrigin.test.js",
+    "Agents/Mango Habanero/tests/restaurantEvidence.test.js",
+    "Agents/Mango Habanero/tests/restaurantUi.test.jsx",
+    "Agents/Mango Habanero/tests/restaurants.test.js",
+    "artifacts/guest-onboarding/backend-manifest.json",
+    "artifacts/guest-onboarding/focused-tests.log",
+    "artifacts/guest-onboarding/postgres-tests.log",
+    "artifacts/guest-onboarding/production-readonly-evidence.json",
+    "artifacts/guest-onboarding/typecheck.log",
+    "artifacts/restaurant-review/changed-files.txt",
+    "artifacts/restaurant-review/mango-fixture-approval.png",
+    "artifacts/restaurant-review/mango-fixture-evidence.png",
+    "artifacts/restaurant-review/mango-fixture-rejection-history.png",
+    "artifacts/restaurant-review/mango-live-pending.png",
+    "artifacts/restaurant-review/prefill-api-error.log",
+    "artifacts/restaurant-review/prefill-api.log",
+    "artifacts/restaurant-review/prefill-vite-error.log",
+    "artifacts/restaurant-review/prefill-vite.log",
+    "buffago-growth-command-center/README.md",
+    "buffago-growth-command-center/artifacts/operations-redesign/buffago-growth-1280x720.png",
+    "buffago-growth-command-center/artifacts/operations-redesign/buffago-growth-1600x900.png",
+    "buffago-growth-command-center/artifacts/operations-redesign/buffago-growth-800x480.png",
+    "buffago-growth-command-center/models.py",
+    "buffago-growth-command-center/tests/test_models.py",
+    "buffago-growth-command-center/tests/test_screenshots.py",
+    "buffago-growth-command-center/ui/dashboard.py",
+    "crawl/components/OnboardingFlow.tsx",
+    "crawl/scripts/qa/guest-onboarding-checks.mjs",
+    "crawl/scripts/qa/read-eas-submissions.cjs",
+    "crawl/tests/mango-restaurant-concurrency.test.mjs",
+    "crawl/tests/mango-restaurant-intake.test.mjs",
+    "crawl/tests/mango-restaurant-postgres.test.mjs",
+    "crawl/tests/wingman-guest-onboarding.test.mjs",
+    "crawl/tests/wingman-guest-postgres.test.mjs",
+    "docs/ios-guest-onboarding-fix.md",
+    "docs/mango-restaurant-review.md",
+    "mango-restaurant-review.patch"
+  ],
+  "activeStack": "buffago-polish-acceptance; all six running containers preserved",
+  "uncertainClusters": 103,
+  "indexChanged": false,
+  "intendedEvidenceFiles": [
+    "artifacts/app-polish/native/320dp-font1.3/wingman-details-keyboard.png",
+    "artifacts/app-polish/native/320dp-font1.3/wingman-town-keyboard.png",
+    "artifacts/app-polish/native/detail-withdrawal-synchronized.png",
+    "artifacts/app-polish/native/jury-vote-changed.png",
+    "artifacts/app-polish/native/jury-vote-withdrawn.png",
+    "artifacts/app-polish/native/restaurant-detail-synchronized.png",
+    "artifacts/app-polish/native/viewer-tapped-second.png",
+    "artifacts/app-polish/native/wingdex-inline-swiped.png",
+    "artifacts/app-polish/native/wingman-confidence-50.png",
+    "artifacts/app-polish/native/wingman-details-keyboard.png",
+    "artifacts/app-polish/native/wingman-town-keyboard.png",
+    "artifacts/app-polish/release-qa/acceptance/android-build-contract-test.log",
+    "artifacts/app-polish/release-qa/acceptance/android-build-voting-source.js",
+    "artifacts/app-polish/release-qa/acceptance/bridge-contract-tests.log",
+    "artifacts/app-polish/release-qa/acceptance/conflict-tests.log",
+    "artifacts/app-polish/release-qa/acceptance/conflicts-http-tests.log",
+    "artifacts/app-polish/release-qa/acceptance/conflicts-readonly.json",
+    "artifacts/app-polish/release-qa/acceptance/distribution-current.json",
+    "artifacts/app-polish/release-qa/acceptance/eas-build-inventory.json",
+    "artifacts/app-polish/release-qa/acceptance/eas-submission-build-mapping.json",
+    "artifacts/app-polish/release-qa/acceptance/eas-submission-metadata.json",
+    "artifacts/app-polish/release-qa/acceptance/http-focused-tests.log",
+    "artifacts/app-polish/release-qa/acceptance/ios-build-contract-test.log",
+    "artifacts/app-polish/release-qa/acceptance/ios-build-voting-source.js",
+    "artifacts/app-polish/release-qa/acceptance/latest-action-audit-tests.log",
+    "artifacts/app-polish/release-qa/acceptance/latest-action-candidate-manifest.json",
+    "artifacts/app-polish/release-qa/acceptance/latest-action-pg17-tests.log",
+    "artifacts/app-polish/release-qa/acceptance/latest-action-policy-tests.log",
+    "artifacts/app-polish/release-qa/acceptance/ota-channels.json",
+    "artifacts/app-polish/release-qa/acceptance/ota-updates.json",
+    "artifacts/app-polish/release-qa/acceptance/prior-prototype-history-guard-tests.log",
+    "artifacts/app-polish/release-qa/acceptance/staging-branch-discovery.json",
+    "artifacts/app-polish/release-qa/acceptance/staging-project-discovery.json",
+    "artifacts/app-polish/release-qa/acceptance/vote-timestamp-contract-readonly.json",
+    "artifacts/app-polish/release-qa/acceptance/worker-tests.log",
+    "artifacts/app-polish/release-qa/branch-inventory.json",
+    "artifacts/app-polish/release-qa/candidate-manifest.json",
+    "artifacts/app-polish/release-qa/cleanup-focused-tests.log",
+    "artifacts/app-polish/release-qa/cleanup-manifest.json",
+    "artifacts/app-polish/release-qa/cleanup-results.json",
+    "artifacts/app-polish/release-qa/deployed-contract-tests.log",
+    "artifacts/app-polish/release-qa/deployed-edge-manifest.json",
+    "artifacts/app-polish/release-qa/deployed-function-definitions.json",
+    "artifacts/app-polish/release-qa/deployed/wing-jury-reveal/index.js",
+    "artifacts/app-polish/release-qa/deployed/wing-jury-vote/index.js",
+    "artifacts/app-polish/release-qa/deployed/wing-public-gallery/index.ts",
+    "artifacts/app-polish/release-qa/deployed/wingman-intake/index.ts",
+    "artifacts/app-polish/release-qa/deployment/20261013022806_wingman_rate_limit_repair.deployed.sql",
+    "artifacts/app-polish/release-qa/deployment/baseline-edge-source-verification.json",
+    "artifacts/app-polish/release-qa/deployment/file-hashes.json",
+    "artifacts/app-polish/release-qa/deployment/jury-only-owner-policy-preflight-test.log",
+    "artifacts/app-polish/release-qa/deployment/local-staging-config-check.log",
+    "artifacts/app-polish/release-qa/deployment/manifest-validation.log",
+    "artifacts/app-polish/release-qa/deployment/production-edge-deployment-final.json",
+    "artifacts/app-polish/release-qa/deployment/schema-baseline-validation.json",
+    "artifacts/app-polish/release-qa/deployment/staging-acceptance-status-check.log",
+    "artifacts/app-polish/release-qa/deployment/staging-branches-current.json",
+    "artifacts/app-polish/release-qa/deployment/staging-catalog-completeness.json",
+    "artifacts/app-polish/release-qa/deployment/staging-cleanup-acceptance.json",
+    "artifacts/app-polish/release-qa/deployment/staging-cleanup-delete-response.json",
+    "artifacts/app-polish/release-qa/deployment/staging-cleanup-endpoint-acceptance.json",
+    "artifacts/app-polish/release-qa/deployment/staging-cleanup-initial-failure.json",
+    "artifacts/app-polish/release-qa/deployment/staging-derivative-agreement.json",
+    "artifacts/app-polish/release-qa/deployment/staging-edge-first-attempt.json",
+    "artifacts/app-polish/release-qa/deployment/staging-edge-phase-acceptance.json",
+    "artifacts/app-polish/release-qa/deployment/staging-existing-schema-check.log",
+    "artifacts/app-polish/release-qa/deployment/staging-fixtures-summary.json",
+    "artifacts/app-polish/release-qa/deployment/staging-projects-current.json",
+    "artifacts/app-polish/release-qa/deployment/staging-readiness-blocker.json",
+    "artifacts/app-polish/release-qa/deployment/staging-real-cleanup-worker.log",
+    "artifacts/app-polish/release-qa/deployment/staging-real-worker.log",
+    "artifacts/app-polish/release-qa/deployment/staging-storage-cascade-acceptance.json",
+    "artifacts/app-polish/release-qa/deployment/staging-upload-acceptance.json",
+    "artifacts/app-polish/release-qa/deployment/staging-voting-acceptance.json",
+    "artifacts/app-polish/release-qa/deployment/staging-voting-first-attempt.json",
+    "artifacts/app-polish/release-qa/deployment/staging-wingman-provider-credential-gate.json",
+    "artifacts/app-polish/release-qa/deployment/wingman-v18-rpc-preservation.json",
+    "artifacts/app-polish/release-qa/deployment/withdrawal-history-test.log",
+    "artifacts/app-polish/release-qa/deployment/withdrawal-review.json",
+    "artifacts/app-polish/release-qa/edge-runtime.log",
+    "artifacts/app-polish/release-qa/final-compatibility-tests.log",
+    "artifacts/app-polish/release-qa/final-hygiene-checks.json",
+    "artifacts/app-polish/release-qa/final-hygiene-helper-removals.json",
+    "artifacts/app-polish/release-qa/final-hygiene.json",
+    "artifacts/app-polish/release-qa/lint.log",
+    "artifacts/app-polish/release-qa/mango-compatibility.json",
+    "artifacts/app-polish/release-qa/mango-full.log",
+    "artifacts/app-polish/release-qa/native/pinch-and-drag-confirmed-frame.png",
+    "artifacts/app-polish/release-qa/native/pinch-and-drag-confirmed-frame.xml",
+    "artifacts/app-polish/release-qa/native/pinch-and-drag-confirmed-preview.png",
+    "artifacts/app-polish/release-qa/native/pinch-confirmed-upload.jpg",
+    "artifacts/app-polish/release-qa/native/pinch-crop-verification.json",
+    "artifacts/app-polish/release-qa/native/pinch-crop.json",
+    "artifacts/app-polish/release-qa/native/pinch-injection.txt",
+    "artifacts/app-polish/release-qa/native/processed/pinch-normalized.jpg",
+    "artifacts/app-polish/release-qa/native/processed/pinch-thumbnail.jpg",
+    "artifacts/app-polish/release-qa/native/statusbar-after-dismissal.png",
+    "artifacts/app-polish/release-qa/native/statusbar-modal-foreground.png",
+    "artifacts/app-polish/release-qa/production-columns-views-ledger.json",
+    "artifacts/app-polish/release-qa/production-contract.json",
+    "artifacts/app-polish/release-qa/production-vote-inventory.json",
+    "artifacts/app-polish/release-qa/sort-filters/acceptance.json",
+    "artifacts/app-polish/release-qa/sort-filters/discover-controls.png",
+    "artifacts/app-polish/release-qa/sort-filters/favorites-reset-defaults.png",
+    "artifacts/app-polish/release-qa/sort-filters/favorites-shared-filters.png",
+    "artifacts/app-polish/release-qa/sort-filters/filter-options.png",
+    "artifacts/app-polish/release-qa/sort-filters/sort-options.png",
+    "artifacts/app-polish/release-qa/sort-filters/want-to-try-cleared.png",
+    "artifacts/app-polish/release-qa/sort-filters/want-to-try-filtered-empty.png",
+    "artifacts/app-polish/release-qa/staging/worker-original.jpg",
+    "artifacts/app-polish/release-qa/staging/worker-primary.jpg",
+    "artifacts/app-polish/release-qa/staging/worker-thumbnail.jpg",
+    "artifacts/app-polish/release-qa/typecheck.log",
+    "artifacts/app-polish/release-qa/wingman-intake-v17.ts",
+    "artifacts/app-polish/release-qa/wingman-v17-comparison.json"
+  ]
+}

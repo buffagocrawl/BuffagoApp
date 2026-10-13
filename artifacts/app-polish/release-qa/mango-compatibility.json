@@ -1,0 +1,29 @@
+[
+  {
+    "name": "wingman_create_destination",
+    "bodyMatches": true,
+    "args": "p_destination jsonb, p_created_by uuid",
+    "acl": [
+      "postgres=X/postgres",
+      "service_role=X/postgres"
+    ]
+  },
+  {
+    "name": "mango_review_restaurant",
+    "bodyMatches": true,
+    "args": "p_suggestion_id uuid, p_reviewer_id uuid, p_action text, p_note text, p_destination jsonb",
+    "acl": [
+      "postgres=X/postgres",
+      "service_role=X/postgres"
+    ]
+  },
+  {
+    "name": "mango_restaurant_pending_count",
+    "bodyMatches": true,
+    "args": "",
+    "acl": [
+      "postgres=X/postgres",
+      "service_role=X/postgres"
+    ]
+  }
+]

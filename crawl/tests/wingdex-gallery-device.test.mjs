@@ -1,3 +1,6 @@
+import { photoControlsRuntime } from './helpers/photo-controls-runtime.mjs';
+import { publishPhotoVote, subscribePhotoVotes } from '../lib/photoVoteEvents.js';
+import { orderWingdexPhotos } from '../lib/wingdexGallery.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -14,16 +17,26 @@ const elements = (tree, type) => {
 };
 function harness(loader, { mutation, user = { id: 'viewer' }, ownVotes, fullPhoto } = {}) {
   const runtime = hookRuntime(); const requests = []; const votes = []; const auth = { user }; let onAppState;
-  const client = { auth: { getUser: async () => ({ data: auth, error: null }) }, from: () => ({
-    upsert: async (row) => { votes.push(row); return mutation ? mutation(row) : { error: null }; },
-    delete() { const row = { vote: null }; return { eq(k,v) { row[k] = v; return this; }, then(resolve,reject) {
-      votes.push(row); return Promise.resolve(mutation ? mutation(row) : { error: null }).then(resolve,reject);
-    } }; },
-  }) };
+  const saved = new Map();
+  const client = { auth: { getUser: async () => ({ data: auth, error: null }) },
+    rpc: async (_name, args) => {
+      const row = { submission_id: args.p_submission_id, vote: args.p_vote, user_id: auth.user.id };
+      votes.push(row);
+      const result = mutation ? await mutation(row) : { error: null };
+      if (result.error) return result;
+      const previous = saved.get(row.submission_id) ?? null;
+      saved.set(row.submission_id, row.vote);
+      const source = { like_count: 2, dislike_count: 1 };
+      return { error: null, data: { submission_id: row.submission_id, vote: row.vote,
+        like_count: (source.like_count ?? 0) + Number(row.vote === 1),
+        dislike_count: (source.dislike_count ?? 0) + Number(row.vote === -1), neutral_count: Number(row.vote === 0) } };
+    } };
+
   const { default: Gallery } = mobileModule('components/WingdexPhotoGallery.jsx', { react: runtime.react, 'react/jsx-runtime': runtime.jsx,
+    './PhotoVoteControls': photoControlsRuntime(runtime), '../lib/photoVoteEvents': { subscribePhotoVotes },
     'react-native': { AppState: { addEventListener: (_event, callback) => { onAppState = callback; return { remove() {} }; } }, Pressable: 'pressable', FlatList: 'flatlist', View: 'view' }, 'expo-image': { Image: 'image' },
     'react-native-paper': { ActivityIndicator: 'spinner', Button: 'button', Dialog: Object.assign(function Dialog() {}, { Title: 'title', Content: 'content', Actions: 'actions' }), Portal: 'portal', Text: 'text' },
-    '../lib/wingdexGallery': { loadWingdexRestaurantGallery: (id, _client, options) => { requests.push({ id, ...options }); return loader(id, options); },
+    '../lib/wingdexGallery': { orderWingdexPhotos, loadWingdexRestaurantGallery: (id, _client, options) => { requests.push({ id, ...options }); return loader(id, options); },
       loadWingdexFullPhoto: async (photo) => fullPhoto ? fullPhoto(photo) : photo },
     './WingdexPhotoViewer': { __esModule: true, default: 'viewer' }, '../lib/wingdexPhotos': { createVoteController,
       loadOwnPhotoVotes: async (photos) => ownVotes ? ownVotes(photos) : photos.map((photo) => ({ ...photo, current_vote: null })) },
@@ -290,4 +303,47 @@ test('account switch during pending preview vote discards the prior selection', 
   assert.equal(findElement(tree, 'photo-preview-like-a').props.accessibilityState.selected, false);
   assert.equal(findElement(tree, 'photo-preview-like-a').props.accessibilityLabel, 'Like, 3');
   h.runtime.unmount();
+});
+
+
+test('Wingdex inline strip ranks likes/newest/ID, swipes counter and opens the tapped photo', async () => {
+  const images = [
+    { submission_id: 'c', signed_url: 'fixture:c', like_count: 2, created_at: '2026-10-10' },
+    { submission_id: 'b', signed_url: 'fixture:b', like_count: 5, created_at: '2026-10-11' },
+    { submission_id: 'a', signed_url: 'fixture:a', like_count: 5, created_at: '2026-10-11' },
+    { submission_id: 'd', signed_url: 'fixture:d', like_count: 5, created_at: '2026-10-09' },
+  ];
+  const h=harness(async()=>({count:4,images}));h.props.embedded=true;h.props.compact=true;
+  h.render();await flush();let tree=h.render();
+  elements(tree,'view').find(node=>node.props.onLayout).props.onLayout({nativeEvent:{layout:{width:342}}});tree=h.render();
+  const strip=elements(tree,'flatlist')[0];
+  assert.deepEqual(strip.props.data.map(photo=>photo.submission_id),['a','b','d','c']);
+  assert.equal(strip.props.snapToInterval,342);assert.equal(strip.props.directionalLockEnabled,true);assert.equal(strip.props.nestedScrollEnabled,true);
+  strip.props.onMomentumScrollEnd({nativeEvent:{contentOffset:{x:342}}});tree=h.render();
+  assert.equal(findElement(tree,'wingdex-photo-counter').props.children.join(''),'2 of 4');
+  let stopped=false;elements(tree,'pressable')[1].props.onPress({stopPropagation(){stopped=true;}});tree=h.render();
+  const viewer=elements(tree,'viewer')[0];assert.equal(viewer.props.selectedId,'b');assert.equal(stopped,true);
+  assert.deepEqual(viewer.props.photos.map(photo=>photo.submission_id),['a','b','d','c']);h.runtime.unmount();
+});
+
+test('Jury vote event updates restaurant counts/selection and ignores another account', async()=>{
+  const h=harness(async()=>({count:1,images:[{submission_id:'a',signed_url:'fixture:a',like_count:0,dislike_count:0}]}));
+  h.render();await flush();h.render();
+  publishPhotoVote('viewer',{submission_id:'a',like_count:8,dislike_count:2,neutral_count:1,current_vote:1});
+  let tree=h.render();assert.equal(findElement(tree,'photo-preview-like-a').props.accessibilityLabel,'Like, 8');assert.equal(findElement(tree,'photo-preview-like-a').props.accessibilityState.selected,true);
+  publishPhotoVote('someone-else',{submission_id:'a',like_count:99,current_vote:-1});
+  tree=h.render();assert.equal(findElement(tree,'photo-preview-like-a').props.accessibilityLabel,'Like, 8');h.runtime.unmount();
+});
+
+
+test('a vote that changes ranking retains the inline photo and updates its counter', async()=>{
+  const h=harness(async()=>({count:2,images:[{submission_id:'a',signed_url:'fixture:a',like_count:0,created_at:'2026-10-12'},
+    {submission_id:'b',signed_url:'fixture:b',like_count:0,created_at:'2026-10-11'}]}));h.props.embedded=true;h.props.compact=true;
+  h.render();await flush();let tree=h.render();const offsets=[];const strip=elements(tree,'flatlist')[0];
+  strip.props.ref.current={scrollToOffset:options=>offsets.push(options.offset)};
+  strip.props.onMomentumScrollEnd({nativeEvent:{contentOffset:{x:240}}});h.render();
+  publishPhotoVote('viewer',{submission_id:'b',current_vote:1,like_count:1,dislike_count:0,neutral_count:0});
+  h.render();tree=h.render();assert.equal(offsets.at(-1),0);
+  assert.equal(findElement(tree,'wingdex-photo-counter').props.children.join(''),'1 of 2');
+  assert.equal(elements(tree,'flatlist')[0].props.data[0].submission_id,'b');h.runtime.unmount();
 });

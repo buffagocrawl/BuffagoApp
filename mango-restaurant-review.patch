@@ -1,0 +1,679 @@
+From eda02231c9d73b3a7d8b8427ae07719b92de1265 Mon Sep 17 00:00:00 2001
+From: Codex <codex@openai.com>
+Date: Tue, 13 Oct 2026 12:02:53 +1100
+Subject: [PATCH] Add restaurant review queue in Mango and shared Pi pending
+ count
+
+---
+ Agents/Mango Habanero/README.md               |   4 +
+ Agents/Mango Habanero/server/index.mjs        |  10 ++
+ Agents/Mango Habanero/server/restaurants.mjs  |  49 ++++++++
+ Agents/Mango Habanero/src/RestaurantQueue.jsx |  51 ++++++++
+ Agents/Mango Habanero/src/main.jsx            |   4 +-
+ Agents/Mango Habanero/src/styles.css          |   1 +
+ Agents/Mango Habanero/tests/approval.test.js  |   2 +-
+ .../tests/restaurantUi.test.jsx               |  37 ++++++
+ .../Mango Habanero/tests/restaurants.test.js  |  31 +++++
+ buffago-growth-command-center/README.md       |   4 +
+ buffago-growth-command-center/models.py       |   2 +
+ .../tests/test_models.py                      |   6 +
+ buffago-growth-command-center/ui/dashboard.py |  18 +--
+ crawl/components/WingmanAddDialog.jsx         |   9 +-
+ .../functions/wingman-intake/index.ts         |   5 +-
+ ...20261013005355_mango_restaurant_review.sql | 111 ++++++++++++++++++
+ .../tests/mango-restaurant-postgres.test.mjs  |  78 ++++++++++++
+ docs/mango-restaurant-review.md               |  32 +++++
+ 18 files changed, 440 insertions(+), 14 deletions(-)
+ create mode 100644 Agents/Mango Habanero/server/restaurants.mjs
+ create mode 100644 Agents/Mango Habanero/src/RestaurantQueue.jsx
+ create mode 100644 Agents/Mango Habanero/tests/restaurantUi.test.jsx
+ create mode 100644 Agents/Mango Habanero/tests/restaurants.test.js
+ create mode 100644 crawl/supabase/migrations/20261013005355_mango_restaurant_review.sql
+ create mode 100644 crawl/tests/mango-restaurant-postgres.test.mjs
+ create mode 100644 docs/mango-restaurant-review.md
+
+diff --git a/Agents/Mango Habanero/README.md b/Agents/Mango Habanero/README.md
+index b483e3f..eda397e 100644
+--- a/Agents/Mango Habanero/README.md	
++++ b/Agents/Mango Habanero/README.md	
+@@ -43,3 +43,7 @@ The service-role key is read only by `server/index.mjs`; Vite receives no secret
+ ## Local validation
+ 
+ Run `npm test` and `npm run build` in this directory. Tests use isolated Supabase/storage fixtures and mock fetch responses to render and exercise the actual React UI in jsdom; they do not load `.env`. For manual browser verification with invented data only, run `npm run build` followed by `node tests/mockUi.mjs`, then open `http://127.0.0.1:4327`. This fixture never creates a Supabase client or invokes a worker.
++
++## Pending Restaurants
++
++Restaurant suggestions can be reviewed in the Pending Restaurants tab. See [restaurant review rollout](../../docs/mango-restaurant-review.md) for the required migration, shared creation flow, evidence limitations and Pi update order.
+diff --git a/Agents/Mango Habanero/server/index.mjs b/Agents/Mango Habanero/server/index.mjs
+index 870bdea..9a4a9c5 100644
+--- a/Agents/Mango Habanero/server/index.mjs	
++++ b/Agents/Mango Habanero/server/index.mjs	
+@@ -2,6 +2,7 @@ import 'dotenv/config';
+ import express from 'express';
+ import { createClient } from '@supabase/supabase-js';
+ import crypto from 'node:crypto';
++import { createRestaurantService } from './restaurants.mjs';
+ import { selectWingPreviewPath } from './mediaPreview.mjs';
+ import { createApprovalService, localRequestsOnly } from './approval.mjs';
+ 
+@@ -24,6 +25,15 @@ const correlation = () => crypto.randomUUID();
+ const idempotency = (prefix, id) => `${prefix}-${id}-${crypto.randomUUID()}`;
+ const rpc = async (name, args) => { const { data, error } = await supabase.rpc(name, args); if (error) { log('database_operation_failed', { rpc: name, code: error.code }); throw error; } return data; };
+ 
++const restaurants = createRestaurantService({ backend: supabase, reviewer: process.env.MANGO_REVIEWER_ID });
++app.get('/api/restaurants', async (_req, res) => {
++  try { res.set('Cache-Control','no-store').json(await restaurants.list()); }
++  catch (error) { res.status(502).json({ error: error.message }); }
++});
++app.post('/api/restaurants/:id/review', async (req, res) => {
++  try { res.json(await restaurants.review(req.params.id, req.body || {})); log('restaurant_review_completed', { suggestion_id: req.params.id, action: req.body.action }); }
++  catch (error) { res.status(409).json({ error: error.message }); }
++});
+ app.get('/api/health', (_req, res) => res.json({ ok: true, agent: 'mango-habanero' }));
+ app.get('/api/submissions', async (_req, res) => { try { const data = await rpc('mango_list_wing_submissions', {}); log('submission_list_requested', { count: data?.length || 0 }); res.json({ submissions: data || [], refreshedAt: new Date().toISOString() }); } catch (error) { res.status(502).json({ error: 'Unable to load Wing Shots right now.' }); } });
+ app.post('/api/submissions/:id/preview', async (req, res) => { try { const { data, error } = await supabase.rpc('mango_list_wing_submissions', {}); if (error) throw error; const row = (data || []).find((item) => item.submission_id === req.params.id); if (!row) return res.status(404).json({ error: 'Submission not found.' }); const path = selectWingPreviewPath(row); if (!path) return res.status(404).json({ error: 'No private media is available yet.' }); const mediaReadiness = { original: Boolean(row.original_object_exists), processed: Boolean(row.processed_object_exists), thumbnail: Boolean(row.thumbnail_object_exists), processing_succeeded: Boolean(row.processing_succeeded) }; const expiresIn = Math.min(300, Math.max(30, Number(process.env.MANGO_PREVIEW_SECONDS || 60))); const signed = await supabase.storage.from('wing-submissions').createSignedUrl(path, expiresIn); if (signed.error) throw signed.error; log('signed_preview_generated', { submission_id: req.params.id, path_kind: path === row.original_storage_path ? 'original' : path === row.thumbnail_storage_path ? 'thumbnail' : 'processed', media_readiness: mediaReadiness, expires_in: expiresIn }); res.set('Cache-Control', 'no-store').json({ url: signed.data.signedUrl, expiresIn }); } catch (error) { log('signed_preview_failed', { submission_id: req.params.id, error_code: error.code || 'private_preview_failed' }); res.status(502).json({ error: 'Unable to generate a private preview.' }); } });
+diff --git a/Agents/Mango Habanero/server/restaurants.mjs b/Agents/Mango Habanero/server/restaurants.mjs
+new file mode 100644
+index 0000000..cb67487
+--- /dev/null
++++ b/Agents/Mango Habanero/server/restaurants.mjs	
+@@ -0,0 +1,49 @@
++const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
++export function reviewInput(id, reviewer, body) {
++  if (!uuid.test(id || '') || !uuid.test(reviewer || '')) throw new Error('Invalid restaurant or reviewer identifier.');
++  if (!['approve', 'reject'].includes(body.action) || typeof body.note !== 'string' || body.note.trim().length < 8 || body.note.length > 2000) throw new Error('Choose an action and enter an 8–2000 character review reason.');
++  let destination = null;
++  if (body.action === 'approve') {
++    const d = body.destination || {};
++    if (!['name','address','city'].every(k => typeof d[k] === 'string' && d[k].trim().length && d[k].length <= 500)
++      || !Number.isInteger(d.state_id) || d.state_id < 1 || typeof d.lat !== 'number' || !Number.isFinite(d.lat) || Math.abs(d.lat) > 90
++      || typeof d.lng !== 'number' || !Number.isFinite(d.lng) || Math.abs(d.lng) > 180) throw new Error('Approval requires a name, address, city, state, latitude and longitude.');
++    destination = { name: d.name.trim(), address: d.address.trim(), city: d.city.trim(), state_id: d.state_id, lat: d.lat, lng: d.lng };
++  }
++  return { p_suggestion_id: id, p_reviewer_id: reviewer, p_action: body.action, p_note: body.note.trim(), p_destination: destination };
++}
++const errors = {
++  restaurant_reviewer_required: 'The configured reviewer does not have an active review role.',
++  restaurant_already_reviewed: 'This restaurant was already reviewed. Refresh the queue.',
++  restaurant_suggestion_not_found: 'Restaurant submission not found.',
++  restaurant_location_required: 'Complete and verify the restaurant location before approval.',
++  restaurant_match_ambiguous: 'An existing restaurant may match this submission. Resolve the address conflict before approving.',
++  restaurant_state_mismatch: 'The reviewed state must match the submitted state.',
++};
++export function createRestaurantService({ backend, reviewer }) {
++  const checked = async operation => { const { data, error } = await operation; if (error) throw new Error(errors[error.message] || 'Restaurant review could not be confirmed. Refresh and retry.'); return data; };
++  const authorize = async () => {
++    if (!uuid.test(reviewer || '')) throw new Error('Invalid reviewer configuration.');
++    const roles = await checked(backend.from('app_user_roles').select('role').eq('user_id',reviewer).eq('active',true).is('revoked_at',null).in('role',['wing_reviewer','wing_admin']));
++    if (!roles?.length) throw new Error(errors.restaurant_reviewer_required);
++  };
++  return {
++    async list() {
++      await authorize();
++      const restaurants = [];
++      for (let offset = 0; ; offset += 500) {
++        const page = await checked(backend.from('mango_pending_restaurants').select('*').order('created_at',{ ascending:true }).order('id',{ ascending:true }).range(offset,offset+499));
++        restaurants.push(...(page || []));
++        if (!page || page.length < 500) break;
++      }
++      const states = await checked(backend.from('states').select('state_id,state_name,state_code'));
++      const history = await checked(backend.from('restaurant_suggestion_reviews').select('*,destination_suggestions(restaurant_name,address,state_id)').order('reviewed_at',{ ascending:false }).limit(50));
++      return { restaurants: (restaurants || []).map(row => ({ ...row, state_name: states?.find(state => state.state_id === row.state_id)?.state_name })), history: history || [] };
++    },
++    async review(id, body) {
++      const args = reviewInput(id,reviewer,body);
++      await authorize();
++      return checked(backend.rpc('mango_review_restaurant', args));
++    },
++  };
++}
+diff --git a/Agents/Mango Habanero/src/RestaurantQueue.jsx b/Agents/Mango Habanero/src/RestaurantQueue.jsx
+new file mode 100644
+index 0000000..a0f9e4e
+--- /dev/null
++++ b/Agents/Mango Habanero/src/RestaurantQueue.jsx	
+@@ -0,0 +1,51 @@
++import React, { useEffect, useRef, useState } from 'react';
++
++export function RestaurantQueue({ refreshKey = 0 }) {
++  const [rows,setRows] = useState([]), [history,setHistory] = useState([]), [error,setError] = useState(''), [loading,setLoading] = useState(true);
++  const [selected,setSelected] = useState(null), [note,setNote] = useState(''), [details,setDetails] = useState({}), [busy,setBusy] = useState(false);
++  const lock = useRef(false), firstInput = useRef(null);
++  const load = async () => {
++    setLoading(true);
++    try { const r = await fetch('/api/restaurants'); const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Unable to load restaurants.'); setRows(d.restaurants || []); setHistory(d.history || []); }
++    catch (e) { setError(e.message); }
++    finally { setLoading(false); }
++  };
++  useEffect(() => { if (!lock.current) load(); }, [refreshKey]);
++  useEffect(() => { if (selected) firstInput.current?.focus(); }, [selected]);
++  const open = (row,action) => {
++    setError(''); setNote('');
++    const evidence = row.verification_evidence || {}, place = evidence.place || {}, submitted = evidence.submittedDetails || {};
++    setDetails({ name:row.restaurant_name, address:row.address || '', city:place.city || submitted.city || '', state_id:row.state_id,
++      lat:place.lat ?? submitted.lat ?? '', lng:place.lng ?? submitted.lng ?? '' });
++    setSelected({ row,action });
++  };
++  const submit = async e => {
++    e.preventDefault(); if (lock.current) return; lock.current=true; setBusy(true); setError('');
++    try {
++      const destination = selected.action === 'approve' ? { ...details, lat:details.lat === '' ? null : Number(details.lat), lng:details.lng === '' ? null : Number(details.lng) } : null;
++      const r = await fetch(`/api/restaurants/${selected.row.id}/review`, { method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:selected.action,note,destination}) });
++      const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Review could not be confirmed.');
++      setSelected(null); await load();
++    } catch(e) { setError(e.message); }
++    finally { lock.current=false; setBusy(false); }
++  };
++  return <section aria-label="Restaurant review">
++    <div className="statusbar"><strong>Pending Restaurants · {loading ? 'Loading…' : rows.length}</strong><button disabled={busy || loading} onClick={() => {setError('');load();}}>Refresh restaurants</button></div>
++    {error && <div className="error" role="alert">{error}</div>}
++    {!loading && !rows.length && !error && <div className="empty"><h2>No restaurants awaiting review</h2></div>}
++    <div className="grid">{rows.map(row => <article className="card restaurant-card" key={row.id}><div className="card-body">
++      <h2>{row.restaurant_name}</h2><dl><dt>Address</dt><dd>{row.address || 'Not provided'}</dd><dt>State</dt><dd>{row.state_name || (row.state_id ?? 'Not provided')}</dd><dt>Submitted</dt><dd>{new Date(row.created_at).toLocaleString()}</dd></dl>
++      {row.verification_evidence?.ai && <div className="advisory"><strong>Wingman assessment</strong><p>{row.verification_evidence.ai.reasoning || 'No explanation provided.'}</p><p>Wing confidence: {row.verification_evidence.ai.wingsProbability == null ? 'Unknown' : `${Math.round(row.verification_evidence.ai.wingsProbability * 100)}%`}</p></div>}
++      <details><summary>Verification evidence</summary>{row.verification_evidence ? <><p className="warning">Wingman’s findings are advisory. Confirm the location and wings before approving.</p><pre className="restaurant-evidence">{JSON.stringify(row.verification_evidence,null,2)}</pre></> : <p className="warning">No linked evidence was saved for this older submission. Verify its location and menu manually.</p>}</details>
++      <div className="actions"><button className="approve" disabled={busy} onClick={() => open(row,'approve')}>Approve</button><button className="reject" disabled={busy} onClick={() => open(row,'reject')}>Reject</button></div>
++    </div></article>)}</div>
++    {!!history.length && <details className="restaurant-history"><summary>Recent restaurant reviews</summary>{history.map(r => <article key={r.suggestion_id}><strong>{r.destination_suggestions?.restaurant_name} · {r.action === 'approve' ? 'Approved' : 'Rejected'}</strong><p>{r.reviewer_note}</p><small>{new Date(r.reviewed_at).toLocaleString()}{r.destination_id ? ` · Restaurant ${r.destination_id}` : ''}</small></article>)}</details>}
++    {selected && <div className="modal-backdrop"><form className="modal restaurant-modal" role="dialog" aria-modal="true" aria-labelledby="restaurant-review-title" onSubmit={submit}>
++      <h2 id="restaurant-review-title">{selected.action === 'approve' ? 'Approve' : 'Reject'} {selected.row.restaurant_name}</h2>
++      {selected.action === 'approve' && <><p>Confirm these details and that the menu includes wings. An existing matching restaurant will be reused.</p>{['name','address','city','lat','lng'].map((key,i) => <label key={key}>{({name:'Restaurant name',address:'Address',city:'City',lat:'Latitude',lng:'Longitude'})[key]}<input ref={i===0 ? firstInput : undefined} required type={['lat','lng'].includes(key) ? 'number' : 'text'} step="any" min={key==='lat' ? -90 : key==='lng' ? -180 : undefined} max={key==='lat' ? 90 : key==='lng' ? 180 : undefined} maxLength={500} value={details[key]} onChange={e => setDetails({...details,[key]:e.target.value})}/></label>)}</>}
++      <label>Review reason<textarea ref={selected.action === 'reject' ? firstInput : undefined} required minLength={8} maxLength={2000} value={note} onChange={e => setNote(e.target.value)} placeholder="Required reason (8–2000 characters)"/></label>
++      {error && <p role="alert" className="error">{error}</p>}
++      <div className="modal-actions"><button type="button" className="quiet" disabled={busy} onClick={() => setSelected(null)}>Cancel</button><button className={selected.action==='approve' ? 'approve' : 'danger'} disabled={busy || note.trim().length<8}>{busy ? 'Saving…' : 'Confirm review'}</button></div>
++    </form></div>}
++  </section>;
++}
+diff --git a/Agents/Mango Habanero/src/main.jsx b/Agents/Mango Habanero/src/main.jsx
+index 1682be3..9ff6df9 100644
+--- a/Agents/Mango Habanero/src/main.jsx	
++++ b/Agents/Mango Habanero/src/main.jsx	
+@@ -1,6 +1,7 @@
+ import React, { useEffect, useMemo, useRef, useState } from 'react';
+ import { createRoot } from 'react-dom/client';
+ import './styles.css';
++import { RestaurantQueue } from './RestaurantQueue.jsx';
+ 
+ const reasons = [['poor_media_quality','Poor media quality'],['inappropriate_content','Inappropriate content'],['not_related_to_rating','Not clearly related to the rating'],['duplicate_submission','Duplicate submission'],['copyright_or_ownership','Copyright or ownership concern'],['restaurant_or_attribution','Restaurant or attribution issue'],['other','Other']];
+ const tabs = [['pending','Pending Review'],['approved','Approved Queue'],['rejected','Rejected'],['posted','Posted / History']];
+@@ -11,6 +12,7 @@ const jobFor = (item, platform) => item.publishing?.find((job) => job.platform =
+ 
+ export function App() {
+   const [items, setItems] = useState([]); const [tab, setTab] = useState('pending'); const [busy, setBusy] = useState(''); const [error, setError] = useState(''); const [toast, setToast] = useState(''); const [rejecting, setRejecting] = useState(null); const [reason, setReason] = useState(''); const [note, setNote] = useState(''); const [refreshed, setRefreshed] = useState(null);
++  const [restaurantRefresh,setRestaurantRefresh] = useState(0);
+   const actionLock = useRef(false); const [progress, setProgress] = useState('');
+   const load = async () => { setError(''); try { const response = await fetch('/api/submissions'); if (!response.ok) throw new Error(); const data = await response.json(); setItems(data.submissions || []); setRefreshed(data.refreshedAt); } catch { setError('Could not reach Mango Habanero. Check the backend terminal and retry.'); } };
+   useEffect(() => { load(); }, []); useEffect(() => { if (!toast) return undefined; const timer = setTimeout(() => setToast(''), 3000); return () => clearTimeout(timer); }, [toast]);
+@@ -26,7 +28,7 @@ export function App() {
+   const approve = (id) => act(id, `/api/submissions/${id}/review`, { body: { action: 'approve', reasonCategory: 'standard_acceptable', reviewerNote: 'Original photo reviewed and acceptable.' }, toast: 'Photo approved.' });
+   const reject = async () => { if (!reason || note.trim().length < 8 || actionLock.current) return; const id = rejecting; setRejecting(null); await act(id, `/api/submissions/${id}/review`, { body: { action: 'reject', reasonCategory: reason, reviewerNote: note }, toast: 'Rejected with an audit reason.' }); setReason(''); setNote(''); };
+   const priority = items.find((item) => item.is_publish_priority && item.status === 'approved' && !item.featured_at); const counts = Object.fromEntries(tabs.map(([key]) => [key, items.filter((item) => visibleIn(key, item)).length]));
+-  return <div className="app"><header><div className="brand-mark">🔥</div><div><p className="eyebrow">BUFFAGO / INTERNAL REVIEW</p><h1>Mango Habanero</h1><p className="subtitle">Approved Queue for Jalapeño social publishing</p></div><button className="refresh" onClick={load}>↻ Refresh</button></header><main><section className="statusbar"><div><strong>Review desk</strong><span className="muted">Private media · service-authorized previews</span></div><span className="last">{refreshed ? `Last refreshed ${formatDate(refreshed)}` : 'Loading queue…'}</span></section><nav>{tabs.map(([key, label]) => <button key={key} className={tab === key ? 'active' : ''} onClick={() => setTab(key)}>{label}<span>{counts[key]}</span></button>)}</nav>{priority && <div className="priority-banner"><span>⚡ Make Next</span><strong>{priority.restaurant?.name || 'Selected submission'}</strong><button onClick={() => act(priority.submission_id, `/api/submissions/${priority.submission_id}/priority`, { method: 'DELETE', toast: 'Make Next cleared.' })}>Clear</button></div>}{error && <div className="error"><strong>Something needs attention.</strong> {error}<button onClick={load}>Retry</button></div>}{!error && !visible.length && <div className="empty"><div>🌶️</div><h2>Nothing in {tabs.find((entry) => entry[0] === tab)?.[1]}</h2><p>New Wing Shots and completed reviews will appear here.</p></div>}<div className="grid">{visible.map((item) => <Card key={item.submission_id} item={item} tab={tab} busy={Boolean(busy)} progress={busy === item.submission_id ? progress : ''} approve={approve} reject={() => { setRejecting(item.submission_id); setReason(''); setNote(''); }} prioritize={() => act(item.submission_id, `/api/submissions/${item.submission_id}/priority`, { toast: 'Marked as the next Jalapeño priority.' })} retry={(id) => act(id, `/api/submissions/${id}/retry`, { toast: 'Retry requested.' })} />)}</div></main>{rejecting && <div className="modal-backdrop"><div className="modal"><h2>Reject Wing Shot</h2><p>Select the reason that best explains the decision.</p><select value={reason} onChange={(event) => setReason(event.target.value)}><option value="">Choose a reason…</option>{reasons.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select><textarea value={note} onChange={(event) => setNote(event.target.value)} placeholder="Required reviewer note (at least 8 characters)" maxLength="2000"/><div className="modal-actions"><button className="quiet" onClick={() => setRejecting(null)}>Cancel</button><button className="danger" disabled={!reason || note.trim().length < 8 || Boolean(busy)} onClick={reject}>Confirm rejection</button></div></div></div>}{toast && <div className="toast">✓ {toast}</div>}</div>;
++  return <div className="app"><header><div className="brand-mark">🔥</div><div><p className="eyebrow">BUFFAGO / INTERNAL REVIEW</p><h1>Mango Habanero</h1><p className="subtitle">Approved Queue for Jalapeño social publishing</p></div><button className="refresh" onClick={() => tab === 'restaurants' ? setRestaurantRefresh(value => value + 1) : load()}>↻ Refresh</button></header><main><section className="statusbar"><div><strong>Review desk</strong><span className="muted">Private media · service-authorized previews</span></div><span className="last">{refreshed ? `Last refreshed ${formatDate(refreshed)}` : 'Loading queue…'}</span></section><nav>{tabs.map(([key, label]) => <button key={key} className={tab === key ? 'active' : ''} onClick={() => setTab(key)}>{label}<span>{counts[key]}</span></button>)}<button className={tab === 'restaurants' ? 'active' : ''} onClick={() => setTab('restaurants')}>Pending Restaurants</button></nav>{tab === 'restaurants' && <RestaurantQueue refreshKey={restaurantRefresh} />}{priority && <div className="priority-banner"><span>⚡ Make Next</span><strong>{priority.restaurant?.name || 'Selected submission'}</strong><button onClick={() => act(priority.submission_id, `/api/submissions/${priority.submission_id}/priority`, { method: 'DELETE', toast: 'Make Next cleared.' })}>Clear</button></div>}{error && <div className="error"><strong>Something needs attention.</strong> {error}<button onClick={load}>Retry</button></div>}{tab !== 'restaurants' && !error && !visible.length && <div className="empty"><div>🌶️</div><h2>Nothing in {tabs.find((entry) => entry[0] === tab)?.[1]}</h2><p>New Wing Shots and completed reviews will appear here.</p></div>}<div className="grid">{tab !== 'restaurants' && visible.map((item) => <Card key={item.submission_id} item={item} tab={tab} busy={Boolean(busy)} progress={busy === item.submission_id ? progress : ''} approve={approve} reject={() => { setRejecting(item.submission_id); setReason(''); setNote(''); }} prioritize={() => act(item.submission_id, `/api/submissions/${item.submission_id}/priority`, { toast: 'Marked as the next Jalapeño priority.' })} retry={(id) => act(id, `/api/submissions/${id}/retry`, { toast: 'Retry requested.' })} />)}</div></main>{rejecting && <div className="modal-backdrop"><div className="modal"><h2>Reject Wing Shot</h2><p>Select the reason that best explains the decision.</p><select value={reason} onChange={(event) => setReason(event.target.value)}><option value="">Choose a reason…</option>{reasons.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select><textarea value={note} onChange={(event) => setNote(event.target.value)} placeholder="Required reviewer note (at least 8 characters)" maxLength="2000"/><div className="modal-actions"><button className="quiet" onClick={() => setRejecting(null)}>Cancel</button><button className="danger" disabled={!reason || note.trim().length < 8 || Boolean(busy)} onClick={reject}>Confirm rejection</button></div></div></div>}{toast && <div className="toast">✓ {toast}</div>}</div>;
+ }
+ 
+ function ProcessingSummary({ item }) { const duplicate = item.processing?.some((job) => job.last_error_code === 'DUPLICATE_MEDIA'); return duplicate ? <div className="publishing-summary"><strong>Status: Duplicate media</strong><span>Exact duplicate detected</span><span>Processing stopped</span><span>No publication occurred</span></div> : null; }
+diff --git a/Agents/Mango Habanero/src/styles.css b/Agents/Mango Habanero/src/styles.css
+index d80e37b..07f160f 100644
+--- a/Agents/Mango Habanero/src/styles.css	
++++ b/Agents/Mango Habanero/src/styles.css	
+@@ -1 +1,2 @@
+ :root{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:#2b1b16;background:#fff8f0;font-synthesis:none}*{box-sizing:border-box}body{margin:0}button,select,textarea{font:inherit}button{cursor:pointer;border:0}button:disabled{opacity:.55;cursor:wait}.app{min-height:100vh}header{display:flex;align-items:center;gap:16px;padding:28px clamp(20px,5vw,72px);background:linear-gradient(120deg,#3a1f18,#7e3218 58%,#f09b32);color:white}.brand-mark{display:grid;place-items:center;width:54px;height:54px;border-radius:16px;background:#ffbb50;font-size:26px}h1,h2,p{margin:0}.eyebrow{font-size:11px;letter-spacing:.16em;opacity:.75}.subtitle{margin-top:5px;color:#ffe0b6}.refresh{margin-left:auto;padding:11px 16px;border-radius:10px;background:#fff;color:#7e3218;font-weight:700}main{max-width:1250px;margin:auto;padding:24px clamp(16px,4vw,48px)}.statusbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.muted,.last{color:#94766b;font-size:13px}.statusbar .muted{margin-left:12px}nav{display:flex;gap:8px;border-bottom:1px solid #ead8c8;margin-bottom:18px}nav button{background:none;padding:12px 14px;color:#8e6c60;font-weight:700;border-bottom:3px solid transparent}nav button.active{color:#bb4c1d;border-color:#f28f2e}nav span{margin-left:8px;padding:2px 7px;background:#f2e5d8;border-radius:20px;font-size:12px}.priority-banner,.error{padding:14px 16px;border-radius:12px;margin:14px 0;display:flex;align-items:center;gap:12px}.priority-banner{background:#fff0cf;border:1px solid #f3cb78;color:#774219}.priority-banner strong{margin-right:auto}.priority-banner button,.error button{padding:7px 10px;border-radius:8px;background:#fff}.error{background:#fff0ed;border:1px solid #efa796;color:#8d2b1e}.error button{margin-left:auto;color:#8d2b1e}.grid{display:grid;gap:18px}.card{display:grid;grid-template-columns:minmax(280px,42%) 1fr;background:#fff;border:1px solid #ecdccd;border-radius:16px;overflow:hidden;box-shadow:0 8px 24px #7d3e1610}.card.selected{border:2px solid #f0a129}.media{min-height:260px;background:#2b211e;display:grid;place-items:center}.media img,.media video{width:100%;height:100%;max-height:440px;object-fit:cover}.preview-placeholder{padding:18px;border-radius:10px;background:#47342b;color:#ffd18e}.card-body{padding:20px}.card-head{display:flex;justify-content:space-between}.pill,.state{font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-right:8px}.pill{color:#c85b1c}.state{color:#9b8177}.card h2{font-size:22px;margin-top:10px}.card-head p{color:#94766b;margin-top:3px}dl{display:grid;grid-template-columns:100px 1fr;gap:7px;margin:18px 0;font-size:13px}dt{color:#a2867b}dd{margin:0;overflow-wrap:anywhere}.caption{padding:12px 0;border-top:1px solid #f0e4da;border-bottom:1px solid #f0e4da;line-height:1.45}.advisory,.warning{margin-top:12px;padding:10px 12px;border-radius:8px;font-size:13px}.advisory{background:#f3f7ec;color:#4b6c30}.warning{background:#fff3df;color:#9a581b}.actions{display:flex;gap:10px;margin-top:18px}.actions button{padding:10px 16px;border-radius:9px;font-weight:800}.approve{background:#e46d24;color:white}.reject,.danger{background:#f8dfd7;color:#9b2d1c}.priority-label{color:#b95a1b;font-weight:800;font-size:12px}.empty{text-align:center;padding:90px 20px;color:#92756a}.empty div{font-size:35px}.empty h2{margin:12px 0 6px;color:#4d3027}.modal-backdrop{position:fixed;inset:0;background:#32150f99;display:grid;place-items:center;padding:20px}.modal{width:min(440px,100%);background:#fff8f0;padding:24px;border-radius:16px;box-shadow:0 20px 60px #2b171355}.modal h2{margin-bottom:8px}.modal p{color:#856b60;margin-bottom:18px}.modal select,.modal textarea{width:100%;padding:11px;border:1px solid #dfc9b9;border-radius:8px;background:#fff;margin-bottom:12px}.modal textarea{min-height:100px;resize:vertical}.modal-actions{display:flex;justify-content:flex-end;gap:10px}.modal-actions button{padding:10px 14px;border-radius:8px}.quiet{background:#eadfd6}.toast{position:fixed;right:24px;bottom:24px;background:#2e211c;color:#fff;padding:13px 16px;border-radius:10px;box-shadow:0 8px 25px #0003}@media(max-width:760px){header{padding:22px 18px}.card{grid-template-columns:1fr}.media{min-height:220px}.statusbar{display:block}.last{display:block;margin-top:8px}.statusbar .muted{display:block;margin:5px 0}nav{overflow:auto}.priority-banner{align-items:flex-start;flex-wrap:wrap}.priority-banner strong{margin-right:0}.priority-banner button{margin-left:auto}}
++.restaurant-card{grid-template-columns:1fr}.restaurant-evidence{white-space:pre-wrap;overflow-wrap:anywhere;max-height:300px;overflow:auto;font-size:13px;margin-top:12px}.restaurant-history{margin-top:24px}.restaurant-history article{padding:14px;border-bottom:1px solid #ead8c8}.restaurant-history p{margin:8px 0}.restaurant-modal{max-height:90vh;overflow:auto}.restaurant-modal label{display:block;font-size:13px}.restaurant-modal input{display:block;width:100%;padding:9px;box-sizing:border-box;border:1px solid #dfc9b9;border-radius:8px;margin:5px 0 10px;font:inherit}
+diff --git a/Agents/Mango Habanero/tests/approval.test.js b/Agents/Mango Habanero/tests/approval.test.js
+index 07c1ddc..f13da38 100644
+--- a/Agents/Mango Habanero/tests/approval.test.js	
++++ b/Agents/Mango Habanero/tests/approval.test.js	
+@@ -83,7 +83,7 @@ describe('selected photo approval', () => {
+   it('construction and progress reads do not process anything', () => { const f = fixture(); expect(f.service.progress(id)).toBe(''); expect(f.state.calls).toHaveLength(0); expect(f.prepare).not.toHaveBeenCalled(); });
+ });
+ describe('safe worker invocation', () => {
+-  const env = { MANGO_PYTHON_EXECUTABLE: 'C:/trusted/python.exe', SUPABASE_URL: 'https://example.invalid', SUPABASE_SERVICE_ROLE_KEY: 'server-secret', WING_MODERATION_PROVIDER_MODE: 'http', PYTHONPATH: 'untrusted', SOCIAL_TOKEN: 'social-secret' };
++  const env = { MANGO_PYTHON_EXECUTABLE: process.platform === 'win32' ? 'C:/trusted/python.exe' : '/trusted/python', SUPABASE_URL: 'https://example.invalid', SUPABASE_SERVICE_ROLE_KEY: 'server-secret', WING_MODERATION_PROVIDER_MODE: 'http', PYTHONPATH: 'untrusted', SOCIAL_TOKEN: 'social-secret' };
+   it('uses a fixed script, argument array, explicit scope and isolated credentials', () => { const call = workerInvocation(id,env); expect(call.args.slice(1)).toEqual(['--photo-once','--photo-submission-id',id,'--photo-review-only']); expect(call.options.shell).toBe(false); expect(JSON.stringify(call.args)).not.toContain('secret'); expect(call.options.env).toMatchObject({ SUPABASE_SERVICE_ROLE_KEY:'server-secret', WING_MODERATION_PROVIDER_MODE:'manual-review', WING_PROCESSING_ENVIRONMENT:'production', WING_PROCESSING_ALLOW_TEST_PROVIDER:'false' }); expect(call.options.env).not.toHaveProperty('SOCIAL_TOKEN'); expect(call.options.env).not.toHaveProperty('PYTHONPATH'); });
+   it('rejects invalid IDs and missing configuration', () => { expect(() => workerInvocation('anything; --drain 100',env)).toThrow('Invalid'); expect(() => validateReview('bad', input)).toThrow('Invalid'); expect(() => workerInvocation(id,{})).toThrow('MANGO_PYTHON'); });
+   it('bounds execution and discards potentially sensitive child output', async () => { vi.useFakeTimers(); const child = Object.assign(new EventEmitter(), { stdout: new EventEmitter(), stderr: new EventEmitter(), kill: vi.fn(() => child.emit('close',null)) }); const result = runWorker(id,env,() => child); const assertion = expect(result).rejects.toThrow('timed out'); child.stderr.emit('data',Buffer.from('server-secret')); await vi.advanceTimersByTimeAsync(120000); await assertion; expect(child.kill).toHaveBeenCalledOnce(); vi.useRealTimers(); });
+diff --git a/Agents/Mango Habanero/tests/restaurantUi.test.jsx b/Agents/Mango Habanero/tests/restaurantUi.test.jsx
+new file mode 100644
+index 0000000..7a71320
+--- /dev/null
++++ b/Agents/Mango Habanero/tests/restaurantUi.test.jsx	
+@@ -0,0 +1,37 @@
++// @vitest-environment jsdom
++import React,{act} from 'react';
++import {createRoot} from 'react-dom/client';
++import {beforeEach,afterEach,it,expect,vi} from 'vitest';
++import {RestaurantQueue} from '../src/RestaurantQueue.jsx';
++let container,root,rows,history,posts;
++const row={id:'10000000-0000-4000-8000-000000000001',restaurant_name:'Wing Place',address:'1 Main',state_id:1,created_at:'2026-10-12',verification_evidence:{place:{city:'Hartford',lat:41,lng:-72},ai:{wingsProbability:0.4}}};
++const click=async label=>act(async()=>{[...container.querySelectorAll('button')].find(b=>b.textContent===label).click();});
++const type=async(el,value)=>act(async()=>{Object.getOwnPropertyDescriptor(el.tagName==='TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype,'value').set.call(el,value);el.dispatchEvent(new Event('input',{bubbles:true}));});
++beforeEach(async()=>{
++ globalThis.IS_REACT_ACT_ENVIRONMENT=true;rows=[row];history=[];posts=[];
++ vi.stubGlobal('fetch',vi.fn(async(url,options)=>{
++  if(options?.method==='POST') {const body=JSON.parse(options.body);posts.push(body);rows=[];history=[{suggestion_id:row.id,action:body.action,reviewer_note:body.note,destination_suggestions:row,reviewed_at:'2026-10-13'}];return {ok:true,json:async()=>({})};}
++  return {ok:true,json:async()=>({restaurants:rows,history})};
++ }));
++ container=document.createElement('div');document.body.append(container);root=createRoot(container);
++ await act(async()=>root.render(<RestaurantQueue/>));
++});
++afterEach(async()=>{await act(async()=>root.unmount());container.remove();vi.unstubAllGlobals();});
++it('shows submitted details and available verification evidence',()=>{expect(container.textContent).toContain('Wing Place');expect(container.textContent).toContain('1 Main');expect(container.textContent).toContain('wingsProbability');});
++it('reject requires reason, focuses note, retains history and refreshes pending',async()=>{
++ await click('Reject');const note=container.querySelector('textarea');expect(document.activeElement).toBe(note);
++ expect([...container.querySelectorAll('button')].find(b=>b.textContent==='Confirm review').disabled).toBe(true);
++ await type(note,'Menu has no wings.');await act(async()=>container.querySelector('form').dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));
++ expect(posts[0]).toMatchObject({action:'reject',note:'Menu has no wings.',destination:null});expect(container.textContent).toContain('No restaurants awaiting review');expect(container.textContent).toContain('Menu has no wings.');
++});
++it('approval focuses location and submits the reviewed details',async()=>{
++ await click('Approve');expect(document.activeElement).toBe(container.querySelector('input'));
++ await type(container.querySelector('textarea'),'Menu confirms chicken wings.');await act(async()=>container.querySelector('form').dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));
++ expect(posts[0].destination).toEqual({name:'Wing Place',address:'1 Main',city:'Hartford',state_id:1,lat:41,lng:-72});
++});
++it('a failed review remains visible with the selected submission',async()=>{
++ await click('Reject');await type(container.querySelector('textarea'),'Menu has no wings.');
++ globalThis.fetch=vi.fn(async()=>({ok:false,json:async()=>({error:'Already reviewed. Refresh.'})}));
++ await act(async()=>container.querySelector('form').dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));
++ expect(container.querySelector('form')).not.toBeNull();expect(container.textContent).toContain('Already reviewed. Refresh.');
++});
+diff --git a/Agents/Mango Habanero/tests/restaurants.test.js b/Agents/Mango Habanero/tests/restaurants.test.js
+new file mode 100644
+index 0000000..df25ce8
+--- /dev/null
++++ b/Agents/Mango Habanero/tests/restaurants.test.js	
+@@ -0,0 +1,31 @@
++import { it,expect,vi } from 'vitest';
++import { createRestaurantService,reviewInput } from '../server/restaurants.mjs';
++const id='10000000-0000-4000-8000-000000000001',reviewer='10000000-0000-4000-8000-000000000002';
++const valid={action:'approve',note:'Menu confirms wings.',destination:{name:' Wings ',address:'1 Main',city:'Hartford',state_id:1,lat:41,lng:-72}};
++it('validates identifiers, actions, notes and full location before any backend writes',()=>{
++ expect(reviewInput(id,reviewer,valid).p_destination.name).toBe('Wings');
++ for(const body of [{...valid,note:'short'},{...valid,action:'invalid'},{...valid,destination:{...valid.destination,lat:null}},{...valid,destination:{...valid.destination,lng:181}},{...valid,destination:{...valid.destination,state_id:1.2}}]) expect(()=>reviewInput(id,reviewer,body)).toThrow();
++ expect(()=>reviewInput('../other',reviewer,valid)).toThrow();
++ expect(reviewInput(id,reviewer,{action:'reject',note:'No wings on menu.',destination:valid.destination}).p_destination).toBeNull();
++});
++function backend(roles=[{role:'wing_reviewer'}], rpcError=null) {
++ const chain=table=>{ const c={}; for(const key of ['select','eq','is','in','order','limit','range']) c[key]=()=>c;
++ c.then=resolve=>resolve({data:table==='app_user_roles' ? roles : [],error:null}); return c; };
++ return {from:vi.fn(chain),rpc:vi.fn(async()=>({data:{action:'approve'},error:rpcError}))};
++}
++it('rejects unauthorized reviewer before listing or moderating',async()=>{
++ const b=backend([]),s=createRestaurantService({backend:b,reviewer});
++ await expect(s.list()).rejects.toThrow('active review role');await expect(s.review(id,valid)).rejects.toThrow('active review role');expect(b.rpc).not.toHaveBeenCalled();
++});
++it('lists the same pending view used by count and returns review history',async()=>{
++ const b=backend(),s=createRestaurantService({backend:b,reviewer});
++ expect(await s.list()).toEqual({restaurants:[],history:[]});expect(b.from).toHaveBeenCalledWith('mango_pending_restaurants');
++});
++it('uses only the transactional RPC and configured reviewer',async()=>{
++ const b=backend(),s=createRestaurantService({backend:b,reviewer});await s.review(id,{...valid,reviewer:'spoofed'});
++ expect(b.rpc).toHaveBeenCalledWith('mango_review_restaurant',reviewInput(id,reviewer,valid));
++});
++it('reports a conflict without exposing database internals',async()=>{
++ const b=backend(undefined,{message:'restaurant_already_reviewed'});await expect(createRestaurantService({backend:b,reviewer}).review(id,valid)).rejects.toThrow('already reviewed');
++ const other=backend(undefined,{message:'secret SQL details'});await expect(createRestaurantService({backend:other,reviewer}).review(id,valid)).rejects.toThrow('could not be confirmed');
++});
+diff --git a/buffago-growth-command-center/README.md b/buffago-growth-command-center/README.md
+index e5b64e1..8c1cdd2 100644
+--- a/buffago-growth-command-center/README.md
++++ b/buffago-growth-command-center/README.md
+@@ -245,3 +245,7 @@ No deployment or production restart was performed during development. When ready
+ 4. Run `python3 -m unittest discover -s tests` from the reviewed source directory in a desktop session with Tk available. The screenshot capture test uses optional developer Pillow; the application does not require it.
+ 5. At a time you choose, restart only the display: `sudo systemctl restart buffago-growth.service`. Check `systemctl status buffago-growth.service` and `journalctl -u buffago-growth.service -n 50`. The control service needs no update for this feature.
+ 6. Open the mission, confirm one platform, reopen and correct it, then undo the trial confirmation. Verify weekly progress, existing metrics and charts. For a restart persistence check, confirm a real completed mission, restart the display manually and check that the confirmation remains.
++
++## Pending restaurants
++
++Action Required includes pending restaurant suggestions from the same queue Mango reviews, alongside photos, feedback and open work. See [restaurant review rollout](../docs/mango-restaurant-review.md). A missing backend field displays unavailable until the migration is applied.
+diff --git a/buffago-growth-command-center/models.py b/buffago-growth-command-center/models.py
+index 1e8cac6..1c5de75 100644
+--- a/buffago-growth-command-center/models.py
++++ b/buffago-growth-command-center/models.py
+@@ -517,6 +517,7 @@ class Snapshot:
+     device_last_24h: DeviceOpens = field(default_factory=DeviceOpens)
+     device_previous_24h: DeviceOpens = field(default_factory=DeviceOpens)
+     pending_photos: int | float | None = None
++    pending_restaurants: int | float | None = None
+     open_work: int | float | None = None
+     calendar_previous_month: tuple[str | None, int | float | None] = (None, None)
+     calendar_current_month: tuple[str | None, int | float | None] = (None, None)
+@@ -595,6 +596,7 @@ class Snapshot:
+             device_all_time=DeviceOpens.parse(devices.get("all_time")),
+             device_last_24h=DeviceOpens.parse(devices.get("last_24h")),
+             device_previous_24h=DeviceOpens.parse(devices.get("previous_24h")),
++            pending_restaurants=as_number(as_dict(pulse.get("pending_restaurants")).get("total")),
+             pending_photos=as_number(as_dict(pulse.get("pending_photos")).get("total")),
+             open_work=as_number(as_dict(pulse.get("open_work")).get("total")),
+             calendar_previous_month=(as_text(previous_month.get("month")), as_number(previous_month.get("value"))),
+diff --git a/buffago-growth-command-center/tests/test_models.py b/buffago-growth-command-center/tests/test_models.py
+index dae75c2..1814441 100644
+--- a/buffago-growth-command-center/tests/test_models.py
++++ b/buffago-growth-command-center/tests/test_models.py
+@@ -26,6 +26,12 @@ class ModelTests(unittest.TestCase):
+         self.assertIsNone(snapshot.wing_total)
+         self.assertEqual(snapshot.wing.direction, "flat")
+ 
++    def test_pending_restaurants_optional_count(self):
++        self.assertIsNone(Snapshot.from_payload({}).pending_restaurants)
++        self.assertEqual(Snapshot.from_payload({"product_pulse": {"pending_restaurants": {"total": 0}}}).pending_restaurants, 0)
++        self.assertEqual(Snapshot.from_payload({"product_pulse": {"pending_restaurants": {"total": 9}}}).pending_restaurants, 9)
++        self.assertIsNone(Snapshot.from_payload({"product_pulse": {"pending_restaurants": {"total": "unknown"}}}).pending_restaurants)
++
+     def test_feedback_age(self):
+         snapshot = Snapshot.from_payload({"product_pulse": {"feedback": {"oldest_open_at": "2026-01-01T00:00:00Z"}}})
+         self.assertEqual(snapshot.oldest_feedback_age(datetime(2026, 1, 3, tzinfo=timezone.utc)), "2d old")
+diff --git a/buffago-growth-command-center/ui/dashboard.py b/buffago-growth-command-center/ui/dashboard.py
+index 32bebbc..9248133 100644
+--- a/buffago-growth-command-center/ui/dashboard.py
++++ b/buffago-growth-command-center/ui/dashboard.py
+@@ -255,14 +255,18 @@ class Dashboard(tk.Canvas):
+ 
+     def _draw_actions(self, p: Painter, s: Snapshot) -> None:
+         p.label(40, 635, "Action Required")
+-        for x, title, value in ((40, 'PENDING PHOTOS', s.pending_photos),
+-                                (222, 'OPEN WORK', s.open_work)):
++        for index, (title, value) in enumerate((('PENDING PHOTOS', s.pending_photos),
++                                                ('PENDING RESTAURANTS', s.pending_restaurants),
++                                                ('OPEN FEEDBACK', s.feedback_open),
++                                                ('OPEN WORK', s.open_work))):
++            x = 40 + (index % 2) * 182
++            y = 660 + (index // 2) * 95
+             alert = value is not None and value >= 1
+-            self._card(p, x, 660, 170, 95, alert=alert)
+-            p.text(x + 12, 671, title, 11, ALERT if alert else theme.MUTED, 'bold')
+-            p.text(x + 12, 689, fmt_number(value), 32, ALERT if alert else theme.TEXT, 'bold')
+-            detail = 'Needs attention' if alert else 'All clear' if value == 0 else 'Unavailable'
+-            p.text(x + 12, 736, detail, 10, theme.MUTED)
++            self._card(p, x, y, 170, 88, alert=alert)
++            p.text(x + 10, y + 10, title, 10, ALERT if alert else theme.MUTED, 'bold')
++            p.text(x + 10, y + 27, fmt_number(value), 32, ALERT if alert else theme.TEXT, 'bold')
++            detail = 'Needs review' if alert else 'All clear' if value == 0 else 'Unavailable'
++            p.text(x + 10, y + 70, detail, 9, theme.MUTED)
+ 
+     def _draw_activity(self, p: Painter, s: Snapshot, now: datetime) -> None:
+         x, w = 412, 658
+diff --git a/crawl/components/WingmanAddDialog.jsx b/crawl/components/WingmanAddDialog.jsx
+index ec48b6b..80198b9 100644
+--- a/crawl/components/WingmanAddDialog.jsx
++++ b/crawl/components/WingmanAddDialog.jsx
+@@ -269,6 +269,13 @@ export default function WingmanAddDialog({
+         state_id: suggestionPayload.state_id,
+         restaurant_name: suggestionPayload.restaurant_name,
+         address: suggestionPayload.address,
++        verification_evidence: {
++          source: 'wingman',
++          decisionReason: result?.decisionReason ?? null,
++          ai: result?.ai ?? null,
++          place: result?.place ?? null,
++          submittedDetails: { city: row?.city ?? city?.trim() ?? null, lat: row?.lat ?? null, lng: row?.lng ?? null, extraInfo: extraInfo?.trim() || null },
++        },
+       });
+ 
+     if (suggestionErr) throw suggestionErr;
+@@ -277,7 +284,7 @@ export default function WingmanAddDialog({
+     setMessage(manualReviewQueuedMessage);
+     setStep('result');
+     onManualReviewQueued?.(suggestionPayload);
+-  }, [manualReviewQueuedMessage, onManualReviewQueued, restaurantName, stateId, userId]);
++  }, [city, extraInfo, manualReviewQueuedMessage, onManualReviewQueued, restaurantName, stateId, userId]);
+ 
+   const verifyWingsAndAdd = useCallback(async (row) => {
+     if (!row?.name || !stateId || !stateCode) return;
+diff --git a/crawl/supabase/functions/wingman-intake/index.ts b/crawl/supabase/functions/wingman-intake/index.ts
+index a4f02d2..c5a8553 100644
+--- a/crawl/supabase/functions/wingman-intake/index.ts
++++ b/crawl/supabase/functions/wingman-intake/index.ts
+@@ -731,10 +731,7 @@ Deno.serve(async (req) => {
+       };
+ 
+       const { data: inserted, error: insertError } = await admin
+-        .from('destinations')
+-        .insert(insertPayload)
+-        .select('id, name, address, city, lat, lng, state_id')
+-        .single();
++        .rpc('wingman_create_destination', { p_destination: insertPayload, p_created_by: authenticatedUserId });
+ 
+       if (insertError) {
+         return jsonResponse({
+diff --git a/crawl/supabase/migrations/20261013005355_mango_restaurant_review.sql b/crawl/supabase/migrations/20261013005355_mango_restaurant_review.sql
+new file mode 100644
+index 0000000..739f359
+--- /dev/null
++++ b/crawl/supabase/migrations/20261013005355_mango_restaurant_review.sql
+@@ -0,0 +1,111 @@
++begin;
++-- Additive intake metadata. Existing clients can continue inserting suggestions.
++alter table public.destination_suggestions add column if not exists verification_evidence jsonb;
++create table public.restaurant_suggestion_reviews (
++ suggestion_id uuid primary key references public.destination_suggestions(id),
++ action text not null check (action in ('approve','reject')),
++ reviewer_id uuid not null references auth.users(id),
++ reviewer_note text not null check (length(btrim(reviewer_note)) between 8 and 2000),
++ destination_id uuid references public.destinations(id),
++ destination_details jsonb,
++ reviewed_at timestamptz not null default now(),
++ check ((action='approve') = (destination_id is not null))
++);
++alter table public.restaurant_suggestion_reviews enable row level security;
++revoke all on public.restaurant_suggestion_reviews from public,anon,authenticated;
++grant select,insert on public.restaurant_suggestion_reviews to service_role;
++
++-- One pending predicate for both Mango and the growth snapshot. Suggestions are
++-- never deleted and review history cannot be edited by an app client.
++create view public.mango_pending_restaurants with (security_invoker=true) as
++ select s.* from public.destination_suggestions s
++ where not exists (select 1 from public.restaurant_suggestion_reviews r where r.suggestion_id=s.id);
++revoke all on public.mango_pending_restaurants from public,anon,authenticated;
++grant select on public.mango_pending_restaurants to service_role;
++
++-- Shared service-only destination creation, used after automated or human
++-- verification. Preserve the same destination fields and normal table triggers.
++create function public.wingman_create_destination(p_destination jsonb,p_created_by uuid)
++returns jsonb language plpgsql security invoker set search_path='' as $$
++declare
++ n text := btrim(p_destination->>'name'); a text := btrim(p_destination->>'address');
++ c text := btrim(p_destination->>'city'); st integer := (p_destination->>'state_id')::integer;
++ latitude numeric := nullif(p_destination->>'lat','')::numeric;
++ longitude numeric := nullif(p_destination->>'lng','')::numeric;
++ d public.destinations; matches integer;
++begin
++ if n is null or n='' or a is null or a='' or c is null or c='' or st is null
++   or latitude is null or longitude is null or latitude not between -90 and 90 or longitude not between -180 and 180
++ then raise exception 'restaurant_location_required'; end if;
++ -- Serialize with all destination writes, including old clients, while looking
++ -- for an existing identity. Held only during this short database transaction.
++ lock table public.destinations in share row exclusive mode;
++ select count(*) into matches from public.destinations x
++ where x.state_id=st and lower(btrim(x.name))=lower(n)
++ and (lower(btrim(x.address))=lower(a) or lower(btrim(x.city))=lower(c));
++ if matches>1 then raise exception 'restaurant_match_ambiguous'; end if;
++ if matches=1 then
++   select * into d from public.destinations x where x.state_id=st and lower(btrim(x.name))=lower(n)
++   and (lower(btrim(x.address))=lower(a) or lower(btrim(x.city))=lower(c));
++   -- Same name/city with a different address might be another branch. Do not
++   -- silently merge it or create a likely duplicate; require operator resolution.
++   if lower(btrim(coalesce(d.address,'')))<>lower(a) then raise exception 'restaurant_match_ambiguous'; end if;
++ else
++   insert into public.destinations(name,address,city,state_id,lat,lng,created_by)
++   values(n,a,c,st,latitude,longitude,p_created_by) returning * into d;
++ end if;
++ return to_jsonb(d);
++end;
++$$;
++revoke all on function public.wingman_create_destination(jsonb,uuid) from public,anon,authenticated;
++grant execute on function public.wingman_create_destination(jsonb,uuid) to service_role;
++
++create function public.mango_review_restaurant(p_suggestion_id uuid,p_reviewer_id uuid,p_action text,p_note text,p_destination jsonb default null)
++returns jsonb language plpgsql security invoker set search_path='' as $$
++declare s public.destination_suggestions; r public.restaurant_suggestion_reviews; d jsonb;
++begin
++ if not exists (select 1 from public.app_user_roles where user_id=p_reviewer_id and active and revoked_at is null
++ and role in ('wing_reviewer','wing_admin')) then raise exception 'restaurant_reviewer_required'; end if;
++ if p_action is null or p_action not in ('approve','reject') or p_note is null or length(btrim(p_note)) not between 8 and 2000
++ then raise exception 'restaurant_review_invalid'; end if;
++ select * into s from public.destination_suggestions where id=p_suggestion_id for update;
++ if not found then raise exception 'restaurant_suggestion_not_found'; end if;
++ select * into r from public.restaurant_suggestion_reviews where suggestion_id=s.id;
++ if found then
++   if r.action=p_action and r.reviewer_id=p_reviewer_id and r.reviewer_note=btrim(p_note)
++      and r.destination_details is not distinct from (case when p_action='approve' then p_destination else null end)
++   then return to_jsonb(r); end if;
++   raise exception 'restaurant_already_reviewed';
++ end if;
++ if p_action='approve' then
++   if (p_destination->>'state_id')::integer is distinct from s.state_id then raise exception 'restaurant_state_mismatch'; end if;
++   d := public.wingman_create_destination(p_destination,s.user_id);
++ end if;
++ insert into public.restaurant_suggestion_reviews(suggestion_id,action,reviewer_id,reviewer_note,destination_id,destination_details)
++ values(s.id,p_action,p_reviewer_id,btrim(p_note),(d->>'id')::uuid,case when p_action='approve' then p_destination else null end)
++ returning * into r;
++ return to_jsonb(r);
++end;
++$$;
++revoke all on function public.mango_review_restaurant(uuid,uuid,text,text,jsonb) from public,anon,authenticated;
++grant execute on function public.mango_review_restaurant(uuid,uuid,text,text,jsonb) to service_role;
++
++create function public.mango_restaurant_pending_count()
++returns bigint language sql stable security invoker set search_path='' as $$
++ select count(*) from public.mango_pending_restaurants;
++$$;
++revoke all on function public.mango_restaurant_pending_count() from public,anon,authenticated;
++grant execute on function public.mango_restaurant_pending_count() to service_role;
++-- Preserve the deployed snapshot, its authorization and every existing metric.
++do $migration$
++declare definition text; marker text := '''product_pulse'', public.buffago_product_pulse_operations() ||';
++begin
++ definition := pg_get_functiondef('public.get_buffago_growth_snapshot()'::regprocedure);
++ if strpos(definition,marker)=0 then raise exception 'Unexpected growth snapshot; inspect before deploying'; end if;
++ if strpos(definition,'''pending_restaurants''')=0 then
++   definition := replace(definition,marker,marker||' jsonb_build_object(''pending_restaurants'', jsonb_build_object(''total'', public.mango_restaurant_pending_count())) ||');
++   execute definition;
++ end if;
++end;
++$migration$;
++commit;
+diff --git a/crawl/tests/mango-restaurant-postgres.test.mjs b/crawl/tests/mango-restaurant-postgres.test.mjs
+new file mode 100644
+index 0000000..957946e
+--- /dev/null
++++ b/crawl/tests/mango-restaurant-postgres.test.mjs
+@@ -0,0 +1,78 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import { readFileSync } from 'node:fs';
++import { PGlite } from '@electric-sql/pglite';
++const reviewer='10000000-0000-4000-8000-000000000001', user='10000000-0000-4000-8000-000000000002';
++const sid=n=>`20000000-0000-4000-8000-${String(n).padStart(12,'0')}`;
++const destination={name:'Wing Place',address:'1 Main St',city:'Hartford',state_id:1,lat:41.76,lng:-72.67};
++test('restaurant queue, atomic moderation, duplicate reuse and service-only access', async t=>{
++ const db=new PGlite();
++ try {
++  await db.exec(`create role anon; create role authenticated; create role service_role bypassrls;
++   create schema auth; create table auth.users(id uuid primary key);
++   create table public.app_user_roles(user_id uuid,role text,active boolean,revoked_at timestamptz);
++   create table public.destinations(id uuid primary key default gen_random_uuid(),name text,address text,city text,state_id integer,lat numeric,lng numeric,created_by uuid,created_at timestamptz default now());
++   create table public.destination_suggestions(id uuid primary key default gen_random_uuid(),user_id uuid,state_id integer,restaurant_name text,address text,created_at timestamptz default now());
++   create function public.buffago_product_pulse_operations() returns jsonb language sql as $$select '{}'::jsonb$$;
++   create function public.get_buffago_growth_snapshot() returns jsonb language sql security definer as $$ select jsonb_build_object('product_pulse', public.buffago_product_pulse_operations() || jsonb_build_object('feedback',jsonb_build_object('open_total',7))) $$;
++   grant usage on schema public,auth to service_role;
++   grant select,insert,update on destinations,destination_suggestions,app_user_roles to service_role;
++   insert into auth.users values('${reviewer}'),('${user}');
++   insert into app_user_roles values('${reviewer}','wing_reviewer',true,null);`);
++  await db.exec(readFileSync(new URL('../supabase/migrations/20261013005355_mango_restaurant_review.sql',import.meta.url),'utf8'));
++  for(let i=1;i<=7;i++) await db.query('insert into destination_suggestions(id,user_id,state_id,restaurant_name,address) values($1,$2,1,$3,$4)',[sid(i),user,destination.name,destination.address]);
++  const review=(i,action='approve',note='Menu confirms wings.',d=destination,actor=reviewer)=>db.query('select mango_review_restaurant($1,$2,$3,$4,$5) result',[sid(i),actor,action,note,d]);
++  await db.exec('set role service_role');
++  await t.test('count is the exact pending queue and snapshot retains existing metrics',async()=>{
++   assert.equal(Number((await db.query('select mango_restaurant_pending_count() n')).rows[0].n),7);
++   const pulse=(await db.query('select get_buffago_growth_snapshot() snapshot')).rows[0].snapshot.product_pulse;
++   assert.equal(pulse.pending_restaurants.total,7);assert.equal(pulse.feedback.open_total,7);
++  });
++  let first;
++  await t.test('approval creates one destination and leaves original submission',async()=>{
++   first=(await review(1)).rows[0].result;
++   assert.equal(first.action,'approve');assert.ok(first.destination_id);
++   assert.equal((await db.query('select * from destinations')).rows.length,1);
++   assert.equal((await db.query('select * from destination_suggestions')).rows.length,7);
++  });
++  await t.test('identical retry returns same receipt; conflicting decision fails',async()=>{
++   assert.equal((await review(1)).rows[0].result.destination_id,first.destination_id);
++   await assert.rejects(review(1,'reject','Changed my review.',null),/already_reviewed/);
++  });
++  await t.test('second suggestion and automated flow reuse destination',async()=>{
++   assert.equal((await review(2)).rows[0].result.destination_id,first.destination_id);
++   const d=(await db.query('select wingman_create_destination($1,$2) d',[destination,user])).rows[0].d;
++   assert.equal(d.id,first.destination_id);assert.equal((await db.query('select * from destinations')).rows.length,1);
++  });
++  await t.test('rejection persists reason and removes only selected pending entry',async()=>{
++   const r=(await review(3,'reject','Menu has no chicken wings.',null)).rows[0].result;
++   assert.equal(r.reviewer_note,'Menu has no chicken wings.');assert.equal(r.destination_id,null);
++   assert.equal(Number((await db.query('select mango_restaurant_pending_count() n')).rows[0].n),4);
++  });
++  await t.test('invalid location, wrong state and ambiguous address roll back',async()=>{
++   await assert.rejects(review(4,'approve','Verified the menu.',{...destination,lat:null}),/location_required/);
++   await assert.rejects(review(4,'approve','Verified the menu.',{...destination,state_id:2}),/state_mismatch/);
++   await assert.rejects(review(4,'approve','Verified the menu.',{...destination,address:'2 Main St'}),/match_ambiguous/);
++   assert.equal((await db.query('select * from restaurant_suggestion_reviews')).rows.length,3);
++   assert.equal((await db.query('select * from destinations')).rows.length,1);
++  });
++  await t.test('unknown, inactive and unauthorized reviewer rejected',async()=>{
++   await assert.rejects(review(5,'approve','Verified the menu.',destination,user),/reviewer_required/);
++   await db.exec(`update app_user_roles set active=false where user_id='${reviewer}'`);
++   await assert.rejects(review(5),/reviewer_required/);
++   await db.exec(`update app_user_roles set active=true where user_id='${reviewer}'`);
++   await assert.rejects(review(99),/not_found/);
++   await assert.rejects(review(5,'reject','short',null),/review_invalid/);
++  });
++  await t.test('anon and authenticated cannot read queue or execute review/create/count',async()=>{
++   for(const role of ['anon','authenticated']){
++    await db.exec(`reset role; set role ${role}`);
++    await assert.rejects(db.query('select * from mango_pending_restaurants'),/permission denied/);
++    await assert.rejects(db.query('select * from restaurant_suggestion_reviews'),/permission denied/);
++    await assert.rejects(review(5),/permission denied/);
++    await assert.rejects(db.query('select wingman_create_destination($1,$2)',[destination,user]),/permission denied/);
++    await assert.rejects(db.query('select mango_restaurant_pending_count()'),/permission denied/);
++   }
++  });
++ } finally {await db.close();}
++});
+diff --git a/docs/mango-restaurant-review.md b/docs/mango-restaurant-review.md
+new file mode 100644
+index 0000000..bc91612
+--- /dev/null
++++ b/docs/mango-restaurant-review.md
+@@ -0,0 +1,32 @@
++# Restaurant review in Mango and the BuffaGo growth dashboard
++
++Mango has a Pending Restaurants tab for the existing destination_suggestions queue. Reviewers can inspect submitted details and saved Wingman confidence/reasoning/place evidence, confirm or correct location details, and approve or reject with a required reason. Recent review history retains the decision, reviewer, timestamp, reason, and approved destination ID. No suggestion is deleted.
++
++Approval uses a service-only destination creation function shared with wingman-intake. It inserts the existing destination fields and runs the usual table triggers. A matching name/state/address reuses the existing restaurant. A same-name/city address conflict fails for manual resolution. Database locking serializes creation and review; identical retries return the saved receipt. A conflicting review fails. Queue/history and review/create/count functions are unavailable to anon and authenticated clients; Mango's local server uses its existing active wing_reviewer/wing_admin identity and same-origin protection.
++
++The Pi shows pending photos, restaurants, open feedback and open work in four compact cards. Restaurants come from the exact pending view used by Mango. A missing count displays unavailable rather than zero.
++
++## Older submissions
++
++Read-only production inspection found 13 suggestions and no explicitly linked Wingman logs. These older submissions remain reviewable and show that linked evidence is unavailable. New mobile submissions save their Wingman assessment directly on the suggestion. Client-supplied evidence is advisory and must be checked by the reviewer. Existing suggestions from other app intake paths also appear in this restaurant queue.
++
++## Deployment order
++
++Nothing was deployed during implementation.
++
++1. Review and apply only crawl/supabase/migrations/20261013005355_mango_restaurant_review.sql. The migration preserves the deployed growth snapshot definition and authorization and adds pending_restaurants to its product_pulse. It fails closed if the expected snapshot integration point is absent. Do not blindly deploy unrelated historical migrations.
++2. Deploy the updated wingman-intake Edge Function after the migration. Its creation RPC must exist first.
++3. Restart Mango using its normal launcher with the updated server/src files and existing protected environment. Open Pending Restaurants and verify the queue. Do not put service keys in client code.
++4. Update models.py and ui/dashboard.py on buffago-growth (192.168.4.35), not life-pi. First inspect `systemctl cat buffago-growth.service` to confirm the active installation. The repository service uses /opt/buffago-growth-command-center. Back up the two files, copy into that active installation, retain ownership and permissions, and restart buffago-growth.service. Preserve .env and mission data.
++5. Include WingmanAddDialog.jsx in the next mobile release so new suggestions retain their assessment. Older mobile clients can continue submitting suggestions without evidence.
++
++Verify the snapshot product_pulse.pending_restaurants.total equals the Mango pending queue length. Use test submissions in a non-production environment for approve/reject smoke checks. An approved destination must be discoverable by the existing mobile search; rejection must leave the reason in Mango history. Recheck the Pi at 800x480, 1280x720 and 1600x900.
++
++## Validation
++
++- Mango: 65 tests passed; build and lint passed. New tests cover API validation, active role authorization, transactional RPC usage, UI focus, evidence, approval/rejection/history, and retained error state. One pre-existing worker test fixture was made portable between Windows and Linux; production worker code was unchanged.
++- PostgreSQL (isolated PGlite): 9 tests passed, covering queue/snapshot consistency, metric preservation, destination creation, duplicate reuse, retries, conflicting decisions, rejection, rollback, authorization and blocked public access.
++- Pi: 82 non-rendering tests passed. Tk rendering tests were blocked because the environment has no functioning graphical display. Layout still needs visual verification on the Pi.
++- No production writes, live reviews, deployment or Pi restart occurred.
++
++For rollback, return Mango/Pi/mobile/Edge Function code to the previous version first; retain the additive schema and audit records. Dropping review records would re-open already reviewed suggestions and should not be used as rollback.
+-- 
+2.51.1
+

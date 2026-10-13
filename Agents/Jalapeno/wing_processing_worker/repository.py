@@ -360,6 +360,9 @@ class ProcessingRepository:
             response = self.client._session.delete(
                 endpoint,
                 timeout=self.client.config.timeout_seconds,
+                # Session defaults describe PostgREST JSON bodies. This exact-
+                # object Storage DELETE has no body; Fastify rejects empty JSON.
+                headers={"Content-Type": None},
             )
         except requests.RequestException as exc:
             raise RetryableWorkerError() from exc

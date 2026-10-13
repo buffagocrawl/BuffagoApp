@@ -5,7 +5,8 @@ const galleryQA = typeof process !== 'undefined' && process.env.EXPO_PUBLIC_BUFF
 const destinationId = 'fixture-spot-0';
 const makePhoto = (submission_id, asset, created_at) => ({
   submission_id, destination_id: destinationId, media_type: 'photo', status: 'approved',
-  signed_url: Image.resolveAssetSource(asset).uri, expires_at: '2099-01-01T00:00:00Z',
+  signed_url: typeof asset === 'number' ? Image.resolveAssetSource(asset).uri : typeof asset === 'string' ? asset : asset.uri,
+  expires_at: '2099-01-01T00:00:00Z',
   like_count: 0, dislike_count: 0, created_at,
 });
 

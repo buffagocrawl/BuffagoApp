@@ -1,0 +1,48 @@
+[
+  {
+    "name": "public",
+    "grants": [
+      {
+        "role": "pg_database_owner",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "pg_database_owner",
+        "privilege": "CREATE"
+      },
+      {
+        "role": "PUBLIC",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "postgres",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "anon",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "authenticated",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "service_role",
+        "privilege": "USAGE"
+      }
+    ]
+  },
+  {
+    "name": "private",
+    "grants": [
+      {
+        "role": "postgres",
+        "privilege": "USAGE"
+      },
+      {
+        "role": "postgres",
+        "privilege": "CREATE"
+      }
+    ]
+  }
+]

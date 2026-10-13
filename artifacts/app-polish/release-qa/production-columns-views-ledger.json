@@ -1,0 +1,233 @@
+{
+  "views": [
+    {
+      "acl": [
+        "postgres=arwdDxtm/postgres",
+        "service_role=arwdDxtm/postgres"
+      ],
+      "name": "mango_pending_restaurants",
+      "options": [
+        "security_invoker=true"
+      ],
+      "definition": " SELECT id,\n    user_id,\n    state_id,\n    restaurant_name,\n    address,\n    created_at,\n    verification_evidence\n   FROM destination_suggestions s\n  WHERE (NOT (EXISTS ( SELECT 1\n           FROM restaurant_suggestion_reviews r\n          WHERE (r.suggestion_id = s.id))));"
+    }
+  ],
+  "ledger": [
+    {
+      "name": "mango_restaurant_review",
+      "version": "20261013011230"
+    },
+    {
+      "name": "wingman_rate_limit_repair",
+      "version": "20261013022806"
+    }
+  ],
+  "columns": [
+    {
+      "type": "uuid",
+      "table": "destination_suggestions",
+      "column": "id",
+      "default": "gen_random_uuid()",
+      "nullable": "NO"
+    },
+    {
+      "type": "uuid",
+      "table": "destination_suggestions",
+      "column": "user_id",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "integer",
+      "table": "destination_suggestions",
+      "column": "state_id",
+      "default": null,
+      "nullable": "YES"
+    },
+    {
+      "type": "text",
+      "table": "destination_suggestions",
+      "column": "restaurant_name",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "text",
+      "table": "destination_suggestions",
+      "column": "address",
+      "default": null,
+      "nullable": "YES"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "destination_suggestions",
+      "column": "created_at",
+      "default": "now()",
+      "nullable": "NO"
+    },
+    {
+      "type": "jsonb",
+      "table": "destination_suggestions",
+      "column": "verification_evidence",
+      "default": null,
+      "nullable": "YES"
+    },
+    {
+      "type": "uuid",
+      "table": "restaurant_suggestion_reviews",
+      "column": "suggestion_id",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "text",
+      "table": "restaurant_suggestion_reviews",
+      "column": "action",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "uuid",
+      "table": "restaurant_suggestion_reviews",
+      "column": "reviewer_id",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "text",
+      "table": "restaurant_suggestion_reviews",
+      "column": "reviewer_note",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "uuid",
+      "table": "restaurant_suggestion_reviews",
+      "column": "destination_id",
+      "default": null,
+      "nullable": "YES"
+    },
+    {
+      "type": "jsonb",
+      "table": "restaurant_suggestion_reviews",
+      "column": "destination_details",
+      "default": null,
+      "nullable": "YES"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "restaurant_suggestion_reviews",
+      "column": "reviewed_at",
+      "default": "now()",
+      "nullable": "NO"
+    },
+    {
+      "type": "uuid",
+      "table": "wing_jury_photo_vote_counts",
+      "column": "submission_id",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "integer",
+      "table": "wing_jury_photo_vote_counts",
+      "column": "like_count",
+      "default": "0",
+      "nullable": "NO"
+    },
+    {
+      "type": "integer",
+      "table": "wing_jury_photo_vote_counts",
+      "column": "neutral_count",
+      "default": "0",
+      "nullable": "NO"
+    },
+    {
+      "type": "integer",
+      "table": "wing_jury_photo_vote_counts",
+      "column": "dislike_count",
+      "default": "0",
+      "nullable": "NO"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "wing_jury_photo_vote_counts",
+      "column": "updated_at",
+      "default": "now()",
+      "nullable": "NO"
+    },
+    {
+      "type": "uuid",
+      "table": "wing_jury_votes",
+      "column": "submission_id",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "uuid",
+      "table": "wing_jury_votes",
+      "column": "user_id",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "smallint",
+      "table": "wing_jury_votes",
+      "column": "vote",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "wing_jury_votes",
+      "column": "created_at",
+      "default": "now()",
+      "nullable": "NO"
+    },
+    {
+      "type": "uuid",
+      "table": "wing_media_photo_votes",
+      "column": "submission_id",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "uuid",
+      "table": "wing_media_photo_votes",
+      "column": "user_id",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "smallint",
+      "table": "wing_media_photo_votes",
+      "column": "vote",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "wing_media_photo_votes",
+      "column": "created_at",
+      "default": "now()",
+      "nullable": "NO"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "wing_media_photo_votes",
+      "column": "updated_at",
+      "default": "now()",
+      "nullable": "NO"
+    }
+  ],
+  "review_security": [
+    {
+      "acl": [
+        "postgres=arwdDxtm/postgres",
+        "service_role=arwdDxtm/postgres"
+      ],
+      "rls": true,
+      "table": "restaurant_suggestion_reviews"
+    }
+  ]
+}

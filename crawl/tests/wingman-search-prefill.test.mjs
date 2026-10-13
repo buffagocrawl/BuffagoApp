@@ -30,7 +30,7 @@ test('Wingdex opens Wingman with the exact search and default launches clear it'
 });
 
 test('Wingman resets on opening, preserves edits while visible and never auto-searches', () => {
-  const effect = dialog.match(/useEffect\(\(\) => \{([\s\S]*?)\n  }, \[visible, initialRestaurant, initialStateId, initialStateCode\]\)/);
+  const effect = dialog.replaceAll('\r\n','\n').match(/useEffect\(\(\) => \{(\n    const justOpened[\s\S]*?)\n  }, \[visible, initialRestaurant, initialStateId, initialStateCode\]\)/);
   assert.ok(effect, 'Dialog open/reset effect is present');
   const state = { name: '' };
   const context = {
@@ -38,7 +38,7 @@ test('Wingman resets on opening, preserves edits while visible and never auto-se
     wasVisibleRef: { current: false }, searchInFlightRef: {}, insertInFlightRef: {}, verifyInFlightRef: {},
     setRestaurantName: value => { state.name = value; },
     setStateId() {}, setStateCode() {}, setCity() {}, setExtraInfo() {},
-    setMessage() {}, setCandidate() {}, setStep: value => { state.step = value; },
+    setLoading() {}, selectionInFlightRef: {}, setMessage() {}, setCandidate() {}, setStep: value => { state.step = value; },
   };
   // Wrap so the effect's early return has the same function semantics as React.
   const run = () => vm.runInNewContext(`(() => {${effect[1]}\n})()`, context);

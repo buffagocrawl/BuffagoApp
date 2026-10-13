@@ -10,9 +10,10 @@ declare const Deno: {
 type Photo = {
   id: string; destination_id: string; media_type: 'photo'; status: 'approved';
   thumbnail_storage_path: string | null; processed_storage_path: string | null;
-  like_count: number; dislike_count: number; created_at: string;
+  like_count: number; dislike_count: number; neutral_count?: number; created_at: string;
   consent_version: string | null; consented_at: string | null; attribution_preference: string;
 };
+type VoteCounts = { submission_id: string; like_count: number; dislike_count: number; neutral_count: number };
 const processedPath = (photo: Photo) => `processed/${photo.id}/primary`;
 const thumbnailPath = (photo: Photo) => `thumbnails/${photo.id}/preview`;
 const hasCanonicalProcessed = (photo: Photo) => photo.processed_storage_path === processedPath(photo);
@@ -61,14 +62,27 @@ Deno.serve(async (request) => {
       .in('destination_id', ids).eq('media_type', 'photo').eq('status', 'approved')
       .is('owner_deleted_at', null).is('withdrawn_at', null)
       .not('user_id', 'is', null).not('consent_version', 'is', null).not('consented_at', 'is', null)
-      .order('like_count', { ascending: false }).order('dislike_count', { ascending: true })
-      .order('created_at', { ascending: true }).order('id', { ascending: true });
+      .order('created_at', { ascending: false }).order('id', { ascending: true });
     if (fullSubmission) query = query.eq('id', fullSubmission);
     const { data, error } = await query.range(start, start + 999);
     if (error) return respond(503, { ok: false, error: 'gallery_unavailable' });
     candidates.push(...(data || []));
     if (!data || data.length < 1000) break;
   }
+  // Jury is the authoritative vote store. Rank before pagination so later
+  // pages cannot contain a higher-liked photo than an earlier page.
+  for (let start = 0; start < candidates.length; start += 250) {
+    const { data, error } = await admin.from('wing_jury_photo_vote_counts')
+      .select('submission_id,like_count,dislike_count,neutral_count')
+      .in('submission_id', candidates.slice(start, start + 250).map((photo) => photo.id));
+    if (error) return respond(503, { ok: false, error: 'gallery_unavailable' });
+    const counts = new Map<string, VoteCounts>((data || []).map((row: VoteCounts) => [row.submission_id, row]));
+    for (const photo of candidates.slice(start, start + 250)) {
+      const row = counts.get(photo.id);
+      Object.assign(photo, { like_count: Number(row?.like_count || 0), dislike_count: Number(row?.dislike_count || 0), neutral_count: Number(row?.neutral_count || 0) });
+    }
+  }
+  candidates.sort((a, b) => b.like_count - a.like_count || Date.parse(b.created_at) - Date.parse(a.created_at) || a.id.localeCompare(b.id));
   const grouped = new Map<string, Photo[]>(ids.map((id) => [id, []]));
   for (const photo of candidates) grouped.get(photo.destination_id)?.push(photo);
   const hasConsent = (photo: Photo) => Boolean(photo.consent_version?.trim() && photo.consented_at
@@ -118,7 +132,7 @@ Deno.serve(async (request) => {
       images.push({ submission_id: submission.id, destination_id: destinationId,
         media_type: 'photo', status: 'approved', signed_url: signedUrl,
         expires_at: expiresAt,
-        like_count: submission.like_count, dislike_count: submission.dislike_count, created_at: submission.created_at });
+        like_count: submission.like_count, dislike_count: submission.dislike_count, neutral_count: submission.neutral_count, created_at: submission.created_at });
     }
     restaurants.push({
       destination_id: destinationId,

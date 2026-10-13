@@ -1,0 +1,24 @@
+{
+  "job": {
+    "id": "82c83e9f-7d0e-48f2-9d67-96da002c706d",
+    "cleanup_kind": "expired_original",
+    "submission_id": "d27eee94-b99d-471d-8664-6bf0d8d3ba81",
+    "upload_intent_id": null,
+    "bucket": "wing-submissions",
+    "object_path": "originals/3c842098-1d70-482b-a5db-a1cb20a5d9f3/d27eee94-b99d-471d-8664-6bf0d8d3ba81/source",
+    "status": "dead",
+    "available_at": "2026-10-13T19:10:51.226543+00:00",
+    "claimed_at": null,
+    "lease_expires_at": null,
+    "claim_token": null,
+    "claimed_by": null,
+    "attempt_count": 1,
+    "max_attempts": 4,
+    "last_error_code": "WORKER_CONTRACT_ERROR",
+    "correlation_id": "1c3bee8d-2d06-4374-a881-967fc047cc38",
+    "created_at": "2026-10-13T19:10:51.226543+00:00",
+    "updated_at": "2026-10-13T19:10:51.262585+00:00",
+    "completed_at": "2026-10-13T19:10:51.262585+00:00"
+  },
+  "reason": "Storage 400 FST_ERR_CTP_EMPTY_JSON_BODY: inherited application/json header with empty DELETE body"
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "name": "archived_at",
+    "type": "timestamp with time zone",
+    "?column?": true,
+    "default": null
+  },
+  {
+    "name": "is_delete_marker",
+    "type": "boolean",
+    "?column?": true,
+    "default": "false"
+  }
+]

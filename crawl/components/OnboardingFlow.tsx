@@ -1,3 +1,4 @@
+import { bounded } from '../lib/wingmanAsync';
 // components/OnboardingFlow.tsx
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
@@ -254,6 +255,8 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
   const [step, setStep] = useState<number>(0);
   const TOTAL_STEPS = 8;
   const completedRef = useRef(false);
+  const mountedRef = useRef(true);
+  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
   const stepSixGateViewedRef = useRef(false);
   const finalScreenViewedRef = useRef(false);
   const finalCtaVisibleRef = useRef(false);
@@ -802,9 +805,9 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
     } catch {}
   };
 
-  const saveDest = async (d: DestRow) => {
+  const saveDest = async (d: DestRow, strict = false, signal?: AbortSignal) => {
     try {
-      await AsyncStorage.setItem(
+      await bounded(AsyncStorage.setItem(
         ONBOARDING_DEST_KEY,
         JSON.stringify({
           id: d.id,
@@ -813,8 +816,8 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
           city: d.city ?? null,
           saved_at: new Date().toISOString(),
         })
-      );
-    } catch {}
+      ), 10000, signal);
+    } catch (error) { if (strict) throw error; }
   };
 
   const loadRestaurantsForState = async (
@@ -1031,7 +1034,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
     }
   };
 
-  const pickWingmanDestination = async (row: DestRow) => {
+  const pickWingmanDestination = async (row: DestRow, options?: { signal?: AbortSignal }) => {
     if (!row?.id) return;
 
     const dest: DestRow = {
@@ -1043,17 +1046,18 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
       lng: row.lng ?? null,
     };
 
+    await saveDest(dest, true, options?.signal);
+    if (options?.signal?.aborted || !mountedRef.current) throw new Error('Onboarding was closed.');
     setPickedDest(dest);
     setRatingError('');
-    await saveDest(dest);
-    await trackEvent({
+    void bounded(trackEvent({
       eventName: 'onboarding_destination_selected',
       screen: 'onboarding',
       userId,
       stateId: pickedState?.state_id ?? null,
       destinationId: dest.id,
       metadata: { source: 'wingman' },
-    });
+    }), 2000).catch(() => {});
     setAddOpen(false);
     setStep(3);
 
@@ -1530,11 +1534,11 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
               "We couldn't find anything online confirming they have wings on the menu, so we're adding it to the queue. For onboarding, please pick a BuffaGo restaurant for your first rating."
             }
             showCloseOnResultMessage
-            onManualReviewQueued={async (suggestion: any) => {
+            onManualReviewQueued={async (suggestion: any, options?: { signal?: AbortSignal }) => {
               try {
                 const restaurantName = String(suggestion?.restaurant_name || destQ || '').trim();
                 if (!userId && restaurantName) {
-                  await AsyncStorage.setItem(
+                  await bounded(AsyncStorage.setItem(
                     ONBOARDING_DEST_SUGGESTION_KEY,
                     JSON.stringify({
                       state_id: suggestion?.state_id ?? pickedState?.state_id ?? null,
@@ -1542,9 +1546,10 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
                       address: suggestion?.address ?? null,
                       saved_at: new Date().toISOString(),
                     })
-                  );
+                  ), 10000, options?.signal);
                 }
-              } catch {}
+              } catch { throw new Error('Could not save this restaurant on your device. Please retry.'); }
+              if (options?.signal?.aborted || !mountedRef.current) throw new Error('Onboarding was closed.');
               setWingmanDisabledAfterQueue(true);
               setDestQ('');
               setPickedDest(null);

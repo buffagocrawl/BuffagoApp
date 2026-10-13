@@ -1,0 +1,8 @@
+{
+  "function_definitions_checked": 88,
+  "table_definitions_constraints_rls_checked": 56,
+  "missing_or_different_functions": [],
+  "different_tables": [],
+  "status": "PASS",
+  "scope": "real isolated PostgreSQL catalog, before fixtures; not yet HTTP/worker acceptance"
+}

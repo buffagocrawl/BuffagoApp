@@ -1,0 +1,32 @@
+Changed/new rollout files (all unstaged, uncommitted, unpushed):
+
+Agents/Mango Habanero/README.md
+Agents/Mango Habanero/server/index.mjs
+Agents/Mango Habanero/server/restaurants.mjs
+Agents/Mango Habanero/src/RestaurantQueue.jsx
+Agents/Mango Habanero/src/main.jsx
+Agents/Mango Habanero/src/styles.css
+Agents/Mango Habanero/tests/approval.test.js
+Agents/Mango Habanero/tests/restaurantUi.test.jsx
+Agents/Mango Habanero/tests/restaurants.test.js
+artifacts/restaurant-review/mango-fixture-approval.png
+artifacts/restaurant-review/mango-fixture-evidence.png
+artifacts/restaurant-review/mango-fixture-rejection-history.png
+artifacts/restaurant-review/mango-live-pending.png
+buffago-growth-command-center/README.md
+buffago-growth-command-center/artifacts/operations-redesign/buffago-growth-1280x720.png
+buffago-growth-command-center/artifacts/operations-redesign/buffago-growth-1600x900.png
+buffago-growth-command-center/artifacts/operations-redesign/buffago-growth-800x480.png
+buffago-growth-command-center/models.py
+buffago-growth-command-center/tests/test_models.py
+buffago-growth-command-center/tests/test_screenshots.py
+buffago-growth-command-center/ui/dashboard.py
+crawl/components/WingmanAddDialog.jsx
+crawl/supabase/functions/wingman-intake/index.ts
+crawl/supabase/migrations/20261013011230_mango_restaurant_review.sql
+crawl/tests/mango-restaurant-concurrency.test.mjs
+crawl/tests/mango-restaurant-intake.test.mjs
+crawl/tests/mango-restaurant-postgres.test.mjs
+docs/mango-restaurant-review.md
+
+Preserved pre-existing untracked file: mango-restaurant-review.patch

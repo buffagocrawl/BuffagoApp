@@ -517,6 +517,7 @@ class Snapshot:
     device_last_24h: DeviceOpens = field(default_factory=DeviceOpens)
     device_previous_24h: DeviceOpens = field(default_factory=DeviceOpens)
     pending_photos: int | float | None = None
+    pending_restaurants: int | float | None = None
     open_work: int | float | None = None
     calendar_previous_month: tuple[str | None, int | float | None] = (None, None)
     calendar_current_month: tuple[str | None, int | float | None] = (None, None)
@@ -595,6 +596,7 @@ class Snapshot:
             device_all_time=DeviceOpens.parse(devices.get("all_time")),
             device_last_24h=DeviceOpens.parse(devices.get("last_24h")),
             device_previous_24h=DeviceOpens.parse(devices.get("previous_24h")),
+            pending_restaurants=as_number(as_dict(pulse.get("pending_restaurants")).get("total")),
             pending_photos=as_number(as_dict(pulse.get("pending_photos")).get("total")),
             open_work=as_number(as_dict(pulse.get("open_work")).get("total")),
             calendar_previous_month=(as_text(previous_month.get("month")), as_number(previous_month.get("value"))),

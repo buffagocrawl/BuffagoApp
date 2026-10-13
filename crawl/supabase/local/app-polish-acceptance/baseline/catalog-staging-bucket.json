@@ -1,0 +1,15 @@
+[
+  {
+    "id": "wing-shot-staging",
+    "public": false,
+    "file_size_limit": 52428800,
+    "allowed_mime_types": [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/heic",
+      "video/mp4",
+      "video/quicktime"
+    ]
+  }
+]

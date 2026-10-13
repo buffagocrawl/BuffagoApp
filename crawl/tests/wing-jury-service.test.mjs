@@ -1,3 +1,4 @@
+import { subscribePhotoVotes } from '../lib/photoVoteEvents.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -71,4 +72,18 @@ test('trusted Edge Function contracts preserve eligibility, pagination, and vote
   assert.match(reveal, /vote_required/);
   assert.match(reveal, /photo_like_count/);
   assert.match(reveal, /user_destination_favorites/);
+});
+
+
+test('a committed first verdict invalidates shared photos even after closing Jury',async()=>{
+  let finish,current=true;const pending=new Promise(resolve=>finish=resolve);const events=[];
+  const unsubscribe=subscribePhotoVotes(event=>events.push(event));
+  const client={auth:{getUser:async()=>({data:{user:{id:'fixture-user'}}})},functions:{invoke:()=>pending}};
+  try{
+    const saving=recordWingJuryVerdict({client,photo:{submission_id:'fixture-photo'},vote:1,enabled:true,isCurrent:()=>current});
+    for(let i=0;i<10;i++)await Promise.resolve();current=false;
+    finish({data:{ok:true,submission_id:'fixture-photo',vote:1,like_count:5,dislike_count:0,neutral_count:0},error:null});
+    await assert.rejects(saving,error=>error.code==='ACCOUNT_CHANGED');
+    assert.equal(events.length,1);assert.equal(events[0].userId,'fixture-user');assert.equal(events[0].photo.like_count,5);
+  }finally{unsubscribe();}
 });

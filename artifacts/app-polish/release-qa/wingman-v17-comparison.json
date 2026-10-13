@@ -1,0 +1,27 @@
+{
+  "protected_sections": [
+    {
+      "name": "adminClient",
+      "identical": true,
+      "sha256": "0c47ed45d359f77270e7ba7d3a5c7e287b47359b919e4b7fa32f5f51f45b7589"
+    },
+    {
+      "name": "userVerification",
+      "identical": true,
+      "sha256": "97397404e3c98fc21ebfef005efe0718632d9028bdb155efe5b0d26e9a727794"
+    },
+    {
+      "name": "optionalUser",
+      "identical": true,
+      "sha256": "0f28fb5b1d3378c9f8e3a116737394f0cdb357f7e324680dae65f11265b33725"
+    },
+    {
+      "name": "atomicLimiter",
+      "identical": true,
+      "sha256": "1cc8a05881dc19b27321ac58d519c45ed3d7340caded7fd5e6f6409d7bc205d6"
+    }
+  ],
+  "creation_rpc_unchanged": true,
+  "deployed_verify_jwt": true,
+  "original_legacy_baseline": "wingman-protected-baseline.json was not a deployed-v17 baseline; superseded"
+}

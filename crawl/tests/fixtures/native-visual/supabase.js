@@ -12,6 +12,9 @@ const guestQA = typeof process !== 'undefined' && process.env.EXPO_PUBLIC_BUFFAG
 const ratedJuryQA = !(typeof process !== 'undefined' && process.env.EXPO_PUBLIC_BUFFAGO_NATIVE_JURY_UNRATED_QA === '1');
 const exhaustedJuryQA = typeof process !== 'undefined' && process.env.EXPO_PUBLIC_BUFFAGO_NATIVE_JURY_EXHAUSTED_QA === '1';
 const round3QA = typeof process !== 'undefined' && process.env.EXPO_PUBLIC_BUFFAGO_NATIVE_ROUND3_QA === '1';
+const polishQA = process.env.EXPO_PUBLIC_BUFFAGO_APP_POLISH_QA === '1';
+const polishVotes = new Map();
+const polishCounts = id => ({ submission_id: id, like_count: Number(polishVotes.get(id) === 1), dislike_count: Number(polishVotes.get(id) === -1), neutral_count: Number(polishVotes.get(id) === 0) });
 const coinQA = typeof process !== 'undefined' && process.env.EXPO_PUBLIC_BUFFAGO_NATIVE_COIN_QA;
 const homeUnratedQA = typeof process !== 'undefined' && process.env.EXPO_PUBLIC_BUFFAGO_NATIVE_HOME_UNRATED_QA === '1';
 const wingPhotoAsset = require('../../../assets/wing-user.png');
@@ -99,19 +102,25 @@ async function fixtureFetch(input, options = {}) {
   else if (url.pathname.includes('/auth/v1/token')) payload = session;
   else if (url.pathname.includes('/functions/v1/wing-jury-feed')) {
     const body = JSON.parse(options.body || '{}');
-    const photos = [
+    const photos = polishQA && approvedSample ? approvedSample.gallery.images.map(photo => ({ submission_id: photo.submission_id, signed_url: photo.signed_url, media_type: 'photo', expires_at: photo.expires_at })).filter(photo => !polishVotes.has(photo.submission_id)) : [
       { submission_id: 'fixture-jury-photo-1', signed_url: assetUri(wingPhotoAsset), media_type: 'photo', expires_at: '2099-01-01T00:00:00Z' },
       { submission_id: 'fixture-jury-photo-2', signed_url: assetUri(logoPhotoAsset), media_type: 'photo', expires_at: '2099-01-01T00:00:00Z' },
     ].filter((photo) => !(body.judged_submission_ids || []).includes(photo.submission_id));
     if (exhaustedJuryQA) photos.length = 0;
     payload = { ok: true, feed_version: 2, photos, has_more: false, next_cursor: null, location_fallback: true };
   } else if (url.pathname.includes('/functions/v1/wing-jury-vote')) {
-    payload = { ok: true, status: 'recorded', submission_id: 'fixture-jury-photo-1', vote: Number(JSON.parse(options.body || '{}').vote), like_count: 12, existing_vote: false };
+    const body = JSON.parse(options.body || '{}');
+    if (polishQA) {
+      const existing = polishVotes.has(body.submission_id);
+      if (!existing) polishVotes.set(body.submission_id, body.vote);
+      payload = { ok: true, ...polishCounts(body.submission_id), vote: polishVotes.get(body.submission_id), existing_vote: existing };
+    } else payload = { ok: true, status: 'recorded', submission_id: 'fixture-jury-photo-1', vote: Number(body.vote), like_count: 12, existing_vote: false };
   } else if (url.pathname.includes('/functions/v1/wing-media-preview')) {
     payload = { ok: true, signed_url: assetUri(wingPhotoAsset), expires_in_seconds: 3600 };
   } else if (url.pathname.includes('/functions/v1/wing-jury-reveal')) {
-    const destination = ratedJuryQA ? destinations[1] : destinations[0];
-    payload = { ok: true, restaurant: destination, photo_like_count: 12, restaurant_rating: { average_weight_score: ratedJuryQA ? 91.4 : null, rating_count: ratedJuryQA ? 3 : 0 }, personal_rating: ratedJuryQA ? { weight_score: 94.2, created_at: now } : null, favorite: savedFavorites.some(row => row.destination_id === destination.id), want_to_try: savedWantToTry.some(row => row.destination_id === destination.id), save_action: guestQA ? 'sign_in_to_save' : (ratedJuryQA ? 'favorite' : 'want_to_try') };
+    const destination = polishQA ? destinations[0] : ratedJuryQA ? destinations[1] : destinations[0];
+    const counts = polishCounts(JSON.parse(options.body || '{}').submission_id);
+    payload = { ok: true, restaurant: destination, photo_like_count: polishQA ? counts.like_count : 12, photo_dislike_count: counts.dislike_count, photo_neutral_count: counts.neutral_count, restaurant_rating: { average_weight_score: ratedJuryQA ? 91.4 : null, rating_count: ratedJuryQA ? 3 : 0 }, personal_rating: ratedJuryQA ? { weight_score: 94.2, created_at: now } : null, favorite: savedFavorites.some(row => row.destination_id === destination.id), want_to_try: savedWantToTry.some(row => row.destination_id === destination.id), save_action: guestQA ? 'sign_in_to_save' : (ratedJuryQA ? 'favorite' : 'want_to_try') };
   } else if (url.pathname.includes('/functions/v1/wingman-intake')) {
     // Only the invalid-host development fixture creates this in-memory spot.
     const body = JSON.parse(options.body || '{}');
@@ -132,7 +141,8 @@ async function fixtureFetch(input, options = {}) {
     const fault = faultQA ? await (await fetch(`http://127.0.0.1:8084/state?kind=${kind}`)).json() : null;
     payload = { ok: true, restaurants: (body.destination_ids || []).map(destination_id => {
       if (!approvedSample || destination_id !== String(approvedSample.restaurant.id)) return { destination_id, picture_count: 0, images: [] };
-      const gallery = approvedSample.gallery;
+      const gallery = { ...approvedSample.gallery, images: approvedSample.gallery.images.map(photo => polishQA ? { ...photo, ...polishCounts(photo.submission_id) } : photo)
+        .sort((a,b) => b.like_count-a.like_count || Date.parse(b.created_at)-Date.parse(a.created_at) || a.submission_id.localeCompare(b.submission_id)) };
       const images = body.submission_id ? gallery.images.filter(image => image.submission_id === body.submission_id)
         : body.include_images ? gallery.images.slice(Number(body.offset) || 0, (Number(body.offset) || 0) + 60)
           : body.include_covers ? gallery.images.slice(0, 1) : [];
@@ -143,6 +153,13 @@ async function fixtureFetch(input, options = {}) {
     }) };
   } else if (url.pathname.includes('/rpc/')) {
     const name = url.pathname.split('/').pop();
+    if (polishQA && !guestQA && name === 'set_wing_jury_photo_vote') {
+      const { p_submission_id: id, p_vote: vote } = JSON.parse(options.body || '{}');
+      if (![null,-1,0,1].includes(vote) || !approvedSample?.gallery.images.some(photo => photo.submission_id === id)) return new Response('{}', { status: 403 });
+      if (vote === null) polishVotes.delete(id); else polishVotes.set(id,vote);
+      payload = { ...polishCounts(id), vote };
+      return new Response(JSON.stringify(payload), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }
     if (name === 'submit_buffacoin_rating_v1' && round3QA && coinQA && !guestQA) {
       const body = JSON.parse(options.body || '{}');
       const state = await fixtureCoinState();
@@ -189,12 +206,13 @@ async function fixtureFetch(input, options = {}) {
       return new Response(null, { status: 204 });
     }
     if (!['GET', 'HEAD'].includes(method)) return new Response(JSON.stringify({ message: 'Fixture writes blocked' }), { status: 403 });
-    payload = tables[url.pathname.split('/').pop()] || [];
+    payload = polishQA && table === 'wing_jury_votes' ? Array.from(polishVotes, ([submission_id,vote]) => ({ submission_id,vote,user_id:uid })) : tables[table] || [];
     for (const [key, val] of url.searchParams) {
       if (val.startsWith('eq.')) payload = payload.filter(row => String(row[key]) === val.slice(3));
       if (val.startsWith('ilike.')) payload = payload.filter(row => String(row[key] || '').toLowerCase().includes(val.slice(6).replace(/%/g, '').toLowerCase()));
       if (val.startsWith('in.')) payload = payload.filter(row => val.slice(3).replace(/[()]/g, '').split(',').includes(String(row[key])));
     }
+    if (Array.isArray(payload) && url.searchParams.has('limit')) payload = payload.slice(Number(url.searchParams.get('offset')) || 0, (Number(url.searchParams.get('offset')) || 0) + Number(url.searchParams.get('limit')));
     const accept = new Headers(options.headers).get('Accept') || '';
     if (accept.includes('object+json')) payload = payload[0] || null;
   }

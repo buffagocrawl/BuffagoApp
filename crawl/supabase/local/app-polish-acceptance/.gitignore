@@ -1,0 +1,4 @@
+# Generated runtime copies and CLI state; authoritative source stays elsewhere.
+supabase/functions/
+supabase/.temp/
+supabase/.branches/

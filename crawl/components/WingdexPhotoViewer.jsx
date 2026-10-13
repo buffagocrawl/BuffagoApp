@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../providers/AuthProvider';
 import { createVoteController, loadOwnPhotoVotes } from '../lib/wingdexPhotos';
 import { loadWingdexFullPhoto } from '../lib/wingdexGallery';
+import PhotoVoteControls from './PhotoVoteControls';
 import { supabase } from '../lib/supabase';
 
 export default function WingdexPhotoViewer({ photos, selectedId, restaurantName, onClose, onPhotoChange, onMore, hasMore, totalCount, pageError, pageLoading, voteController, isVotePending, getVoteVersion, parentVotesReady }) {
@@ -49,12 +50,12 @@ export default function WingdexPhotoViewer({ photos, selectedId, restaurantName,
   useEffect(() => {
     // The gallery owns votes and counts. Keep the open viewer in sync with it,
     // while preserving a vote that this viewer is still saving.
+    const currentId = photoRef.current;
+    const nextIndex = photos.findIndex((p) => p.submission_id === currentId);
+    if (nextIndex >= 0) setIndex(nextIndex);
     setItems((old) => {
-      const incoming = new Map(photos.map((p) => [p.submission_id, p]));
-      const existing = new Set(old.map((p) => p.submission_id));
-      return [...old.filter((p) => incoming.has(p.submission_id))
-        .map((p) => busyRef.current[p.submission_id] ? p : { ...p, ...incoming.get(p.submission_id) }),
-        ...photos.filter((p) => !existing.has(p.submission_id))];
+      const previous = new Map(old.map((p) => [p.submission_id, p]));
+      return photos.map((p) => busyRef.current[p.submission_id] ? previous.get(p.submission_id) || p : p);
     });
   }, [photos]);
   useEffect(() => {
@@ -96,11 +97,11 @@ export default function WingdexPhotoViewer({ photos, selectedId, restaurantName,
       if (voteController && getVoteVersion && !isVotePending?.(loaded.submission_id)
         && getVoteVersion(loaded.submission_id) === parentVersion) {
         onPhotoChange?.({ submission_id: loaded.submission_id,
-          like_count: loaded.like_count, dislike_count: loaded.dislike_count }, false);
+          like_count: loaded.like_count, dislike_count: loaded.dislike_count, neutral_count: loaded.neutral_count }, false);
       }
       setItems((old) => old.map((p) => !voteController && p.submission_id === loaded.submission_id && !busyRef.current[p.submission_id]
         && voteVersions.current[p.submission_id] === version
-        ? { ...p, like_count: loaded.like_count, dislike_count: loaded.dislike_count } : p));
+        ? { ...p, like_count: loaded.like_count, dislike_count: loaded.dislike_count, neutral_count: loaded.neutral_count } : p));
       timer = setTimeout(() => { if (alive) setReload((n) => n + 1); }, 240000);
     }).catch((e) => { if (alive) setError(e.message); });
     const subscription = AppState.addEventListener('change', (state) => { if (state === 'active') setReload((n) => n + 1); });
@@ -138,7 +139,7 @@ export default function WingdexPhotoViewer({ photos, selectedId, restaurantName,
       if (accountRef.current === account && !busyRef.current[photo.submission_id]
         && version === voteVersions.current[photo.submission_id]) {
         if (active.current) setItems((old) => old.map((p) => p.submission_id === updated.submission_id
-          ? { ...p, like_count: updated.like_count, dislike_count: updated.dislike_count } : p));
+          ? { ...p, like_count: updated.like_count, dislike_count: updated.dislike_count, neutral_count: updated.neutral_count } : p));
         onPhotoChange?.(updated, false);
       }
     } catch (e) { if (active.current && account === accountRef.current) setError(e.message); }
@@ -186,14 +187,9 @@ export default function WingdexPhotoViewer({ photos, selectedId, restaurantName,
             if (pageError && !error) onMore?.();
             else { setReload((n) => n + 1); setVoteReload((n) => n + 1); }
           }}>Retry</Button></View> : null}
-        <View style={styles.controls}>
-          <Button testID="photo-vote-like" icon="thumb-up-outline" contentStyle={{ minHeight: 44 }} mode={photo?.current_vote === 1 ? 'contained' : 'outlined'}
-            accessibilityLabel={`Like, ${photo?.like_count ?? 0}`} accessibilityState={{ selected: photo?.current_vote === 1 }}
-            disabled={!displayedAsset || !votesReady || busy[photo?.submission_id] || isVotePending?.(photo?.submission_id)} onPress={() => void cast(1)}>Like {photo?.like_count ?? 0}</Button>
-          <Button testID="photo-vote-dislike" icon="thumb-down-outline" contentStyle={{ minHeight: 44 }} mode={photo?.current_vote === -1 ? 'contained' : 'outlined'}
-            accessibilityLabel={`Dislike, ${photo?.dislike_count ?? 0}`} accessibilityState={{ selected: photo?.current_vote === -1 }}
-            disabled={!displayedAsset || !votesReady || busy[photo?.submission_id] || isVotePending?.(photo?.submission_id)} onPress={() => void cast(-1)}>Dislike {photo?.dislike_count ?? 0}</Button>
-        </View>
+        <PhotoVoteControls photo={photo}
+          disabled={!displayedAsset || !votesReady || busy[photo?.submission_id] || isVotePending?.(photo?.submission_id)}
+          onVote={(choice) => void cast(choice)} />
         <View style={styles.controls}>
           <Button testID="photo-previous" textColor="#fff" disabled={index === 0} onPress={() => navigate(index - 1)}>Previous</Button>
           <Button textColor="#bbb" onPress={() => zoom.current?.reset()}>Reset zoom</Button>

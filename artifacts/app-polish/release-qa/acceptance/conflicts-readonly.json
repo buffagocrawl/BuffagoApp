@@ -1,0 +1,45 @@
+{
+  "inspection": "2026-10-13",
+  "source": "read-only production SELECT; no writes",
+  "rows": [
+    {
+      "submission_id": "189f18c1-3955-41bd-94aa-e0d7918039ae",
+      "user_id": "23898359-306a-4dd3-91f0-da66da19ccfc",
+      "legacy_vote": 1,
+      "legacy_created_at": "2026-10-11 14:26:26.27651+00",
+      "legacy_updated_at": "2026-10-11 14:26:26.27651+00",
+      "jury_vote": -1,
+      "jury_created_at": "2026-10-11 19:59:23.129031+00",
+      "status": "approved",
+      "media_type": "photo",
+      "like_count": 1,
+      "dislike_count": 0
+    },
+    {
+      "submission_id": "c1c6e647-b925-4d2d-b0b2-bbef5b9df15e",
+      "user_id": "23898359-306a-4dd3-91f0-da66da19ccfc",
+      "legacy_vote": 1,
+      "legacy_created_at": "2026-10-11 14:26:46.559983+00",
+      "legacy_updated_at": "2026-10-11 14:26:46.559983+00",
+      "jury_vote": 0,
+      "jury_created_at": "2026-10-11 19:59:05.979572+00",
+      "status": "failed",
+      "media_type": "photo",
+      "like_count": 1,
+      "dislike_count": 0
+    },
+    {
+      "submission_id": "f686c20e-4a9d-476b-b01b-fd42e2f44ea1",
+      "user_id": "23898359-306a-4dd3-91f0-da66da19ccfc",
+      "legacy_vote": -1,
+      "legacy_created_at": "2026-10-11 20:35:35.215217+00",
+      "legacy_updated_at": "2026-10-11 20:35:35.215217+00",
+      "jury_vote": 1,
+      "jury_created_at": "2026-10-11 20:01:07.666547+00",
+      "status": "approved",
+      "media_type": "photo",
+      "like_count": 0,
+      "dislike_count": 1
+    }
+  ]
+}

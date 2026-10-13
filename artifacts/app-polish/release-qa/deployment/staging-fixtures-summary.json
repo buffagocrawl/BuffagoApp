@@ -1,0 +1,18 @@
+{
+  "actors": {
+    "voter": "990660a6-1c63-4fe9-82b0-c4ed83d30b9e",
+    "owner": "9857b39b-3832-4595-be3f-3ccf61939a4b",
+    "reviewer": "651a2b50-5e83-4c0d-8e53-f3735e856977",
+    "other": "3c842098-1d70-482b-a5db-a1cb20a5d9f3"
+  },
+  "destination": "b61512b5-65a9-49e8-af95-d798cf0877eb",
+  "photos": [
+    "823a9ae3-3555-4af1-baef-855802088c75",
+    "dcba4426-1692-415d-a6a6-1a5d0e2687a0",
+    "c313b010-a6e5-409a-b276-2abbf7887b92",
+    "0a6ef261-542d-4308-b49d-c34d567028c1",
+    "29ee44b0-26b2-4656-a1f9-d9e335c84274"
+  ],
+  "synthetic": true,
+  "target": "127.0.0.1:55321"
+}

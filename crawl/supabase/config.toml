@@ -446,3 +446,7 @@ enabled = true
 # declarative_schema_path = "./database"
 # JSON string passed through to pg-delta SQL formatting.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
+
+# Guest intake still requires a valid project JWT at the gateway.
+[functions.wingman-intake]
+verify_jwt = true

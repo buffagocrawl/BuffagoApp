@@ -1,3 +1,4 @@
+import { confirmedWingShotCrop } from '../lib/wingShotFraming.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mobileModule, hookRuntime, findElement } from './helpers/mobile-runtime.mjs';
@@ -16,6 +17,7 @@ function flowHarness({ picker, staging = async () => ({ bucket: 'wing-shot-stagi
   const cleanupCalls=[];
   const progress = { displayProgress:0,stage:'idle',clearTimer(){},stop(){},start(){return 1;},updateRealProgress(){},isCurrent(){return true;},setStage(){},complete(){} };
   const { WingShotFlow } = mobileModule('components/wingShots/WingShotFlow.tsx', {
+    '../../lib/statusBarPolicy':{acquireDarkModalStatusBar:()=>()=>{},refreshStatusBarPolicy(){}},
     react: runtime.react, 'react/jsx-runtime': runtime.jsx,
     '@expo/vector-icons': { Ionicons:'icon' }, 'expo-crypto': { randomUUID:() => `session-${++uuid}` },
     'expo-network': { useNetworkState:() => ({isConnected:true,isInternetReachable:true}) },
@@ -26,6 +28,7 @@ function flowHarness({ picker, staging = async () => ({ bucket: 'wing-shot-stagi
     '../../lib/wingShotDrafts':{wingShotDrafts:draftStore},
     '../../lib/analytics':{trackEvent:async()=>{}},
     '../../lib/wingShots':{...wingShots,validateWingShotMediaRemotely:validation},
+    './WingShotFramingPreview':{WingShotFramingPreview:'framing'},
     './WingShotMediaPreview':{WingShotMediaPreview:'preview'},
     './mediaAdapter':{ expoWingShotMediaAdapter:{},WingShotMediaAdapterError:class extends Error{} },
     './useInterpolatedUploadProgress':{useInterpolatedUploadProgress:()=>progress},
@@ -40,6 +43,7 @@ function flowHarness({ picker, staging = async () => ({ bucket: 'wing-shot-stagi
     mediaAdapter:{takePhoto:picker,chooseFromLibrary:picker},supabaseClient:{},};
   return {...runtime,closed,continued,cleanupCalls,props,render:()=>runtime.render(WingShotFlow,props)};
 }
+const framing=tree=>!tree?null:Array.isArray(tree)?tree.map(framing).find(Boolean):tree.type==='framing'?tree:framing(tree.props?.children);
 const media={uri:'photo-a',kind:'photo',mimeType:'image/jpeg',sizeBytes:100,width:100,height:100,getUploadBody:async()=>new Uint8Array(100)};
 
 test('real flow ignores a picker finishing after Skip and prevents duplicate picker taps',async()=>{
@@ -61,7 +65,7 @@ test('real flow reopens a persisted staging handoff after process termination an
   const pendingValidation = deferred();
   const firstStore = createWingShotDraftStore(storage);
   const first = flowHarness({ picker: async () => media, draftStore: firstStore, validation: () => pendingValidation.promise });
-  await findElement(first.render(), 'wing-shot.take-photo').props.onPress(); await flush();
+  await findElement(first.render(), 'wing-shot.take-photo').props.onPress(); framing(first.render()).props.onConfirm(media); await flush();
   const saved = await firstStore.load({ userId: 'owner', destinationId: 'restaurant-a', flow: 'home-rating' });
   assert.ok(saved); first.unmount();
   let revalidated = 0;
@@ -81,7 +85,7 @@ test('real flow reopens a persisted staging handoff after process termination an
 
 test('real flow hands off exactly one staged image on repeated Continue taps',async()=>{
   const harness=flowHarness({picker:async()=>media});
-  await findElement(harness.render(),'wing-shot.take-photo').props.onPress(); await flush();
+  await findElement(harness.render(),'wing-shot.take-photo').props.onPress(); framing(harness.render()).props.onConfirm(media); await flush();
   let tree=harness.render();
   findElement(tree,'wing-shot.attribution.anonymous').props.onPress();
   findElement(tree,'wing-shot.consent').props.onPress();
@@ -99,7 +103,7 @@ test('real flow hands off exactly one staged image on repeated Continue taps',as
 test('real flow never installs an abandoned staging result into the next upload session',async()=>{
   const staged=deferred();
   const harness=flowHarness({picker:async()=>media,staging:()=>staged.promise});
-  await findElement(harness.render(),'wing-shot.take-photo').props.onPress();
+  await findElement(harness.render(),'wing-shot.take-photo').props.onPress(); framing(harness.render()).props.onConfirm(media);
   findElement(harness.render(),'wing-shot.skip-media').props.onPress();
   staged.resolve({objectPath:'abandoned-old-photo'}); await flush();
   const session=harness.hooks.find((hook)=>hook?.current?.correlationId)?.current;
@@ -127,20 +131,22 @@ test('pre-rating failure copy never claims a rating has already saved',()=>{
   }
 });
 
-test('real media adapter resizes full-resolution HEIC before upload and handles decoder failure',async()=>{
+test('real media adapter preserves full-resolution HEIC for framing and handles decoder failure',async()=>{
   const calls=[];let fail=false;
   const {expoWingShotMediaAdapter, WingShotMediaAdapterError}=mobileModule('components/wingShots/mediaAdapter.ts',{
+    '../../lib/wingShotFraming':{confirmedWingShotCrop},
+    '../../lib/wingShotLimits':{WING_SHOT_PHOTO_MAX_BYTES:20*1024*1024},
     'react-native':{Platform:{OS:'ios'}},
     'expo-file-system':{File:class{size=1234;}},
     'expo-image-picker':{requestCameraPermissionsAsync:async()=>({granted:true}),CameraType:{back:'back'},
       launchCameraAsync:async()=>({canceled:false,assets:[{type:'image',uri:'native-heic',mimeType:'image/heic',width:4032,height:3024}]})},
     'expo-image-manipulator':{SaveFormat:{JPEG:'jpeg'},ImageManipulator:{manipulate:(uri)=>{
-      calls.push(uri);return {resize:(size)=>calls.push(size),renderAsync:async()=>{if(fail)throw new Error('corrupt image');return {saveAsync:async(options)=>{calls.push(options);return {uri:'prepared-jpeg',width:2048,height:1536};}};}};
+      calls.push(uri);return {resize:(size)=>calls.push(size),renderAsync:async()=>{if(fail)throw new Error('corrupt image');return {saveAsync:async(options)=>{calls.push(options);return {uri:'prepared-jpeg',width:4032,height:3024};}};}};
     }}},
   });
   const selected=await expoWingShotMediaAdapter.takePhoto();
-  assert.equal(selected.uri,'prepared-jpeg');assert.equal(selected.mimeType,'image/jpeg');assert.equal(selected.width,2048);
-  assert.equal(calls[1].width,2048);assert.equal(selected.sizeBytes,1234);
+  assert.equal(selected.uri,'prepared-jpeg');assert.equal(selected.mimeType,'image/jpeg');assert.equal(selected.width,4032);
+  assert.equal(calls[1].compress,1);assert.equal(selected.sizeBytes,1234);
   fail=true;await assert.rejects(expoWingShotMediaAdapter.takePhoto(),(error)=>error instanceof WingShotMediaAdapterError);
 });
 
@@ -197,4 +203,23 @@ test('Crawl draft attaches to its exact committed rating, survives failure and r
   assert.equal(operations[1].input.ratingId,'crawl-rating');
   assert.equal(operations[1].input.destinationId,'crawl-stop');
   assert.equal(operations[1].input.userId,'crawl-user');
+});
+
+
+test('framing gates every upload and cancellation cannot stage or validate an image',async()=>{
+  let stages=0,validations=0;
+  const h=flowHarness({picker:async()=>media,staging:async()=>{stages++;return {};},validation:async()=>validations++});
+  await findElement(h.render(),'wing-shot.take-photo').props.onPress();let frame=framing(h.render());
+  assert.ok(frame);assert.equal(stages,0);assert.equal(validations,0);
+  frame.props.onCancel();assert.ok(!framing(h.render()));assert.equal(stages,0);
+  await findElement(h.render(),'wing-shot.take-photo').props.onPress();frame=framing(h.render());
+  frame.props.onConfirm({...media,uri:'confirmed-crop.jpg'});await flush();
+  assert.equal(stages,1);assert.equal(validations,1);h.unmount();
+});
+
+test('a framing confirmation finishing after explicit close is ignored',async()=>{
+  let stages=0;const h=flowHarness({picker:async()=>media,staging:async()=>{stages++;return {};}});
+  await findElement(h.render(),'wing-shot.take-photo').props.onPress();const frame=framing(h.render());
+  findElement(h.render(),'wing-shot.not-now').props.onPress();frame.props.onConfirm(media);await flush();
+  assert.equal(stages,0);assert.equal(h.closed.length,1);h.unmount();
 });

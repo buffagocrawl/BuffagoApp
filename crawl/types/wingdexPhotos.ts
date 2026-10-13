@@ -1,4 +1,4 @@
-export type PhotoVote = 1 | -1 | null;
+export type PhotoVote = 1 | 0 | -1 | null;
 /** Safe public response. Storage paths are confined to the protected media server. */
 export interface ApprovedPhoto {
   submission_id: string;
@@ -10,5 +10,6 @@ export interface ApprovedPhoto {
   created_at: string;
   like_count: number;
   dislike_count: number;
+  neutral_count?: number;
   current_vote?: PhotoVote;
 }

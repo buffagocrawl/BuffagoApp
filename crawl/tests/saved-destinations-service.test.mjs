@@ -23,7 +23,7 @@ test('saved destinations are enabled locally and in every release profile, with 
 
 function queryResult(data, error = null) {
   const chain = {
-    select() { return chain; }, eq() { return chain; }, in() { return chain; }, order() { return chain; },
+    range(start,end) { data = Array.isArray(data) ? data.slice(start,end+1) : data; return chain; }, select() { return chain; }, eq() { return chain; }, in() { return chain; }, order() { return chain; },
     upsert: async () => ({ data: null, error }), delete() { return chain; },
     then(resolve, reject) { return Promise.resolve({ data, error }).then(resolve, reject); },
   };
@@ -88,6 +88,22 @@ test('guest saved collections return an authentication state without querying ta
   guest.from = () => { throw new Error('guest must not read personal tables'); };
   for (const kind of ['favorites', 'wantToTry']) {
     assert.deepEqual(await getSavedDestinations({ client: guest, kind }), { status: 'guest', userId: null, rows: [] });
+  }
+});
+
+test('both saved collections include rows past the PostgREST page cap', async () => {
+  const destinations=Array.from({length:1201},(_,i)=>({id:`d${i}`,name:`Restaurant ${i}`}));
+  for(const kind of ['favorites','wantToTry']){
+    const saved=destinations.map(row=>({destination_id:row.id,created_at:'2026-10-13T00:00:00Z'}));
+    const pages=[];
+    const paged={auth:{getUser:async()=>({data:{user:{id:'u1'}},error:null}),getSession:async()=>({data:{session:{user:{id:'u1'}}},error:null})},from(table){
+      let data=table==='destinations'?destinations:table==='destination_ratings'?[]:saved;
+      const query={select(){return query;},eq(){return query;},order(){return query;},in(field,ids){data=data.filter(row=>ids.includes(row[field]));return query;},range(a,b){pages.push([table,a,b]);return Promise.resolve({data:data.slice(a,b+1),error:null});}};
+      return query;
+    }};
+    const result=await getSavedDestinations({client:paged,kind});
+    assert.equal(result.rows.length,1201);assert.equal(result.rows.at(-1).name,'Restaurant 1200');
+    assert.ok(pages.some(([table,offset])=>table!=='destinations'&&offset===1000));
   }
 });
 

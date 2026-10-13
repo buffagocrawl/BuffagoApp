@@ -1,3 +1,4 @@
+import type { WingEvidenceStatus, WingmanLocationStatus } from '../../supabase/functions/_shared/wingmanConfidence';
 export type WingmanDecision =
   | 'approved'
   | 'suggestion'
@@ -32,6 +33,7 @@ export interface WingmanInput {
   restaurantName?: string | null;
   city?: string | null;
   extraInfo?: string | null;
+  candidateAddress?: string | null;
 
   stateId: number;
   stateCode?: string | null;
@@ -49,6 +51,12 @@ export interface WingmanAIExtraction {
   wingsProbability: number | null;
   category: string | null;
   reasoning: string | null;
+  verifiedPlace?: boolean;
+  locationStatus?: WingmanLocationStatus;
+  wingEvidenceStatus?: WingEvidenceStatus;
+  wingEvidence?: string | null;
+  menuEvidence?: { url: string; text: string; explicitUnavailable: boolean }[];
+  existingDestinationId?: string | null;
 }
 
 export interface WingmanPlaceCandidate {

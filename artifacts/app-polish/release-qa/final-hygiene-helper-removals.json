@@ -1,0 +1,32 @@
+﻿[
+    {
+        "path":  ".tmp/app-polish-hygiene-inventory.cjs",
+        "bytes":  3434,
+        "reason":  "Temporary audit helper or intermediate export generated during final hygiene; final report retained"
+    },
+    {
+        "path":  ".tmp/app-polish-hygiene-inventory.json",
+        "bytes":  96933,
+        "reason":  "Temporary audit helper or intermediate export generated during final hygiene; final report retained"
+    },
+    {
+        "path":  ".tmp/app-polish-hygiene-removals.json",
+        "bytes":  16105,
+        "reason":  "Temporary audit helper or intermediate export generated during final hygiene; final report retained"
+    },
+    {
+        "path":  ".tmp/app-polish-hygiene-report.cjs",
+        "bytes":  10486,
+        "reason":  "Temporary audit helper or intermediate export generated during final hygiene; final report retained"
+    },
+    {
+        "path":  ".tmp/app-polish-hygiene-validate.cjs",
+        "bytes":  3654,
+        "reason":  "Temporary audit helper or intermediate export generated during final hygiene; final report retained"
+    },
+    {
+        "path":  ".tmp/app-polish-deployment-receipt.json",
+        "bytes":  1231,
+        "reason":  "Temporary audit helper or intermediate export generated during final hygiene; final report retained"
+    }
+]

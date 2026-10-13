@@ -8,6 +8,10 @@ if (process.env.BUFFAGO_NATIVE_VISUAL_QA === '1') {
     const replacements = {
       [path.join(__dirname, 'lib', 'supabase.js')]: 'supabase.js',
       [path.join(__dirname, 'providers', 'LocationProvider.tsx')]: 'LocationProvider.jsx',
+      ...(process.env.EXPO_PUBLIC_BUFFAGO_APP_POLISH_QA === '1' ? {
+        [path.join(__dirname, 'lib', 'Wingman', 'WingmanService.ts')]: 'WingmanService.ts',
+        [path.join(__dirname, 'lib', 'wingShotStaging.ts')]: 'wingShotStaging.ts',
+      } : {}),
       ...(process.env.EXPO_PUBLIC_BUFFAGO_NATIVE_GALLERY_QA === '1' ? { [path.join(__dirname, 'components', 'ui', 'OperationUI.jsx')]: 'OperationUI.jsx' } : {}),
       ...(process.env.BUFFAGO_NATIVE_VISUAL_PHOTO === '1' ? { [path.join(__dirname, 'tests', 'fixtures', 'native-visual', 'approvedPhoto.js')]: 'approvedPhoto.local.json' } : {}),
     };

@@ -6,7 +6,7 @@ import { AppState, Platform, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Linking from 'expo-linking';
 import { Stack, usePathname } from 'expo-router'; 
-import { StatusBar } from 'expo-status-bar';
+import AppStatusBar from '../components/AppStatusBar';
 import * as SystemUI from 'expo-system-ui';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -435,7 +435,7 @@ function AppShell() {
     <PaperProvider theme={paperTheme}>
       <NavThemeProvider value={navTheme}>
         <LocationProvider>
-          <StatusBar style="light" />
+          <AppStatusBar />
           <XpToastProvider>
             <ReferralAttributionBridge />
             <CoinBonusNotice />

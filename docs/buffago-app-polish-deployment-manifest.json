@@ -1,0 +1,291 @@
+{
+  "schemaVersion": 1,
+  "branch": "feature/buffago-app-polish",
+  "productionProject": "vhfxnizaxdanmvmouuaf",
+  "productionReleaseStatus": "Three voting/photo Edge Functions deployed and verified; other component release gates remain separate",
+  "productionDeploymentPerformed": true,
+  "ownerDecision": {
+    "date": "2026-10-13",
+    "statement": "Use existing Jury verdicts as shared active votes",
+    "scope": "110 inspected eligible Jury-only pairs; preserve original Jury records and document absent Gallery source, without asserting historical intent"
+  },
+  "sql": [
+    {
+      "order": null,
+      "path": "crawl/supabase/migrations/20261013011230_mango_restaurant_review.sql",
+      "status": "already deployed",
+      "execute": false,
+      "ledgerVersion": "20261013011230",
+      "reason": "Mango review/create prerequisites and history already installed; no replay",
+      "sha256": "f19101514c07bec3ace012e6695ad9f661a5aa99510c4f89e8d1fc878cefc5e0"
+    },
+    {
+      "order": null,
+      "path": "artifacts/app-polish/release-qa/deployment/20261013022806_wingman_rate_limit_repair.deployed.sql",
+      "status": "already deployed",
+      "execute": false,
+      "ledgerVersion": "20261013022806",
+      "reason": "Exact read-only deployed ledger capture; atomic limiter unchanged. Evidence only, never replay",
+      "sha256": "72958888c40abb2bca17816c695b5f9e45e303d9f8a26204cf77b51278f79e69"
+    },
+    {
+      "order": 1,
+      "path": "crawl/supabase/proposals/app-polish-vote-conflict-review.sql",
+      "status": "required",
+      "operation": "read-only preflight, not a migration",
+      "execute": false,
+      "reason": "Check conflict timestamps/eligibility immediately before eventual bridge; review drift",
+      "sha256": "12e496c16bf3b31399ca65411d5656808d2210696580bc5bdfa82002cd946d4b"
+    },
+    {
+      "order": 2,
+      "path": "crawl/supabase/proposals/app-polish-shared-photo-votes.sql",
+      "status": "already installed; read-only deployed voting contract verification passed before Edge deployment",
+      "requirement": "required new SQL change",
+      "operation": "single transactional migration",
+      "execute": false,
+      "reason": "Historical tested proposal retained; do not replay. Cleanup did not deploy SQL.",
+      "sha256": "f93474fbceb1756700b43989de21abc8b0e2259078d97c486447fdb610eb513c"
+    },
+    {
+      "order": null,
+      "path": "crawl/supabase/local/phase-7b3a/supabase/migrations/20261010192747_wing_jury_saved_destinations_forward.sql",
+      "status": "blocked",
+      "execute": false,
+      "reason": "Quarantined unrelated draft, not a production prerequisite replay; live Jury contracts already exist, no matching migration name was returned",
+      "sha256": "322377eca0934ff28a9ce11ce43e17d0370affc965ead10a17ae91ada2a7de6b"
+    },
+    {
+      "order": null,
+      "path": "crawl/supabase/proposals/android-qa-round-3-randomized-jury-feed.sql",
+      "status": "optional",
+      "execute": false,
+      "reason": "Excluded from polish release; no feed/ranking SQL expansion authorized in this manifest",
+      "sha256": "2b702abdd62e9d8ce2183929340c0018dd7eb793068925968e19518ae75e9960"
+    }
+  ],
+  "baseline": "Existing media/storage/worker, gallery eligibility and Jury definitions are inspected prerequisites, not extra SQL deployments. Validate catalog fingerprints; stop on mismatch. Never replay historical migrations or a quarantined foundation.",
+  "edgeFunctions": [
+    {
+      "order": 3,
+      "name": "wing-jury-vote",
+      "source": "crawl/supabase/functions/wing-jury-vote/index.ts",
+      "sharedSources": [
+        "crawl/supabase/functions/_shared/wingJury.ts"
+      ],
+      "verifyJwt": true,
+      "deployedVersion": 2,
+      "reason": "Add canonical dislike/neutral counts; retain authenticated blind-vote validation and duplicate semantics",
+      "rollbackSource": "artifacts/app-polish/release-qa/deployed/wing-jury-vote/index.js",
+      "sourceSha256": "46f767b37602f86552948bdc541a81ec3e7550b9067be34786169f15be1df6f6",
+      "status": "deployed; authentication and exact source verified",
+      "deploymentRequired": false,
+      "sharedSourceSha256": {
+        "crawl/supabase/functions/_shared/wingJury.ts": "e452d78f9b975e086ae8c6be6beab6f03cf13e07b34ebb346a647e5c2d6af883"
+      }
+    },
+    {
+      "order": 4,
+      "name": "wing-jury-reveal",
+      "source": "crawl/supabase/functions/wing-jury-reveal/index.ts",
+      "sharedSources": [
+        "crawl/supabase/functions/_shared/wingJury.ts"
+      ],
+      "verifyJwt": false,
+      "deployedVersion": 2,
+      "reason": "Add canonical dislike/neutral counts; preserve committed/guest reveal and privacy",
+      "rollbackSource": "artifacts/app-polish/release-qa/deployed/wing-jury-reveal/index.js",
+      "sourceSha256": "60819520fc47024e90459ccec162c61ec8d53ab2e2ec84d3799091337b5d0b6c",
+      "status": "deployed; authentication and exact source verified",
+      "deploymentRequired": false,
+      "sharedSourceSha256": {
+        "crawl/supabase/functions/_shared/wingJury.ts": "e452d78f9b975e086ae8c6be6beab6f03cf13e07b34ebb346a647e5c2d6af883"
+      }
+    },
+    {
+      "order": 5,
+      "name": "wing-public-gallery",
+      "source": "crawl/supabase/functions/wing-public-gallery/index.ts",
+      "sharedSources": [],
+      "verifyJwt": false,
+      "deployedVersion": 4,
+      "reason": "Canonical shared counts and like/newest/id ordering before pagination; preserve eligibility and asset signing",
+      "rollbackSource": "artifacts/app-polish/release-qa/deployed/wing-public-gallery/index.ts",
+      "sourceSha256": "a3d6065bfd5679dfc885bfd6e024ffa94bae150feb0b773be779351d0e173231",
+      "status": "deployed; authentication and exact source verified",
+      "deploymentRequired": false,
+      "sharedSourceSha256": {}
+    },
+    {
+      "order": 6,
+      "name": "wingman-intake",
+      "source": "crawl/supabase/functions/wingman-intake/index.ts",
+      "sharedSources": [
+        "crawl/supabase/functions/_shared/wingmanConfidence.ts",
+        "crawl/supabase/functions/_shared/wingmanMenuEvidence.ts",
+        "crawl/supabase/functions/_shared/wingmanDeadline.ts"
+      ],
+      "verifyJwt": true,
+      "deployedVersion": 18,
+      "reason": "v18 already includes confidence/menu/deadline changes and protected v17 atomic limiter/auth/duplicate-safe creation; provider-backed acceptance remains blocked, not deployment evidence",
+      "rollbackSource": "artifacts/app-polish/release-qa/wingman-intake-v17.ts",
+      "sourceSha256": "6cfcfa473fbcab3dfdba3c54aade4c53cf88e3879d5b2b39da4941cff00133ce",
+      "status": "already deployed externally; fresh source matches local candidate exactly; skip redundant deployment",
+      "deploymentRequired": false,
+      "historicalProtectedBaseline": 17,
+      "sharedSourceSha256": {
+        "crawl/supabase/functions/_shared/wingmanConfidence.ts": "1666c9edbb79c08cfe09293e58c2bbb04123ecb08e081c45f731faebc98b9bc3",
+        "crawl/supabase/functions/_shared/wingmanMenuEvidence.ts": "3e4d74d70cc4bbe6be4306ef303660ad70e5c94e44af899d4515c75ce612efc3",
+        "crawl/supabase/functions/_shared/wingmanDeadline.ts": "0c340c0029fc9e296fdc39f8bdba344e5eccd456a65b101b38a503d548c4d8a1"
+      }
+    }
+  ],
+  "rollout": [
+    {
+      "phase": "SQL",
+      "gate": "Fresh read-only conflict/catalog/config preflight, reviewed owner policy, real old/new HTTP/SQL-only acceptance, bounded lock/load timings and dual snapshots",
+      "rollback": "On failure entire transaction rolls back. After install prefer retain bridge/neutral/dual snapshots; full reversal blocked pending writer quiescence/current-store snapshot/reconciliation; never restore pre-install votes blindly"
+    },
+    {
+      "phase": "Edge",
+      "gate": "SQL -> required vote/reveal/gallery, each real forward phase passed. Wingman v18 is already deployed externally; source/RPC preservation verified, provider success/calibration still blocked; no redundant deploy.",
+      "rollback": "Restore captured old sources with original verify_jwt flags, preserve bridge and all live votes; independently restore Wingman v17"
+    },
+    {
+      "phase": "Worker",
+      "gate": "Bodyless Storage DELETE header fix; actual local worker cleanup/retry and focused test passed; release preserved worker package before final cleanup/mobile gate",
+      "rollback": "restore prior worker package only; retain all DB jobs/receipts/votes; prior package can fail cleanup with Storage 400, so pause affected cleanup rather than erase/reseed jobs"
+    },
+    {
+      "phase": "Mango",
+      "gate": "Reviewed UI/server build, role/auth/loopback/origin protection and review/history receipts in isolated staging; no extra SQL",
+      "rollback": "Restore preserved reviewer build/environment, preserve review records, roles and bridge"
+    },
+    {
+      "phase": "mobile",
+      "gate": "New vote RPC and Edge metadata available; actual distributed-contract inventory and physical Android/native iPhone acceptance, feature flags appropriate and fixture routing off for real-service tests",
+      "rollback": "Stop rollout/restore previous client via normal platform process, retain compatible servers/bridge. Installed builds/OTA cohorts unknown; no guessed minimum version"
+    }
+  ],
+  "staging": {
+    "status": "isolated native local Supabase running; real partial acceptance passed",
+    "config": "crawl/supabase/local/app-polish-acceptance/supabase/config.toml",
+    "projectId": "buffago-polish-acceptance",
+    "api": "http://127.0.0.1:55321",
+    "productionSecretOrPersonalDataCopy": false,
+    "minimumServices": [
+      "PostgreSQL17",
+      "PostgREST",
+      "GoTrue authentication",
+      "Storage private wing-submissions",
+      "Edge runtime",
+      "current Jalapeno worker, actual manual-review mode, local service key; no test provider/fake repository"
+    ],
+    "baselineGate": "56 application tables/92 deployed function prerequisites; original 56-table/88-function schema validated pre-bridge, 89 unchanged function definitions/76 policies/56 table ACLs validated after bridge",
+    "costOptions": {
+      "local": "$0 added Supabase cloud charge; uses existing host/Docker, no paid project provisioned",
+      "hostedBranch": "$0.01344/hour, approximately $0.32/24h, $2.26/week, $9.68/720h plus usage and any required paid plan; approval before provisioning",
+      "hostedProject": "Additional Micro project from $10/month on existing Pro; a new Pro organization from $25/month, plus usage; Free eligibility unknown; approval before provisioning",
+      "pricingSource": "https://supabase.com/pricing"
+    },
+    "deviceBackend": "Host API running at http://127.0.0.1:55321. Loopback signed URLs are host-only; physical devices require the isolated public-origin setup in release plan. No phone target/build configured.",
+    "testBuilds": "Candidate acceptance Android APK/iPhone native build not created or distributed. Use this branch/source manifest, unique QA application identifiers and isolated keys. Existing EAS builds are previous-client evidence only.",
+    "baseline": "crawl/supabase/local/app-polish-acceptance/baseline/schema-baseline.sql",
+    "localOnlySchemaAdaptation": "baseline/platform-storage-prerequisites.sql adds two already-deployed Storage columns absent in local platform version; NOT production SQL",
+    "localOnlyRouting": {
+      "files": [
+        "crawl/scripts/qa/app-polish-local-api-proxy.ts",
+        "crawl/scripts/qa/app-polish-runtime-routing.py",
+        "crawl/scripts/qa/app-polish-local-main.sh"
+      ],
+      "change": "transparent loopback55321 -> actual Kong8000; single SUPABASE_URL env override in native main, own Kong functions upstream8082; native JWT logic unmodified",
+      "productionDeployment": false
+    }
+  },
+  "excludedDeployments": [
+    "all other migrations",
+    "wing-jury-feed",
+    "media/moderation/account deletion functions",
+    "growth dashboard",
+    "store submissions",
+    "OTA publishing",
+    "isolated baseline/schema/platform adaptations",
+    "local routing proxy/native-main override/runtime loader copies",
+    "redundant wingman-intake v18 deployment",
+    "isolated baseline/schema/platform adaptations",
+    "local routing proxy/native-main override/runtime loader copies",
+    "redundant wingman-intake v18 deployment"
+  ],
+  "releasePlan": "docs/buffago-app-polish-release-plan.md",
+  "worker": {
+    "status": "required local header fix; real worker/storage cleanup regression passed",
+    "source": "Agents/Jalapeno/wing_processing_worker/repository.py",
+    "test": "Agents/Jalapeno/tests/test_wing_processing_repository.py",
+    "change": "Remove inherited Content-Type only on bodyless exact-object Storage DELETE; retain service auth/path/timeout/retry/settlement",
+    "sha256": "181cbdac5b2e158918af06e760c84f9dd25df977df51754b5ad5b0b24c525bfe",
+    "deployOrder": "after SQL/voting Edges, before final cleanup acceptance/mobile; independently compatible",
+    "rollback": "restore prior worker package only; retain all DB jobs/receipts/votes; prior package can fail cleanup with Storage 400, so pause affected cleanup rather than erase/reseed jobs"
+  },
+  "acceptanceEvidence": {
+    "staging-voting-acceptance.json": "artifacts/app-polish/release-qa/deployment/staging-voting-acceptance.json",
+    "staging-edge-phase-acceptance.json": "artifacts/app-polish/release-qa/deployment/staging-edge-phase-acceptance.json",
+    "staging-upload-acceptance.json": "artifacts/app-polish/release-qa/deployment/staging-upload-acceptance.json",
+    "staging-storage-cascade-acceptance.json": "artifacts/app-polish/release-qa/deployment/staging-storage-cascade-acceptance.json",
+    "staging-cleanup-acceptance.json": "artifacts/app-polish/release-qa/deployment/staging-cleanup-acceptance.json",
+    "staging-cleanup-endpoint-acceptance.json": "artifacts/app-polish/release-qa/deployment/staging-cleanup-endpoint-acceptance.json",
+    "staging-derivative-agreement.json": "artifacts/app-polish/release-qa/deployment/staging-derivative-agreement.json",
+    "staging-catalog-completeness.json": "artifacts/app-polish/release-qa/deployment/staging-catalog-completeness.json",
+    "baseline-edge-source-verification.json": "artifacts/app-polish/release-qa/deployment/baseline-edge-source-verification.json",
+    "wingman-v18-rpc-preservation.json": "artifacts/app-polish/release-qa/deployment/wingman-v18-rpc-preservation.json"
+  },
+  "readinessByComponent": {
+    "sharedVotingPhotos": "real local acceptance passed; deploy candidate after fresh production preflight, load/rollback gate and owner release decision",
+    "workerFix": "real local cleanup regression passed; include worker package release, independent of voting",
+    "Wingman": "v18 already deployed externally; provider-backed verification/insertion and representative score calibration NOT PASSED"
+  },
+  "remainingGates": [
+    {
+      "gate": "Wingman provider success/insertion and representative confidence calibration",
+      "status": "blocked: no suitable dedicated test provider keys",
+      "owner": "Backend engineer + Branden"
+    },
+    {
+      "gate": "fresh production preflight, representative lock/load timing and explicit code rollback rehearsal",
+      "status": "incomplete",
+      "owner": "Release/backend engineer"
+    },
+    {
+      "gate": "real isolated Mango HTTP review/history and growth snapshot after phases",
+      "status": "incomplete; earlier broad suites preserved",
+      "owner": "Mango/backend engineer"
+    },
+    {
+      "gate": "signed-in anonymous-auth path if distributed cohort depends on it",
+      "status": "not exercised; local anonymous sign-in disabled",
+      "owner": "Backend engineer"
+    },
+    {
+      "gate": "actual store/testing/OTA cohort contracts",
+      "status": "unknown assignments",
+      "owner": "Branden/mobile release engineer"
+    },
+    {
+      "gate": "physical Android/native iPhone identified QA builds and isolated connection",
+      "status": "outstanding",
+      "owner": "Branden/mobile engineer"
+    }
+  ],
+  "mobileSortFilters": {
+    "status": "implemented; 19 focused tests/lint/typecheck/Android emulator fixture interactions passed",
+    "source": [
+      "crawl/app/(tabs)/ratings/index.jsx",
+      "crawl/lib/wingdexCollection.js",
+      "crawl/lib/savedDestinations.js"
+    ],
+    "backendDeploymentRequired": false,
+    "screenshots": "artifacts/app-polish/release-qa/sort-filters/",
+    "physicalAndroidNativeIOS": "outstanding"
+  },
+  "finalDeploymentEvidence": "artifacts/app-polish/release-qa/deployment/production-edge-deployment-final.json",
+  "finalCleanup": "docs/buffago-app-polish-final-hygiene.md"
+}

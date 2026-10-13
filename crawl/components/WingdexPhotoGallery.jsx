@@ -2,13 +2,15 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AppState, FlatList, Pressable, View } from 'react-native';
 import { Image } from 'expo-image';
 import { ActivityIndicator, Button, Dialog, Portal, Text } from 'react-native-paper';
-import { loadWingdexFullPhoto, loadWingdexRestaurantGallery } from '../lib/wingdexGallery';
+import { loadWingdexFullPhoto, loadWingdexRestaurantGallery, orderWingdexPhotos } from '../lib/wingdexGallery';
 import { supabase } from '../lib/supabase';
 import WingdexPhotoViewer from './WingdexPhotoViewer';
+import PhotoVoteControls from './PhotoVoteControls';
+import { subscribePhotoVotes } from '../lib/photoVoteEvents';
 import { createVoteController, loadOwnPhotoVotes } from '../lib/wingdexPhotos';
 import { useAuth } from '../providers/AuthProvider';
 
-export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange, embedded = false }) {
+export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange, embedded = false, compact = false }) {
   const { user } = useAuth();
   const generation = useRef(0);
   const inFlight = useRef(false);
@@ -30,6 +32,29 @@ export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange
   const [refreshToken, setRefreshToken] = useState(0);
   const [brokenImages, setBrokenImages] = useState({});
   const [state, setState] = useState({ images: [], count: 0, offset: 0, loading: true, error: null });
+  const [stripWidth, setStripWidth] = useState(240);
+  const [stripIndex, setStripIndex] = useState(0);
+  const stripList = useRef(null);
+  const stripPosition = useRef({ id: null, index: 0, width: 240 });
+  const orderedImages = useMemo(() => orderWingdexPhotos(state.images), [state.images]);
+  useEffect(() => {
+    if (!orderedImages.length) return;
+    const previous = stripPosition.current;
+    const found = orderedImages.findIndex((image) => image.submission_id === previous.id);
+    const index = found >= 0 ? found : Math.min(previous.index, orderedImages.length - 1);
+    const width = compact ? stripWidth : 248;
+    if (index !== previous.index || width !== previous.width) {
+      stripList.current?.scrollToOffset({ offset: index * width, animated: false });
+      setStripIndex(index);
+    }
+    stripPosition.current = { id: orderedImages[index].submission_id, index, width };
+  }, [orderedImages, compact, stripWidth]);
+  useEffect(() => subscribePhotoVotes(({ userId, photo }) => {
+    if (userId !== accountRef.current) return;
+    voteVersions.current[photo.submission_id] = (voteVersions.current[photo.submission_id] || 0) + 1;
+    setState((old) => ({ ...old, images: old.images.map((image) => image.submission_id === photo.submission_id
+      ? { ...image, ...photo, signed_url: image.signed_url } : image) }));
+  }), []);
   const stateRef = useRef(state);
   stateRef.current = state;
   const load = useCallback(async (offset = 0) => {
@@ -56,6 +81,8 @@ export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange
   useEffect(() => {
     inFlight.current = false;
     setSelectedId(null);
+    stripPosition.current = { ...stripPosition.current, id: null, index: 0 };
+    setStripIndex(0);
     setBrokenImages({});
     setState({ images: [], count: 0, offset: 0, loading: true, error: null });
     void load();
@@ -70,11 +97,13 @@ export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange
   const photoIds = state.images.map((image) => image.submission_id).join(',');
   useEffect(() => {
     let alive = true;
+    const versions = { ...voteVersions.current };
     setVotesReady(false);
     loadOwnPhotoVotes(state.images, supabase).then((photos) => {
       if (!alive) return;
       const ownVotes = new Map(photos.map((photo) => [photo.submission_id, photo.current_vote]));
       setState((old) => ({ ...old, images: old.images.map((image) => busyRef.current[image.submission_id]
+        || voteVersions.current[image.submission_id] !== versions[image.submission_id]
         ? image : { ...image, current_vote: ownVotes.get(image.submission_id) ?? null }) }));
       setVotesReady(true);
       setVoteError(null);
@@ -107,7 +136,7 @@ export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange
             ...old.images.filter((image) => byId.has(image.submission_id))
               .map((image) => ({ ...image, ...byId.get(image.submission_id),
                 ...(busyRef.current[image.submission_id] || voteVersions.current[image.submission_id] !== versions[image.submission_id]
-                  ? { like_count: image.like_count, dislike_count: image.dislike_count } : {}),
+                  ? { like_count: image.like_count, dislike_count: image.dislike_count, neutral_count: image.neutral_count } : {}),
                 current_vote: image.current_vote })),
             ...refreshed.filter((image) => !existing.has(image.submission_id)),
           ] };
@@ -144,7 +173,7 @@ export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange
       if (active.current && accountRef.current === account && !busyRef.current[photo.submission_id]
         && version === voteVersions.current[photo.submission_id]) {
         setState((old) => ({ ...old, images: old.images.map((image) => image.submission_id === refreshed.submission_id
-          ? { ...image, like_count: refreshed.like_count, dislike_count: refreshed.dislike_count } : image) }));
+          ? { ...image, like_count: refreshed.like_count, dislike_count: refreshed.dislike_count, neutral_count: refreshed.neutral_count } : image) }));
         onPhotoChange?.(refreshed);
       }
     } catch (error) { if (active.current && accountRef.current === account) setVoteError(error.message); }
@@ -155,7 +184,7 @@ export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange
   const gallery = <Container {...(embedded ? { testID: 'restaurant-wing-shots' } : {
     visible: Boolean(restaurant), onDismiss: onClose, style: { borderRadius: 24 },
   })}>
-    {embedded ? <Text variant="titleMedium" style={{ marginBottom: 8 }}>Wing Shots</Text>
+    {compact ? null : embedded ? <Text variant="titleMedium" style={{ marginBottom: 8 }}>Wing Shots</Text>
       : <Dialog.Title>{restaurant?.name || 'Pictures'}</Dialog.Title>}
     <Content>
       {state.error ? <View><Text>{state.error}</Text><Button onPress={() => void load()}>Retry pictures</Button></View> : null}
@@ -165,15 +194,25 @@ export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange
       {!state.loading && !state.error && !state.images.length ? <View style={{ alignItems: 'center', paddingVertical: embedded ? 12 : 24 }}>
         {embedded ? <Text>No approved Wing Shots yet.</Text> : <Text variant="titleMedium">BUFFAGO</Text>}
         <Text>Be the first to add a photo</Text></View> : null}
-      <FlatList horizontal style={{ maxHeight: 340 }} data={state.images}
+      <View onLayout={(event) => { if (compact && event.nativeEvent.layout.width > 0) setStripWidth(event.nativeEvent.layout.width); }}>
+      {state.count > 1 ? <Text testID="wingdex-photo-counter" style={{ textAlign: 'right', fontSize: 12, marginBottom: 4 }}>{Math.min(stripIndex + 1, state.count)} of {state.count}</Text> : null}
+      <FlatList ref={stripList} horizontal directionalLockEnabled nestedScrollEnabled
+        snapToInterval={compact ? stripWidth : 248} decelerationRate="fast" showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={(event) => {
+          const index = Math.max(0, Math.min(orderedImages.length - 1, Math.round(event.nativeEvent.contentOffset.x / (compact ? stripWidth : 248))));
+          stripPosition.current = { id: orderedImages[index]?.submission_id, index, width: compact ? stripWidth : 248 };
+          setStripIndex(index);
+        }}
+        onEndReached={() => { if (state.offset < state.count && !state.loading) void load(state.offset); }} onEndReachedThreshold={0.5}
+        style={{ flexGrow: 0 }} data={orderedImages}
         keyExtractor={(image) => image.submission_id} initialNumToRender={3} maxToRenderPerBatch={5}
-        windowSize={5} getItemLayout={(_, index) => ({ length: 248, offset: 248 * index, index })}
-        renderItem={({ item: image }) => <View style={{ width: 240, marginRight: 8 }}>
-          {brokenImages[image.submission_id] ? <View style={{ width: 240, height: 240, justifyContent: 'center', alignItems: 'center' }}>
+        windowSize={5} getItemLayout={(_, index) => ({ length: compact ? stripWidth : 248, offset: (compact ? stripWidth : 248) * index, index })}
+        renderItem={({ item: image }) => <View style={{ width: compact ? stripWidth : 240, marginRight: compact ? 0 : 8 }}>
+          {brokenImages[image.submission_id] ? <View style={{ width: compact ? stripWidth : 240, height: compact ? stripWidth * 9 / 16 : 240, justifyContent: 'center', alignItems: 'center' }}>
             <Text>Photo unavailable</Text><Button onPress={() => void load()}>Retry photo</Button>
           </View> : <Pressable accessibilityRole="button" accessibilityLabel="Open approved restaurant photo"
-            onPress={() => setSelectedId(image.submission_id)}>
-            <Image source={{ uri: image.signed_url }} contentFit="cover" style={{ width: 240, height: 240, borderRadius: 12 }} accessibilityLabel="Approved restaurant picture"
+            onPress={(event) => { event?.stopPropagation?.(); setSelectedId(image.submission_id); }}>
+            <Image source={{ uri: image.signed_url }} contentFit="cover" style={{ width: compact ? stripWidth : 240, height: compact ? stripWidth * 9 / 16 : 240, borderRadius: 12 }} accessibilityLabel="Approved restaurant picture"
               onError={() => {
                 if (active.current && stateRef.current.images.some((current) => current.submission_id === image.submission_id
                   && current.signed_url === image.signed_url)) {
@@ -181,24 +220,17 @@ export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange
                 }
               }} />
           </Pressable>}
-          <View style={{ flexDirection: 'row', gap: 4, paddingBottom: 4 }}>
-            <Button testID={`photo-preview-like-${image.submission_id}`} compact icon="thumb-up-outline"
-              mode={image.current_vote === 1 ? 'contained' : 'text'} accessibilityLabel={`Like, ${image.like_count ?? 0}`}
-              accessibilityState={{ selected: image.current_vote === 1 }} disabled={!votesReady || busy[image.submission_id]}
-              onPress={() => void cast(image, 1)}>{image.like_count ?? 0}</Button>
-            <Button testID={`photo-preview-dislike-${image.submission_id}`} compact icon="thumb-down-outline"
-              mode={image.current_vote === -1 ? 'contained' : 'text'} accessibilityLabel={`Dislike, ${image.dislike_count ?? 0}`}
-              accessibilityState={{ selected: image.current_vote === -1 }} disabled={!votesReady || busy[image.submission_id]}
-              onPress={() => void cast(image, -1)}>{image.dislike_count ?? 0}</Button>
-          </View>
+          <PhotoVoteControls photo={image} testPrefix={`photo-preview-${image.submission_id}`}
+            disabled={!votesReady || busy[image.submission_id]} onVote={(choice) => void cast(image, choice)} />
         </View>} />
+      </View>
     </Content>
     <Actions>
       {state.offset < state.count ? <Button disabled={state.loading} onPress={() => void load(state.offset)}>More pictures</Button> : null}
       {embedded ? null : <Button contentStyle={{ minHeight: 44 }} onPress={onClose}>Close</Button>}
     </Actions>
   </Container>;
-  return <>{embedded ? gallery : <Portal>{gallery}</Portal>}{selectedId ? <Portal><WingdexPhotoViewer photos={state.images} selectedId={selectedId} restaurantName={restaurant.name}
+  return <>{embedded ? gallery : <Portal>{gallery}</Portal>}{selectedId ? <Portal><WingdexPhotoViewer photos={orderedImages} selectedId={selectedId} restaurantName={restaurant.name}
     voteController={vote} isVotePending={isVotePending} getVoteVersion={getVoteVersion} parentVotesReady={votesReady}
     onClose={() => { setSelectedId(null); setRefreshToken((n) => n + 1); }}
     totalCount={state.count} hasMore={state.offset < state.count} onMore={() => void load(state.offset)}

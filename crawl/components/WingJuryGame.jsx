@@ -17,13 +17,12 @@ import { saveSavedDestinationIntent } from '../lib/savedDestinations.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FeedbackState from './ui/FeedbackState';
+import PhotoVoteControls from './PhotoVoteControls';
+import { createVoteController } from '../lib/wingdexPhotos';
+import { subscribePhotoVotes } from '../lib/photoVoteEvents';
 import { accountUserId, createAccountScope, lookupAccount } from '../lib/accountBoundary.js';
 
-const VERDICTS = [
-  { value: -1, label: 'Dislike', icon: 'thumb-down-outline', color: '#E57373' },
-  { value: 0, label: 'Average', icon: 'minus-circle-outline', color: '#F0BE62' },
-  { value: 1, label: 'Like', icon: 'thumb-up-outline', color: '#78C996' },
-];
+
 
 const previewWingPhotoAsset = require('../assets/wing-user.png');
 const previewWingPhotoUri = typeof previewWingPhotoAsset === 'string'
@@ -66,6 +65,8 @@ export default function WingJuryGame() {
   const [error, setError] = useState(null);
   const [reveal, setReveal] = useState(null);
   const [confirmedVote, setConfirmedVote] = useState(null);
+  const [editingVote, setEditingVote] = useState(false);
+  const editVote = useMemo(() => createVoteController(supabase), []);
   const [imageFailed, setImageFailed] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
   const [authPromptVisible, setAuthPromptVisible] = useState(false);
@@ -81,6 +82,35 @@ export default function WingJuryGame() {
   const currentPhoto = photos[0] || null;
   const currentPhotoRef = useRef(null);
   currentPhotoRef.current = currentPhoto?.submission_id || null;
+  useEffect(() => subscribePhotoVotes(({ userId, photo }) => {
+    if (userId !== accountRef.current || photo.submission_id !== currentPhotoRef.current) return;
+    setConfirmedVote((old) => ({ ...old, vote: photo.current_vote }));
+    setReveal((old) => old ? { ...old, photo_like_count: photo.like_count,
+      photo_dislike_count: photo.dislike_count, photo_neutral_count: photo.neutral_count } : old);
+  }), []);
+  const revealedVotePhoto = {
+    ...currentPhoto, current_vote: confirmedVote?.vote ?? null,
+    like_count: reveal?.photo_like_count ?? confirmedVote?.like_count ?? 0,
+    dislike_count: reveal?.photo_dislike_count ?? confirmedVote?.dislike_count ?? 0,
+    neutral_count: reveal?.photo_neutral_count ?? confirmedVote?.neutral_count ?? 0,
+  };
+  const changeRevealedVote = async (choice) => {
+    if (!signedIn || visualPreview || editingVote || actionRef.current) return;
+    const epoch = accountScope.capture();
+    const photoId = currentPhotoRef.current;
+    setError(null);
+    setEditingVote(true);
+    try {
+      await editVote(revealedVotePhoto, choice, (photo, pending) => {
+        if (!accountScope.current(epoch) || currentPhotoRef.current !== photoId) return;
+        setConfirmedVote((old) => ({ ...old, vote: photo.current_vote }));
+        setReveal((old) => old ? { ...old, photo_like_count: photo.like_count,
+          photo_dislike_count: photo.dislike_count, photo_neutral_count: photo.neutral_count } : old);
+        setEditingVote(pending);
+      }, accountRef.current);
+    } catch (nextError) { if (accountScope.current(epoch)) setError(nextError); }
+    finally { if (accountScope.current(epoch)) setEditingVote(false); }
+  };
   const imageEpoch = accountScope.capture();
   const previewPhoto = useMemo(() => ({
     submission_id: `visual-preview-${previewMode || 'blind'}`,
@@ -120,6 +150,7 @@ export default function WingJuryGame() {
       setHasMore(true);
       setReveal(null);
       setConfirmedVote(null);
+      setEditingVote(false);
       setError(null);
       setImageFailed(false);
       setAuthPromptVisible(false);
@@ -405,26 +436,8 @@ export default function WingJuryGame() {
       </Card>
 
       {!isRevealed && !imageFailed ? (
-        <View style={styles.verdictRow} accessibilityLabel="Choose your Wing Jury verdict">
-          {VERDICTS.map((verdict) => {
-            const disabled = status !== 'READY_TO_VOTE';
-            return (
-              <Pressable
-                key={verdict.value}
-                testID={`wing-jury-verdict-${verdict.value}`}
-                accessibilityRole="button"
-                accessibilityLabel={verdict.label}
-                accessibilityState={{ disabled }}
-                disabled={disabled}
-                onPress={() => submitVote(verdict.value)}
-                style={({ pressed }) => [styles.verdict, { borderColor: verdict.color }, pressed && styles.pressed, disabled && styles.disabled]}
-              >
-                <MaterialCommunityIcons name={verdict.icon} size={27} color={verdict.color} />
-                <Text style={[styles.verdictText, { color: verdict.color }]}>{verdict.label}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
+        <PhotoVoteControls photo={currentPhoto} showCounts={false} testPrefix="wing-jury-verdict"
+          disabled={status !== 'READY_TO_VOTE'} onVote={submitVote} />
       ) : null}
 
       {status === 'SUBMITTING' ? <View style={styles.progressRow}><ActivityIndicator color={theme.colors.primary} /><Text>Locking in your verdict…</Text></View> : null}
@@ -438,6 +451,9 @@ export default function WingJuryGame() {
           <Text variant="titleLarge" style={styles.restaurantName}>{revealedRestaurant.name || 'Wing spot'}</Text>
           {(revealedRestaurant.address || revealedRestaurant.city) ? <Text style={styles.address}>{[revealedRestaurant.address, revealedRestaurant.city].filter(Boolean).join(', ')}</Text> : null}
           <Divider style={styles.divider} />
+          {signedIn && !visualPreview ? <PhotoVoteControls photo={revealedVotePhoto}
+            testPrefix="wing-jury-photo-vote" disabled={editingVote} onVote={changeRevealedVote} /> : null}
+          {error && status === 'REVEALED' ? <Text accessibilityRole="alert">{error.message}</Text> : null}
           <View style={styles.statsRow}>
             <RevealStat label="Photo Likes" value={`${readableNumber(reveal.photo_like_count)} Likes`} icon="thumb-up-outline" />
             <RevealStat label="Wingdex Average" value={wingdexAverage == null || !Number.isFinite(Number(wingdexAverage)) ? 'Not rated yet' : Number(wingdexAverage).toFixed(2)} icon="star-outline" />

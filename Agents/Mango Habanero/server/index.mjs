@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'node:crypto';
+import { createRestaurantService } from './restaurants.mjs';
 import { selectWingPreviewPath } from './mediaPreview.mjs';
 import { createApprovalService, localRequestsOnly } from './approval.mjs';
 
@@ -24,6 +25,15 @@ const correlation = () => crypto.randomUUID();
 const idempotency = (prefix, id) => `${prefix}-${id}-${crypto.randomUUID()}`;
 const rpc = async (name, args) => { const { data, error } = await supabase.rpc(name, args); if (error) { log('database_operation_failed', { rpc: name, code: error.code }); throw error; } return data; };
 
+const restaurants = createRestaurantService({ backend: supabase, reviewer: process.env.MANGO_REVIEWER_ID });
+app.get('/api/restaurants', async (_req, res) => {
+  try { res.set('Cache-Control','no-store').json(await restaurants.list()); }
+  catch (error) { res.status(502).json({ error: error.message }); }
+});
+app.post('/api/restaurants/:id/review', async (req, res) => {
+  try { res.json(await restaurants.review(req.params.id, req.body || {})); log('restaurant_review_completed', { suggestion_id: req.params.id, action: req.body.action }); }
+  catch (error) { res.status(409).json({ error: error.message }); }
+});
 app.get('/api/health', (_req, res) => res.json({ ok: true, agent: 'mango-habanero' }));
 app.get('/api/submissions', async (_req, res) => { try { const data = await rpc('mango_list_wing_submissions', {}); log('submission_list_requested', { count: data?.length || 0 }); res.json({ submissions: data || [], refreshedAt: new Date().toISOString() }); } catch (error) { res.status(502).json({ error: 'Unable to load Wing Shots right now.' }); } });
 app.post('/api/submissions/:id/preview', async (req, res) => { try { const { data, error } = await supabase.rpc('mango_list_wing_submissions', {}); if (error) throw error; const row = (data || []).find((item) => item.submission_id === req.params.id); if (!row) return res.status(404).json({ error: 'Submission not found.' }); const path = selectWingPreviewPath(row); if (!path) return res.status(404).json({ error: 'No private media is available yet.' }); const mediaReadiness = { original: Boolean(row.original_object_exists), processed: Boolean(row.processed_object_exists), thumbnail: Boolean(row.thumbnail_object_exists), processing_succeeded: Boolean(row.processing_succeeded) }; const expiresIn = Math.min(300, Math.max(30, Number(process.env.MANGO_PREVIEW_SECONDS || 60))); const signed = await supabase.storage.from('wing-submissions').createSignedUrl(path, expiresIn); if (signed.error) throw signed.error; log('signed_preview_generated', { submission_id: req.params.id, path_kind: path === row.original_storage_path ? 'original' : path === row.thumbnail_storage_path ? 'thumbnail' : 'processed', media_readiness: mediaReadiness, expires_in: expiresIn }); res.set('Cache-Control', 'no-store').json({ url: signed.data.signedUrl, expiresIn }); } catch (error) { log('signed_preview_failed', { submission_id: req.params.id, error_code: error.code || 'private_preview_failed' }); res.status(502).json({ error: 'Unable to generate a private preview.' }); } });

@@ -56,6 +56,15 @@ Agents/Chipotle/artifacts/last-run-result.json
 /crawl/output/
 /output/buffaverse-web-correction/
 
+# Disposable app-polish capture/output (keep reviewed screenshots, receipts and source).
+/artifacts-app-polish-*.log
+/artifacts/app-polish/**/*.xml
+/artifacts/app-polish/release-qa/deployment/staging-functions-runtime.log
+/artifacts/app-polish/release-qa/deployment/staging-fixture-setup*.log
+/artifacts/app-polish/release-qa/deployment/staging-old-jury-http*.log
+/artifacts/app-polish/release-qa/deployment/staging-edge-phase*.log
+/artifacts/app-polish/release-qa/deployment/wingdex-sort-filters-*.log
+
 # Generated image-workflow regression evidence (source tests and fixtures live elsewhere).
 /artifacts/qa-image-regression/
 

@@ -1,0 +1,30 @@
+[
+  {
+    "slug": "wingman-intake",
+    "deployed_version": 17,
+    "verify_jwt": true,
+    "entrypoint": "file:///tmp/user_fn_vhfxnizaxdanmvmouuaf_3b6e638a-8d75-412d-9c49-8fa187877250_17/source/wingman-intake/index.ts",
+    "bundle_sha256": "58c0c274c6548dd3e7476a9d121cd4ced3b72016c35a25a71ebac59f7e984e7d"
+  },
+  {
+    "slug": "wing-public-gallery",
+    "deployed_version": 3,
+    "verify_jwt": false,
+    "entrypoint": "file:///tmp/user_fn_vhfxnizaxdanmvmouuaf_404ba677-8b30-45c9-b167-68f9fbbc3cba_3/source/index.ts",
+    "bundle_sha256": "879051d6d793430bc1522259d508bc6191d762cd5fe3f2fd7c56dba746419a1e"
+  },
+  {
+    "slug": "wing-jury-vote",
+    "deployed_version": 1,
+    "verify_jwt": true,
+    "entrypoint": "file:///Users/Brand/Downloads/buffago-wing-jury-edge-functions/supabase/functions/wing-jury-vote/index.js",
+    "bundle_sha256": "86dec517d3749f2ba24e6fa28c61c3b351de94f3ae38c4f42bcded9e8b208bc9"
+  },
+  {
+    "slug": "wing-jury-reveal",
+    "deployed_version": 1,
+    "verify_jwt": false,
+    "entrypoint": "file:///Users/Brand/Downloads/buffago-wing-jury-edge-functions/supabase/functions/wing-jury-reveal/index.js",
+    "bundle_sha256": "68414678a1aaf19d379c8e40c4a772652fca41fd6f319284847e5e79f175deb3"
+  }
+]

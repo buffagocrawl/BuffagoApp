@@ -1,0 +1,43 @@
+{
+  "project": "vhfxnizaxdanmvmouuaf",
+  "deploymentCompleted": true,
+  "cleanupPerformedNoDeployment": true,
+  "functions": [
+    {
+      "name": "wing-jury-vote",
+      "version": 2,
+      "verify_jwt": true,
+      "status": "ACTIVE",
+      "bundleSha256": "79bcdee5f47999df7e7243a11c768e19ee9d01d49804c68b4eb59f52cef7a0f9",
+      "sourceVerified": true
+    },
+    {
+      "name": "wing-jury-reveal",
+      "version": 2,
+      "verify_jwt": false,
+      "status": "ACTIVE",
+      "bundleSha256": "dd4faf8e0075f6ffc4a47036887e19ffc863bc504431df82f033d41fee288904",
+      "sourceVerified": true
+    },
+    {
+      "name": "wing-public-gallery",
+      "version": 4,
+      "verify_jwt": false,
+      "status": "ACTIVE",
+      "bundleSha256": "7ca9611a3b2fb851c911858d92a6c76e534d52c758288e99f693bd34775ab033",
+      "sourceVerified": true
+    }
+  ],
+  "sqlContracts": {
+    "bridgeFunctionBodiesMatched": 8,
+    "lineEndingsNormalized": true,
+    "triggerAndPermissionChecks": "passed"
+  },
+  "readOnlyChecks": {
+    "countMismatches": 0,
+    "publicProjectionMismatches": 0,
+    "galleryHTTPStatus": 200,
+    "logs": "vote v2/gallery v4 HTTP 200; reveal v2 traffic not yet observed"
+  },
+  "noProductionVotesOrRecordWrites": true
+}

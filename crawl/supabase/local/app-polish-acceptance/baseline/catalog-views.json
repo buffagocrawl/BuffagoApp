@@ -1,0 +1,230 @@
+[
+  {
+    "schema": "public",
+    "name": "v_badges_for_user",
+    "definition": " SELECT u.user_id,\n    bc.id AS badge_id,\n    bc.code,\n    bc.name,\n    bc.description,\n    bc.icon,\n    bc.xp_reward,\n    COALESCE(ub.earned_at, NULL::timestamp with time zone) AS earned_at,\n    (ub.user_id IS NOT NULL) AS earned\n   FROM ((badge_catalog bc\n     CROSS JOIN LATERAL ( SELECT auth.uid() AS user_id) u)\n     LEFT JOIN user_badges ub ON (((ub.badge_id = bc.id) AND (ub.user_id = u.user_id))))\n  WHERE (bc.is_active = true);",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "route_ordered_destinations",
+    "definition": " SELECT routes.id AS route_id,\n    routes.stop1_id AS destination_id,\n    1 AS stop_order\n   FROM routes\n  WHERE (routes.stop1_id IS NOT NULL)\nUNION ALL\n SELECT routes.id AS route_id,\n    routes.stop2_id AS destination_id,\n    2 AS stop_order\n   FROM routes\n  WHERE (routes.stop2_id IS NOT NULL)\nUNION ALL\n SELECT routes.id AS route_id,\n    routes.stop3_id AS destination_id,\n    3 AS stop_order\n   FROM routes\n  WHERE (routes.stop3_id IS NOT NULL)\nUNION ALL\n SELECT routes.id AS route_id,\n    routes.stop4_id AS destination_id,\n    4 AS stop_order\n   FROM routes\n  WHERE (routes.stop4_id IS NOT NULL)\nUNION ALL\n SELECT routes.id AS route_id,\n    routes.stop5_id AS destination_id,\n    5 AS stop_order\n   FROM routes\n  WHERE (routes.stop5_id IS NOT NULL);",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "wing_battle_options_active",
+    "definition": " SELECT id,\n    label,\n    left_option,\n    right_option\n   FROM wing_battle_options\n  WHERE (is_active = true)\n  ORDER BY sort_order, id;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "socially_visible_users",
+    "definition": " SELECT user_id,\n    username,\n    avatar_url,\n    created_at,\n    xp,\n    facebook_connected,\n    facebook_connected_at\n   FROM users u\n  WHERE can_user_appear_socially(user_id);",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "socially_visible_destination_ratings",
+    "definition": " SELECT id,\n    destination_id,\n    crawl_id,\n    user_id,\n    crispiness,\n    sauce,\n    meat,\n    overall,\n    weight_score,\n    created_at,\n    tag_id,\n    wings_eaten,\n    sauce_style,\n    flavor_vibe,\n    spice_level,\n    would_order_again,\n    is_buffacoin\n   FROM destination_ratings dr\n  WHERE ((user_id IS NOT NULL) AND can_user_appear_socially(user_id));",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "socially_visible_crawls",
+    "definition": " SELECT crawl_id,\n    route_id,\n    user_id,\n    status,\n    start_time,\n    end_time,\n    crawl_type,\n    is_solo\n   FROM crawls c\n  WHERE ((user_id IS NOT NULL) AND can_user_appear_socially(user_id));",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "analytics_social_opt_out_summary",
+    "definition": " SELECT count(*) AS total_users,\n    count(*) FILTER (WHERE social_opt_out) AS total_users_opted_out,\n    round(((count(*) FILTER (WHERE social_opt_out))::numeric / (NULLIF(count(*), 0))::numeric), 4) AS opt_out_rate\n   FROM users;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "analytics_social_opt_out_by_account_age",
+    "definition": " SELECT\n        CASE\n            WHEN (created_at >= (now() - '7 days'::interval)) THEN '0_7_days'::text\n            WHEN (created_at >= (now() - '30 days'::interval)) THEN '8_30_days'::text\n            WHEN (created_at >= (now() - '90 days'::interval)) THEN '31_90_days'::text\n            ELSE '91_plus_days'::text\n        END AS account_age_bucket,\n    count(*) AS total_users,\n    count(*) FILTER (WHERE social_opt_out) AS total_users_opted_out,\n    round(((count(*) FILTER (WHERE social_opt_out))::numeric / (NULLIF(count(*), 0))::numeric), 4) AS opt_out_rate\n   FROM users\n  GROUP BY\n        CASE\n            WHEN (created_at >= (now() - '7 days'::interval)) THEN '0_7_days'::text\n            WHEN (created_at >= (now() - '30 days'::interval)) THEN '8_30_days'::text\n            WHEN (created_at >= (now() - '90 days'::interval)) THEN '31_90_days'::text\n            ELSE '91_plus_days'::text\n        END;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "analytics_social_opt_out_by_facebook_link",
+    "definition": " SELECT facebook_connected,\n    count(*) AS total_users,\n    count(*) FILTER (WHERE social_opt_out) AS total_users_opted_out,\n    round(((count(*) FILTER (WHERE social_opt_out))::numeric / (NULLIF(count(*), 0))::numeric), 4) AS opt_out_rate\n   FROM users\n  GROUP BY facebook_connected;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "ratings_per_crawl_user",
+    "definition": " SELECT crawl_id,\n    user_id,\n    count(DISTINCT destination_id) AS rated_count\n   FROM destination_ratings dr\n  WHERE ((user_id IS NOT NULL) AND ((user_id)::text <> '23898359-306a-4dd3-91f0-da66da19ccfc'::text))\n  GROUP BY crawl_id, user_id;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "crawl_coverage_public",
+    "definition": " SELECT c.crawl_id,\n    c.user_id,\n    c.route_id,\n    c.status,\n    c.start_time,\n    c.end_time,\n    rsc.stop_count,\n    COALESCE(rpcu.rated_count, (0)::bigint) AS rated_count,\n        CASE\n            WHEN (rsc.stop_count > 0) THEN round(((100.0 * (COALESCE(rpcu.rated_count, (0)::bigint))::numeric) / (rsc.stop_count)::numeric), 2)\n            ELSE NULL::numeric\n        END AS pct_rated\n   FROM ((crawl_public c\n     JOIN route_stop_counts rsc ON ((rsc.route_id = c.route_id)))\n     LEFT JOIN ratings_per_crawl_user rpcu ON (((rpcu.crawl_id = c.crawl_id) AND (rpcu.user_id = c.user_id))))\n  WHERE ((c.user_id IS NOT NULL) AND ((c.user_id)::text <> '23898359-306a-4dd3-91f0-da66da19ccfc'::text));",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "crawl_public",
+    "definition": " SELECT crawl_id,\n    user_id,\n    route_id,\n    status,\n    start_time,\n    end_time\n   FROM crawls;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "route_stop_counts",
+    "definition": " SELECT id AS route_id,\n    ((((((stop1_id IS NOT NULL))::integer + ((stop2_id IS NOT NULL))::integer) + ((stop3_id IS NOT NULL))::integer) + ((stop4_id IS NOT NULL))::integer) + ((stop5_id IS NOT NULL))::integer) AS stop_count\n   FROM routes r;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "lb_user_routes_completed",
+    "definition": " SELECT user_id,\n    count(DISTINCT route_id) AS completed_routes\n   FROM crawls c\n  WHERE ((user_id IS NOT NULL) AND (user_id <> '23898359-306a-4dd3-91f0-da66da19ccfc'::uuid) AND (lower(status) = 'completed'::text))\n  GROUP BY user_id;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "lb_user_destinations_rated",
+    "definition": " SELECT user_id,\n    count(DISTINCT destination_id) AS distinct_destinations\n   FROM destination_ratings dr\n  WHERE ((user_id IS NOT NULL) AND (user_id <> '23898359-306a-4dd3-91f0-da66da19ccfc'::uuid))\n  GROUP BY user_id;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "lb_total_routes",
+    "definition": " SELECT (count(*))::integer AS total_routes\n   FROM routes;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "lb_total_destinations",
+    "definition": " SELECT (count(*))::integer AS total_destinations\n   FROM destinations;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "user_with_level",
+    "definition": " SELECT user_id,\n    xp,\n    COALESCE(( SELECT max(t.level) AS max\n           FROM level_thresholds t\n          WHERE (t.xp_required <= u.xp)), 1) AS level\n   FROM users u;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "crawl_weekly_streak",
+    "definition": " WITH weeks AS (\n         SELECT crawls.user_id,\n            (date_trunc('week'::text, crawls.end_time))::date AS week_start\n           FROM crawls\n          WHERE ((crawls.end_time IS NOT NULL) AND (lower(crawls.status) = 'completed'::text))\n        ), bucket AS (\n         SELECT weeks.user_id,\n            weeks.week_start,\n            1 AS has_crawl\n           FROM weeks\n          GROUP BY weeks.user_id, weeks.week_start\n        ), series AS (\n         SELECT b.user_id,\n            (generate_series((( SELECT min(b2.week_start) AS min\n                   FROM bucket b2\n                  WHERE (b2.user_id = b.user_id)))::timestamp with time zone, (( SELECT max(b3.week_start) AS max\n                   FROM bucket b3\n                  WHERE (b3.user_id = b.user_id)))::timestamp with time zone, '7 days'::interval))::date AS week_start\n           FROM bucket b\n          GROUP BY b.user_id\n        ), joined AS (\n         SELECT s.user_id,\n            s.week_start,\n            COALESCE(b.has_crawl, 0) AS has_crawl\n           FROM (series s\n             LEFT JOIN bucket b ON (((b.user_id = s.user_id) AND (b.week_start = s.week_start))))\n        ), label AS (\n         SELECT j.user_id,\n            j.week_start,\n            j.has_crawl,\n            sum(\n                CASE\n                    WHEN (j.has_crawl = 0) THEN 1\n                    ELSE 0\n                END) OVER (PARTITION BY j.user_id ORDER BY j.week_start) AS gap_group\n           FROM joined j\n        )\n SELECT user_id,\n    COALESCE(( SELECT count(*) AS count\n           FROM label l2\n          WHERE ((l2.user_id = l.user_id) AND (l2.week_start <= (date_trunc('week'::text, now()))::date) AND (l2.gap_group = ( SELECT max(l3.gap_group) AS max\n                   FROM label l3\n                  WHERE ((l3.user_id = l.user_id) AND (l3.week_start <= (date_trunc('week'::text, now()))::date)))) AND (l2.has_crawl = 1))), (0)::bigint) AS current_streak_weeks\n   FROM label l\n  GROUP BY user_id;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "00_Open_Work",
+    "definition": " SELECT source,\n    status,\n    item_count\n   FROM ( SELECT 'user_feedback'::text AS source,\n            user_feedback.status,\n            (count(*))::integer AS item_count\n           FROM user_feedback\n          GROUP BY user_feedback.status\n        UNION ALL\n         SELECT 'user_contactus'::text AS source,\n            user_contactus.status,\n            (count(*))::integer AS item_count\n           FROM user_contactus\n          GROUP BY user_contactus.status\n        UNION ALL\n         SELECT 'route_submissions'::text AS source,\n            route_submissions.status,\n            (count(*))::integer AS item_count\n           FROM route_submissions\n          GROUP BY route_submissions.status) t\n  ORDER BY\n        CASE status\n            WHEN 'new'::text THEN 1\n            WHEN 'open'::text THEN 2\n            WHEN 'closed'::text THEN 3\n            ELSE 4\n        END, source;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "analytics_daily_active_users",
+    "definition": " SELECT (date_trunc('day'::text, occurred_at))::date AS event_date,\n    count(DISTINCT user_id) FILTER (WHERE (user_id IS NOT NULL)) AS signed_in_users,\n    count(DISTINCT anonymous_id) FILTER (WHERE ((user_id IS NULL) AND (anonymous_id IS NOT NULL))) AS anonymous_users,\n    count(DISTINCT COALESCE((user_id)::text, anonymous_id)) AS active_identities,\n    count(DISTINCT session_id) AS sessions,\n    count(*) AS total_events,\n    count(*) FILTER (WHERE (event_name = 'app_opened'::text)) AS app_opens,\n    count(*) FILTER (WHERE (event_name = 'screen_viewed'::text)) AS screen_views\n   FROM user_events\n  GROUP BY ((date_trunc('day'::text, occurred_at))::date)\n  ORDER BY ((date_trunc('day'::text, occurred_at))::date) DESC;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "analytics_rating_funnel_daily",
+    "definition": " SELECT (date_trunc('day'::text, occurred_at))::date AS event_date,\n    count(*) FILTER (WHERE (event_name = 'rating_started'::text)) AS rating_started,\n    count(*) FILTER (WHERE (event_name = 'rating_completed'::text)) AS rating_completed,\n    count(*) FILTER (WHERE (event_name = ANY (ARRAY['rating_abandoned'::text, 'rating_failed'::text, 'rating_validation_failed'::text]))) AS rating_not_completed,\n    count(*) FILTER (WHERE (event_name = 'rating_abandoned'::text)) AS rating_abandoned,\n    count(*) FILTER (WHERE (event_name = 'rating_failed'::text)) AS rating_failed,\n    count(*) FILTER (WHERE (event_name = 'rating_validation_failed'::text)) AS rating_validation_failed,\n    round(((count(*) FILTER (WHERE (event_name = 'rating_completed'::text)))::numeric / (NULLIF(count(*) FILTER (WHERE (event_name = 'rating_started'::text)), 0))::numeric), 4) AS completion_rate\n   FROM user_events\n  WHERE (event_name ~~ 'rating_%'::text)\n  GROUP BY ((date_trunc('day'::text, occurred_at))::date)\n  ORDER BY ((date_trunc('day'::text, occurred_at))::date) DESC;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "analytics_crawl_funnel_daily",
+    "definition": " SELECT (date_trunc('day'::text, occurred_at))::date AS event_date,\n    count(*) FILTER (WHERE (event_name = 'crawl_started'::text)) AS crawl_started,\n    count(*) FILTER (WHERE (event_name = 'crawl_viewed'::text)) AS crawl_viewed,\n    count(*) FILTER (WHERE (event_name = 'crawl_resumed'::text)) AS crawl_resumed,\n    count(*) FILTER (WHERE (event_name = 'crawl_saved'::text)) AS crawl_saved,\n    count(*) FILTER (WHERE (event_name = 'crawl_completed'::text)) AS crawl_completed,\n    count(*) FILTER (WHERE (event_name = 'crawl_abandoned'::text)) AS crawl_abandoned,\n    count(*) FILTER (WHERE ((event_name = 'rating_completed'::text) AND (crawl_id IS NOT NULL))) AS crawl_ratings_completed,\n    round(((count(*) FILTER (WHERE (event_name = 'crawl_completed'::text)))::numeric / (NULLIF(count(*) FILTER (WHERE (event_name = ANY (ARRAY['crawl_started'::text, 'crawl_resumed'::text, 'crawl_viewed'::text]))), 0))::numeric), 4) AS rough_completion_rate\n   FROM user_events\n  WHERE ((event_name ~~ 'crawl_%'::text) OR ((event_name = 'rating_completed'::text) AND (crawl_id IS NOT NULL)))\n  GROUP BY ((date_trunc('day'::text, occurred_at))::date)\n  ORDER BY ((date_trunc('day'::text, occurred_at))::date) DESC;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "analytics_discovery_daily",
+    "definition": " SELECT (date_trunc('day'::text, occurred_at))::date AS event_date,\n    count(*) FILTER (WHERE (event_name = 'restaurant_search_results_viewed'::text)) AS restaurant_searches_with_results,\n    count(*) FILTER (WHERE (event_name = 'restaurant_search_empty'::text)) AS restaurant_search_empty,\n    count(*) FILTER (WHERE (event_name = 'restaurant_search_failed'::text)) AS restaurant_search_failed,\n    count(*) FILTER (WHERE (event_name = 'restaurant_search_result_selected'::text)) AS restaurant_search_result_selected,\n    count(*) FILTER (WHERE (event_name = 'restaurant_profile_viewed'::text)) AS restaurant_profile_views,\n    count(*) FILTER (WHERE (event_name = 'directions_tapped'::text)) AS directions_taps,\n    count(*) FILTER (WHERE (event_name = 'map_opened'::text)) AS map_opens,\n    count(*) FILTER (WHERE (event_name = ANY (ARRAY['screen_load_failed'::text, 'api_request_failed'::text, 'external_maps_failed'::text]))) AS failures,\n    count(*) FILTER (WHERE (event_name = 'screen_load_slow'::text)) AS slow_screens\n   FROM user_events\n  GROUP BY ((date_trunc('day'::text, occurred_at))::date)\n  ORDER BY ((date_trunc('day'::text, occurred_at))::date) DESC;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "analytics_route_performance_daily",
+    "definition": " SELECT (date_trunc('day'::text, occurred_at))::date AS event_date,\n    route_id,\n    count(DISTINCT COALESCE((user_id)::text, anonymous_id)) AS unique_identities,\n    count(*) FILTER (WHERE (event_name = ANY (ARRAY['crawl_viewed'::text, 'crawl_resumed'::text]))) AS crawl_views,\n    count(*) FILTER (WHERE (event_name = 'crawl_started'::text)) AS crawl_starts,\n    count(*) FILTER (WHERE (event_name = 'crawl_saved'::text)) AS crawl_saves,\n    count(*) FILTER (WHERE (event_name = 'crawl_completed'::text)) AS crawl_completions,\n    count(*) FILTER (WHERE (event_name = 'rating_completed'::text)) AS ratings_completed,\n    count(*) FILTER (WHERE (event_name = 'leaderboard_viewed'::text)) AS leaderboard_views\n   FROM user_events\n  WHERE (route_id IS NOT NULL)\n  GROUP BY ((date_trunc('day'::text, occurred_at))::date), route_id\n  ORDER BY ((date_trunc('day'::text, occurred_at))::date) DESC;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "analytics_destination_performance_daily",
+    "definition": " SELECT (date_trunc('day'::text, occurred_at))::date AS event_date,\n    destination_id,\n    count(DISTINCT COALESCE((user_id)::text, anonymous_id)) AS unique_identities,\n    count(*) FILTER (WHERE (event_name = 'restaurant_profile_viewed'::text)) AS profile_views,\n    count(*) FILTER (WHERE (event_name = 'directions_tapped'::text)) AS directions_taps,\n    count(*) FILTER (WHERE (event_name = 'rating_started'::text)) AS rating_starts,\n    count(*) FILTER (WHERE (event_name = 'rating_completed'::text)) AS rating_completions,\n    count(*) FILTER (WHERE (event_name = 'share_completed'::text)) AS shares\n   FROM user_events\n  WHERE (destination_id IS NOT NULL)\n  GROUP BY ((date_trunc('day'::text, occurred_at))::date), destination_id\n  ORDER BY ((date_trunc('day'::text, occurred_at))::date) DESC;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "analytics_agent_restaurant_summary",
+    "definition": " WITH event_30d AS (\n         SELECT user_events.destination_id,\n            count(*) FILTER (WHERE (user_events.event_name = 'restaurant_profile_viewed'::text)) AS profile_views_30d,\n            count(*) FILTER (WHERE (user_events.event_name = 'directions_tapped'::text)) AS directions_taps_30d,\n            count(*) FILTER (WHERE (user_events.event_name = 'rating_started'::text)) AS rating_starts_30d,\n            count(*) FILTER (WHERE (user_events.event_name = 'rating_completed'::text)) AS event_rating_completions_30d,\n            count(*) FILTER (WHERE (user_events.event_name = 'share_completed'::text)) AS shares_30d\n           FROM user_events\n          WHERE ((user_events.destination_id IS NOT NULL) AND (user_events.occurred_at >= (now() - '30 days'::interval)))\n          GROUP BY user_events.destination_id\n        ), rating_facts AS (\n         SELECT destination_ratings.destination_id,\n            count(*) AS rating_count,\n            avg(destination_ratings.weight_score) AS avg_weight_score,\n            avg(destination_ratings.overall) AS avg_overall,\n            max(destination_ratings.created_at) AS last_rated_at\n           FROM destination_ratings\n          GROUP BY destination_ratings.destination_id\n        )\n SELECT d.id AS destination_id,\n    d.name AS destination_name,\n    d.city,\n    d.state_id,\n    COALESCE(r.rating_count, (0)::bigint) AS rating_count,\n    round(r.avg_weight_score, 2) AS avg_weight_score,\n    round(r.avg_overall, 2) AS avg_overall,\n    r.last_rated_at,\n    COALESCE(e.profile_views_30d, (0)::bigint) AS profile_views_30d,\n    COALESCE(e.directions_taps_30d, (0)::bigint) AS directions_taps_30d,\n    COALESCE(e.rating_starts_30d, (0)::bigint) AS rating_starts_30d,\n    COALESCE(e.event_rating_completions_30d, (0)::bigint) AS event_rating_completions_30d,\n    COALESCE(e.shares_30d, (0)::bigint) AS shares_30d\n   FROM ((destinations d\n     LEFT JOIN rating_facts r ON ((r.destination_id = d.id)))\n     LEFT JOIN event_30d e ON ((e.destination_id = d.id)));",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "analytics_agent_route_summary",
+    "definition": " WITH event_30d AS (\n         SELECT user_events.route_id,\n            count(DISTINCT COALESCE((user_events.user_id)::text, user_events.anonymous_id)) AS unique_identities_30d,\n            count(*) FILTER (WHERE (user_events.event_name = ANY (ARRAY['crawl_viewed'::text, 'crawl_resumed'::text]))) AS crawl_views_30d,\n            count(*) FILTER (WHERE (user_events.event_name = 'crawl_started'::text)) AS crawl_starts_30d,\n            count(*) FILTER (WHERE (user_events.event_name = 'crawl_completed'::text)) AS crawl_completions_30d,\n            count(*) FILTER (WHERE (user_events.event_name = 'rating_completed'::text)) AS ratings_completed_30d\n           FROM user_events\n          WHERE ((user_events.route_id IS NOT NULL) AND (user_events.occurred_at >= (now() - '30 days'::interval)))\n          GROUP BY user_events.route_id\n        ), crawl_facts AS (\n         SELECT crawls.route_id,\n            count(*) AS all_crawls,\n            count(*) FILTER (WHERE ((crawls.status = 'completed'::text) OR (crawls.end_time IS NOT NULL))) AS completed_crawls,\n            max(COALESCE(crawls.end_time, crawls.start_time)) AS last_crawl_at\n           FROM crawls\n          WHERE (crawls.route_id IS NOT NULL)\n          GROUP BY crawls.route_id\n        )\n SELECT r.id AS route_id,\n    r.title,\n    r.city,\n    r.is_public,\n    r.is_token_route,\n    COALESCE(c.all_crawls, (0)::bigint) AS all_crawls,\n    COALESCE(c.completed_crawls, (0)::bigint) AS completed_crawls,\n    c.last_crawl_at,\n    COALESCE(e.unique_identities_30d, (0)::bigint) AS unique_identities_30d,\n    COALESCE(e.crawl_views_30d, (0)::bigint) AS crawl_views_30d,\n    COALESCE(e.crawl_starts_30d, (0)::bigint) AS crawl_starts_30d,\n    COALESCE(e.crawl_completions_30d, (0)::bigint) AS crawl_completions_30d,\n    COALESCE(e.ratings_completed_30d, (0)::bigint) AS ratings_completed_30d\n   FROM ((routes r\n     LEFT JOIN crawl_facts c ON ((c.route_id = r.id)))\n     LEFT JOIN event_30d e ON ((e.route_id = r.id)));",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "analytics_agent_growth_opportunities",
+    "definition": " SELECT 'search_empty'::text AS opportunity_type,\n    NULL::uuid AS destination_id,\n    NULL::uuid AS route_id,\n    NULL::integer AS state_id,\n    (date_trunc('day'::text, user_events.occurred_at))::date AS event_date,\n    count(*) AS signal_count,\n    jsonb_build_object('screen', user_events.screen) AS context\n   FROM user_events\n  WHERE (user_events.event_name = 'restaurant_search_empty'::text)\n  GROUP BY ((date_trunc('day'::text, user_events.occurred_at))::date), user_events.screen\nUNION ALL\n SELECT 'restaurant_interest_no_rating'::text AS opportunity_type,\n    user_events.destination_id,\n    NULL::uuid AS route_id,\n    NULL::integer AS state_id,\n    (date_trunc('day'::text, user_events.occurred_at))::date AS event_date,\n    count(*) AS signal_count,\n    jsonb_build_object('profile_views', count(*) FILTER (WHERE (user_events.event_name = 'restaurant_profile_viewed'::text)), 'directions_taps', count(*) FILTER (WHERE (user_events.event_name = 'directions_tapped'::text)), 'rating_completions', count(*) FILTER (WHERE (user_events.event_name = 'rating_completed'::text))) AS context\n   FROM user_events\n  WHERE ((user_events.destination_id IS NOT NULL) AND (user_events.event_name = ANY (ARRAY['restaurant_profile_viewed'::text, 'directions_tapped'::text, 'rating_completed'::text])))\n  GROUP BY user_events.destination_id, ((date_trunc('day'::text, user_events.occurred_at))::date)\n HAVING ((count(*) FILTER (WHERE (user_events.event_name = ANY (ARRAY['restaurant_profile_viewed'::text, 'directions_tapped'::text]))) >= 3) AND (count(*) FILTER (WHERE (user_events.event_name = 'rating_completed'::text)) = 0));",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "referral_reporting_daily",
+    "definition": " SELECT (date_trunc('day'::text, COALESCE(a.clicked_at, a.created_at)))::date AS report_date,\n    COALESCE(a.source, 'unknown'::text) AS source,\n    COALESCE(a.campaign, 'none'::text) AS campaign,\n    COALESCE(a.placement, 'unknown'::text) AS placement,\n    count(*) AS link_opens,\n    count(*) FILTER (WHERE (a.invitee_user_id IS NOT NULL)) AS attributed_signups,\n    count(*) FILTER (WHERE (a.status = ANY (ARRAY['qualified'::text, 'rewarded'::text, 'reversed'::text]))) AS qualified_referrals,\n    round(((100.0 * (count(*) FILTER (WHERE (a.status = ANY (ARRAY['qualified'::text, 'rewarded'::text, 'reversed'::text]))))::numeric) / (NULLIF(count(*) FILTER (WHERE (a.invitee_user_id IS NOT NULL)), 0))::numeric), 2) AS signup_to_first_rating_percent,\n    avg((a.qualified_at - a.signed_up_at)) FILTER (WHERE ((a.qualified_at IS NOT NULL) AND (a.signed_up_at IS NOT NULL))) AS average_time_to_qualification,\n    (COALESCE(sum(r.reward_cost_xp), (0)::numeric))::bigint AS reward_cost_xp,\n    count(*) FILTER (WHERE (a.review_status = ANY (ARRAY['flagged'::text, 'under_review'::text, 'rejected'::text]))) AS suspicious_or_rejected\n   FROM (referral_attributions a\n     LEFT JOIN ( SELECT referral_rewards.referral_attribution_id,\n            sum(referral_rewards.reward_amount) FILTER (WHERE (referral_rewards.reward_amount > 0)) AS reward_cost_xp\n           FROM referral_rewards\n          GROUP BY referral_rewards.referral_attribution_id) r ON ((r.referral_attribution_id = a.id)))\n  GROUP BY ((date_trunc('day'::text, COALESCE(a.clicked_at, a.created_at)))::date), COALESCE(a.source, 'unknown'::text), COALESCE(a.campaign, 'none'::text), COALESCE(a.placement, 'unknown'::text);",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "referral_funnel_summary",
+    "definition": " SELECT ( SELECT count(*) AS count\n           FROM user_events\n          WHERE (user_events.event_name = 'referral_share_completed'::text)) AS invitations_shared,\n    ( SELECT count(*) AS count\n           FROM referral_attributions\n          WHERE (referral_attributions.clicked_at IS NOT NULL)) AS link_opens,\n    ( SELECT count(*) AS count\n           FROM referral_attributions\n          WHERE (referral_attributions.invitee_user_id IS NOT NULL)) AS attributed_signups,\n    ( SELECT count(*) AS count\n           FROM referral_attributions\n          WHERE (referral_attributions.status = ANY (ARRAY['qualified'::text, 'rewarded'::text, 'reversed'::text]))) AS qualified_referrals,\n    round(((100.0 * (( SELECT count(*) AS count\n           FROM referral_attributions\n          WHERE (referral_attributions.status = ANY (ARRAY['qualified'::text, 'rewarded'::text, 'reversed'::text]))))::numeric) / (NULLIF(( SELECT count(*) AS count\n           FROM referral_attributions\n          WHERE (referral_attributions.invitee_user_id IS NOT NULL)), 0))::numeric), 2) AS signup_to_first_rating_percent,\n    ( SELECT avg((referral_attributions.qualified_at - referral_attributions.signed_up_at)) AS avg\n           FROM referral_attributions\n          WHERE ((referral_attributions.qualified_at IS NOT NULL) AND (referral_attributions.signed_up_at IS NOT NULL))) AS average_time_to_qualification,\n    ( SELECT COALESCE(sum(referral_rewards.reward_amount), (0)::bigint) AS \"coalesce\"\n           FROM referral_rewards\n          WHERE (referral_rewards.reward_amount > 0)) AS reward_cost_xp,\n    (( SELECT COALESCE(avg(q.referral_count), (0)::numeric) AS \"coalesce\"\n           FROM ( SELECT (count(*))::numeric AS referral_count\n                   FROM referral_attributions\n                  WHERE (referral_attributions.status = ANY (ARRAY['qualified'::text, 'rewarded'::text, 'reversed'::text]))\n                  GROUP BY referral_attributions.inviter_user_id) q))::numeric(12,2) AS qualified_referrals_per_inviter,\n    ( SELECT (user_events.metadata ->> 'placement'::text)\n           FROM user_events\n          WHERE ((user_events.event_name = 'referral_share_completed'::text) AND (user_events.metadata ? 'placement'::text))\n          GROUP BY (user_events.metadata ->> 'placement'::text)\n          ORDER BY (count(*)) DESC\n         LIMIT 1) AS top_share_placement,\n    ( SELECT count(*) AS count\n           FROM referral_attributions\n          WHERE ((referral_attributions.status = 'rejected'::text) OR (referral_attributions.review_status = ANY (ARRAY['flagged'::text, 'under_review'::text, 'rejected'::text])))) AS rejected_or_suspicious,\n    round(((100.0 * (( SELECT count(DISTINCT a.invitee_user_id) AS count\n           FROM referral_attributions a\n          WHERE ((a.qualified_at IS NOT NULL) AND (EXISTS ( SELECT 1\n                   FROM destination_ratings dr\n                  WHERE ((dr.user_id = a.invitee_user_id) AND (dr.created_at >= (a.qualified_at + '7 days'::interval))))))))::numeric) / (NULLIF(( SELECT count(*) AS count\n           FROM referral_attributions\n          WHERE (referral_attributions.qualified_at IS NOT NULL)), 0))::numeric), 2) AS referred_user_7d_return_percent;",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "buffacoin_rating_reconciliation",
+    "definition": " SELECT o.operation_id,\n    ((l.id IS NOT NULL) AND (l.delta = (- o.coin_cost))) AS debit_matches,\n    ((r.id IS NOT NULL) AND (r.user_id = o.user_id) AND (r.crawl_id = o.crawl_id)) AS rating_matches,\n    ((c.crawl_id IS NOT NULL) AND (c.user_id = o.user_id)) AS crawl_matches\n   FROM (((buffacoin_rating_operations o\n     LEFT JOIN buffacoin_ledger l ON ((l.id = o.debit_ledger_id)))\n     LEFT JOIN destination_ratings r ON ((r.id = o.rating_id)))\n     LEFT JOIN crawls c ON ((c.crawl_id = o.crawl_id)));",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "social_feed_v2",
+    "definition": " SELECT ('rating:'::text || (dr.id)::text) AS event_id,\n    'restaurant_rating'::text AS event_type,\n    dr.user_id,\n    u.username,\n    u.avatar_url,\n    dr.created_at AS occurred_at,\n    dr.id AS rating_id,\n    d.id AS subject_id,\n    d.name AS subject_name,\n    d.city AS subject_town,\n    d.state_id AS subject_state_id,\n    dr.weight_score AS score,\n    COALESCE(dr.is_buffacoin, false) AS is_buffacoin,\n    NULL::integer AS stop_count\n   FROM ((destination_ratings dr\n     JOIN destinations d ON ((d.id = dr.destination_id)))\n     JOIN users u ON ((u.user_id = dr.user_id)))\n  WHERE can_user_appear_socially(dr.user_id)\nUNION ALL\n SELECT ('crawl_completed:'::text || (c.crawl_id)::text) AS event_id,\n    'crawl_completed'::text AS event_type,\n    c.user_id,\n    u.username,\n    u.avatar_url,\n    COALESCE(c.end_time, c.start_time) AS occurred_at,\n    NULL::uuid AS rating_id,\n    c.crawl_id AS subject_id,\n    COALESCE(r.title, 'Wing crawl'::text) AS subject_name,\n    COALESCE(r.city, first_stop.city) AS subject_town,\n    first_stop.state_id AS subject_state_id,\n    NULL::numeric AS score,\n    false AS is_buffacoin,\n    ( SELECT (count(*))::integer AS count\n           FROM unnest(ARRAY[r.stop1_id, r.stop2_id, r.stop3_id, r.stop4_id, r.stop5_id]) stop_id(stop_id)\n          WHERE (stop_id.stop_id IS NOT NULL)) AS stop_count\n   FROM (((crawls c\n     JOIN users u ON ((u.user_id = c.user_id)))\n     LEFT JOIN routes r ON ((r.id = c.route_id)))\n     LEFT JOIN destinations first_stop ON ((first_stop.id = r.stop1_id)))\n  WHERE ((c.status = 'completed'::text) AND (c.end_time IS NOT NULL) AND can_user_appear_socially(c.user_id));",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "v_social_feed",
+    "definition": " SELECT dr.user_id,\n    dr.weight_score,\n    dr.created_at,\n    d.id AS destination_id,\n    d.name AS destination_name,\n    d.city AS destination_city,\n    d.state_id AS destination_state_id,\n    u.username,\n    dr.id AS rating_id,\n    u.avatar_url\n   FROM ((destination_ratings dr\n     JOIN destinations d ON ((d.id = dr.destination_id)))\n     JOIN users u ON ((u.user_id = dr.user_id)))\n  WHERE can_user_appear_socially(dr.user_id);",
+    "options": null
+  },
+  {
+    "schema": "public",
+    "name": "buffaverse_event_feed",
+    "definition": " SELECT id,\n    event_type_id,\n    event_type_version,\n    lifecycle_status,\n    geographic_scope,\n    state_id,\n    geography_key,\n    starts_at,\n    ends_at,\n    progress_model,\n    progress_target,\n    reward_reference_kind,\n    reward_reference_key,\n    title,\n    summary,\n    display_metadata,\n    updated_at\n   FROM buffaverse_event_instances event\n  WHERE ((lifecycle_status = ANY (ARRAY['scheduled'::text, 'active'::text])) AND (ends_at > now()))\n  ORDER BY\n        CASE lifecycle_status\n            WHEN 'active'::text THEN 0\n            ELSE 1\n        END, starts_at, id;",
+    "options": [
+      "security_invoker=true"
+    ]
+  },
+  {
+    "schema": "public",
+    "name": "buffaverse_admin_event_visibility",
+    "definition": " SELECT event.id,\n    event.event_type_id,\n    event.event_type_version,\n    event.lifecycle_status,\n    event.geographic_scope,\n    event.state_id,\n    event.geography_key,\n    event.starts_at,\n    event.ends_at,\n    event.feature_flag_key,\n    flag.enabled AS feature_flag_enabled,\n    event.source,\n    event.correlation_id,\n    event.created_at,\n    event.updated_at,\n    ( SELECT max(history.occurred_at) AS max\n           FROM buffaverse_event_lifecycle_history history\n          WHERE (history.event_instance_id = event.id)) AS last_transition_at,\n    ( SELECT (count(*))::integer AS count\n           FROM buffaverse_event_lifecycle_history history\n          WHERE (history.event_instance_id = event.id)) AS transition_count\n   FROM (buffaverse_event_instances event\n     JOIN buffaverse_feature_flags flag ON ((flag.flag_key = event.feature_flag_key)));",
+    "options": [
+      "security_invoker=true"
+    ]
+  },
+  {
+    "schema": "public",
+    "name": "mango_pending_restaurants",
+    "definition": " SELECT id,\n    user_id,\n    state_id,\n    restaurant_name,\n    address,\n    created_at,\n    verification_evidence\n   FROM destination_suggestions s\n  WHERE (NOT (EXISTS ( SELECT 1\n           FROM restaurant_suggestion_reviews r\n          WHERE (r.suggestion_id = s.id))));",
+    "options": [
+      "security_invoker=true"
+    ]
+  }
+]

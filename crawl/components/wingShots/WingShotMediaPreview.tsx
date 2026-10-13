@@ -28,7 +28,7 @@ export function WingShotMediaPreview({ media, disabled = false, onReplace, onRem
 
 const styles = StyleSheet.create({
   card: { borderRadius: 18, overflow: 'hidden', backgroundColor: '#1D2430' },
-  image: { width: '100%', minHeight: 220, aspectRatio: 4 / 3 },
+  image: { width: '100%', aspectRatio: 1 },
   actions: { flexDirection: 'row', gap: 12, padding: 12 },
   secondaryButton: { flex: 1, minHeight: 48, borderRadius: 12, borderWidth: 1, borderColor: '#F2A93B', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 12 },
   secondaryButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },

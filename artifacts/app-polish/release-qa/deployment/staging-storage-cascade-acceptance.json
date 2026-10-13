@@ -1,0 +1,42 @@
+{
+  "target": "http://127.0.0.1:55321",
+  "realServices": true,
+  "receipts": [
+    {
+      "name": "actual worker produces protected derivatives and preserves cropped original in review",
+      "status": "PASS",
+      "files": [
+        {
+          "label": "original",
+          "bytes": 23356,
+          "sha256": "7bb23df27c6e18da1f96a3032bd2485b573e36b7a88b138bc57a8b5640f5eb14"
+        },
+        {
+          "label": "primary",
+          "bytes": 17937,
+          "sha256": "43bff7015434f42d07f54b73794fa8a27db49db735c21ee20bc69567a9427b2d"
+        },
+        {
+          "label": "thumbnail",
+          "bytes": 16494,
+          "sha256": "dfc8146f6c55138249cc55632b824fa2993ae5e134caf04ccec6152139cb2758"
+        }
+      ],
+      "attempts": 2,
+      "receiptCount": 5,
+      "moderationMode": "actual manual-review provider; no live model/provider and no fake repository"
+    },
+    {
+      "name": "real private Storage signed URL expires and guests cannot download originals directly",
+      "status": "PASS"
+    },
+    {
+      "name": "real Auth account deletion cascades votes and stale token cannot vote",
+      "status": "PASS"
+    },
+    {
+      "name": "real media deletion cascades both vote stores counts and original audit snapshots",
+      "status": "PASS"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+// Copy only the known, opt-in synthetic crop produced by the emulator fixture.
+import { execFileSync } from 'node:child_process';
+import { writeFileSync } from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+const bundle=await fetch('http://127.0.0.1:8086/node_modules/expo-router/entry.bundle?platform=android&dev=true&minify=false');
+const source=await bundle.text();assert.ok(bundle.ok&&source.includes('Fixture network boundary blocked')&&source.includes('[AppPolishFixture] confirmed crop'));
+const adb=path.join(process.env.LOCALAPPDATA,'Android/Sdk/platform-tools/adb.exe');
+const run=(...args)=>execFileSync(adb,['-s','emulator-5554',...args],{maxBuffer:30*1024*1024,timeout:30000});
+const log=run('logcat','-d','-s','ReactNativeJS:V').toString().split('\n').filter(line=>line.includes('[AppPolishFixture] confirmed crop')).at(-1);
+const matched=log?.match(/(\{"crop":.*\})'/);assert.ok(matched,'Missing synthetic crop diagnostics');
+const meta=JSON.parse(matched[1]);
+assert.match(meta.uri,/^file:\/\/\/data\/user\/0\/com\.buffago\.app\/cache\/ImageManipulator\/[a-f0-9-]+\.jpg$/);
+assert.ok(meta.crop.originX>=0&&meta.crop.originY>=0&&meta.crop.originX+meta.crop.width<=1800&&meta.crop.originY+meta.crop.height<=1200);
+const relative=meta.uri.replace('file:///data/user/0/com.buffago.app/','');
+const size=Number(run('shell','run-as','com.buffago.app','stat','-c','%s',relative).toString().trim());
+assert.ok(size>0&&size<20*1024*1024);
+const bytes=run('exec-out','run-as','com.buffago.app','cat',relative);assert.equal(bytes.length,size);
+const out=new URL('../../../artifacts/app-polish/release-qa/native/',import.meta.url);
+writeFileSync(new URL('pinch-confirmed-upload.jpg',out),bytes);
+writeFileSync(new URL('pinch-crop.json',out),JSON.stringify({...meta,size,source:'synthetic landscape grid; local emulator only'},null,2));
+console.log(JSON.stringify({size,crop:meta.crop,networkUploadPerformed:false}));

@@ -29,6 +29,7 @@ test('actual Deno handler and pinned Supabase SDK enforce asset fallback, fields
         assert.equal(url.searchParams.get('user_id'),'not.is.null');
         const selected=url.searchParams.get('id');res.end(JSON.stringify(selected?rows.filter(row=>'eq.'+row.id===selected):rows));return;
       }
+      if(url.pathname==='/rest/v1/wing_jury_photo_vote_counts') {res.end(JSON.stringify(rows.map(row=>({submission_id:row.id,like_count:row.like_count,dislike_count:row.dislike_count,neutral_count:0}))));return;}
       if(url.pathname==='/storage/v1/object/sign/wing-submissions' && req.method==='POST') {
         const data=JSON.parse(body);assert.equal(data.expiresIn,300);
         res.end(JSON.stringify(data.paths.map(path=>{
