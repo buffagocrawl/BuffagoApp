@@ -18,7 +18,7 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
 const app = express();
 app.use(localRequestsOnly(port));
 app.use(express.json({ limit: '64kb' }));
-const approval = createApprovalService({ backend: supabase, reviewer: process.env.MANGO_REVIEWER_ID });
+const approval = createApprovalService({ backend: supabase, reviewer: process.env.MANGO_REVIEWER_ID, log });
 app.get('/api/submissions/:id/progress', (req, res) => res.json({ phase: approval.progress(req.params.id.toLowerCase()) }));
 const correlation = () => crypto.randomUUID();
 const idempotency = (prefix, id) => `${prefix}-${id}-${crypto.randomUUID()}`;
