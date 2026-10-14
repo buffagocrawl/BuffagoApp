@@ -2,12 +2,18 @@
 
 ## Scope and root cause
 
-Branch: `fix/wingdex-wingman-and-photo-controls`, isolated at
-`C:/Users/Brand/repo/buffago-wingdex-fix` from HEAD `335cc5f`.
-The original working tree's `crawl/app.config.js` version change remains untouched.
-The isolated worktree retains version **1.0.6**. Carry the original **1.0.7**
-version bump into this worktree before building if that is the intended release version.
-Repository README and SECURITY instructions were reviewed; no applicable AGENTS.md was present.
+Branch: `fix/wingdex-wingman-and-photo-controls`.
+The only editing/build workspace is `C:/Users/Brand/repo/BuffagoApp/crawl`.
+App config version is **1.0.7**, with the existing iOS build number **10** and
+Android version code **6** preserved. Future branch changes stay in BuffagoApp;
+no alternate project folder or worktree is authorized.
+
+The completed task changes were already merged into the normal workspace through
+PR #29. The mistaken worktree had no uncommitted source or required untracked
+source files. Its tracked tree differed only by the older app version. All 48
+useful local QA evidence files were copied into the normal workspace and verified
+by SHA-256 before worktree removal. Dependencies, caches and generated builds
+were not copied.
 
 In the tracked history, `72b6bb7` introduced the Wingdex Wingman integration
 through `ListEmptyComponent`, rather than a persistent header action. Subsequent
@@ -18,7 +24,7 @@ that add-restaurant CTA. The dialog and callbacks themselves remain intact.
 No Wingman rollout flag gates this screen. `ENABLE_SAVED_DESTINATIONS` controls
 saved collections and `ENABLE_WING_JURY` controls the separate Jury entry.
 There is no evidence in this history of a persistent Wingman button being removed;
-the supported root cause is conditional-only discoverability.
+the original change expanded discoverability; the requested final behavior is empty-results-only.
 
 Main restaurant cards render the shared `WingdexPhotoGallery` with `embedded`
 and `compact`. The shared gallery rendered `PhotoVoteControls` unconditionally,
@@ -56,7 +62,8 @@ Vote calculations, service contracts and restaurant-reveal content remain unchan
   Pass shared vote errors and retry to the viewer.
 - `components/WingdexPhotoViewer.jsx`: show shared vote-load errors and retry
   through the parent gallery, preserving the shared controller and selected state.
-- `tests/wingman-search-prefill.test.mjs`: persistent entry and callback regression.
+- `tests/wingman-search-prefill.test.mjs`: header absence, executed empty-state
+  JSX branch/callback checks, exact search prefill and dialog reset regressions.
 - `tests/wingdex-gallery-device.test.mjs`: rendered main-card vote absence,
   swipe/counter/selected photo behavior and shared viewer vote state.
 - `tests/wingdex-photo-viewer.test.mjs`: shared vote-load failure/retry regression.
@@ -80,7 +87,20 @@ manual-review submission, duplicate prevention, rate limiting, SQL and Edge
 Functions were not modified. Default gallery voting remains enabled in detail;
 Wing Jury's controls and shared vote event subscription remain intact.
 
-## Verification
+## Workspace correction verification (2026-10-13)
+
+- Focused UI run: **114 passed, 0 failed, 0 skipped** across Wingman prefill and
+  guest onboarding, focus/framing, photo gallery/viewer, saved presentation,
+  Home viewer/quick actions and Wing Jury UI/results.
+- `npm run typecheck`: passed.
+- Relevant ESLint: **0 errors, 21 existing warnings** across the UI files.
+- `git diff --check`: passed. Mistaken worktree unregistered and folder removed;
+  worktree list contains only BuffagoApp and prune dry-run reports no stale metadata.
+- Logs are retained alongside the prior QA evidence as `consolidated-*.log`.
+- Emulator automation was not rerun. The native smoke script's entry expectations
+  now follow empty-results-only visibility; prior screenshots record the earlier UI.
+
+## Prior verification
 
 - Regression command: Node test files matching `wingman-*.test.mjs`,
   `wingdex-*.test.mjs`, `*wing-jury*.test.mjs`, `app-polish-*.test.mjs`,
@@ -122,7 +142,7 @@ success/failure/revisit/editor interactions on physical Android.
 
 Screenshots to review:
 
-- `wingdex-entry-and-clean-cards.png`: persistent action and photo without a vote row.
+- `wingdex-entry-and-clean-cards.png`: prior header action and photo without a vote row (historical evidence).
 - `wingman-open.png`: existing popup, focused name input and Android keyboard.
 - `card-swiped-second-photo.png`: second card photo and updated counter.
 - `viewer-voting.png` / `viewer-vote-selected.png`: selected photo, vote controls,

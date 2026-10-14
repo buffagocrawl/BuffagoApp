@@ -2,21 +2,66 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
+import ts from 'typescript';
 
 const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 const screen = read('app/(tabs)/ratings/index.jsx');
 const dialog = read('components/WingmanAddDialog.jsx');
 
-test('Wingman add-place entry is in the persistent header regardless of flags or results', () => {
+test('Wingman is absent from the header and remains wired to the existing dialog', () => {
   const header = screen.slice(screen.indexOf('<Searchbar'), screen.indexOf('<Animated.FlatList'));
-  assert.match(header, /<Button mode="contained-tonal" icon="plus" accessibilityLabel="Wingman: Add a place" testID="wingdex-wingman-entry"\s+onPress=\{\(\) => void openWingman\('wingdex', query\)\}/);
-  assert.ok(header.indexOf('wingdex-wingman-entry') < header.indexOf('{loading ||'));
-  assert.match(header, /contentStyle=\{\{ minHeight: 48 \}\}/);
-  const entry = header.slice(header.indexOf('<Button mode="contained-tonal" icon="plus"'), header.indexOf('<View style={styles.discoveryToolbar}>'));
-  assert.doesNotMatch(entry, /ENABLE_|filtered|savedView|loading/);
+  assert.doesNotMatch(header, /Wingman: Add a place|wingdex-wingman-entry|openWingman\(/);
+  assert.match(screen, /data=\{displayedRows\}/);
   assert.match(screen, /onPickDestination=\{handleWingmanPickDestination\}/);
   assert.match(screen, /onManualReviewQueued=\{\(\) =>/);
 });
+
+// Evaluate the screen's actual empty-state JSX, including branch selection and callbacks.
+function emptyState(overrides = {}) {
+  const start = screen.indexOf('ListEmptyComponent={') + 'ListEmptyComponent={'.length;
+  const end = screen.indexOf('scrollEventThrottle={16}', start);
+  const expression = screen.slice(start, end).trim().replace(/}$/, '');
+  const calls = [];
+  const context = {
+    React: { createElement: (type, props) => ({ type, props }) }, FeedbackState: 'feedback',
+    styles: { emptyState: {} }, savedView: 'discover', saved: { listStatus: 'ready' },
+    filteredEmpty: false, locationMode: 'all', radiusMiles: 10, nextRadius: 25,
+    wingdexRadiusMessage: () => 'Radius empty', query: "  O'Brien Wings  ",
+    user: null, stateCodeFilter: null, selectedTagId: null, trackEvent() {},
+    clearFilters: () => calls.push('clear'), openWingman: (...args) => calls.push(args),
+    router: { push() {} }, ...overrides,
+  };
+  const code = ts.transpileModule(`const result = (${expression});`, {
+    compilerOptions: { jsx: ts.JsxEmit.React, target: ts.ScriptTarget.ES2022 }, fileName: 'empty.jsx',
+  }).outputText;
+  return { node: vm.runInNewContext(`${code} result`, context), calls, query: context.query };
+}
+
+for (const options of [
+  {}, { locationMode: 'radius' }, { filteredEmpty: true },
+  { savedView: 'favorites', filteredEmpty: true }, { savedView: 'want_to_try', filteredEmpty: true },
+  { savedView: 'favorites' }, { savedView: 'want_to_try' },
+]) {
+  test(`no matches offer Wingman with exact prefill: ${JSON.stringify(options)}`, () => {
+    const { node, calls, query } = emptyState(options);
+    const primary = node.props.actionLabel === 'Wingman: Add a place';
+    assert.equal(primary ? node.props.actionLabel : node.props.secondaryLabel, 'Wingman: Add a place');
+    (primary ? node.props.onAction : node.props.onSecondary)();
+    assert.deepEqual(calls, [['wingdex_empty_state', query]]);
+    if (options.filteredEmpty) {
+      node.props.onAction();
+      assert.equal(calls.at(-1), 'clear');
+    }
+  });
+}
+
+for (const listStatus of ['guest', 'error']) {
+  test(`saved ${listStatus} state keeps its recovery action without Wingman`, () => {
+    const { node } = emptyState({ savedView: 'favorites', saved: { listStatus, loadList() {} } });
+    assert.doesNotMatch(node.props.actionLabel, /Wingman/);
+    assert.equal(node.props.secondaryLabel, undefined);
+  });
+}
 
 test('Wingdex opens Wingman with the exact search and default launches clear it', async () => {
   const callback = screen.match(/const openWingman = useCallback\((async[\s\S]*?)\n  }, \[getWingmanStateContext/);

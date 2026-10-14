@@ -64,7 +64,7 @@ async function searchFor(text) {
 const response = await fetch(`http://127.0.0.1:${port}/node_modules/expo-router/entry.bundle?platform=android&dev=true&minify=false`, { signal: AbortSignal.timeout(60000) });
 assert.ok(response.ok);
 const bundle = await response.text();
-for (const marker of ['Fixture network boundary blocked', 'native-fixture.invalid', 'fixture-photo-1', 'wingdex-wingman-entry', 'showInlineVotes', 'home-destination-photo', 'Already favorited']) assert.ok(bundle.includes(marker), `Missing isolated/current bundle marker ${marker}`);
+for (const marker of ['Fixture network boundary blocked', 'native-fixture.invalid', 'fixture-photo-1', 'wingdex_empty_state', 'showInlineVotes', 'home-destination-photo', 'Already favorited']) assert.ok(bundle.includes(marker), `Missing isolated/current bundle marker ${marker}`);
 adb('reverse', `tcp:${port}`, `tcp:${port}`);
 adb('shell', 'input', 'keyevent', '224');
 adb('shell', 'wm', 'dismiss-keyguard');
@@ -73,9 +73,9 @@ adb('shell', 'am', 'start', '-a', 'android.intent.action.VIEW', '-d', `buffago:/
 await wait('Wingdex navigation');
 await tap('Wingdex navigation');
 if (!process.argv.includes('--saved-home-only')) {
-await wait('Wingman: Add a place');
 await wait('Open approved restaurant photo');
 let xml = state();
+assert.ok(!xml.includes('Wingman: Add a place'), 'Populated results must not show Wingman');
 assert.ok(!/content-desc="(?:Like|Dislike),/.test(xml), 'Main cards must not have inline voting');
 capture('wingdex-entry-and-clean-cards');
 const photo = find(xml, 'Open approved restaurant photo');
@@ -83,11 +83,6 @@ const [left, top, right, bottom] = photo.match(/bounds="\[(\d+),(\d+)\]\[(\d+),(
 adb('shell', 'input', 'swipe', String(right - 60), String((top + bottom) / 2), String(left + 60), String((top + bottom) / 2), '400');
 await wait('2 of 2');
 capture('card-swiped-second-photo');
-await tap('Wingman: Add a place');
-await wait('Wingman');
-capture('wingman-open');
-await tap('Close');
-await wait('Wingman: Add a place');
 await tap('Open approved restaurant photo');
 await wait('Close photo');
 await wait('2 of 2');
@@ -99,10 +94,11 @@ xml = await wait('Like, 1');
 assert.ok(find(xml, 'Like, 1').includes('selected="true"'), 'Viewer vote must remain selected');
 capture('viewer-vote-selected');
 await tap('Close photo');
-xml = await wait('Wingman: Add a place');
+xml = await wait('Open approved restaurant photo');
+assert.ok(!xml.includes('Wingman: Add a place'), 'Populated results must not show Wingman after viewer dismissal');
 assert.ok(!/content-desc="(?:Like|Dislike),/.test(xml), 'Returning from viewer must not reveal inline votes');
 capture('wingdex-after-viewer-vote');
-// A search with no matches must retain the header action and prefill the dialog.
+// A search with no matches exposes the empty-state action and prefills the dialog.
 const search = nodes(xml).find(node => node.includes('class="android.widget.EditText"'));
 assert.ok(search, 'Wingdex search input present');
 tapNode(search);
@@ -165,6 +161,6 @@ writeFileSync(path.join(out, 'acceptance.json'), JSON.stringify({
   status: 'PASS', environment: 'Android emulator development client, isolated synthetic native-visual fixtures',
   productionWrites: false, physicalDevice: false,
   runMode: process.argv.includes('--saved-home-only') ? 'saved-home-only' : 'all',
-  checks: [...(process.argv.includes('--saved-home-only') ? [] : ['persistent Wingman entry opens existing dialog with keyboard focus', 'main cards have no inline votes', 'card swipe updates counter and selected viewer photo', 'viewer vote updates count and selection', 'returning to cards keeps voting hidden', 'filtered empty results retain Wingman and prefill search']), 'four rated/unrated saved labels and favorite/Want to Try toggling', 'Home no-photo fallback', 'Home current photo opens and dismisses existing viewer with separate navigation retained'],
+  checks: [...(process.argv.includes('--saved-home-only') ? [] : ['Wingman is absent from populated results and opens from empty results with search prefill', 'main cards have no inline votes', 'card swipe updates counter and selected viewer photo', 'viewer vote updates count and selection', 'returning to cards keeps voting hidden', 'filtered empty results retain Wingman and prefill search']), 'four rated/unrated saved labels and favorite/Want to Try toggling', 'Home no-photo fallback', 'Home current photo opens and dismisses existing viewer with separate navigation retained'],
 }, null, 2));
 console.log(`PASS: ${out}`);

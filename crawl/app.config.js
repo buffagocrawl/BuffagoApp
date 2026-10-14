@@ -32,7 +32,7 @@ module.exports = ({ config }) => {
   ios: {
     supportsTablet: false,
     bundleIdentifier: "com.buffago.app",
-    buildNumber: "9",
+    buildNumber: "10",
     associatedDomains: ["applinks:buffago.com"],
   
     config: {
