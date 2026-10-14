@@ -11,7 +11,7 @@ import { loadWingdexFullPhoto } from '../lib/wingdexGallery';
 import PhotoVoteControls from './PhotoVoteControls';
 import { supabase } from '../lib/supabase';
 
-export default function WingdexPhotoViewer({ photos, selectedId, restaurantName, onClose, onPhotoChange, onMore, hasMore, totalCount, pageError, pageLoading, voteController, isVotePending, getVoteVersion, parentVotesReady }) {
+export default function WingdexPhotoViewer({ photos, selectedId, restaurantName, onClose, onPhotoChange, onMore, hasMore, totalCount, pageError, pageLoading, voteController, isVotePending, getVoteVersion, parentVotesReady, parentVoteError, onRetryVotes }) {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const [items, setItems] = useState(photos);
@@ -147,7 +147,7 @@ export default function WingdexPhotoViewer({ photos, selectedId, restaurantName,
   const ratio = resolution ? resolution.width / resolution.height : box.width / box.height;
   const imageWidth = Math.min(box.width, box.height * ratio);
   const imageHeight = imageWidth / ratio;
-  const visibleError = error || pageError || (!photo ? 'No photos available.' : null);
+  const visibleError = error || parentVoteError || pageError || (!photo ? 'No photos available.' : null);
   return <Modal visible animationType="fade" presentationStyle="fullScreen" onRequestClose={onClose}>
     <GestureHandlerRootView style={[styles.root, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <View style={styles.header}>
@@ -184,7 +184,8 @@ export default function WingdexPhotoViewer({ photos, selectedId, restaurantName,
       <View style={styles.footer}>
         {visibleError ? <View style={styles.message}><Text accessibilityRole="alert" style={styles.muted}>{visibleError}</Text>
           <Button textColor="#ffba77" disabled={pageLoading} onPress={() => {
-            if (pageError && !error) onMore?.();
+            if (parentVoteError && !error) onRetryVotes?.();
+            else if (pageError && !error) onMore?.();
             else { setReload((n) => n + 1); setVoteReload((n) => n + 1); }
           }}>Retry</Button></View> : null}
         <PhotoVoteControls photo={photo}
