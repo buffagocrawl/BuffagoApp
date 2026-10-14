@@ -2361,10 +2361,6 @@ export default function PublicRatingsScreen() {
           inputStyle={{ minHeight: 0 }}
         />
 
-        <Button mode="contained-tonal" icon="plus" accessibilityLabel="Wingman: Add a place" testID="wingdex-wingman-entry"
-          onPress={() => void openWingman('wingdex', query)} contentStyle={{ minHeight: 48 }} style={{ marginTop: 8, borderRadius: 12 }}>
-          Wingman: Add a place
-        </Button>
         <View style={styles.discoveryToolbar}>
           <Pressable accessibilityRole="button" accessibilityLabel={`Filters, ${activeFilterCount} active`} testID="wingdex-filters-entry" onPress={() => setFiltersOpen(true)} style={[styles.toolbarAction, { backgroundColor: colors.surfaceVariant }]}>
             <MaterialCommunityIcons name="tune-variant" size={18} color={colors.primary} />
@@ -2441,7 +2437,8 @@ export default function PublicRatingsScreen() {
               />
             ) : filteredEmpty ? (
               <FeedbackState style={styles.emptyState} icon="filter-off-outline" title="No restaurants match your filters"
-                body="Your restaurants are still here. Clear filters to see the full list." actionLabel="Clear filters" onAction={clearFilters} />
+                body="Your restaurants are still here. Clear filters to see the full list." actionLabel="Clear filters" onAction={clearFilters}
+                secondaryLabel="Wingman: Add a place" onSecondary={() => void openWingman('wingdex_empty_state', query)} />
             ) : savedView !== 'discover' ? (
               <FeedbackState
                 style={styles.emptyState}
@@ -2450,6 +2447,8 @@ export default function PublicRatingsScreen() {
                 body={savedView === 'favorites'
                   ? 'Rate a restaurant, then save it here for an easy return.'
                   : 'Save unrated restaurants here when you find wings worth trying.'}
+                actionLabel="Wingman: Add a place"
+                onAction={() => void openWingman('wingdex_empty_state', query)}
               />
             ) : (
               <FeedbackState
@@ -2459,7 +2458,7 @@ export default function PublicRatingsScreen() {
                 body={locationMode === 'radius'
                   ? wingdexRadiusMessage(radiusMiles)
                   : 'Broaden the search, jump to a state, or add the missing restaurant so your local Wingdex gets better.'}
-                actionLabel="Add restaurant"
+                actionLabel="Wingman: Add a place"
                 onAction={() => {
                   trackEvent({
                     eventName: 'empty_state_cta_clicked',
