@@ -14,11 +14,12 @@ import {
 } from '../lib/wingJuryService.js';
 import { useSavedDestinations } from '../hooks/useSavedDestinations';
 import { saveSavedDestinationIntent } from '../lib/savedDestinations.js';
+import { savedRestaurantLabel } from '../lib/savedRestaurantLabels';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FeedbackState from './ui/FeedbackState';
 import PhotoVoteControls from './PhotoVoteControls';
-import { createVoteController } from '../lib/wingdexPhotos';
+import { createVoteController, loadOwnPhotoVotes } from '../lib/wingdexPhotos';
 import { subscribePhotoVotes } from '../lib/photoVoteEvents';
 import { accountUserId, createAccountScope, lookupAccount } from '../lib/accountBoundary.js';
 
@@ -66,6 +67,9 @@ export default function WingJuryGame() {
   const [reveal, setReveal] = useState(null);
   const [confirmedVote, setConfirmedVote] = useState(null);
   const [editingVote, setEditingVote] = useState(false);
+  const [voteEditorOpen, setVoteEditorOpen] = useState(false);
+  const confirmedPhotos = useRef(new Map());
+  const voteEvent = useRef({ version: 0, photo: null });
   const editVote = useMemo(() => createVoteController(supabase), []);
   const [imageFailed, setImageFailed] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
@@ -80,14 +84,29 @@ export default function WingJuryGame() {
   const initializeRef = useRef(null);
   const authIntentRef = useRef(null);
   const currentPhoto = photos[0] || null;
+  const statusRef = useRef(status);
+  statusRef.current = status;
   const currentPhotoRef = useRef(null);
   currentPhotoRef.current = currentPhoto?.submission_id || null;
   useEffect(() => subscribePhotoVotes(({ userId, photo }) => {
     if (userId !== accountRef.current || photo.submission_id !== currentPhotoRef.current) return;
-    setConfirmedVote((old) => ({ ...old, vote: photo.current_vote }));
+    voteEvent.current = { version: voteEvent.current.version + 1, photo };
+    setConfirmedVote((old) => ({ ...old, submission_id: photo.submission_id, vote: photo.current_vote }));
     setReveal((old) => old ? { ...old, photo_like_count: photo.like_count,
       photo_dislike_count: photo.dislike_count, photo_neutral_count: photo.neutral_count } : old);
   }), []);
+  const applyReveal = useCallback((nextReveal, version) => {
+    const latest = voteEvent.current;
+    setReveal(latest.version !== version && latest.photo?.submission_id === currentPhotoRef.current
+      ? { ...nextReveal, photo_like_count: latest.photo.like_count,
+        photo_dislike_count: latest.photo.dislike_count, photo_neutral_count: latest.photo.neutral_count }
+      : nextReveal);
+  }, []);
+  useEffect(() => {
+    if (status === 'REVEALED' && currentPhoto && confirmedVote && reveal) {
+      confirmedPhotos.current.set(currentPhoto.submission_id, { verdict: confirmedVote, reveal });
+    }
+  }, [status, currentPhoto, confirmedVote, reveal]);
   const revealedVotePhoto = {
     ...currentPhoto, current_vote: confirmedVote?.vote ?? null,
     like_count: reveal?.photo_like_count ?? confirmedVote?.like_count ?? 0,
@@ -101,13 +120,14 @@ export default function WingJuryGame() {
     setError(null);
     setEditingVote(true);
     try {
-      await editVote(revealedVotePhoto, choice, (photo, pending) => {
+      const result = await editVote(revealedVotePhoto, choice, (photo, pending) => {
         if (!accountScope.current(epoch) || currentPhotoRef.current !== photoId) return;
         setConfirmedVote((old) => ({ ...old, vote: photo.current_vote }));
         setReveal((old) => old ? { ...old, photo_like_count: photo.like_count,
           photo_dislike_count: photo.dislike_count, photo_neutral_count: photo.neutral_count } : old);
         setEditingVote(pending);
       }, accountRef.current);
+      if (result && accountScope.current(epoch) && currentPhotoRef.current === photoId) setVoteEditorOpen(false);
     } catch (nextError) { if (accountScope.current(epoch)) setError(nextError); }
     finally { if (accountScope.current(epoch)) setEditingVote(false); }
   };
@@ -151,6 +171,9 @@ export default function WingJuryGame() {
       setReveal(null);
       setConfirmedVote(null);
       setEditingVote(false);
+      setVoteEditorOpen(false);
+      confirmedPhotos.current.clear();
+      voteEvent.current = { version: 0, photo: null };
       setError(null);
       setImageFailed(false);
       setAuthPromptVisible(false);
@@ -233,6 +256,7 @@ export default function WingJuryGame() {
       const photoId = currentPhoto.submission_id;
       const isCurrent = () => accountScope.current(epoch) && currentPhotoRef.current === photoId && actionRef.current === operation;
       setStatus('REVEAL_LOADING');
+      const version = voteEvent.current.version;
       void getWingJuryReveal({
         client: supabase,
         submissionId: currentPhoto.submission_id,
@@ -240,15 +264,15 @@ export default function WingJuryGame() {
         enabled: ENABLE_WING_JURY,
         expectedUserId: accountRef.current,
         isCurrent,
-      }).then((nextReveal) => { if (isCurrent()) { setReveal(nextReveal); setStatus('REVEALED'); } }).catch((nextError) => { if (isCurrent()) { setError(nextError); setStatus('REVEAL_ERROR'); } }).finally(() => { if (actionRef.current === operation) actionRef.current = null; });
+      }).then((nextReveal) => { if (isCurrent()) { applyReveal(nextReveal, version); setStatus('REVEALED'); } }).catch((nextError) => { if (isCurrent()) { setError(nextError); setStatus('REVEAL_ERROR'); } }).finally(() => { if (actionRef.current === operation) actionRef.current = null; });
       return;
     }
     if (currentPhoto && status === 'ERROR') { setError(null); setStatus('READY_TO_VOTE'); return; }
     void loadBatch({ replace: true });
-  }, [accountScope, confirmedVote, currentPhoto, loadBatch, status]);
+  }, [accountScope, applyReveal, confirmedVote, currentPhoto, loadBatch, status]);
 
   const submitVote = useCallback(async (vote) => {
-    if (!currentPhoto || status !== 'READY_TO_VOTE' || actionRef.current) return;
+    if (!currentPhoto || !['READY_TO_VOTE', 'ERROR'].includes(status) || actionRef.current) return;
     const epoch = accountScope.capture();
     const photoId = currentPhoto.submission_id;
     const operation = {};
@@ -278,6 +302,7 @@ export default function WingJuryGame() {
       setConfirmedVote(result);
       setStatus('REVEAL_LOADING');
       try {
+        const version = voteEvent.current.version;
         const nextReveal = await getWingJuryReveal({
           client: supabase,
           submissionId: currentPhoto.submission_id,
@@ -287,7 +312,7 @@ export default function WingJuryGame() {
           isCurrent,
         });
         if (!isCurrent()) return;
-        setReveal(nextReveal);
+        applyReveal(nextReveal, version);
         setStatus('REVEALED');
       } catch (revealError) {
         if (!isCurrent()) return;
@@ -301,7 +326,39 @@ export default function WingJuryGame() {
     } finally {
       if (isCurrent() && actionRef.current === operation) actionRef.current = null;
     }
-  }, [accountScope, currentPhoto, guestSession, previewGuest, previewRated, status, visualPreview]);
+  }, [accountScope, applyReveal, currentPhoto, guestSession, previewGuest, previewRated, status, visualPreview]);
+
+  useEffect(() => {
+    if (!currentPhoto || visualPreview || actionRef.current) return;
+    let alive = true;
+    const epoch = accountScope.capture();
+    const photoId = currentPhoto.submission_id;
+    const isCurrent = () => alive && accountScope.current(epoch) && currentPhotoRef.current === photoId;
+    const restore = async () => {
+      const cached = confirmedPhotos.current.get(photoId);
+      const ownPhoto = cached ? null : signedIn ? (await loadOwnPhotoVotes([currentPhoto], supabase))[0] : null;
+      if (!isCurrent() || actionRef.current || statusRef.current !== 'READY_TO_VOTE' || (!cached && ownPhoto?.current_vote == null)) return;
+      const operation = {};
+      actionRef.current = operation;
+      const verdict = cached?.verdict || { status: 'authenticated', submission_id: photoId, vote: ownPhoto.current_vote };
+      setConfirmedVote(verdict);
+      if (cached) setReveal(cached.reveal);
+      setStatus(cached ? 'REVEALED' : 'REVEAL_LOADING');
+      const version = voteEvent.current.version;
+      try {
+        const nextReveal = await getWingJuryReveal({ client: supabase, submissionId: photoId,
+          guestVerdictRegistered: verdict.status === 'guest', enabled: ENABLE_WING_JURY,
+          expectedUserId: accountRef.current, isCurrent });
+        if (isCurrent()) { applyReveal(nextReveal, version); setStatus('REVEALED'); }
+      } catch (nextError) {
+        if (isCurrent()) { setError(nextError); if (!cached) setStatus('REVEAL_ERROR'); }
+      } finally { if (actionRef.current === operation) actionRef.current = null; }
+    };
+    void restore().catch(() => { /* Keep blind controls available if the existing-vote read fails. */ });
+    return () => { alive = false; };
+    // Photo identity changes restore results; verdict edits must not restart this read.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPhoto?.submission_id, signedIn, visualPreview, accountScope, applyReveal]);
 
   const nextPhoto = useCallback(() => {
     if (!currentPhoto || status !== 'REVEALED') return;
@@ -313,6 +370,7 @@ export default function WingJuryGame() {
       return;
     }
     setReveal(null);
+    setVoteEditorOpen(false);
     setConfirmedVote(null);
     setImageFailed(false);
     currentPhotoRef.current = photos[1]?.submission_id || null;
@@ -397,7 +455,7 @@ export default function WingJuryGame() {
   );
 
   const isRevealed = ['REVEAL_LOADING', 'REVEALED', 'REVEAL_ERROR'].includes(status);
-  const revealSaveLabel = reveal?.favorite ? 'Remove from Favorites' : reveal?.want_to_try ? 'Remove from Want to Try' : reveal?.save_action === 'favorite' ? 'Add to Favorites' : 'Add to Want to Try';
+  const revealSaveLabel = savedRestaurantLabel(reveal?.save_action === 'favorite', reveal?.save_action === 'favorite' ? reveal?.favorite : reveal?.want_to_try);
   const revealedRestaurant = reveal?.restaurant || {};
   const personalRating = reveal?.personal_rating?.weight_score;
   const wingdexAverage = reveal?.restaurant_rating?.average_weight_score;
@@ -437,7 +495,7 @@ export default function WingJuryGame() {
 
       {!isRevealed && !imageFailed ? (
         <PhotoVoteControls photo={currentPhoto} showCounts={false} testPrefix="wing-jury-verdict"
-          disabled={status !== 'READY_TO_VOTE'} onVote={submitVote} />
+          disabled={!['READY_TO_VOTE', 'ERROR'].includes(status)} onVote={submitVote} />
       ) : null}
 
       {status === 'SUBMITTING' ? <View style={styles.progressRow}><ActivityIndicator color={theme.colors.primary} /><Text>Locking in your verdict…</Text></View> : null}
@@ -451,8 +509,8 @@ export default function WingJuryGame() {
           <Text variant="titleLarge" style={styles.restaurantName}>{revealedRestaurant.name || 'Wing spot'}</Text>
           {(revealedRestaurant.address || revealedRestaurant.city) ? <Text style={styles.address}>{[revealedRestaurant.address, revealedRestaurant.city].filter(Boolean).join(', ')}</Text> : null}
           <Divider style={styles.divider} />
-          {signedIn && !visualPreview ? <PhotoVoteControls photo={revealedVotePhoto}
-            testPrefix="wing-jury-photo-vote" disabled={editingVote} onVote={changeRevealedVote} /> : null}
+          {signedIn && !visualPreview ? <Button compact mode="text" testID="wing-jury-change-verdict"
+            onPress={() => setVoteEditorOpen(true)}>Change verdict</Button> : null}
           {error && status === 'REVEALED' ? <Text accessibilityRole="alert">{error.message}</Text> : null}
           <View style={styles.statsRow}>
             <RevealStat label="Photo Likes" value={`${readableNumber(reveal.photo_like_count)} Likes`} icon="thumb-up-outline" />
@@ -470,6 +528,16 @@ export default function WingJuryGame() {
       </View>
     ) : null}
     <Portal>
+      <Dialog visible={voteEditorOpen} onDismiss={() => { if (!editingVote) setVoteEditorOpen(false); }} testID="wing-jury-vote-editor">
+        <Dialog.Title>Change your verdict</Dialog.Title>
+        <Dialog.Content>
+          <Text>Choose a verdict, or tap your selected verdict to withdraw it.</Text>
+          {voteEditorOpen ? <PhotoVoteControls photo={revealedVotePhoto} testPrefix="wing-jury-photo-vote"
+            disabled={editingVote} onVote={changeRevealedVote} /> : null}
+          {error ? <Text accessibilityRole="alert">{error.message}</Text> : null}
+        </Dialog.Content>
+        <Dialog.Actions><Button disabled={editingVote} onPress={() => setVoteEditorOpen(false)}>Done</Button></Dialog.Actions>
+      </Dialog>
       <Dialog visible={authPromptVisible} onDismiss={() => { authIntentRef.current = null; setAuthPromptVisible(false); }} testID="wing-jury-auth-prompt">
         <Dialog.Title>Save this restaurant</Dialog.Title>
         <Dialog.Content><Text>Found wings worth trying? Sign in to save this restaurant to your Want to Try list.</Text></Dialog.Content>

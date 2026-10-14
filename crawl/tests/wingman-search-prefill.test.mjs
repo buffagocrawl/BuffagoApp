@@ -7,6 +7,17 @@ const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8'
 const screen = read('app/(tabs)/ratings/index.jsx');
 const dialog = read('components/WingmanAddDialog.jsx');
 
+test('Wingman add-place entry is in the persistent header regardless of flags or results', () => {
+  const header = screen.slice(screen.indexOf('<Searchbar'), screen.indexOf('<Animated.FlatList'));
+  assert.match(header, /<Button mode="contained-tonal" icon="plus" accessibilityLabel="Wingman: Add a place" testID="wingdex-wingman-entry"\s+onPress=\{\(\) => void openWingman\('wingdex', query\)\}/);
+  assert.ok(header.indexOf('wingdex-wingman-entry') < header.indexOf('{loading ||'));
+  assert.match(header, /contentStyle=\{\{ minHeight: 48 \}\}/);
+  const entry = header.slice(header.indexOf('<Button mode="contained-tonal" icon="plus"'), header.indexOf('<View style={styles.discoveryToolbar}>'));
+  assert.doesNotMatch(entry, /ENABLE_|filtered|savedView|loading/);
+  assert.match(screen, /onPickDestination=\{handleWingmanPickDestination\}/);
+  assert.match(screen, /onManualReviewQueued=\{\(\) =>/);
+});
+
 test('Wingdex opens Wingman with the exact search and default launches clear it', async () => {
   const callback = screen.match(/const openWingman = useCallback\((async[\s\S]*?)\n  }, \[getWingmanStateContext/);
   assert.ok(callback, 'Wingdex open callback is present');
@@ -25,6 +36,10 @@ test('Wingdex opens Wingman with the exact search and default launches clear it'
   assert.equal(state.visible, true);
   await open();
   assert.equal(state.name, '');
+  await open('wingdex', query);
+  assert.equal(state.name, query);
+  assert.equal(state.visible, true);
+  assert.equal(state.location.stateId, 1);
   assert.match(screen, /openWingman\('wingdex_empty_state', query\)/);
   assert.match(screen, /initialRestaurant=\{wingmanInitialRestaurant\}/);
 });

@@ -58,6 +58,7 @@ import { useLocationCtx } from '../../../providers/LocationProvider';
 import MapView, { Marker, PROVIDER_GOOGLE } from '../../../lib/platformMap';
 import { mapCoordinate } from '../../../lib/mapSafety';
 import WingdexPhotoGallery from '../../../components/WingdexPhotoGallery';
+import SavedRestaurantButton from '../../../components/SavedRestaurantButton';
 import { loadWingdexGallery } from '../../../lib/wingdexGallery';
 import { useLegendaryFeed } from '../../../hooks/useLegendaryFeed';
 import { useSavedDestinations } from '../../../hooks/useSavedDestinations';
@@ -2103,7 +2104,7 @@ export default function PublicRatingsScreen() {
         onPress={() => openDestinationDetail(item)}
       >
       <Card.Content style={styles.cardContent}>
-        {approvedThumbnails[destIdStr] ? <WingdexPhotoGallery key={destIdStr} restaurant={item} embedded compact onPhotoChange={() => setPhotoRevision((n) => n + 1)} /> : null}
+        {approvedThumbnails[destIdStr] ? <WingdexPhotoGallery key={destIdStr} restaurant={item} embedded compact showInlineVotes={false} onPhotoChange={() => setPhotoRevision((n) => n + 1)} /> : null}
         <View style={styles.restaurantHeader}>
           <Text variant="titleSmall" style={[styles.nameCentered, styles.restaurantCardName]}>{item.name}</Text>
           <View style={styles.restaurantPhotoCount}>
@@ -2160,40 +2161,12 @@ export default function PublicRatingsScreen() {
         </View>
         {savedFeatureEnabled ? (
           <View style={styles.savedActionRow}>
-            <Button
-              mode={isFavorite ? 'contained-tonal' : 'outlined'}
-              compact
-              icon={isFavorite ? 'heart' : 'heart-outline'}
-              disabled={favoritePending || (!ratedByMe && !isFavorite)}
-              loading={favoritePending}
-              accessibilityLabel={ratedByMe ? `${isFavorite ? 'Remove from' : 'Add to'} Favorites: ${item.name}` : `Rate ${item.name} to add it to Favorites`}
-              onPress={(event) => {
-                event?.stopPropagation?.();
-                void handleSavedAction(item, 'favorites', !isFavorite);
-              }}
-              style={styles.savedActionButton}
-              contentStyle={styles.savedActionContent}
-              labelStyle={styles.savedActionLabel}
-            >
-              {ratedByMe ? (isFavorite ? 'Favorited' : 'Favorite') : 'Rate to favorite'}
-            </Button>
-            <Button
-              mode={isWantToTry ? 'contained-tonal' : 'outlined'}
-              compact
-              icon={isWantToTry ? 'bookmark' : 'bookmark-outline'}
-              disabled={wantToTryPending || ratedByMe}
-              loading={wantToTryPending}
-              accessibilityLabel={ratedByMe ? `${item.name} is already rated` : `${isWantToTry ? 'Remove from' : 'Save to'} Want to Try: ${item.name}`}
-              onPress={(event) => {
-                event?.stopPropagation?.();
-                void handleSavedAction(item, 'wantToTry', !isWantToTry);
-              }}
-              style={styles.savedActionButton}
-              contentStyle={styles.savedActionContent}
-              labelStyle={styles.savedActionLabel}
-            >
-              {ratedByMe ? 'Already rated' : (isWantToTry ? 'Saved' : 'Want to Try')}
-            </Button>
+            <SavedRestaurantButton
+              ratedByMe={ratedByMe} isFavorite={isFavorite} isWantToTry={isWantToTry}
+              pending={ratedByMe ? favoritePending : wantToTryPending} restaurantName={item.name}
+              onToggle={(kind, nextSaved) => void handleSavedAction(item, kind, nextSaved)}
+              compact style={styles.savedActionButton} contentStyle={styles.savedActionContent} labelStyle={styles.savedActionLabel}
+            />
           </View>
         ) : null}
         {savedFeatureEnabled && savedView === 'wantToTry' ? (
@@ -2388,6 +2361,10 @@ export default function PublicRatingsScreen() {
           inputStyle={{ minHeight: 0 }}
         />
 
+        <Button mode="contained-tonal" icon="plus" accessibilityLabel="Wingman: Add a place" testID="wingdex-wingman-entry"
+          onPress={() => void openWingman('wingdex', query)} contentStyle={{ minHeight: 48 }} style={{ marginTop: 8, borderRadius: 12 }}>
+          Wingman: Add a place
+        </Button>
         <View style={styles.discoveryToolbar}>
           <Pressable accessibilityRole="button" accessibilityLabel={`Filters, ${activeFilterCount} active`} testID="wingdex-filters-entry" onPress={() => setFiltersOpen(true)} style={[styles.toolbarAction, { backgroundColor: colors.surfaceVariant }]}>
             <MaterialCommunityIcons name="tune-variant" size={18} color={colors.primary} />
@@ -2651,30 +2628,12 @@ export default function PublicRatingsScreen() {
                       const wantToTryPending = saved.isPending('wantToTry', active.destination_id);
                       return (
                         <>
-                          <Button
-                            mode={isFavorite ? 'contained-tonal' : 'outlined'}
-                            icon={isFavorite ? 'heart' : 'heart-outline'}
-                            disabled={favoritePending || (!ratedByMe && !isFavorite)}
-                            loading={favoritePending}
-                            onPress={() => void handleSavedAction(active, 'favorites', !isFavorite)}
-                            style={styles.detailSavedButton}
-                            contentStyle={styles.savedActionContent}
-                            accessibilityLabel={ratedByMe ? `${isFavorite ? 'Remove from' : 'Add to'} Favorites` : 'Rate this restaurant to add it to Favorites'}
-                          >
-                            {ratedByMe ? (isFavorite ? 'Favorited' : 'Favorite') : 'Rate to favorite'}
-                          </Button>
-                          <Button
-                            mode={isWantToTry ? 'contained-tonal' : 'outlined'}
-                            icon={isWantToTry ? 'bookmark' : 'bookmark-outline'}
-                            disabled={wantToTryPending || ratedByMe}
-                            loading={wantToTryPending}
-                            onPress={() => void handleSavedAction(active, 'wantToTry', !isWantToTry)}
-                            style={styles.detailSavedButton}
-                            contentStyle={styles.savedActionContent}
-                            accessibilityLabel={ratedByMe ? 'This restaurant is already rated' : `${isWantToTry ? 'Remove from' : 'Save to'} Want to Try`}
-                          >
-                            {ratedByMe ? 'Already rated' : (isWantToTry ? 'Saved' : 'Want to Try')}
-                          </Button>
+                          <SavedRestaurantButton
+                            ratedByMe={ratedByMe} isFavorite={isFavorite} isWantToTry={isWantToTry}
+                            pending={ratedByMe ? favoritePending : wantToTryPending} restaurantName={active.name}
+                            onToggle={(kind, nextSaved) => void handleSavedAction(active, kind, nextSaved)}
+                            style={styles.detailSavedButton} contentStyle={styles.savedActionContent}
+                          />
                         </>
                       );
                     })()}

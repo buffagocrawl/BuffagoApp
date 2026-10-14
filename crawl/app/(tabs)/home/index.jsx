@@ -21,7 +21,8 @@ import * as Crypto from 'expo-crypto';
 import * as Location from 'expo-location';
 import WingmanAddDialog from '../../../components/WingmanAddDialog';
 import FeedbackState from '../../../components/ui/FeedbackState';
-import { StatCard, WingShotImage } from '../../../components/ui/OperationUI';
+import { StatCard } from '../../../components/ui/OperationUI';
+import HomeDestinationPhoto from '../../../components/home/HomeDestinationPhoto';
 import { loadWingdexRestaurantGallery } from '../../../lib/wingdexGallery';
 import WelcomeWizard from '../../../components/WelcomeWizard';
 import { supabase } from '../../../lib/supabase.js';
@@ -351,7 +352,7 @@ export default function Home() {
     if (closest?.id) {
       // The existing public gallery enforces approval and visibility server-side.
       void loadWingdexRestaurantGallery(closest.id, supabase).then((gallery) => {
-        if (active) setFeaturedPhoto({ destinationId: closest.id, uri: gallery.images[0]?.signed_url || null });
+        if (active) setFeaturedPhoto({ destinationId: closest.id, uri: gallery.images[0]?.signed_url || null, photo: gallery.images[0] || null });
       }).catch(() => { if (active) setFeaturedPhoto({ destinationId: closest.id, uri: null, unavailable: true }); }).finally(() => { if (active) setFeaturedPhotoLoading(false); });
       void supabase.from('destination_ratings').select('id', { count: 'exact', head: true }).eq('destination_id', closest.id).then(({ count, error }) => {
         if (active && !error && typeof count === 'number') setFeaturedRatingCount(count);
@@ -3108,7 +3109,7 @@ export default function Home() {
                   <View style={[styles.featuredImage, styles.featuredPhotoLoading, { backgroundColor: colors.surfaceVariant }]}><ActivityIndicator /></View>
                 ) : featuredPhoto?.destinationId === closest.id && featuredPhoto.uri ? (
                   <>
-                    <WingShotImage approved uri={featuredPhoto.uri} style={styles.featuredImage} />
+                    <HomeDestinationPhoto key={closest.id} photo={featuredPhoto.photo} restaurantName={closest.name || 'Wing Spot'} style={styles.featuredImage} />
                     <Pressable accessibilityRole="button" accessibilityLabel="View restaurant ratings and details" onPress={() => openRestaurantPeek(closest.id)} style={{ minHeight: 44, padding: 8, borderRadius: 12, justifyContent: 'center', backgroundColor: colors.surface }}>
                       <Text style={[styles.closestName, { color: colors.onSurface }]} numberOfLines={2}>{closest.name || 'Wing Spot'}</Text>
                       <Text style={{ fontSize: 12, color: colors.onSurfaceVariant }}>View ratings and details</Text>
