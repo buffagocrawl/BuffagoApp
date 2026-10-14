@@ -15,7 +15,7 @@ test('Home uses the compact layout and keeps discovery actions', () => {
   assert.doesNotMatch(home, /PlayerProgressCard/);
   assert.match(home, /DailyGiftPill claimed=\{!!dailyGift.claimedToday\}[\s\S]*?onPress=\{\(\) => claimDaily\(session.user.id\)\}/);
   assert.match(home, /loadWingdexRestaurantGallery\(closest.id, supabase\)/);
-  assert.match(home, /WingShotImage approved uri=/);
+  assert.match(home, /HomeDestinationPhoto key=\{closest.id\} photo=\{featuredPhoto.photo\}/);
   assert.match(home, /restaurantIconButton: \{ width: 40, height: 40/);
   assert.match(home, /contentStyle=\{\{ minHeight: 44 \}\}/);
 });

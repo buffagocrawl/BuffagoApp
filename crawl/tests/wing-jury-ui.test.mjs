@@ -31,7 +31,7 @@ test('pre-vote UI contains only blind photo and verdict controls', () => {
 
 test('vote lifecycle prevents duplicate actions and separates reveal retry from vote retry', () => {
   for (const state of ['LOADING', 'READY_TO_VOTE', 'SUBMITTING', 'REVEAL_LOADING', 'REVEALED', 'ERROR', 'FEED_EXHAUSTED']) assert.match(game, new RegExp(state));
-  assert.match(game, /status !== 'READY_TO_VOTE'/);
+  assert.match(game, /!\['READY_TO_VOTE', 'ERROR'\]\.includes\(status\)/);
   assert.match(game, /Your verdict is saved/);
   assert.match(game, /Retry Reveal/);
   assert.match(game, /guestVerdictRegistered: result\.status === 'guest'/);

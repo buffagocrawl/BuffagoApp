@@ -51,6 +51,24 @@ test('shared gallery controller reuses parent vote state without another vote re
   h.runtime.unmount();
 });
 
+test('viewer exposes shared vote-load failure and retries through its gallery', async (t) => {
+  const h = harness({ sharedController: true });
+  t.after(() => h.runtime.unmount());
+  let retries = 0;
+  h.props.parentVotesReady = false;
+  h.props.parentVoteError = 'Could not load your votes. Please retry.';
+  h.props.onRetryVotes = () => retries++;
+  h.render(); await flush(); let tree = h.render();
+  assert.ok(all(tree, 'text').some((node) => node.props.children === h.props.parentVoteError));
+  assert.equal(findElement(tree, 'photo-vote-like').props.disabled, true);
+  all(tree, 'button').find((node) => node.props.children === 'Retry').props.onPress();
+  assert.equal(retries, 1);
+  h.props.parentVoteError = null;
+  h.props.parentVotesReady = true;
+  tree = h.render();
+  assert.notEqual(findElement(tree, 'photo-vote-like').props.disabled, true);
+});
+
 test('shared viewer refreshes server totals without changing the parent vote selection', async (t) => {
   let count = 7;
   const h = harness({ sharedController: true, fullPhoto: (photo) => ({ ...photo, like_count: count }) });

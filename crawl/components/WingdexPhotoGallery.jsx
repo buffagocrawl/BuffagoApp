@@ -10,7 +10,7 @@ import { subscribePhotoVotes } from '../lib/photoVoteEvents';
 import { createVoteController, loadOwnPhotoVotes } from '../lib/wingdexPhotos';
 import { useAuth } from '../providers/AuthProvider';
 
-export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange, embedded = false, compact = false }) {
+export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange, embedded = false, compact = false, showInlineVotes = true }) {
   const { user } = useAuth();
   const generation = useRef(0);
   const inFlight = useRef(false);
@@ -188,7 +188,7 @@ export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange
       : <Dialog.Title>{restaurant?.name || 'Pictures'}</Dialog.Title>}
     <Content>
       {state.error ? <View><Text>{state.error}</Text><Button onPress={() => void load()}>Retry pictures</Button></View> : null}
-      {voteError ? <View><Text accessibilityRole="alert">{voteError}</Text>
+      {showInlineVotes && voteError ? <View><Text accessibilityRole="alert">{voteError}</Text>
         {votesReady ? null : <Button onPress={() => setVoteReload((n) => n + 1)}>Retry votes</Button>}</View> : null}
       {state.loading ? <ActivityIndicator /> : null}
       {!state.loading && !state.error && !state.images.length ? <View style={{ alignItems: 'center', paddingVertical: embedded ? 12 : 24 }}>
@@ -220,18 +220,19 @@ export default function WingdexPhotoGallery({ restaurant, onClose, onPhotoChange
                 }
               }} />
           </Pressable>}
-          <PhotoVoteControls photo={image} testPrefix={`photo-preview-${image.submission_id}`}
-            disabled={!votesReady || busy[image.submission_id]} onVote={(choice) => void cast(image, choice)} />
+          {showInlineVotes ? <PhotoVoteControls photo={image} testPrefix={`photo-preview-${image.submission_id}`}
+            disabled={!votesReady || busy[image.submission_id]} onVote={(choice) => void cast(image, choice)} /> : null}
         </View>} />
       </View>
     </Content>
-    <Actions>
+    {state.offset < state.count || !embedded ? <Actions>
       {state.offset < state.count ? <Button disabled={state.loading} onPress={() => void load(state.offset)}>More pictures</Button> : null}
       {embedded ? null : <Button contentStyle={{ minHeight: 44 }} onPress={onClose}>Close</Button>}
-    </Actions>
+    </Actions> : null}
   </Container>;
   return <>{embedded ? gallery : <Portal>{gallery}</Portal>}{selectedId ? <Portal><WingdexPhotoViewer photos={orderedImages} selectedId={selectedId} restaurantName={restaurant.name}
     voteController={vote} isVotePending={isVotePending} getVoteVersion={getVoteVersion} parentVotesReady={votesReady}
+    parentVoteError={voteError} onRetryVotes={() => setVoteReload((n) => n + 1)}
     onClose={() => { setSelectedId(null); setRefreshToken((n) => n + 1); }}
     totalCount={state.count} hasMore={state.offset < state.count} onMore={() => void load(state.offset)}
     pageError={state.error} pageLoading={state.loading}

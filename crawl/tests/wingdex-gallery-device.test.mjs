@@ -49,6 +49,33 @@ test('active Wingdex tab has list and restaurant-detail picture affordances', ()
   assert.match(source, /loadWingdexGallery/); assert.match(source, /setGalleryRestaurant\(item\)/);
   assert.match(source, /setGalleryRestaurant\(active\)/); assert.match(source, /key=\{galleryRestaurant\.destination_id\}/);
   assert.match(source, /<WingdexPhotoGallery\s+key=\{`detail-\$\{active\.destination_id\}`\}\s+restaurant=\{active\}\s+embedded/);
+  assert.match(source, /restaurant=\{item\} embedded compact showInlineVotes=\{false\}/);
+  assert.equal((source.match(/showInlineVotes=\{false\}/g) || []).length, 1);
+});
+
+test('main card omits the complete vote row and opens a viewer with shared voting state', async (t) => {
+  const h = harness(async () => ({ count: 2, images: [
+    { submission_id: 'a', signed_url: 'fixture:a', like_count: 2 },
+    { submission_id: 'b', signed_url: 'fixture:b', like_count: 1 },
+  ] }), { ownVotes: async (photos) => photos.map((photo) => ({ ...photo, current_vote: 1 })) });
+  t.after(() => h.runtime.unmount());
+  Object.assign(h.props, { embedded: true, compact: true, showInlineVotes: false });
+  h.render(); await flush(); h.render(); await flush(); let tree = h.render();
+  assert.equal(findElement(tree, 'photo-preview-like-a'), null);
+  assert.equal(findElement(tree, 'photo-preview-dislike-a'), null);
+  assert.equal(elements(tree, 'button').length, 0);
+  const strip = elements(tree, 'flatlist')[0];
+  strip.props.onMomentumScrollEnd({ nativeEvent: { contentOffset: { x: 240 } } });
+  tree = h.render();
+  assert.equal(findElement(tree, 'wingdex-photo-counter').props.children.join(''), '2 of 2');
+  elements(tree, 'pressable')[1].props.onPress();
+  const viewer = elements(h.render(), 'viewer')[0];
+  assert.equal(viewer.props.selectedId, 'b');
+  assert.equal(viewer.props.parentVotesReady, true);
+  assert.equal(viewer.props.photos[1].current_vote, 1);
+  assert.equal(typeof viewer.props.voteController, 'function');
+  viewer.props.onPhotoChange({ submission_id: 'b', current_vote: -1, dislike_count: 3 }, false);
+  assert.equal(elements(h.render(), 'viewer')[0].props.photos.find((p) => p.submission_id === 'b').current_vote, -1);
 });
 
 test('restaurant detail embeds the shared gallery without a modal or a large empty placeholder', async () => {
