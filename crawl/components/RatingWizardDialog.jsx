@@ -1,8 +1,8 @@
 // components/RatingWizardDialog.jsx
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, Pressable, ScrollView, FlatList, StyleSheet } from 'react-native';
+import { View, Pressable, ScrollView, FlatList, StyleSheet, I18nManager, PanResponder } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Slider from '@react-native-community/slider';
+import { clampRatingScore, ratingScoreAtPosition } from '../lib/ratingSlider';
 import { Button, Dialog, Portal, ProgressBar, Text, useTheme } from 'react-native-paper';
 import {
   FULL_RATING_FLOW_VARIANT,
@@ -30,87 +30,59 @@ function toggleInArray(arr, val, max = 2) {
   return Array.from(set).sort((a, b) => a - b);
 }
 
-/* Color helper: green → yellow → red */
-function lerpColor(a, b, t) {
-  const ah = parseInt(a.replace('#', ''), 16);
-  const ar = (ah >> 16) & 0xff;
-  const ag = (ah >> 8) & 0xff;
-  const ab = ah & 0xff;
-
-  const bh = parseInt(b.replace('#', ''), 16);
-  const br = (bh >> 16) & 0xff;
-  const bg = (bh >> 8) & 0xff;
-  const bb = bh & 0xff;
-
-  const rr = Math.round(ar + (br - ar) * t);
-  const rg = Math.round(ag + (bg - ag) * t);
-  const rb = Math.round(ab + (bb - ab) * t);
-
-  return `rgb(${rr}, ${rg}, ${rb})`;
-}
-
-function pepperColorForValue(value) {
-  const t = Math.max(0, Math.min(1, (value - 1) / 9));
-  const green = '#2e7d32';
-  const mid = '#FFB300';
-  const red = '#c62828';
-  if (t <= 0.5) return lerpColor(green, mid, t / 0.5);
-  return lerpColor(mid, red, (t - 0.5) / 0.5);
-}
-
-/* Pepper-style slider row */
-function SliderRowPretty({ label, value, onChange, description, badLabel, goodLabel }) {
+/* Shared measured integer slider for quick and full ratings. */
+export function SliderRowPretty({ label, value, onChange, description, badLabel, goodLabel }) {
   const theme = useTheme();
-  const progress = Math.max(0, Math.min(1, (value - 1) / 9));
-  const pepperColor = pepperColorForValue(value);
-
+  const width = useRef(0);
+  const current = useRef({ value, onChange });
+  current.current = { value, onChange };
+  const responder = useMemo(() => {
+    const update = (event) => {
+      const score = ratingScoreAtPosition(event.nativeEvent.locationX, width.current, I18nManager.isRTL);
+      if (score != null) current.current.onChange(score);
+    };
+    return PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: update,
+      onPanResponderMove: update,
+      onPanResponderRelease: update,
+      onPanResponderTerminationRequest: () => false,
+    });
+  }, []);
+  const fraction = (clampRatingScore(value) - 1) / 9;
   return (
     <View style={{ marginBottom: 24 }}>
       <Text style={[styles.stepTitle, { color: theme.colors.onSurface }]}>{label}</Text>
-
-      {(badLabel || goodLabel) ? (
-        <View style={styles.pepperLabelsRow}>
-          <Text style={[styles.pepperEdgeLabel, { color: theme.colors.onSurface }]}>
-            {badLabel ?? ''}
-          </Text>
-          <Text style={[styles.pepperEdgeLabel, { color: theme.colors.onSurface }]}>
-            {goodLabel ?? ''}
-          </Text>
-        </View>
-      ) : null}
-
-      <View style={styles.pepperOuter}>
-        <View style={styles.pepperVisualWrapper} pointerEvents="none">
-          <View style={styles.pepperBodyBase}>
-            <View
-              style={[
-                styles.pepperFill,
-                { width: `${progress * 100}%`, backgroundColor: pepperColor },
-              ]}
-            />
-          </View>
-
-          <View pointerEvents="none" style={[styles.pepperArrowContainer, { left: `${progress * 100}%` }]}>
-            <View style={styles.pepperArrow} />
-          </View>
-        </View>
-
-        <Slider
-          value={value}
-          minimumValue={1}
-          maximumValue={10}
-          step={1}
-          onValueChange={(v) => onChange(Math.round(v))}
-          minimumTrackTintColor="transparent"
-          maximumTrackTintColor="transparent"
-          thumbTintColor="rgba(255,255,255,0.001)"
-          style={styles.pepperSliderGesture}
-        />
+      <Text style={{ textAlign: 'center', fontSize: 26, fontWeight: '800', color: theme.colors.onSurface }}>
+        {value} / 10
+      </Text>
+      <View style={styles.pepperLabelsRow}>
+        <Text style={[styles.pepperEdgeLabel, { color: theme.colors.onSurface }]}>{badLabel}</Text>
+        <Text style={[styles.pepperEdgeLabel, { color: theme.colors.onSurface }]}>{goodLabel}</Text>
       </View>
-
-      {description ? (
-        <Text style={[styles.sliderDescription, { color: theme.colors.onSurface }]}>{description}</Text>
-      ) : null}
+      <View
+        {...responder.panHandlers}
+        onLayout={(event) => { width.current = event.nativeEvent.layout.width; }}
+        accessible accessibilityRole="adjustable" accessibilityLabel={label}
+        accessibilityHint="Tap or drag to choose a score. Swipe up or down to adjust."
+        accessibilityValue={{ min: 1, max: 10, now: value, text: `${value} out of 10` }}
+        accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
+        onAccessibilityAction={({ nativeEvent }) => {
+          if (nativeEvent.actionName === 'increment' || nativeEvent.actionName === 'decrement') {
+            onChange(clampRatingScore(value + (nativeEvent.actionName === 'increment' ? 1 : -1)));
+          }
+        }}
+        style={{ height: 56, justifyContent: 'center', paddingHorizontal: 14 }}
+      >
+        <View pointerEvents="none" style={{ height: 10, borderRadius: 5, backgroundColor: '#666' }}>
+          <View style={{ width: `${fraction * 100}%`, height: 10, borderRadius: 5, backgroundColor: '#D94A00' }} />
+          <View style={{ position: 'absolute', start: `${fraction * 100}%`, top: -9,
+            marginStart: -14, width: 28, height: 28, borderRadius: 14,
+            backgroundColor: '#FF7A22', borderWidth: 3, borderColor: theme.dark ? '#FFF' : '#111' }} />
+        </View>
+      </View>
+      {description ? <Text style={{ fontSize: 15, color: theme.colors.onSurface }}>{description}</Text> : null}
     </View>
   );
 }
@@ -253,7 +225,7 @@ function DialogHeaderArrow({ title, onBack }) {
  * }
  */
 /** @typedef {{id: number|string, label?: string, tag?: string}} RatingTagOption */
-/** @param {{visible: boolean, destinationName?: string, tagOptions?: RatingTagOption[], saving?: boolean, onDismiss?: () => void, onBeforeConfirmation?: () => Promise<boolean>, onFinalize?: (payload: unknown) => void|Promise<void>, finalizeLabel?: string, flowVariant?: string}} props */
+/** @param {{visible: boolean, destinationName?: string, tagOptions?: RatingTagOption[], saving?: boolean, onDismiss?: () => void, onBeforeConfirmation?: () => Promise<boolean>, onFinalize?: (payload: unknown) => void|Promise<void>, finalizeLabel?: string, flowVariant?: string, finalizeError?: string}} props */
 export default function RatingWizardDialog({
   visible,
   destinationName,
@@ -263,6 +235,7 @@ export default function RatingWizardDialog({
   onFinalize,
   onBeforeConfirmation,
   finalizeLabel = 'Finalize',
+  finalizeError = '',
   flowVariant = FULL_RATING_FLOW_VARIANT,
 }) {
   const theme = useTheme();
@@ -375,6 +348,7 @@ export default function RatingWizardDialog({
       >
         <DialogHeaderArrow title={destinationName || 'Rate this stop'} onBack={goBack} />
 
+        <ScrollView style={{ flexShrink: 1 }} keyboardShouldPersistTaps="handled">
         <Dialog.Content>
         {quickMode ? (
           <View style={styles.quickIntroCard}>
@@ -610,7 +584,9 @@ export default function RatingWizardDialog({
           ) : null}
         </View>
       </Dialog.Content>
+      </ScrollView>
 
+      {!!finalizeError && <Text accessibilityRole="alert" style={{ color: theme.colors.error, paddingHorizontal: 24 }}>{finalizeError}</Text>}
       <Dialog.Actions style={{ justifyContent: 'space-between', paddingHorizontal: 8 }}>
         <Button mode="text" disabled={saving} onPress={goBack}>
           {step === 0 ? 'Cancel' : 'Back'}
@@ -711,62 +687,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   pepperEdgeLabel: {
-    fontSize: 11,
-    opacity: 0.85,
-  },
-  pepperOuter: {
-    marginTop: 2,
-    marginBottom: 6,
-    height: 44,
-    justifyContent: 'center',
-  },
-  pepperVisualWrapper: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-  },
-  pepperBodyBase: {
-    height: 26,
-    backgroundColor: '#050505',
-    borderTopLeftRadius: 24,
-    borderBottomLeftRadius: 30,
-    borderTopRightRadius: 10,
-    borderBottomRightRadius: 6,
-    overflow: 'hidden',
-    transform: [{ skewX: '-10deg' }, { scaleY: 1.05 }],
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
-  },
-  pepperFill: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    borderTopLeftRadius: 24,
-    borderBottomLeftRadius: 30,
-    borderTopRightRadius: 10,
-    borderBottomRightRadius: 6,
-  },
-  pepperArrowContainer: {
-    position: 'absolute',
-    top: -4,
-    transform: [{ translateX: -6 }],
-  },
-  pepperArrow: {
-    width: 0,
-    height: 0,
-    borderLeftWidth: 6,
-    borderRightWidth: 6,
-    borderTopWidth: 8,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderTopColor: '#ffffff',
-  },
-  pepperSliderGesture: {
-    ...StyleSheet.absoluteFillObject,
+    fontSize: 15,
+    flexShrink: 1,
+    maxWidth: '48%',
   },
   sliderDescription: {
     textAlign: 'center',

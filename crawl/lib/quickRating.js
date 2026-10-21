@@ -18,7 +18,7 @@ const QUICK_RATING_STEPS = [
     label: 'Sauce / Rub',
     title: 'Sauce or Rub',
     description: 'How strong was the flavor, balance, and cling?',
-    badLabel: 'Flat',
+    badLabel: 'Forgettable',
     goodLabel: 'Craveable',
   },
   {
