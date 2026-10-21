@@ -96,3 +96,6 @@ export const ENABLE_WING_JURY = parseBooleanFlag(
   process.env.EXPO_PUBLIC_ENABLE_WING_JURY,
   false
 );
+
+// V2 supersedes the short-onboarding experiment when enabled.
+export const ENABLE_ONBOARDING_V2 = parseBooleanFlag(process.env.EXPO_PUBLIC_ONBOARDING_V2, false);

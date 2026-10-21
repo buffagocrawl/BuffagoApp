@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import * as Location from 'expo-location';
 import { Linking } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ENABLE_ONBOARDING_V2 } from '../config/features';
+import { hasCompletedOnboarding } from '../hooks/useOnboardingGate';
 
 type LocState = {
   status: 'unknown' | 'granted' | 'denied';
@@ -42,9 +45,20 @@ export default function LocationProvider({ children }: { children: React.ReactNo
   }, []);
 
   useEffect(() => {
-    // Ask on first mount
-    askPermission();
-  }, [askPermission]);
+    let active = true;
+    (async () => {
+      const participant = await AsyncStorage.getItem('buffago:onboarding:v2_arrival');
+      const freshV2 = ENABLE_ONBOARDING_V2 && !await hasCompletedOnboarding();
+      if (!active) return;
+      if (participant || freshV2) {
+        const permission = await Location.getForegroundPermissionsAsync();
+        if (!active) return;
+        setStatus(permission.status === 'granted' ? 'granted' : 'unknown');
+        if (permission.status === 'granted') await refreshPosition();
+      } else await askPermission();
+    })().catch(() => {});
+    return () => { active = false; };
+  }, [askPermission, refreshPosition]);
 
   return (
     <Ctx.Provider value={{ status, coords, askPermission, refreshPosition }}>

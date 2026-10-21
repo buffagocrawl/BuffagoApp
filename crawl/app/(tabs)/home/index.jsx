@@ -302,6 +302,22 @@ export default function Home() {
   const COIN_REWARD_AMOUNT = 3;
 
   // Welcome Wizard (tutorial)
+  const [v2LocationOptional, setV2LocationOptional] = useState(false);
+  useEffect(() => {
+    let active = true;
+    AsyncStorage.getItem('buffago:onboarding:v2_arrival').then(async raw => {
+      if (!raw || !active) return;
+      const arrival = JSON.parse(raw);
+      setV2LocationOptional(true);
+      if (arrival.pending) {
+        await trackEvent({ eventName: 'onboarding_main_app_arrived', screen: 'home', metadata: {
+          onboarding_version: 'v2', entry_path: arrival.entry_path, platform: arrival.platform,
+        } });
+        await AsyncStorage.setItem('buffago:onboarding:v2_arrival', JSON.stringify({ ...arrival, pending: false }));
+      }
+    }).catch(() => {});
+    return () => { active = false; };
+  }, []);
   const [welcomeOpen, setWelcomeOpen] = useState(false);
   const { loading: onboardingLoading, shouldShowIntro } = useOnboardingGate();
   const canShowWelcomeWizard = !shouldShowIntro;
@@ -2949,7 +2965,7 @@ export default function Home() {
 
   if (onboardingLoading) {
     return (
-      <LocationGate>
+      <LocationGate allowWithoutLocation={v2LocationOptional}>
         <SafeAreaView
           style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}
         >
@@ -2962,7 +2978,7 @@ export default function Home() {
 
   if (shouldShowIntro) {
     return (
-      <LocationGate>
+      <LocationGate allowWithoutLocation={v2LocationOptional}>
         <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <ActivityIndicator />
         </SafeAreaView>
@@ -2971,7 +2987,7 @@ export default function Home() {
   }
 
   return (
-    <LocationGate>
+    <LocationGate allowWithoutLocation={v2LocationOptional}>
       <SafeAreaView edges={['top', 'left', 'right']} style={{ flex: 1, backgroundColor: colors.background }}>
         <ScrollView
           contentContainerStyle={[styles.scroll, { paddingBottom: 16 }]}

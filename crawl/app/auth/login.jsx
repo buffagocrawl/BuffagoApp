@@ -318,6 +318,8 @@ export default function EmailAuthScreen() {
       let seed = null;
       try {
         const parsed = JSON.parse(raw);
+        // V2 previews require a separate, explicit review workflow.
+        if (parsed?.onboarding_version === 'v2') return;
         seed = parsed?.status === 'local_preview' ? parsed.payload : parsed;
       } catch {
         await AsyncStorage.removeItem(ONBOARDING_SEED_RATING_KEY);

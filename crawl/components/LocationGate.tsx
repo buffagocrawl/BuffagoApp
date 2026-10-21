@@ -4,11 +4,11 @@ import { Text, Button, Card, useTheme } from 'react-native-paper';
 import { useLocationCtx } from '../providers/LocationProvider';
 import { openLocationSettings } from '../providers/LocationProvider';
 
-export default function LocationGate({ children }: { children: React.ReactNode }) {
+export default function LocationGate({ children, allowWithoutLocation = false }: { children: React.ReactNode; allowWithoutLocation?: boolean }) {
   const { colors } = useTheme();
   const { status, askPermission } = useLocationCtx();
 
-  if (status === 'granted') return children;
+  if (allowWithoutLocation || status === 'granted') return children;
 
   return (
     <View style={[styles.wrap, { backgroundColor: colors.background }]}>
