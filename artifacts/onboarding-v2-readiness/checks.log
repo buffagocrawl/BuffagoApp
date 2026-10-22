@@ -1,0 +1,14 @@
+Starting branch: feature/onboarding-v2-simplified-first-value
+Starting HEAD: 984e7555386dc375287e5097b1db0ec1077695cc
+Starting git status --short: empty
+Final regression: 407 tests, 403 passed, 0 failed, 4 skipped; regression.log
+Focused production-component/helper/Flow runtime: 51 passed, 0 failed; focused.log
+Quick-rating: PASS; quick-rating.log
+Lint: exit 0, 0 errors / 100 warnings; lint.log (same count as start)
+TypeScript baseline: three unchanged TS5097 failures only; typecheck.log
+TypeScript --allowImportingTsExtensions: exit 0, no diagnostics; typecheck-workaround.log
+Git diff --cached --check: PASS (line-ending normalization notices are not whitespace errors)
+Scope check: no staged SQL, Supabase/Edge Functions, RLS, migrations, EAS/deployment configuration, legacy onboarding or shared rating slider changes
+Default V2 false; new public invitation false. QA true values were process-local to Expo only; Metro terminated and task-owned AVD closed.
+No production requests/writes, upload success, provider success, device journey pass, deployment or feature rollout claimed.
+Secret/public-config staged scan: see secrets.log

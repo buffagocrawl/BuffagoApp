@@ -1,3 +1,4 @@
+import { ENABLE_ONBOARDING_WING_SHOT_INVITE } from '../config/features';
 import { loadPhotoWorkflowFlags } from '../lib/photoWorkflowFlags';
 import { saveWingShotIntent, claimWingShotIntent, clearWingShotIntent } from '../lib/wingShotAuthIntent';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -97,19 +98,26 @@ export default function OnboardingV2() {
   useEffect(() => {
     if (step !== 'result') return;
     let active = true;
+    if (!user || user.is_anonymous) {
+      setPhotoAvailable(ENABLE_ONBOARDING_WING_SHOT_INVITE);
+      if (ENABLE_ONBOARDING_WING_SHOT_INVITE) emit('onboarding_wing_shot_offer_viewed', { source: 'onboarding', eligibility: 'check_after_signin' }, preview?.payload?.destination_id);
+      return;
+    }
     setPhotoAvailable(false);
     loadPhotoWorkflowFlags(supabase).then(flags => {
       if (active) { setPhotoAvailable(flags.prompt && flags.photo);
         if (flags.prompt && flags.photo) emit('onboarding_wing_shot_offer_viewed', { source: 'onboarding' }, preview?.payload?.destination_id); }
     }).catch(() => {});
     return () => { active = false; };
-  }, [step, user?.id, emit, preview?.payload?.destination_id]);
+  }, [step, user, emit, preview?.payload?.destination_id]);
   const addPhoto = async () => {
     if (busy.current) return;
     busy.current = true; setSaving(true);
     try {
-      const flags = await loadPhotoWorkflowFlags(supabase);
-      if (!flags.prompt || !flags.photo) throw new Error('Photos unavailable');
+      if (user && !user.is_anonymous) {
+        const flags = await loadPhotoWorkflowFlags(supabase);
+        if (!flags.prompt || !flags.photo) throw new Error('Photos unavailable');
+      } else if (!ENABLE_ONBOARDING_WING_SHOT_INVITE) return;
       await saveWingShotIntent(AsyncStorage, { destinationId: preview?.payload?.destination_id, restaurantName: destination?.name || preview?.payload?.restaurant_name, userId: user && !user.is_anonymous ? user.id : null });
       emit('onboarding_wing_shot_selected', { source: 'onboarding' }, preview?.payload?.destination_id);
       const route = user && !user.is_anonymous ? await claimWingShotIntent({ storage: AsyncStorage, client: supabase, userId: user.id }) : null;
@@ -196,7 +204,7 @@ export default function OnboardingV2() {
             <Text variant="headlineMedium">Nice! Your wing rating</Text><Text variant="titleLarge">{destination?.name || preview?.payload?.restaurant_name || 'Your restaurant'}</Text>
             <Text style={{ fontSize: 40, fontWeight: '800' }}>{preview?.payload?.overall} / 10</Text>
             <Text variant="bodyLarge">Saved on this device only. This preview is not a public review and has not earned rewards. It stays here after sign-up; it is not automatically published or synced.</Text>
-            {photoAvailable ? <><Text variant="headlineMedium">Got a picture of those wings?</Text><Text variant="bodyLarge">Share a Wing Shot with the BuffaGo community. Create a free account to upload a photo, keep track of your favorite spots, and build your wing journey.</Text><Text variant="bodySmall">Wing Shots are reviewed before they appear in the gallery.</Text></> : <Text>Wing Shots are unavailable right now. You can still explore BuffaGo; your preview stays on this device.</Text>}
+            {photoAvailable ? <><Text variant="headlineMedium">Got a picture of those wings?</Text><Text variant="bodyLarge">Create a free account to share a Wing Shot, keep your favorites, and build your wing journey.</Text><Text variant="bodySmall">Upload availability is checked after sign-in. Wing Shots are reviewed before they appear in the gallery.</Text></> : <Text>{user && !user.is_anonymous ? 'Wing Shots are unavailable right now. You can still explore BuffaGo; your preview stays on this device.' : 'Create a free account to keep your favorites and build your wing journey. Your rating preview stays on this device.'}</Text>}
 
           </>}
           {!!notice && <Text accessibilityRole="alert">{notice}</Text>}
@@ -204,6 +212,7 @@ export default function OnboardingV2() {
         </ScrollView>
       </KeyboardAvoidingView>
       {step === 'result' && <View style={{ paddingHorizontal: 24, paddingBottom: 16, gap: 10 }}>
+            {!photoAvailable && (!user || user.is_anonymous) && <Button mode="contained" disabled={saving} contentStyle={{ minHeight: 48 }} onPress={() => finish(true)}>Create Free Account</Button>}
             {photoAvailable && <Button mode="contained" disabled={saving} labelStyle={{ fontSize: 16 }} contentStyle={{ minHeight: 48 }} onPress={addPhoto}>{user && !user.is_anonymous ? 'Add a Wing Shot' : 'Create Account & Add a Wing Shot'}</Button>}
             <Button mode="outlined" disabled={saving} labelStyle={{ fontSize: 16 }} contentStyle={{ minHeight: 48 }} onPress={() => finish()}>Explore BuffaGo</Button>
       </View>}

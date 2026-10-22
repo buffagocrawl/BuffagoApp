@@ -1,3 +1,5 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { clearWingShotIntentForAccount } from '../lib/wingShotAuthIntent';
 // providers/AuthProvider.jsx
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
@@ -18,6 +20,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     let active = true;
+    let previousAccount = null;
     console.info('[auth] initial session load started');
     dbg('initial_session_load_started', { provider: 'AuthProvider' }, 'auth');
 
@@ -25,6 +28,8 @@ export function AuthProvider({ children }) {
       .getSession()
       .then(({ data, error }) => {
         if (!active) return;
+        previousAccount = data?.session?.user && !data.session.user.is_anonymous ? data.session.user.id : null;
+        void clearWingShotIntentForAccount(AsyncStorage, { userId: previousAccount }).catch(() => {});
         setSession(data?.session ?? null);
         if (data?.session) {
           trackEvent({ eventName: 'auth_session_restored', screen: 'app_boot' });
@@ -58,6 +63,10 @@ export function AuthProvider({ children }) {
       });
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      const nextAccount = newSession?.user && !newSession.user.is_anonymous ? newSession.user.id : null;
+      const previousUserId = previousAccount;
+      previousAccount = nextAccount;
+      void clearWingShotIntentForAccount(AsyncStorage, { signedOut: _event === 'SIGNED_OUT', previousUserId, userId: nextAccount }).catch(() => {});
       setSession(newSession);
       console.info('[auth] auth event', {
         event: _event,

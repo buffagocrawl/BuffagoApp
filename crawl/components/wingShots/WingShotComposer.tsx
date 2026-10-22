@@ -8,12 +8,13 @@ import { supabase } from '../../lib/supabase';
 type Source = 'onboarding' | 'buffacoin' | 'profile' | 'home_cta';
 type Restaurant = { id: string; name: string | null; city: string | null };
 
-export function WingShotComposer({ source, onClose, destinationId, restaurantName }: { source: Source; onClose: () => void; destinationId?: string; restaurantName?: string }) {
+export function WingShotComposer({ source, onClose, destinationId, restaurantName, userId, onDestinationResolved }: { source: Source; onClose: () => void; destinationId?: string; restaurantName?: string; userId?: string; onDestinationResolved?: () => void | Promise<void> }) {
   const [query, setQuery] = useState((restaurantName || '').slice(0, 120));
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [selected, setSelected] = useState<Restaurant | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const [editing, setEditing] = useState(false);
   const [notice, setNotice] = useState('');
   const [resolving, setResolving] = useState(Boolean(destinationId));
   useEffect(() => {
@@ -22,6 +23,7 @@ export function WingShotComposer({ source, onClose, destinationId, restaurantNam
     if (!isWingShotDestinationId(destinationId)) {
       setResolving(false);
       if (destinationId) setNotice('Choose an available restaurant below.');
+      void Promise.resolve(onDestinationResolved?.()).catch(() => {});
       return;
     }
     setResolving(true);
@@ -31,16 +33,20 @@ export function WingShotComposer({ source, onClose, destinationId, restaurantNam
         setSelected(data);
         void trackEvent({ eventName: 'wing_shot_restaurant_preselected', screen: 'profile/wing-shots/submit', destinationId: data.id, metadata: { source } }).catch(() => {});
       } else setNotice('This restaurant could not be opened. Choose an available restaurant below.');
+      if (!error) void Promise.resolve(onDestinationResolved?.()).catch(() => {});
       setResolving(false);
     }).catch(() => { if (active) { setNotice('Restaurant lookup failed. Search again or explore.'); setResolving(false); } });
     return () => { active = false; };
+    // Resolution belongs to this destination, not a parent callback identity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [destinationId, source]);
   const search = useCallback(async (value: string) => {
     setLoading(true);
     const normalized = value.trim();
     let request = supabase.from('destinations').select('id,name,city').order('name').limit(20);
     if (normalized) request = request.ilike('name', `%${normalized.replace(/[%_\\]/g, '').slice(0, 100)}%`);
-    const { data } = await request;
+    const { data, error } = await request;
+    if (error) throw error;
     setRestaurants((data ?? []).filter((row) => isWingShotDestinationId(row.id)) as Restaurant[]);
     setLoading(false);
   }, []);
@@ -56,8 +62,8 @@ export function WingShotComposer({ source, onClose, destinationId, restaurantNam
         <Text style={styles.copy}>Choose the restaurant associated with your photo. You do not need to be there now.</Text>
         <TextInput value={query} onChangeText={setQuery} placeholder="Search restaurants" style={styles.input} testID="wing-shot.restaurant-search" />
         {loading ? <Text>Searching…</Text> : null}
-        <FlatList data={restaurants} keyExtractor={(item) => item.id} renderItem={({ item }) => (
-          <Pressable onPress={() => setSelected(item)} style={styles.result} testID={`wing-shot.restaurant-${item.id}`}>
+        <FlatList ListEmptyComponent={!loading ? <Text>No matching restaurants. Try another name.</Text> : null} data={restaurants} keyExtractor={(item) => item.id} renderItem={({ item }) => (
+          <Pressable onPress={() => { setSelected(item); setEditing(false); }} style={styles.result} testID={`wing-shot.restaurant-${item.id}`}>
             <Text style={styles.resultName}>{item.name || 'Restaurant'}</Text>
             {item.city ? <Text>{item.city}</Text> : null}
           </Pressable>
@@ -66,7 +72,7 @@ export function WingShotComposer({ source, onClose, destinationId, restaurantNam
       </View>
     );
   }
-  return <View style={{ flex: 1 }}><Text style={styles.resultName}>{selected.name || 'Restaurant'}</Text><WingShotFlow visible destinationId={selected.id} submissionSource={source} analyticsContext={{ screen: 'profile/wing-shots/submit', destinationId: selected.id }} onClose={onClose} /></View>;
+  return <View style={{ flex: 1 }}><Text style={styles.resultName}>{selected.name || 'Restaurant'}</Text><WingShotFlow key={selected.id} visible={!editing} destinationId={selected.id} submissionSource={source} destinationName={selected.name || 'Restaurant'} onChangeRestaurant={() => { setSelected(null); setEditing(true); }} analyticsContext={{ screen: 'profile/wing-shots/submit', destinationId: selected.id, userId }} onClose={onClose} /></View>;
 }
 
 const styles = StyleSheet.create({

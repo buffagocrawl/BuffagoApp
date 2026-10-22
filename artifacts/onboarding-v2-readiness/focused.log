@@ -1,0 +1,436 @@
+TAP version 13
+# Subtest: real flow ignores a picker finishing after Skip and prevents duplicate picker taps
+ok 1 - real flow ignores a picker finishing after Skip and prevents duplicate picker taps
+  ---
+  duration_ms: 226.4668
+  type: 'test'
+  ...
+# Subtest: real flow reopens a persisted staging handoff after process termination and revalidates before Continue
+ok 2 - real flow reopens a persisted staging handoff after process termination and revalidates before Continue
+  ---
+  duration_ms: 179.6469
+  type: 'test'
+  ...
+# Subtest: real flow hands off exactly one staged image on repeated Continue taps
+ok 3 - real flow hands off exactly one staged image on repeated Continue taps
+  ---
+  duration_ms: 47.1078
+  type: 'test'
+  ...
+# Subtest: real flow never installs an abandoned staging result into the next upload session
+ok 4 - real flow never installs an abandoned staging result into the next upload session
+  ---
+  duration_ms: 45.8614
+  type: 'test'
+  ...
+# Subtest: Wingdex batches all destinations beyond the server cap and does not sign images for counts
+ok 5 - Wingdex batches all destinations beyond the server cap and does not sign images for counts
+  ---
+  duration_ms: 3.8522
+  type: 'test'
+  ...
+# Subtest: authoritative zero public count does not fall back to stale images
+ok 6 - authoritative zero public count does not fall back to stale images
+  ---
+  duration_ms: 0.1623
+  type: 'test'
+  ...
+# Subtest: pre-rating failure copy never claims a rating has already saved
+ok 7 - pre-rating failure copy never claims a rating has already saved
+  ---
+  duration_ms: 1.347
+  type: 'test'
+  ...
+# Subtest: real media adapter preserves full-resolution HEIC for framing and handles decoder failure
+ok 8 - real media adapter preserves full-resolution HEIC for framing and handles decoder failure
+  ---
+  duration_ms: 19.0588
+  type: 'test'
+  ...
+# Subtest: Home attachment completion cannot clear a newer restaurant image draft
+ok 9 - Home attachment completion cannot clear a newer restaurant image draft
+  ---
+  duration_ms: 3.9438
+  type: 'test'
+  ...
+# Subtest: Skip at the initial image step cannot prompt for another photo after rating
+ok 10 - Skip at the initial image step cannot prompt for another photo after rating
+  ---
+  duration_ms: 4.8336
+  type: 'test'
+  ...
+# Subtest: Crawl draft attaches to its exact committed rating, survives failure and retries the same session
+ok 11 - Crawl draft attaches to its exact committed rating, survives failure and retries the same session
+  ---
+  duration_ms: 3.4033
+  type: 'test'
+  ...
+# Subtest: framing gates every upload and cancellation cannot stage or validate an image
+ok 12 - framing gates every upload and cancellation cannot stage or validate an image
+  ---
+  duration_ms: 59.6175
+  type: 'test'
+  ...
+# Subtest: a framing confirmation finishing after explicit close is ignored
+ok 13 - a framing confirmation finishing after explicit close is ignored
+  ---
+  duration_ms: 35.9537
+  type: 'test'
+  ...
+# Subtest: standalone onboarding Flow shows restaurant/change action and never auto-opens media
+ok 14 - standalone onboarding Flow shows restaurant/change action and never auto-opens media
+  ---
+  duration_ms: 29.2594
+  type: 'test'
+  ...
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 1 }
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 0 }
+# [cayenne-auth] submit_completed { outcome: 'error', duration_ms: 0 }
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 0 }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: actual login component signup preserves local preview and reaches fixed uploader
+ok 15 - actual login component signup preserves local preview and reaches fixed uploader
+  ---
+  duration_ms: 263.5205
+  type: 'test'
+  ...
+# Subtest: actual login component signin preserves local preview and reaches fixed uploader
+ok 16 - actual login component signin preserves local preview and reaches fixed uploader
+  ---
+  duration_ms: 108.5833
+  type: 'test'
+  ...
+# Subtest: actual login component confirmation preserves local preview and reaches fixed uploader
+ok 17 - actual login component confirmation preserves local preview and reaches fixed uploader
+  ---
+  duration_ms: 130.8704
+  type: 'test'
+  ...
+# Subtest: wrong password retry, double signup tap and explicit Explore do not lose preview or duplicate navigation
+ok 18 - wrong password retry, double signup tap and explicit Explore do not lose preview or duplicate navigation
+  ---
+  duration_ms: 137.9998
+  type: 'test'
+  ...
+# Subtest: actual login google session listener defers to OAuth callback, cancel and error permit retry
+ok 19 - actual login google session listener defers to OAuth callback, cancel and error permit retry
+  ---
+  duration_ms: 96.0095
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792630078028-1',
+#       destinationId: '11111111-1111-4111-8111-111111111111',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: actual google callback deep-link code exchange sends current user to original restaurant
+ok 20 - actual google callback deep-link code exchange sends current user to original restaurant
+  ---
+  duration_ms: 114.1963
+  type: 'test'
+  ...
+# Subtest: actual login facebook session listener defers to OAuth callback, cancel and error permit retry
+ok 21 - actual login facebook session listener defers to OAuth callback, cancel and error permit retry
+  ---
+  duration_ms: 81.0662
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792630078213-1',
+#       destinationId: '11111111-1111-4111-8111-111111111111',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: actual facebook callback deep-link code exchange sends current user to original restaurant
+ok 22 - actual facebook callback deep-link code exchange sends current user to original restaurant
+  ---
+  duration_ms: 105.2234
+  type: 'test'
+  ...
+# Subtest: normal login and saved destination precedence remain intact
+ok 23 - normal login and saved destination precedence remain intact
+  ---
+  duration_ms: 57.982
+  type: 'test'
+  ...
+# Subtest: legacy import cannot replay nested V2 local preview payloads
+ok 24 - legacy import cannot replay nested V2 local preview payloads
+  ---
+  duration_ms: 26.7435
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792630078403-1',
+#       destinationId: '11111111-1111-4111-8111-111111111111',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792630078515-1',
+#       destinationId: '11111111-1111-4111-8111-111111111111',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792630078625-1',
+#       destinationId: '11111111-1111-4111-8111-111111111111',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/(tabs)/ratings',
+#     params: {
+#       savedAction: 'save',
+#       savedDestinationId: '11111111-1111-4111-8111-111111111111',
+#       savedActionState: 'save',
+#       savedActionUserId: 'synthetic-account'
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# OAuth callback failed { code: 'callback_failed' }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: callback rejects arbitrary return-route injection and preserves saved-action priority
+ok 25 - callback rejects arbitrary return-route injection and preserves saved-action priority
+  ---
+  duration_ms: 431.3205
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792630078837-1',
+#       destinationId: '11111111-1111-4111-8111-111111111111',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# OAuth callback failed { code: 'callback_failed' }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: actual google callback rejects anonymous user and permits retry without consuming Wing Shot
+ok 26 - actual google callback rejects anonymous user and permits retry without consuming Wing Shot
+  ---
+  duration_ms: 102.9838
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792630078942-1',
+#       destinationId: '11111111-1111-4111-8111-111111111111',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# Subtest: actual facebook callback rejects anonymous user and permits retry without consuming Wing Shot
+ok 27 - actual facebook callback rejects anonymous user and permits retry without consuming Wing Shot
+  ---
+  duration_ms: 105.3436
+  type: 'test'
+  ...
+# Subtest: welcome has two paths; explore completes and replaces with home without rating
+ok 28 - welcome has two paths; explore completes and replaces with home without rating
+  ---
+  duration_ms: 156.4056
+  type: 'test'
+  ...
+# Subtest: Wingman canonical selection uses shared rating; result is local and auth follows completion
+ok 29 - Wingman canonical selection uses shared rating; result is local and auth follows completion
+  ---
+  duration_ms: 78.2342
+  type: 'test'
+  ...
+# Subtest: pending Wingman result cannot open rating; manual review allows explore
+ok 30 - pending Wingman result cannot open rating; manual review allows explore
+  ---
+  duration_ms: 59.3031
+  type: 'test'
+  ...
+# Subtest: preview survives compatibility write failure and restores result on a later mount
+ok 31 - preview survives compatibility write failure and restores result on a later mount
+  ---
+  duration_ms: 79.2531
+  type: 'test'
+  ...
+# Subtest: slider maps min/max/midpoint, clamped taps, RTL and drag sequences across widths
+ok 32 - slider maps min/max/midpoint, clamped taps, RTL and drag sequences across widths
+  ---
+  duration_ms: 0.8302
+  type: 'test'
+  ...
+# Subtest: V2 supersedes experiment and both auth import paths explicitly preserve V2 previews
+ok 33 - V2 supersedes experiment and both auth import paths explicitly preserve V2 previews
+  ---
+  duration_ms: 7.3705
+  type: 'test'
+  ...
+# Subtest: shared slider dispatches tap, drag, RTL, and accessibility adjustments
+ok 34 - shared slider dispatches tap, drag, RTL, and accessibility adjustments
+  ---
+  duration_ms: 74.1177
+  type: 'test'
+  ...
+# Subtest: quick and full rating revisits keep selected scores and submit unchanged numbers
+ok 35 - quick and full rating revisits keep selected scores and submit unchanged numbers
+  ---
+  duration_ms: 67.4503
+  type: 'test'
+  ...
+# Subtest: V2 location stays optional; returning users and disabled flag retain permission behavior
+ok 36 - V2 location stays optional; returning users and disabled flag retain permission behavior
+  ---
+  duration_ms: 32.9747
+  type: 'test'
+  ...
+# Subtest: existing restaurant search selects the same shared quick rating dialog
+ok 37 - existing restaurant search selects the same shared quick rating dialog
+  ---
+  duration_ms: 386.2629
+  type: 'test'
+  ...
+# Subtest: disabled photo flags keep preview and Explore without advertising account upload
+ok 38 - disabled photo flags keep preview and Explore without advertising account upload
+  ---
+  duration_ms: 15.0066
+  type: 'test'
+  ...
+# Subtest: guest invitation uses release contract without calling authenticated flags
+ok 39 - guest invitation uses release contract without calling authenticated flags
+  ---
+  duration_ms: 14.0288
+  type: 'test'
+  ...
+# Subtest: authenticated V2 result skips signup and opens same restaurant uploader directly
+ok 40 - authenticated V2 result skips signup and opens same restaurant uploader directly
+  ---
+  duration_ms: 16.5597
+  type: 'test'
+  ...
+# Subtest: post-auth definitive flags open same destination with existing composer; identity loss closes uploader
+ok 41 - post-auth definitive flags open same destination with existing composer; identity loss closes uploader
+  ---
+  duration_ms: 101.3053
+  type: 'test'
+  ...
+# Subtest: invite followed by disabled flags offers truthful retry and Explore, never uploader
+ok 42 - invite followed by disabled flags offers truthful retry and Explore, never uploader
+  ---
+  duration_ms: 31.901
+  type: 'test'
+  ...
+# Subtest: invite followed by network flags offers truthful retry and Explore, never uploader
+ok 43 - invite followed by network flags offers truthful retry and Explore, never uploader
+  ---
+  duration_ms: 34.9603
+  type: 'test'
+  ...
+# Subtest: authoritative flag timeout is bounded; failed and partial responses never grant uploads
+ok 44 - authoritative flag timeout is bounded; failed and partial responses never grant uploads
+  ---
+  duration_ms: 23.3602
+  type: 'test'
+  ...
+# Subtest: all password and OAuth session handoffs use validated one-time route, never preview rating ID
+ok 45 - all password and OAuth session handoffs use validated one-time route, never preview rating ID
+  ---
+  duration_ms: 3.2831
+  type: 'test'
+  ...
+# Subtest: no session and anonymous sessions preserve intent until actual current login
+ok 46 - no session and anonymous sessions preserve intent until actual current login
+  ---
+  duration_ms: 0.6783
+  type: 'test'
+  ...
+# Subtest: expiry, different bound account, stale screen and pseudo IDs fail safely
+ok 47 - expiry, different bound account, stale screen and pseudo IDs fail safely
+  ---
+  duration_ms: 0.5892
+  type: 'test'
+  ...
+# Subtest: composer verifies canonical ID through RLS before opening existing flow; lookup failures keep picker
+ok 48 - composer verifies canonical ID through RLS before opening existing flow; lookup failures keep picker
+  ---
+  duration_ms: 218.4092
+  type: 'test'
+  ...
+# Subtest: durable routed intent survives cold restart until destination acknowledgment, then cannot replay
+ok 49 - durable routed intent survives cold restart until destination acknowledgment, then cannot replay
+  ---
+  duration_ms: 13.9859
+  type: 'test'
+  ...
+# Subtest: failed verification retains intent; explicit sign-out and account switches clear private action
+ok 50 - failed verification retains intent; explicit sign-out and account switches clear private action
+  ---
+  duration_ms: 26.4071
+  type: 'test'
+  ...
+# Subtest: route-supplied handoff identity and account cannot impersonate the bound handoff
+ok 51 - route-supplied handoff identity and account cannot impersonate the bound handoff
+  ---
+  duration_ms: 13.8369
+  type: 'test'
+  ...
+1..51
+# tests 51
+# suites 0
+# pass 51
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2150.7112

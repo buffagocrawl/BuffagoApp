@@ -223,3 +223,10 @@ test('a framing confirmation finishing after explicit close is ignored',async()=
   findElement(h.render(),'wing-shot.not-now').props.onPress();frame.props.onConfirm(media);await flush();
   assert.equal(stages,0);assert.equal(h.closed.length,1);h.unmount();
 });
+
+test('standalone onboarding Flow shows restaurant/change action and never auto-opens media',async()=>{
+ let picked=0,changed=0;const h=flowHarness({picker:async()=>{picked++;return media;}});
+ Object.assign(h.props,{draftMode:false,submissionSource:'onboarding',destinationName:'Verified Wings',onChangeRestaurant:()=>{changed++;}});
+ h.render();await flush();assert.equal(picked,0);
+ const change=findElement(h.render(),'wing-shot.change-restaurant');assert.ok(change);change.props.onPress();assert.equal(changed,1);assert.equal(picked,0);h.unmount();
+});

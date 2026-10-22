@@ -50,3 +50,25 @@ test('composer verifies canonical ID through RLS before opening existing flow; l
     runtime.unmount();
   }
 });
+
+test('durable routed intent survives cold restart until destination acknowledgment, then cannot replay',async()=>{
+ const s=setup();s.now=Date.now();await saveWingShotIntent(s.storage,{destinationId:id},s.now);
+ const route=await claimWingShotIntent(s);assert.ok(route);assert.ok(await s.storage.getItem('buffago:wing-shot:onboarding-return:v1'));
+ const restarted=mobileModule('lib/wingShotAuthIntent.js',{});
+ const resumed=await restarted.claimWingShotIntent(s);assert.equal(resumed.params.handoffId,route.params.handoffId);
+ const verified=await restarted.getWingShotHandoff({...s,handoffId:resumed.params.handoffId});assert.equal(verified.destinationId,id);
+ await restarted.completeWingShotHandoff(s.storage,resumed.params.handoffId);assert.equal(await restarted.claimWingShotIntent(s),null);
+});
+test('failed verification retains intent; explicit sign-out and account switches clear private action',async()=>{
+ for(const boundary of [{signedOut:true},{previousUserId:'first',userId:'second'}]) {
+  const s=setup();await saveWingShotIntent(s.storage,{destinationId:id},1000);
+  s.client.auth.getUser=async()=>({error:Error('offline')});assert.equal(await claimWingShotIntent(s),null);
+  const api=mobileModule('lib/wingShotAuthIntent.js',{});await api.clearWingShotIntentForAccount(s.storage,boundary,1000);
+  s.client.auth.getUser=async()=>({data:{user:{id:'account'}}});assert.equal(await claimWingShotIntent(s),null);
+ }
+});
+test('route-supplied handoff identity and account cannot impersonate the bound handoff',async()=>{
+ const api=mobileModule('lib/wingShotAuthIntent.js',{}),s=setup();await api.saveWingShotIntent(s.storage,{destinationId:id},1000);const route=await api.claimWingShotIntent(s);
+ assert.equal(await api.getWingShotHandoff({...s,handoffId:'external-route'}),null);
+ s.client.auth.getUser=async()=>({data:{user:{id:'other'}}});assert.equal(await api.getWingShotHandoff({...s,handoffId:route.params.handoffId}),null);
+});

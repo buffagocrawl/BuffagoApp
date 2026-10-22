@@ -1,5 +1,5 @@
-import { claimWingShotIntent } from '../../lib/wingShotAuthIntent';
-﻿// app/auth/callback.jsx
+import { claimWingShotIntent, clearWingShotIntent } from '../../lib/wingShotAuthIntent';
+// app/auth/callback.jsx
 import { useEffect, useRef, useState } from 'react';
 import { View, ActivityIndicator, Text, Platform } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -30,7 +30,7 @@ import {
   refreshLinkedProviders,
 } from '../../lib/socialAccounts';
 import { Button, useTheme } from 'react-native-paper';
-import { resolveCallbackFallbackRoute, withCallbackTimeout } from '../../lib/authCallbackHelpers';
+import { resolveCallbackFallbackRoute, safeAuthReturnPath, withCallbackTimeout } from '../../lib/authCallbackHelpers';
 import { submitBuffacoinRatingTransaction } from '../../lib/buffacoinRatingTransaction';
 import { claimSavedDestinationAuthHandoff } from '../../lib/savedDestinations.js';
 import { accountKey } from '../../lib/accountBoundary.js';
@@ -107,8 +107,6 @@ function secretSummary(value) {
   return {
     present: true,
     length: value.length,
-    prefix: value.slice(0, 4),
-    suffix: value.slice(-4),
   };
 }
 
@@ -243,6 +241,7 @@ const applyOnboardingSeedRatingIfAny = async (userId) => {
       const parsed = JSON.parse(raw);
       // V2 previews require a separate, explicit review workflow.
       if (parsed?.onboarding_version === 'v2') return;
+        if (parsed?.payload?.onboarding_version === 'v2' || parsed?.local_only === true || parsed?.payload?.local_only === true) return;
       seed = parsed?.status === 'local_preview' ? parsed.payload : parsed;
     } catch {
       await AsyncStorage.removeItem(ONBOARDING_SEED_RATING_KEY);
@@ -315,6 +314,7 @@ export default function AuthCallback() {
     ranRef.current = true;
 
     let cancelled = false;
+    let handoffAborted = false;
     let accountIdentity;
     let accountRevision = 0;
     const { data: accountSubscription } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -433,7 +433,7 @@ export default function AuthCallback() {
           });
         }
 
-        const returnPath = (await AsyncStorage.getItem(OAUTH_RETURN_PATH_KEY)) || null;
+        const returnPath = safeAuthReturnPath(await AsyncStorage.getItem(OAUTH_RETURN_PATH_KEY));
         const expectedLinkUserId = (await AsyncStorage.getItem(OAUTH_LINK_USER_ID_KEY)) || null;
         const linkSessionSnapshot = await getStoredLinkSessionSnapshot();
         const safeFallbackRoute = resolveCallbackFallbackRoute({ returnPath, mode: flowMode });
@@ -445,7 +445,7 @@ export default function AuthCallback() {
             flowId,
             provider: flowProvider,
             mode: flowMode,
-            redirectUrl: url,
+            hasRedirectUrl: Boolean(url),
             callback: describeUrl(url),
             expectedLinkUserId,
             snapshotUserId: linkSessionSnapshot?.userId || null,
@@ -681,9 +681,10 @@ export default function AuthCallback() {
         const { data: userData, error: userError } = await supabase.auth.getUser();
         if (userError) throw userError;
         let user = userData?.user || null;
+        if (!user?.id || user.is_anonymous) throw new Error('A verified account session is required.');
         accountIdentity = accountKey(user);
         const handoffRevision = accountRevision;
-        const handoffCurrent = () => !cancelled && handoffRevision === accountRevision;
+        const handoffCurrent = () => !cancelled && !handoffAborted && handoffRevision === accountRevision;
         // Reserve this account's handoff before optional setup can fail or unmount.
         let savedIntent = null;
         if (user?.id && !user.is_anonymous) {
@@ -910,7 +911,7 @@ export default function AuthCallback() {
         if (handoffCurrent() && !finalAccountError && finalAccount?.user?.id === user?.id && !finalAccount?.user?.is_anonymous) router.replace(finalRoute);
         })(), flowProvider);
       } catch (e) {
-        const msg = String(e?.message || e);
+        handoffAborted = true;
         await trackEvent({
           eventName: 'auth_callback_failed',
           screen: 'auth/callback',
@@ -920,7 +921,7 @@ export default function AuthCallback() {
             elapsed_ms: Date.now() - callbackStartedAt,
           },
         });
-        console.warn('OAuth callback failed', msg);
+        console.warn('OAuth callback failed', { code: e?.code || 'callback_failed' });
         if (flowProvider === 'facebook') {
           await dbg(
             'facebook_link_failure',
@@ -973,7 +974,7 @@ export default function AuthCallback() {
         }
 
         if (!cancelled) {
-          setErrMsg(msg);
+          setErrMsg('Sign-in could not be completed. Retry or explore BuffaGo; your local preview is unchanged.');
           await trackEvent({
             eventName: 'auth_recovery_shown',
             screen: 'auth/callback',
@@ -1048,6 +1049,7 @@ export default function AuthCallback() {
           }}>
             Continue safely
           </Button>
+          <Button mode="text" onPress={async () => { await clearWingShotIntent(AsyncStorage); router.replace('/(tabs)/home'); }}>Explore BuffaGo</Button>
           <Button mode="text" onPress={signOutAndRecover}>
             Log out
           </Button>

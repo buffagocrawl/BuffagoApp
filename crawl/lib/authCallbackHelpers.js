@@ -1,7 +1,9 @@
+const AUTH_RETURN_ROUTES = new Set(['/(tabs)/home', '/user', '/auth/login']);
+export function safeAuthReturnPath(value) { return typeof value === 'string' && AUTH_RETURN_ROUTES.has(value) ? value : null; }
 export const CALLBACK_TIMEOUT_MS = 15000;
 
 export function resolveCallbackFallbackRoute({ returnPath = null, mode = null } = {}) {
-  if (returnPath) return returnPath;
+  if (safeAuthReturnPath(returnPath)) return returnPath;
   if (mode === 'link_identity') return '/user';
   return '/auth/login';
 }

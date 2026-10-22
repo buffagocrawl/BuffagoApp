@@ -9,14 +9,16 @@ const slider = require('../lib/ratingSlider.js');
 const id = '11111111-1111-4111-8111-111111111111';
 const nodes = (tree, type) => !tree ? [] : Array.isArray(tree) ? tree.flatMap(n => nodes(n, type)) : [...(tree.type === type ? [tree] : []), ...nodes(tree.props?.children, type)];
 const flush = async () => { for (let i = 0; i < 30; i++) await Promise.resolve(); };
-function setup(saved = null, failSeed = false, photoEnabled = true) {
+function setup(saved = null, failSeed = false, photoEnabled = true, account = null) {
   const runtime = hookRuntime(), data = new Map(), events = [], routes = [];
   const storage = { getItem: async k => data.get(k) || null, setItem: async (k,v) => { if (failSeed && k.endsWith('seed_rating')) throw Error('disk'); data.set(k,v); } };
   const previewTools = mobileModule('lib/guestRatingPreview.js', {});
   if (saved) data.set(previewTools.GUEST_RATING_PREVIEW_KEY, JSON.stringify(saved));
+  let flagCalls = 0;
   const imports = {
-    '../lib/photoWorkflowFlags': { loadPhotoWorkflowFlags: async () => ({ prompt: photoEnabled, photo: photoEnabled }) },
-    '../lib/wingShotAuthIntent': { saveWingShotIntent: async () => {}, claimWingShotIntent: async () => null, clearWingShotIntent: async () => {} },
+    '../config/features': { ENABLE_ONBOARDING_WING_SHOT_INVITE: photoEnabled },
+    '../lib/photoWorkflowFlags': { loadPhotoWorkflowFlags: async () => { flagCalls++; return { prompt: photoEnabled, photo: photoEnabled }; } },
+    '../lib/wingShotAuthIntent': { saveWingShotIntent: async () => {}, claimWingShotIntent: async () => account && !account.is_anonymous ? { pathname: '/profile/wing-shots/submit', params: { source: 'onboarding', destinationId: id } } : null, clearWingShotIntent: async () => {} },
     react: runtime.react, 'react/jsx-runtime': runtime.jsx,
     'react-native': { BackHandler: { addEventListener: () => ({ remove() {} }) }, KeyboardAvoidingView: 'keyboard', Platform: { OS: 'android' }, ScrollView: 'scroll', View: 'view' },
     'react-native-safe-area-context': { SafeAreaView: 'safe' },
@@ -25,7 +27,7 @@ function setup(saved = null, failSeed = false, photoEnabled = true) {
     'expo-crypto': { randomUUID: () => 'operation-1' },
     'expo-router': { useRouter: () => ({ replace: r => routes.push(['replace',r]), push: r => routes.push(['push',r]) }) },
     './RatingWizardDialog': 'rating', './WingmanAddDialog': 'wingman',
-    '../lib/supabase': { supabase: { from: () => ({ select() { return this; }, ilike() { return this; }, order() { return this; }, limit() { return this; }, abortSignal: async () => ({ data: [{id, name: 'Existing Wings', city: 'Buffalo', state_id: 1}] }) }) } }, '../providers/AuthProvider': { useAuth: () => ({ user: null }) },
+    '../lib/supabase': { supabase: { from: () => ({ select() { return this; }, ilike() { return this; }, order() { return this; }, limit() { return this; }, abortSignal: async () => ({ data: [{id, name: 'Existing Wings', city: 'Buffalo', state_id: 1}] }) }) } }, '../providers/AuthProvider': { useAuth: () => ({ user: account }) },
     '../lib/analytics': { trackEvent: async e => events.push(e) },
     '../hooks/useOnboardingGate': { markOnboardingSeen: async () => data.set('done','1') },
     '../lib/guestRatingPreview': previewTools, '../lib/quickRating': require('../lib/quickRating.js'), '../lib/onboardingV2': helpers,
@@ -34,7 +36,7 @@ function setup(saved = null, failSeed = false, photoEnabled = true) {
   const render = () => runtime.render(Component, {});
   const press = async label => { render(); await flush(); const button = nodes(render(),'button').find(n => n.props.children === label); assert.ok(button,label); await button.props.onPress(); await flush(); };
   render();
-  return { render, press, data, events, routes, runtime, previewTools };
+  return { render, press, data, events, routes, runtime, previewTools, flagCalls: () => flagCalls };
 }
 test('welcome has two paths; explore completes and replaces with home without rating', async () => {
   const s=setup(); await flush();
@@ -172,4 +174,20 @@ test('disabled photo flags keep preview and Explore without advertising account 
   assert.ok(!nodes(tree,'button').some(n=>n.props.children==='Create Account & Add a Wing Shot'));
   await s.press('Explore BuffaGo');assert.deepEqual(s.routes,[['replace','/(tabs)/home']]);
   assert.ok(s.data.has('buffago:guest_rating_preview:v1'));s.runtime.unmount();
+});
+
+test('guest invitation uses release contract without calling authenticated flags',async()=>{
+ const s=setup();await flush();await s.press('Find / rate wings');
+ await nodes(s.render(),'wingman')[0].props.onPickDestination({id,name:'Wings'},{});
+ await nodes(s.render(),'rating')[0].props.onFinalize({scores:{overall:9,sauce:7,crispiness:6,meat:9}});
+ s.render();await flush();assert.ok(nodes(s.render(),'button').some(n=>n.props.children==='Create Account & Add a Wing Shot'));
+ assert.equal(s.flagCalls(),0);await s.press('Create Account & Add a Wing Shot');assert.equal(s.flagCalls(),0);assert.deepEqual(s.routes,[['replace','/(tabs)/home'],['push','/auth/login']]);s.runtime.unmount();
+});
+
+test('authenticated V2 result skips signup and opens same restaurant uploader directly',async()=>{
+ const s=setup(null,false,true,{id:'account',is_anonymous:false});await flush();await s.press('Find / rate wings');
+ await nodes(s.render(),'wingman')[0].props.onPickDestination({id,name:'Wings'},{});
+ await nodes(s.render(),'rating')[0].props.onFinalize({scores:{overall:8,sauce:7,crispiness:6,meat:9}});
+ s.render();await flush();await s.press('Add a Wing Shot');
+ assert.equal(s.routes.length,2);assert.equal(s.routes[1][1].pathname,'/profile/wing-shots/submit');assert.equal(s.routes[1][1].params.destinationId,id);assert.ok(!s.routes.some(r=>r[1]==='/auth/login'));assert.ok(s.data.has('buffago:guest_rating_preview:v1'));s.runtime.unmount();
 });

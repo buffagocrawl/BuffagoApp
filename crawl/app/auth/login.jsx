@@ -1,5 +1,5 @@
-import { claimWingShotIntent } from '../../lib/wingShotAuthIntent';
-﻿// app/auth/login.jsx
+import { claimWingShotIntent, clearWingShotIntent } from '../../lib/wingShotAuthIntent';
+// app/auth/login.jsx
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
@@ -32,6 +32,7 @@ import {
 import { dbg } from '../../lib/debugLog';
 import {
   clearOAuthFlowState,
+  isOAuthFlowInProgress,
   facebookConfigChecklist,
   getFacebookRedirectUrl,
   runSocialOAuth,
@@ -133,6 +134,7 @@ export default function EmailAuthScreen() {
   const passwordRequestPendingRef = useRef(false);
   const navigatedRef = useRef(false);
   const cancelledRef = useRef(false);
+  const socialInFlightRef = useRef(false);
   const accountRevisionRef = useRef(0);
   const accountIdentityRef = useRef(undefined);
 
@@ -159,10 +161,11 @@ export default function EmailAuthScreen() {
     // Bootstrap is detached from the auth timeout and screen lifetime. Retry
     // once after a transient failure, only while the same user is signed in.
     void Promise.resolve().then(async () => {
+      if (socialInFlightRef.current || await isOAuthFlowInProgress()) { navigatedRef.current = false; return; }
       let intent = null;
       try { intent = await claimSavedDestinationIntent({ client: supabase, userId: user.id, isCurrent }); } catch {}
       const { data: currentAccount, error: accountError } = await supabase.auth.getUser();
-      if (!isCurrent() || accountError || currentAccount?.user?.id !== user.id || currentAccount.user.is_anonymous) return;
+      if (!isCurrent() || accountError || currentAccount?.user?.id !== user.id || currentAccount.user.is_anonymous) { navigatedRef.current = false; return; }
       const wingRoute = !intent ? await claimWingShotIntent({ storage: AsyncStorage, client: supabase, userId: user.id, isCurrent }) : null;
       if (!isCurrent()) return;
       if (wingRoute) void trackEvent({ eventName: 'onboarding_wing_shot_auth_return', screen: 'auth/login', destinationId: wingRoute.params.destinationId || null, metadata: { source: 'onboarding' } }).catch(() => {});
@@ -174,7 +177,7 @@ export default function EmailAuthScreen() {
       if (data?.user?.id !== user.id) return;
       try { await afterAuthSuccess(user); }
       catch { console.warn('[password-auth] account setup retry failed'); }
-    }).catch(() => console.warn('[password-auth] account setup retry unavailable'));
+    }).catch(() => { navigatedRef.current = false; if (mountedRef.current) show('Sign-in needs another try. Your Wing Shot choice is retained.'); });
   };
 
   useEffect(() => {
@@ -324,6 +327,7 @@ export default function EmailAuthScreen() {
         const parsed = JSON.parse(raw);
         // V2 previews require a separate, explicit review workflow.
         if (parsed?.onboarding_version === 'v2') return;
+        if (parsed?.payload?.onboarding_version === 'v2' || parsed?.local_only === true || parsed?.payload?.local_only === true) return;
         seed = parsed?.status === 'local_preview' ? parsed.payload : parsed;
       } catch {
         await AsyncStorage.removeItem(ONBOARDING_SEED_RATING_KEY);
@@ -412,6 +416,8 @@ export default function EmailAuthScreen() {
   };
 
   const handleSocialAuth = async (provider) => {
+    if (socialInFlightRef.current || busyRef.current) return;
+    socialInFlightRef.current = true;
     try {
       await trackEvent({ eventName: 'auth_started', screen: 'auth/login', metadata: { auth_method: 'oauth' } });
       await trackEvent({ eventName: 'auth_provider_selected', screen: 'auth/login', metadata: { provider } });
@@ -451,7 +457,7 @@ export default function EmailAuthScreen() {
         scope
       );
       show(getSocialAuthErrorMessage(provider, e, 'sign in'));
-    }
+    } finally { socialInFlightRef.current = false; }
   };
 
   const onSignIn = async () => {
@@ -511,11 +517,12 @@ export default function EmailAuthScreen() {
       if (mountedRef.current) setBusy(false);
       passwordAuthDiagnostic('attempt_cancelled');
     }
-    router.back();
+    void clearWingShotIntent(AsyncStorage).catch(() => {});
+    if (router.canGoBack?.()) router.back(); else router.replace('/(tabs)/home');
   };
 
   const onSignUp = async () => {
-    if (!emailValid || !pwdValid) return;
+    if (!emailValid || !pwdValid || busyRef.current || socialInFlightRef.current || navigatedRef.current) return;
 
     const uname = String(username || '').trim();
     if (!USERNAME_REGEX.test(uname)) {
@@ -523,6 +530,8 @@ export default function EmailAuthScreen() {
       return;
     }
 
+    cancelledRef.current = false;
+    busyRef.current = true;
     setBusy(true);
     try {
       const check = await isUsernameTaken(uname);
@@ -575,10 +584,11 @@ export default function EmailAuthScreen() {
       await applyOnboardingDestinationSuggestionIfAny(authedUser.id);
       await applyOnboardingSeedRatingIfAny(authedUser.id);
 
-      acceptSession(authedUser);
+      if (mountedRef.current && !cancelledRef.current) acceptSession(authedUser);
     } catch (e) {
       show(e?.message || 'Sign-up failed');
     } finally {
+      busyRef.current = false;
       setBusy(false);
     }
   };
@@ -604,6 +614,12 @@ export default function EmailAuthScreen() {
     }
   };
 
+  const explore = async () => {
+    cancelledRef.current = true;
+    attemptRef.current += 1;
+    await clearWingShotIntent(AsyncStorage);
+    router.replace('/(tabs)/home');
+  };
   const headerIconColor = theme.colors.onSurface;
   const screenBg = theme.colors.background;
   const socialButtons = getSocialAuthButtonModels(activeSocialProvider).filter(
@@ -658,7 +674,8 @@ export default function EmailAuthScreen() {
 
               <Text style={styles.orText}>or continue with email</Text>
 
-              <SegmentedButtons
+              <Button onPress={explore}>Explore BuffaGo</Button>
+            <SegmentedButtons
                 value={mode}
                 onValueChange={setMode}
                 buttons={[

@@ -60,6 +60,8 @@ type Props = {
   visible: boolean;
   eligibleRatingId?: string | null;
   destinationId: string;
+  destinationName?: string;
+  onChangeRestaurant?: () => void;
   submissionSource: 'rating' | 'onboarding' | 'buffacoin' | 'profile' | 'home_cta';
   draftMode?: boolean;
   draftResetSignal?: number;
@@ -119,6 +121,8 @@ export function WingShotFlow({
   visible,
   eligibleRatingId,
   destinationId,
+  destinationName,
+  onChangeRestaurant,
   submissionSource,
   draftMode = false,
   draftResetSignal = 0,
@@ -454,7 +458,7 @@ export function WingShotFlow({
         wingShotLog(correlationId, 'validation_return', { reasonCode: 'stale_validation_sequence', stage: 'final_catch', sequence, currentSequence: validationSequenceRef.current });
         return;
       }
-      const message = wingShotUserMessage(error, { ratingSaved: !draftMode });
+      const message = wingShotUserMessage(error, { ratingSaved: !draftMode && submissionSource === 'rating' });
       if (!retryable && sessionRef.current.staging) void cleanupWingShotStaging({ client: supabaseClient, staging: sessionRef.current.staging, correlationId }).catch(() => undefined);
       if (!retryable) setMedia(null);
       setConsentAccepted(false);
@@ -465,7 +469,7 @@ export function WingShotFlow({
     } finally {
       if (validationAbortRef.current === controller) validationAbortRef.current = null;
     }
-  }, [analyticsContext?.userId, draftFlow, announce, destinationId, draftMode, progressController, setPhaseSafely, supabaseClient, validationTransport]);
+  }, [analyticsContext?.userId, draftFlow, announce, destinationId, draftMode, submissionSource, progressController, setPhaseSafely, supabaseClient, validationTransport]);
 
   useEffect(() => {
     if (!visible || !draftMode || media) return;
@@ -556,7 +560,7 @@ export function WingShotFlow({
         } else acceptMedia(null);
       } catch (error) {
         if (!mountedRef.current || selectionSequence !== validationSequenceRef.current) return;
-        const message = wingShotUserMessage(error, { ratingSaved: !draftMode });
+        const message = wingShotUserMessage(error, { ratingSaved: !draftMode && submissionSource === 'rating' });
         setErrorCode(String((error as { code?: string })?.code || ''));
         wingShotLog(sessionRef.current.correlationId, 'Upload failed', {
           validationRule: (error as { code?: string })?.code ?? null,
@@ -567,7 +571,7 @@ export function WingShotFlow({
         announce(message);
       }
     },
-    [acceptMedia, analyticsContext, announce, draftMode, mediaAdapter, setPhaseSafely],
+    [acceptMedia, analyticsContext, announce, draftMode, submissionSource, mediaAdapter, setPhaseSafely],
   );
 
   const removeMedia = useCallback(() => {
@@ -605,7 +609,7 @@ export function WingShotFlow({
   const submit = useCallback(async () => {
     if (submitInFlightRef.current || phaseRef.current !== 'valid' || rateLimitRemainingSeconds > 0) return;
     if (!networkAvailable) {
-      const message = wingShotUserMessage({ code: 'offline' });
+      const message = wingShotUserMessage({ code: 'offline' }, { ratingSaved: !draftMode && submissionSource === 'rating' });
       setErrorMessage(message);
       setPhaseSafely('error');
       announce(message);
@@ -682,7 +686,7 @@ export function WingShotFlow({
     } catch (error) {
       if (!mountedRef.current || !progressController.isCurrent(operation)) return;
       progressController.stop(controller.signal.aborted ? 'canceled' : 'failed');
-      const message = wingShotUserMessage(error);
+      const message = wingShotUserMessage(error, { ratingSaved: !draftMode && submissionSource === 'rating' });
       const caughtCode = String((error as { code?: string })?.code || '');
       const isRateLimited = caughtCode === 'WING_SHOT_RATE_LIMITED' || caughtCode === 'RATE_LIMITED' || caughtCode === 'rate_limited';
       if (isRateLimited) {
@@ -727,6 +731,7 @@ export function WingShotFlow({
     consentAccepted,
     eligibleRatingId,
     destinationId,
+    draftMode,
     networkAvailable,
     media,
     onSubmitted,
@@ -819,9 +824,12 @@ export function WingShotFlow({
                 framingRef.current = null; setFramingMedia(null); acceptMedia(framed);
               }} /> : <>
 
+              {destinationName ? <Text style={styles.intro} allowFontScaling>{destinationName}</Text> : null}
+              {onChangeRestaurant && phase !== 'submitted' ? <ActionButton label="Change restaurant" icon="images" testID="wing-shot.change-restaurant" disabled={disabled}
+                onPress={() => { if (!disabled && resetWingShotForm('change_restaurant')) onChangeRestaurant(); }} /> : null}
               <View style={styles.headerCopy}>
                 <Text style={styles.eyebrow} allowFontScaling>
-                  {draftMode ? 'OPTIONAL · ADD A PHOTO BEFORE RATING' : 'OPTIONAL · YOUR RATING HAS ALREADY SAVED'}
+                  {draftMode ? 'OPTIONAL · ADD A PHOTO BEFORE RATING' : submissionSource === 'rating' ? 'OPTIONAL · YOUR RATING HAS ALREADY SAVED' : 'OPTIONAL · SHARE A RESTAURANT PHOTO'}
                 </Text>
                 <Text style={styles.title} accessibilityRole="header" allowFontScaling>
                   {draftMode ? 'Add a photo' : 'Show us the wings'}

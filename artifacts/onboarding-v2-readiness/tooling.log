@@ -1,0 +1,10 @@
+Android: Windows host; adb and emulator available. Booted Medium_Phone_API_36.1 headless, emulator-5554.
+Installed com.buffago.app: versionName 1.0.5, DEBUGGABLE; current app config 1.0.7.
+Attempt: npx expo start --dev-client --port 8092 --localhost; process-local EXPO_NO_DOTENV=1, EXPO_PUBLIC_ONBOARDING_V2=true, EXPO_PUBLIC_ONBOARDING_WING_SHOT_INVITE=true; synthetic key and http://10.0.2.2:55321 only. No production endpoint or credentials.
+adb reverse tcp:8092 tcp:8092; opened development-client URL via 127.0.0.1 and 10.0.2.2.
+Observed: SocketTimeoutException loading project; subsequent retry produced Android app-not-responding dialog. Current JS bundle never demonstrated loaded. App force-stopped after evidence capture.
+Android full journey / viewport / screenshot acceptance: BLOCKED. PNGs are blocker evidence only, not product screenshots.
+iOS: Windows; xcrun unavailable. BLOCKED; no iOS simulator/device exercised.
+Backend: existing loopback-only acceptance credential file discovered; no credentials copied into artifacts. Docker daemon initially unavailable, Docker Desktop started hidden; existing services auto-started.
+127.0.0.1:55321 refused connections. Kong repeatedly logs: can't create /home/kong/kong.yml: Permission denied. Edge runtime stopped. Existing refresh-auth script attempted local reads but all failed connection; its generic success line is not evidence of login. No successful auth or upload.
+No migrations, SQL/RLS/function edits, deployments, bucket changes, release builds, or flag changes were performed. Backend standalone upload gate remains BLOCKED. Do not use production as substitute.

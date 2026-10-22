@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+﻿import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import ts from 'typescript';
 
@@ -6,7 +6,7 @@ export function mobileModule(path, imports) {
   const exports = {};
   const source = readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
   const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true } }).outputText;
-  vm.runInNewContext(code, { exports, AbortController, setTimeout, clearTimeout, setInterval, clearInterval, console, __DEV__: false, process: { env: {} },
+  vm.runInNewContext(code, { exports, URL, URLSearchParams, AbortController, setTimeout, clearTimeout, setInterval, clearInterval, console, __DEV__: false, process: { env: {} },
     require: (name) => { if (!(name in imports)) throw new Error(`Unmocked mobile import: ${name}`); return imports[name]; },
   });
   return exports;

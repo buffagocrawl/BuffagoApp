@@ -99,3 +99,11 @@ export const ENABLE_WING_JURY = parseBooleanFlag(
 
 // V2 supersedes the short-onboarding experiment when enabled.
 export const ENABLE_ONBOARDING_V2 = parseBooleanFlag(process.env.EXPO_PUBLIC_ONBOARDING_V2, false);
+
+// Public invitation contract only: not upload permission. Release owners opt in
+// after verifying Wing Shots are supported in that environment. Default/rollback
+// is the neutral favorites invitation. Server flags always gate actual uploads.
+export const ENABLE_ONBOARDING_WING_SHOT_INVITE = parseBooleanFlag(
+  process.env.EXPO_PUBLIC_ONBOARDING_WING_SHOT_INVITE,
+  false
+);
