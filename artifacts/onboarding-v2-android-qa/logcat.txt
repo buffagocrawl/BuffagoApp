@@ -1,0 +1,1426 @@
+--------- beginning of system
+10-21 21:06:37.755   760   760 D ActivityManager: sync unfroze 2449 com.google.android.tts for 6
+--------- beginning of main
+10-21 21:06:39.667  1000  1000 I Choreographer: Skipped 205 frames!  The application may be doing too much work on its main thread.
+10-21 21:06:39.877   760   793 I ActivityManager: Start proc 3119:com.google.android.apps.restore/u0a139 for broadcast {com.google.android.apps.restore/com.google.android.apps.restore.restoreanytime.availability.SettingEntryUpdateReceiver_Receiver}
+10-21 21:06:40.500   760   793 W ActivityManager: Slow operation: 52ms so far, now at startProcess: returned from zygote!
+10-21 21:06:40.630   760   793 W ActivityManager: Slow operation: 182ms so far, now at startProcess: done updating battery stats
+10-21 21:06:40.630   760   793 W ActivityManager: Slow operation: 182ms so far, now at startProcess: building log message
+10-21 21:06:40.630   760   793 I ActivityManager: Start proc 3168:com.android.vending:background/u0a144 for service {com.android.vending/com.google.frameworks.client.data.android.server.play.BackgroundProcessEndpointService}
+10-21 21:06:40.630   760   793 W ActivityManager: Slow operation: 182ms so far, now at startProcess: starting to update pids map
+10-21 21:06:40.630   760   793 W ActivityManager: Slow operation: 182ms so far, now at startProcess: done updating pids map
+10-21 21:06:42.366   760   776 W ActivityManager: Slow operation: 108ms so far, now at finishAttachApplicationInner: after mServices.attachApplicationLocked
+10-21 21:06:42.367   760   776 W ActivityManager: Slow operation: 108ms so far, now at finishAttachApplicationInner: after dispatching broadcasts
+10-21 21:06:43.725   760  1490 W ActivityManager: Slow operation: 77ms so far, now at finishAttachApplicationInner: after dispatching broadcasts
+10-21 21:06:43.895   760   792 W ActivityManager: Slow operation: 57ms so far, now at startProcess: done creating new process record
+10-21 21:06:43.895   760   792 W ActivityManager: Slow operation: 57ms so far, now at startProcess: stepping in to startProcess
+10-21 21:06:43.915  1000  1000 I Choreographer: Skipped 216 frames!  The application may be doing too much work on its main thread.
+10-21 21:06:43.930   760   792 W ActivityManager: Slow operation: 92ms so far, now at startProcess: done starting proc!
+10-21 21:06:43.949   760   793 W ActivityManager: Slow operation: 54ms so far, now at startProcess: returned from zygote!
+10-21 21:06:43.950   760   793 W ActivityManager: Slow operation: 55ms so far, now at startProcess: done updating battery stats
+10-21 21:06:43.950   760   793 W ActivityManager: Slow operation: 55ms so far, now at startProcess: building log message
+10-21 21:06:43.950   760   793 I ActivityManager: Start proc 3277:com.google.android.apps.safetyhub/u0a147 for broadcast {com.google.android.apps.safetyhub/com.google.android.apps.safetyhub.startup.StartupBroadcastReceiver_Receiver}
+10-21 21:06:43.950   760   793 W ActivityManager: Slow operation: 55ms so far, now at startProcess: starting to update pids map
+10-21 21:06:43.951   760   793 W ActivityManager: Slow operation: 55ms so far, now at startProcess: done updating pids map
+10-21 21:06:44.284   760  1490 W ActivityManager: Slow operation: 58ms so far, now at attachApplicationLocked: after updateOomAdjLocked
+10-21 21:06:45.335  1000  1000 I Choreographer: Skipped 50 frames!  The application may be doing too much work on its main thread.
+10-21 21:06:46.581  1000  1000 I Choreographer: Skipped 70 frames!  The application may be doing too much work on its main thread.
+10-21 21:06:47.774  1000  1000 I Choreographer: Skipped 70 frames!  The application may be doing too much work on its main thread.
+10-21 21:06:47.896   760   847 W ActivityManager: pid 760 system sent binder code 31 with flags 1 and got error -32
+10-21 21:06:48.105   760   776 W ActivityManager: pid 2284 com.google.android.apps.photos sent binder code 2 with flags 1 and got error -32
+10-21 21:06:48.106   760   776 D ActivityManager: Too many transaction errors, throttling freezer binder callback.
+10-21 21:06:48.163   760  2130 I ActivityManager: Process com.google.android.apps.wallpaper (pid 2156) has died: cch CEM
+10-21 21:06:48.818  1000  1000 I Choreographer: Skipped 60 frames!  The application may be doing too much work on its main thread.
+10-21 21:06:49.483  1000  1000 I Choreographer: Skipped 39 frames!  The application may be doing too much work on its main thread.
+10-21 21:06:50.299   760  2294 W ActivityManager: Slow operation: 54ms so far, now at finishAttachApplicationInner: after mServices.attachApplicationLocked
+10-21 21:06:50.340   760  2294 W ActivityManager: Slow operation: 94ms so far, now at finishAttachApplicationInner: after dispatching broadcasts
+10-21 21:06:50.501   760   854 D ActivityManager: freezing 2473 com.android.imsserviceentitlement
+10-21 21:06:50.562   760   792 W ActivityManager: Slow operation: 56ms so far, now at startProcess: done starting proc!
+10-21 21:06:50.621   760   793 W ActivityManager: Slow operation: 66ms so far, now at startProcess: returned from zygote!
+10-21 21:06:50.632   760   793 W ActivityManager: Slow operation: 77ms so far, now at startProcess: done updating battery stats
+10-21 21:06:50.632   760   793 W ActivityManager: Slow operation: 77ms so far, now at startProcess: building log message
+10-21 21:06:50.632   760   793 I ActivityManager: Start proc 3369:com.google.android.configupdater/u0a134 for broadcast {com.google.android.configupdater/com.google.android.configupdater.MainReceiver}
+10-21 21:06:50.632   760   793 W ActivityManager: Slow operation: 77ms so far, now at startProcess: starting to update pids map
+10-21 21:06:50.666   760   793 W ActivityManager: Slow operation: 111ms so far, now at startProcess: done updating pids map
+10-21 21:06:51.590   760   793 W ActivityManager: Slow operation: 134ms so far, now at startProcess: done updating battery stats
+10-21 21:06:51.592   760   793 W ActivityManager: Slow operation: 135ms so far, now at startProcess: building log message
+10-21 21:06:51.592   760   793 I ActivityManager: Start proc 3397:com.google.android.federatedcompute/u0a212 for broadcast {com.google.android.federatedcompute/com.android.federatedcompute.services.FederatedComputeBroadcastReceiver}
+10-21 21:06:51.592   760   793 W ActivityManager: Slow operation: 136ms so far, now at startProcess: starting to update pids map
+10-21 21:06:51.592   760   793 W ActivityManager: Slow operation: 136ms so far, now at startProcess: done updating pids map
+10-21 21:06:52.552   760  1708 W ActivityManager: Slow operation: 312ms so far, now at finishAttachApplicationInner: after mServices.attachApplicationLocked
+10-21 21:06:52.669   760  1708 W ActivityManager: Slow operation: 429ms so far, now at finishAttachApplicationInner: after dispatching broadcasts
+10-21 21:06:53.480   760   793 W ActivityManager: Slow operation: 58ms so far, now at startProcess: returned from zygote!
+10-21 21:06:53.658   760   793 W ActivityManager: Slow operation: 236ms so far, now at startProcess: done updating battery stats
+10-21 21:06:53.658   760   793 W ActivityManager: Slow operation: 236ms so far, now at startProcess: building log message
+10-21 21:06:53.658   760   793 I ActivityManager: Start proc 3431:com.google.android.healthconnect.controller/u0a200 for broadcast {com.google.android.healthconnect.controller/com.android.healthconnect.controller.safetycenter.SafetySourceBroadcastReceiver}
+10-21 21:06:53.659   760   793 W ActivityManager: Slow operation: 237ms so far, now at startProcess: starting to update pids map
+10-21 21:06:53.663   760   793 W ActivityManager: Slow operation: 241ms so far, now at startProcess: done updating pids map
+10-21 21:06:54.120   760   776 W ActivityManager: Slow operation: 85ms so far, now at finishAttachApplicationInner: after mServices.attachApplicationLocked
+10-21 21:06:54.157   760   776 W ActivityManager: Slow operation: 123ms so far, now at finishAttachApplicationInner: after dispatching broadcasts
+10-21 21:06:54.840   760   793 I ActivityManager: Start proc 3466:com.google.android.ondevicepersonalization.services/u0a211 for broadcast {com.google.android.ondevicepersonalization.services/com.android.ondevicepersonalization.services.OnDevicePersonalizationBroadcastReceiver}
+10-21 21:06:55.566   760  2294 W ActivityManager: Slow operation: 118ms so far, now at finishAttachApplicationInner: after dispatching broadcasts
+10-21 21:06:55.614   760   793 I ActivityManager: Start proc 3490:com.google.android.packageinstaller/u0a105 for broadcast {com.google.android.packageinstaller/com.android.packageinstaller.common.TemporaryFileManager}
+10-21 21:06:55.958   760   972 W ActivityManager: Slow operation: 56ms so far, now at attachApplicationLocked: after updateOomAdjLocked
+10-21 21:06:56.265   760   854 D ActivityManager: freezing 2510 com.google.android.cellbroadcastreceiver
+10-21 21:06:56.616   760   793 W ActivityManager: Slow operation: 57ms so far, now at startProcess: returned from zygote!
+10-21 21:06:56.665   760   793 W ActivityManager: Slow operation: 105ms so far, now at startProcess: done updating battery stats
+10-21 21:06:56.665   760   793 W ActivityManager: Slow operation: 106ms so far, now at startProcess: building log message
+10-21 21:06:56.665   760   793 I ActivityManager: Start proc 3519:com.google.android.partnersetup/u0a143 for broadcast {com.google.android.partnersetup/com.google.android.partnersetup.BootReceiver}
+10-21 21:06:56.665   760   793 W ActivityManager: Slow operation: 106ms so far, now at startProcess: starting to update pids map
+10-21 21:06:56.665   760   793 W ActivityManager: Slow operation: 106ms so far, now at startProcess: done updating pids map
+10-21 21:06:58.319   760  1607 W ActivityManager: Slow operation: 52ms so far, now at finishAttachApplicationInner: after dispatching broadcasts
+10-21 21:06:58.442   760   793 W ActivityManager: Slow operation: 114ms so far, now at startProcess: returned from zygote!
+10-21 21:06:58.586   760   793 W ActivityManager: Slow operation: 258ms so far, now at startProcess: done updating battery stats
+10-21 21:06:58.586   760   793 W ActivityManager: Slow operation: 258ms so far, now at startProcess: building log message
+10-21 21:06:58.586   760   793 I ActivityManager: Start proc 3554:com.google.android.projection.gearhead:car/u0a133 for broadcast {com.google.android.projection.gearhead/com.google.android.apps.auto.carservice.gmscorecompatstub.StubComponentInitReceiver}
+10-21 21:06:58.586   760   793 W ActivityManager: Slow operation: 258ms so far, now at startProcess: starting to update pids map
+10-21 21:06:58.587   760   793 W ActivityManager: Slow operation: 259ms so far, now at startProcess: done updating pids map
+10-21 21:06:59.089   760   793 W ActivityManager: Slow operation: 61ms so far, now at startProcess: done updating battery stats
+10-21 21:06:59.089   760   793 W ActivityManager: Slow operation: 61ms so far, now at startProcess: building log message
+10-21 21:06:59.089   760   793 I ActivityManager: Start proc 3580:com.google.android.settings.intelligence/u0a148 for broadcast {com.google.android.settings.intelligence/androidx.work.impl.background.systemalarm.RescheduleReceiver}
+10-21 21:06:59.089   760   793 W ActivityManager: Slow operation: 61ms so far, now at startProcess: starting to update pids map
+10-21 21:06:59.089   760   793 W ActivityManager: Slow operation: 61ms so far, now at startProcess: done updating pids map
+10-21 21:06:59.405   760  2294 I ActivityManager: Process com.google.android.photopicker (pid 2670) has died: cch  +55 CEM
+10-21 21:06:59.441   760  2146 I ActivityManager: Process com.android.managedprovisioning (pid 2956) has died: cch CEM
+10-21 21:06:59.452   760  2539 I ActivityManager: Process com.android.shell (pid 3037) has died: cch CEM
+10-21 21:07:00.131   760   854 D ActivityManager: freezing 2593 com.google.android.deskclock
+10-21 21:07:00.643   760  2539 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.BIND_VERIFIER_PUBLIC_API xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:07:00.645   760  2539 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@dc701bd
+10-21 21:07:03.161   760  1608 W ActivityManager: Slow operation: 190ms so far, now at finishAttachApplicationInner: after mServices.attachApplicationLocked
+10-21 21:07:03.180   760  1608 W ActivityManager: Slow operation: 209ms so far, now at finishAttachApplicationInner: after dispatching broadcasts
+10-21 21:07:03.626   760   793 W ActivityManager: Slow operation: 188ms so far, now at startProcess: done updating battery stats
+10-21 21:07:03.626   760   793 W ActivityManager: Slow operation: 190ms so far, now at startProcess: building log message
+10-21 21:07:03.626   760   793 I ActivityManager: Start proc 3658:com.android.externalstorage/u0a104 for broadcast {com.android.externalstorage/com.android.externalstorage.MountReceiver}
+10-21 21:07:03.627   760   793 W ActivityManager: Slow operation: 190ms so far, now at startProcess: starting to update pids map
+10-21 21:07:03.633   760   793 W ActivityManager: Slow operation: 197ms so far, now at startProcess: done updating pids map
+10-21 21:07:04.819   760   793 W ActivityManager: Slow operation: 215ms so far, now at startProcess: done updating battery stats
+10-21 21:07:04.826   760   793 W ActivityManager: Slow operation: 215ms so far, now at startProcess: building log message
+10-21 21:07:04.826   760   793 I ActivityManager: Start proc 3695:com.android.settings/1000 for broadcast {com.android.settings/com.android.settings.fuelgauge.batteryusage.BatteryUsageBroadcastReceiver}
+10-21 21:07:04.826   760   793 W ActivityManager: Slow operation: 223ms so far, now at startProcess: starting to update pids map
+10-21 21:07:04.828   760   793 W ActivityManager: Slow operation: 225ms so far, now at startProcess: done updating pids map
+10-21 21:07:05.485   760  1602 W ActivityManager: Slow operation: 61ms so far, now at attachApplicationLocked: after updateOomAdjLocked
+10-21 21:07:05.882   760   854 D ActivityManager: freezing 2735 com.android.traceur
+10-21 21:07:06.172   760   854 D ActivityManager: freezing 2785 com.google.android.onetimeinitializer
+10-21 21:07:06.372   760   854 D ActivityManager: freezing 2236 com.google.android.dialer
+10-21 21:07:06.483   760  2302 W ActivityManager: pid 3580 com.google.android.settings.intelligence sent binder code 6 with flags 2 and got error -74
+10-21 21:07:06.753   760   854 D ActivityManager: freezing 2016 com.google.android.apps.messaging
+10-21 21:07:07.013   760   854 D ActivityManager: freezing 2818 com.android.camera2
+10-21 21:07:07.022   760   854 D ActivityManager: freezing 2875 com.android.devicediagnostics
+10-21 21:07:07.029   760   854 D ActivityManager: freezing 2935 com.android.dynsystem:dynsystem
+10-21 21:07:07.116   760  1347 W ActivityManager: Slow operation: 54ms so far, now at startProcess: done creating new process record
+10-21 21:07:07.116   760  1347 W ActivityManager: Slow operation: 54ms so far, now at startProcess: stepping in to startProcess
+10-21 21:07:07.142   760  1347 W ActivityManager: Slow operation: 80ms so far, now at startProcess: done starting proc!
+10-21 21:07:07.181   760   793 W ActivityManager: Slow operation: 65ms so far, now at startProcess: returned from zygote!
+10-21 21:07:07.205   760   793 W ActivityManager: Slow operation: 89ms so far, now at startProcess: done updating battery stats
+10-21 21:07:07.205   760   793 W ActivityManager: Slow operation: 89ms so far, now at startProcess: building log message
+10-21 21:07:07.205   760   793 I ActivityManager: Start proc 3756:com.google.android.gms:com.google.android.gms.chimera.IsolatedBoundBrokerService/u0ai9000 for service {com.google.android.gms/com.google.android.gms.chimera.IsolatedBoundBrokerService}
+10-21 21:07:07.205   760   793 W ActivityManager: Slow operation: 89ms so far, now at startProcess: starting to update pids map
+10-21 21:07:07.206   760   793 W ActivityManager: Slow operation: 90ms so far, now at startProcess: done updating pids map
+10-21 21:07:07.841   760   854 D ActivityManager: freezing 2912 com.android.dynsystem
+10-21 21:07:08.381   760   776 W ActivityManager: Slow operation: 69ms so far, now at finishAttachApplicationInner: after mServices.attachApplicationLocked
+10-21 21:07:08.401   760   776 W ActivityManager: Slow operation: 89ms so far, now at finishAttachApplicationInner: after dispatching broadcasts
+10-21 21:07:08.572   760  1220 W ActivityManager: Slow operation: 140ms so far, now at finishAttachApplicationInner: after mServices.attachApplicationLocked
+10-21 21:07:08.572   760  1220 W ActivityManager: Slow operation: 140ms so far, now at finishAttachApplicationInner: after dispatching broadcasts
+10-21 21:07:08.598   760   793 W ActivityManager: Slow operation: 140ms so far, now at startProcess: done updating battery stats
+10-21 21:07:08.598   760   793 W ActivityManager: Slow operation: 140ms so far, now at startProcess: building log message
+10-21 21:07:08.598   760   793 I ActivityManager: Start proc 3786:com.android.chrome/u0a153 for broadcast {com.android.chrome/org.chromium.chrome.browser.browserservices.InstalledWebappBroadcastReceiver}
+10-21 21:07:08.598   760   793 W ActivityManager: Slow operation: 140ms so far, now at startProcess: starting to update pids map
+10-21 21:07:08.599   760   793 W ActivityManager: Slow operation: 140ms so far, now at startProcess: done updating pids map
+10-21 21:07:10.741   760  1920 W ActivityManager: Slow operation: 78ms so far, now at finishAttachApplicationInner: after mServices.attachApplicationLocked
+10-21 21:07:10.810   760  1920 W ActivityManager: Slow operation: 147ms so far, now at finishAttachApplicationInner: after dispatching broadcasts
+10-21 21:07:10.946   760   776 D ActivityManager: sync unfroze 2935 com.android.dynsystem:dynsystem for 10
+10-21 21:07:10.947   760   776 D ActivityManager: sync unfroze 2912 com.android.dynsystem for 10
+10-21 21:07:10.968   760   793 W ActivityManager: Slow operation: 101ms so far, now at startProcess: done updating battery stats
+10-21 21:07:10.968   760   793 W ActivityManager: Slow operation: 102ms so far, now at startProcess: building log message
+10-21 21:07:10.968   760   793 I ActivityManager: Start proc 3832:com.google.android.documentsui/u0a102 for broadcast {com.google.android.documentsui/com.android.documentsui.PackageReceiver}
+10-21 21:07:10.968   760   793 W ActivityManager: Slow operation: 102ms so far, now at startProcess: starting to update pids map
+10-21 21:07:10.968   760   793 W ActivityManager: Slow operation: 102ms so far, now at startProcess: done updating pids map
+10-21 21:07:11.090   760   854 D ActivityManager: freezing 2998 com.android.providers.calendar
+10-21 21:07:11.389   760   777 I ActivityManager: Killing 3756:com.google.android.gms:com.google.android.gms.chimera.IsolatedBoundBrokerService/u0a146i0 (adj 0): isolated not needed
+10-21 21:07:11.853   760   776 W ActivityManager: Slow operation: 79ms so far, now at finishAttachApplicationInner: after mServices.attachApplicationLocked
+10-21 21:07:11.868   760   776 W ActivityManager: Slow operation: 94ms so far, now at finishAttachApplicationInner: after dispatching broadcasts
+10-21 21:07:12.028   760   793 W ActivityManager: Slow operation: 56ms so far, now at startProcess: done updating battery stats
+10-21 21:07:12.028   760   793 W ActivityManager: Slow operation: 57ms so far, now at startProcess: building log message
+10-21 21:07:12.028   760   793 I ActivityManager: Start proc 3862:com.google.android.adservices.api/u0a215 for broadcast {com.google.android.adservices.api/com.android.adservices.service.common.PackageChangedReceiver}
+10-21 21:07:12.029   760   793 W ActivityManager: Slow operation: 58ms so far, now at startProcess: starting to update pids map
+10-21 21:07:12.030   760   793 W ActivityManager: Slow operation: 58ms so far, now at startProcess: done updating pids map
+10-21 21:07:12.127   760   854 D ActivityManager: freezing 2190 com.google.android.apps.wellbeing
+10-21 21:07:17.488   760   854 D ActivityManager: freezing 2960 com.google.android.rkpdapp
+10-21 21:07:18.805   760   854 D ActivityManager: freezing 2449 com.google.android.tts
+10-21 21:07:19.626   760  2175 D ActivityManager: sync unfroze 2735 com.android.traceur for 7
+10-21 21:07:19.695   760   793 I ActivityManager: Start proc 3945:com.google.android.accessibility.switchaccess/u0a168 for content provider {com.google.android.accessibility.switchaccess/com.google.android.accessibility.switchaccess.systemsettings.search.SwitchAccessSearchIndexablesProvider}
+10-21 21:07:19.733   760  1608 D ActivityManager: sync unfroze 2016 com.google.android.apps.messaging for 7
+10-21 21:07:20.089   760  2175 D ActivityManager: sync unfroze 2190 com.google.android.apps.wellbeing for 7
+10-21 21:07:20.471   760  1602 D ActivityManager: sync unfroze 2510 com.google.android.cellbroadcastreceiver for 7
+10-21 21:07:20.531   760   793 W ActivityManager: Slow operation: 140ms so far, now at startProcess: done updating battery stats
+10-21 21:07:20.531   760   793 W ActivityManager: Slow operation: 141ms so far, now at startProcess: building log message
+10-21 21:07:20.531   760   793 I ActivityManager: Start proc 3971:com.google.android.gms.ui/u0a146 for content provider {com.google.android.gms/com.google.android.gms.accountsettings.content.SettingsSearchContentProvider}
+10-21 21:07:20.531   760   793 W ActivityManager: Slow operation: 141ms so far, now at startProcess: starting to update pids map
+10-21 21:07:20.533   760   793 W ActivityManager: Slow operation: 141ms so far, now at startProcess: done updating pids map
+10-21 21:07:21.636   760   972 D ActivityManager: sync unfroze 2960 com.google.android.rkpdapp for 6
+10-21 21:07:21.969   760   854 D ActivityManager: freezing 3832 com.google.android.documentsui
+10-21 21:07:21.982   760   793 I ActivityManager: Start proc 4026:com.google.android.marvin.talkback/u0a174 for content provider {com.google.android.marvin.talkback/com.google.android.accessibility.talkback.preference.search.TalkBackSearchIndexablesProvider}
+10-21 21:07:22.008   760   854 D ActivityManager: freezing 3658 com.android.externalstorage
+10-21 21:07:22.070   760  1602 W ActivityManager: Slow operation: 103ms so far, now at finishAttachApplicationInner: after mServices.attachApplicationLocked
+10-21 21:07:22.070   760  1602 W ActivityManager: Slow operation: 104ms so far, now at finishAttachApplicationInner: after dispatching broadcasts
+10-21 21:07:23.390   760   854 D ActivityManager: freezing 3862 com.google.android.adservices.api
+10-21 21:07:23.429   760   854 D ActivityManager: freezing 3397 com.google.android.federatedcompute
+10-21 21:07:24.404   760   854 D ActivityManager: freezing 3369 com.google.android.configupdater
+10-21 21:07:24.842   760   840 I ActivityManager: Process com.android.imsserviceentitlement (pid 2473) has died: cch CEM
+10-21 21:07:24.906   760   840 I ActivityManager: Process com.google.android.deskclock (pid 2593) has died: cch CEM
+10-21 21:07:24.919   760  2175 I ActivityManager: Process com.android.providers.calendar (pid 2998) has died: cch CEM
+10-21 21:07:25.123   760  1608 I ActivityManager: Process com.google.android.tts (pid 2449) has died: cch CEM
+10-21 21:07:25.179   760  1602 I ActivityManager: Process com.google.android.federatedcompute (pid 3397) has died: cch CEM
+10-21 21:07:25.631   760   854 D ActivityManager: freezing 3466 com.google.android.ondevicepersonalization.services
+10-21 21:07:25.892   760   854 D ActivityManager: freezing 2272 com.google.android.googlequicksearchbox:googleapp
+10-21 21:07:26.626   760   854 D ActivityManager: freezing 3490 com.google.android.packageinstaller
+10-21 21:07:27.936   760   854 D ActivityManager: freezing 3786 com.android.chrome
+10-21 21:07:28.998   760   854 D ActivityManager: freezing 3554 com.google.android.projection.gearhead:car
+10-21 21:07:30.495   760   793 I ActivityManager: Start proc 4159:com.google.android.gms:com.google.android.gms.chimera.IsolatedBoundBrokerService/u0i1 for service {com.google.android.gms/com.google.android.gms.chimera.IsolatedBoundBrokerService}
+10-21 21:07:30.517   760   854 D ActivityManager: freezing 3519 com.google.android.partnersetup
+10-21 21:07:30.910   760  1220 I ActivityManager: Killing 4159:com.google.android.gms:com.google.android.gms.chimera.IsolatedBoundBrokerService/u0a146i1 (adj 0): isolated not needed
+10-21 21:07:31.454   760   854 D ActivityManager: freezing 2208 android.process.media
+10-21 21:07:31.547   760   792 I ActivityManager: Waited long enough for: ServiceRecord{de1e598 u0 com.android.settings/.SettingsDumpService c:com.android.settings}
+10-21 21:07:32.749   760  1895 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.backport.VERIFY_PACKAGE xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:07:32.752   760  1708 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@6c30ebd
+10-21 21:07:32.845   760  1220 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.BIND_VERIFIER_PUBLIC_API xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:07:32.868   760  1220 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@442e957
+10-21 21:07:33.680   760  1347 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.backport.VERIFY_PACKAGE xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:07:33.682   760  1347 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@8371bb3
+10-21 21:07:35.113   760  1708 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.backport.VERIFY_PACKAGE xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:07:35.156   760  1708 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@9020046
+10-21 21:07:36.078   760   854 D ActivityManager: freezing 2735 com.android.traceur
+10-21 21:07:36.101   760   854 D ActivityManager: freezing 3277 com.google.android.apps.safetyhub
+10-21 21:07:36.416   760   854 D ActivityManager: freezing 2190 com.google.android.apps.wellbeing
+10-21 21:07:36.537   760   854 D ActivityManager: freezing 2016 com.google.android.apps.messaging
+10-21 21:07:37.062   760   854 D ActivityManager: freezing 2960 com.google.android.rkpdapp
+10-21 21:07:37.066   760   854 D ActivityManager: freezing 2510 com.google.android.cellbroadcastreceiver
+10-21 21:07:37.513   760   854 D ActivityManager: freezing 3945 com.google.android.accessibility.switchaccess
+10-21 21:07:37.650   760  1608 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.backport.VERIFY_PACKAGE xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:07:37.651   760  1608 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@a9a83c8
+10-21 21:07:37.908   760   854 D ActivityManager: freezing 1916 com.google.android.googlequicksearchbox:search
+10-21 21:07:38.016   760   854 D ActivityManager: freezing 3431 com.google.android.healthconnect.controller
+10-21 21:07:39.635   760   793 I ActivityManager: Start proc 4232:com.buffago.app/u0a218 for next-top-activity {com.buffago.app/com.buffago.app.MainActivity}
+10-21 21:07:39.686   760   854 D ActivityManager: freezing 4026 com.google.android.marvin.talkback
+10-21 21:07:40.015   760   854 D ActivityManager: freezing 1649 com.google.android.permissioncontroller
+10-21 21:07:40.579   760  1602 W ActivityManager: Slow operation: 71ms so far, now at attachApplicationLocked: immediately after bindApplication
+10-21 21:07:40.579   760  1602 W ActivityManager: Slow operation: 71ms so far, now at attachApplicationLocked: after updateLruProcessLocked
+10-21 21:07:40.587   760  1602 W ActivityManager: Slow operation: 79ms so far, now at attachApplicationLocked: after updateOomAdjLocked
+10-21 21:07:41.122   760   847 D ActivityManager: sync unfroze 2208 android.process.media for 6
+10-21 21:07:41.356   760   854 D ActivityManager: freezing 3971 com.google.android.gms.ui
+10-21 21:07:41.944   760  1708 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.backport.VERIFY_PACKAGE xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:07:41.985   760  2146 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@6b10214
+10-21 21:07:44.397   760   854 D ActivityManager: freezing 2935 com.android.dynsystem:dynsystem
+10-21 21:07:44.406   760   854 D ActivityManager: freezing 2912 com.android.dynsystem
+10-21 21:07:44.916  4256  4256 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:07:44.978  4256  4256 I AndroidRuntime: Using default boot image
+10-21 21:07:44.978  4256  4256 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:07:45.869  4256  4256 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:07:48.084  4256  4256 D AndroidRuntime: Shutting down VM
+10-21 21:07:49.634   760  1220 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.backport.VERIFY_PACKAGE xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:07:49.640   760  1220 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@87e8488
+10-21 21:07:50.022   760  1220 W ActivityManager: Slow operation: 71ms so far, now at finishAttachApplicationInner: after mServices.attachApplicationLocked
+10-21 21:07:50.023   760  1220 W ActivityManager: Slow operation: 73ms so far, now at finishAttachApplicationInner: after dispatching broadcasts
+10-21 21:07:50.067  4232  4232 I Choreographer: Skipped 370 frames!  The application may be doing too much work on its main thread.
+10-21 21:07:51.575   760   792 I ActivityManager: Force stopping com.google.android.apps.wellbeing appid=10150 user=-1: installPackageLI
+10-21 21:07:51.628   760   792 E ActivityManager: Unable to freeze binder for 2190: -11
+10-21 21:07:51.649   760   792 I ActivityManager: Killing 2190:com.google.android.apps.wellbeing/u0a150 (adj 965): stop com.google.android.apps.wellbeing due to installPackageLI
+10-21 21:07:51.719   760   819 I ActivityManager: Force stopping com.google.android.apps.wellbeing appid=10150 user=0: pkg removed
+10-21 21:07:51.751   760   819 I ActivityManager: Force stopping com.google.android.apps.wellbeing appid=10150 user=0: pkg removed
+10-21 21:07:52.282   760  1220 V ActivityManager: Got obituary of 2190:com.google.android.apps.wellbeing
+10-21 21:07:52.286   760   854 D ActivityManager: freezing 1981 com.google.android.as.oss
+10-21 21:07:52.441   760   760 D ActivityManager: sync unfroze 2935 com.android.dynsystem:dynsystem for 10
+10-21 21:07:52.465   760   760 D ActivityManager: sync unfroze 2912 com.android.dynsystem for 10
+10-21 21:07:52.709   760   854 D ActivityManager: freezing 2208 android.process.media
+10-21 21:07:52.922   760   792 D ActivityManager: sync unfroze 1649 com.google.android.permissioncontroller for 3
+10-21 21:07:53.133   760   792 W ActivityManager: Slow operation: 70ms so far, now at startProcess: done creating new process record
+10-21 21:07:53.133   760   792 W ActivityManager: Slow operation: 70ms so far, now at startProcess: stepping in to startProcess
+10-21 21:07:53.144   760   792 W ActivityManager: Slow operation: 82ms so far, now at startProcess: done starting proc!
+10-21 21:07:53.186   760   793 W ActivityManager: Slow operation: 589ms so far, now at startProcess: done updating battery stats
+10-21 21:07:53.186   760   793 W ActivityManager: Slow operation: 589ms so far, now at startProcess: building log message
+10-21 21:07:53.186   760   793 I ActivityManager: Start proc 4318:com.android.keychain/1000 for service {com.android.keychain/com.android.keychain.KeyChainService}
+10-21 21:07:53.187   760   793 W ActivityManager: Slow operation: 590ms so far, now at startProcess: starting to update pids map
+10-21 21:07:53.187   760   793 W ActivityManager: Slow operation: 590ms so far, now at startProcess: done updating pids map
+10-21 21:07:53.188   760   793 W ActivityManager: Slow operation: 55ms so far, now at startProcess: asking zygote to start proc
+10-21 21:07:53.202   760   793 W ActivityManager: Slow operation: 70ms so far, now at startProcess: returned from zygote!
+10-21 21:07:53.213   760   793 W ActivityManager: Slow operation: 81ms so far, now at startProcess: done updating battery stats
+10-21 21:07:53.213   760   793 W ActivityManager: Slow operation: 81ms so far, now at startProcess: building log message
+10-21 21:07:53.213   760   793 I ActivityManager: Start proc 4332:com.google.android.apps.wellbeing/u0a150 for broadcast {com.google.android.apps.wellbeing/com.google.android.apps.wellbeing.appconfig.service.impl.UsageLimitServicePackageReplacedBroadcastReceiver_Receiver}
+10-21 21:07:53.214   760   793 W ActivityManager: Slow operation: 82ms so far, now at startProcess: starting to update pids map
+10-21 21:07:53.214   760   793 W ActivityManager: Slow operation: 82ms so far, now at startProcess: done updating pids map
+10-21 21:07:53.219   760   854 D ActivityManager: freezing 3580 com.google.android.settings.intelligence
+10-21 21:07:53.389   760  1347 W ActivityManager: Slow operation: 97ms so far, now at attachApplicationLocked: immediately after bindApplication
+10-21 21:07:53.389   760  1347 W ActivityManager: Slow operation: 97ms so far, now at attachApplicationLocked: after updateLruProcessLocked
+10-21 21:07:53.419   760  1347 W ActivityManager: Slow operation: 127ms so far, now at attachApplicationLocked: after updateOomAdjLocked
+10-21 21:07:53.867   760   972 W ActivityManager: Slow operation: 207ms so far, now at finishAttachApplicationInner: after mServices.attachApplicationLocked
+10-21 21:07:53.874   760   972 W ActivityManager: Slow operation: 214ms so far, now at finishAttachApplicationInner: after dispatching broadcasts
+10-21 21:07:54.010   760   854 D ActivityManager: freezing 2745 com.google.android.gms.unstable
+10-21 21:07:59.189   760   793 I ActivityManager: Start proc 4411:com.google.android.deskclock/u0a163 for content provider {com.google.android.deskclock/com.android.deskclock.provider.ClockContentProvider}
+10-21 21:07:59.548   760   776 W ActivityManager: Slow operation: 72ms so far, now at attachApplicationLocked: after updateOomAdjLocked
+10-21 21:07:59.647  4232  4232 I Choreographer: Skipped 289 frames!  The application may be doing too much work on its main thread.
+10-21 21:08:00.598   760   972 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.backport.VERIFY_PACKAGE xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:08:00.604   760   777 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@650b332
+10-21 21:08:03.678  4441  4441 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:08:03.729  4441  4441 I AndroidRuntime: Using default boot image
+10-21 21:08:03.729  4441  4441 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:08:04.325  4441  4441 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:08:05.654  4441  4441 D AndroidRuntime: Shutting down VM
+10-21 21:08:07.178   760   783 I ActivityManager: Killing 1000:com.android.systemui/u0a185 (adj -800): user request after error
+10-21 21:08:07.258   760  1347 I ActivityManager: Process com.android.systemui (pid 1000) has died: pers PER
+10-21 21:08:07.265   760   783 W ActivityManager: pid 760 system sent binder code 36 with flags 1 and got error -32
+10-21 21:08:07.324   760   783 W ActivityManager: pid 760 system sent binder code 36 with flags 1 and got error -32
+10-21 21:08:07.324   760   783 D ActivityManager: Too many transaction errors, throttling freezer binder callback.
+10-21 21:08:07.334   760   864 W ActivityManager: pid 760 system sent binder code 13 with flags 1 and got error -32
+10-21 21:08:07.334   760   864 D ActivityManager: Too many transaction errors, throttling freezer binder callback.
+10-21 21:08:07.338   760   864 W ActivityManager: pid 760 system sent binder code 2 with flags 1 and got error -32
+10-21 21:08:07.338   760   864 D ActivityManager: Too many transaction errors, throttling freezer binder callback.
+10-21 21:08:07.350   760  2146 W ActivityManager: pid 760 system sent binder code 5 with flags 1 and got error -32
+10-21 21:08:07.350   760  2146 D ActivityManager: Too many transaction errors, throttling freezer binder callback.
+10-21 21:08:07.485   760  1490 W ActivityManager: pid 760 system sent binder code 55 with flags 1 and got error -32
+10-21 21:08:07.486   760  1490 D ActivityManager: Too many transaction errors, throttling freezer binder callback.
+10-21 21:08:07.565   760  1347 W ActivityManager: Scheduling restart of crashed service com.android.systemui/.dump.SystemUIAuxiliaryDumpService in 0ms for persistent
+10-21 21:08:07.566   760  1347 W ActivityManager: Scheduling restart of crashed service com.android.systemui/.keyguard.KeyguardService in 0ms for persistent
+10-21 21:08:07.567   760  1347 W ActivityManager: Scheduling restart of crashed service com.android.systemui/.selectiontoolbar.app.service.SysUiSelectionToolbarRenderService in 0ms for persistent
+10-21 21:08:07.568   760  1347 W ActivityManager: Scheduling restart of crashed service com.android.systemui/.SystemUIService in 0ms for persistent
+10-21 21:08:07.572   760  1347 W ActivityManager: Scheduling restart of crashed service com.android.systemui/.wallpapers.ImageWallpaper in 0ms for persistent
+10-21 21:08:07.624   760  1347 W ActivityManager: Re-adding persistent process ProcessRecord{69991c1 1000:com.android.systemui/u0a185}
+10-21 21:08:07.677   760   793 I ActivityManager: Start proc 4482:com.android.systemui/u0a185 for restart com.android.systemui
+10-21 21:08:07.845   760   785 W ActivityManager: setHasOverlayUi called on unknown pid: 1000
+10-21 21:08:08.088   760  2175 W ActivityManager: Slow operation: 133ms so far, now at attachApplicationLocked: immediately after bindApplication
+10-21 21:08:08.102   760  2175 W ActivityManager: Slow operation: 147ms so far, now at attachApplicationLocked: after updateLruProcessLocked
+10-21 21:08:08.122   760  2175 W ActivityManager: Slow operation: 167ms so far, now at attachApplicationLocked: after updateOomAdjLocked
+10-21 21:08:08.150  1142  1142 I Choreographer: Skipped 33 frames!  The application may be doing too much work on its main thread.
+10-21 21:08:08.365  4479  4479 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:08:08.375  4479  4479 I AndroidRuntime: Using default boot image
+10-21 21:08:08.375  4479  4479 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:08:08.634  4479  4479 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:08:09.793  4479  4479 D AndroidRuntime: Shutting down VM
+10-21 21:08:10.849   760   760 W ActivityManager: pid 760 system sent binder code 3 with flags 1 and got error -32
+10-21 21:08:10.849   760   760 D ActivityManager: Too many transaction errors, throttling freezer binder callback.
+10-21 21:08:10.859   760   760 W ActivityManager: pid 760 system sent binder code 3 with flags 1 and got error -32
+10-21 21:08:10.859   760   760 D ActivityManager: Too many transaction errors, throttling freezer binder callback.
+10-21 21:08:12.188   760  1708 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:08:12.207   760  1708 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:08:12.403   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:08:14.135   760   854 D ActivityManager: freezing 1649 com.google.android.permissioncontroller
+10-21 21:08:14.343   760  1708 W ActivityManager: Receiver with filter android.content.IntentFilter@e851036 already registered for pid 4482, callerPackage is com.android.systemui
+10-21 21:08:16.365  4232  4232 I Choreographer: Skipped 38 frames!  The application may be doing too much work on its main thread.
+10-21 21:08:18.882   760  1909 D ActivityManager: ThemeHomeDelay: Home launch is not delayable, ignoring setThemeOverlayReady() call
+10-21 21:08:19.807  4482  4482 I Choreographer: Skipped 303 frames!  The application may be doing too much work on its main thread.
+10-21 21:08:19.871  4232  4232 I Choreographer: Skipped 209 frames!  The application may be doing too much work on its main thread.
+10-21 21:08:20.307   760  2294 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.backport.VERIFY_PACKAGE xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:08:20.327   760  2294 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@8916613
+10-21 21:08:22.418  4482  4482 I Choreographer: Skipped 156 frames!  The application may be doing too much work on its main thread.
+10-21 21:08:23.292   760  2294 W ActivityManager: pid 1315 com.google.android.gms.persistent sent binder code 2 with flags 1 and got error -32
+10-21 21:08:23.673  4482  4482 I Choreographer: Skipped 74 frames!  The application may be doing too much work on its main thread.
+10-21 21:08:23.809  4632  4632 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:08:23.896  4632  4632 I AndroidRuntime: Using default boot image
+10-21 21:08:23.897  4632  4632 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:08:24.299   760   777 I ActivityManager: Process com.android.traceur (pid 2735) has died: cch  +85 CEM
+10-21 21:08:24.422  4632  4632 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:08:24.446   760  1490 I ActivityManager: Process com.google.android.cellbroadcastreceiver (pid 2510) has died: cch  +85 CEM
+10-21 21:08:24.468   760  2294 I ActivityManager: Process com.google.android.onetimeinitializer (pid 2785) has died: cch  +75 CEM
+10-21 21:08:24.483   760  2175 I ActivityManager: Process com.android.camera2 (pid 2818) has died: cch  +75 CEM
+10-21 21:08:24.562  4482  4482 I Choreographer: Skipped 52 frames!  The application may be doing too much work on its main thread.
+10-21 21:08:24.699   760  1087 I ActivityManager: Process com.google.android.dialer (pid 2236) has died: cch  +75 CEM
+10-21 21:08:24.725   760  1710 I ActivityManager: Process com.android.devicediagnostics (pid 2875) has died: cch  +75 CEM
+10-21 21:08:24.936  4232  4543 I ReactNativeJS: Running "main" with {"rootTag":1,"initialProps":{},"fabric":true}
+10-21 21:08:25.633  4482  4482 I Choreographer: Skipped 63 frames!  The application may be doing too much work on its main thread.
+10-21 21:08:26.101  4632  4632 D AndroidRuntime: Shutting down VM
+10-21 21:08:26.897  4482  4482 I Choreographer: Skipped 74 frames!  The application may be doing too much work on its main thread.
+10-21 21:08:31.314  4232  4543 I ReactNativeJS: '[startup] app mounted', { pathname: '/' }
+10-21 21:08:31.321  4232  4543 I ReactNativeJS: [auth] initial session load started
+10-21 21:08:31.444  4232  4543 I ReactNativeJS: '[auth] initial session load completed', { hasSession: false, userId: null, error: null }
+10-21 21:08:31.490  4232  4543 I ReactNativeJS: '[startup] initial session hydration completed', { userId: null }
+10-21 21:08:31.588  4232  4543 I ReactNativeJS: '[auth] auth event', { event: 'INITIAL_SESSION', hasSession: false, userId: null }
+10-21 21:08:31.728  4679  4679 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:08:31.801  4679  4679 I AndroidRuntime: Using default boot image
+10-21 21:08:31.802  4679  4679 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:08:32.181   760   854 D ActivityManager: freezing 4318 com.android.keychain
+10-21 21:08:32.258   760   854 D ActivityManager: freezing 2935 com.android.dynsystem:dynsystem
+10-21 21:08:32.273   760   854 D ActivityManager: freezing 2912 com.android.dynsystem
+10-21 21:08:32.567  4679  4679 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:08:33.891  4679  4679 D AndroidRuntime: Shutting down VM
+10-21 21:08:35.562  4232  4543 I ReactNativeJS: '[startup] Splash initialization complete', { duration_ms: 5151,
+10-21 21:08:35.562  4232  4543 I ReactNativeJS:   platform: 'android',
+10-21 21:08:35.562  4232  4543 I ReactNativeJS:   ios_splash_asset: undefined }
+10-21 21:08:35.839  4715  4715 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:08:35.902  4232  4232 I Choreographer: Skipped 44 frames!  The application may be doing too much work on its main thread.
+10-21 21:08:36.054  4715  4715 I AndroidRuntime: Using default boot image
+10-21 21:08:36.054  4715  4715 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:08:36.227   760   972 I ActivityManager: Process com.google.android.configupdater (pid 3369) has died: cch  +65 CEM
+10-21 21:08:36.337   760   777 I ActivityManager: Process com.google.android.apps.safetyhub (pid 3277) has died: cch  +65 CEM
+10-21 21:08:36.499  4715  4715 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:08:37.000   760   854 D ActivityManager: freezing 4411 com.google.android.deskclock
+10-21 21:08:37.586  4232  4543 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-21 21:08:38.397   760   972 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.backport.VERIFY_PACKAGE xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:08:38.397   760  2175 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@da28953
+10-21 21:08:38.567   760   854 D ActivityManager: freezing 4332 com.google.android.apps.wellbeing
+10-21 21:08:38.956   760  1710 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.BIND_VERIFIER_PUBLIC_API xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:08:38.980   760   777 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@15efb87
+10-21 21:08:39.373   760  2294 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.backport.VERIFY_PACKAGE xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:08:39.374   760  2294 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@401d47f
+10-21 21:08:39.440  4715  4715 D AndroidRuntime: Shutting down VM
+10-21 21:08:39.610  4232  4543 I ReactNativeJS: '[startup] app mounted', { pathname: '/onboarding' }
+10-21 21:08:40.759   760  1710 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.backport.VERIFY_PACKAGE xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:08:40.760   760  1710 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@c17d477
+10-21 21:08:41.183  4232  4543 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:08:41.416  4232  4543 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:08:41.726  4232  4543 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:08:41.727  4232  4543 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:08:41.786  4232  4543 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:08:41.819  4232  4543 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:08:41.920   760  2294 D ActivityManager: sync unfroze 2745 com.google.android.gms.unstable for 6
+10-21 21:08:43.500   760   777 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.backport.VERIFY_PACKAGE xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:08:43.505   760   777 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@4c3df6b
+10-21 21:08:45.050  4781  4781 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:08:45.061  4781  4781 I AndroidRuntime: Using default boot image
+10-21 21:08:45.061  4781  4781 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:08:45.263  4781  4781 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:08:46.624  4781  4781 D AndroidRuntime: Shutting down VM
+10-21 21:08:47.794   760   854 D ActivityManager: freezing 3119 com.google.android.apps.restore
+10-21 21:08:47.878  4803  4803 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:08:47.892  4803  4803 I AndroidRuntime: Using default boot image
+10-21 21:08:47.892  4803  4803 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:08:48.337   760  2175 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.backport.VERIFY_PACKAGE xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:08:48.338   760  2175 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@1236d28
+10-21 21:08:48.752  4803  4803 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:08:49.959  4803  4803 D AndroidRuntime: Shutting down VM
+10-21 21:08:50.051   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:08:51.871   760   972 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:08:51.882   760   972 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:08:52.037   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:08:52.425  4841  4841 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:08:52.435  4841  4841 I AndroidRuntime: Using default boot image
+10-21 21:08:52.435  4841  4841 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:08:52.646  4841  4841 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:08:53.814  4841  4841 D AndroidRuntime: Shutting down VM
+10-21 21:08:54.189   760  1607 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.backport.VERIFY_PACKAGE xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:08:54.189   760  1607 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@33c2e1
+10-21 21:08:55.870   760   792 I ActivityManager: Force stopping com.google.android.apps.safetyhub appid=10147 user=-1: installPackageLI
+10-21 21:08:55.929   760   819 I ActivityManager: Force stopping com.google.android.apps.safetyhub appid=10147 user=0: pkg removed
+10-21 21:08:56.022   760   819 I ActivityManager: Force stopping com.google.android.apps.safetyhub appid=10147 user=0: pkg removed
+10-21 21:08:56.473   760   760 D ActivityManager: sync unfroze 4318 com.android.keychain for 10
+10-21 21:08:56.480   760   760 D ActivityManager: sync unfroze 2935 com.android.dynsystem:dynsystem for 10
+10-21 21:08:56.490   760   760 D ActivityManager: sync unfroze 2912 com.android.dynsystem for 10
+10-21 21:08:57.151   760   979 D ActivityManager: sync unfroze 1649 com.google.android.permissioncontroller for 6
+10-21 21:08:57.456   760   854 D ActivityManager: freezing 1474 android.process.acore
+10-21 21:08:57.608   760  1087 D ActivityManager: sync unfroze 4332 com.google.android.apps.wellbeing for 7
+10-21 21:08:57.612   760   793 W ActivityManager: Slow operation: 56ms so far, now at startProcess: done updating battery stats
+10-21 21:08:57.613   760   793 W ActivityManager: Slow operation: 56ms so far, now at startProcess: building log message
+10-21 21:08:57.613   760   793 I ActivityManager: Start proc 4871:com.google.android.apps.safetyhub/u0a147 for broadcast {com.google.android.apps.safetyhub/com.google.android.apps.safetyhub.startup.StartupBroadcastReceiver_Receiver}
+10-21 21:08:57.613   760   793 W ActivityManager: Slow operation: 57ms so far, now at startProcess: starting to update pids map
+10-21 21:08:57.613   760   793 W ActivityManager: Slow operation: 57ms so far, now at startProcess: done updating pids map
+10-21 21:08:58.101   760   854 D ActivityManager: freezing 2745 com.google.android.gms.unstable
+10-21 21:09:02.433   760   847 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 6
+10-21 21:09:06.143   760  1607 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.backport.VERIFY_PACKAGE xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:09:06.144   760  1607 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@1cba9c
+10-21 21:09:09.617   760  1490 W ActivityManager: pid 1315 com.google.android.gms.persistent sent binder code 2 with flags 1 and got error -32
+10-21 21:09:11.064  4959  4959 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:09:11.083  4959  4959 I AndroidRuntime: Using default boot image
+10-21 21:09:11.083  4959  4959 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:09:11.499  4959  4959 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:09:12.637  4959  4959 D AndroidRuntime: Shutting down VM
+10-21 21:09:14.330  4980  4980 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:09:14.382  4980  4980 I AndroidRuntime: Using default boot image
+10-21 21:09:14.382  4980  4980 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:09:14.962  4980  4980 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:09:15.707  4232  4543 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-21 21:09:17.065   760   854 D ActivityManager: freezing 3168 com.android.vending:background
+10-21 21:09:17.084   760   854 D ActivityManager: freezing 3067 com.android.vending
+10-21 21:09:17.622  4232  4543 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:09:17.623  4232  4543 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:09:17.624  4232  4543 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:09:17.627  4232  4543 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:09:17.764   760   854 D ActivityManager: freezing 1649 com.google.android.permissioncontroller
+10-21 21:09:18.876  4980  4980 D AndroidRuntime: Shutting down VM
+10-21 21:09:20.025  5008  5008 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:09:20.043  5008  5008 I AndroidRuntime: Using default boot image
+10-21 21:09:20.045  5008  5008 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:09:20.289  5008  5008 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:09:21.628  5008  5008 D AndroidRuntime: Shutting down VM
+10-21 21:09:22.124   760   847 D ActivityManager: sync unfroze 3067 com.android.vending for 6
+10-21 21:09:23.039   760  3769 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.backport.VERIFY_PACKAGE xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:09:23.048   760  3769 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@eaf95be
+10-21 21:09:23.148   760  3769 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:09:23.153   760  3769 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:09:23.186   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:09:24.698   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:09:30.262   760   840 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 7
+10-21 21:09:30.840   760   854 D ActivityManager: freezing 4871 com.google.android.apps.safetyhub
+10-21 21:09:32.527   760   854 D ActivityManager: freezing 3067 com.android.vending
+10-21 21:09:33.526   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:09:36.342   760   854 D ActivityManager: freezing 4318 com.android.keychain
+10-21 21:09:36.343   760   854 D ActivityManager: freezing 2935 com.android.dynsystem:dynsystem
+10-21 21:09:36.346   760   854 D ActivityManager: freezing 2912 com.android.dynsystem
+10-21 21:09:37.736   760   854 D ActivityManager: freezing 4332 com.google.android.apps.wellbeing
+10-21 21:09:44.314   760  3769 I ActivityManager: Force stopping com.buffago.app appid=10218 user=0: from pid 5050
+10-21 21:09:44.324   760  3769 I ActivityManager: Killing 4232:com.buffago.app/u0a218 (adj 0): stop com.buffago.app due to from pid 5050
+10-21 21:09:44.579   760  1895 V ActivityManager: Got obituary of 4232:com.buffago.app
+10-21 21:09:44.626   760   785 W ActivityManager: setHasOverlayUi called on unknown pid: 4232
+10-21 21:09:44.633  5053  5053 I BuffagoQA: COLD_START_1
+10-21 21:09:44.879   760   793 I ActivityManager: Start proc 5064:com.buffago.app/u0a218 for next-top-activity {com.buffago.app/com.buffago.app.MainActivity}
+10-21 21:09:44.982  5062  5062 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:09:44.992  5062  5062 I AndroidRuntime: Using default boot image
+10-21 21:09:44.992  5062  5062 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:09:45.153  5062  5062 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:09:46.308  5062  5062 D AndroidRuntime: Shutting down VM
+10-21 21:09:49.651  5064  5064 I Choreographer: Skipped 155 frames!  The application may be doing too much work on its main thread.
+10-21 21:09:50.038   760   840 W ActivityManager: pid 760 system sent binder code 7 with flags 1 and got error -32
+10-21 21:09:53.011   760  1920 I ActivityManager: Force stopping com.buffago.app appid=10218 user=0: from pid 5131
+10-21 21:09:53.015   760  1920 I ActivityManager: Killing 5064:com.buffago.app/u0a218 (adj 0): stop com.buffago.app due to from pid 5131
+10-21 21:09:53.165   760  2302 V ActivityManager: Got obituary of 5064:com.buffago.app
+10-21 21:09:53.174   760   785 W ActivityManager: setHasOverlayUi called on unknown pid: 5064
+10-21 21:09:53.229  5134  5134 I BuffagoQA: COLD_START_1
+10-21 21:09:53.541   760   793 I ActivityManager: Start proc 5145:com.buffago.app/u0a218 for next-top-activity {com.buffago.app/com.buffago.app.MainActivity}
+10-21 21:09:53.675  5143  5143 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:09:53.687  5143  5143 I AndroidRuntime: Using default boot image
+10-21 21:09:53.687  5143  5143 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:09:54.004  5143  5143 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:09:55.117  5143  5143 D AndroidRuntime: Shutting down VM
+10-21 21:09:57.190  5177  5177 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:09:57.195  5177  5177 I AndroidRuntime: Using default boot image
+10-21 21:09:57.195  5177  5177 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:09:57.344  5177  5177 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:09:58.375  5145  5145 I Choreographer: Skipped 156 frames!  The application may be doing too much work on its main thread.
+10-21 21:09:58.478  5177  5177 D AndroidRuntime: Shutting down VM
+10-21 21:10:00.504  5215  5215 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:10:00.508  5215  5215 I AndroidRuntime: Using default boot image
+10-21 21:10:00.508  5215  5215 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:10:00.726  5215  5215 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:10:01.832  5215  5215 D AndroidRuntime: Shutting down VM
+10-21 21:10:02.963  5145  5145 I Choreographer: Skipped 111 frames!  The application may be doing too much work on its main thread.
+10-21 21:10:03.953  5248  5248 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:10:03.962  5248  5248 I AndroidRuntime: Using default boot image
+10-21 21:10:03.962  5248  5248 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:10:04.129  5248  5248 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:10:05.401  5248  5248 D AndroidRuntime: Shutting down VM
+10-21 21:10:05.541   760  1490 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:10:07.176  5145  5238 I ReactNativeJS: Running "main" with {"rootTag":1,"initialProps":{},"fabric":true}
+10-21 21:10:07.406  5281  5281 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:10:07.410  5281  5281 I AndroidRuntime: Using default boot image
+10-21 21:10:07.410  5281  5281 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:10:07.599  5281  5281 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:10:08.676  5281  5281 D AndroidRuntime: Shutting down VM
+10-21 21:10:09.668   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:10:09.876  5145  5238 I ReactNativeJS: '[startup] app mounted', { pathname: '/' }
+10-21 21:10:09.884  5145  5238 I ReactNativeJS: [auth] initial session load started
+10-21 21:10:09.958  5145  5238 I ReactNativeJS: '[auth] auth event', { event: 'INITIAL_SESSION', hasSession: false, userId: null }
+10-21 21:10:10.069  5145  5238 I ReactNativeJS: '[auth] initial session load completed', { hasSession: false, userId: null, error: null }
+10-21 21:10:10.176  5145  5238 I ReactNativeJS: '[startup] initial session hydration completed', { userId: null }
+10-21 21:10:10.759  5304  5304 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:10:10.767  5304  5304 I AndroidRuntime: Using default boot image
+10-21 21:10:10.767  5304  5304 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:10:10.887  5304  5304 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:10:11.994  5304  5304 D AndroidRuntime: Shutting down VM
+10-21 21:10:13.820  5145  5238 I ReactNativeJS: '[startup] Splash initialization complete', { duration_ms: 4675,
+10-21 21:10:13.820  5145  5238 I ReactNativeJS:   platform: 'android',
+10-21 21:10:13.820  5145  5238 I ReactNativeJS:   ios_splash_asset: undefined }
+10-21 21:10:14.005  5328  5328 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:10:14.009  5328  5328 I AndroidRuntime: Using default boot image
+10-21 21:10:14.010  5328  5328 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:10:14.149  5328  5328 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:10:14.738  5145  5238 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-21 21:10:15.441   760   847 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 6
+10-21 21:10:16.996  5145  5238 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:10:17.000  5145  5238 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:10:17.051  5145  5238 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:10:18.142  5328  5328 D AndroidRuntime: Shutting down VM
+10-21 21:10:19.528   760  1087 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:10:19.530   760  1087 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:10:19.570   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:10:19.730   760  1087 I ActivityManager: Force stopping com.buffago.app appid=10218 user=0: from pid 5369
+10-21 21:10:19.751   760  1087 I ActivityManager: Killing 5145:com.buffago.app/u0a218 (adj 0): stop com.buffago.app due to from pid 5369
+10-21 21:10:19.894   760   831 V ActivityManager: Got obituary of 5145:com.buffago.app
+10-21 21:10:19.903   760   785 W ActivityManager: setHasOverlayUi called on unknown pid: 5145
+10-21 21:10:20.094  5373  5373 I BuffagoQA: COLD_START_2
+10-21 21:10:20.485   760   793 I ActivityManager: Start proc 5383:com.buffago.app/u0a218 for next-top-activity {com.buffago.app/com.buffago.app.MainActivity}
+10-21 21:10:20.607  5381  5381 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:10:20.618  5381  5381 I AndroidRuntime: Using default boot image
+10-21 21:10:20.619  5381  5381 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:10:20.836   760  2302 W ActivityManager: pid 760 system sent binder code 7 with flags 1 and got error -32
+10-21 21:10:20.912  5381  5381 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:10:22.185  5381  5381 D AndroidRuntime: Shutting down VM
+10-21 21:10:22.714   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:10:23.501   760  1895 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:10:23.503   760  1895 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:10:23.506   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:10:23.740   760  1866 I ActivityManager: Force stopping com.buffago.app appid=10218 user=0: from pid 5428
+10-21 21:10:23.760   760  1866 I ActivityManager: Killing 5383:com.buffago.app/u0a218 (adj 0): stop com.buffago.app due to from pid 5428
+10-21 21:10:23.844   760  1895 V ActivityManager: Got obituary of 5383:com.buffago.app
+10-21 21:10:23.882  5431  5431 I BuffagoQA: COLD_START_3
+10-21 21:10:24.049   760   793 I ActivityManager: Start proc 5442:com.buffago.app/u0a218 for next-top-activity {com.buffago.app/com.buffago.app.MainActivity}
+10-21 21:10:24.152  5440  5440 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:10:24.156  5440  5440 I AndroidRuntime: Using default boot image
+10-21 21:10:24.157  5440  5440 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:10:24.361  5440  5440 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:10:25.480  5440  5440 D AndroidRuntime: Shutting down VM
+10-21 21:10:25.581   760  1866 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:10:25.935   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:10:26.816   760  2294 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:10:26.817   760  2294 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:10:26.832   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:10:28.150  5442  5442 I Choreographer: Skipped 134 frames!  The application may be doing too much work on its main thread.
+10-21 21:10:32.441  5442  5442 I Choreographer: Skipped 95 frames!  The application may be doing too much work on its main thread.
+10-21 21:10:36.206  5442  5522 I ReactNativeJS: Running "main" with {"rootTag":1,"initialProps":{},"fabric":true}
+10-21 21:10:37.093   760   847 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 6
+10-21 21:10:38.716  5442  5522 I ReactNativeJS: '[startup] app mounted', { pathname: '/' }
+10-21 21:10:38.733  5442  5522 I ReactNativeJS: [auth] initial session load started
+10-21 21:10:38.847  5442  5522 I ReactNativeJS: '[auth] auth event', { event: 'INITIAL_SESSION', hasSession: false, userId: null }
+10-21 21:10:38.942  5442  5522 I ReactNativeJS: '[auth] initial session load completed', { hasSession: false, userId: null, error: null }
+10-21 21:10:38.984  5442  5522 I ReactNativeJS: '[startup] initial session hydration completed', { userId: null }
+10-21 21:10:40.825   760  2302 I ActivityManager: Force stopping com.buffago.app appid=10218 user=0: from pid 5564
+10-21 21:10:40.831   760  2302 I ActivityManager: Killing 5442:com.buffago.app/u0a218 (adj 0): stop com.buffago.app due to from pid 5564
+10-21 21:10:40.933   760  1866 V ActivityManager: Got obituary of 5442:com.buffago.app
+10-21 21:10:40.974  5567  5567 I BuffagoQA: COLD_START_1
+10-21 21:10:41.003   760   785 W ActivityManager: setHasOverlayUi called on unknown pid: 5442
+10-21 21:10:41.105   760   793 I ActivityManager: Start proc 5579:com.buffago.app/u0a218 for next-top-activity {com.buffago.app/com.buffago.app.MainActivity}
+10-21 21:10:41.125   760   793 W ActivityManager: Slow operation: 52ms so far, now at startProcess: done updating pids map
+10-21 21:10:41.444  5585  5585 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:10:41.448  5585  5585 I AndroidRuntime: Using default boot image
+10-21 21:10:41.448  5585  5585 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:10:41.624  5585  5585 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:10:42.740  5585  5585 D AndroidRuntime: Shutting down VM
+10-21 21:10:44.866  5624  5624 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:10:44.871  5624  5624 I AndroidRuntime: Using default boot image
+10-21 21:10:44.871  5624  5624 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:10:45.051  5624  5624 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:10:45.276  5579  5579 I Choreographer: Skipped 129 frames!  The application may be doing too much work on its main thread.
+10-21 21:10:45.877   760  1602 W ActivityManager: pid 760 system sent binder code 7 with flags 1 and got error -32
+10-21 21:10:46.124  5624  5624 D AndroidRuntime: Shutting down VM
+10-21 21:10:46.227   760  3769 D ActivityManager: sync unfroze 2745 com.google.android.gms.unstable for 6
+10-21 21:10:47.844   760   785 I ActivityManager: updateOomAdj start time is before than pendingPid added, don't delete it
+10-21 21:10:48.178  5672  5672 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:10:48.184  5672  5672 I AndroidRuntime: Using default boot image
+10-21 21:10:48.185  5672  5672 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:10:48.363  5672  5672 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:10:48.647   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:10:49.507  5672  5672 D AndroidRuntime: Shutting down VM
+10-21 21:10:50.064  5579  5579 I Choreographer: Skipped 113 frames!  The application may be doing too much work on its main thread.
+10-21 21:10:51.261   760   847 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 6
+10-21 21:10:51.701  5700  5700 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:10:51.705  5700  5700 I AndroidRuntime: Using default boot image
+10-21 21:10:51.705  5700  5700 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:10:51.918  5700  5700 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:10:53.070  5700  5700 D AndroidRuntime: Shutting down VM
+10-21 21:10:55.202  5733  5733 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:10:55.236  5733  5733 I AndroidRuntime: Using default boot image
+10-21 21:10:55.236  5733  5733 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:10:55.353  5579  5687 I ReactNativeJS: Running "main" with {"rootTag":1,"initialProps":{},"fabric":true}
+10-21 21:10:55.384  5733  5733 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:10:55.604   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:10:56.493  5733  5733 D AndroidRuntime: Shutting down VM
+10-21 21:10:57.663  5579  5687 I ReactNativeJS: '[startup] app mounted', { pathname: '/' }
+10-21 21:10:57.670  5579  5687 I ReactNativeJS: [auth] initial session load started
+10-21 21:10:57.788  5579  5687 I ReactNativeJS: '[auth] auth event', { event: 'INITIAL_SESSION', hasSession: false, userId: null }
+10-21 21:10:57.987  5579  5687 I ReactNativeJS: '[auth] initial session load completed', { hasSession: false, userId: null, error: null }
+10-21 21:10:58.081  5579  5687 I ReactNativeJS: '[startup] initial session hydration completed', { userId: null }
+10-21 21:10:58.569  5764  5764 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:10:58.571  5764  5764 I AndroidRuntime: Using default boot image
+10-21 21:10:58.571  5764  5764 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:10:58.780  5764  5764 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:10:59.926  5764  5764 D AndroidRuntime: Shutting down VM
+10-21 21:11:01.538  5579  5687 I ReactNativeJS: '[startup] Splash initialization complete', { duration_ms: 4441,
+10-21 21:11:01.538  5579  5687 I ReactNativeJS:   platform: 'android',
+10-21 21:11:01.538  5579  5687 I ReactNativeJS:   ios_splash_asset: undefined }
+10-21 21:11:01.548   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:11:01.848   760   854 D ActivityManager: freezing 2745 com.google.android.gms.unstable
+10-21 21:11:02.026  5782  5782 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:11:02.029  5782  5782 I AndroidRuntime: Using default boot image
+10-21 21:11:02.030  5782  5782 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:11:02.214  5579  5687 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-21 21:11:02.237  5782  5782 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:11:03.726  5579  5687 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:11:03.730  5579  5687 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:11:03.870  5579  5687 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:11:04.997  5782  5782 D AndroidRuntime: Shutting down VM
+10-21 21:11:05.439   760   777 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:11:06.295   760   777 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:11:06.298   760   777 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:11:06.313   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:11:06.474   760  1602 I ActivityManager: Force stopping com.buffago.app appid=10218 user=0: from pid 5815
+10-21 21:11:06.480   760  1602 I ActivityManager: Killing 5579:com.buffago.app/u0a218 (adj 0): stop com.buffago.app due to from pid 5815
+10-21 21:11:06.575  5818  5818 I BuffagoQA: COLD_START_2
+10-21 21:11:06.632   760   777 V ActivityManager: Got obituary of 5579:com.buffago.app
+10-21 21:11:06.641   760   785 W ActivityManager: setHasOverlayUi called on unknown pid: 5579
+10-21 21:11:06.904   760   793 I ActivityManager: Start proc 5827:com.buffago.app/u0a218 for next-top-activity {com.buffago.app/com.buffago.app.MainActivity}
+10-21 21:11:07.220   760  2539 W ActivityManager: pid 760 system sent binder code 7 with flags 1 and got error -32
+10-21 21:11:07.251  5830  5830 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:11:07.262  5830  5830 I AndroidRuntime: Using default boot image
+10-21 21:11:07.262  5830  5830 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:11:07.589  5830  5830 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:11:08.801  5830  5830 D AndroidRuntime: Shutting down VM
+10-21 21:11:10.871  5875  5875 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:11:10.878  5875  5875 I AndroidRuntime: Using default boot image
+10-21 21:11:10.878  5875  5875 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:11:11.048  5875  5875 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:11:11.509  5827  5827 I Choreographer: Skipped 130 frames!  The application may be doing too much work on its main thread.
+10-21 21:11:12.169  5875  5875 D AndroidRuntime: Shutting down VM
+10-21 21:11:14.260  5920  5920 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:11:14.266  5920  5920 I AndroidRuntime: Using default boot image
+10-21 21:11:14.266  5920  5920 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:11:14.437  5920  5920 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:11:15.551  5920  5920 D AndroidRuntime: Shutting down VM
+10-21 21:11:15.659  5827  5827 I Choreographer: Skipped 95 frames!  The application may be doing too much work on its main thread.
+10-21 21:11:16.983   760   847 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 6
+10-21 21:11:17.791  5952  5952 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:11:17.797  5952  5952 I AndroidRuntime: Using default boot image
+10-21 21:11:17.798  5952  5952 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:11:17.984  5952  5952 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:11:19.109  5952  5952 D AndroidRuntime: Shutting down VM
+10-21 21:11:20.181  5827  5933 I ReactNativeJS: Running "main" with {"rootTag":1,"initialProps":{},"fabric":true}
+10-21 21:11:21.209  5989  5989 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:11:21.213  5989  5989 I AndroidRuntime: Using default boot image
+10-21 21:11:21.214  5989  5989 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:11:21.395  5989  5989 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:11:22.597  5827  5933 I ReactNativeJS: '[startup] app mounted', { pathname: '/' }
+10-21 21:11:22.603  5827  5933 I ReactNativeJS: [auth] initial session load started
+10-21 21:11:22.662  5827  5933 I ReactNativeJS: '[auth] auth event', { event: 'INITIAL_SESSION', hasSession: false, userId: null }
+10-21 21:11:22.754  5827  5933 I ReactNativeJS: '[auth] initial session load completed', { hasSession: false, userId: null, error: null }
+10-21 21:11:22.838  5827  5933 I ReactNativeJS: '[startup] initial session hydration completed', { userId: null }
+10-21 21:11:24.104  5989  5989 D AndroidRuntime: Shutting down VM
+10-21 21:11:24.259   760  1220 D ActivityManager: sync unfroze 2745 com.google.android.gms.unstable for 6
+10-21 21:11:24.592   760  2539 D ActivityManager: sync unfroze 2960 com.google.android.rkpdapp for 6
+10-21 21:11:25.530   760   793 I ActivityManager: Start proc 6034:com.google.android.photopicker/u0a203 for broadcast {com.google.android.photopicker/com.android.photopicker.PhotopickerDeviceConfigReceiver}
+10-21 21:11:26.293  6055  6055 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:11:26.306  6055  6055 I AndroidRuntime: Using default boot image
+10-21 21:11:26.306  6055  6055 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:11:26.494  6055  6055 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:11:26.583  5827  5933 I ReactNativeJS: '[startup] Splash initialization complete', { duration_ms: 4653,
+10-21 21:11:26.583  5827  5933 I ReactNativeJS:   platform: 'android',
+10-21 21:11:26.583  5827  5933 I ReactNativeJS:   ios_splash_asset: undefined }
+10-21 21:11:27.438  5827  5933 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-21 21:11:29.478  5827  5933 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:11:29.670  5827  5933 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:11:29.685  5827  5933 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:11:30.796  6055  6055 D AndroidRuntime: Shutting down VM
+10-21 21:11:32.345   760   776 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:11:32.347   760   776 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:11:32.381   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:11:32.549   760   776 I ActivityManager: Force stopping com.buffago.app appid=10218 user=0: from pid 6107
+10-21 21:11:32.565   760   776 I ActivityManager: Killing 5827:com.buffago.app/u0a218 (adj 0): stop com.buffago.app due to from pid 6107
+10-21 21:11:32.726  6110  6110 I BuffagoQA: COLD_START_3
+10-21 21:11:32.778   760  1220 V ActivityManager: Got obituary of 5827:com.buffago.app
+10-21 21:11:32.835   760   785 W ActivityManager: setHasOverlayUi called on unknown pid: 5827
+10-21 21:11:33.003   760   793 W ActivityManager: Slow operation: 72ms so far, now at startProcess: returned from zygote!
+10-21 21:11:33.082   760   793 W ActivityManager: Slow operation: 151ms so far, now at startProcess: done updating battery stats
+10-21 21:11:33.082   760   793 W ActivityManager: Slow operation: 151ms so far, now at startProcess: building log message
+10-21 21:11:33.082   760   793 I ActivityManager: Start proc 6122:com.buffago.app/u0a218 for next-top-activity {com.buffago.app/com.buffago.app.MainActivity}
+10-21 21:11:33.082   760   793 W ActivityManager: Slow operation: 151ms so far, now at startProcess: starting to update pids map
+10-21 21:11:33.083   760   793 W ActivityManager: Slow operation: 151ms so far, now at startProcess: done updating pids map
+10-21 21:11:33.235  6129  6129 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:11:33.243  6129  6129 I AndroidRuntime: Using default boot image
+10-21 21:11:33.243  6129  6129 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:11:33.461  6129  6129 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:11:34.542  6129  6129 D AndroidRuntime: Shutting down VM
+10-21 21:11:34.672   760   854 D ActivityManager: freezing 2960 com.google.android.rkpdapp
+10-21 21:11:36.645  6165  6165 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:11:36.650  6165  6165 I AndroidRuntime: Using default boot image
+10-21 21:11:36.650  6165  6165 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:11:36.842  6165  6165 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:11:36.944  6122  6122 I Choreographer: Skipped 133 frames!  The application may be doing too much work on its main thread.
+10-21 21:11:37.510   760  1920 W ActivityManager: pid 760 system sent binder code 7 with flags 1 and got error -32
+10-21 21:11:37.660   760   854 D ActivityManager: freezing 6034 com.google.android.photopicker
+10-21 21:11:39.605   760   854 D ActivityManager: freezing 2745 com.google.android.gms.unstable
+10-21 21:11:41.498  6122  6122 I Choreographer: Skipped 106 frames!  The application may be doing too much work on its main thread.
+10-21 21:11:41.629  6165  6165 D AndroidRuntime: Shutting down VM
+10-21 21:11:42.921   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:11:43.730  6222  6222 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:11:43.735  6222  6222 I AndroidRuntime: Using default boot image
+10-21 21:11:43.735  6222  6222 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:11:43.884  6222  6222 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:11:45.081  6222  6222 D AndroidRuntime: Shutting down VM
+10-21 21:11:45.531   760  2294 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:11:45.945  6122  6207 I ReactNativeJS: Running "main" with {"rootTag":1,"initialProps":{},"fabric":true}
+10-21 21:11:47.135  6252  6252 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:11:47.139  6252  6252 I AndroidRuntime: Using default boot image
+10-21 21:11:47.140  6252  6252 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:11:47.298  6252  6252 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:11:48.148  6122  6207 I ReactNativeJS: '[startup] app mounted', { pathname: '/' }
+10-21 21:11:48.156  6122  6207 I ReactNativeJS: [auth] initial session load started
+10-21 21:11:48.202  6122  6207 I ReactNativeJS: '[auth] auth event', { event: 'INITIAL_SESSION', hasSession: false, userId: null }
+10-21 21:11:48.290  6122  6207 I ReactNativeJS: '[auth] initial session load completed', { hasSession: false, userId: null, error: null }
+10-21 21:11:48.347  6122  6207 I ReactNativeJS: '[startup] initial session hydration completed', { userId: null }
+10-21 21:11:49.569  6252  6252 D AndroidRuntime: Shutting down VM
+10-21 21:11:51.653  6275  6275 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:11:51.657  6275  6275 I AndroidRuntime: Using default boot image
+10-21 21:11:51.657  6275  6275 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:11:51.793  6275  6275 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:11:52.067  6122  6207 I ReactNativeJS: '[startup] Splash initialization complete', { duration_ms: 4463,
+10-21 21:11:52.067  6122  6207 I ReactNativeJS:   platform: 'android',
+10-21 21:11:52.067  6122  6207 I ReactNativeJS:   ios_splash_asset: undefined }
+10-21 21:11:52.636  6122  6207 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-21 21:11:54.079  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:11:54.083  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:11:54.084  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:11:54.457   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:11:55.219  6275  6275 D AndroidRuntime: Shutting down VM
+10-21 21:11:56.511   760  1920 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:11:56.513   760  1920 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:11:56.523   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:12:05.856   760  1920 D ActivityManager: sync unfroze 2745 com.google.android.gms.unstable for 6
+10-21 21:12:06.671   760   847 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 6
+10-21 21:12:08.431   760   831 D ActivityManager: sync unfroze 3971 com.google.android.gms.ui for 6
+10-21 21:12:08.837  6346  6346 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:12:08.858  6346  6346 I AndroidRuntime: Using default boot image
+10-21 21:12:08.862  6346  6346 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:12:09.199  6346  6346 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:12:10.270  6122  6207 I ReactNativeJS: '[startup] app mounted', { pathname: '/onboarding' }
+10-21 21:12:11.142  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:12:11.146  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:12:11.158  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:12:11.160  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:12:11.305  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:12:11.945  6346  6346 D AndroidRuntime: Shutting down VM
+10-21 21:12:13.065  6371  6371 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:12:13.072  6371  6371 I AndroidRuntime: Using default boot image
+10-21 21:12:13.073  6371  6371 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:12:13.317  6371  6371 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:12:14.439  6371  6371 D AndroidRuntime: Shutting down VM
+10-21 21:12:15.735  6393  6393 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:12:15.745  6393  6393 I AndroidRuntime: Using default boot image
+10-21 21:12:15.745  6393  6393 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:12:16.003  6393  6393 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:12:16.729  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:12:17.595  6393  6393 D AndroidRuntime: Shutting down VM
+10-21 21:12:18.863   760  2539 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:12:18.873   760  2539 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:12:18.894   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:12:19.138  6421  6421 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:12:19.140  6421  6421 I AndroidRuntime: Using default boot image
+10-21 21:12:19.140  6421  6421 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:12:19.268  6421  6421 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:12:19.607   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:12:20.461  6421  6421 D AndroidRuntime: Shutting down VM
+10-21 21:12:21.300   760   854 D ActivityManager: freezing 2745 com.google.android.gms.unstable
+10-21 21:12:26.420   760   854 D ActivityManager: freezing 3971 com.google.android.gms.ui
+10-21 21:12:27.194  6438  6438 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:12:27.198  6438  6438 I AndroidRuntime: Using default boot image
+10-21 21:12:27.199  6438  6438 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:12:27.340  6438  6438 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:12:28.485  6438  6438 D AndroidRuntime: Shutting down VM
+10-21 21:12:29.038   760   847 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 6
+10-21 21:12:32.520  1384  1384 I Choreographer: Skipped 123 frames!  The application may be doing too much work on its main thread.
+10-21 21:12:33.306  1384  1384 I Choreographer: Skipped 42 frames!  The application may be doing too much work on its main thread.
+10-21 21:12:34.181  6498  6498 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:12:34.189  6498  6498 I AndroidRuntime: Using default boot image
+10-21 21:12:34.189  6498  6498 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:12:34.420  6498  6498 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:12:37.170  6498  6498 D AndroidRuntime: Shutting down VM
+10-21 21:12:46.548  6518  6518 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:12:46.555  6518  6518 I AndroidRuntime: Using default boot image
+10-21 21:12:46.557  6518  6518 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:12:46.717  6518  6518 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:12:47.921  6518  6518 D AndroidRuntime: Shutting down VM
+10-21 21:12:49.155   760   832 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:12:49.157   760   832 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:12:49.167   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:12:49.459  6545  6545 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:12:49.464  6545  6545 I AndroidRuntime: Using default boot image
+10-21 21:12:49.464  6545  6545 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:12:49.610  6545  6545 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:12:50.772  6545  6545 D AndroidRuntime: Shutting down VM
+10-21 21:12:51.894  6569  6569 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:12:51.898  6569  6569 I AndroidRuntime: Using default boot image
+10-21 21:12:51.898  6569  6569 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:12:52.148  6569  6569 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:12:52.475  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:12:52.484  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:12:52.484  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:12:53.434  6569  6569 D AndroidRuntime: Shutting down VM
+10-21 21:12:54.438  6586  6586 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:12:54.443  6586  6586 I AndroidRuntime: Using default boot image
+10-21 21:12:54.443  6586  6586 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:12:54.603  6586  6586 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:12:55.734  6586  6586 D AndroidRuntime: Shutting down VM
+10-21 21:12:56.939   760  1087 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:12:56.940   760  1087 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:12:56.943   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:12:59.463   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:13:05.350  6628  6628 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:13:05.356  6628  6628 I AndroidRuntime: Using default boot image
+10-21 21:13:05.356  6628  6628 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:13:05.523  6628  6628 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:13:06.705  6628  6628 D AndroidRuntime: Shutting down VM
+10-21 21:13:06.998   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:13:07.089   760   847 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 6
+10-21 21:13:08.018   760  2539 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:13:08.018   760  2539 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:13:08.027   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:13:08.242  6661  6661 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:13:08.246  6661  6661 I AndroidRuntime: Using default boot image
+10-21 21:13:08.249  6661  6661 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:13:08.407  6661  6661 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:13:09.385   760   831 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:13:09.571  6661  6661 D AndroidRuntime: Shutting down VM
+10-21 21:13:10.694  6685  6685 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:13:10.698  6685  6685 I AndroidRuntime: Using default boot image
+10-21 21:13:10.698  6685  6685 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:13:10.850  6685  6685 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:13:12.007  6685  6685 D AndroidRuntime: Shutting down VM
+10-21 21:13:22.641  6714  6714 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:13:22.646  6714  6714 I AndroidRuntime: Using default boot image
+10-21 21:13:22.646  6714  6714 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:13:22.830  6714  6714 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:13:24.104  6714  6714 D AndroidRuntime: Shutting down VM
+10-21 21:13:25.355   760  1087 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:13:25.358   760  1087 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:13:25.367   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:13:25.655  6741  6741 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:13:25.658  6741  6741 I AndroidRuntime: Using default boot image
+10-21 21:13:25.658  6741  6741 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:13:25.802  6741  6741 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:13:26.995  6741  6741 D AndroidRuntime: Shutting down VM
+10-21 21:13:28.076  6765  6765 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:13:28.080  6765  6765 I AndroidRuntime: Using default boot image
+10-21 21:13:28.080  6765  6765 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:13:28.247  6765  6765 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:13:29.621  6765  6765 D AndroidRuntime: Shutting down VM
+10-21 21:13:30.627  6782  6782 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:13:30.631  6782  6782 I AndroidRuntime: Using default boot image
+10-21 21:13:30.632  6782  6782 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:13:30.778  6782  6782 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:13:32.011  6782  6782 D AndroidRuntime: Shutting down VM
+10-21 21:13:33.131  6804  6804 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:13:33.150  6804  6804 I AndroidRuntime: Using default boot image
+10-21 21:13:33.151  6804  6804 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:13:33.324  6804  6804 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:13:34.421  6804  6804 D AndroidRuntime: Shutting down VM
+10-21 21:13:35.627  6825  6825 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:13:35.633  6825  6825 I AndroidRuntime: Using default boot image
+10-21 21:13:35.633  6825  6825 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:13:35.805  6825  6825 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:13:37.007  6825  6825 D AndroidRuntime: Shutting down VM
+10-21 21:13:42.784   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:13:43.475  6854  6854 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:13:43.479  6854  6854 I AndroidRuntime: Using default boot image
+10-21 21:13:43.479  6854  6854 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:13:43.618  6854  6854 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:13:44.796  6854  6854 D AndroidRuntime: Shutting down VM
+10-21 21:13:45.985   760   831 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:13:45.991   760   831 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:13:46.002   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:13:46.257  6881  6881 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:13:46.260  6881  6881 I AndroidRuntime: Using default boot image
+10-21 21:13:46.260  6881  6881 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:13:46.391  6881  6881 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:13:47.286   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:13:47.497  6881  6881 D AndroidRuntime: Shutting down VM
+10-21 21:13:48.703  6904  6904 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:13:48.712  6904  6904 I AndroidRuntime: Using default boot image
+10-21 21:13:48.716  6904  6904 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:13:48.869  6904  6904 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:13:49.469   760  1220 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:13:50.008  6904  6904 D AndroidRuntime: Shutting down VM
+10-21 21:13:56.153   760   847 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 6
+10-21 21:13:56.739  6936  6936 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:13:56.747  6936  6936 I AndroidRuntime: Using default boot image
+10-21 21:13:56.747  6936  6936 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:13:56.987  6936  6936 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:13:58.105  6936  6936 D AndroidRuntime: Shutting down VM
+10-21 21:13:59.426   760   831 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:13:59.427   760   831 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:13:59.435   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:13:59.678  6965  6965 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:13:59.683  6965  6965 I AndroidRuntime: Using default boot image
+10-21 21:13:59.683  6965  6965 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:13:59.840  6965  6965 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:14:00.955  6965  6965 D AndroidRuntime: Shutting down VM
+10-21 21:14:02.067  6989  6989 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:14:02.071  6989  6989 I AndroidRuntime: Using default boot image
+10-21 21:14:02.072  6989  6989 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:14:02.263  6989  6989 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:14:02.943  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:14:02.974  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:14:02.997  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:14:03.046  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:14:03.850  6989  6989 D AndroidRuntime: Shutting down VM
+10-21 21:14:05.112   760  1220 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:14:05.115   760  1220 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:14:05.119   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:14:05.419  7024  7024 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:14:05.423  7024  7024 I AndroidRuntime: Using default boot image
+10-21 21:14:05.423  7024  7024 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:14:05.558  7024  7024 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:14:06.621  7024  7024 D AndroidRuntime: Shutting down VM
+10-21 21:14:19.448   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:14:26.416   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:14:40.666  7064  7064 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:14:40.672  7064  7064 I AndroidRuntime: Using default boot image
+10-21 21:14:40.672  7064  7064 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:14:40.963  6122  6122 I Choreographer: Skipped 30 frames!  The application may be doing too much work on its main thread.
+10-21 21:14:41.012  7064  7064 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:14:41.331  6122  6207 I ReactNativeJS: Running "main" with {"rootTag":11,"initialProps":{},"fabric":true}
+10-21 21:14:41.424  1142  1142 I Choreographer: Skipped 86 frames!  The application may be doing too much work on its main thread.
+10-21 21:14:41.785   760  1920 D ActivityManager: sync unfroze 1474 android.process.acore for 7
+10-21 21:14:42.048  4482  4482 I Choreographer: Skipped 97 frames!  The application may be doing too much work on its main thread.
+10-21 21:14:42.299  6122  6207 I ReactNativeJS: '[startup] app mounted', { pathname: '/' }
+10-21 21:14:42.301  6122  6207 I ReactNativeJS: [auth] initial session load started
+10-21 21:14:42.517  1142  1142 I Choreographer: Skipped 65 frames!  The application may be doing too much work on its main thread.
+10-21 21:14:43.050  6122  6207 I ReactNativeJS: '[auth] auth event', { event: 'INITIAL_SESSION', hasSession: false, userId: null }
+10-21 21:14:43.258  6122  6207 I ReactNativeJS: '[auth] initial session load completed', { hasSession: false, userId: null, error: null }
+10-21 21:14:43.334  6122  6207 I ReactNativeJS: '[startup] initial session hydration completed', { userId: null }
+10-21 21:14:43.378  1142  1142 I Choreographer: Skipped 49 frames!  The application may be doing too much work on its main thread.
+10-21 21:14:43.485  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:14:43.793  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:14:43.937  1142  1142 I Choreographer: Skipped 32 frames!  The application may be doing too much work on its main thread.
+10-21 21:14:44.140  7064  7064 D AndroidRuntime: Shutting down VM
+10-21 21:14:44.486   760   832 D ActivityManager: sync unfroze 1916 com.google.android.googlequicksearchbox:search for 7
+10-21 21:14:44.494   760   793 W ActivityManager: Slow operation: 55ms so far, now at startProcess: done updating battery stats
+10-21 21:14:44.546   760   793 W ActivityManager: Slow operation: 107ms so far, now at startProcess: building log message
+10-21 21:14:44.547   760   793 I ActivityManager: Start proc 7108:com.google.android.apps.wallpaper/u0a188 for content provider {com.google.android.apps.wallpaper/com.google.android.apps.wallpaper.provider.RecentWallpapersProvider}
+10-21 21:14:44.547   760   793 W ActivityManager: Slow operation: 107ms so far, now at startProcess: starting to update pids map
+10-21 21:14:44.569   760   793 W ActivityManager: Slow operation: 130ms so far, now at startProcess: done updating pids map
+10-21 21:14:45.615   760  1347 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 6
+10-21 21:14:45.620   760  1920 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:14:45.634   760  1920 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:14:45.642   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:14:46.108  7164  7164 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:14:46.115  7164  7164 I AndroidRuntime: Using default boot image
+10-21 21:14:46.117  7164  7164 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:14:46.244   760  1347 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:14:46.527  7164  7164 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:14:46.640  6122  6207 I ReactNativeJS: '[startup] Splash initialization complete', { duration_ms: 179004,
+10-21 21:14:46.640  6122  6207 I ReactNativeJS:   platform: 'android',
+10-21 21:14:46.640  6122  6207 I ReactNativeJS:   ios_splash_asset: undefined }
+10-21 21:14:47.698  6122  6207 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-21 21:14:47.763  7164  7164 D AndroidRuntime: Shutting down VM
+10-21 21:14:49.145   760   792 D ActivityManager: sync unfroze 2272 com.google.android.googlequicksearchbox:googleapp for 10
+10-21 21:14:49.563  6122  6207 I ReactNativeJS: Running "main" with {"rootTag":21,"initialProps":{},"fabric":true}
+10-21 21:14:49.589  7205  7205 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:14:49.675  7205  7205 I AndroidRuntime: Using default boot image
+10-21 21:14:49.680  7205  7205 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:14:50.022  6122  6207 E ReactNativeJS: 'Looks like you have configured linking in multiple places. This is likely an error since deep links should only be handled in one place to avoid conflicts. Make sure that:\n- You don\'t have multiple NavigationContainers in the app each with \'linking\' enabled\n- Only a single instance of the root component is rendered\n- You have set \'android:launchMode=singleTask\' in the \'<activity />\' section of the \'AndroidManifest.xml\' file to avoid launching multiple instances', { [Stack] name: 'Stack' }
+10-21 21:14:50.303  1142  1142 I Choreographer: Skipped 71 frames!  The application may be doing too much work on its main thread.
+10-21 21:14:50.777  7205  7205 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:14:51.480  1142  1142 I Choreographer: Skipped 68 frames!  The application may be doing too much work on its main thread.
+10-21 21:14:52.039  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:14:52.083  4482  4482 I Choreographer: Skipped 168 frames!  The application may be doing too much work on its main thread.
+10-21 21:14:52.205  7205  7205 D AndroidRuntime: Shutting down VM
+10-21 21:14:52.673  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:14:52.761  4482  4482 I Choreographer: Skipped 37 frames!  The application may be doing too much work on its main thread.
+10-21 21:14:52.998  6122  6207 I ReactNativeJS: '[startup] app mounted', { pathname: '/' }
+10-21 21:14:53.058  6122  6207 I ReactNativeJS: [auth] initial session load started
+10-21 21:14:53.360  4482  4482 I Choreographer: Skipped 34 frames!  The application may be doing too much work on its main thread.
+10-21 21:14:53.616  6122  6207 I ReactNativeJS: '[auth] initial session load completed', { hasSession: false, userId: null, error: null }
+10-21 21:14:53.779  6122  6207 I ReactNativeJS: '[auth] auth event', { event: 'INITIAL_SESSION', hasSession: false, userId: null }
+10-21 21:14:53.832  6122  6207 I ReactNativeJS: '[startup] initial session hydration completed', { userId: null }
+10-21 21:14:53.885  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:14:53.953   760  1087 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:14:53.955   760  1087 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:14:54.120   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:14:54.214  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:14:54.488  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:14:54.700  4482  4482 I Choreographer: Skipped 55 frames!  The application may be doing too much work on its main thread.
+10-21 21:14:56.958  6122  6207 I ReactNativeJS: '[startup] Splash initialization complete', { duration_ms: 189352,
+10-21 21:14:56.958  6122  6207 I ReactNativeJS:   platform: 'android',
+10-21 21:14:56.958  6122  6207 I ReactNativeJS:   ios_splash_asset: undefined }
+10-21 21:14:57.577  6122  6207 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-21 21:14:59.068  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:14:59.086  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:14:59.102  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:15:05.449  7288  7288 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:15:05.500  7288  7288 I AndroidRuntime: Using default boot image
+10-21 21:15:05.500  7288  7288 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:15:05.880  7288  7288 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:15:06.377   760  1087 D ActivityManager: sync unfroze 2745 com.google.android.gms.unstable for 6
+10-21 21:15:07.074  7288  7288 D AndroidRuntime: Shutting down VM
+10-21 21:15:09.216   760   854 D ActivityManager: freezing 2272 com.google.android.googlequicksearchbox:googleapp
+10-21 21:15:15.610  7320  7320 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:15:15.658  7320  7320 I AndroidRuntime: Using default boot image
+10-21 21:15:15.658  7320  7320 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:15:16.051  6122  6207 I ReactNativeJS: '[startup] app mounted', { pathname: '/onboarding' }
+10-21 21:15:16.063  7320  7320 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:15:16.203   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:15:16.996  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:15:17.278  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:15:17.279  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:15:17.353  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:15:17.426  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:15:17.436  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:15:17.437  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:15:17.930  7320  7320 D AndroidRuntime: Shutting down VM
+10-21 21:15:19.057   760  2175 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:15:19.060   760  2175 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:15:19.063   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:15:19.342  7349  7349 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:15:19.352  7349  7349 I AndroidRuntime: Using default boot image
+10-21 21:15:19.355  7349  7349 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:15:19.498  7349  7349 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:15:20.615  7349  7349 D AndroidRuntime: Shutting down VM
+10-21 21:15:21.700   760   854 D ActivityManager: freezing 2745 com.google.android.gms.unstable
+10-21 21:15:26.015   760   831 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:15:27.750   760   854 D ActivityManager: freezing 1474 android.process.acore
+10-21 21:15:28.758   760   854 D ActivityManager: freezing 1916 com.google.android.googlequicksearchbox:search
+10-21 21:15:29.755   760   854 D ActivityManager: freezing 7108 com.google.android.apps.wallpaper
+10-21 21:15:43.159   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:15:51.429  7376  7376 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:15:51.434  7376  7376 I AndroidRuntime: Using default boot image
+10-21 21:15:51.434  7376  7376 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:15:51.649  7376  7376 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:15:52.820  7376  7376 D AndroidRuntime: Shutting down VM
+10-21 21:15:53.973   760  1066 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:15:53.976   760  1066 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:15:53.984   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:15:54.317   760  1066 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:15:54.576  7425  7425 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:15:54.580  7425  7425 I AndroidRuntime: Using default boot image
+10-21 21:15:54.580  7425  7425 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:15:54.773  7425  7425 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:15:55.234  6122  6207 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-21 21:15:55.984  6122  6207 I ReactNativeJS: '[startup] app mounted', { pathname: '/auth/login' }
+10-21 21:15:56.003  7425  7425 D AndroidRuntime: Shutting down VM
+10-21 21:15:57.106  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:15:57.260  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:15:57.262  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:15:57.267  7444  7444 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:15:57.270  7444  7444 I AndroidRuntime: Using default boot image
+10-21 21:15:57.270  7444  7444 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:15:57.324  6122  6207 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:15:57.459  7444  7444 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:15:58.837  7444  7444 D AndroidRuntime: Shutting down VM
+10-21 21:16:00.009   760  1066 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:16:00.010   760  1066 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:16:00.018   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:16:07.181   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:16:10.171   760   847 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 6
+10-21 21:16:13.131   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:16:14.264   760  1066 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:16:23.988   760   831 I ActivityManager: Force stopping com.buffago.app appid=10218 user=0: from pid 7496
+10-21 21:16:24.000   760   831 I ActivityManager: Killing 6122:com.buffago.app/u0a218 (adj 0): stop com.buffago.app due to from pid 7496
+10-21 21:16:24.440   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:16:24.566   760   785 W ActivityManager: ProcessRecord{b22d89e 0:com.buffago.app/u0a218} is attached to a previous process 6122
+10-21 21:16:24.643  1142  1142 I Choreographer: Skipped 75 frames!  The application may be doing too much work on its main thread.
+10-21 21:16:24.946   760   831 D ActivityManager: sync unfroze 1474 android.process.acore for 7
+10-21 21:16:25.307  4482  4482 I Choreographer: Skipped 95 frames!  The application may be doing too much work on its main thread.
+10-21 21:16:25.502   760  2146 V ActivityManager: Got obituary of 6122:com.buffago.app
+10-21 21:16:25.512   760   793 W ActivityManager: Slow operation: 936ms so far, now at startProcess: asking zygote to start proc
+10-21 21:16:25.525   760   785 W ActivityManager: setHasOverlayUi called on unknown pid: 6122
+10-21 21:16:25.546   760   793 W ActivityManager: Slow operation: 969ms so far, now at startProcess: returned from zygote!
+10-21 21:16:25.563   760   793 W ActivityManager: Slow operation: 987ms so far, now at startProcess: done updating battery stats
+10-21 21:16:25.564   760   793 W ActivityManager: Slow operation: 987ms so far, now at startProcess: building log message
+10-21 21:16:25.564   760   793 I ActivityManager: Start proc 7513:com.buffago.app/u0a218 for next-top-activity {com.buffago.app/com.buffago.app.MainActivity}
+10-21 21:16:25.564   760   793 W ActivityManager: Slow operation: 988ms so far, now at startProcess: starting to update pids map
+10-21 21:16:25.564   760   793 W ActivityManager: Slow operation: 988ms so far, now at startProcess: done updating pids map
+10-21 21:16:26.219  4482  4482 I Choreographer: Skipped 46 frames!  The application may be doing too much work on its main thread.
+10-21 21:16:26.898  1142  1142 I Choreographer: Skipped 133 frames!  The application may be doing too much work on its main thread.
+10-21 21:16:27.387   760  1920 D ActivityManager: sync unfroze 7108 com.google.android.apps.wallpaper for 7
+10-21 21:16:27.578   760  1436 D ActivityManager: sync unfroze 1916 com.google.android.googlequicksearchbox:search for 7
+10-21 21:16:31.042   760  1759 D ActivityManager: sync unfroze 2272 com.google.android.googlequicksearchbox:googleapp for 6
+10-21 21:16:33.627  7513  7513 I Choreographer: Skipped 275 frames!  The application may be doing too much work on its main thread.
+10-21 21:16:37.778  7513  7513 I Choreographer: Skipped 114 frames!  The application may be doing too much work on its main thread.
+10-21 21:16:41.488   760   854 D ActivityManager: freezing 2272 com.google.android.googlequicksearchbox:googleapp
+10-21 21:16:42.554   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:16:43.426  7513  7612 I ReactNativeJS: Running "main" with {"rootTag":1,"initialProps":{},"fabric":true}
+10-21 21:16:46.451  7513  7612 I ReactNativeJS: '[startup] app mounted', { pathname: '/' }
+10-21 21:16:46.461  7513  7612 I ReactNativeJS: [auth] initial session load started
+10-21 21:16:46.513  7513  7612 I ReactNativeJS: '[auth] auth event', { event: 'INITIAL_SESSION', hasSession: false, userId: null }
+10-21 21:16:46.622  7513  7612 I ReactNativeJS: '[auth] initial session load completed', { hasSession: false, userId: null, error: null }
+10-21 21:16:46.718  7513  7612 I ReactNativeJS: '[startup] initial session hydration completed', { userId: null }
+10-21 21:16:50.338  7513  7612 I ReactNativeJS: '[startup] Splash initialization complete', { duration_ms: 4924,
+10-21 21:16:50.338  7513  7612 I ReactNativeJS:   platform: 'android',
+10-21 21:16:50.338  7513  7612 I ReactNativeJS:   ios_splash_asset: undefined }
+10-21 21:16:50.878  7513  7612 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-21 21:16:52.372  7513  7612 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:16:52.401  7513  7612 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:16:52.417  7513  7612 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:16:54.382  7651  7651 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:16:54.395  7651  7651 I AndroidRuntime: Using default boot image
+10-21 21:16:54.396  7651  7651 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:16:54.628  7651  7651 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:16:56.116  7651  7651 D AndroidRuntime: Shutting down VM
+10-21 21:17:01.682   760   854 D ActivityManager: freezing 1474 android.process.acore
+10-21 21:17:03.563   760   854 D ActivityManager: freezing 7108 com.google.android.apps.wallpaper
+10-21 21:17:04.566   760   854 D ActivityManager: freezing 1916 com.google.android.googlequicksearchbox:search
+10-21 21:17:22.873  7667  7667 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:17:22.876  7667  7667 I AndroidRuntime: Using default boot image
+10-21 21:17:22.876  7667  7667 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:17:23.040  7667  7667 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:17:24.326  7667  7667 D AndroidRuntime: Shutting down VM
+10-21 21:17:25.482  7694  7694 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:17:25.486  7694  7694 I AndroidRuntime: Using default boot image
+10-21 21:17:25.486  7694  7694 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:17:25.668  7694  7694 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:17:26.196  7513  7612 I ReactNativeJS: '[startup] app mounted', { pathname: '/auth/login' }
+10-21 21:17:26.842  7513  7612 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:17:27.860  7694  7694 D AndroidRuntime: Shutting down VM
+10-21 21:17:29.142   760  1759 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:17:29.145   760  1759 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:17:29.160   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:17:29.457  7724  7724 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:17:29.462  7724  7724 I AndroidRuntime: Using default boot image
+10-21 21:17:29.462  7724  7724 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:17:29.495   760  1759 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:17:29.704  7724  7724 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:17:31.022  7724  7724 D AndroidRuntime: Shutting down VM
+10-21 21:17:32.058  7743  7743 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:17:32.063  7743  7743 I AndroidRuntime: Using default boot image
+10-21 21:17:32.063  7743  7743 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:17:32.223  7743  7743 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:17:33.589  7743  7743 D AndroidRuntime: Shutting down VM
+10-21 21:17:34.738  7766  7766 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:17:34.743  7766  7766 I AndroidRuntime: Using default boot image
+10-21 21:17:34.743  7766  7766 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:17:34.968  7766  7766 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:17:36.146  7766  7766 D AndroidRuntime: Shutting down VM
+10-21 21:17:37.447   760  1347 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:17:37.448   760  1347 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:17:37.451   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:17:37.686  7794  7794 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:17:37.692  7794  7794 I AndroidRuntime: Using default boot image
+10-21 21:17:37.692  7794  7794 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:17:37.848  7794  7794 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:17:39.076  7794  7794 D AndroidRuntime: Shutting down VM
+10-21 21:17:46.703   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:17:47.562   760   847 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 6
+10-21 21:17:49.467   760  1347 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:17:59.595   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:18:09.215   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:18:15.529  7816  7816 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:18:15.533  7816  7816 I AndroidRuntime: Using default boot image
+10-21 21:18:15.533  7816  7816 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:18:15.712  7816  7816 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:18:17.070  7816  7816 D AndroidRuntime: Shutting down VM
+10-21 21:18:18.173  7839  7839 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:18:18.177  7839  7839 I AndroidRuntime: Using default boot image
+10-21 21:18:18.177  7839  7839 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:18:18.358  7513  7612 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-21 21:18:18.364  7839  7839 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:18:18.817  7513  7612 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:18:19.920  7839  7839 D AndroidRuntime: Shutting down VM
+10-21 21:18:21.202   760  1436 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:18:21.203   760  1436 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:18:21.213   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:18:21.451   760  1436 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:18:31.381   760   847 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 6
+10-21 21:18:46.121   760  2174 I ActivityManager: Force stopping com.buffago.app appid=10218 user=0: from pid 7882
+10-21 21:18:46.135   760  2174 I ActivityManager: Killing 7513:com.buffago.app/u0a218 (adj 0): stop com.buffago.app due to from pid 7882
+10-21 21:18:46.398   760  1759 V ActivityManager: Got obituary of 7513:com.buffago.app
+10-21 21:18:46.488   760   785 W ActivityManager: setHasOverlayUi called on unknown pid: 7513
+10-21 21:18:46.545   760   847 D ActivityManager: sync unfroze 3067 com.android.vending for 6
+10-21 21:18:46.644   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:18:47.094   760  2174 W ActivityManager: pid 760 system sent binder code 7 with flags 1 and got error -32
+10-21 21:18:47.214   760  1759 W ActivityManager: Unable to start service Intent { act=com.google.android.verifier.backport.VERIFY_PACKAGE xflg=0x4 pkg=com.google.android.verifier } U=0: not found
+10-21 21:18:47.229   760  1759 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@d49c235
+10-21 21:18:49.118   760  1759 I ActivityManager: Force stopping com.buffago.app appid=10218 user=0: clear data
+10-21 21:18:49.127   760   819 I ActivityManager: Force stopping com.buffago.app appid=10218 user=0: clearApplicationUserData
+10-21 21:18:49.294   760   792 D ActivityManager: sync unfroze 3832 com.google.android.documentsui for 3
+10-21 21:18:49.360   760   792 D ActivityManager: sync unfroze 3786 com.android.chrome for 3
+10-21 21:18:49.384   760   792 D ActivityManager: sync unfroze 3168 com.android.vending:background for 3
+10-21 21:18:49.581   760  1759 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:18:49.731   760  2130 D ActivityManager: sync unfroze 3658 com.android.externalstorage for 7
+10-21 21:18:49.839   760   792 D ActivityManager: sync unfroze 1649 com.google.android.permissioncontroller for 3
+10-21 21:18:49.991   760   793 W ActivityManager: Slow operation: 227ms so far, now at startProcess: done updating battery stats
+10-21 21:18:49.992   760   793 W ActivityManager: Slow operation: 227ms so far, now at startProcess: building log message
+10-21 21:18:49.992   760   793 I ActivityManager: Start proc 7951:com.buffago.app/u0a218 for next-top-activity {com.buffago.app/com.buffago.app.MainActivity}
+10-21 21:18:49.992   760   793 W ActivityManager: Slow operation: 227ms so far, now at startProcess: starting to update pids map
+10-21 21:18:50.053   760   793 W ActivityManager: Slow operation: 288ms so far, now at startProcess: done updating pids map
+10-21 21:18:50.129   760   792 D ActivityManager: sync unfroze 3862 com.google.android.adservices.api for 3
+10-21 21:18:54.878  7951  7951 I Choreographer: Skipped 129 frames!  The application may be doing too much work on its main thread.
+10-21 21:18:57.900   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:18:59.396  7951  7951 I Choreographer: Skipped 109 frames!  The application may be doing too much work on its main thread.
+10-21 21:18:59.829   760   854 D ActivityManager: freezing 3786 com.android.chrome
+10-21 21:19:00.129   760   854 D ActivityManager: freezing 3168 com.android.vending:background
+10-21 21:19:00.255   760   854 D ActivityManager: freezing 3658 com.android.externalstorage
+10-21 21:19:00.258   760   854 D ActivityManager: freezing 3832 com.google.android.documentsui
+10-21 21:19:00.420   760   854 D ActivityManager: freezing 3862 com.google.android.adservices.api
+10-21 21:19:01.096   760   854 D ActivityManager: freezing 1649 com.google.android.permissioncontroller
+10-21 21:19:02.757  7951  7951 I Choreographer: Skipped 89 frames!  The application may be doing too much work on its main thread.
+10-21 21:19:04.272  7951  8029 I ReactNativeJS: Running "main" with {"rootTag":1,"initialProps":{},"fabric":true}
+10-21 21:19:04.477   760   854 D ActivityManager: freezing 3067 com.android.vending
+10-21 21:19:06.430  7951  8029 I ReactNativeJS: '[startup] app mounted', { pathname: '/' }
+10-21 21:19:06.435  7951  8029 I ReactNativeJS: [auth] initial session load started
+10-21 21:19:06.512  7951  8029 I ReactNativeJS: '[auth] initial session load completed', { hasSession: false, userId: null, error: null }
+10-21 21:19:06.551  7951  8029 I ReactNativeJS: '[startup] initial session hydration completed', { userId: null }
+10-21 21:19:06.681  7951  8029 I ReactNativeJS: '[auth] auth event', { event: 'INITIAL_SESSION', hasSession: false, userId: null }
+10-21 21:19:10.308  7951  8029 I ReactNativeJS: '[startup] Splash initialization complete', { duration_ms: 4294,
+10-21 21:19:10.308  7951  8029 I ReactNativeJS:   platform: 'android',
+10-21 21:19:10.308  7951  8029 I ReactNativeJS:   ios_splash_asset: undefined }
+10-21 21:19:10.873  7951  8029 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-21 21:19:11.778  7951  8029 I ReactNativeJS: '[startup] app mounted', { pathname: '/onboarding' }
+10-21 21:19:12.145  7951  8029 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:19:12.446  7951  8029 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:19:12.447  7951  8029 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:19:12.447  7951  8029 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:19:12.448  7951  8029 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:19:12.619  7951  8029 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:19:15.841   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:19:21.099   760  1759 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:19:21.523  8070  8070 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:19:21.528  8070  8070 I AndroidRuntime: Using default boot image
+10-21 21:19:21.528  8070  8070 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:19:21.708  8070  8070 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:19:23.138  8070  8070 D AndroidRuntime: Shutting down VM
+10-21 21:19:31.352   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:19:32.029  8092  8092 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:19:32.037  8092  8092 I AndroidRuntime: Using default boot image
+10-21 21:19:32.037  8092  8092 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:19:32.179  8092  8092 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:19:33.342  8092  8092 D AndroidRuntime: Shutting down VM
+10-21 21:19:34.698  8115  8115 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:19:34.707  8115  8115 I AndroidRuntime: Using default boot image
+10-21 21:19:34.707  8115  8115 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:19:34.880  8115  8115 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:19:36.225  8115  8115 D AndroidRuntime: Shutting down VM
+10-21 21:19:37.432  8138  8138 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:19:37.436  8138  8138 I AndroidRuntime: Using default boot image
+10-21 21:19:37.436  8138  8138 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:19:37.597  8138  8138 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:19:38.776  8138  8138 D AndroidRuntime: Shutting down VM
+10-21 21:19:39.993  8162  8162 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:19:40.006  8162  8162 I AndroidRuntime: Using default boot image
+10-21 21:19:40.006  8162  8162 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:19:40.250  8162  8162 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:19:41.136   760   832 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:19:41.349  7951  8029 W ReactNativeJS: '[analytics] insert failed', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:19:42.503  8162  8162 D AndroidRuntime: Shutting down VM
+10-21 21:19:45.348  1384  1384 I Choreographer: Skipped 76 frames!  The application may be doing too much work on its main thread.
+10-21 21:19:47.678  8209  8209 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:19:47.716  8209  8209 I AndroidRuntime: Using default boot image
+10-21 21:19:47.716  8209  8209 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:19:48.124  8209  8209 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:19:50.285  8209  8209 D AndroidRuntime: Shutting down VM
+10-21 21:19:51.581   760  2539 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:19:51.584   760  2539 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:19:51.592   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:19:51.869  8241  8241 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:19:51.875  8241  8241 I AndroidRuntime: Using default boot image
+10-21 21:19:51.875  8241  8241 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:19:52.005  8241  8241 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:19:53.103  8241  8241 D AndroidRuntime: Shutting down VM
+10-21 21:19:54.396  8265  8265 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:19:54.401  8265  8265 I AndroidRuntime: Using default boot image
+10-21 21:19:54.401  8265  8265 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:19:54.693  8265  8265 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:19:55.587   760  1087 D ActivityManager: sync unfroze 1474 android.process.acore for 7
+10-21 21:19:56.101  7951  8029 W ReactNativeJS: 'load states failed:', 'Read-only Android QA: remote writes and sign-in are disabled.'
+10-21 21:19:57.560  8265  8265 D AndroidRuntime: Shutting down VM
+10-21 21:20:07.541   760   847 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 6
+10-21 21:20:10.516  8299  8299 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:20:10.520  8299  8299 I AndroidRuntime: Using default boot image
+10-21 21:20:10.520  8299  8299 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:20:10.742  8299  8299 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:20:11.998  8299  8299 D AndroidRuntime: Shutting down VM
+10-21 21:20:13.270   760  1347 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:20:13.271   760  1347 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:20:13.275   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:20:13.630  8329  8329 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:20:13.634  8329  8329 I AndroidRuntime: Using default boot image
+10-21 21:20:13.634  8329  8329 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:20:13.780  8329  8329 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:20:14.922  8329  8329 D AndroidRuntime: Shutting down VM
+10-21 21:20:16.164  8353  8353 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:20:16.169  8353  8353 I AndroidRuntime: Using default boot image
+10-21 21:20:16.170  8353  8353 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:20:16.386  8353  8353 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:20:17.965  8353  8353 D AndroidRuntime: Shutting down VM
+10-21 21:20:19.220   760  1487 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:20:19.221   760  1487 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:20:19.236   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:20:21.009   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:20:21.042   760  1708 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:20:29.065   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:20:29.338   760   847 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 6
+10-21 21:20:31.967   760   854 D ActivityManager: freezing 1474 android.process.acore
+10-21 21:20:39.545  8387  8387 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:20:39.550  8387  8387 I AndroidRuntime: Using default boot image
+10-21 21:20:39.550  8387  8387 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:20:39.739  8387  8387 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:20:40.869  8387  8387 D AndroidRuntime: Shutting down VM
+10-21 21:20:42.136  8412  8412 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:20:42.145  8412  8412 I AndroidRuntime: Using default boot image
+10-21 21:20:42.145  8412  8412 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:20:42.348  8412  8412 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:20:42.921   760  1708 D ActivityManager: sync unfroze 1474 android.process.acore for 7
+10-21 21:20:46.107  8412  8412 D AndroidRuntime: Shutting down VM
+10-21 21:20:47.446  8445  8445 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:20:47.460  8445  8445 I AndroidRuntime: Using default boot image
+10-21 21:20:47.460  8445  8445 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:20:47.610  8445  8445 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:20:49.107  8445  8445 D AndroidRuntime: Shutting down VM
+10-21 21:20:50.948   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:20:58.903   760   847 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 6
+10-21 21:21:00.248  8469  8469 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:21:00.251  8469  8469 I AndroidRuntime: Using default boot image
+10-21 21:21:00.251  8469  8469 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:21:00.375  8469  8469 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:21:01.724  8469  8469 D AndroidRuntime: Shutting down VM
+10-21 21:21:03.037  8495  8495 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:21:03.042  8495  8495 I AndroidRuntime: Using default boot image
+10-21 21:21:03.042  8495  8495 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:21:03.208  8495  8495 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:21:04.524  8495  8495 D AndroidRuntime: Shutting down VM
+10-21 21:21:05.803   760  2130 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:21:05.804   760  2130 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:21:05.811   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:21:06.111  8524  8524 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:21:06.116  8524  8524 I AndroidRuntime: Using default boot image
+10-21 21:21:06.116  8524  8524 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:21:06.238  8524  8524 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:21:07.682  8524  8524 D AndroidRuntime: Shutting down VM
+10-21 21:21:08.917  8550  8550 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:21:08.925  8550  8550 I AndroidRuntime: Using default boot image
+10-21 21:21:08.925  8550  8550 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:21:09.214  8550  8550 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:21:09.481  7951  8029 W ReactNativeJS: '[Wingman] Log insert failed', [Error: Failed to insert Wingman log: Read-only Android QA: remote writes and sign-in are disabled.]
+10-21 21:21:09.483  7951  8029 W ReactNativeJS: 'runWingman failed:', [Error: Wingman function call failed: Edge Function returned a non-2xx status code]
+10-21 21:21:10.751  8550  8550 D AndroidRuntime: Shutting down VM
+10-21 21:21:10.994   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:21:12.044   760  1759 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-21 21:21:12.045   760  1759 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-21 21:21:12.051   760   782 I ActivityManager: Broadcast completed: result=0
+10-21 21:21:12.353  8582  8582 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:21:12.357  8582  8582 I AndroidRuntime: Using default boot image
+10-21 21:21:12.357  8582  8582 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:21:12.518  8582  8582 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:21:13.659  8582  8582 D AndroidRuntime: Shutting down VM
+10-21 21:21:18.119   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:21:19.061   760   854 D ActivityManager: freezing 1474 android.process.acore
+10-21 21:21:21.086   760   777 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:21:23.669   760   847 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 6
+10-21 21:21:34.853   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:21:38.168   760   854 D ActivityManager: freezing 1631 com.google.android.gms
+10-21 21:21:56.632   760  1487 D ActivityManager: sync unfroze 1631 com.google.android.gms for 6
+10-21 21:21:56.727  8607  8607 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:21:56.734  8607  8607 I AndroidRuntime: Using default boot image
+10-21 21:21:56.734  8607  8607 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:21:56.876  8607  8607 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:21:58.011  8607  8607 D AndroidRuntime: Shutting down VM
+10-21 21:21:59.282  8634  8634 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:21:59.292  8634  8634 I AndroidRuntime: Using default boot image
+10-21 21:21:59.292  8634  8634 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:21:59.594  8634  8634 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:22:00.733  8634  8634 D AndroidRuntime: Shutting down VM
+10-21 21:22:02.667  8671  8671 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:22:02.675  8671  8671 I AndroidRuntime: Using default boot image
+10-21 21:22:02.677  8671  8671 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:22:02.898  8671  8671 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:22:09.613   760  2130 D ActivityManager: sync unfroze 2745 com.google.android.gms.unstable for 6
+10-21 21:22:12.498   760   847 D ActivityManager: sync unfroze 2284 com.google.android.apps.photos for 6
+10-21 21:22:13.080  8671  8671 D AndroidRuntime: Shutting down VM
+10-21 21:22:14.335  8704  8704 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:22:14.347  8704  8704 I AndroidRuntime: Using default boot image
+10-21 21:22:14.347  8704  8704 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:22:14.573  8704  8704 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:22:22.948   760   854 D ActivityManager: freezing 2284 com.google.android.apps.photos
+10-21 21:22:24.646  8704  8704 D AndroidRuntime: Shutting down VM
+10-21 21:22:25.299   760   854 D ActivityManager: freezing 2745 com.google.android.gms.unstable
+10-21 21:22:25.760  8722  8722 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:22:25.792  8722  8722 I AndroidRuntime: Using default boot image
+10-21 21:22:25.792  8722  8722 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:22:25.992  8722  8722 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:22:36.197  8722  8722 D AndroidRuntime: Shutting down VM
+10-21 21:22:37.359  8742  8742 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-21 21:22:37.364  8742  8742 I AndroidRuntime: Using default boot image
+10-21 21:22:37.364  8742  8742 I AndroidRuntime: Leaving lock profiling enabled
+10-21 21:22:37.533  8742  8742 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-21 21:22:42.141   760   792 W ActivityManager: Slow operation: 61ms so far, now at startProcess: done creating new process record
+10-21 21:22:42.141   760   792 W ActivityManager: Slow operation: 62ms so far, now at startProcess: stepping in to startProcess
+10-21 21:22:42.184   760   792 W ActivityManager: Slow operation: 105ms so far, now at startProcess: done starting proc!
+10-21 21:22:42.208   760   793 W ActivityManager: Slow operation: 52ms so far, now at startProcess: returned from zygote!
+10-21 21:22:42.208   760   793 W ActivityManager: Slow operation: 56ms so far, now at startProcess: done updating battery stats
+10-21 21:22:42.211   760   793 W ActivityManager: Slow operation: 58ms so far, now at startProcess: building log message
+10-21 21:22:42.212   760   793 I ActivityManager: Start proc 8757:com.google.android.configupdater/u0a134 for broadcast {com.google.android.configupdater/com.google.android.configupdater.PhenotypeBroadcastReceiver}
+10-21 21:22:42.213   760   793 W ActivityManager: Slow operation: 60ms so far, now at startProcess: starting to update pids map
+10-21 21:22:42.227   760   793 W ActivityManager: Slow operation: 75ms so far, now at startProcess: done updating pids map
+10-21 21:22:43.767   760   854 D ActivityManager: freezing 1631 com.google.android.gms

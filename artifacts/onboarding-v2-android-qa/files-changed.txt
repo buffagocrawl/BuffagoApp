@@ -1,0 +1,6 @@
+crawl/metro.config.js
+crawl/scripts/qa/onboarding-android-ui.mjs
+crawl/scripts/qa/onboarding-readonly-catalog.mjs
+crawl/scripts/qa/probe-android-metro.mjs
+crawl/tests/onboarding-metro-startup.test.mjs
+docs/onboarding-v2.md

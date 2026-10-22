@@ -1,0 +1,81 @@
+Networking has been disabled
+Starting project at C:\Users\Brand\repo\BuffagoApp\crawl
+node : » android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+At line:2 char:383
++ ... expo:api*'; node node_modules/expo/bin/cli start --dev-client --offli ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (» android: andr...backgroundColor:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Starting Metro Bundler
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+2026-10-22T00:58:42.734Z expo:start:server:middleware:manifest Resolved entry point: node_modules/expo-router/entry.js
+(project root: C:\Users\Brand\repo\BuffagoApp\crawl)
+Debugger listening on ws://127.0.0.1:9229/9975398d-3bb2-41a2-93b0-c559070322c9
+For help, see: https://nodejs.org/en/docs/inspector
+Debugger attached.
+Debugger ending on ws://127.0.0.1:9229/9975398d-3bb2-41a2-93b0-c559070322c9
+For help, see: https://nodejs.org/en/docs/inspector
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+2026-10-22T00:59:41.492Z expo:start:server:middleware:manifest Resolved entry point: node_modules/expo-router/entry.js
+(project root: C:\Users\Brand\repo\BuffagoApp\crawl)
+Debugger attached.
+Debugger ending on ws://127.0.0.1:9229/9975398d-3bb2-41a2-93b0-c559070322c9
+For help, see: https://nodejs.org/en/docs/inspector
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+2026-10-22T01:00:07.562Z expo:start:server:middleware:manifest Resolved entry point: node_modules/expo-router/entry.js
+(project root: C:\Users\Brand\repo\BuffagoApp\crawl)
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+2026-10-22T01:00:33.469Z expo:start:server:middleware:manifest Resolved entry point: node_modules/expo-router/entry.js
+(project root: C:\Users\Brand\repo\BuffagoApp\crawl)
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+2026-10-22T01:00:34.281Z expo:start:server:middleware:manifest Resolved entry point: node_modules/expo-router/entry.js
+(project root: C:\Users\Brand\repo\BuffagoApp\crawl)
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+| (node:27980) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+| (Use `node --trace-warnings ...` to show where the warning was created)
+| (node:6420) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+| (Use `node --trace-warnings ...` to show where the warning was created)
+Android node_modules\expo-router\entry.js ▓░░░░░░░░░░░░░░░ 10.0% ( 45/196)
+Android node_modules\expo-router\entry.js ▓▓▓▓░░░░░░░░░░░░ 29.8% (198/369)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓░░░░░░░░░░░ 36.8% (296/553)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓░░░░░░░░░ 48.3% (479/689)
+Debugger attached.
+Debugger ending on ws://127.0.0.1:9229/9975398d-3bb2-41a2-93b0-c559070322c9
+For help, see: https://nodejs.org/en/docs/inspector
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓░░░░░░░░░ 48.8% (495/779)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓░░░░░░░░░ 48.8% (536/867)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓░░░░░░░░ 52.6% (700/978)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓░░░░░░░░ 54.4% ( 847/1175)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓░░░░░░ 65.5% (1075/1386)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓░░░░░░ 65.5% (1239/1586)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 72.4% (1515/1789)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 74.4% (1738/2015)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░ 87.6% (1980/2115)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 96.3% (2299/2360)
+Android Bundled 62458ms node_modules\expo-router\entry.js (2512 modules)
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": false, "userId": null}
+ INFO  [auth] initial session load completed {"error": null, "hasSession": false, "userId": null}
+ INFO  [startup] initial session hydration completed {"userId": null}
+ INFO  [startup] Splash initialization complete {"duration_ms": 4598, "ios_splash_asset": undefined, "platform": "android"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+› Detected a change in metro.config.js. Restart the server to see the new results.
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+2026-10-22T01:05:04.941Z expo:start:server:middleware:manifest Resolved entry point: node_modules/expo-router/entry.js
+(project root: C:\Users\Brand\repo\BuffagoApp\crawl)
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+2026-10-22T01:05:48.524Z expo:start:server:middleware:manifest Resolved entry point: node_modules/expo-router/entry.js
+(project root: C:\Users\Brand\repo\BuffagoApp\crawl)
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 137ms node_modules\expo-router\entry.js (1 module)

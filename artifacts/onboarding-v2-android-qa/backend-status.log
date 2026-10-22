@@ -1,0 +1,10 @@
+docker : sh: can't create /home/kong/kong.yml: Permission denied
+At line:2 char:1
++ docker logs --tail 4 supabase_kong_buffago-polish-acceptance *> artif ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (sh: can't creat...rmission denied:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+sh: can't create /home/kong/kong.yml: Permission denied
+sh: can't create /home/kong/kong.yml: Permission denied
+sh: can't create /home/kong/kong.yml: Permission denied

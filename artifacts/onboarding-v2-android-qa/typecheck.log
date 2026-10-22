@@ -1,0 +1,7 @@
+
+> crawl@1.0.0 typecheck
+> tsc --noEmit
+
+supabase/functions/_shared/wingmanMenuEvidence.ts(1,37): error TS5097: An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled.
+supabase/functions/_shared/wingmanMenuPolicy.ts(1,56): error TS5097: An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled.
+supabase/functions/wingman-intake/index.ts(10,35): error TS5097: An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled.

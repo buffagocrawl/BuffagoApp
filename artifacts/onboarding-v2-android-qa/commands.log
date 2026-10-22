@@ -1,0 +1,143 @@
+# Reproduction commands (PowerShell; no secrets recorded)
+# Repo C:\Users\Brand\repo\BuffagoApp; native UI serial emulator-5554 unless noted.
+git branch --show-current
+git rev-parse HEAD
+git status --short
+git diff 984e755..HEAD --stat
+git rev-parse origin/main:crawl/metro.config.js HEAD:crawl/metro.config.js origin/main:crawl/app/_layout.tsx HEAD:crawl/app/_layout.tsx
+node --version
+java -version
+& 'C:/Program Files/Android/Android Studio/jbr/bin/java.exe' -version
+adb version
+emulator -version
+emulator -list-avds
+adb devices -l
+Get-NetTCPConnection -State Listen -LocalPort 8081,8092 -ErrorAction SilentlyContinue
+
+# Initial emulator and normal CLI startup reproduced manifest timeout; baseline logs retained.
+emulator -avd Medium_Phone_API_36.1 -no-window -no-audio -no-snapshot-save
+# In crawl; all env values are process-local. Key below is synthetic, not an account credential.
+$env:EXPO_NO_DOTENV='1'
+$env:EXPO_PUBLIC_ONBOARDING_V2='true'
+$env:EXPO_PUBLIC_ONBOARDING_WING_SHOT_INVITE='true'
+$env:EXPO_PUBLIC_SUPABASE_URL='http://10.0.2.2:55321'
+$env:EXPO_PUBLIC_SUPABASE_ANON_KEY='<synthetic QA-only key; not a real backend key>'
+node node_modules/expo/bin/cli start --dev-client --port 8081 --localhost
+curl.exe --max-time 5 http://127.0.0.1:8081/status
+curl.exe --max-time 8 -H 'expo-platform: android' -H 'accept: application/expo+json' http://127.0.0.1:8081/
+# Outcome: /status 200; manifest curl timeout (8s, then 10s); first JS not yet executing.
+# Read-only Node inspector sampled Metro FallbackWatcher _watchdir/fs.watch and _register/micromatch.
+# No SDK source patched; no package versions changed.
+
+# Dedicated fresh AVD attempt; stopped after Android package service/StorageManager failures.
+& "$env:ANDROID_HOME/cmdline-tools/latest/bin/avdmanager.bat" create avd --name Buffago_Onboarding_QA --package 'system-images;android-36.1;google_apis_playstore;x86_64' --device pixel_4
+emulator -avd Buffago_Onboarding_QA -no-window -no-audio -no-snapshot -cores 4 -memory 3072
+adb -s emulator-5556 install crawl/android/app/build/outputs/apk/debug/app-debug.apk
+adb -s emulator-5556 emu kill
+
+# Recovered target; no AVD directory deleted or wiped.
+emulator -avd Medium_Phone_API_36.1 -no-window -no-audio -no-snapshot-save -cores 4 -gpu host
+adb -s emulator-5554 shell getprop sys.boot_completed
+adb -s emulator-5554 shell service check package
+adb -s emulator-5554 install -r crawl/android/app/build/outputs/apk/debug/app-debug.apk
+# Existing emulator data was privately archived with run-as tar BEFORE the first pm clear.
+# Second campaign backed up native-created rated QA data, then restored it afterwards.
+# No physical install cleared; private archives stay in ignored crawl/.expo.
+adb -s emulator-5554 shell am force-stop com.buffago.app
+adb -s emulator-5554 exec-out run-as com.buffago.app tar -cf - .
+adb -s emulator-5554 shell pm clear com.buffago.app
+
+# Final local Metro mode (in crawl, same process-local flags as above):
+$env:REACT_NATIVE_PACKAGER_HOSTNAME='127.0.0.1'
+node node_modules/expo/bin/cli start --dev-client --offline --max-workers 2 --port 8081
+# --offline and --localhost cannot be combined by this Expo CLI; initial rejected attempt corrected.
+# Wait for complete server readiness. /status alone is not readiness.
+node scripts/qa/probe-android-metro.mjs http://127.0.0.1:8081
+# Final successful probe JSON: manifest/bundle HTTP 200, 16875623 bundle bytes, 1278ms.
+adb -s emulator-5554 reverse tcp:8081 tcp:8081
+adb -s emulator-5554 shell am start -a android.intent.action.VIEW -d 'buffago://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081' com.buffago.app
+# Native dev-client intro: Continue, then Close. No app timeout/retry/error handling disabled.
+
+# Read-only catalog bridge, from repo root; uses existing public anon config privately.
+node crawl/scripts/qa/onboarding-readonly-catalog.mjs
+# Allowed only GET destinations/states public columns; caller auth never forwarded.
+# Negative safety test rejected locally with HTTP 403:
+curl.exe -X POST -H 'content-type: application/json' -d '{}' http://127.0.0.1:55321/rest/v1/destinations
+
+# Actual native actions and screenshots recorded in actions.jsonl and ui/*.xml.
+node crawl/scripts/qa/onboarding-android-ui.mjs nodes
+node crawl/scripts/qa/onboarding-android-ui.mjs tap 'Explore BuffaGo'
+node crawl/scripts/qa/onboarding-android-ui.mjs shot 02-guest-explore-home
+# Three cycles: force-stop, launch dev-client URL, poll fresh UI XML to Home (remove prior XML each poll), screencap.
+# Results: launches.jsonl. Original stale-XML polling draft corrected and rerun before final measurements.
+adb -s emulator-5554 shell am start -a android.intent.action.VIEW -d 'buffago://onboarding' com.buffago.app
+node crawl/scripts/qa/onboarding-android-ui.mjs tap 'Find / rate wings'
+node crawl/scripts/qa/onboarding-android-ui.mjs tap 'Restaurant name'
+node crawl/scripts/qa/onboarding-android-ui.mjs input Wingnutz
+node crawl/scripts/qa/onboarding-android-ui.mjs back
+node crawl/scripts/qa/onboarding-android-ui.mjs tap 'Wingnutz Bar and Grill'
+# Slider coordinates derived from current UI bounds; normal 1170x2532/density 480.
+adb -s emulator-5554 shell input tap 820 1482
+adb -s emulator-5554 shell input swipe 820 1482 1009 1482 500
+adb -s emulator-5554 shell input tap 820 1482
+node crawl/scripts/qa/onboarding-android-ui.mjs tap Next
+adb -s emulator-5554 shell input tap 726 1509
+adb -s emulator-5554 shell input swipe 161 1509 726 1509 500
+node crawl/scripts/qa/onboarding-android-ui.mjs tap Back
+node crawl/scripts/qa/onboarding-android-ui.mjs tap Next
+node crawl/scripts/qa/onboarding-android-ui.mjs tap Next
+adb -s emulator-5554 shell input tap 632 1509
+adb -s emulator-5554 shell input swipe 161 1509 632 1509 500
+node crawl/scripts/qa/onboarding-android-ui.mjs tap Next
+adb -s emulator-5554 shell input tap 915 1509
+adb -s emulator-5554 shell input swipe 632 1509 915 1509 500
+node crawl/scripts/qa/onboarding-android-ui.mjs tap 'Save local preview'
+# Native result 8 / 10; SQLite read-only evidence records full 8/7/6/9 preview and no server rating.
+adb -s emulator-5554 shell wm size 720x1280
+adb -s emulator-5554 shell wm density 320
+adb -s emulator-5554 shell settings put system font_scale 1.3
+# Configuration recreation returned Home; manually re-entered onboarding to restore preview.
+adb -s emulator-5554 shell am start -a android.intent.action.VIEW -d 'buffago://onboarding' com.buffago.app
+adb -s emulator-5554 shell input swipe 360 850 360 330 350
+adb -s emulator-5554 shell input tap 360 1032
+adb -s emulator-5554 shell input tap 360 1032
+adb -s emulator-5554 shell input tap 360 1032
+# Single persisted pending intent and signup screen; metadata in intent-after-rapid-taps-restart.json.
+adb -s emulator-5554 shell wm size 1170x2532
+adb -s emulator-5554 shell wm density 480
+adb -s emulator-5554 shell settings put system font_scale 1.0
+# Force-stop/relaunch to clear debug configuration-change linking warning; pending intent survived restart.
+node crawl/scripts/qa/onboarding-android-ui.mjs tap 'Sign in'
+node crawl/scripts/qa/onboarding-android-ui.mjs tap 'Sign In'
+node crawl/scripts/qa/onboarding-android-ui.mjs tap Cancel
+# No credentials entered and no auth/provider/submit action executed.
+# Second fresh emulator app-data campaign, privately backed up first:
+node crawl/scripts/qa/onboarding-android-ui.mjs input Zzzqanonexistentwings
+node crawl/scripts/qa/onboarding-android-ui.mjs tap "Can't find it? Ask Wingman"
+node crawl/scripts/qa/onboarding-android-ui.mjs tap AL
+node crawl/scripts/qa/onboarding-android-ui.mjs tap Search
+# Function POST denied locally. Native Retry search/Close shown; no location created.
+# Stopped bridge to test API outage, changed search input, observed persistent spinner.
+adb -s emulator-5554 shell input keyevent 4
+node crawl/scripts/qa/onboarding-android-ui.mjs tap 'Explore BuffaGo'
+# Welcome then Home reachable; no claim of bounded search timeout.
+# Restored private rated QA archive after campaign; restored-state.json verifies score/preview/no intent.
+
+# Diagnostics/evidence
+adb -s emulator-5554 shell dumpsys activity lastanr
+adb -s emulator-5554 logcat -d -v threadtime -s ActivityManager AndroidRuntime ReactNativeJS Choreographer ExpoUpdates BuffagoQA
+# Raw logs privately captured then scrubbed before logcat.txt; no tokens/credentials copied.
+docker logs --tail 4 supabase_kong_buffago-polish-acceptance
+# Permission denied writing /home/kong/kong.yml; backend untouched.
+
+# Automated validation from crawl
+$files = Get-ChildItem tests/onboarding*.test.*,tests/wingman*.test.mjs,tests/wingShot*.test.mjs,tests/wing-shot*.test.mjs,tests/auth/*.test.js,tests/image-workflow-mobile-runtime.test.mjs | Select-Object -ExpandProperty FullName
+node --test --experimental-default-type=module $files
+npm run test:quick-rating
+npm run lint
+npm run typecheck
+node node_modules/typescript/bin/tsc --noEmit --allowImportingTsExtensions
+# From repo root after focused staging
+node scripts/security/scan-secrets.mjs --staged
+git diff --cached --check
+# No push/merge/deploy/migration command executed.

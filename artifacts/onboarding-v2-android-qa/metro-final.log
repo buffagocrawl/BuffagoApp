@@ -1,0 +1,286 @@
+Networking has been disabled
+Starting project at C:\Users\Brand\repo\BuffagoApp\crawl
+node : » android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+At line:2 char:321
++ ... 127.0.0.1'; node node_modules/expo/bin/cli start --dev-client --offli ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (» android: andr...backgroundColor:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Starting Metro Bundler
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Debugger listening on ws://127.0.0.1:9229/0bcb28c5-990a-4e28-814c-8e50d0c315f2
+For help, see: https://nodejs.org/en/docs/inspector
+Debugger attached.
+Debugger ending on ws://127.0.0.1:9229/0bcb28c5-990a-4e28-814c-8e50d0c315f2
+For help, see: https://nodejs.org/en/docs/inspector
+Debugger attached.
+Debugger ending on ws://127.0.0.1:9229/0bcb28c5-990a-4e28-814c-8e50d0c315f2
+For help, see: https://nodejs.org/en/docs/inspector
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓░░░░░░░ 62.0% (1270/1613)
+Android Bundled 5820ms node_modules\expo-router\entry.js (2507 modules)
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 165ms node_modules\expo-router\entry.js (1 module)
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] initial session load completed {"error": null, "hasSession": false, "userId": null}
+ INFO  [startup] initial session hydration completed {"userId": null}
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": false, "userId": null}
+ INFO  [startup] Splash initialization complete {"duration_ms": 5151, "ios_splash_asset": undefined, "platform": "android"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ INFO  [startup] app mounted {"pathname": "/onboarding"}
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 152ms node_modules\expo-router\entry.js (1 module)
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 118ms node_modules\expo-router\entry.js (1 module)
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": false, "userId": null}
+ INFO  [auth] initial session load completed {"error": null, "hasSession": false, "userId": null}
+ INFO  [startup] initial session hydration completed {"userId": null}
+ INFO  [startup] Splash initialization complete {"duration_ms": 4675, "ios_splash_asset": undefined, "platform": "android"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 127ms node_modules\expo-router\entry.js (1 module)
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": false, "userId": null}
+ INFO  [auth] initial session load completed {"error": null, "hasSession": false, "userId": null}
+ INFO  [startup] initial session hydration completed {"userId": null}
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 141ms node_modules\expo-router\entry.js (1 module)
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": false, "userId": null}
+ INFO  [auth] initial session load completed {"error": null, "hasSession": false, "userId": null}
+ INFO  [startup] initial session hydration completed {"userId": null}
+ INFO  [startup] Splash initialization complete {"duration_ms": 4441, "ios_splash_asset": undefined, "platform": "android"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 142ms node_modules\expo-router\entry.js (1 module)
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": false, "userId": null}
+ INFO  [auth] initial session load completed {"error": null, "hasSession": false, "userId": null}
+ INFO  [startup] initial session hydration completed {"userId": null}
+ INFO  [startup] Splash initialization complete {"duration_ms": 4653, "ios_splash_asset": undefined, "platform": "android"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 147ms node_modules\expo-router\entry.js (1 module)
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 119ms node_modules\expo-router\entry.js (1 module)
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": false, "userId": null}
+ INFO  [auth] initial session load completed {"error": null, "hasSession": false, "userId": null}
+ INFO  [startup] initial session hydration completed {"userId": null}
+ INFO  [startup] Splash initialization complete {"duration_ms": 4463, "ios_splash_asset": undefined, "platform": "android"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ INFO  [startup] app mounted {"pathname": "/onboarding"}
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": false, "userId": null}
+ INFO  [auth] initial session load completed {"error": null, "hasSession": false, "userId": null}
+ INFO  [startup] initial session hydration completed {"userId": null}
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ INFO  [startup] Splash initialization complete {"duration_ms": 179004, "ios_splash_asset": undefined, "platform": "android"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ ERROR  Looks like you have configured linking in multiple places. This is likely an error since deep links should only be handled in one place to avoid conflicts. Make sure that:
+- You don't have multiple NavigationContainers in the app each with 'linking' enabled
+- Only a single instance of the root component is rendered
+- You have set 'android:launchMode=singleTask' in the '<activity />' section of the 'AndroidManifest.xml' file to avoid launching multiple instances
+
+Call Stack
+  construct (<native>)
+  apply (<native>)
+  _construct (node_modules\@babel\runtime\helpers\construct.js)
+  Wrapper (node_modules\@babel\runtime\helpers\wrapNativeSuper.js)
+  construct (<native>)
+  _callSuper (node_modules\@babel\runtime\helpers\callSuper.js)
+  NamelessError (node_modules\@expo\metro-runtime\src\metroServerLogs.native.ts)
+  captureCurrentStack (node_modules\@expo\metro-runtime\src\metroServerLogs.native.ts)
+  HMRClient.log (node_modules\@expo\metro-runtime\src\metroServerLogs.native.ts)
+  console.level (node_modules\react-native\Libraries\Core\setUpDeveloperTools.js)
+  React.useEffect$argument_0 (node_modules\expo-router\build\fork\useLinking.native.js)
+  callCreate.reactStackBottomFrame (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  runWithFiberInDEV (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitHookEffectListMount (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitHookPassiveMountEffects (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitPassiveMountOnFiber (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  recursivelyTraversePassiveMountEffects (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitPassiveMountOnFiber (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  recursivelyTraversePassiveMountEffects (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitPassiveMountOnFiber (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  recursivelyTraversePassiveMountEffects (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitPassiveMountOnFiber (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  recursivelyTraversePassiveMountEffects (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitPassiveMountOnFiber (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  recursivelyTraversePassiveMountEffects (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitPassiveMountOnFiber (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  recursivelyTraversePassiveMountEffects (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitPassiveMountOnFiber (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  recursivelyTraversePassiveMountEffects (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitPassiveMountOnFiber (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  recursivelyTraversePassiveMountEffects (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitPassiveMountOnFiber (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  recursivelyTraversePassiveMountEffects (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitPassiveMountOnFiber (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  recursivelyTraversePassiveMountEffects (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitPassiveMountOnFiber (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  recursivelyTraversePassiveMountEffects (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitPassiveMountOnFiber (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  recursivelyTraversePassiveMountEffects (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitPassiveMountOnFiber (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  recursivelyTraversePassiveMountEffects (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitPassiveMountOnFiber (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  recursivelyTraversePassiveMountEffects (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitPassiveMountOnFiber (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  flushPassiveEffects (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  flushPendingEffects (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  performSyncWorkOnRoot (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  flushSyncWorkAcrossRoots_impl (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  flushSpawnedWork (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitRoot (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  commitRootWhenReady (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  performWorkOnRoot (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  performWorkOnRootViaSchedulerTask (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+
+Call Stack
+  ContextNavigator (node_modules\expo-router\build\ExpoRoot.js)
+  ExpoRoot (node_modules\expo-router\build\ExpoRoot.js)
+  App (node_modules\expo-router\build\qualified-entry.js)
+  WithDevTools (node_modules\expo\src\launch\withDevTools.tsx)
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] initial session load completed {"error": null, "hasSession": false, "userId": null}
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": false, "userId": null}
+ INFO  [startup] initial session hydration completed {"userId": null}
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ INFO  [startup] Splash initialization complete {"duration_ms": 189352, "ios_splash_asset": undefined, "platform": "android"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ INFO  [startup] app mounted {"pathname": "/onboarding"}
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ INFO  [startup] app mounted {"pathname": "/home"}
+ INFO  [startup] app mounted {"pathname": "/auth/login"}
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 134ms node_modules\expo-router\entry.js (1 module)
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": false, "userId": null}
+ INFO  [auth] initial session load completed {"error": null, "hasSession": false, "userId": null}
+ INFO  [startup] initial session hydration completed {"userId": null}
+ INFO  [startup] Splash initialization complete {"duration_ms": 4924, "ios_splash_asset": undefined, "platform": "android"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ INFO  [startup] app mounted {"pathname": "/auth/login"}
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 116ms node_modules\expo-router\entry.js (1 module)
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] initial session load completed {"error": null, "hasSession": false, "userId": null}
+ INFO  [startup] initial session hydration completed {"userId": null}
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": false, "userId": null}
+ INFO  [startup] Splash initialization complete {"duration_ms": 4294, "ios_splash_asset": undefined, "platform": "android"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ INFO  [startup] app mounted {"pathname": "/onboarding"}
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [analytics] insert failed Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  load states failed: Read-only Android QA: remote writes and sign-in are disabled.
+ WARN  [Wingman] Log insert failed [Error: Failed to insert Wingman log: Read-only Android QA: remote writes and sign-in are disabled.]
+ WARN  runWingman failed: [Error: Wingman function call failed: Edge Function returned a non-2xx status code]
+ INFO  [startup] app mounted {"pathname": "/home"}

@@ -1,0 +1,19 @@
+Starting project at C:\Users\Brand\repo\BuffagoApp\crawl
+node : » android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+At line:2 char:272
++ ... -local-qa'; node node_modules/expo/bin/cli start --dev-client --port  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (» android: andr...backgroundColor:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Starting Metro Bundler
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor

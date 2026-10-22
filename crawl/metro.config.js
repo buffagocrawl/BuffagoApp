@@ -1,6 +1,14 @@
 const { getDefaultConfig } = require('expo/metro-config');
 const path = require('path');
 const config = getDefaultConfig(__dirname);
+// Local Expo exports and acceptance runtimes are generated caches, not app
+// sources. Crawling them can delay manifest/bundle responses until the Android
+// development client times out. Keep Expo's existing exclusions as well.
+const defaultBlockList = config.resolver.blockList;
+config.resolver.blockList = [
+  ...(Array.isArray(defaultBlockList) ? defaultBlockList : [defaultBlockList]).filter(Boolean),
+  /[\\/]\.expo(?:[\\/]|$)/,
+];
 // Opt-in local native QA only. Release bundles cannot resolve fixture modules.
 if (process.env.BUFFAGO_NATIVE_VISUAL_QA === '1') {
   config.resolver.resolveRequest = (context, moduleName, platform) => {

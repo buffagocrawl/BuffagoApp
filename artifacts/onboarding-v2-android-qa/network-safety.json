@@ -1,0 +1,13 @@
+{
+  "forwardedRequests": 3,
+  "forwardedMethods": [
+    "GET"
+  ],
+  "forwardedResources": [
+    "/rest/v1/destinations",
+    "/rest/v1/states"
+  ],
+  "remoteMutations": 0,
+  "blockedLocalRequests": 187,
+  "guestUploadFlagRpcForwarded": false
+}

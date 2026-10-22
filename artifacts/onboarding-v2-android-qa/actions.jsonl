@@ -1,0 +1,61 @@
+{"time":"2026-10-22T01:08:48.503Z","serial":"emulator-5554","action":"tap","target":"Close app"}
+{"time":"2026-10-22T01:08:53.951Z","serial":"emulator-5554","action":"shot","name":"startup-system-ui-stall"}
+{"time":"2026-10-22T01:09:16.626Z","serial":"emulator-5554","action":"tap","target":"Continue"}
+{"time":"2026-10-22T01:09:29.159Z","serial":"emulator-5554","action":"tap","target":"Close"}
+{"time":"2026-10-22T01:09:33.629Z","serial":"emulator-5554","action":"shot","name":"01-welcome"}
+{"time":"2026-10-22T01:09:55.244Z","serial":"emulator-5554","action":"tap","target":"Explore BuffaGo"}
+{"time":"2026-10-22T01:10:04.790Z","serial":"emulator-5554","action":"shot","name":"02-guest-explore-home"}
+{"time":"2026-10-22T01:12:56.872Z","serial":"emulator-5554","action":"tap","target":"Find / rate wings"}
+{"time":"2026-10-22T01:13:00.491Z","serial":"emulator-5554","action":"shot","name":"03-search"}
+{"time":"2026-10-22T01:13:11.212Z","serial":"emulator-5554","action":"tap","target":"Restaurant name"}
+{"time":"2026-10-22T01:13:15.212Z","serial":"emulator-5554","action":"input","characters":8}
+{"time":"2026-10-22T01:13:15.369Z","serial":"emulator-5554","action":"back"}
+{"time":"2026-10-22T01:13:30.745Z","serial":"emulator-5554","action":"shot","name":"04-real-restaurant-results"}
+{"time":"2026-10-22T01:13:33.157Z","serial":"emulator-5554","action":"tap","target":"Wingnutz Bar and Grill"}
+{"time":"2026-10-22T01:13:38.490Z","serial":"emulator-5554","action":"shot","name":"05-rating-overall"}
+{"time":"2026-10-22T01:13:49.555Z","serial":"emulator-5554","action":"shot","name":"06-overall-eight"}
+{"time":"2026-10-22T01:13:51.969Z","serial":"emulator-5554","action":"tap","target":"Next"}
+{"time":"2026-10-22T01:14:06.992Z","serial":"emulator-5554","action":"shot","name":"07-sauce-seven"}
+{"time":"2026-10-22T01:14:09.367Z","serial":"emulator-5554","action":"tap","target":"Back"}
+{"time":"2026-10-22T01:14:14.398Z","serial":"emulator-5554","action":"tap","target":"Next"}
+{"time":"2026-10-22T01:14:16.862Z","serial":"emulator-5554","action":"tap","target":"Next"}
+{"time":"2026-10-22T01:14:27.564Z","serial":"emulator-5554","action":"shot","name":"08-crispiness-six"}
+{"time":"2026-10-22T01:14:29.939Z","serial":"emulator-5554","action":"tap","target":"Next"}
+{"time":"2026-10-22T01:14:40.978Z","serial":"emulator-5554","action":"shot","name":"09-chicken-nine"}
+{"time":"2026-10-22T01:14:43.335Z","serial":"emulator-5554","action":"tap","target":"Save local preview"}
+{"time":"2026-10-22T01:14:46.734Z","serial":"emulator-5554","action":"shot","name":"10-result-wing-shot-offer"}
+{"time":"2026-10-22T01:15:27.247Z","serial":"emulator-5554","action":"shot","name":"11-small-result"}
+{"time":"2026-10-22T01:15:35.691Z","serial":"emulator-5554","action":"shot","name":"12-small-large-text-result"}
+{"time":"2026-10-22T01:16:00.622Z","serial":"emulator-5554","action":"shot","name":"11-small-result"}
+{"time":"2026-10-22T01:16:35.545Z","serial":"emulator-5554","action":"shot","name":"12-small-large-text-result"}
+{"time":"2026-10-22T01:16:41.635Z","serial":"emulator-5554","action":"shot","name":"13-signup-small"}
+{"time":"2026-10-22T01:18:06.764Z","serial":"emulator-5554","action":"tap","target":"Sign in"}
+{"time":"2026-10-22T01:18:10.720Z","serial":"emulator-5554","action":"shot","name":"14-signup-normal"}
+{"time":"2026-10-22T01:18:15.991Z","serial":"emulator-5554","action":"tap","target":"Sign In"}
+{"time":"2026-10-22T01:18:18.982Z","serial":"emulator-5554","action":"shot","name":"15-signin-normal"}
+{"time":"2026-10-22T01:18:59.474Z","serial":"emulator-5554","action":"tap","target":"Cancel"}
+{"time":"2026-10-22T01:19:02.781Z","serial":"emulator-5554","action":"shot","name":"16-auth-cancel-home"}
+{"time":"2026-10-22T01:20:15.928Z","serial":"emulator-5554","action":"tap","target":"Continue"}
+{"time":"2026-10-22T01:20:18.667Z","serial":"emulator-5554","action":"tap","target":"Close"}
+{"time":"2026-10-22T01:20:21.182Z","serial":"emulator-5554","action":"tap","target":"Find / rate wings"}
+{"time":"2026-10-22T01:20:25.078Z","serial":"emulator-5554","action":"tap","target":"Restaurant name"}
+{"time":"2026-10-22T01:20:28.386Z","serial":"emulator-5554","action":"input","characters":21}
+{"time":"2026-10-22T01:20:28.629Z","serial":"emulator-5554","action":"back"}
+{"time":"2026-10-22T01:20:33.122Z","serial":"emulator-5554","action":"shot","name":"17-search-no-results"}
+{"time":"2026-10-22T01:20:35.475Z","serial":"emulator-5554","action":"tap","target":"Can't find it? Ask Wingman"}
+{"time":"2026-10-22T01:20:54.896Z","serial":"emulator-5554","action":"shot","name":"18-wingman-state-unavailable"}
+{"time":"2026-10-22T01:20:57.358Z","serial":"emulator-5554","action":"tap","target":"Close"}
+{"time":"2026-10-22T01:21:00.769Z","serial":"emulator-5554","action":"shot","name":"19-wingman-close-preserves-search"}
+{"time":"2026-10-22T01:21:23.350Z","serial":"emulator-5554","action":"tap","target":"Can't find it? Ask Wingman"}
+{"time":"2026-10-22T01:21:28.535Z","serial":"emulator-5554","action":"tap","target":"Select a state"}
+{"time":"2026-10-22T01:21:44.142Z","serial":"emulator-5554","action":"tap","target":"AL"}
+{"time":"2026-10-22T01:21:47.357Z","serial":"emulator-5554","action":"shot","name":"20-wingman-ready"}
+{"time":"2026-10-22T01:21:50.098Z","serial":"emulator-5554","action":"tap","target":"Search"}
+{"time":"2026-10-22T01:21:53.635Z","serial":"emulator-5554","action":"shot","name":"21-wingman-service-failure"}
+{"time":"2026-10-22T01:22:40.439Z","serial":"emulator-5554","action":"tap","target":"Close"}
+{"time":"2026-10-22T01:22:43.170Z","serial":"emulator-5554","action":"tap","target":"Restaurant name"}
+{"time":"2026-10-22T01:22:43.627Z","serial":"emulator-5554","action":"input","characters":1}
+{"time":"2026-10-22T01:22:43.811Z","serial":"emulator-5554","action":"back"}
+{"time":"2026-10-22T01:24:21.076Z","serial":"emulator-5554","action":"shot","name":"23-offline-hardware-back"}
+{"time":"2026-10-22T01:24:25.795Z","serial":"emulator-5554","action":"tap","target":"Explore BuffaGo"}
+{"time":"2026-10-22T01:24:29.930Z","serial":"emulator-5554","action":"shot","name":"24-offline-explore-home"}

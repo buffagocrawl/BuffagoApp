@@ -1,0 +1,4 @@
+{"time":"2026-10-22T01:21:10.809Z","ready":true,"readOnly":true,"port":55321}
+{"time":"2026-10-22T01:21:24.785Z","method":"GET","path":"/rest/v1/states","forwarded":true,"status":200}
+{"time":"2026-10-22T01:21:50.578Z","method":"POST","path":"/functions/v1/wingman-intake","forwarded":false,"status":403}
+{"time":"2026-10-22T01:21:50.849Z","method":"POST","path":"/rest/v1/wingman_intake_logs","forwarded":false,"status":403}
