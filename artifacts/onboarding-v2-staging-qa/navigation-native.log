@@ -1,0 +1,74 @@
+10-22 10:35:57.658  4214  4292 I ReactNativeJS: '[startup] app mounted', { pathname: '/' }
+10-22 10:35:57.720  4214  4292 I ReactNativeJS: '[auth] initial session load completed', { hasSession: false, userId: null, error: null }
+10-22 10:35:57.920  4214  4292 I ReactNativeJS: '[auth] auth event', { event: 'INITIAL_SESSION', hasSession: false, userId: null }
+10-22 10:36:02.228  4214  4292 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:36:02.859  4214  4292 I ReactNativeJS: '[startup] app mounted', { pathname: '/onboarding' }
+10-22 10:38:11.433  4214  4292 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:38:12.675  4214  4292 I ReactNativeJS: '[startup] app mounted', { pathname: '/auth/login' }
+10-22 10:38:31.845  4214  4292 I ReactNativeJS: '[auth] auth event', { event: 'SIGNED_IN',
+10-22 10:38:33.960  4214  4292 I ReactNativeJS: '[startup] app mounted', { pathname: '/profile/wing-shots/submit' }
+10-22 10:40:57.393  4214  4292 D ReactNativeJS: '[WingShot][[id redacted]] Final success or failure', { outcome: 'success',
+10-22 10:41:46.833  4214  4292 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:42:07.440  6322  6427 I ReactNativeJS: '[startup] app mounted', { pathname: '/' }
+10-22 10:42:07.565  6322  6427 I ReactNativeJS: '[auth] auth event', { event: 'INITIAL_SESSION',
+10-22 10:42:08.110  6322  6427 I ReactNativeJS: '[auth] initial session load completed', { hasSession: true,
+10-22 10:42:11.965  6322  6427 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:42:38.690  6322  6427 I ReactNativeJS: '[startup] app mounted', { pathname: '/journey' }
+10-22 10:43:03.289  6322  6427 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:43:22.669  6322  6427 I ReactNativeJS: '[startup] app mounted', { pathname: '/user' }
+10-22 10:43:38.776  6322  6427 I ReactNativeJS: '[auth] auth event', { event: 'SIGNED_OUT', hasSession: false, userId: null }
+10-22 10:43:40.047  6322  6427 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:43:54.511  6322  6427 I ReactNativeJS: '[startup] app mounted', { pathname: '/auth/login' }
+10-22 10:44:23.806  6322  6427 I ReactNativeJS: '[auth] auth event', { event: 'SIGNED_IN',
+10-22 10:44:44.278  7069  7169 I ReactNativeJS: '[startup] app mounted', { pathname: '/' }
+10-22 10:44:44.381  7069  7169 I ReactNativeJS: '[auth] auth event', { event: 'INITIAL_SESSION',
+10-22 10:44:44.944  7069  7169 I ReactNativeJS: '[auth] initial session load completed', { hasSession: true,
+10-22 10:44:48.834  7069  7169 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:45:59.194  7393  7494 I ReactNativeJS: '[startup] app mounted', { pathname: '/' }
+10-22 10:45:59.234  7393  7494 I ReactNativeJS: '[auth] initial session load completed', { hasSession: false, userId: null, error: null }
+10-22 10:45:59.331  7393  7494 I ReactNativeJS: '[auth] auth event', { event: 'INITIAL_SESSION', hasSession: false, userId: null }
+10-22 10:46:03.720  7393  7494 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:46:04.523  7393  7494 I ReactNativeJS: '[startup] app mounted', { pathname: '/onboarding' }
+10-22 10:46:50.502  7393  7494 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:46:51.108  7393  7494 I ReactNativeJS: '[startup] app mounted', { pathname: '/auth/login' }
+10-22 10:47:36.803  7393  7494 I ReactNativeJS: '[auth] auth event', { event: 'SIGNED_IN',
+10-22 10:47:39.323  7393  7494 I ReactNativeJS: '[startup] app mounted', { pathname: '/profile/wing-shots/submit' }
+10-22 10:48:08.489  7393  7494 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:48:32.494  8268  8369 I ReactNativeJS: '[startup] app mounted', { pathname: '/' }
+10-22 10:48:32.587  8268  8369 I ReactNativeJS: '[auth] auth event', { event: 'INITIAL_SESSION',
+10-22 10:48:33.200  8268  8369 I ReactNativeJS: '[auth] initial session load completed', { hasSession: true,
+10-22 10:48:36.901  8268  8369 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:51:26.867  8268  8369 I ReactNativeJS: '[startup] app mounted', { pathname: '/user' }
+10-22 10:51:31.980  8268  8369 I ReactNativeJS: '[auth] auth event', { event: 'SIGNED_OUT', hasSession: false, userId: null }
+10-22 10:51:32.878  8268  8369 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:51:41.535  8268  8369 I ReactNativeJS: '[startup] app mounted', { pathname: '/auth/login' }
+10-22 10:51:47.346  8268  8369 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:52:03.246  8268  8369 I ReactNativeJS: '[startup] app mounted', { pathname: '/auth/login' }
+10-22 10:52:28.338  8268  8369 I ReactNativeJS: '[auth] auth event', { event: 'SIGNED_IN',
+10-22 10:53:34.825  9356  9462 I ReactNativeJS: '[startup] app mounted', { pathname: '/' }
+10-22 10:53:34.909  9356  9462 I ReactNativeJS: '[auth] auth event', { event: 'INITIAL_SESSION',
+10-22 10:53:35.444  9356  9462 I ReactNativeJS: '[auth] initial session load completed', { hasSession: true,
+10-22 10:53:39.316  9356  9462 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:55:53.290  9356  9462 I ReactNativeJS: '[startup] app mounted', { pathname: '/user' }
+10-22 10:55:59.686  9356  9462 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:55:59.786  9356  9462 I ReactNativeJS: '[auth] auth event', { event: 'SIGNED_OUT', hasSession: false, userId: null }
+10-22 10:56:05.817  9356  9462 I ReactNativeJS: '[startup] app mounted', { pathname: '/auth/login' }
+10-22 10:56:38.761  9356  9462 I ReactNativeJS: '[auth] auth event', { event: 'SIGNED_IN',
+10-22 10:56:40.793  9356  9462 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:57:03.321 10067 10165 I ReactNativeJS: '[startup] app mounted', { pathname: '/' }
+10-22 10:57:03.396 10067 10165 I ReactNativeJS: '[auth] auth event', { event: 'INITIAL_SESSION',
+10-22 10:57:03.943 10067 10165 I ReactNativeJS: '[auth] initial session load completed', { hasSession: true,
+10-22 10:57:07.857 10067 10165 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:57:46.656 10067 10165 I ReactNativeJS: '[startup] app mounted', { pathname: '/user' }
+10-22 10:57:52.854 10067 10165 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:57:53.713 10067 10165 I ReactNativeJS: '[startup] app mounted', { pathname: '/onboarding' }
+10-22 10:57:54.041 10067 10165 I ReactNativeJS: '[auth] auth event', { event: 'SIGNED_OUT', hasSession: false, userId: null }
+10-22 10:57:59.971 10067 10165 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:58:00.807 10067 10165 I ReactNativeJS: '[startup] app mounted', { pathname: '/auth/login' }
+10-22 10:58:33.039 10067 10165 I ReactNativeJS: '[auth] auth event', { event: 'SIGNED_IN',
+10-22 10:58:35.980 10067 10165 I ReactNativeJS: '[startup] app mounted', { pathname: '/profile/wing-shots/submit' }
+10-22 10:58:46.290 10067 10165 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }
+10-22 10:59:09.914 10780 10884 I ReactNativeJS: '[startup] app mounted', { pathname: '/' }
+10-22 10:59:10.037 10780 10884 I ReactNativeJS: '[auth] auth event', { event: 'INITIAL_SESSION',
+10-22 10:59:10.561 10780 10884 I ReactNativeJS: '[auth] initial session load completed', { hasSession: true,
+10-22 10:59:14.378 10780 10884 I ReactNativeJS: '[startup] app mounted', { pathname: '/home' }

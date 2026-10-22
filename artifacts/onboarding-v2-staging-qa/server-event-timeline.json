@@ -1,0 +1,248 @@
+[
+  {
+    "occurred_at": "2026-10-22T14:36:42.058986+00:00",
+    "event_name": "onboarding_started",
+    "screen": "onboarding",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:36:42.070894+00:00",
+    "event_name": "onboarding_step_viewed",
+    "screen": "onboarding",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:36:59.662276+00:00",
+    "event_name": "onboarding_step_viewed",
+    "screen": "onboarding",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:37:14.846643+00:00",
+    "event_name": "onboarding_step_viewed",
+    "screen": "onboarding",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:38:42.601548+00:00",
+    "event_name": "onboarding_step_viewed",
+    "screen": "onboarding",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:38:42.63012+00:00",
+    "event_name": "onboarding_wing_shot_offer_viewed",
+    "screen": "onboarding",
+    "correct_destination": true
+  },
+  {
+    "occurred_at": "2026-10-22T14:38:52.538713+00:00",
+    "event_name": "onboarding_wing_shot_selected",
+    "screen": "onboarding",
+    "correct_destination": true
+  },
+  {
+    "occurred_at": "2026-10-22T14:38:52.816138+00:00",
+    "event_name": "onboarding_main_app_arrived",
+    "screen": "home",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:39:13.393366+00:00",
+    "event_name": "onboarding_wing_shot_auth_return",
+    "screen": "auth/login",
+    "correct_destination": true
+  },
+  {
+    "occurred_at": "2026-10-22T14:39:13.568112+00:00",
+    "event_name": "wing_shot_upload_opened",
+    "screen": "profile/wing-shots/submit",
+    "correct_destination": true
+  },
+  {
+    "occurred_at": "2026-10-22T14:39:14.24713+00:00",
+    "event_name": "wing_shot_restaurant_preselected",
+    "screen": "profile/wing-shots/submit",
+    "correct_destination": true
+  },
+  {
+    "occurred_at": "2026-10-22T14:41:36.458426+00:00",
+    "event_name": "wing_shot_upload_completed",
+    "screen": "profile/wing-shots/submit",
+    "correct_destination": true
+  },
+  {
+    "occurred_at": "2026-10-22T14:42:47.398144+00:00",
+    "event_name": "auth_session_restored",
+    "screen": "app_boot",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:45:24.250427+00:00",
+    "event_name": "auth_session_restored",
+    "screen": "app_boot",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:46:43.918355+00:00",
+    "event_name": "onboarding_started",
+    "screen": "onboarding",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:46:44.004583+00:00",
+    "event_name": "onboarding_step_viewed",
+    "screen": "onboarding",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:47:03.39382+00:00",
+    "event_name": "onboarding_step_viewed",
+    "screen": "onboarding",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:47:10.57789+00:00",
+    "event_name": "onboarding_step_viewed",
+    "screen": "onboarding",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:47:23.229158+00:00",
+    "event_name": "onboarding_wing_shot_offer_viewed",
+    "screen": "onboarding",
+    "correct_destination": true
+  },
+  {
+    "occurred_at": "2026-10-22T14:47:23.258225+00:00",
+    "event_name": "onboarding_step_viewed",
+    "screen": "onboarding",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:47:30.94313+00:00",
+    "event_name": "onboarding_wing_shot_selected",
+    "screen": "onboarding",
+    "correct_destination": true
+  },
+  {
+    "occurred_at": "2026-10-22T14:47:31.008056+00:00",
+    "event_name": "onboarding_main_app_arrived",
+    "screen": "home",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:48:15.527593+00:00",
+    "event_name": "auth_started",
+    "screen": "auth/login",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:48:18.931083+00:00",
+    "event_name": "onboarding_wing_shot_auth_return",
+    "screen": "auth/login",
+    "correct_destination": true
+  },
+  {
+    "occurred_at": "2026-10-22T14:48:19.202727+00:00",
+    "event_name": "wing_shot_upload_opened",
+    "screen": "profile/wing-shots/submit",
+    "correct_destination": true
+  },
+  {
+    "occurred_at": "2026-10-22T14:48:19.794883+00:00",
+    "event_name": "wing_shot_restaurant_preselected",
+    "screen": "profile/wing-shots/submit",
+    "correct_destination": true
+  },
+  {
+    "occurred_at": "2026-10-22T14:49:12.511459+00:00",
+    "event_name": "auth_session_restored",
+    "screen": "app_boot",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:54:14.69911+00:00",
+    "event_name": "auth_session_restored",
+    "screen": "app_boot",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:57:17.692491+00:00",
+    "event_name": "auth_started",
+    "screen": "auth/login",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:57:43.209587+00:00",
+    "event_name": "auth_session_restored",
+    "screen": "app_boot",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:58:34.155381+00:00",
+    "event_name": "onboarding_step_viewed",
+    "screen": "onboarding",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:58:34.163859+00:00",
+    "event_name": "onboarding_started",
+    "screen": "onboarding",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:58:34.361147+00:00",
+    "event_name": "onboarding_wing_shot_offer_viewed",
+    "screen": "onboarding",
+    "correct_destination": true
+  },
+  {
+    "occurred_at": "2026-10-22T14:58:34.361962+00:00",
+    "event_name": "onboarding_step_viewed",
+    "screen": "onboarding",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:58:40.729475+00:00",
+    "event_name": "onboarding_wing_shot_selected",
+    "screen": "onboarding",
+    "correct_destination": true
+  },
+  {
+    "occurred_at": "2026-10-22T14:58:41.048266+00:00",
+    "event_name": "onboarding_main_app_arrived",
+    "screen": "home",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:59:12.014265+00:00",
+    "event_name": "auth_started",
+    "screen": "auth/login",
+    "correct_destination": null
+  },
+  {
+    "occurred_at": "2026-10-22T14:59:15.828193+00:00",
+    "event_name": "onboarding_wing_shot_auth_return",
+    "screen": "auth/login",
+    "correct_destination": true
+  },
+  {
+    "occurred_at": "2026-10-22T14:59:15.984551+00:00",
+    "event_name": "wing_shot_upload_opened",
+    "screen": "profile/wing-shots/submit",
+    "correct_destination": true
+  },
+  {
+    "occurred_at": "2026-10-22T14:59:16.721115+00:00",
+    "event_name": "wing_shot_restaurant_preselected",
+    "screen": "profile/wing-shots/submit",
+    "correct_destination": true
+  },
+  {
+    "occurred_at": "2026-10-22T14:59:49.757988+00:00",
+    "event_name": "auth_session_restored",
+    "screen": "app_boot",
+    "correct_destination": null
+  }
+]

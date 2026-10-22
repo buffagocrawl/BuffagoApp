@@ -1,0 +1,220 @@
+TAP version 13
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 0 }
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 0 }
+# [cayenne-auth] submit_completed { outcome: 'error', duration_ms: 0 }
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 0 }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: real completion helper persists all gate keys before auth and survives fresh Home mounts
+ok 1 - real completion helper persists all gate keys before auth and survives fresh Home mounts
+  ---
+  duration_ms: 95.4083
+  type: 'test'
+  ...
+# Subtest: actual login component signup preserves local preview and reaches fixed uploader
+ok 2 - actual login component signup preserves local preview and reaches fixed uploader
+  ---
+  duration_ms: 93.8238
+  type: 'test'
+  ...
+# Subtest: actual login component signin preserves local preview and reaches fixed uploader
+ok 3 - actual login component signin preserves local preview and reaches fixed uploader
+  ---
+  duration_ms: 48.1124
+  type: 'test'
+  ...
+# Subtest: actual login component confirmation preserves local preview and reaches fixed uploader
+ok 4 - actual login component confirmation preserves local preview and reaches fixed uploader
+  ---
+  duration_ms: 73.7519
+  type: 'test'
+  ...
+# Subtest: wrong password retry, double signup tap and explicit Explore do not lose preview or duplicate navigation
+ok 5 - wrong password retry, double signup tap and explicit Explore do not lose preview or duplicate navigation
+  ---
+  duration_ms: 98.2613
+  type: 'test'
+  ...
+# Subtest: actual login google session listener defers to OAuth callback, cancel and error permit retry
+ok 6 - actual login google session listener defers to OAuth callback, cancel and error permit retry
+  ---
+  duration_ms: 85.6948
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792680690138-1',
+#       destinationId: '[test id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: actual google callback deep-link code exchange sends current user to original restaurant
+ok 7 - actual google callback deep-link code exchange sends current user to original restaurant
+  ---
+  duration_ms: 127.3998
+  type: 'test'
+  ...
+# Subtest: actual login facebook session listener defers to OAuth callback, cancel and error permit retry
+ok 8 - actual login facebook session listener defers to OAuth callback, cancel and error permit retry
+  ---
+  duration_ms: 78.2417
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792680690331-1',
+#       destinationId: '[test id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: actual facebook callback deep-link code exchange sends current user to original restaurant
+ok 9 - actual facebook callback deep-link code exchange sends current user to original restaurant
+  ---
+  duration_ms: 106.952
+  type: 'test'
+  ...
+# Subtest: normal login and saved destination precedence remain intact
+ok 10 - normal login and saved destination precedence remain intact
+  ---
+  duration_ms: 56.5015
+  type: 'test'
+  ...
+# Subtest: duplicate signed-in notifications before and after handoff cannot replace uploader with Home
+ok 11 - duplicate signed-in notifications before and after handoff cannot replace uploader with Home
+  ---
+  duration_ms: 22.2633
+  type: 'test'
+  ...
+# Subtest: legacy import cannot replay nested V2 local preview payloads
+ok 12 - legacy import cannot replay nested V2 local preview payloads
+  ---
+  duration_ms: 26.6537
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792680690553-1',
+#       destinationId: '[test id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792680690655-1',
+#       destinationId: '[test id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792680690766-1',
+#       destinationId: '[test id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/(tabs)/ratings',
+#     params: {
+#       savedAction: 'save',
+#       savedDestinationId: '[test id redacted]',
+#       savedActionState: 'save',
+#       savedActionUserId: 'synthetic-account'
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# OAuth callback failed { code: 'callback_failed' }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: callback rejects arbitrary return-route injection and preserves saved-action priority
+ok 13 - callback rejects arbitrary return-route injection and preserves saved-action priority
+  ---
+  duration_ms: 440.3032
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792680690989-1',
+#       destinationId: '[test id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# OAuth callback failed { code: 'callback_failed' }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: actual google callback rejects anonymous user and permits retry without consuming Wing Shot
+ok 14 - actual google callback rejects anonymous user and permits retry without consuming Wing Shot
+  ---
+  duration_ms: 106.7811
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792680691090-1',
+#       destinationId: '[test id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# Subtest: actual facebook callback rejects anonymous user and permits retry without consuming Wing Shot
+ok 15 - actual facebook callback rejects anonymous user and permits retry without consuming Wing Shot
+  ---
+  duration_ms: 109.2758
+  type: 'test'
+  ...
+1..15
+# tests 15
+# suites 0
+# pass 15
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1891.0441

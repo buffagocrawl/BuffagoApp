@@ -1,0 +1,269 @@
+Networking has been disabled
+Starting project at C:\Users\Brand\repo\BuffagoApp\crawl
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Starting Metro Bundler
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 2748ms node_modules\expo-router\entry.js (2512 modules)
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 138ms node_modules\expo-router\entry.js (1 module)
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] initial session load completed {"error": null, "hasSession": false, "userId": null}
+ INFO  [startup] initial session hydration completed {"userId": null}
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": false, "userId": null}
+ INFO  [startup] Splash initialization complete {"duration_ms": 4515, "ios_splash_asset": undefined, "platform": "android"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ INFO  [startup] app mounted {"pathname": "/onboarding"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ INFO  [startup] app mounted {"pathname": "/auth/login"}
+ INFO  [auth] auth event {"event": "SIGNED_IN", "hasSession": true, "userId": "[id redacted]"}
+ INFO  [startup] initial session hydration completed {"userId": "[id redacted]"}
+ WARN  daily_xp_status failed: Could not find the function public.daily_xp_status(p_user) in the schema cache
+ INFO  [startup] app mounted {"pathname": "/profile/wing-shots/submit"}
+ DEBUG  [WingShot][[id redacted]] Rating-to-Wing-Shot transition {"destinationIdPresent": true, "platform": "android", "ratingIdPresent": false, "submissionSource": "onboarding", "userIdPresent": true}
+ DEBUG  [WingShot][[id redacted]] Photo selection {"dimensions": {"height": 533, "width": 533}, "fileExtension": "jpg", "fileSizeBytes": 23545, "localFileExists": true, "localFileReadable": true, "mediaType": "photo", "mimeType": "image/jpeg", "platform": "native", "uriScheme": "file"}
+ DEBUG  [WingShot][[id redacted]] validation_handoff_started {"correlationId": "[id redacted]", "currentValidationState": "framing", "dimensions": {"height": 533, "width": 533}, "fileExtension": "jpg", "fileSizeBytes": 23545, "localFileExists": true, "localFileReadable": true, "mediaType": "photo", "mimeType": "image/jpeg", "platform": "native", "uriScheme": "file"}
+ DEBUG  [WingShot][[id redacted]] local_validation_started {"dimensions": {"height": 533, "width": 533}, "fileExtension": "jpg", "fileSizeBytes": 23545, "localFileExists": true, "localFileReadable": true, "mediaType": "photo", "mimeType": "image/jpeg", "platform": "native", "reasonCode": null, "uriScheme": "file"}
+ DEBUG  [WingShot][[id redacted]] local_validation_passed {"dimensions": {"height": 533, "width": 533}, "fileExtension": "jpg", "fileSizeBytes": 23545, "localFileExists": true, "localFileReadable": true, "mediaType": "photo", "mimeType": "image/jpeg", "platform": "native", "reasonCode": "local_validation_passed", "uriScheme": "file"}
+ DEBUG  [WingShot][[id redacted]] validation_started {"project": "vhfxnizaxdanmvmouuaf", "reasonCode": "local_validation_passed", "stage": "staging_upload_server_validator", "validator": "wing-media-validate"}
+ DEBUG  [WingShot][[id redacted]] staging_authorization_started {"authenticatedSession": true, "fileSizeBytes": 23545, "mediaType": "photo", "stage": "staging_authorization"}
+ DEBUG  [WingShot][[id redacted]] function_request_headers {"apikeyPresent": true, "bearerPresent": true, "bearerShape": "jwt_like", "projectRef": "127", "refreshAttempted": false, "stage": "wing-media-stage-authorize", "userId": "[id redacted]"}
+ DEBUG  [WingShot][[id redacted]] staging_authorization_received {"bucket": "wing-shot-staging", "fileSizeBytes": 23545, "mediaType": "photo", "objectPath": "…/[id redacted]/wing-shot.jpg", "stage": "staging_authorization"}
+ DEBUG  [WingShot][[id redacted]] staging_upload_started {"bucket": "wing-shot-staging", "fileSizeBytes": 23545, "mediaType": "photo", "objectPath": "…/[id redacted]/wing-shot.jpg", "stage": "staging_upload"}
+ DEBUG  [WingShot][[id redacted]] staging_upload_progress {"bucket": "wing-shot-staging", "fileSizeBytes": 23545, "objectPath": "…/[id redacted]/wing-shot.jpg", "progressPercent": 35, "stage": "staging_upload"}
+ DEBUG  [WingShot][[id redacted]] staging_upload_progress {"bucket": "wing-shot-staging", "fileSizeBytes": 23545, "objectPath": "…/[id redacted]/wing-shot.jpg", "progressPercent": 100, "stage": "staging_upload"}
+ DEBUG  [WingShot][[id redacted]] staging_upload_completed {"bucket": "wing-shot-staging", "fileSizeBytes": 23545, "mediaType": "photo", "objectPath": "…/[id redacted]/wing-shot.jpg", "stage": "staging_upload"}
+ DEBUG  [WingShot][[id redacted]] function_request_headers {"apikeyPresent": true, "bearerPresent": true, "bearerShape": "jwt_like", "refreshAttempted": false, "stage": "wing-media-validate"}
+ DEBUG  [WingShot][[id redacted]] validation_passed {"reasonCode": "server_validation_passed", "stage": "server_validation"}
+ DEBUG  [WingShot][[id redacted]] Upload preparation {"destinationIdPresent": true, "dimensions": {"height": 533, "width": 533}, "fileExtension": "jpg", "fileSizeBytes": 23545, "localFileExists": true, "localFileReadable": true, "mediaType": "photo", "mimeType": "image/jpeg", "platform": "native", "ratingIdPresent": false, "uriScheme": "file", "userIdPresent": true}
+ DEBUG  [WingShot][[id redacted]] Photo upload preparation {"dimensions": {"height": 533, "width": 533}, "fileExtension": "jpg", "fileSizeBytes": 23545, "localFileExists": true, "localFileReadable": true, "mediaType": "photo", "mimeType": "image/jpeg", "platform": "native", "preprocessing": "client upload body preparation", "uriScheme": "file"}
+ DEBUG  [WingShot][[id redacted]] RPC request {"rpcArguments": {"attributionPreferencePresent": true, "captionPresent": false, "consentVersionPresent": true, "correlationIdPresent": true, "destinationIdPresent": true, "expectedSizeBytes": 23545, "idempotencyKeyPresent": true, "mediaType": "photo", "mimeType": "image/jpeg", "ratingIdPresent": false, "submissionSource": "onboarding", "userIdPresent": true}, "rpcName": "reserve_wing_submission_upload"}
+ DEBUG  [WingShot][[id redacted]] RPC response {"clientClassification": null, "databaseCode": null, "databaseMessage": null, "exception": null, "existingRecordFound": false, "existingRecordId": "[id redacted]", "existingRecordStatus": null, "recordCreation": "created", "retryAfterSeconds": null, "rpcName": "reserve_wing_submission_upload"}
+ DEBUG  [WingShot][[id redacted]] function_request_headers {"apikeyPresent": true, "bearerPresent": true, "bearerShape": "jwt_like", "refreshAttempted": false, "stage": "wing-media-promote"}
+ DEBUG  [WingShot][[id redacted]] RPC response {"exception": null, "existingRecordFound": true, "existingRecordId": "[id redacted]", "existingRecordStatus": "in_review", "recordCreation": "updated", "rpcName": "finalize_wing_submission_upload"}
+ DEBUG  [WingShot][[id redacted]] Database record creation/update {"destinationIdPresent": true, "ratingIdPresent": false, "supabaseError": null, "userIdPresent": true}
+ DEBUG  [WingShot][[id redacted]] Final success or failure {"dimensions": {"height": 533, "width": 533}, "fileExtension": "jpg", "fileSizeBytes": 23545, "localFileExists": true, "localFileReadable": true, "mediaType": "photo", "mimeType": "image/jpeg", "outcome": "success", "platform": "native", "uriScheme": "file"}
+ DEBUG  [WingShot][[id redacted]] Modal close and state cleanup {"reason": "successful_upload_closed", "stateCleared": true}
+ DEBUG  [WingShot][[id redacted]] Modal close and state cleanup {"reason": "explicit_reset", "stateCleared": true}
+ DEBUG  [WingShot][[id redacted]] staging_cleanup_started {"bucket": "wing-shot-staging", "objectPath": "…/[id redacted]/wing-shot.jpg", "stage": "staging_cleanup"}
+ DEBUG  [WingShot][[id redacted]] function_request_headers {"apikeyPresent": true, "bearerPresent": true, "bearerShape": "jwt_like", "projectRef": "127", "refreshAttempted": false, "stage": "wing-media-staging-cleanup", "userId": "[id redacted]"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  loadBattle failed: Could not find the table 'public.wing_battle_options_active' in the schema cache
+ WARN  daily_xp_status failed: Could not find the function public.daily_xp_status(p_user) in the schema cache
+ DEBUG  [WingShot][[id redacted]] staging_cleanup_completed {"reasonCode": "staging_cleanup_completed", "stage": "staging_cleanup"}
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 132ms node_modules\expo-router\entry.js (1 module)
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": true, "userId": "[id redacted]"}
+ INFO  [auth] initial session load completed {"error": null, "hasSession": true, "userId": "[id redacted]"}
+ INFO  [startup] initial session hydration completed {"userId": "[id redacted]"}
+ INFO  [startup] Splash initialization complete {"duration_ms": 4636, "ios_splash_asset": undefined, "platform": "android"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  daily_xp_status failed: Could not find the function public.daily_xp_status(p_user) in the schema cache
+ WARN  loadBattle failed: Could not find the table 'public.wing_battle_options_active' in the schema cache
+ WARN  Passing an object as the argument to 'navigate' is deprecated. Use 'navigate(name, params, options)' instead.
+ INFO  [startup] app mounted {"pathname": "/journey"}
+ WARN  profile wizard check failed: Could not find the table 'public.users_check_profile' in the schema cache
+ WARN  Passing an object as the argument to 'navigate' is deprecated. Use 'navigate(name, params, options)' instead.
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  loadBattle failed: Could not find the table 'public.wing_battle_options_active' in the schema cache
+ INFO  [startup] app mounted {"pathname": "/user"}
+ LOG  [prefs load error] {"code": "PGRST205", "details": null, "hint": null, "message": "Could not find the table 'public.user_preferences' in the schema cache"}
+ INFO  [auth] auth event {"event": "SIGNED_OUT", "hasSession": false, "userId": null}
+ INFO  [startup] initial session hydration completed {"userId": null}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ INFO  [startup] app mounted {"pathname": "/auth/login"}
+ INFO  [password-auth] submit_started
+ INFO  [password-auth] supabase_request_started
+ INFO  [auth] auth event {"event": "SIGNED_IN", "hasSession": true, "userId": "[id redacted]"}
+ INFO  [password-auth] supabase_response_received
+ INFO  [password-auth] session_present
+ INFO  [password-auth] profile_bootstrap_started
+ INFO  [password-auth] profile_bootstrap_completed
+ INFO  [password-auth] navigation_requested
+ INFO  [cayenne-auth] submit_completed {"duration_ms": 452, "outcome": "session_received"}
+ INFO  [password-auth] loading_cleanup_completed
+ INFO  [startup] initial session hydration completed {"userId": "[id redacted]"}
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 139ms node_modules\expo-router\entry.js (1 module)
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": true, "userId": "[id redacted]"}
+ INFO  [auth] initial session load completed {"error": null, "hasSession": true, "userId": "[id redacted]"}
+ INFO  [startup] initial session hydration completed {"userId": "[id redacted]"}
+ INFO  [startup] Splash initialization complete {"duration_ms": 4611, "ios_splash_asset": undefined, "platform": "android"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  daily_xp_status failed: Could not find the function public.daily_xp_status(p_user) in the schema cache
+ WARN  loadBattle failed: Could not find the table 'public.wing_battle_options_active' in the schema cache
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 105ms node_modules\expo-router\entry.js (1 module)
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] initial session load completed {"error": null, "hasSession": false, "userId": null}
+ INFO  [startup] initial session hydration completed {"userId": null}
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": false, "userId": null}
+ INFO  [startup] Splash initialization complete {"duration_ms": 4426, "ios_splash_asset": undefined, "platform": "android"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ INFO  [startup] app mounted {"pathname": "/onboarding"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ INFO  [startup] app mounted {"pathname": "/auth/login"}
+ INFO  [password-auth] submit_started
+ INFO  [password-auth] supabase_request_started
+ INFO  [auth] auth event {"event": "SIGNED_IN", "hasSession": true, "userId": "[id redacted]"}
+ INFO  [password-auth] supabase_response_received
+ INFO  [password-auth] session_present
+ INFO  [password-auth] profile_bootstrap_started
+ INFO  [password-auth] profile_bootstrap_completed
+ INFO  [password-auth] navigation_requested
+ INFO  [cayenne-auth] submit_completed {"duration_ms": 524, "outcome": "session_received"}
+ INFO  [password-auth] loading_cleanup_completed
+ INFO  [startup] initial session hydration completed {"userId": "[id redacted]"}
+ WARN  daily_xp_status failed: Could not find the function public.daily_xp_status(p_user) in the schema cache
+ INFO  [startup] app mounted {"pathname": "/profile/wing-shots/submit"}
+ DEBUG  [WingShot][[id redacted]] Rating-to-Wing-Shot transition {"destinationIdPresent": true, "platform": "android", "ratingIdPresent": false, "submissionSource": "onboarding", "userIdPresent": true}
+ DEBUG  [WingShot][[id redacted]] Modal close and state cleanup {"reason": "explicit_close", "stateCleared": true}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  loadBattle failed: Could not find the table 'public.wing_battle_options_active' in the schema cache
+ WARN  daily_xp_status failed: Could not find the function public.daily_xp_status(p_user) in the schema cache
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 133ms node_modules\expo-router\entry.js (1 module)
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": true, "userId": "[id redacted]"}
+ INFO  [auth] initial session load completed {"error": null, "hasSession": true, "userId": "[id redacted]"}
+ INFO  [startup] initial session hydration completed {"userId": "[id redacted]"}
+ INFO  [startup] Splash initialization complete {"duration_ms": 4740, "ios_splash_asset": undefined, "platform": "android"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  daily_xp_status failed: Could not find the function public.daily_xp_status(p_user) in the schema cache
+ WARN  loadBattle failed: Could not find the table 'public.wing_battle_options_active' in the schema cache
+ INFO  [startup] app mounted {"pathname": "/user"}
+ LOG  [prefs load error] {"code": "PGRST205", "details": null, "hint": null, "message": "Could not find the table 'public.user_preferences' in the schema cache"}
+ INFO  [auth] auth event {"event": "SIGNED_OUT", "hasSession": false, "userId": null}
+ INFO  [startup] initial session hydration completed {"userId": null}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ INFO  [startup] app mounted {"pathname": "/auth/login"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ INFO  [startup] app mounted {"pathname": "/auth/login"}
+ INFO  [password-auth] submit_started
+ INFO  [password-auth] supabase_request_started
+ INFO  [auth] auth event {"event": "SIGNED_IN", "hasSession": true, "userId": "[id redacted]"}
+ INFO  [password-auth] supabase_response_received
+ INFO  [password-auth] session_present
+ INFO  [password-auth] profile_bootstrap_started
+ INFO  [password-auth] profile_bootstrap_completed
+ INFO  [password-auth] navigation_requested
+ INFO  [cayenne-auth] submit_completed {"duration_ms": 493, "outcome": "session_received"}
+ INFO  [password-auth] loading_cleanup_completed
+ INFO  [startup] initial session hydration completed {"userId": "[id redacted]"}
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 144ms node_modules\expo-router\entry.js (1 module)
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": true, "userId": "[id redacted]"}
+ INFO  [auth] initial session load completed {"error": null, "hasSession": true, "userId": "[id redacted]"}
+ INFO  [startup] initial session hydration completed {"userId": "[id redacted]"}
+ INFO  [startup] Splash initialization complete {"duration_ms": 4583, "ios_splash_asset": undefined, "platform": "android"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  daily_xp_status failed: Could not find the function public.daily_xp_status(p_user) in the schema cache
+ WARN  loadBattle failed: Could not find the table 'public.wing_battle_options_active' in the schema cache
+| (node:24680) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+| (Use `node --trace-warnings ...` to show where the warning was created)
+ INFO  [startup] app mounted {"pathname": "/user"}
+ LOG  [prefs load error] {"code": "PGRST205", "details": null, "hint": null, "message": "Could not find the table 'public.user_preferences' in the schema cache"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ INFO  [auth] auth event {"event": "SIGNED_OUT", "hasSession": false, "userId": null}
+ INFO  [startup] initial session hydration completed {"userId": null}
+ WARN  loadBattle failed: Could not find the table 'public.wing_battle_options_active' in the schema cache
+ INFO  [startup] app mounted {"pathname": "/auth/login"}
+ INFO  [password-auth] submit_started
+ INFO  [password-auth] supabase_request_started
+ INFO  [auth] auth event {"event": "SIGNED_IN", "hasSession": true, "userId": "[id redacted]"}
+ INFO  [password-auth] supabase_response_received
+ INFO  [password-auth] session_present
+ INFO  [password-auth] profile_bootstrap_started
+ INFO  [password-auth] profile_bootstrap_completed
+ INFO  [password-auth] navigation_requested
+ INFO  [cayenne-auth] submit_completed {"duration_ms": 658, "outcome": "session_received"}
+ INFO  [password-auth] loading_cleanup_completed
+ INFO  [startup] initial session hydration completed {"userId": "[id redacted]"}
+ WARN  daily_xp_status failed: Could not find the function public.daily_xp_status(p_user) in the schema cache
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  loadBattle failed: Could not find the table 'public.wing_battle_options_active' in the schema cache
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 130ms node_modules\expo-router\entry.js (1 module)
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": true, "userId": "[id redacted]"}
+ INFO  [auth] initial session load completed {"error": null, "hasSession": true, "userId": "[id redacted]"}
+ INFO  [startup] initial session hydration completed {"userId": "[id redacted]"}
+ INFO  [startup] Splash initialization complete {"duration_ms": 4508, "ios_splash_asset": undefined, "platform": "android"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  loadBattle failed: Could not find the table 'public.wing_battle_options_active' in the schema cache
+ WARN  daily_xp_status failed: Could not find the function public.daily_xp_status(p_user) in the schema cache
+ INFO  [startup] app mounted {"pathname": "/user"}
+ LOG  [prefs load error] {"code": "PGRST205", "details": null, "hint": null, "message": "Could not find the table 'public.user_preferences' in the schema cache"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ INFO  [startup] app mounted {"pathname": "/onboarding"}
+ INFO  [auth] auth event {"event": "SIGNED_OUT", "hasSession": false, "userId": null}
+ INFO  [startup] initial session hydration completed {"userId": null}
+ WARN  loadBattle failed: Could not find the table 'public.wing_battle_options_active' in the schema cache
+ INFO  [startup] app mounted {"pathname": "/home"}
+ INFO  [startup] app mounted {"pathname": "/auth/login"}
+ INFO  [password-auth] submit_started
+ INFO  [password-auth] supabase_request_started
+ INFO  [auth] auth event {"event": "SIGNED_IN", "hasSession": true, "userId": "[id redacted]"}
+ INFO  [password-auth] supabase_response_received
+ INFO  [password-auth] session_present
+ INFO  [password-auth] profile_bootstrap_started
+ INFO  [password-auth] profile_bootstrap_completed
+ INFO  [password-auth] navigation_requested
+ INFO  [cayenne-auth] submit_completed {"duration_ms": 405, "outcome": "session_received"}
+ INFO  [password-auth] loading_cleanup_completed
+ INFO  [startup] initial session hydration completed {"userId": "[id redacted]"}
+ WARN  daily_xp_status failed: Could not find the function public.daily_xp_status(p_user) in the schema cache
+ WARN  daily_xp_status failed: Could not find the function public.daily_xp_status(p_user) in the schema cache
+ INFO  [startup] app mounted {"pathname": "/profile/wing-shots/submit"}
+ DEBUG  [WingShot][[id redacted]] Rating-to-Wing-Shot transition {"destinationIdPresent": true, "platform": "android", "ratingIdPresent": false, "submissionSource": "onboarding", "userIdPresent": true}
+ DEBUG  [WingShot][[id redacted]] Modal close and state cleanup {"reason": "explicit_close", "stateCleared": true}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  daily_xp_status failed: Could not find the function public.daily_xp_status(p_user) in the schema cache
+ WARN  loadBattle failed: Could not find the table 'public.wing_battle_options_active' in the schema cache
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 101ms node_modules\expo-router\entry.js (1 module)
+ INFO  [startup] app mounted {"pathname": "/"}
+ INFO  [auth] initial session load started
+ INFO  [auth] auth event {"event": "INITIAL_SESSION", "hasSession": true, "userId": "[id redacted]"}
+ INFO  [auth] initial session load completed {"error": null, "hasSession": true, "userId": "[id redacted]"}
+ INFO  [startup] initial session hydration completed {"userId": "[id redacted]"}
+ INFO  [startup] Splash initialization complete {"duration_ms": 4776, "ios_splash_asset": undefined, "platform": "android"}
+ INFO  [startup] app mounted {"pathname": "/home"}
+ WARN  loadBattle failed: Could not find the table 'public.wing_battle_options_active' in the schema cache
+ WARN  daily_xp_status failed: Could not find the function public.daily_xp_status(p_user) in the schema cache

@@ -1,0 +1,228 @@
+TAP version 13
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 1 }
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 0 }
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 0 }
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 0 }
+# [cayenne-auth] submit_completed { outcome: 'error', duration_ms: 1 }
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 0 }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: real completion helper persists all gate keys before auth and survives fresh Home mounts
+ok 1 - real completion helper persists all gate keys before auth and survives fresh Home mounts
+  ---
+  duration_ms: 84.4299
+  type: 'test'
+  ...
+# Subtest: ordinary signin dismisses its modal to existing Home; photo handoff still replaces exactly once
+ok 2 - ordinary signin dismisses its modal to existing Home; photo handoff still replaces exactly once
+  ---
+  duration_ms: 151.1345
+  type: 'test'
+  ...
+# Subtest: actual login component signup preserves local preview and reaches fixed uploader
+ok 3 - actual login component signup preserves local preview and reaches fixed uploader
+  ---
+  duration_ms: 37.2463
+  type: 'test'
+  ...
+# Subtest: actual login component signin preserves local preview and reaches fixed uploader
+ok 4 - actual login component signin preserves local preview and reaches fixed uploader
+  ---
+  duration_ms: 36.6487
+  type: 'test'
+  ...
+# Subtest: actual login component confirmation preserves local preview and reaches fixed uploader
+ok 5 - actual login component confirmation preserves local preview and reaches fixed uploader
+  ---
+  duration_ms: 71.4432
+  type: 'test'
+  ...
+# Subtest: wrong password retry, double signup tap and explicit Explore do not lose preview or duplicate navigation
+ok 6 - wrong password retry, double signup tap and explicit Explore do not lose preview or duplicate navigation
+  ---
+  duration_ms: 92.7553
+  type: 'test'
+  ...
+# Subtest: actual login google session listener defers to OAuth callback, cancel and error permit retry
+ok 7 - actual login google session listener defers to OAuth callback, cancel and error permit retry
+  ---
+  duration_ms: 84.5467
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792680987554-1',
+#       destinationId: '[test id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: actual google callback deep-link code exchange sends current user to original restaurant
+ok 8 - actual google callback deep-link code exchange sends current user to original restaurant
+  ---
+  duration_ms: 110.7205
+  type: 'test'
+  ...
+# Subtest: actual login facebook session listener defers to OAuth callback, cancel and error permit retry
+ok 9 - actual login facebook session listener defers to OAuth callback, cancel and error permit retry
+  ---
+  duration_ms: 89.0496
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792680987755-1',
+#       destinationId: '[test id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: actual facebook callback deep-link code exchange sends current user to original restaurant
+ok 10 - actual facebook callback deep-link code exchange sends current user to original restaurant
+  ---
+  duration_ms: 112.8871
+  type: 'test'
+  ...
+# Subtest: normal login and saved destination precedence remain intact
+ok 11 - normal login and saved destination precedence remain intact
+  ---
+  duration_ms: 67.4649
+  type: 'test'
+  ...
+# Subtest: duplicate signed-in notifications before and after handoff cannot replace uploader with Home
+ok 12 - duplicate signed-in notifications before and after handoff cannot replace uploader with Home
+  ---
+  duration_ms: 33.078
+  type: 'test'
+  ...
+# Subtest: legacy import cannot replay nested V2 local preview payloads
+ok 13 - legacy import cannot replay nested V2 local preview payloads
+  ---
+  duration_ms: 26.4153
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792680987993-1',
+#       destinationId: '[test id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792680988091-1',
+#       destinationId: '[test id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792680988200-1',
+#       destinationId: '[test id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/(tabs)/ratings',
+#     params: {
+#       savedAction: 'save',
+#       savedDestinationId: '[test id redacted]',
+#       savedActionState: 'save',
+#       savedActionUserId: 'synthetic-account'
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# OAuth callback failed { code: 'callback_failed' }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: callback rejects arbitrary return-route injection and preserves saved-action priority
+ok 14 - callback rejects arbitrary return-route injection and preserves saved-action priority
+  ---
+  duration_ms: 431.1512
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792680988419-1',
+#       destinationId: '[test id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# OAuth callback failed { code: 'callback_failed' }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: actual google callback rejects anonymous user and permits retry without consuming Wing Shot
+ok 15 - actual google callback rejects anonymous user and permits retry without consuming Wing Shot
+  ---
+  duration_ms: 108.133
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792680988529-1',
+#       destinationId: '[test id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# Subtest: actual facebook callback rejects anonymous user and permits retry without consuming Wing Shot
+ok 16 - actual facebook callback rejects anonymous user and permits retry without consuming Wing Shot
+  ---
+  duration_ms: 108.9285
+  type: 'test'
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1966.522

@@ -169,7 +169,11 @@ export default function EmailAuthScreen() {
       const wingRoute = !intent ? await claimWingShotIntent({ storage: AsyncStorage, client: supabase, userId: user.id, isCurrent }) : null;
       if (!isCurrent()) return;
       if (wingRoute) void trackEvent({ eventName: 'onboarding_wing_shot_auth_return', screen: 'auth/login', destinationId: wingRoute.params.destinationId || null, metadata: { source: 'onboarding' } }).catch(() => {});
-      router.replace(wingRoute || routeAfterAuth(intent));
+      // Home already sits underneath this modal. Replacing the modal with the
+      // same tabs route can leave Android's native stack displaying no screen.
+      // Pop to that Home instead; explicit photo/saved-action routes still replace.
+      if (!wingRoute && !intent) router.dismissTo('/(tabs)/home');
+      else router.replace(wingRoute || routeAfterAuth(intent));
       try { await afterAuthSuccess(user); return; }
       catch { console.warn('[password-auth] profile bootstrap failed; retrying account setup'); }
       await new Promise((resolve) => setTimeout(resolve, 2000));

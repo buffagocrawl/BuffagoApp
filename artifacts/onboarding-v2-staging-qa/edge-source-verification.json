@@ -1,0 +1,18 @@
+{
+  "wing-media-stage-authorize": {
+    "unchangedRepoBytes": true,
+    "sha256": "a9fbc1de35227d8f73adc98dc7a1147b6d10702f836bd4f1dc6e9b7f98ad1ed8"
+  },
+  "wing-media-validate": {
+    "unchangedRepoBytes": true,
+    "sha256": "0a849f0900c54117f8e15f8c1f16b0b34603e02f2290fada66300d8a4bd2d6b2"
+  },
+  "wing-media-promote": {
+    "unchangedRepoBytes": true,
+    "sha256": "1959a4869d61c01cb2927c0edb3f1f47a0e940d8265ee33edccd14542d775069"
+  },
+  "wing-media-staging-cleanup": {
+    "unchangedRepoBytes": true,
+    "sha256": "ce1a2adb3959c07283c763f2f7db84981081c6319074d03a577c144533625f39"
+  }
+}

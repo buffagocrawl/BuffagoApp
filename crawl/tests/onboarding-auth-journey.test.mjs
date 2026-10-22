@@ -25,7 +25,7 @@ test('real completion helper persists all gate keys before auth and survives fre
  assert.equal(values.get('buffago:onboarding:complete'),'true');assert.equal(values.get('hasSeenIntro'),'true');
 });
 function harness({confirmation=false,saved=null,callback=false,provider='google',returnPath='/(tabs)/home',oauthOutcome='callback'}={}) {
- const runtime=hookRuntime(), values=new Map(), routes=[], events=[];
+ const runtime=hookRuntime(), values=new Map(), routes=[], events=[], navigationCalls=[];
  const storage={getItem:async k=>values.get(k)||null,setItem:async(k,v)=>values.set(k,v),removeItem:async k=>values.delete(k),multiRemove:async keys=>keys.forEach(k=>values.delete(k))};
  const intent=mobileModule('lib/wingShotAuthIntent.js',{});
  let current=null,listener=()=>{},badPassword=false,oauthActive=callback,signupCalls=0,seedWrites=0;
@@ -51,7 +51,7 @@ function harness({confirmation=false,saved=null,callback=false,provider='google'
  paper.TextInput=Object.assign(()=>{}, {Icon:'icon'});paper.Card=Object.assign(()=>{},{Content:'card-content'});
  const imports={react:runtime.react,'react/jsx-runtime':runtime.jsx,'react-native':{View:'view',Pressable:'press',ScrollView:'scroll',KeyboardAvoidingView:'keyboard',Platform:{OS:'android'},StyleSheet:{create:x=>x},ActivityIndicator:'spinner',Text:'text'},
  '@expo/vector-icons':{MaterialCommunityIcons:'icon'},'@react-native-async-storage/async-storage':storage,'expo-crypto':{randomUUID:()=>id},
- 'expo-router':{useRouter:()=>({replace:r=>routes.push(r),back:()=>routes.push('back'),canGoBack:()=>false}),useLocalSearchParams:()=>({code:'synthetic-code'})},
+ 'expo-router':{useRouter:()=>({replace:r=>{navigationCalls.push(['replace',r]);routes.push(r);},dismissTo:r=>{navigationCalls.push(['dismissTo',r]);routes.push(r);},back:()=>routes.push('back'),canGoBack:()=>false}),useLocalSearchParams:()=>({code:'synthetic-code'})},
  'expo-linking':{useURL:()=>callback?'buffago://auth/callback?code=synthetic-code':null,getInitialURL:async()=>null},
  'react-native-paper':paper,'../../lib/supabase.js':{supabase:client},'../../lib/supabase':{supabase:client},
  '../../lib/wingShotAuthIntent':intent,'../../lib/passwordSignInFlow':mobileModule('lib/passwordSignInFlow.js',{'./passwordAuthTimeout.js':mobileModule('lib/passwordAuthTimeout.js',{})}),
@@ -67,8 +67,20 @@ function harness({confirmation=false,saved=null,callback=false,provider='google'
  const render=()=>runtime.render(Component,{});
  const button=(label)=>nodes(render()).find(n=>n.type==='Button'&&(n.props.children===label||n.props.testID===label));
  const fill=()=>{let tree=render();for(const [label,value] of [['Username','tester'],['Email','synthetic@example.invalid'],['Password','synthetic-password']])nodes(tree).find(n=>n.props?.label===label)?.props.onChangeText(value);render();};
- return {runtime,render,button,fill,routes,events,storage,values,intent,client,account,authenticate,signupCalls:()=>signupCalls,seedWrites:()=>seedWrites,setBad:v=>{badPassword=v;},setCurrent:v=>{current=v;}};
+ return {runtime,render,button,fill,routes,events,navigationCalls,storage,values,intent,client,account,authenticate,signupCalls:()=>signupCalls,seedWrites:()=>seedWrites,setBad:v=>{badPassword=v;},setCurrent:v=>{current=v;}};
 }
+
+test('ordinary signin dismisses its modal to existing Home; photo handoff still replaces exactly once',async()=>{
+ for(const photo of [false,true]){
+  const h=harness();if(photo)await h.intent.saveWingShotIntent(h.storage,{destinationId:id});
+  h.render();h.fill();nodes(h.render()).find(n=>n.type==='SegmentedButtons').props.onValueChange('signin');
+  await h.button('auth.signin.native-action').props.onPress();await flush();h.authenticate();await flush();
+  assert.equal(h.navigationCalls.length,1);
+  assert.equal(h.navigationCalls[0][0],photo?'replace':'dismissTo');
+  assert.equal(photo?h.routes[0]?.pathname:h.routes[0],photo?'/profile/wing-shots/submit':'/(tabs)/home');
+  h.runtime.unmount();
+ }
+});
 for(const method of ['signup','signin','confirmation'])test(`actual login component ${method} preserves local preview and reaches fixed uploader`,async()=>{
  const h=harness({confirmation:method==='confirmation'});await h.intent.saveWingShotIntent(h.storage,{destinationId:id,restaurantName:'Wings'});
  h.values.set('buffago:onboarding:seed_rating',JSON.stringify({onboarding_version:'v2',destination_id:id}));h.values.set('buffago:guest_rating_preview:v1','preview');

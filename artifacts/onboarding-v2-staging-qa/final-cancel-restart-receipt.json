@@ -1,0 +1,32 @@
+{
+  "time": "2026-10-22T14:49:20.738Z",
+  "target": "loopback-only acceptance",
+  "nativeSessionVerified": true,
+  "signupAccountMatches": true,
+  "nonanonymous": true,
+  "completion": "1",
+  "legacyComplete": "true",
+  "intro": "true",
+  "pendingIntentPresent": false,
+  "previewStatus": "local_preview",
+  "previewScores": {
+    "overall": 8,
+    "sauce": 1,
+    "crispiness": 1,
+    "meat": 1
+  },
+  "canonicalRatingsForAccount": 0,
+  "submissionCount": 1,
+  "submissions": [
+    {
+      "status": "in_review",
+      "source": "onboarding",
+      "ratingIdNull": true,
+      "correctDestination": true,
+      "correctAccount": true,
+      "anonymousAttribution": true,
+      "consented": true
+    }
+  ],
+  "originalStoredBytes": 23545
+}

@@ -1,0 +1,168 @@
+{"time":"2026-10-22T14:36:21.608Z","device":"Android QA emulator","action":"shot","name":"android-startup-before-metro-ready"}
+{"time":"2026-10-22T14:36:50.877Z","device":"Android QA emulator","action":"tap","target":"Continue"}
+{"time":"2026-10-22T14:36:53.510Z","device":"Android QA emulator","action":"tap","target":"Close"}
+{"time":"2026-10-22T14:36:56.619Z","device":"Android QA emulator","action":"shot","name":"android-01-guest-welcome"}
+{"time":"2026-10-22T14:36:58.980Z","device":"Android QA emulator","action":"tap","target":"Find / rate wings"}
+{"time":"2026-10-22T14:37:01.856Z","device":"Android QA emulator","action":"tap","target":"Restaurant name"}
+{"time":"2026-10-22T14:37:05.344Z","device":"Android QA emulator","action":"input","characters":9}
+{"time":"2026-10-22T14:37:05.477Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:37:11.925Z","device":"Android QA emulator","action":"shot","name":"android-02-staging-restaurant-search"}
+{"time":"2026-10-22T14:37:14.310Z","device":"Android QA emulator","action":"tap","target":"Synthetic Framing Wing Cafe"}
+{"time":"2026-10-22T14:37:39.923Z","device":"Android QA emulator","action":"shot","name":"android-03-overall-8"}
+{"time":"2026-10-22T14:37:42.334Z","device":"Android QA emulator","action":"tap","target":"Next"}
+{"time":"2026-10-22T14:37:47.702Z","device":"Android QA emulator","action":"shot","name":"android-04-sauce-7"}
+{"time":"2026-10-22T14:37:50.130Z","device":"Android QA emulator","action":"tap","target":"Next"}
+{"time":"2026-10-22T14:38:07.864Z","device":"Android QA emulator","action":"tap","target":"Back"}
+{"time":"2026-10-22T14:38:10.404Z","device":"Android QA emulator","action":"tap","target":"Back"}
+{"time":"2026-10-22T14:38:12.807Z","device":"Android QA emulator","action":"score","value":8}
+{"time":"2026-10-22T14:38:15.632Z","device":"Android QA emulator","action":"shot","name":"android-03-overall-8"}
+{"time":"2026-10-22T14:38:18.025Z","device":"Android QA emulator","action":"tap","target":"Next"}
+{"time":"2026-10-22T14:38:20.588Z","device":"Android QA emulator","action":"score","value":7}
+{"time":"2026-10-22T14:38:23.378Z","device":"Android QA emulator","action":"shot","name":"android-04-sauce-7"}
+{"time":"2026-10-22T14:38:25.741Z","device":"Android QA emulator","action":"tap","target":"Next"}
+{"time":"2026-10-22T14:38:28.155Z","device":"Android QA emulator","action":"score","value":6}
+{"time":"2026-10-22T14:38:31.146Z","device":"Android QA emulator","action":"shot","name":"android-05-crispiness-6"}
+{"time":"2026-10-22T14:38:33.497Z","device":"Android QA emulator","action":"tap","target":"Next"}
+{"time":"2026-10-22T14:38:36.072Z","device":"Android QA emulator","action":"score","value":9}
+{"time":"2026-10-22T14:38:38.954Z","device":"Android QA emulator","action":"shot","name":"android-06-chicken-9"}
+{"time":"2026-10-22T14:38:41.348Z","device":"Android QA emulator","action":"tap","target":"Save local preview"}
+{"time":"2026-10-22T14:38:45.279Z","device":"Android QA emulator","action":"shot","name":"android-07-local-celebration"}
+{"time":"2026-10-22T14:38:48.093Z","device":"Android QA emulator","action":"tap","target":"Create account and add a Wing Shot photo"}
+{"time":"2026-10-22T14:38:51.971Z","device":"Android QA emulator","action":"shot","name":"android-08-before-email-signup"}
+{"time":"2026-10-22T14:38:54.746Z","device":"Android QA emulator","action":"tap","target":"Username"}
+{"time":"2026-10-22T14:38:56.568Z","device":"Android QA emulator","action":"input","characters":10}
+{"time":"2026-10-22T14:38:56.699Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:38:59.981Z","device":"Android QA emulator","action":"tap","target":"Email"}
+{"time":"2026-10-22T14:39:01.205Z","device":"Android QA emulator","action":"input","characters":26}
+{"time":"2026-10-22T14:39:01.340Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:39:04.205Z","device":"Android QA emulator","action":"tap","target":"Password"}
+{"time":"2026-10-22T14:39:06.632Z","device":"Android QA emulator","action":"input","characters":32}
+{"time":"2026-10-22T14:39:06.794Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:39:09.714Z","device":"Android QA emulator","action":"tap","target":"Create Account"}
+{"time":"2026-10-22T14:39:32.899Z","device":"Android QA emulator","action":"shot","name":"android-09-after-signup-preselected-uploader"}
+{"time":"2026-10-22T14:39:46.426Z","device":"Android QA emulator","action":"tap","target":"Choose from Library"}
+{"time":"2026-10-22T14:39:51.093Z","device":"Android QA emulator","action":"shot","name":"android-10-native-media-picker"}
+{"time":"2026-10-22T14:40:02.348Z","device":"Android QA emulator","action":"tap","target":"Photo taken on Oct 22, 2026 10:38 AM"}
+{"time":"2026-10-22T14:40:06.843Z","device":"Android QA emulator","action":"shot","name":"android-11-photo-crop"}
+{"time":"2026-10-22T14:40:34.506Z","device":"Android QA emulator","action":"tap","target":"Cancel"}
+{"time":"2026-10-22T14:40:36.972Z","device":"Android QA emulator","action":"tap","target":"Choose from Library"}
+{"time":"2026-10-22T14:40:39.642Z","device":"Android QA emulator","action":"tap","target":"Photo taken on Oct 13, 2026 7:42 PM"}
+{"time":"2026-10-22T14:40:43.325Z","device":"Android QA emulator","action":"shot","name":"android-12-synthetic-photo-crop"}
+{"time":"2026-10-22T14:40:53.572Z","device":"Android QA emulator","action":"tap","target":"Confirm framing"}
+{"time":"2026-10-22T14:41:08.900Z","device":"Android QA emulator","action":"shot","name":"android-13-consent-options"}
+{"time":"2026-10-22T14:41:18.471Z","device":"Android QA emulator","action":"tap","target":"Anonymous"}
+{"time":"2026-10-22T14:41:32.502Z","device":"Android QA emulator","action":"shot","name":"android-14-consented-ready-to-submit"}
+{"time":"2026-10-22T14:41:34.963Z","device":"Android QA emulator","action":"tap","target":"Submit Wing Shot"}
+{"time":"2026-10-22T14:41:38.976Z","device":"Android QA emulator","action":"shot","name":"android-15-upload-first-result"}
+{"time":"2026-10-22T14:42:22.286Z","device":"Android QA emulator","action":"shot","name":"android-16-upload-in-review"}
+{"time":"2026-10-22T14:42:24.693Z","device":"Android QA emulator","action":"tap","target":"Done"}
+{"time":"2026-10-22T14:42:30.030Z","device":"Android QA emulator","action":"shot","name":"android-17-signed-in-home"}
+{"time":"2026-10-22T14:42:55.627Z","device":"Android QA emulator","action":"launch","name":"android-18-authenticated-cold-restart-home","home":true,"elapsedMs":25220,"pid":"6322"}
+{"time":"2026-10-22T14:43:17.003Z","device":"Android QA emulator","action":"tap","target":"Profile navigation"}
+{"time":"2026-10-22T14:43:41.778Z","device":"Android QA emulator","action":"tap","target":"Home navigation"}
+{"time":"2026-10-22T14:44:00.765Z","device":"Android QA emulator","action":"tap","target":"Open profile"}
+{"time":"2026-10-22T14:44:17.462Z","device":"Android QA emulator","action":"tap","target":"Sign out"}
+{"time":"2026-10-22T14:44:17.851Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:44:21.587Z","device":"Android QA emulator","action":"shot","name":"android-19-home-after-signout"}
+{"time":"2026-10-22T14:44:32.592Z","device":"Android QA emulator","action":"tap","target":"Sign in"}
+{"time":"2026-10-22T14:44:35.991Z","device":"Android QA emulator","action":"tap","target":"Sign In"}
+{"time":"2026-10-22T14:44:39.000Z","device":"Android QA emulator","action":"shot","name":"android-20-existing-signin-before-fields"}
+{"time":"2026-10-22T14:44:41.746Z","device":"Android QA emulator","action":"tap","target":"Email"}
+{"time":"2026-10-22T14:44:43.982Z","device":"Android QA emulator","action":"input","characters":26}
+{"time":"2026-10-22T14:44:44.125Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:44:47.216Z","device":"Android QA emulator","action":"tap","target":"Password"}
+{"time":"2026-10-22T14:44:48.944Z","device":"Android QA emulator","action":"input","characters":32}
+{"time":"2026-10-22T14:44:49.069Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:45:02.177Z","device":"Android QA emulator","action":"tapid","target":"auth.signin.native-action"}
+{"time":"2026-10-22T14:45:05.905Z","device":"Android QA emulator","action":"shot","name":"android-21-home-after-signout-signin"}
+{"time":"2026-10-22T14:45:30.484Z","device":"Android QA emulator","action":"launch","name":"android-22-relogin-cold-restart-home","home":true,"elapsedMs":24075,"pid":"7069"}
+{"time":"2026-10-22T14:46:19.042Z","device":"Android QA emulator","action":"shot","name":"android-21-home-after-signout-signin"}
+{"time":"2026-10-22T14:46:54.701Z","device":"Android QA emulator","action":"tap","target":"Continue"}
+{"time":"2026-10-22T14:46:57.329Z","device":"Android QA emulator","action":"tap","target":"Close"}
+{"time":"2026-10-22T14:47:00.417Z","device":"Android QA emulator","action":"shot","name":"android-23-second-fresh-guest-welcome"}
+{"time":"2026-10-22T14:47:02.839Z","device":"Android QA emulator","action":"tap","target":"Find / rate wings"}
+{"time":"2026-10-22T14:47:05.485Z","device":"Android QA emulator","action":"tap","target":"Restaurant name"}
+{"time":"2026-10-22T14:47:06.991Z","device":"Android QA emulator","action":"input","characters":9}
+{"time":"2026-10-22T14:47:07.170Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:47:10.128Z","device":"Android QA emulator","action":"tap","target":"Synthetic Framing Wing Cafe"}
+{"time":"2026-10-22T14:47:12.666Z","device":"Android QA emulator","action":"score","value":8}
+{"time":"2026-10-22T14:47:15.068Z","device":"Android QA emulator","action":"tap","target":"Next"}
+{"time":"2026-10-22T14:47:17.599Z","device":"Android QA emulator","action":"tap","target":"Next"}
+{"time":"2026-10-22T14:47:20.099Z","device":"Android QA emulator","action":"tap","target":"Next"}
+{"time":"2026-10-22T14:47:22.594Z","device":"Android QA emulator","action":"tap","target":"Save local preview"}
+{"time":"2026-10-22T14:47:25.879Z","device":"Android QA emulator","action":"shot","name":"android-24-existing-account-invitation"}
+{"time":"2026-10-22T14:47:28.210Z","device":"Android QA emulator","action":"tap","target":"Create account and add a Wing Shot photo"}
+{"time":"2026-10-22T14:47:33.835Z","device":"Android QA emulator","action":"shot","name":"android-25-invitation-before-existing-signin"}
+{"time":"2026-10-22T14:47:36.394Z","device":"Android QA emulator","action":"tap","target":"Email"}
+{"time":"2026-10-22T14:47:37.476Z","device":"Android QA emulator","action":"input","characters":26}
+{"time":"2026-10-22T14:47:37.607Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:47:40.624Z","device":"Android QA emulator","action":"tap","target":"Password"}
+{"time":"2026-10-22T14:47:42.219Z","device":"Android QA emulator","action":"input","characters":32}
+{"time":"2026-10-22T14:47:42.350Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:48:12.487Z","device":"Android QA emulator","action":"tap","target":"Sign In"}
+{"time":"2026-10-22T14:48:15.133Z","device":"Android QA emulator","action":"tapid","target":"auth.signin.native-action"}
+{"time":"2026-10-22T14:48:21.847Z","device":"Android QA emulator","action":"wait","target":"Show us the wings","elapsedMs":6586}
+{"time":"2026-10-22T14:48:24.606Z","device":"Android QA emulator","action":"shot","name":"android-26-after-existing-signin-preselected-uploader"}
+{"time":"2026-10-22T14:48:46.650Z","device":"Android QA emulator","action":"tap","target":"Not now, close Wing Shot"}
+{"time":"2026-10-22T14:48:51.812Z","device":"Android QA emulator","action":"wait","target":"Home navigation","elapsedMs":5118}
+{"time":"2026-10-22T14:48:54.782Z","device":"Android QA emulator","action":"shot","name":"android-27-home-after-uploader-cancel"}
+{"time":"2026-10-22T14:49:20.528Z","device":"Android QA emulator","action":"launch","name":"android-28-existing-signin-cold-restart-home","home":true,"elapsedMs":25270,"pid":"8268"}
+{"time":"2026-10-22T14:52:04.750Z","device":"Android QA emulator","action":"tap","target":"Open profile"}
+{"time":"2026-10-22T14:52:10.664Z","device":"Android QA emulator","action":"tap","target":"Sign out"}
+{"time":"2026-10-22T14:52:10.944Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:52:13.991Z","device":"Android QA emulator","action":"wait","target":"Sign in","elapsedMs":2998}
+{"time":"2026-10-22T14:52:16.918Z","device":"Android QA emulator","action":"shot","name":"android-29-second-signout-guest-home"}
+{"time":"2026-10-22T14:52:19.483Z","device":"Android QA emulator","action":"tap","target":"Sign in"}
+{"time":"2026-10-22T14:52:23.002Z","device":"Android QA emulator","action":"wait","target":"Create your BuffaGo account","elapsedMs":3464}
+{"time":"2026-10-22T14:52:25.515Z","device":"Android QA emulator","action":"tap","target":"Explore BuffaGo"}
+{"time":"2026-10-22T14:52:28.713Z","device":"Android QA emulator","action":"wait","target":"Home navigation","elapsedMs":3146}
+{"time":"2026-10-22T14:52:31.571Z","device":"Android QA emulator","action":"shot","name":"android-30-auth-cancel-home"}
+{"time":"2026-10-22T14:52:41.125Z","device":"Android QA emulator","action":"tap","target":"Sign in"}
+{"time":"2026-10-22T14:52:44.835Z","device":"Android QA emulator","action":"wait","target":"Create your BuffaGo account","elapsedMs":3666}
+{"time":"2026-10-22T14:52:47.323Z","device":"Android QA emulator","action":"tap","target":"Sign In"}
+{"time":"2026-10-22T14:52:50.084Z","device":"Android QA emulator","action":"tap","target":"Email"}
+{"time":"2026-10-22T14:52:52.281Z","device":"Android QA emulator","action":"input","characters":26}
+{"time":"2026-10-22T14:52:52.370Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:52:55.371Z","device":"Android QA emulator","action":"tap","target":"Password"}
+{"time":"2026-10-22T14:52:57.109Z","device":"Android QA emulator","action":"input","characters":32}
+{"time":"2026-10-22T14:52:57.217Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:53:06.723Z","device":"Android QA emulator","action":"tapid","target":"auth.signin.native-action"}
+{"time":"2026-10-22T14:53:56.916Z","device":"Android QA emulator","action":"shot","name":"android-31-stable-home-after-relogin"}
+{"time":"2026-10-22T14:54:22.817Z","device":"Android QA emulator","action":"launch","name":"android-32-stable-relogin-cold-restart-home","home":true,"elapsedMs":25342,"pid":"9356"}
+{"time":"2026-10-22T14:56:31.304Z","device":"Android QA emulator","action":"tap","target":"Open profile"}
+{"time":"2026-10-22T14:56:37.875Z","device":"Android QA emulator","action":"tap","target":"Sign out"}
+{"time":"2026-10-22T14:56:38.111Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:56:41.432Z","device":"Android QA emulator","action":"wait","target":"Sign in","elapsedMs":3272}
+{"time":"2026-10-22T14:56:43.983Z","device":"Android QA emulator","action":"tap","target":"Sign in"}
+{"time":"2026-10-22T14:56:47.380Z","device":"Android QA emulator","action":"wait","target":"Create your BuffaGo account","elapsedMs":3337}
+{"time":"2026-10-22T14:56:49.987Z","device":"Android QA emulator","action":"tap","target":"Sign In"}
+{"time":"2026-10-22T14:56:52.847Z","device":"Android QA emulator","action":"tap","target":"Email"}
+{"time":"2026-10-22T14:56:55.138Z","device":"Android QA emulator","action":"input","characters":26}
+{"time":"2026-10-22T14:56:55.271Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:56:58.448Z","device":"Android QA emulator","action":"tap","target":"Password"}
+{"time":"2026-10-22T14:57:00.357Z","device":"Android QA emulator","action":"input","characters":32}
+{"time":"2026-10-22T14:57:00.441Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:57:16.951Z","device":"Android QA emulator","action":"tapid","target":"auth.signin.native-action"}
+{"time":"2026-10-22T14:57:22.936Z","device":"Android QA emulator","action":"wait","target":"Home navigation","elapsedMs":5938}
+{"time":"2026-10-22T14:57:25.893Z","device":"Android QA emulator","action":"shot","name":"android-33-fixed-signin-stable-home"}
+{"time":"2026-10-22T14:57:51.354Z","device":"Android QA emulator","action":"launch","name":"android-34-fixed-signin-cold-restart-home","home":true,"elapsedMs":24906,"pid":"10067"}
+{"time":"2026-10-22T14:58:24.615Z","device":"Android QA emulator","action":"tap","target":"Open profile"}
+{"time":"2026-10-22T14:58:31.062Z","device":"Android QA emulator","action":"tap","target":"Sign out"}
+{"time":"2026-10-22T14:58:31.246Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:58:35.547Z","device":"Android QA emulator","action":"wait","target":"Nice! Your wing rating","elapsedMs":4101}
+{"time":"2026-10-22T14:58:37.859Z","device":"Android QA emulator","action":"tap","target":"Create account and add a Wing Shot photo"}
+{"time":"2026-10-22T14:58:42.783Z","device":"Android QA emulator","action":"wait","target":"Create your BuffaGo account","elapsedMs":4873}
+{"time":"2026-10-22T14:58:45.194Z","device":"Android QA emulator","action":"tap","target":"Sign In"}
+{"time":"2026-10-22T14:58:48.159Z","device":"Android QA emulator","action":"tap","target":"Email"}
+{"time":"2026-10-22T14:58:50.645Z","device":"Android QA emulator","action":"input","characters":26}
+{"time":"2026-10-22T14:58:50.808Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:58:54.143Z","device":"Android QA emulator","action":"tap","target":"Password"}
+{"time":"2026-10-22T14:58:56.173Z","device":"Android QA emulator","action":"input","characters":32}
+{"time":"2026-10-22T14:58:56.289Z","device":"Android QA emulator","action":"back"}
+{"time":"2026-10-22T14:59:11.461Z","device":"Android QA emulator","action":"tapid","target":"auth.signin.native-action"}
+{"time":"2026-10-22T14:59:18.697Z","device":"Android QA emulator","action":"wait","target":"Show us the wings","elapsedMs":7189}
+{"time":"2026-10-22T14:59:21.512Z","device":"Android QA emulator","action":"shot","name":"android-35-postfix-existing-signin-preselected-uploader"}
+{"time":"2026-10-22T14:59:24.181Z","device":"Android QA emulator","action":"tap","target":"Not now, close Wing Shot"}
+{"time":"2026-10-22T14:59:29.031Z","device":"Android QA emulator","action":"wait","target":"Home navigation","elapsedMs":4802}
+{"time":"2026-10-22T14:59:32.134Z","device":"Android QA emulator","action":"shot","name":"android-36-postfix-cancel-home"}
+{"time":"2026-10-22T14:59:57.757Z","device":"Android QA emulator","action":"launch","name":"android-37-postfix-handoff-cold-restart-home","home":true,"elapsedMs":25251,"pid":"10780"}

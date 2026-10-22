@@ -1,0 +1,14 @@
+{
+  "time": "2026-10-22T15:11:39.614Z",
+  "namespace": "buffago-polish-acceptance",
+  "clientTarget": "http://127.0.0.1:55321",
+  "authHealthStatus": 200,
+  "unauthenticatedUploadAuthorizationStatus": 401,
+  "unauthenticatedUploadAuthorizationCode": "authentication_required",
+  "gatewayConfigOwner": "100:65533",
+  "existingDatabaseAndBucketsReused": true,
+  "noDatabaseResetOrMigrationReplay": true,
+  "noSchemaOrRLSEdits": true,
+  "noProductionOperations": true,
+  "releaseFlagDefaultsUnchangedOff": true
+}

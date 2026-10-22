@@ -27,5 +27,8 @@ assert old in config or new in config
 config=config.replace(old,new)
 file=ROOT/'crawl/.expo/app-polish-native-kong.yml';file.write_text(config,encoding='utf-8')
 subprocess.run(['docker','cp',str(file),kong+':/home/kong/kong.yml'],check=True)
+# docker cp defaults to root ownership. Kong's next entrypoint writes this file
+# as its unprivileged user; retain that user's ownership after local routing.
+subprocess.run(['docker','exec','--user','0',kong,'chown','kong:nogroup','/home/kong/kong.yml'],check=True)
 subprocess.run(['docker','exec',kong,'kong','reload'],capture_output=True,check=True)
 print('Local-only loopback API environment and upstream port configured; native JWT logic unchanged.')
