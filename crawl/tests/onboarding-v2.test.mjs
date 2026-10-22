@@ -9,12 +9,14 @@ const slider = require('../lib/ratingSlider.js');
 const id = '11111111-1111-4111-8111-111111111111';
 const nodes = (tree, type) => !tree ? [] : Array.isArray(tree) ? tree.flatMap(n => nodes(n, type)) : [...(tree.type === type ? [tree] : []), ...nodes(tree.props?.children, type)];
 const flush = async () => { for (let i = 0; i < 30; i++) await Promise.resolve(); };
-function setup(saved = null, failSeed = false) {
+function setup(saved = null, failSeed = false, photoEnabled = true) {
   const runtime = hookRuntime(), data = new Map(), events = [], routes = [];
   const storage = { getItem: async k => data.get(k) || null, setItem: async (k,v) => { if (failSeed && k.endsWith('seed_rating')) throw Error('disk'); data.set(k,v); } };
   const previewTools = mobileModule('lib/guestRatingPreview.js', {});
   if (saved) data.set(previewTools.GUEST_RATING_PREVIEW_KEY, JSON.stringify(saved));
   const imports = {
+    '../lib/photoWorkflowFlags': { loadPhotoWorkflowFlags: async () => ({ prompt: photoEnabled, photo: photoEnabled }) },
+    '../lib/wingShotAuthIntent': { saveWingShotIntent: async () => {}, claimWingShotIntent: async () => null, clearWingShotIntent: async () => {} },
     react: runtime.react, 'react/jsx-runtime': runtime.jsx,
     'react-native': { BackHandler: { addEventListener: () => ({ remove() {} }) }, KeyboardAvoidingView: 'keyboard', Platform: { OS: 'android' }, ScrollView: 'scroll', View: 'view' },
     'react-native-safe-area-context': { SafeAreaView: 'safe' },
@@ -30,7 +32,7 @@ function setup(saved = null, failSeed = false) {
   };
   const Component = mobileModule('components/OnboardingV2.jsx', imports).default;
   const render = () => runtime.render(Component, {});
-  const press = async label => { const button = nodes(render(),'button').find(n => n.props.children === label); assert.ok(button,label); await button.props.onPress(); await flush(); };
+  const press = async label => { render(); await flush(); const button = nodes(render(),'button').find(n => n.props.children === label); assert.ok(button,label); await button.props.onPress(); await flush(); };
   render();
   return { render, press, data, events, routes, runtime, previewTools };
 }
@@ -52,7 +54,7 @@ test('Wingman canonical selection uses shared rating; result is local and auth f
   assert.equal(preview.status,'local_preview'); assert.equal(preview.payload.overall,8);
   assert.equal(JSON.parse(s.data.get('buffago:onboarding:seed_rating')).local_only,true);
   assert.ok(!s.events.some(e=>e.eventName==='rating_submitted'));
-  await s.press('Create free account'); assert.equal(s.data.get('done'),'1');
+  await s.press('Create Account & Add a Wing Shot'); assert.equal(s.data.get('done'),'1');
   assert.deepEqual(s.routes,[['replace','/(tabs)/home'],['push','/auth/login']]);
   assert.ok(s.data.has('buffago:guest_rating_preview:v1')); s.runtime.unmount();
 });
@@ -71,7 +73,7 @@ test('preview survives compatibility write failure and restores result on a late
   await nodes(s.render(),'wingman')[0].props.onPickDestination({id,name:'Wings'},{});
   await nodes(s.render(),'rating')[0].props.onFinalize({scores:{overall:10,sauce:1,crispiness:5,meat:8}});
   const saved=JSON.parse(s.data.get('buffago:guest_rating_preview:v1')); assert.equal(saved.payload.overall,10);
-  const restored=setup(saved); await flush(); assert.ok(nodes(restored.render(),'button').some(n=>n.props.children==='Create free account'));
+  const restored=setup(saved); await flush(); restored.render(); await flush(); assert.ok(nodes(restored.render(),'button').some(n=>n.props.children==='Create Account & Add a Wing Shot'));
   s.runtime.unmount();restored.runtime.unmount();
 });
 test('slider maps min/max/midpoint, clamped taps, RTL and drag sequences across widths',()=>{
@@ -160,4 +162,14 @@ test('existing restaurant search selects the same shared quick rating dialog',as
   assert.equal(nodes(s.render(),'rating')[0].props.visible,true);
   assert.equal(nodes(s.render(),'rating')[0].props.flowVariant,'quick_onboarding');
   assert.equal(s.events.find(e=>e.eventName==='restaurant_selected').metadata.source,'search');s.runtime.unmount();
+});
+
+test('disabled photo flags keep preview and Explore without advertising account upload',async()=>{
+  const s=setup(null,false,false);await flush();await s.press('Find / rate wings');
+  await nodes(s.render(),'wingman')[0].props.onPickDestination({id,name:'Wings'},{});
+  await nodes(s.render(),'rating')[0].props.onFinalize({scores:{overall:8,sauce:7,crispiness:6,meat:9}});
+  s.render();await flush();const tree=s.render();
+  assert.ok(!nodes(tree,'button').some(n=>n.props.children==='Create Account & Add a Wing Shot'));
+  await s.press('Explore BuffaGo');assert.deepEqual(s.routes,[['replace','/(tabs)/home']]);
+  assert.ok(s.data.has('buffago:guest_rating_preview:v1'));s.runtime.unmount();
 });

@@ -1,3 +1,4 @@
+import { claimWingShotIntent } from '../../lib/wingShotAuthIntent';
 ﻿// app/auth/callback.jsx
 import { useEffect, useRef, useState } from 'react';
 import { View, ActivityIndicator, Text, Platform } from 'react-native';
@@ -874,10 +875,12 @@ export default function AuthCallback() {
 
         const { data: currentAccount, error: accountError } = await supabase.auth.getUser();
         if (cancelled || accountError || currentAccount?.user?.id !== user?.id || currentAccount?.user?.is_anonymous) return;
+        const wingRoute = !savedIntent && (!returnPath || returnPath === '/(tabs)/home') && flowMode !== 'link_identity' ? await claimWingShotIntent({ storage: AsyncStorage, client: supabase, userId: user.id, isCurrent: handoffCurrent }) : null;
+        if (wingRoute) void trackEvent({ eventName: 'onboarding_wing_shot_auth_return', screen: 'auth/callback', destinationId: wingRoute.params.destinationId || null, metadata: { source: 'onboarding' } }).catch(() => {});
         const finalRoute = savedIntent ? {
           pathname: '/(tabs)/ratings',
           params: { savedAction: savedIntent.kind, savedDestinationId: savedIntent.destinationId, savedActionState: savedIntent.saved === false ? 'remove' : 'save', savedActionUserId: savedIntent.userId },
-        } : returnPath || '/(tabs)/home';
+        } : wingRoute || returnPath || '/(tabs)/home';
         await trackEvent({
           eventName: 'auth_callback_completed',
           screen: 'auth/callback',

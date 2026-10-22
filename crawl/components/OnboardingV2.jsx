@@ -1,3 +1,5 @@
+import { loadPhotoWorkflowFlags } from '../lib/photoWorkflowFlags';
+import { saveWingShotIntent, claimWingShotIntent, clearWingShotIntent } from '../lib/wingShotAuthIntent';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -19,6 +21,7 @@ export default function OnboardingV2() {
   const router = useRouter();
   const theme = useTheme();
   const { user } = useAuth();
+  const [photoAvailable, setPhotoAvailable] = useState(false);
   const [step, setStep] = useState('welcome');
   const [entryPath, setEntryPath] = useState(null);
   const [query, setQuery] = useState('');
@@ -91,6 +94,30 @@ export default function OnboardingV2() {
     return () => { active = false; clearTimeout(timer); controller.abort(); };
   }, [query, step]);
 
+  useEffect(() => {
+    if (step !== 'result') return;
+    let active = true;
+    setPhotoAvailable(false);
+    loadPhotoWorkflowFlags(supabase).then(flags => {
+      if (active) { setPhotoAvailable(flags.prompt && flags.photo);
+        if (flags.prompt && flags.photo) emit('onboarding_wing_shot_offer_viewed', { source: 'onboarding' }, preview?.payload?.destination_id); }
+    }).catch(() => {});
+    return () => { active = false; };
+  }, [step, user?.id, emit, preview?.payload?.destination_id]);
+  const addPhoto = async () => {
+    if (busy.current) return;
+    busy.current = true; setSaving(true);
+    try {
+      const flags = await loadPhotoWorkflowFlags(supabase);
+      if (!flags.prompt || !flags.photo) throw new Error('Photos unavailable');
+      await saveWingShotIntent(AsyncStorage, { destinationId: preview?.payload?.destination_id, restaurantName: destination?.name || preview?.payload?.restaurant_name, userId: user && !user.is_anonymous ? user.id : null });
+      emit('onboarding_wing_shot_selected', { source: 'onboarding' }, preview?.payload?.destination_id);
+      const route = user && !user.is_anonymous ? await claimWingShotIntent({ storage: AsyncStorage, client: supabase, userId: user.id }) : null;
+      await finishV2({ markSeen: markOnboardingSeen, router, account: false, storage: AsyncStorage, entryPath: entryPath || 'find_rate', platform: Platform.OS });
+      router.push(route || '/auth/login');
+    } catch { setError('Wing Shots are unavailable right now. Try again or explore; your preview stays on this device.'); }
+    finally { busy.current = false; setSaving(false); }
+  };
   const select = async (row, options = {}, source = 'search') => {
     if (options.signal?.aborted) throw new Error('Selection cancelled.');
     if (!isCanonicalDestination(row)) {
@@ -114,7 +141,7 @@ export default function OnboardingV2() {
     setError('');
     try {
       if (!draft.current) draft.current = createGuestRatingPreview({
-        destination_id: destination.id, state_id: destination.state_id ?? state?.state_id ?? null,
+        destination_id: destination.id, restaurant_name: destination.name, state_id: destination.state_id ?? state?.state_id ?? null,
         state_code: destination.state_id === state?.state_id ? state?.state_code : null, ...payload.scores,
         onboarding_seed: true, onboarding_version: 'v2', local_only: true,
         created_at: new Date().toISOString(),
@@ -134,6 +161,7 @@ export default function OnboardingV2() {
     busy.current = true;
     setSaving(true);
     try {
+      await clearWingShotIntent(AsyncStorage);
       emit(account ? 'onboarding_account_offer_selected' : 'onboarding_explore_selected', { entry_path: path });
       await finishV2({ markSeen: markOnboardingSeen, router, account, storage: AsyncStorage, entryPath: path, platform: Platform.OS });
       emit('onboarding_completed', { entry_path: path, rating_status: preview ? 'local_preview' : 'none' });
@@ -165,10 +193,10 @@ export default function OnboardingV2() {
           </>}
           {step === 'rating' && <Text>Rate {destination?.name}</Text>}
           {step === 'result' && <>
-            <Text variant="headlineMedium">Nice! Your wing rating</Text>
+            <Text variant="headlineMedium">Nice! Your wing rating</Text><Text variant="titleLarge">{destination?.name || preview?.payload?.restaurant_name || 'Your restaurant'}</Text>
             <Text style={{ fontSize: 40, fontWeight: '800' }}>{preview?.payload?.overall} / 10</Text>
             <Text variant="bodyLarge">Saved on this device only. This preview is not a public review and has not earned rewards. It stays here after sign-up; it is not automatically published or synced.</Text>
-            <Text variant="bodyLarge">A free account lets you sync future published ratings and upload wing pictures when eligible.</Text>
+            {photoAvailable ? <><Text variant="headlineMedium">Got a picture of those wings?</Text><Text variant="bodyLarge">Share a Wing Shot with the BuffaGo community. Create a free account to upload a photo, keep track of your favorite spots, and build your wing journey.</Text><Text variant="bodySmall">Wing Shots are reviewed before they appear in the gallery.</Text></> : <Text>Wing Shots are unavailable right now. You can still explore BuffaGo; your preview stays on this device.</Text>}
 
           </>}
           {!!notice && <Text accessibilityRole="alert">{notice}</Text>}
@@ -176,7 +204,7 @@ export default function OnboardingV2() {
         </ScrollView>
       </KeyboardAvoidingView>
       {step === 'result' && <View style={{ paddingHorizontal: 24, paddingBottom: 16, gap: 10 }}>
-            <Button mode="contained" disabled={saving} labelStyle={{ fontSize: 16 }} contentStyle={{ minHeight: 48 }} onPress={() => finish(!user || user.is_anonymous)}>{user && !user.is_anonymous ? 'Continue to BuffaGo' : 'Create free account'}</Button>
+            {photoAvailable && <Button mode="contained" disabled={saving} labelStyle={{ fontSize: 16 }} contentStyle={{ minHeight: 48 }} onPress={addPhoto}>{user && !user.is_anonymous ? 'Add a Wing Shot' : 'Create Account & Add a Wing Shot'}</Button>}
             <Button mode="outlined" disabled={saving} labelStyle={{ fontSize: 16 }} contentStyle={{ minHeight: 48 }} onPress={() => finish()}>Explore BuffaGo</Button>
       </View>}
       <RatingWizardDialog visible={step === 'rating'} destinationName={destination?.name}
