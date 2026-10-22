@@ -56,7 +56,7 @@ test('Wingman canonical selection uses shared rating; result is local and auth f
   assert.equal(preview.status,'local_preview'); assert.equal(preview.payload.overall,8);
   assert.equal(JSON.parse(s.data.get('buffago:onboarding:seed_rating')).local_only,true);
   assert.ok(!s.events.some(e=>e.eventName==='rating_submitted'));
-  await s.press('Create Account & Add a Wing Shot'); assert.equal(s.data.get('done'),'1');
+  await s.press('Create Account & Add Photo'); assert.equal(s.data.get('done'),'1');
   assert.deepEqual(s.routes,[['replace','/(tabs)/home'],['push','/auth/login']]);
   assert.ok(s.data.has('buffago:guest_rating_preview:v1')); s.runtime.unmount();
 });
@@ -75,7 +75,7 @@ test('preview survives compatibility write failure and restores result on a late
   await nodes(s.render(),'wingman')[0].props.onPickDestination({id,name:'Wings'},{});
   await nodes(s.render(),'rating')[0].props.onFinalize({scores:{overall:10,sauce:1,crispiness:5,meat:8}});
   const saved=JSON.parse(s.data.get('buffago:guest_rating_preview:v1')); assert.equal(saved.payload.overall,10);
-  const restored=setup(saved); await flush(); restored.render(); await flush(); assert.ok(nodes(restored.render(),'button').some(n=>n.props.children==='Create Account & Add a Wing Shot'));
+  const restored=setup(saved); await flush(); restored.render(); await flush(); assert.ok(nodes(restored.render(),'button').some(n=>n.props.children==='Create Account & Add Photo'));
   s.runtime.unmount();restored.runtime.unmount();
 });
 test('slider maps min/max/midpoint, clamped taps, RTL and drag sequences across widths',()=>{
@@ -171,7 +171,7 @@ test('disabled photo flags keep preview and Explore without advertising account 
   await nodes(s.render(),'wingman')[0].props.onPickDestination({id,name:'Wings'},{});
   await nodes(s.render(),'rating')[0].props.onFinalize({scores:{overall:8,sauce:7,crispiness:6,meat:9}});
   s.render();await flush();const tree=s.render();
-  assert.ok(!nodes(tree,'button').some(n=>n.props.children==='Create Account & Add a Wing Shot'));
+  assert.ok(!nodes(tree,'button').some(n=>n.props.children==='Create Account & Add Photo'));
   await s.press('Explore BuffaGo');assert.deepEqual(s.routes,[['replace','/(tabs)/home']]);
   assert.ok(s.data.has('buffago:guest_rating_preview:v1'));s.runtime.unmount();
 });
@@ -180,8 +180,8 @@ test('guest invitation uses release contract without calling authenticated flags
  const s=setup();await flush();await s.press('Find / rate wings');
  await nodes(s.render(),'wingman')[0].props.onPickDestination({id,name:'Wings'},{});
  await nodes(s.render(),'rating')[0].props.onFinalize({scores:{overall:9,sauce:7,crispiness:6,meat:9}});
- s.render();await flush();assert.ok(nodes(s.render(),'button').some(n=>n.props.children==='Create Account & Add a Wing Shot'));
- assert.equal(s.flagCalls(),0);await s.press('Create Account & Add a Wing Shot');assert.equal(s.flagCalls(),0);assert.deepEqual(s.routes,[['replace','/(tabs)/home'],['push','/auth/login']]);s.runtime.unmount();
+ s.render();await flush();assert.ok(nodes(s.render(),'button').some(n=>n.props.children==='Create Account & Add Photo'));
+ assert.equal(s.flagCalls(),0);await s.press('Create Account & Add Photo');assert.equal(s.flagCalls(),0);assert.deepEqual(s.routes,[['replace','/(tabs)/home'],['push','/auth/login']]);s.runtime.unmount();
 });
 
 test('authenticated V2 result skips signup and opens same restaurant uploader directly',async()=>{

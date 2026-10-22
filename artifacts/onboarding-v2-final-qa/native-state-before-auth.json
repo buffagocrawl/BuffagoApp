@@ -1,0 +1,17 @@
+{
+  "time": "2026-10-22T12:27:02.157Z",
+  "done": "1",
+  "legacy": "true",
+  "intro": "true",
+  "previewStatus": "local_preview",
+  "scores": {
+    "overall": 8,
+    "sauce": 7,
+    "crispiness": 1,
+    "meat": 9
+  },
+  "sameDestination": true,
+  "intentState": "pending",
+  "ttlMinutes": 30,
+  "bound": false
+}

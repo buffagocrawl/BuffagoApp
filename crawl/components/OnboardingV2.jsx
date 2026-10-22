@@ -213,7 +213,7 @@ export default function OnboardingV2() {
       </KeyboardAvoidingView>
       {step === 'result' && <View style={{ paddingHorizontal: 24, paddingBottom: 16, gap: 10 }}>
             {!photoAvailable && (!user || user.is_anonymous) && <Button mode="contained" disabled={saving} contentStyle={{ minHeight: 48 }} onPress={() => finish(true)}>Create Free Account</Button>}
-            {photoAvailable && <Button mode="contained" disabled={saving} labelStyle={{ fontSize: 16 }} contentStyle={{ minHeight: 48 }} onPress={addPhoto}>{user && !user.is_anonymous ? 'Add a Wing Shot' : 'Create Account & Add a Wing Shot'}</Button>}
+            {photoAvailable && <Button mode="contained" disabled={saving} accessibilityLabel={user && !user.is_anonymous ? 'Add a Wing Shot' : 'Create account and add a Wing Shot photo'} labelStyle={{ fontSize: 16 }} contentStyle={{ minHeight: 48 }} onPress={addPhoto}>{user && !user.is_anonymous ? 'Add a Wing Shot' : 'Create Account & Add Photo'}</Button>}
             <Button mode="outlined" disabled={saving} labelStyle={{ fontSize: 16 }} contentStyle={{ minHeight: 48 }} onPress={() => finish()}>Explore BuffaGo</Button>
       </View>}
       <RatingWizardDialog visible={step === 'rating'} destinationName={destination?.name}

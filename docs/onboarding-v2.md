@@ -2,6 +2,8 @@
 
 Current release status: **BLOCKED FOR RELEASE**. The Android recovery follow-up below contains the latest native evidence; earlier sections retain historical limitations and counts. Older sections retain historical evidence.
 
+Latest final release QA (2026-10-22): **NO-GO**, [full 20-scenario report](../artifacts/onboarding-v2-final-qa/QA.md), [native screenshots](../artifacts/onboarding-v2-final-qa/screenshots/index.md), [redirect trace](../artifacts/onboarding-v2-final-qa/redirect-trace.md). Android fresh guest Welcome/Explore, search/shared rating/local result, photo invitation/auth screen/Back, three cold guest launches and native flag-off smoke were exercised. Real signup/password/Google/Facebook success, authenticated relaunch/signout/signin, actual upload and iOS remain blocked. Native scores in this run were 8/7/1/9, result 8/10; no server rating was submitted. Small-screen CTA truncation was fixed with visible "Create Account & Add Photo" and an explicit Wing Shot accessibility label, verified at 360x640dp/font scale 1.3. Both release defaults remain false. Durable interrupted handoff storage can be reclaimed on a subsequent login within expiry; startup itself opens Home and does not automatically claim the intent. Do not infer automatic cold-start uploader recovery from older summaries.
+
 V2 is an opt-in first-value flow: Welcome -> Find / rate wings -> restaurant search or Wingman -> the existing four-dimension RatingWizardDialog -> local result -> optional account or guest Home. Explore goes straight to Home. No preference questionnaire, required rating, login, location prompt, or Crawl education is part of V2.
 
 ## Rollout and rollback

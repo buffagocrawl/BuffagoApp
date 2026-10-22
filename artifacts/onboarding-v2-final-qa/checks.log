@@ -1,0 +1,5 @@
+Initial whitespace check found trailing whitespace in raw log output. Normalized log whitespace only.
+Final staged secret/public-config scan: PASS (83 files).
+Final staged diff whitespace check: PASS.
+QA helper node --check: PASS.
+No production flags, env, backend, packages or lockfiles changed.

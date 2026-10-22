@@ -1,0 +1,4078 @@
+TAP version 13
+# Subtest: weekly mission summary reports next mission and completion ratio
+ok 1 - weekly mission summary reports next mission and completion ratio
+  ---
+  duration_ms: 1.6881
+  type: 'test'
+  ...
+# Subtest: weekly mission summary caps progress at the mission target
+ok 2 - weekly mission summary caps progress at the mission target
+  ---
+  duration_ms: 0.2646
+  type: 'test'
+  ...
+# Subtest: weekly mission metadata centralizes action, reset, and truthful reward copy
+ok 3 - weekly mission metadata centralizes action, reset, and truthful reward copy
+  ---
+  duration_ms: 0.4163
+  type: 'test'
+  ...
+# Subtest: share artifact clearly identifies the restaurant and its location
+ok 4 - share artifact clearly identifies the restaurant and its location
+  ---
+  duration_ms: 0.5994
+  type: 'test'
+  ...
+# Subtest: share artifact includes a deep link when one is available and has a concise fallback without one
+ok 5 - share artifact includes a deep link when one is available and has a concise fallback without one
+  ---
+  duration_ms: 0.319
+  type: 'test'
+  ...
+# Subtest: password authentication returns a successful result before its timeout
+ok 6 - password authentication returns a successful result before its timeout
+  ---
+  duration_ms: 3.0325
+  type: 'test'
+  ...
+# Subtest: password authentication rejects with a safe timeout error
+ok 7 - password authentication rejects with a safe timeout error
+  ---
+  duration_ms: 6.5399
+  type: 'test'
+  ...
+# Subtest: successful password sign-in returns a session and bootstraps independently
+ok 8 - successful password sign-in returns a session and bootstraps independently
+  ---
+  duration_ms: 4.0439
+  type: 'test'
+  ...
+# Subtest: invalid credentials produce a safe user-facing error
+ok 9 - invalid credentials produce a safe user-facing error
+  ---
+  duration_ms: 1.0682
+  type: 'test'
+  ...
+# Subtest: a rejected Supabase request clears through the caller error path
+ok 10 - a rejected Supabase request clears through the caller error path
+  ---
+  duration_ms: 0.5518
+  type: 'test'
+  ...
+# Subtest: successful auth never times out when profile bootstrap never resolves
+ok 11 - successful auth never times out when profile bootstrap never resolves
+  ---
+  duration_ms: 0.4169
+  type: 'test'
+  ...
+# Subtest: profile query failures and missing profile rows are distinguishable from auth failure
+ok 12 - profile query failures and missing profile rows are distinguishable from auth failure
+  ---
+  duration_ms: 0.8265
+  type: 'test'
+  ...
+# Subtest: cancelled and late attempts cannot bootstrap or navigate
+ok 13 - cancelled and late attempts cannot bootstrap or navigate
+  ---
+  duration_ms: 0.5382
+  type: 'test'
+  ...
+# Subtest: missing session is rejected and a second submit can start after the first settles
+ok 14 - missing session is rejected and a second submit can start after the first settles
+  ---
+  duration_ms: 1.1206
+  type: 'test'
+  ...
+# Subtest: social auth buttons include Google first and Facebook second
+ok 15 - social auth buttons include Google first and Facebook second
+  ---
+  duration_ms: 3.0711
+  type: 'test'
+  ...
+# Subtest: social auth button state shows selected provider loading and disables both buttons
+ok 16 - social auth button state shows selected provider loading and disables both buttons
+  ---
+  duration_ms: 0.2404
+  type: 'test'
+  ...
+# Subtest: executeSocialAuth calls OAuth with Google provider and clears loading state
+ok 17 - executeSocialAuth calls OAuth with Google provider and clears loading state
+  ---
+  duration_ms: 0.3673
+  type: 'test'
+  ...
+# Subtest: executeSocialAuth calls OAuth with Facebook provider
+ok 18 - executeSocialAuth calls OAuth with Facebook provider
+  ---
+  duration_ms: 0.374
+  type: 'test'
+  ...
+# Subtest: executeSocialAuth blocks duplicate taps while another provider is active
+ok 19 - executeSocialAuth blocks duplicate taps while another provider is active
+  ---
+  duration_ms: 0.2756
+  type: 'test'
+  ...
+# Subtest: executeSocialAuth resets loading state after cancellation
+ok 20 - executeSocialAuth resets loading state after cancellation
+  ---
+  duration_ms: 0.4649
+  type: 'test'
+  ...
+# Subtest: executeSocialAuth resets loading state after error
+ok 21 - executeSocialAuth resets loading state after error
+  ---
+  duration_ms: 1.0313
+  type: 'test'
+  ...
+# Subtest: getSocialAuthErrorMessage returns provider fallback when no message exists
+ok 22 - getSocialAuthErrorMessage returns provider fallback when no message exists
+  ---
+  duration_ms: 0.3581
+  type: 'test'
+  ...
+# Subtest: callback fallback routes stay safe for auth and linking flows
+ok 23 - callback fallback routes stay safe for auth and linking flows
+  ---
+  duration_ms: 0.6044
+  type: 'test'
+  ...
+# Subtest: callback timeout surfaces provider-specific errors
+ok 24 - callback timeout surfaces provider-specific errors
+  ---
+  duration_ms: 12.9938
+  type: 'test'
+  ...
+# Subtest: real flow ignores a picker finishing after Skip and prevents duplicate picker taps
+ok 25 - real flow ignores a picker finishing after Skip and prevents duplicate picker taps
+  ---
+  duration_ms: 403.748
+  type: 'test'
+  ...
+# Subtest: real flow reopens a persisted staging handoff after process termination and revalidates before Continue
+ok 26 - real flow reopens a persisted staging handoff after process termination and revalidates before Continue
+  ---
+  duration_ms: 391.4654
+  type: 'test'
+  ...
+# Subtest: real flow hands off exactly one staged image on repeated Continue taps
+ok 27 - real flow hands off exactly one staged image on repeated Continue taps
+  ---
+  duration_ms: 122.4632
+  type: 'test'
+  ...
+# Subtest: real flow never installs an abandoned staging result into the next upload session
+ok 28 - real flow never installs an abandoned staging result into the next upload session
+  ---
+  duration_ms: 84.5881
+  type: 'test'
+  ...
+# Subtest: Wingdex batches all destinations beyond the server cap and does not sign images for counts
+ok 29 - Wingdex batches all destinations beyond the server cap and does not sign images for counts
+  ---
+  duration_ms: 3.9114
+  type: 'test'
+  ...
+# Subtest: authoritative zero public count does not fall back to stale images
+ok 30 - authoritative zero public count does not fall back to stale images
+  ---
+  duration_ms: 0.302
+  type: 'test'
+  ...
+# Subtest: pre-rating failure copy never claims a rating has already saved
+ok 31 - pre-rating failure copy never claims a rating has already saved
+  ---
+  duration_ms: 1.7991
+  type: 'test'
+  ...
+# Subtest: real media adapter preserves full-resolution HEIC for framing and handles decoder failure
+ok 32 - real media adapter preserves full-resolution HEIC for framing and handles decoder failure
+  ---
+  duration_ms: 38.1385
+  type: 'test'
+  ...
+# Subtest: Home attachment completion cannot clear a newer restaurant image draft
+ok 33 - Home attachment completion cannot clear a newer restaurant image draft
+  ---
+  duration_ms: 4.3226
+  type: 'test'
+  ...
+# Subtest: Skip at the initial image step cannot prompt for another photo after rating
+ok 34 - Skip at the initial image step cannot prompt for another photo after rating
+  ---
+  duration_ms: 6.1086
+  type: 'test'
+  ...
+# Subtest: Crawl draft attaches to its exact committed rating, survives failure and retries the same session
+ok 35 - Crawl draft attaches to its exact committed rating, survives failure and retries the same session
+  ---
+  duration_ms: 4.7382
+  type: 'test'
+  ...
+# Subtest: framing gates every upload and cancellation cannot stage or validate an image
+ok 36 - framing gates every upload and cancellation cannot stage or validate an image
+  ---
+  duration_ms: 123.9798
+  type: 'test'
+  ...
+# Subtest: a framing confirmation finishing after explicit close is ignored
+ok 37 - a framing confirmation finishing after explicit close is ignored
+  ---
+  duration_ms: 73.8735
+  type: 'test'
+  ...
+# Subtest: standalone onboarding Flow shows restaurant/change action and never auto-opens media
+ok 38 - standalone onboarding Flow shows restaurant/change action and never auto-opens media
+  ---
+  duration_ms: 72.999
+  type: 'test'
+  ...
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 53 }
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 0 }
+# [cayenne-auth] submit_completed { outcome: 'error', duration_ms: 0 }
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 0 }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: real completion helper persists all gate keys before auth and survives fresh Home mounts
+ok 39 - real completion helper persists all gate keys before auth and survives fresh Home mounts
+  ---
+  duration_ms: 214.8675
+  type: 'test'
+  ...
+# Subtest: actual login component signup preserves local preview and reaches fixed uploader
+ok 40 - actual login component signup preserves local preview and reaches fixed uploader
+  ---
+  duration_ms: 334.4762
+  type: 'test'
+  ...
+# Subtest: actual login component signin preserves local preview and reaches fixed uploader
+ok 41 - actual login component signin preserves local preview and reaches fixed uploader
+  ---
+  duration_ms: 208.6836
+  type: 'test'
+  ...
+# Subtest: actual login component confirmation preserves local preview and reaches fixed uploader
+ok 42 - actual login component confirmation preserves local preview and reaches fixed uploader
+  ---
+  duration_ms: 280.936
+  type: 'test'
+  ...
+# Subtest: wrong password retry, double signup tap and explicit Explore do not lose preview or duplicate navigation
+ok 43 - wrong password retry, double signup tap and explicit Explore do not lose preview or duplicate navigation
+  ---
+  duration_ms: 236.1116
+  type: 'test'
+  ...
+# Subtest: actual login google session listener defers to OAuth callback, cancel and error permit retry
+ok 44 - actual login google session listener defers to OAuth callback, cancel and error permit retry
+  ---
+  duration_ms: 180.7009
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792672403315-1',
+#       destinationId: '[id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: actual google callback deep-link code exchange sends current user to original restaurant
+ok 45 - actual google callback deep-link code exchange sends current user to original restaurant
+  ---
+  duration_ms: 160.0303
+  type: 'test'
+  ...
+# Subtest: actual login facebook session listener defers to OAuth callback, cancel and error permit retry
+ok 46 - actual login facebook session listener defers to OAuth callback, cancel and error permit retry
+  ---
+  duration_ms: 123.1618
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792672403569-1',
+#       destinationId: '[id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: actual facebook callback deep-link code exchange sends current user to original restaurant
+ok 47 - actual facebook callback deep-link code exchange sends current user to original restaurant
+  ---
+  duration_ms: 128.2994
+  type: 'test'
+  ...
+# Subtest: normal login and saved destination precedence remain intact
+ok 48 - normal login and saved destination precedence remain intact
+  ---
+  duration_ms: 81.5889
+  type: 'test'
+  ...
+# Subtest: duplicate signed-in notifications before and after handoff cannot replace uploader with Home
+ok 49 - duplicate signed-in notifications before and after handoff cannot replace uploader with Home
+  ---
+  duration_ms: 34.6072
+  type: 'test'
+  ...
+# Subtest: legacy import cannot replay nested V2 local preview payloads
+ok 50 - legacy import cannot replay nested V2 local preview payloads
+  ---
+  duration_ms: 37.901
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792672403851-1',
+#       destinationId: '[id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792672403976-1',
+#       destinationId: '[id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792672404106-1',
+#       destinationId: '[id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/(tabs)/ratings',
+#     params: {
+#       savedAction: 'save',
+#       savedDestinationId: '[id redacted]',
+#       savedActionState: 'save',
+#       savedActionUserId: 'synthetic-account'
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# OAuth callback failed { code: 'callback_failed' }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: callback rejects arbitrary return-route injection and preserves saved-action priority
+ok 51 - callback rejects arbitrary return-route injection and preserves saved-action priority
+  ---
+  duration_ms: 501.407
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792672404348-1',
+#       destinationId: '[id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# OAuth callback failed { code: 'callback_failed' }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: actual google callback rejects anonymous user and permits retry without consuming Wing Shot
+ok 52 - actual google callback rejects anonymous user and permits retry without consuming Wing Shot
+  ---
+  duration_ms: 124.001
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792672404473-1',
+#       destinationId: '[id redacted]',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# Subtest: actual facebook callback rejects anonymous user and permits retry without consuming Wing Shot
+ok 53 - actual facebook callback rejects anonymous user and permits retry without consuming Wing Shot
+  ---
+  duration_ms: 124.5291
+  type: 'test'
+  ...
+# Subtest: assignment is deterministic, mutually exclusive, and rolls back to control
+ok 54 - assignment is deterministic, mutually exclusive, and rolls back to control
+  ---
+  duration_ms: 1.5259
+  type: 'test'
+  ...
+# Subtest: canonical metadata includes required fields and no raw error text
+ok 55 - canonical metadata includes required fields and no raw error text
+  ---
+  duration_ms: 1.798
+  type: 'test'
+  ...
+# Subtest: Metro prunes generated Expo cache directories on Windows and POSIX without excluding app or QA fixture sources
+ok 56 - Metro prunes generated Expo cache directories on Windows and POSIX without excluding app or QA fixture sources
+  ---
+  duration_ms: 1.5211
+  type: 'test'
+  ...
+# Subtest: onboarding has one route owner and is not globally overlaid during auth hydration
+ok 57 - onboarding has one route owner and is not globally overlaid during auth hydration
+  ---
+  duration_ms: 1.1807
+  type: 'test'
+  ...
+# Subtest: welcome has two paths; explore completes and replaces with home without rating
+ok 58 - welcome has two paths; explore completes and replaces with home without rating
+  ---
+  duration_ms: 375.1082
+  type: 'test'
+  ...
+# Subtest: Wingman canonical selection uses shared rating; result is local and auth follows completion
+ok 59 - Wingman canonical selection uses shared rating; result is local and auth follows completion
+  ---
+  duration_ms: 119.8118
+  type: 'test'
+  ...
+# Subtest: pending Wingman result cannot open rating; manual review allows explore
+ok 60 - pending Wingman result cannot open rating; manual review allows explore
+  ---
+  duration_ms: 131.2491
+  type: 'test'
+  ...
+# Subtest: preview survives compatibility write failure and restores result on a later mount
+ok 61 - preview survives compatibility write failure and restores result on a later mount
+  ---
+  duration_ms: 198.5438
+  type: 'test'
+  ...
+# Subtest: slider maps min/max/midpoint, clamped taps, RTL and drag sequences across widths
+ok 62 - slider maps min/max/midpoint, clamped taps, RTL and drag sequences across widths
+  ---
+  duration_ms: 0.9164
+  type: 'test'
+  ...
+# Subtest: V2 supersedes experiment and both auth import paths explicitly preserve V2 previews
+ok 63 - V2 supersedes experiment and both auth import paths explicitly preserve V2 previews
+  ---
+  duration_ms: 5.617
+  type: 'test'
+  ...
+# Subtest: shared slider dispatches tap, drag, RTL, and accessibility adjustments
+ok 64 - shared slider dispatches tap, drag, RTL, and accessibility adjustments
+  ---
+  duration_ms: 94.0264
+  type: 'test'
+  ...
+# Subtest: quick and full rating revisits keep selected scores and submit unchanged numbers
+ok 65 - quick and full rating revisits keep selected scores and submit unchanged numbers
+  ---
+  duration_ms: 123.9864
+  type: 'test'
+  ...
+# Subtest: V2 location stays optional; returning users and disabled flag retain permission behavior
+ok 66 - V2 location stays optional; returning users and disabled flag retain permission behavior
+  ---
+  duration_ms: 83.2064
+  type: 'test'
+  ...
+# Subtest: existing restaurant search selects the same shared quick rating dialog
+ok 67 - existing restaurant search selects the same shared quick rating dialog
+  ---
+  duration_ms: 390.4833
+  type: 'test'
+  ...
+# Subtest: disabled photo flags keep preview and Explore without advertising account upload
+ok 68 - disabled photo flags keep preview and Explore without advertising account upload
+  ---
+  duration_ms: 25.9769
+  type: 'test'
+  ...
+# Subtest: guest invitation uses release contract without calling authenticated flags
+ok 69 - guest invitation uses release contract without calling authenticated flags
+  ---
+  duration_ms: 28.7656
+  type: 'test'
+  ...
+# Subtest: authenticated V2 result skips signup and opens same restaurant uploader directly
+ok 70 - authenticated V2 result skips signup and opens same restaurant uploader directly
+  ---
+  duration_ms: 28.987
+  type: 'test'
+  ...
+# Subtest: post-auth definitive flags open same destination with existing composer; identity loss closes uploader
+ok 71 - post-auth definitive flags open same destination with existing composer; identity loss closes uploader
+  ---
+  duration_ms: 161.9076
+  type: 'test'
+  ...
+# Subtest: invite followed by disabled flags offers truthful retry and Explore, never uploader
+ok 72 - invite followed by disabled flags offers truthful retry and Explore, never uploader
+  ---
+  duration_ms: 51.2415
+  type: 'test'
+  ...
+# Subtest: invite followed by network flags offers truthful retry and Explore, never uploader
+ok 73 - invite followed by network flags offers truthful retry and Explore, never uploader
+  ---
+  duration_ms: 26.3207
+  type: 'test'
+  ...
+# Subtest: authoritative flag timeout is bounded; failed and partial responses never grant uploads
+ok 74 - authoritative flag timeout is bounded; failed and partial responses never grant uploads
+  ---
+  duration_ms: 79.9482
+  type: 'test'
+  ...
+# Subtest: repository pins gateway bypass plus handler authentication for all user staging functions
+ok 75 - repository pins gateway bypass plus handler authentication for all user staging functions
+  ---
+  duration_ms: 15.2333
+  type: 'test'
+  ...
+# Subtest: client retries authentication exactly once and preserves HTTP/reason metadata
+ok 76 - client retries authentication exactly once and preserves HTTP/reason metadata
+  ---
+  duration_ms: 2.7218
+  type: 'test'
+  ...
+# Subtest: staging handlers enforce exact user/correlation/file path shape
+ok 77 - staging handlers enforce exact user/correlation/file path shape
+  ---
+  duration_ms: 8.8377
+  type: 'test'
+  ...
+# [WingShot][[id redacted]] function_request_headers {
+#   stage: 'wing-media-stage-authorize',
+#   bearerPresent: true,
+#   bearerShape: 'jwt_like',
+#   userId: 'user-1',
+#   projectRef: 'vhfxnizaxdanmvmouuaf',
+#   apikeyPresent: true,
+#   refreshAttempted: false
+# }
+# [WingShot][[id redacted]] auth_refresh_succeeded {
+#   stage: 'wing-media-stage-authorize',
+#   httpStatus: 401,
+#   reasonCode: 'token_refreshed'
+# }
+# [WingShot][[id redacted]] function_request_headers {
+#   stage: 'wing-media-stage-authorize',
+#   bearerPresent: true,
+#   bearerShape: 'jwt_like',
+#   userId: null,
+#   projectRef: 'vhfxnizaxdanmvmouuaf',
+#   apikeyPresent: true,
+#   refreshAttempted: true
+# }
+# Subtest: stage authorization verifies the explicit bearer token against the project
+ok 78 - stage authorization verifies the explicit bearer token against the project
+  ---
+  duration_ms: 2.5986
+  type: 'test'
+  ...
+# Subtest: auth refresh retry sends the token returned by refresh and required project headers
+ok 79 - auth refresh retry sends the token returned by refresh and required project headers
+  ---
+  duration_ms: 38.9652
+  type: 'test'
+  ...
+# Subtest: function-level invalid, missing, and wrong-project tokens have a structured 401 contract
+ok 80 - function-level invalid, missing, and wrong-project tokens have a structured 401 contract
+  ---
+  duration_ms: 0.2867
+  type: 'test'
+  ...
+# [WingShot][[id redacted]] auth_refresh_started {
+#   stage: 'wing-media-stage-authorize',
+#   httpStatus: 401,
+#   reasonCode: 'authentication_required'
+# }
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: true,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 100,
+#   dimensions: null,
+#   localFileExists: false,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# Subtest: process kill after staging restores metadata without tokens, URLs, local paths or bytes
+ok 81 - process kill after staging restores metadata without tokens, URLs, local paths or bytes
+  ---
+  duration_ms: 5.4777
+  type: 'test'
+  ...
+# Subtest: rating commit before attachment acknowledgement restores exact rating and operation
+ok 82 - rating commit before attachment acknowledgement restores exact rating and operation
+  ---
+  duration_ms: 0.4126
+  type: 'test'
+  ...
+# Subtest: kill after reservation retains the same finalizer key and promoted state
+ok 83 - kill after reservation retains the same finalizer key and promoted state
+  ---
+  duration_ms: 0.4575
+  type: 'test'
+  ...
+# Subtest: expired draft clears deterministically and a late callback cannot revive it
+ok 84 - expired draft clears deterministically and a late callback cannot revive it
+  ---
+  duration_ms: 1.5978
+  type: 'test'
+  ...
+# Subtest: different restaurant and flow cannot receive an older draft
+ok 85 - different restaurant and flow cannot receive an older draft
+  ---
+  duration_ms: 0.5674
+  type: 'test'
+  ...
+# Subtest: logout and foreign login discard state and block stale writes
+ok 86 - logout and foreign login discard state and block stale writes
+  ---
+  duration_ms: 0.6385
+  type: 'test'
+  ...
+# Subtest: newer draft survives an old save and old acknowledgement
+ok 87 - newer draft survives an old save and old acknowledgement
+  ---
+  duration_ms: 0.707
+  type: 'test'
+  ...
+# Subtest: restart after timeout-after-success returns the owner record without another promotion or reservation
+ok 88 - restart after timeout-after-success returns the owner record without another promotion or reservation
+  ---
+  duration_ms: 23.437
+  type: 'test'
+  ...
+# Subtest: media confirmation only populates the draft and never resets it
+ok 89 - media confirmation only populates the draft and never resets it
+  ---
+  duration_ms: 1.3384
+  type: 'test'
+  ...
+# Subtest: upload progress, failure, and success preserve the draft until Done
+ok 90 - upload progress, failure, and success preserve the draft until Done
+  ---
+  duration_ms: 0.2974
+  type: 'test'
+  ...
+# Subtest: completed and skipped flows reset safely while X preserves unfinished drafts
+ok 91 - completed and skipped flows reset safely while X preserves unfinished drafts
+  ---
+  duration_ms: 0.7075
+  type: 'test'
+  ...
+# Subtest: all password and OAuth session handoffs use validated one-time route, never preview rating ID
+ok 92 - all password and OAuth session handoffs use validated one-time route, never preview rating ID
+  ---
+  duration_ms: 3.0285
+  type: 'test'
+  ...
+# Subtest: no session and anonymous sessions preserve intent until actual current login
+ok 93 - no session and anonymous sessions preserve intent until actual current login
+  ---
+  duration_ms: 0.7205
+  type: 'test'
+  ...
+# Subtest: expiry, different bound account, stale screen and pseudo IDs fail safely
+ok 94 - expiry, different bound account, stale screen and pseudo IDs fail safely
+  ---
+  duration_ms: 0.7631
+  type: 'test'
+  ...
+# Subtest: composer verifies canonical ID through RLS before opening existing flow; lookup failures keep picker
+ok 95 - composer verifies canonical ID through RLS before opening existing flow; lookup failures keep picker
+  ---
+  duration_ms: 431.1208
+  type: 'test'
+  ...
+# Subtest: durable routed intent survives cold restart until destination acknowledgment, then cannot replay
+ok 96 - durable routed intent survives cold restart until destination acknowledgment, then cannot replay
+  ---
+  duration_ms: 25.3332
+  type: 'test'
+  ...
+# Subtest: failed verification retains intent; explicit sign-out and account switches clear private action
+ok 97 - failed verification retains intent; explicit sign-out and account switches clear private action
+  ---
+  duration_ms: 41.3777
+  type: 'test'
+  ...
+# Subtest: route-supplied handoff identity and account cannot impersonate the bound handoff
+ok 98 - route-supplied handoff identity and account cannot impersonate the bound handoff
+  ---
+  duration_ms: 61.0914
+  type: 'test'
+  ...
+# Subtest: owner-only vote proposal returns authoritative zero and persisted totals without leaking private photos
+ok 99 - owner-only vote proposal returns authoritative zero and persisted totals without leaking private photos
+  ---
+  duration_ms: 1971.7465
+  type: 'test'
+  ...
+# Subtest: validation progress advances visibly through a fifteen-second validation
+ok 100 - validation progress advances visibly through a fifteen-second validation
+  ---
+  duration_ms: 2.3439
+  type: 'test'
+  ...
+# Subtest: simulated validation progress is capped until a real success completes it
+ok 101 - simulated validation progress is capped until a real success completes it
+  ---
+  duration_ms: 2.381
+  type: 'test'
+  ...
+# Subtest: only success reaches 100%; failure freezes at the current validation progress
+ok 102 - only success reaches 100%; failure freezes at the current validation progress
+  ---
+  duration_ms: 0.6021
+  type: 'test'
+  ...
+# Subtest: validation timers are cleaned up on completion, failure, restart, and explicit cleanup
+ok 103 - validation timers are cleaned up on completion, failure, restart, and explicit cleanup
+  ---
+  duration_ms: 0.4823
+  type: 'test'
+  ...
+# Subtest: real progress is monotonic and capped before success
+ok 104 - real progress is monotonic and capped before success
+  ---
+  duration_ms: 6.9023
+  type: 'test'
+  ...
+# Subtest: interpolation and lifecycle safeguards are wired to the flow
+ok 105 - interpolation and lifecycle safeguards are wired to the flow
+  ---
+  duration_ms: 0.8782
+  type: 'test'
+  ...
+# Subtest: the client exposes separate progress stages and never declares UI success
+ok 106 - the client exposes separate progress stages and never declares UI success
+  ---
+  duration_ms: 0.6519
+  type: 'test'
+  ...
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1024,
+#   dimensions: { width: 1200, height: 800 },
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] Photo upload preparation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1024,
+#   dimensions: { width: 1200, height: 800 },
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   preprocessing: 'client upload body preparation'
+# }
+# [WingShot][[id redacted]] function_request_headers {
+#   stage: 'wing-media-promote',
+#   bearerPresent: true,
+#   bearerShape: 'jwt_like',
+#   apikeyPresent: false,
+#   refreshAttempted: false
+# }
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1024,
+#   dimensions: { width: 1200, height: 800 },
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] Photo upload preparation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1024,
+#   dimensions: { width: 1200, height: 800 },
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   preprocessing: 'client upload body preparation'
+# }
+# [WingShot][[id redacted]] function_request_headers {
+#   stage: 'wing-media-promote',
+#   bearerPresent: true,
+#   bearerShape: 'jwt_like',
+#   apikeyPresent: false,
+#   refreshAttempted: false
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'finalize_wing_submission_upload',
+#   exception: null,
+#   existingRecordFound: true,
+#   existingRecordId: '[id redacted]',
+#   existingRecordStatus: 'in_review',
+#   recordCreation: 'updated'
+# }
+# [WingShot][[id redacted]] Database record creation/update {
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   supabaseError: null
+# }
+# Subtest: promotion uses the reserved intent before finalize and returns structured failures
+ok 107 - promotion uses the reserved intent before finalize and returns structured failures
+  ---
+  duration_ms: 1.5963
+  type: 'test'
+  ...
+# Subtest: FunctionsHttpError JSON preserves status and server metadata
+ok 108 - FunctionsHttpError JSON preserves status and server metadata
+  ---
+  duration_ms: 35.8953
+  type: 'test'
+  ...
+# Subtest: malformed promotion response becomes a typed retryable client error without throwing while reading it
+ok 109 - malformed promotion response becomes a typed retryable client error without throwing while reading it
+  ---
+  duration_ms: 7.2845
+  type: 'test'
+  ...
+# Subtest: canonical promotion response is finalized as the exact reserved private object
+ok 110 - canonical promotion response is finalized as the exact reserved private object
+  ---
+  duration_ms: 4.0042
+  type: 'test'
+  ...
+# Subtest: promotion retry returns the same canonical reference when destination already exists
+ok 111 - promotion retry returns the same canonical reference when destination already exists
+  ---
+  duration_ms: 0.6604
+  type: 'test'
+  ...
+# Subtest: completed-upload quota is centralized at five per rolling fifteen minutes
+ok 112 - completed-upload quota is centralized at five per rolling fifteen minutes
+  ---
+  duration_ms: 1.419
+  type: 'test'
+  ...
+# Subtest: rate-limit response is handled inline and preserves the draft
+ok 113 - rate-limit response is handled inline and preserves the draft
+  ---
+  duration_ms: 1.1743
+  type: 'test'
+  ...
+# Subtest: retry migration resumes the existing intent before the eligibility gate
+ok 114 - retry migration resumes the existing intent before the eligibility gate
+  ---
+  duration_ms: 1.6864
+  type: 'test'
+  ...
+# Subtest: native Wing Shot media uses binary Storage staging, not multipart bytes
+ok 115 - native Wing Shot media uses binary Storage staging, not multipart bytes
+  ---
+  duration_ms: 2.2169
+  type: 'test'
+  ...
+# Subtest: native adapter never reads a native URI into JavaScript memory
+ok 116 - native adapter never reads a native URI into JavaScript memory
+  ---
+  duration_ms: 0.6743
+  type: 'test'
+  ...
+# Subtest: staging bucket and signed path remain private and user-scoped
+ok 117 - staging bucket and signed path remain private and user-scoped
+  ---
+  duration_ms: 20.8421
+  type: 'test'
+  ...
+# Subtest: photo validation rejects legacy video, bad MIME, and oversized photos
+ok 118 - photo validation rejects legacy video, bad MIME, and oversized photos
+  ---
+  duration_ms: 2.1936
+  type: 'test'
+  ...
+# Subtest: photo size boundary is inclusive and reports the detected size
+ok 119 - photo size boundary is inclusive and reports the detected size
+  ---
+  duration_ms: 0.9096
+  type: 'test'
+  ...
+# Subtest: photos within configured size and dimensions remain eligible
+ok 120 - photos within configured size and dimensions remain eligible
+  ---
+  duration_ms: 0.2161
+  type: 'test'
+  ...
+# Subtest: messages are actionable and confirm the rating was saved
+ok 121 - messages are actionable and confirm the rating was saved
+  ---
+  duration_ms: 0.5186
+  type: 'test'
+  ...
+# Subtest: rate-limit copy is dedicated and not video-processing copy (legacy assertion)
+ok 122 - rate-limit copy is dedicated and not video-processing copy (legacy assertion) # SKIP
+  ---
+  duration_ms: 0.1996
+  type: 'test'
+  ...
+# Subtest: diagnostics redact private paths and secret fields
+ok 123 - diagnostics redact private paths and secret fields
+  ---
+  duration_ms: 0.6636
+  type: 'test'
+  ...
+# [WingShot][test] handled database failure { code: 'P0001' }
+# Subtest: validator uses the authenticated reservation path instead of service-role object ownership
+ok 124 - validator uses the authenticated reservation path instead of service-role object ownership
+  ---
+  duration_ms: 1.428
+  type: 'test'
+  ...
+# Subtest: promotion returns the canonical destination reference
+ok 125 - promotion returns the canonical destination reference
+  ---
+  duration_ms: 1.4322
+  type: 'test'
+  ...
+# Subtest: handled diagnostics never call console.error
+ok 126 - handled diagnostics never call console.error
+  ---
+  duration_ms: 1.739
+  type: 'test'
+  ...
+# Subtest: camera and library selections start one guarded validation pass
+ok 127 - camera and library selections start one guarded validation pass
+  ---
+  duration_ms: 1.7817
+  type: 'test'
+  ...
+# Subtest: validation status and submit gating are explicit
+ok 128 - validation status and submit gating are explicit
+  ---
+  duration_ms: 0.386
+  type: 'test'
+  ...
+# Subtest: every client reason code has safe actionable copy
+ok 129 - every client reason code has safe actionable copy
+  ---
+  duration_ms: 1.4543
+  type: 'test'
+  ...
+# Subtest: server endpoint uses stable reason codes and structured lifecycle logs
+ok 130 - server endpoint uses stable reason codes and structured lifecycle logs
+  ---
+  duration_ms: 1.616
+  type: 'test'
+  ...
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] Photo upload preparation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   preprocessing: 'client upload body preparation'
+# }
+# [WingShot][[id redacted]] Local file validation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] RPC request {
+#   rpcName: 'reserve_wing_submission_upload',
+#   rpcArguments: {
+#     ratingIdPresent: true,
+#     destinationIdPresent: true,
+#     userIdPresent: false,
+#     mediaType: 'photo',
+#     mimeType: 'image/jpeg',
+#     expectedSizeBytes: 1234,
+#     consentVersionPresent: true,
+#     attributionPreferencePresent: true,
+#     captionPresent: false,
+#     idempotencyKeyPresent: true,
+#     correlationIdPresent: true,
+#     submissionSource: 'rating'
+#   }
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'reserve_wing_submission_upload',
+#   databaseCode: null,
+#   databaseMessage: null,
+#   clientClassification: null,
+#   retryAfterSeconds: null,
+#   exception: null,
+#   existingRecordFound: false,
+#   existingRecordId: '[id redacted]',
+#   existingRecordStatus: null,
+#   recordCreation: 'created'
+# }
+# [WingShot][[id redacted]] Supabase Storage upload {
+#   bucket: 'wing-submissions',
+#   objectPath: '…/[id redacted]/source',
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   supabaseError: null
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'finalize_wing_submission_upload',
+#   exception: null,
+#   existingRecordFound: true,
+#   existingRecordId: '[id redacted]',
+#   existingRecordStatus: 'in_review',
+#   recordCreation: 'updated'
+# }
+# [WingShot][[id redacted]] Database record creation/update {
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   supabaseError: null
+# }
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] Photo upload preparation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   preprocessing: 'client upload body preparation'
+# }
+# [WingShot][[id redacted]] Local file validation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] RPC request {
+#   rpcName: 'reserve_wing_submission_upload',
+#   rpcArguments: {
+#     ratingIdPresent: true,
+#     destinationIdPresent: true,
+#     userIdPresent: false,
+#     mediaType: 'photo',
+#     mimeType: 'image/jpeg',
+#     expectedSizeBytes: 1234,
+#     consentVersionPresent: true,
+#     attributionPreferencePresent: true,
+#     captionPresent: false,
+#     idempotencyKeyPresent: true,
+#     correlationIdPresent: true,
+#     submissionSource: 'rating'
+#   }
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'reserve_wing_submission_upload',
+#   databaseCode: null,
+#   databaseMessage: null,
+#   clientClassification: null,
+#   retryAfterSeconds: null,
+#   exception: null,
+#   existingRecordFound: false,
+#   existingRecordId: '[id redacted]',
+#   existingRecordStatus: null,
+#   recordCreation: 'created'
+# }
+# [WingShot][[id redacted]] Supabase Storage upload {
+#   bucket: 'wing-submissions',
+#   objectPath: '…/[id redacted]/source',
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   supabaseError: null
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'finalize_wing_submission_upload',
+#   exception: {
+#     className: 'Object',
+#     name: null,
+#     code: 'P0001',
+#     internalCode: 'P0001',
+#     message: 'uploaded_object_not_found',
+#     details: null,
+#     hint: null,
+#     status: null,
+#     httpStatus: null,
+#     stage: null
+#   },
+#   existingRecordFound: true,
+#   existingRecordId: '[id redacted]',
+#   existingRecordStatus: 'reserved',
+#   recordCreation: 'failed'
+# }
+# [WingShot][[id redacted]] Database record creation/update {
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   supabaseError: {
+#     className: 'Object',
+#     name: null,
+#     code: 'P0001',
+#     internalCode: 'P0001',
+#     message: 'uploaded_object_not_found',
+#     details: null,
+#     hint: null,
+#     status: null,
+#     httpStatus: null,
+#     stage: null
+#   }
+# }
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] Photo upload preparation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   preprocessing: 'client upload body preparation'
+# }
+# [WingShot][[id redacted]] Local file validation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] RPC request {
+#   rpcName: 'reserve_wing_submission_upload',
+#   rpcArguments: {
+#     ratingIdPresent: true,
+#     destinationIdPresent: true,
+#     userIdPresent: false,
+#     mediaType: 'photo',
+#     mimeType: 'image/jpeg',
+#     expectedSizeBytes: 1234,
+#     consentVersionPresent: true,
+#     attributionPreferencePresent: true,
+#     captionPresent: false,
+#     idempotencyKeyPresent: true,
+#     correlationIdPresent: true,
+#     submissionSource: 'rating'
+#   }
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'reserve_wing_submission_upload',
+#   databaseCode: '42900',
+#   databaseMessage: 'rate limited',
+#   clientClassification: 'RATE_LIMITED',
+#   retryAfterSeconds: null,
+#   exception: {
+#     className: 'Object',
+#     name: null,
+#     code: '42900',
+#     internalCode: '42900',
+#     message: 'rate limited',
+#     details: null,
+#     hint: null,
+#     status: null,
+#     httpStatus: null,
+#     stage: null
+#   },
+#   existingRecordFound: false,
+#   existingRecordId: null,
+#   existingRecordStatus: null,
+#   recordCreation: 'failed'
+# }
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] Photo upload preparation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   preprocessing: 'client upload body preparation'
+# }
+# [WingShot][[id redacted]] Local file validation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] RPC request {
+#   rpcName: 'reserve_wing_submission_upload',
+#   rpcArguments: {
+#     ratingIdPresent: true,
+#     destinationIdPresent: true,
+#     userIdPresent: false,
+#     mediaType: 'photo',
+#     mimeType: 'image/jpeg',
+#     expectedSizeBytes: 1234,
+#     consentVersionPresent: true,
+#     attributionPreferencePresent: true,
+#     captionPresent: false,
+#     idempotencyKeyPresent: true,
+#     correlationIdPresent: true,
+#     submissionSource: 'rating'
+#   }
+# }
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] Photo upload preparation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   preprocessing: 'client upload body preparation'
+# }
+# [WingShot][[id redacted]] Local file validation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] RPC request {
+#   rpcName: 'reserve_wing_submission_upload',
+#   rpcArguments: {
+#     ratingIdPresent: true,
+#     destinationIdPresent: true,
+#     userIdPresent: false,
+#     mediaType: 'photo',
+#     mimeType: 'image/jpeg',
+#     expectedSizeBytes: 1234,
+#     consentVersionPresent: true,
+#     attributionPreferencePresent: true,
+#     captionPresent: false,
+#     idempotencyKeyPresent: true,
+#     correlationIdPresent: true,
+#     submissionSource: 'rating'
+#   }
+# }
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] Photo upload preparation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   preprocessing: 'client upload body preparation'
+# }
+# [WingShot][[id redacted]] Local file validation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] RPC request {
+#   rpcName: 'reserve_wing_submission_upload',
+#   rpcArguments: {
+#     ratingIdPresent: true,
+#     destinationIdPresent: true,
+#     userIdPresent: false,
+#     mediaType: 'photo',
+#     mimeType: 'image/jpeg',
+#     expectedSizeBytes: 1234,
+#     consentVersionPresent: true,
+#     attributionPreferencePresent: true,
+#     captionPresent: false,
+#     idempotencyKeyPresent: true,
+#     correlationIdPresent: true,
+#     submissionSource: 'rating'
+#   }
+# }
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] Photo upload preparation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   preprocessing: 'client upload body preparation'
+# }
+# [WingShot][[id redacted]] Local file validation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] RPC request {
+#   rpcName: 'reserve_wing_submission_upload',
+#   rpcArguments: {
+#     ratingIdPresent: true,
+#     destinationIdPresent: true,
+#     userIdPresent: false,
+#     mediaType: 'photo',
+#     mimeType: 'image/jpeg',
+#     expectedSizeBytes: 1234,
+#     consentVersionPresent: true,
+#     attributionPreferencePresent: true,
+#     captionPresent: false,
+#     idempotencyKeyPresent: true,
+#     correlationIdPresent: true,
+#     submissionSource: 'rating'
+#   }
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'reserve_wing_submission_upload',
+#   databaseCode: null,
+#   databaseMessage: null,
+#   clientClassification: null,
+#   retryAfterSeconds: null,
+#   exception: null,
+#   existingRecordFound: false,
+#   existingRecordId: '[id redacted]',
+#   existingRecordStatus: null,
+#   recordCreation: 'created'
+# }
+# [WingShot][[id redacted]] Supabase Storage upload {
+#   bucket: 'wing-submissions',
+#   objectPath: '…/[id redacted]/source',
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   supabaseError: null
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'finalize_wing_submission_upload',
+#   exception: null,
+#   existingRecordFound: true,
+#   existingRecordId: '[id redacted]',
+#   existingRecordStatus: 'in_review',
+#   recordCreation: 'updated'
+# }
+# [WingShot][[id redacted]] Database record creation/update {
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   supabaseError: null
+# }
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] Photo upload preparation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   preprocessing: 'client upload body preparation'
+# }
+# [WingShot][[id redacted]] Local file validation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] RPC request {
+#   rpcName: 'reserve_wing_submission_upload',
+#   rpcArguments: {
+#     ratingIdPresent: true,
+#     destinationIdPresent: true,
+#     userIdPresent: false,
+#     mediaType: 'photo',
+#     mimeType: 'image/jpeg',
+#     expectedSizeBytes: 1234,
+#     consentVersionPresent: true,
+#     attributionPreferencePresent: true,
+#     captionPresent: false,
+#     idempotencyKeyPresent: true,
+#     correlationIdPresent: true,
+#     submissionSource: 'rating'
+#   }
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'reserve_wing_submission_upload',
+#   databaseCode: null,
+#   databaseMessage: null,
+#   clientClassification: null,
+#   retryAfterSeconds: null,
+#   exception: null,
+#   existingRecordFound: false,
+#   existingRecordId: '[id redacted]',
+#   existingRecordStatus: null,
+#   recordCreation: 'created'
+# }
+# [WingShot][[id redacted]] Supabase Storage upload {
+#   bucket: 'wing-submissions',
+#   objectPath: '…/[id redacted]/source',
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   supabaseError: null
+# }
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] Photo upload preparation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   preprocessing: 'client upload body preparation'
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'finalize_wing_submission_upload',
+#   exception: null,
+#   existingRecordFound: true,
+#   existingRecordId: '[id redacted]',
+#   existingRecordStatus: 'in_review',
+#   recordCreation: 'updated'
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'reserve_wing_submission_upload',
+#   databaseCode: null,
+#   databaseMessage: 'wing_upload_rate_limit_exceeded',
+#   clientClassification: 'RATE_LIMITED',
+#   retryAfterSeconds: null,
+#   exception: {
+#     className: 'Object',
+#     name: null,
+#     code: null,
+#     internalCode: null,
+#     message: 'wing_upload_rate_limit_exceeded',
+#     details: null,
+#     hint: null,
+#     status: null,
+#     httpStatus: null,
+#     stage: null
+#   },
+#   existingRecordFound: false,
+#   existingRecordId: null,
+#   existingRecordStatus: null,
+#   recordCreation: 'failed'
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'reserve_wing_submission_upload',
+#   databaseCode: '42900',
+#   databaseMessage: 'wing_upload_rate_limit_exceeded',
+#   clientClassification: 'RATE_LIMITED',
+#   retryAfterSeconds: 75,
+#   exception: {
+#     className: 'Object',
+#     name: null,
+#     code: 'PGRST202',
+#     internalCode: 'PGRST202',
+#     message: 'RPC failed',
+#     details: null,
+#     hint: null,
+#     status: null,
+#     httpStatus: null,
+#     stage: null
+#   },
+#   existingRecordFound: false,
+#   existingRecordId: null,
+#   existingRecordStatus: null,
+#   recordCreation: 'failed'
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'reserve_wing_submission_upload',
+#   databaseCode: '42900',
+#   databaseMessage: 'wing_upload_rate_limit_exceeded',
+#   clientClassification: 'RATE_LIMITED',
+#   retryAfterSeconds: null,
+#   exception: {
+#     className: 'Object',
+#     name: null,
+#     code: '42900',
+#     internalCode: '42900',
+#     message: 'wing_upload_rate_limit_exceeded',
+#     details: null,
+#     hint: null,
+#     status: null,
+#     httpStatus: null,
+#     stage: null
+#   },
+#   existingRecordFound: false,
+#   existingRecordId: null,
+#   existingRecordStatus: null,
+#   recordCreation: 'failed'
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'finalize_wing_submission_upload',
+#   exception: {
+#     className: 'Object',
+#     name: null,
+#     code: null,
+#     internalCode: null,
+#     message: 'temporary',
+#     details: null,
+#     hint: null,
+#     status: null,
+#     httpStatus: null,
+#     stage: null
+#   },
+#   existingRecordFound: true,
+#   existingRecordId: '[id redacted]',
+#   existingRecordStatus: 'reserved',
+#   recordCreation: 'failed'
+# }
+# [WingShot][[id redacted]] Database record creation/update {
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   supabaseError: {
+#     className: 'Object',
+#     name: null,
+#     code: null,
+#     internalCode: null,
+#     message: 'temporary',
+#     details: null,
+#     hint: null,
+#     status: null,
+#     httpStatus: null,
+#     stage: null
+#   }
+# }
+# [WingShot][[id redacted]] Database record creation/update {
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   supabaseError: null
+# }
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] Photo upload preparation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   preprocessing: 'client upload body preparation'
+# }
+# [WingShot][[id redacted]] Local file validation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] RPC request {
+#   rpcName: 'reserve_wing_submission_upload',
+#   rpcArguments: {
+#     ratingIdPresent: true,
+#     destinationIdPresent: true,
+#     userIdPresent: false,
+#     mediaType: 'photo',
+#     mimeType: 'image/jpeg',
+#     expectedSizeBytes: 1234,
+#     consentVersionPresent: true,
+#     attributionPreferencePresent: true,
+#     captionPresent: false,
+#     idempotencyKeyPresent: true,
+#     correlationIdPresent: true,
+#     submissionSource: 'rating'
+#   }
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'reserve_wing_submission_upload',
+#   databaseCode: null,
+#   databaseMessage: null,
+#   clientClassification: null,
+#   retryAfterSeconds: null,
+#   exception: null,
+#   existingRecordFound: false,
+#   existingRecordId: '[id redacted]',
+#   existingRecordStatus: null,
+#   recordCreation: 'created'
+# }
+# [WingShot][[id redacted]] Supabase Storage upload {
+#   bucket: 'wing-submissions',
+#   objectPath: '…/[id redacted]/source',
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   supabaseError: null
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'finalize_wing_submission_upload',
+#   exception: {
+#     className: 'Object',
+#     name: null,
+#     code: '23505',
+#     internalCode: '23505',
+#     message: 'duplicate key wing_processing_jobs_submission_id_job_kind_generation_key',
+#     details: null,
+#     hint: null,
+#     status: null,
+#     httpStatus: null,
+#     stage: null
+#   },
+#   existingRecordFound: true,
+#   existingRecordId: '[id redacted]',
+#   existingRecordStatus: 'reserved',
+#   recordCreation: 'failed'
+# }
+# [WingShot][[id redacted]] Database record creation/update {
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   supabaseError: {
+#     className: 'Object',
+#     name: null,
+#     code: '23505',
+#     internalCode: '23505',
+#     message: 'duplicate key wing_processing_jobs_submission_id_job_kind_generation_key',
+#     details: null,
+#     hint: null,
+#     status: null,
+#     httpStatus: null,
+#     stage: null
+#   }
+# }
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] Photo upload preparation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   preprocessing: 'client upload body preparation'
+# }
+# [WingShot][[id redacted]] Local file validation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] RPC request {
+#   rpcName: 'reserve_wing_submission_upload',
+#   rpcArguments: {
+#     ratingIdPresent: true,
+#     destinationIdPresent: true,
+#     userIdPresent: false,
+#     mediaType: 'photo',
+#     mimeType: 'image/jpeg',
+#     expectedSizeBytes: 1234,
+#     consentVersionPresent: true,
+#     attributionPreferencePresent: true,
+#     captionPresent: false,
+#     idempotencyKeyPresent: true,
+#     correlationIdPresent: true,
+#     submissionSource: 'rating'
+#   }
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'reserve_wing_submission_upload',
+#   databaseCode: null,
+#   databaseMessage: null,
+#   clientClassification: null,
+#   retryAfterSeconds: null,
+#   exception: null,
+#   existingRecordFound: false,
+#   existingRecordId: '[id redacted]',
+#   existingRecordStatus: null,
+#   recordCreation: 'created'
+# }
+# [WingShot][[id redacted]] Supabase Storage upload {
+#   bucket: 'wing-submissions',
+#   objectPath: '…/[id redacted]/source',
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   supabaseError: {
+#     className: 'Object',
+#     name: null,
+#     code: null,
+#     internalCode: null,
+#     message: '[object Object]',
+#     details: null,
+#     hint: null,
+#     status: 503,
+#     httpStatus: 503,
+#     stage: null
+#   }
+# }
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] Photo upload preparation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   preprocessing: 'client upload body preparation'
+# }
+# [WingShot][[id redacted]] Local file validation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] RPC request {
+#   rpcName: 'reserve_wing_submission_upload',
+#   rpcArguments: {
+#     ratingIdPresent: true,
+#     destinationIdPresent: true,
+#     userIdPresent: false,
+#     mediaType: 'photo',
+#     mimeType: 'image/jpeg',
+#     expectedSizeBytes: 1234,
+#     consentVersionPresent: true,
+#     attributionPreferencePresent: true,
+#     captionPresent: false,
+#     idempotencyKeyPresent: true,
+#     correlationIdPresent: true,
+#     submissionSource: 'rating'
+#   }
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'reserve_wing_submission_upload',
+#   databaseCode: null,
+#   databaseMessage: null,
+#   clientClassification: null,
+#   retryAfterSeconds: null,
+#   exception: null,
+#   existingRecordFound: false,
+#   existingRecordId: '[id redacted]',
+#   existingRecordStatus: null,
+#   recordCreation: 'created'
+# }
+# [WingShot][[id redacted]] Supabase Storage upload {
+#   bucket: 'wing-submissions',
+#   objectPath: '…/[id redacted]/source',
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   supabaseError: null
+# }
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] Photo upload preparation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   preprocessing: 'client upload body preparation'
+# }
+# [WingShot][[id redacted]] Local file validation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] RPC request {
+#   rpcName: 'reserve_wing_submission_upload',
+#   rpcArguments: {
+#     ratingIdPresent: true,
+#     destinationIdPresent: true,
+#     userIdPresent: false,
+#     mediaType: 'photo',
+#     mimeType: 'image/jpeg',
+#     expectedSizeBytes: 1234,
+#     consentVersionPresent: true,
+#     attributionPreferencePresent: true,
+#     captionPresent: false,
+#     idempotencyKeyPresent: true,
+#     correlationIdPresent: true,
+#     submissionSource: 'rating'
+#   }
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'reserve_wing_submission_upload',
+#   databaseCode: null,
+#   databaseMessage: null,
+#   clientClassification: null,
+#   retryAfterSeconds: null,
+#   exception: null,
+#   existingRecordFound: false,
+#   existingRecordId: '[id redacted]',
+#   existingRecordStatus: null,
+#   recordCreation: 'created'
+# }
+# [WingShot][[id redacted]] Supabase Storage upload {
+#   bucket: 'wing-submissions',
+#   objectPath: '…/[id redacted]/source',
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   supabaseError: {
+#     className: 'Object',
+#     name: null,
+#     code: null,
+#     internalCode: null,
+#     message: 'already exists',
+#     details: null,
+#     hint: null,
+#     status: 409,
+#     httpStatus: 409,
+#     stage: null
+#   }
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'finalize_wing_submission_upload',
+#   exception: null,
+#   existingRecordFound: true,
+#   existingRecordId: '[id redacted]',
+#   existingRecordStatus: 'in_review',
+#   recordCreation: 'updated'
+# }
+# [WingShot][[id redacted]] Database record creation/update {
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   supabaseError: null
+# }
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] Photo upload preparation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   preprocessing: 'client upload body preparation'
+# }
+# [WingShot][[id redacted]] Local file validation {
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# [WingShot][[id redacted]] RPC request {
+#   rpcName: 'reserve_wing_submission_upload',
+#   rpcArguments: {
+#     ratingIdPresent: true,
+#     destinationIdPresent: true,
+#     userIdPresent: false,
+#     mediaType: 'photo',
+#     mimeType: 'image/jpeg',
+#     expectedSizeBytes: 1234,
+#     consentVersionPresent: true,
+#     attributionPreferencePresent: true,
+#     captionPresent: false,
+#     idempotencyKeyPresent: true,
+#     correlationIdPresent: true,
+#     submissionSource: 'rating'
+#   }
+# }
+# [WingShot][[id redacted]] RPC response {
+#   rpcName: 'reserve_wing_submission_upload',
+#   databaseCode: null,
+#   databaseMessage: null,
+#   clientClassification: null,
+#   retryAfterSeconds: null,
+#   exception: null,
+#   existingRecordFound: false,
+#   existingRecordId: '[id redacted]',
+#   existingRecordStatus: null,
+#   recordCreation: 'created'
+# }
+# [WingShot][[id redacted]] Supabase Storage upload {
+#   bucket: 'wing-submissions',
+#   objectPath: '…/[id redacted]/source',
+#   platform: 'Win32',
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 1234,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown',
+#   supabaseError: {
+#     className: 'Object',
+#     name: null,
+#     code: null,
+#     internalCode: null,
+#     message: '[object Object]',
+#     details: null,
+#     hint: null,
+#     status: 503,
+#     httpStatus: 503,
+#     stage: null
+#   }
+# }
+# [WingShot][[id redacted]] Upload preparation {
+#   platform: 'Win32',
+#   ratingIdPresent: true,
+#   destinationIdPresent: true,
+#   userIdPresent: false,
+#   mediaType: 'photo',
+#   mimeType: 'image/jpeg',
+#   fileExtension: 'unknown',
+#   fileSizeBytes: 4321,
+#   dimensions: null,
+#   localFileExists: true,
+#   localFileReadable: true,
+#   uriScheme: 'unknown'
+# }
+# Subtest: media validation rejects video uploads in the photo-only user path
+ok 131 - media validation rejects video uploads in the photo-only user path
+  ---
+  duration_ms: 1.9318
+  type: 'test'
+  ...
+# Subtest: submission requires affirmative consent and explicit attribution
+ok 132 - submission requires affirmative consent and explicit attribution
+  ---
+  duration_ms: 0.447
+  type: 'test'
+  ...
+# Subtest: upload uses only the exact reserved bucket and path before finalizing
+ok 133 - upload uses only the exact reserved bucket and path before finalizing
+  ---
+  duration_ms: 10.9685
+  type: 'test'
+  ...
+# Subtest: uploaded-object validation is a retryable safe domain failure
+ok 134 - uploaded-object validation is a retryable safe domain failure
+  ---
+  duration_ms: 3.9424
+  type: 'test'
+  ...
+# Subtest: reserve RPC code 42900 is classified as RATE_LIMITED
+ok 135 - reserve RPC code 42900 is classified as RATE_LIMITED
+  ---
+  duration_ms: 2.7526
+  type: 'test'
+  ...
+# Subtest: reserve RPC message classifies as RATE_LIMITED without a numeric code
+ok 136 - reserve RPC message classifies as RATE_LIMITED without a numeric code
+  ---
+  duration_ms: 3.0014
+  type: 'test'
+  ...
+# Subtest: wrapped Supabase rate-limit errors retain RATE_LIMITED classification and retry-after
+ok 137 - wrapped Supabase rate-limit errors retain RATE_LIMITED classification and retry-after
+  ---
+  duration_ms: 1.0065
+  type: 'test'
+  ...
+# Subtest: rate-limit copy confirms the rating was saved and never uses processing copy (legacy assertion)
+ok 138 - rate-limit copy confirms the rating was saved and never uses processing copy (legacy assertion) # SKIP
+  ---
+  duration_ms: 0.1448
+  type: 'test'
+  ...
+# Subtest: retry reuses the upload session and never creates a rating
+ok 139 - retry reuses the upload session and never creates a rating
+  ---
+  duration_ms: 2.8484
+  type: 'test'
+  ...
+# Subtest: retry after finalization failure does not upload twice
+ok 140 - retry after finalization failure does not upload twice
+  ---
+  duration_ms: 3.6493
+  type: 'test'
+  ...
+# Subtest: duplicate finalization after a timeout refreshes history and succeeds without reuploading
+ok 141 - duplicate finalization after a timeout refreshes history and succeeds without reuploading
+  ---
+  duration_ms: 2.4138
+  type: 'test'
+  ...
+# Subtest: storage interruption never calls finalize
+ok 142 - storage interruption never calls finalize
+  ---
+  duration_ms: 1.298
+  type: 'test'
+  ...
+# Subtest: cancel before reserve performs no network mutation
+ok 143 - cancel before reserve performs no network mutation
+  ---
+  duration_ms: 0.6805
+  type: 'test'
+  ...
+# Subtest: cancel during transport never finalizes the reserved submission
+ok 144 - cancel during transport never finalizes the reserved submission
+  ---
+  duration_ms: 1.0367
+  type: 'test'
+  ...
+# Subtest: existing reserved object is finalized rather than overwritten
+ok 145 - existing reserved object is finalized rather than overwritten
+  ---
+  duration_ms: 1.2345
+  type: 'test'
+  ...
+# Subtest: a reserved session cannot be reused for different media
+ok 146 - a reserved session cannot be reused for different media
+  ---
+  duration_ms: 1.7684
+  type: 'test'
+  ...
+# Subtest: flow is full-screen, scrollable, keyboard-safe, and post-rating optional
+ok 147 - flow is full-screen, scrollable, keyboard-safe, and post-rating optional
+  ---
+  duration_ms: 1.6062
+  type: 'test'
+  ...
+# Subtest: capture actions and stable selectors are present
+ok 148 - capture actions and stable selectors are present
+  ---
+  duration_ms: 1.7913
+  type: 'test'
+  ...
+# Subtest: consent is affirmative and attribution has no default
+ok 149 - consent is affirmative and attribution has no default
+  ---
+  duration_ms: 0.3759
+  type: 'test'
+  ...
+# Subtest: accessibility labels, reduced-motion-aware animation, and live status are explicit
+ok 150 - accessibility labels, reduced-motion-aware animation, and live status are explicit
+  ---
+  duration_ms: 0.2465
+  type: 'test'
+  ...
+# Subtest: fallback adapter does not ask for permissions or invent media
+ok 151 - fallback adapter does not ask for permissions or invent media
+  ---
+  duration_ms: 0.2487
+  type: 'test'
+  ...
+# Subtest: production adapter requests permissions only inside user actions
+ok 152 - production adapter requests permissions only inside user actions
+  ---
+  duration_ms: 0.3112
+  type: 'test'
+  ...
+# Subtest: photo preview remains image-only
+ok 153 - photo preview remains image-only
+  ---
+  duration_ms: 0.1879
+  type: 'test'
+  ...
+# Subtest: photo actions fail closed and video actions are absent
+ok 154 - photo actions fail closed and video actions are absent
+  ---
+  duration_ms: 0.3704
+  type: 'test'
+  ...
+# Subtest: optional post-rating skip is accessible, idempotent, and resets media state
+ok 155 - optional post-rating skip is accessible, idempotent, and resets media state
+  ---
+  duration_ms: 0.6541
+  type: 'test'
+  ...
+# Subtest: validation failures clear media and return to the empty state
+ok 156 - validation failures clear media and return to the empty state
+  ---
+  duration_ms: 1.0519
+  type: 'test'
+  ...
+# Subtest: selection automatically validates and submit is gated on valid state
+ok 157 - selection automatically validates and submit is gated on valid state
+  ---
+  duration_ms: 0.6208
+  type: 'test'
+  ...
+# Subtest: submit remains disabled without valid media and skip follows submit
+ok 158 - submit remains disabled without valid media and skip follows submit
+  ---
+  duration_ms: 0.5355
+  type: 'test'
+  ...
+# Subtest: privacy-safe Wing Shot analytics cover capture consent upload and failure
+ok 159 - privacy-safe Wing Shot analytics cover capture consent upload and failure
+  ---
+  duration_ms: 0.3805
+  type: 'test'
+  ...
+# Subtest: Wing Shot client feature flags fail closed and require resolved server decisions
+ok 160 - Wing Shot client feature flags fail closed and require resolved server decisions
+  ---
+  duration_ms: 2.3453
+  type: 'test'
+  ...
+# Subtest: Wing Shot native modules are SDK-pinned rather than blanket upgraded
+ok 161 - Wing Shot native modules are SDK-pinned rather than blanket upgraded
+  ---
+  duration_ms: 1.2655
+  type: 'test'
+  ...
+# Subtest: native permission copy is purpose-specific and configured through plugins
+ok 162 - native permission copy is purpose-specific and configured through plugins
+  ---
+  duration_ms: 1.1193
+  type: 'test'
+  ...
+# Subtest: onboarding does not import media modules or request media permissions
+ok 163 - onboarding does not import media modules or request media permissions
+  ---
+  duration_ms: 0.3513
+  type: 'test'
+  ...
+# Subtest: completed Home rating succeeds
+ok 164 - completed Home rating succeeds
+  ---
+  duration_ms: 1.601
+  type: 'test'
+  ...
+# Subtest: completed Crawl rating succeeds
+ok 165 - completed Crawl rating succeeds
+  ---
+  duration_ms: 0.2623
+  type: 'test'
+  ...
+# Subtest: administrative, missing, and in-person receipts do not affect eligibility
+ok 166 - administrative, missing, and in-person receipts do not affect eligibility
+  ---
+  duration_ms: 0.4427
+  type: 'test'
+  ...
+# Subtest: Buffacoin and incomplete ratings fail
+ok 167 - Buffacoin and incomplete ratings fail
+  ---
+  duration_ms: 0.1929
+  type: 'test'
+  ...
+# Subtest: ownership, destination, and not-found failures are safe and specific
+ok 168 - ownership, destination, and not-found failures are safe and specific
+  ---
+  duration_ms: 0.2973
+  type: 'test'
+  ...
+# Subtest: migration installs the exact reason vocabulary and duplicate guards
+ok 169 - migration installs the exact reason vocabulary and duplicate guards
+  ---
+  duration_ms: 0.4231
+  type: 'test'
+  ...
+# Subtest: authenticated crawl ratings use canonical provenance and prompt after any saved rating
+ok 170 - authenticated crawl ratings use canonical provenance and prompt after any saved rating
+  ---
+  duration_ms: 1.4736
+  type: 'test'
+  ...
+# Subtest: Home uses an idempotent server rating transaction while guests remain ineligible
+ok 171 - Home uses an idempotent server rating transaction while guests remain ineligible
+  ---
+  duration_ms: 0.5798
+  type: 'test'
+  ...
+# Subtest: skip closes only media flow and explicitly preserves the saved rating
+ok 172 - skip closes only media flow and explicitly preserves the saved rating
+  ---
+  duration_ms: 0.5688
+  type: 'test'
+  ...
+# Subtest: rating provenance does not gate the independent media seam
+ok 173 - rating provenance does not gate the independent media seam
+  ---
+  duration_ms: 1.2996
+  type: 'test'
+  ...
+# Subtest: home social links use native deep links with browser fallbacks
+ok 174 - home social links use native deep links with browser fallbacks
+  ---
+  duration_ms: 1.5641
+  type: 'test'
+  ...
+# Subtest: Wing Shot education and entry points never require proximity
+ok 175 - Wing Shot education and entry points never require proximity
+  ---
+  duration_ms: 0.5308
+  type: 'test'
+  ...
+# Subtest: analytics schema allowlists Wing Shot events and blocks private fields
+ok 176 - analytics schema allowlists Wing Shot events and blocks private fields
+  ---
+  duration_ms: 0.2294
+  type: 'test'
+  ...
+# Subtest: remote and admin-bypassed rating results both receive the optional prompt
+ok 177 - remote and admin-bypassed rating results both receive the optional prompt
+  ---
+  duration_ms: 1.7125
+  type: 'test'
+  ...
+# Subtest: independent sources are intentional and restaurant selection is searchable
+ok 178 - independent sources are intentional and restaurant selection is searchable
+  ---
+  duration_ms: 1.029
+  type: 'test'
+  ...
+# Subtest: rating and media are independent while source and restaurant are persisted
+ok 179 - rating and media are independent while source and restaurant are persisted
+  ---
+  duration_ms: 0.2472
+  type: 'test'
+  ...
+# Subtest: authentication and moderation boundaries remain server enforced
+ok 180 - authentication and moderation boundaries remain server enforced
+  ---
+  duration_ms: 3.1962
+  type: 'test'
+  ...
+# Subtest: account deletion prepares and completes Wing Shot cleanup before auth deletion
+ok 181 - account deletion prepares and completes Wing Shot cleanup before auth deletion
+  ---
+  duration_ms: 1.2005
+  type: 'test'
+  ...
+# Subtest: private deletion is bounded and fails closed without returning paths
+ok 182 - private deletion is bounded and fails closed without returning paths
+  ---
+  duration_ms: 0.4273
+  type: 'test'
+  ...
+# Subtest: admin queue is role and feature gated and exposes sanitized review context
+ok 183 - admin queue is role and feature gated and exposes sanitized review context
+  ---
+  duration_ms: 1.4841
+  type: 'test'
+  ...
+# Subtest: review actions are server allowlisted, require notes, and record human overrides
+ok 184 - review actions are server allowlisted, require notes, and record human overrides
+  ---
+  duration_ms: 0.5504
+  type: 'test'
+  ...
+# Subtest: admin claim remains one-time and role-bound; owner photo fallback stays privately authorized
+ok 185 - admin claim remains one-time and role-bound; owner photo fallback stays privately authorized
+  ---
+  duration_ms: 0.7952
+  type: 'test'
+  ...
+# Subtest: admin client uses only protected RPC and Edge Function boundaries
+ok 186 - admin client uses only protected RPC and Edge Function boundaries
+  ---
+  duration_ms: 0.4229
+  type: 'test'
+  ...
+# Subtest: route fails closed and exposes stable accessible selectors
+ok 187 - route fails closed and exposes stable accessible selectors
+  ---
+  duration_ms: 0.5651
+  type: 'test'
+  ...
+# Subtest: Creator rewards use normalized append-only receipts with database uniqueness
+ok 188 - Creator rewards use normalized append-only receipts with database uniqueness
+  ---
+  duration_ms: 3.0064
+  type: 'test'
+  ...
+# Subtest: only authoritative approved and real posted transitions award Creator XP
+ok 189 - only authoritative approved and real posted transitions award Creator XP
+  ---
+  duration_ms: 1.8287
+  type: 'test'
+  ...
+# Subtest: transition trigger is retry-safe for approval, feature, and withdrawal counterbalance
+ok 190 - transition trigger is retry-safe for approval, feature, and withdrawal counterbalance
+  ---
+  duration_ms: 0.6323
+  type: 'test'
+  ...
+# Subtest: fraud and revocation create negative ledger counterbalances without deleting audit
+ok 191 - fraud and revocation create negative ledger counterbalances without deleting audit
+  ---
+  duration_ms: 0.6433
+  type: 'test'
+  ...
+# Subtest: badges are centralized, threshold-derived, zero-XP, and auditable
+ok 192 - badges are centralized, threshold-derived, zero-XP, and auditable
+  ---
+  duration_ms: 0.5666
+  type: 'test'
+  ...
+# Subtest: weekly and all-time Creator read models honor social privacy and bound limits
+ok 193 - weekly and all-time Creator read models honor social privacy and bound limits
+  ---
+  duration_ms: 0.8582
+  type: 'test'
+  ...
+# Subtest: generic authenticated XP forgery is closed with a compatibility-only Facebook boundary
+ok 194 - generic authenticated XP forgery is closed with a compatibility-only Facebook boundary
+  ---
+  duration_ms: 1.2481
+  type: 'test'
+  ...
+# Subtest: reward mutation functions and tables remain service-only
+ok 195 - reward mutation functions and tables remain service-only
+  ---
+  duration_ms: 1.5371
+  type: 'test'
+  ...
+# Subtest: owner detail is private, sanitized, and exposes only real posted HTTPS links
+ok 196 - owner detail is private, sanitized, and exposes only real posted HTTPS links
+  ---
+  duration_ms: 1.2813
+  type: 'test'
+  ...
+# Subtest: Creator leaderboard is server gated, private, and uses Reputation copy
+ok 197 - Creator leaderboard is server gated, private, and uses Reputation copy
+  ---
+  duration_ms: 0.3889
+  type: 'test'
+  ...
+# Subtest: history and detail include stable selectors and understandable states
+ok 198 - history and detail include stable selectors and understandable states
+  ---
+  duration_ms: 0.4448
+  type: 'test'
+  ...
+# Subtest: unposted withdrawal and posted review are separate server-authoritative actions
+ok 199 - unposted withdrawal and posted review are separate server-authoritative actions
+  ---
+  duration_ms: 0.2777
+  type: 'test'
+  ...
+# Subtest: private preview broker verifies the caller and returns a short-lived signed URL
+ok 200 - private preview broker verifies the caller and returns a short-lived signed URL
+  ---
+  duration_ms: 0.3131
+  type: 'test'
+  ...
+# Subtest: new eligibility rule uses ownership, destination, scores, Buffacoin, and duplicate guards
+ok 201 - new eligibility rule uses ownership, destination, scores, Buffacoin, and duplicate guards
+  ---
+  duration_ms: 1.5176
+  type: 'test'
+  ...
+# Subtest: eligibility reason distinguishes safe ownership and product reasons
+ok 202 - eligibility reason distinguishes safe ownership and product reasons
+  ---
+  duration_ms: 0.2591
+  type: 'test'
+  ...
+# Subtest: reservation retains media, consent, idempotency, feature, private-path, and duplicate protections
+ok 203 - reservation retains media, consent, idempotency, feature, private-path, and duplicate protections
+  ---
+  duration_ms: 0.4122
+  type: 'test'
+  ...
+# Subtest: client maps the revised product errors without in-person messaging
+ok 204 - client maps the revised product errors without in-person messaging
+  ---
+  duration_ms: 0.3939
+  type: 'test'
+  ...
+# Subtest: photo media remains supported while legacy video rows remain reviewable
+ok 205 - photo media remains supported while legacy video rows remain reviewable
+  ---
+  duration_ms: 6.5305
+  type: 'test'
+  ...
+# Subtest: every required Wing Shots capability is independently controlled
+ok 206 - every required Wing Shots capability is independently controlled
+  ---
+  duration_ms: 1.5826
+  type: 'test'
+  ...
+# Subtest: operational flags default disabled with zero rollout
+ok 207 - operational flags default disabled with zero rollout
+  ---
+  duration_ms: 0.3689
+  type: 'test'
+  ...
+# Subtest: flag decisions are deterministic, authenticated, and read-only
+ok 208 - flag decisions are deterministic, authenticated, and read-only
+  ---
+  duration_ms: 0.4165
+  type: 'test'
+  ...
+# Subtest: generation context is claim-bound and exposes processed media only
+ok 209 - generation context is claim-bound and exposes processed media only
+  ---
+  duration_ms: 1.4133
+  type: 'test'
+  ...
+# Subtest: generation completion proves community source and accessible alt text
+ok 210 - generation completion proves community source and accessible alt text
+  ---
+  duration_ms: 0.3516
+  type: 'test'
+  ...
+# Subtest: generation failures use bounded retries and dead-letter transition
+ok 211 - generation failures use bounded retries and dead-letter transition
+  ---
+  duration_ms: 1.1791
+  type: 'test'
+  ...
+# Subtest: generation worker RPCs are service-role only
+ok 212 - generation worker RPCs are service-role only
+  ---
+  duration_ms: 0.3448
+  type: 'test'
+  ...
+# Subtest: Home rating persistence is authenticated, server-authoritative, and idempotent
+ok 213 - Home rating persistence is authenticated, server-authoritative, and idempotent
+  ---
+  duration_ms: 1.1672
+  type: 'test'
+  ...
+# Subtest: only proximity-verified non-admin Home ratings become Wing Shot eligible
+ok 214 - only proximity-verified non-admin Home ratings become Wing Shot eligible
+  ---
+  duration_ms: 0.3777
+  type: 'test'
+  ...
+# Subtest: rating, provenance, operation receipt, and referral settlement share one transaction
+ok 215 - rating, provenance, operation receipt, and referral settlement share one transaction
+  ---
+  duration_ms: 0.2587
+  type: 'test'
+  ...
+# Subtest: legacy jalapeno media buckets are made private without deleting history
+ok 216 - legacy jalapeno media buckets are made private without deleting history
+  ---
+  duration_ms: 1.3096
+  type: 'test'
+  ...
+# Subtest: legacy reusable video inventory and automation settings are disabled
+ok 217 - legacy reusable video inventory and automation settings are disabled
+  ---
+  duration_ms: 0.2592
+  type: 'test'
+  ...
+# Subtest: moderation contract is structured, versioned, bounded, and advisory
+ok 218 - moderation contract is structured, versioned, bounded, and advisory
+  ---
+  duration_ms: 1.6356
+  type: 'test'
+  ...
+# Subtest: thresholds route unsafe and uncertain content without auto-approval
+ok 219 - thresholds route unsafe and uncertain content without auto-approval
+  ---
+  duration_ms: 0.4022
+  type: 'test'
+  ...
+# Subtest: upload abuse controls enforce suspension and bounded hourly/daily rates
+ok 220 - upload abuse controls enforce suspension and bounded hourly/daily rates
+  ---
+  duration_ms: 0.2549
+  type: 'test'
+  ...
+# Subtest: fingerprints create auditable duplicate signals and force review
+ok 221 - fingerprints create auditable duplicate signals and force review
+  ---
+  duration_ms: 0.2378
+  type: 'test'
+  ...
+# Subtest: processing claims use skip-locked leases, stale recovery, backoff, and dead state
+ok 222 - processing claims use skip-locked leases, stale recovery, backoff, and dead state
+  ---
+  duration_ms: 0.2422
+  type: 'test'
+  ...
+# Subtest: admin queue is role-gated and excludes raw results and storage paths
+ok 223 - admin queue is role-gated and excludes raw results and storage paths
+  ---
+  duration_ms: 0.3018
+  type: 'test'
+  ...
+# Subtest: human review is authoritative, audited, idempotent, and requires override notes
+ok 224 - human review is authoritative, audited, idempotent, and requires override notes
+  ---
+  duration_ms: 0.2453
+  type: 'test'
+  ...
+# Subtest: nightly selection is atomic, business-date unique, transparent, and cleanly skips
+ok 225 - nightly selection is atomic, business-date unique, transparent, and cleanly skips
+  ---
+  duration_ms: 0.2729
+  type: 'test'
+  ...
+# Subtest: manual priority cannot bypass safety, wing, duplicate, or abuse filters
+ok 226 - manual priority cannot bypass safety, wing, duplicate, or abuse filters
+  ---
+  duration_ms: 0.4463
+  type: 'test'
+  ...
+# Subtest: generation is leased and creates recoverable independent platform jobs
+ok 227 - generation is leased and creates recoverable independent platform jobs
+  ---
+  duration_ms: 0.6201
+  type: 'test'
+  ...
+# Subtest: new control tables are RLS protected and worker RPCs are service-only
+ok 228 - new control tables are RLS protected and worker RPCs are service-only
+  ---
+  duration_ms: 0.5166
+  type: 'test'
+  ...
+# Subtest: submission transitions enqueue approved rejected and featured events once
+ok 229 - submission transitions enqueue approved rejected and featured events once
+  ---
+  duration_ms: 1.7704
+  type: 'test'
+  ...
+# Subtest: featured copy is celebratory and deep-links to the featured submission
+ok 230 - featured copy is celebratory and deep-links to the featured submission
+  ---
+  duration_ms: 0.2652
+  type: 'test'
+  ...
+# Subtest: notifications honor feature flag preference quiet hours and source state
+ok 231 - notifications honor feature flag preference quiet hours and source state
+  ---
+  duration_ms: 0.4772
+  type: 'test'
+  ...
+# Subtest: notification provider outcome is independent and receipts are auditable
+ok 232 - notification provider outcome is independent and receipts are auditable
+  ---
+  duration_ms: 0.7337
+  type: 'test'
+  ...
+# Subtest: processing worker contract automatically enqueues and supports bounded backfill
+ok 233 - processing worker contract automatically enqueues and supports bounded backfill
+  ---
+  duration_ms: 2.961
+  type: 'test'
+  ...
+# Subtest: claim-bound context exposes deterministic private paths only to service role
+ok 234 - claim-bound context exposes deterministic private paths only to service role
+  ---
+  duration_ms: 0.6684
+  type: 'test'
+  ...
+# Subtest: successful settlement verifies both protected objects before human review
+ok 235 - successful settlement verifies both protected objects before human review
+  ---
+  duration_ms: 0.759
+  type: 'test'
+  ...
+# Subtest: failure settlement delegates bounded retry and dead-letters submission state
+ok 236 - failure settlement delegates bounded retry and dead-letters submission state
+  ---
+  duration_ms: 0.5449
+  type: 'test'
+  ...
+# Subtest: original retention is bounded, configurable, and cleanup is auditable
+ok 237 - original retention is bounded, configurable, and cleanup is auditable
+  ---
+  duration_ms: 0.6801
+  type: 'test'
+  ...
+# Subtest: cleanup targets originals only and leaves processed/publication assets alone
+ok 238 - cleanup targets originals only and leaves processed/publication assets alone
+  ---
+  duration_ms: 0.7449
+  type: 'test'
+  ...
+# Subtest: publisher claim uses a bounded lease, stale recovery, and skip locked
+ok 239 - publisher claim uses a bounded lease, stale recovery, and skip locked
+  ---
+  duration_ms: 1.4844
+  type: 'test'
+  ...
+# Subtest: platform results remain independent and safe receipts reject secrets
+ok 240 - platform results remain independent and safe receipts reject secrets
+  ---
+  duration_ms: 1.5204
+  type: 'test'
+  ...
+# Subtest: first real success transitions once and lets existing triggers settle rewards and notification
+ok 241 - first real success transitions once and lets existing triggers settle rewards and notification
+  ---
+  duration_ms: 0.2954
+  type: 'test'
+  ...
+# Subtest: dry run cannot produce a real post or feature transition
+ok 242 - dry run cannot produce a real post or feature transition
+  ---
+  duration_ms: 0.3196
+  type: 'test'
+  ...
+# Subtest: live approval is role and feature-flag gated
+ok 243 - live approval is role and feature-flag gated
+  ---
+  duration_ms: 0.3034
+  type: 'test'
+  ...
+# Subtest: publishing mutation RPCs are service-only
+ok 244 - publishing mutation RPCs are service-only
+  ---
+  duration_ms: 0.4921
+  type: 'test'
+  ...
+# Subtest: creates normalized durable rating verification receipts without raw coordinates
+ok 245 - creates normalized durable rating verification receipts without raw coordinates
+  ---
+  duration_ms: 2.5863
+  type: 'test'
+  ...
+# Subtest: receipt eligibility shape permits only verified in-person provenance
+ok 246 - receipt eligibility shape permits only verified in-person provenance
+  ---
+  duration_ms: 0.4724
+  type: 'test'
+  ...
+# Subtest: receipts are append-only and unavailable for direct client mutation
+ok 247 - receipts are append-only and unavailable for direct client mutation
+  ---
+  duration_ms: 0.6273
+  type: 'test'
+  ...
+# Subtest: canonical rating RPC rejects incomplete scores and preserves in-person validation
+ok 248 - canonical rating RPC rejects incomplete scores and preserves in-person validation
+  ---
+  duration_ms: 0.4039
+  type: 'test'
+  ...
+# Subtest: canonical RPC persists rating before provenance and excludes administrative bypass
+ok 249 - canonical RPC persists rating before provenance and excludes administrative bypass
+  ---
+  duration_ms: 0.3699
+  type: 'test'
+  ...
+# Subtest: failed rating cannot leave provenance because persistence and settlement share a transaction
+ok 250 - failed rating cannot leave provenance because persistence and settlement share a transaction
+  ---
+  duration_ms: 0.2177
+  type: 'test'
+  ...
+# Subtest: eligibility predicate fails closed for BuffaCoin incomplete or unverified ratings
+ok 251 - eligibility predicate fails closed for BuffaCoin incomplete or unverified ratings
+  ---
+  duration_ms: 0.4289
+  type: 'test'
+  ...
+# Subtest: owner eligibility RPC sanitizes results and treats absent provenance as unverified
+ok 252 - owner eligibility RPC sanitizes results and treats absent provenance as unverified
+  ---
+  duration_ms: 0.3325
+  type: 'test'
+  ...
+# Subtest: migration does not backfill legacy onboarding imported or direct ratings
+ok 253 - migration does not backfill legacy onboarding imported or direct ratings
+  ---
+  duration_ms: 0.6741
+  type: 'test'
+  ...
+# Subtest: all Wing Shots core and boundary tables enable RLS and revoke client table access
+ok 254 - all Wing Shots core and boundary tables enable RLS and revoke client table access
+  ---
+  duration_ms: 1.9626
+  type: 'test'
+  ...
+# Subtest: upload reservation is owner-bound, bounded, affirmative-consent based, and idempotent
+ok 255 - upload reservation is owner-bound, bounded, affirmative-consent based, and idempotent
+  ---
+  duration_ms: 0.4822
+  type: 'test'
+  ...
+# Subtest: private Storage policy allows only an exact active owner reservation
+ok 256 - private Storage policy allows only an exact active owner reservation
+  ---
+  duration_ms: 0.4475
+  type: 'test'
+  ...
+# Subtest: finalization proves the private object exists before creating authoritative submission state
+ok 257 - finalization proves the private object exists before creating authoritative submission state
+  ---
+  duration_ms: 0.3138
+  type: 'test'
+  ...
+# Subtest: state changes use expected-state locking and the explicit non-terminal graph
+ok 258 - state changes use expected-state locking and the explicit non-terminal graph
+  ---
+  duration_ms: 0.46
+  type: 'test'
+  ...
+# Subtest: owner withdrawal cannot affect another user or terminal content
+ok 259 - owner withdrawal cannot affect another user or terminal content
+  ---
+  duration_ms: 0.4028
+  type: 'test'
+  ...
+# Subtest: history is owner-scoped and excludes storage, moderation, and reviewer internals
+ok 260 - history is owner-scoped and excludes storage, moderation, and reviewer internals
+  ---
+  duration_ms: 0.5504
+  type: 'test'
+  ...
+# Subtest: media access uses a five-minute opaque request and exposes paths only to service role
+ok 261 - media access uses a five-minute opaque request and exposes paths only to service role
+  ---
+  duration_ms: 0.3932
+  type: 'test'
+  ...
+# Subtest: account deletion pseudonymizes owners and emits a service-only private-object manifest
+ok 262 - account deletion pseudonymizes owners and emits a service-only private-object manifest
+  ---
+  duration_ms: 0.8648
+  type: 'test'
+  ...
+# Subtest: server enforces staged prompt and media-type feature flags
+ok 263 - server enforces staged prompt and media-type feature flags
+  ---
+  duration_ms: 0.6867
+  type: 'test'
+  ...
+# Subtest: social rewards describe visits and explicitly deny follow verification
+ok 264 - social rewards describe visits and explicitly deny follow verification
+  ---
+  duration_ms: 1.9724
+  type: 'test'
+  ...
+# Subtest: visit completion is owner-bound, delayed, expiring, and one-time
+ok 265 - visit completion is owner-bound, delayed, expiring, and one-time
+  ---
+  duration_ms: 0.4695
+  type: 'test'
+  ...
+# Subtest: community XP is modest, idempotent, and cannot be claimed by direct table writes
+ok 266 - community XP is modest, idempotent, and cannot be claimed by direct table writes
+  ---
+  duration_ms: 2.3531
+  type: 'test'
+  ...
+# Subtest: award records are append-only except one-way deletion pseudonymization
+ok 267 - award records are append-only except one-way deletion pseudonymization
+  ---
+  duration_ms: 0.3694
+  type: 'test'
+  ...
+# Subtest: expired intent history is preserved while only active ratings stay unique
+ok 268 - expired intent history is preserved while only active ratings stay unique
+  ---
+  duration_ms: 2.2074
+  type: 'test'
+  ...
+# Subtest: terminal intents cannot be revived and new paths use a fresh submission UUID
+ok 269 - terminal intents cannot be revived and new paths use a fresh submission UUID
+  ---
+  duration_ms: 1.4497
+  type: 'test'
+  ...
+# Subtest: fresh reservation retains all owner eligibility flag and rate-limit controls
+ok 270 - fresh reservation retains all owner eligibility flag and rate-limit controls
+  ---
+  duration_ms: 0.63
+  type: 'test'
+  ...
+# Subtest: rating lock and partial uniqueness prevent parallel active reservations
+ok 271 - rating lock and partial uniqueness prevent parallel active reservations
+  ---
+  duration_ms: 0.4509
+  type: 'test'
+  ...
+# Subtest: idempotent replay returns immutable history without reactivating the intent
+ok 272 - idempotent replay returns immutable history without reactivating the intent
+  ---
+  duration_ms: 0.5579
+  type: 'test'
+  ...
+# Subtest: the migration installs exactly the client-authoritative RPC identity
+ok 273 - the migration installs exactly the client-authoritative RPC identity
+  ---
+  duration_ms: 2.492
+  type: 'test'
+  ...
+# Subtest: the client sends all eleven named parameters and has no legacy fallback
+ok 274 - the client sends all eleven named parameters and has no legacy fallback
+  ---
+  duration_ms: 0.6526
+  type: 'test'
+  ...
+# Subtest: image and video limits match the private bucket contract
+ok 275 - image and video limits match the private bucket contract
+  ---
+  duration_ms: 3.0565
+  type: 'test'
+  ...
+# Subtest: legacy video media is rejected by the new user upload validator
+ok 276 - legacy video media is rejected by the new user upload validator
+  ---
+  duration_ms: 0.8966
+  type: 'test'
+  ...
+# Subtest: client progression uses the evidence-backed RPC, not generic award_xp
+ok 277 - client progression uses the evidence-backed RPC, not generic award_xp
+  ---
+  duration_ms: 1.5966
+  type: 'test'
+  ...
+# Subtest: rating XP requires a verified in-person non-BuffaCoin rating
+ok 278 - rating XP requires a verified in-person non-BuffaCoin rating
+  ---
+  duration_ms: 0.2573
+  type: 'test'
+  ...
+# Subtest: server derives fixed amounts and idempotency from durable evidence
+ok 279 - server derives fixed amounts and idempotency from durable evidence
+  ---
+  duration_ms: 1.3188
+  type: 'test'
+  ...
+# Subtest: crawl completion XP requires an owned completed crawl and all route stops rated
+ok 280 - crawl completion XP requires an owned completed crawl and all route stops rated
+  ---
+  duration_ms: 0.2429
+  type: 'test'
+  ...
+# Subtest: generic XP remains private while verified claim is authenticated
+ok 281 - generic XP remains private while verified claim is authenticated
+  ---
+  duration_ms: 0.2861
+  type: 'test'
+  ...
+# Subtest: version 17 limiter allows exactly ten simultaneous signed-in requests and denies client execution
+ok 282 - version 17 limiter allows exactly ten simultaneous signed-in requests and denies client execution # SKIP
+  ---
+  duration_ms: 0.8922
+  type: 'test'
+  ...
+# RATE LIMIT DEPENDENCY ERROR: 42883
+# RATE LIMIT DEPENDENCY ERROR: invalid_rate_limit_response
+# RATE LIMIT DEPENDENCY ERROR: invalid_rate_limit_response
+# RATE LIMIT DEPENDENCY ERROR: 42883
+# Subtest: shared approval: wing score 0.499
+ok 283 - shared approval: wing score 0.499
+  ---
+  duration_ms: 1.4556
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score 0.5
+ok 284 - shared approval: wing score 0.5
+  ---
+  duration_ms: 0.2103
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score 0.501
+ok 285 - shared approval: wing score 0.501
+  ---
+  duration_ms: 0.084
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score null
+ok 286 - shared approval: wing score null
+  ---
+  duration_ms: 0.07
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score undefined
+ok 287 - shared approval: wing score undefined
+  ---
+  duration_ms: 0.141
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score 50%
+ok 288 - shared approval: wing score 50%
+  ---
+  duration_ms: 0.1258
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score 50
+ok 289 - shared approval: wing score 50
+  ---
+  duration_ms: 0.0636
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score NaN
+ok 290 - shared approval: wing score NaN
+  ---
+  duration_ms: 0.0613
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score Infinity
+ok 291 - shared approval: wing score Infinity
+  ---
+  duration_ms: 0.2519
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score true
+ok 292 - shared approval: wing score true
+  ---
+  duration_ms: 0.3257
+  type: 'test'
+  ...
+# Subtest: shared approval: wing score
+ok 293 - shared approval: wing score
+  ---
+  duration_ms: 0.1852
+  type: 'test'
+  ...
+# Subtest: a wing score cannot replace match, location, verification, or contradictory evidence
+ok 294 - a wing score cannot replace match, location, verification, or contradictory evidence
+  ---
+  duration_ms: 0.2315
+  type: 'test'
+  ...
+# Subtest: mobile decision at 0.499
+ok 295 - mobile decision at 0.499
+  ---
+  duration_ms: 88.5739
+  type: 'test'
+  ...
+# Subtest: mobile decision at 0.5
+ok 296 - mobile decision at 0.5
+  ---
+  duration_ms: 56.4045
+  type: 'test'
+  ...
+# Subtest: mobile decision at 0.501
+ok 297 - mobile decision at 0.501
+  ---
+  duration_ms: 53.5254
+  type: 'test'
+  ...
+# Subtest: mobile decision at null
+ok 298 - mobile decision at null
+  ---
+  duration_ms: 38.6761
+  type: 'test'
+  ...
+# Subtest: second pass never replaces missing scores and preserves conflicting evidence/location
+ok 299 - second pass never replaces missing scores and preserves conflicting evidence/location
+  ---
+  duration_ms: 85.3587
+  type: 'test'
+  ...
+# Subtest: existing destination lookup does not invent confidence or authorize new creation
+ok 300 - existing destination lookup does not invent confidence or authorize new creation
+  ---
+  duration_ms: 31.5548
+  type: 'test'
+  ...
+# Subtest: authoritative insertion at 0.499
+ok 301 - authoritative insertion at 0.499
+  ---
+  duration_ms: 109.9794
+  type: 'test'
+  ...
+# Subtest: authoritative insertion at 0.5
+ok 302 - authoritative insertion at 0.5
+  ---
+  duration_ms: 56.3435
+  type: 'test'
+  ...
+# Subtest: authoritative insertion at 0.501
+ok 303 - authoritative insertion at 0.501
+  ---
+  duration_ms: 62.7086
+  type: 'test'
+  ...
+# Subtest: authoritative insertion at null
+ok 304 - authoritative insertion at null
+  ---
+  duration_ms: 49.4724
+  type: 'test'
+  ...
+# Subtest: insertion blocked: missingMatch
+ok 305 - insertion blocked: missingMatch
+  ---
+  duration_ms: 51.7956
+  type: 'test'
+  ...
+# Subtest: insertion blocked: lowMatch
+ok 306 - insertion blocked: lowMatch
+  ---
+  duration_ms: 46.5956
+  type: 'test'
+  ...
+# Subtest: insertion blocked: notRestaurant
+ok 307 - insertion blocked: notRestaurant
+  ---
+  duration_ms: 43.9645
+  type: 'test'
+  ...
+# Subtest: insertion blocked: ambiguity
+ok 308 - insertion blocked: ambiguity
+  ---
+  duration_ms: 51.4929
+  type: 'test'
+  ...
+# Subtest: insertion blocked: modelConflict
+ok 309 - insertion blocked: modelConflict
+  ---
+  duration_ms: 50.0345
+  type: 'test'
+  ...
+# Subtest: insertion blocked: negativeMenu
+ok 310 - insertion blocked: negativeMenu
+  ---
+  duration_ms: 52.5345
+  type: 'test'
+  ...
+# Subtest: insertion blocked: wrongState
+ok 311 - insertion blocked: wrongState
+  ---
+  duration_ms: 32.5913
+  type: 'test'
+  ...
+# Subtest: insertion blocked: failedPlaces
+ok 312 - insertion blocked: failedPlaces
+  ---
+  duration_ms: 40.7824
+  type: 'test'
+  ...
+# Subtest: insertion blocked: ambiguousPlaces
+ok 313 - insertion blocked: ambiguousPlaces
+  ---
+  duration_ms: 39.2857
+  type: 'test'
+  ...
+# Subtest: existing unique destination is reused before external calls; conflicting city is not a match
+ok 314 - existing unique destination is reused before external calls; conflicting city is not a match
+  ---
+  duration_ms: 66.459
+  type: 'test'
+  ...
+# Subtest: deployed rate-limit repair is byte-equivalent and still blocks before provider work
+ok 315 - deployed rate-limit repair is byte-equivalent and still blocks before provider work
+  ---
+  duration_ms: 73.2493
+  type: 'test'
+  ...
+# Subtest: menu negative evidence ignores scripts and ingredient claims
+ok 316 - menu negative evidence ignores scripts and ingredient claims
+  ---
+  duration_ms: 0.2873
+  type: 'test'
+  ...
+# Subtest: menu retrieval keeps official excerpts and rejects private DNS and foreign redirects
+ok 317 - menu retrieval keeps official excerpts and rejects private DNS and foreign redirects
+  ---
+  duration_ms: 10.352
+  type: 'test'
+  ...
+# Subtest: atomic limiter fails closed on dependency errors or malformed results
+ok 318 - atomic limiter fails closed on dependency errors or malformed results
+  ---
+  duration_ms: 70.7252
+  type: 'test'
+  ...
+# Subtest: verified creation preserves caller ownership: fixture-token
+ok 319 - verified creation preserves caller ownership: fixture-token
+  ---
+  duration_ms: 46.0464
+  type: 'test'
+  ...
+# Subtest: verified creation preserves caller ownership: synthetic-secret
+ok 320 - verified creation preserves caller ownership: synthetic-secret
+  ---
+  duration_ms: 41.5504
+  type: 'test'
+  ...
+# Subtest: invalid caller cannot downgrade to guest: null
+ok 321 - invalid caller cannot downgrade to guest: null
+  ---
+  duration_ms: 15.8185
+  type: 'test'
+  ...
+# Subtest: invalid caller cannot downgrade to guest: expired
+ok 322 - invalid caller cannot downgrade to guest: expired
+  ---
+  duration_ms: 16.2278
+  type: 'test'
+  ...
+# Subtest: invalid caller cannot downgrade to guest: forged
+ok 323 - invalid caller cannot downgrade to guest: forged
+  ---
+  duration_ms: 19.55
+  type: 'test'
+  ...
+# Subtest: invalid caller cannot downgrade to guest: device-id
+ok 324 - invalid caller cannot downgrade to guest: device-id
+  ---
+  duration_ms: 16.8954
+  type: 'test'
+  ...
+# Subtest: guest still fails closed on limiter, missing IP and unverified location
+ok 325 - guest still fails closed on limiter, missing IP and unverified location
+  ---
+  duration_ms: 96.8441
+  type: 'test'
+  ...
+# Subtest: invalid input returns 400 before providers: {"action":"arbitrary"}
+ok 326 - invalid input returns 400 before providers: {"action":"arbitrary"}
+  ---
+  duration_ms: 15.7685
+  type: 'test'
+  ...
+# Subtest: invalid input returns 400 before providers: {"stateId":1.5}
+ok 327 - invalid input returns 400 before providers: {"stateId":1.5}
+  ---
+  duration_ms: 18.5194
+  type: 'test'
+  ...
+# Subtest: invalid input returns 400 before providers: {"stateId":-1}
+ok 328 - invalid input returns 400 before providers: {"stateId":-1}
+  ---
+  duration_ms: 18.7106
+  type: 'test'
+  ...
+# Subtest: invalid input returns 400 before providers: {"restaurant":42}
+ok 329 - invalid input returns 400 before providers: {"restaurant":42}
+  ---
+  duration_ms: 20.7374
+  type: 'test'
+  ...
+# Subtest: invalid input returns 400 before providers: {"extraInfo":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ok 330 - invalid input returns 400 before providers: {"extraInfo":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  ---
+  duration_ms: 15.8904
+  type: 'test'
+  ...
+# Subtest: backend dependency timeout returns a response: auth
+ok 331 - backend dependency timeout returns a response: auth
+  ---
+  duration_ms: 38.9507
+  type: 'test'
+  ...
+# Subtest: backend dependency timeout returns a response: state
+ok 332 - backend dependency timeout returns a response: state
+  ---
+  duration_ms: 48.1948
+  type: 'test'
+  ...
+# Subtest: backend dependency timeout returns a response: limiter
+ok 333 - backend dependency timeout returns a response: limiter
+  ---
+  duration_ms: 32.2538
+  type: 'test'
+  ...
+# Subtest: backend dependency timeout returns a response: create
+ok 334 - backend dependency timeout returns a response: create
+  ---
+  duration_ms: 61.5889
+  type: 'test'
+  ...
+# Subtest: backend dependency timeout returns a response: model-fetch
+ok 335 - backend dependency timeout returns a response: model-fetch
+  ---
+  duration_ms: 46.5269
+  type: 'test'
+  ...
+# Subtest: backend dependency timeout returns a response: model-body
+ok 336 - backend dependency timeout returns a response: model-body
+  ---
+  duration_ms: 46.6095
+  type: 'test'
+  ...
+# Subtest: rate-limit bucket ignores a spoofed first forwarded IP
+ok 337 - rate-limit bucket ignores a spoofed first forwarded IP
+  ---
+  duration_ms: 49.3728
+  type: 'test'
+  ...
+# Subtest: neutral insertion and legacy mobile approval: unknown
+ok 338 - neutral insertion and legacy mobile approval: unknown
+  ---
+  duration_ms: 59.3035
+  type: 'test'
+  ...
+# Subtest: neutral insertion and legacy mobile approval: incomplete
+ok 339 - neutral insertion and legacy mobile approval: incomplete
+  ---
+  duration_ms: 62.1068
+  type: 'test'
+  ...
+# Subtest: neutral insertion and legacy mobile approval: unavailable
+ok 340 - neutral insertion and legacy mobile approval: unavailable
+  ---
+  duration_ms: 55.0284
+  type: 'test'
+  ...
+# Subtest: neutral insertion and legacy mobile approval: conflicting
+ok 341 - neutral insertion and legacy mobile approval: conflicting
+  ---
+  duration_ms: 52.9606
+  type: 'test'
+  ...
+# Subtest: neutral insertion and legacy mobile approval: callerNegative
+ok 342 - neutral insertion and legacy mobile approval: callerNegative
+  ---
+  duration_ms: 52.7559
+  type: 'test'
+  ...
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 401, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 429, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 500, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 401, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 429, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 500, clone: [Function: clone] }
+# }
+# Subtest: whole-operation timeout, cancellation and stalled error body are bounded
+ok 343 - whole-operation timeout, cancellation and stalled error body are bounded
+  ---
+  duration_ms: 2065.5271
+  type: 'test'
+  ...
+# Subtest: search/add/select succeeds and repeated taps are suppressed: null
+ok 344 - search/add/select succeeds and repeated taps are suppressed: null
+  ---
+  duration_ms: 92.8537
+  type: 'test'
+  ...
+# Subtest: search/add/select succeeds and repeated taps are suppressed: signed-in
+ok 345 - search/add/select succeeds and repeated taps are suppressed: signed-in
+  ---
+  duration_ms: 73.0334
+  type: 'test'
+  ...
+# Subtest: HTTP 401 (null) exits loading and preserves restaurant for retry
+ok 346 - HTTP 401 (null) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 39.1197
+  type: 'test'
+  ...
+# Subtest: HTTP 429 (null) exits loading and preserves restaurant for retry
+ok 347 - HTTP 429 (null) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 41.3401
+  type: 'test'
+  ...
+# Subtest: HTTP 422 (null) exits loading and preserves restaurant for retry
+ok 348 - HTTP 422 (null) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 33.5839
+  type: 'test'
+  ...
+# Subtest: HTTP 500 (null) exits loading and preserves restaurant for retry
+ok 349 - HTTP 500 (null) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 34.4584
+  type: 'test'
+  ...
+# Subtest: HTTP 401 (signed-in) exits loading and preserves restaurant for retry
+ok 350 - HTTP 401 (signed-in) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 31.1154
+  type: 'test'
+  ...
+# Subtest: HTTP 429 (signed-in) exits loading and preserves restaurant for retry
+ok 351 - HTTP 429 (signed-in) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 24.6234
+  type: 'test'
+  ...
+# Subtest: HTTP 422 (signed-in) exits loading and preserves restaurant for retry
+ok 352 - HTTP 422 (signed-in) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 28.6168
+  type: 'test'
+  ...
+# Subtest: HTTP 500 (signed-in) exits loading and preserves restaurant for retry
+ok 353 - HTTP 500 (signed-in) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 19.5051
+  type: 'test'
+  ...
+# Subtest: 422 with stalled parsing exits loading and defers guest review locally
+ok 354 - 422 with stalled parsing exits loading and defers guest review locally
+  ---
+  duration_ms: 33.9455
+  type: 'test'
+  ...
+# runWingman failed: Error: Wingman took too long. Please try again; your details are still here.
+#     at Timeout.<anonymous> (evalmachine.<anonymous>:12:60)
+#     at listOnTimeout (node:internal/timers:588:17)
+#     at process.processTimers (node:internal/timers:523:7)
+# Subtest: search failure/timeout leaves loading
+ok 355 - search failure/timeout leaves loading
+  ---
+  duration_ms: 46.6351
+  type: 'test'
+  ...
+# verifyWingsAndAdd failed: Error: Wingman took too long. Please try again; your details are still here.
+#     at Timeout.<anonymous> (evalmachine.<anonymous>:12:60)
+#     at listOnTimeout (node:internal/timers:588:17)
+#     at process.processTimers (node:internal/timers:523:7)
+# Subtest: verification failure/timeout leaves loading
+ok 356 - verification failure/timeout leaves loading
+  ---
+  duration_ms: 61.7206
+  type: 'test'
+  ...
+# insertWingmanDestination failed: Error: Wingman took too long. Please try again; your details are still here.
+#     at Timeout.<anonymous> (evalmachine.<anonymous>:12:60)
+#     at listOnTimeout (node:internal/timers:588:17)
+#     at process.processTimers (node:internal/timers:523:7)
+# Subtest: insert failure/timeout leaves loading
+ok 357 - insert failure/timeout leaves loading
+  ---
+  duration_ms: 47.7305
+  type: 'test'
+  ...
+# Subtest: selection failure/timeout leaves loading
+ok 358 - selection failure/timeout leaves loading
+  ---
+  duration_ms: 76.9884
+  type: 'test'
+  ...
+# runWingman failed: Error: Network disconnected
+#     at file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/wingman-guest-onboarding.test.mjs:72:81
+#     at WingmanService.run (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/wingman-guest-onboarding.test.mjs:33:107)
+#     at Object.onPress (evalmachine.<anonymous>:445:47)
+#     at Object.press (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/wingman-guest-onboarding.test.mjs:45:154)
+#     at TestContext.<anonymous> (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/wingman-guest-onboarding.test.mjs:74:11)
+#     at Test.runInAsyncScope (node:async_hooks:214:14)
+#     at Test.run (node:internal/test_runner/test:1047:25)
+#     at Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+#     at Test.postRun (node:internal/test_runner/test:1173:19)
+#     at Test.run (node:internal/test_runner/test:1101:12)
+# load states failed: Wingman request cancelled.
+# runWingman failed: Error: Wingman request cancelled.
+#     at AbortSignal.cancel (evalmachine.<anonymous>:11:50)
+#     at [nodejs.internal.kHybridDispatch] (node:internal/event_target:827:20)
+#     at AbortSignal.dispatchEvent (node:internal/event_target:762:26)
+#     at runAbort (node:internal/abort_controller:486:10)
+#     at abortSignal (node:internal/abort_controller:457:3)
+#     at AbortController.abort (node:internal/abort_controller:505:5)
+#     at Object.cleanup (evalmachine.<anonymous>:76:40)
+#     at file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/helpers/mobile-runtime.mjs:45:44
+#     at Object.render (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/helpers/mobile-runtime.mjs:50:114)
+#     at Object.render (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/wingman-guest-onboarding.test.mjs:43:32)
+# runWingman failed: Error: Wingman request cancelled.
+#     at AbortSignal.cancel (evalmachine.<anonymous>:11:50)
+#     at [nodejs.internal.kHybridDispatch] (node:internal/event_target:827:20)
+#     at AbortSignal.dispatchEvent (node:internal/event_target:762:26)
+#     at runAbort (node:internal/abort_controller:486:10)
+#     at abortSignal (node:internal/abort_controller:457:3)
+#     at AbortController.abort (node:internal/abort_controller:505:5)
+#     at Object.cleanup (evalmachine.<anonymous>:76:40)
+#     at Object.unmount (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/helpers/mobile-runtime.mjs:51:58)
+#     at TestContext.<anonymous> (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/wingman-guest-onboarding.test.mjs:86:42)
+#     at async Test.run (node:internal/test_runner/test:1054:7)
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 401, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 401, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 401, clone: [Function: clone] }
+# }
+# Subtest: review failure/timeout leaves loading
+ok 359 - review failure/timeout leaves loading
+  ---
+  duration_ms: 46.9821
+  type: 'test'
+  ...
+# Subtest: network failure/timeout leaves loading
+ok 360 - network failure/timeout leaves loading
+  ---
+  duration_ms: 19.008
+  type: 'test'
+  ...
+# Subtest: signed-in rejection writes a real suggestion and guest local save errors do not claim success
+ok 361 - signed-in rejection writes a real suggestion and guest local save errors do not claim success
+  ---
+  duration_ms: 47.856
+  type: 'test'
+  ...
+# Subtest: dismiss/reopen and unmount cancel pending search and ignore late completion
+ok 362 - dismiss/reopen and unmount cancel pending search and ignore late completion
+  ---
+  duration_ms: 20.5302
+  type: 'test'
+  ...
+# Subtest: installed iOS build source: ordinary 401 clears loading; stalled error-body parsing reproduces persistent spinner
+ok 363 - installed iOS build source: ordinary 401 clears loading; stalled error-body parsing reproduces persistent spinner
+  ---
+  duration_ms: 165.5369
+  type: 'test'
+  ...
+# Subtest: pre-cancelled operations observe rejections and never start a request
+ok 364 - pre-cancelled operations observe rejections and never start a request
+  ---
+  duration_ms: 0.3484
+  type: 'test'
+  ...
+# Subtest: fixed 401 does not wait for a stalled error body
+ok 365 - fixed 401 does not wait for a stalled error body
+  ---
+  duration_ms: 18.8348
+  type: 'test'
+  ...
+# Subtest: actual onboarding selection advances despite stalled analytics and stops on storage failure/cancellation
+ok 366 - actual onboarding selection advances despite stalled analytics and stops on storage failure/cancellation
+  ---
+  duration_ms: 40.5839
+  type: 'test'
+  ...
+# Subtest: real PostgreSQL shared RPC supports null creator, concurrent retries and service-only permissions
+ok 367 - real PostgreSQL shared RPC supports null creator, concurrent retries and service-only permissions # SKIP
+  ---
+  duration_ms: 0.9155
+  type: 'test'
+  ...
+# Subtest: official wing terminology: Chicken wings $12
+ok 368 - official wing terminology: Chicken wings $12
+  ---
+  duration_ms: 5.5
+  type: 'test'
+  ...
+# Subtest: official wing terminology: Bone-in wings
+ok 369 - official wing terminology: Bone-in wings
+  ---
+  duration_ms: 1.1302
+  type: 'test'
+  ...
+# Subtest: official wing terminology: Boneless wings
+ok 370 - official wing terminology: Boneless wings
+  ---
+  duration_ms: 0.2464
+  type: 'test'
+  ...
+# Subtest: official wing terminology: Buffalo wings
+ok 371 - official wing terminology: Buffalo wings
+  ---
+  duration_ms: 0.199
+  type: 'test'
+  ...
+# Subtest: official wing terminology: 10 wings
+ok 372 - official wing terminology: 10 wings
+  ---
+  duration_ms: 0.3025
+  type: 'test'
+  ...
+# Subtest: official wing terminology: 12 pc wings
+ok 373 - official wing terminology: 12 pc wings
+  ---
+  duration_ms: 0.1856
+  type: 'test'
+  ...
+# Subtest: official wing terminology: Wings $14
+ok 374 - official wing terminology: Wings $14
+  ---
+  duration_ms: 0.2596
+  type: 'test'
+  ...
+# Subtest: official wing terminology: Smoked wings with garlic parmesan
+ok 375 - official wing terminology: Smoked wings with garlic parmesan
+  ---
+  duration_ms: 0.2189
+  type: 'test'
+  ...
+# Subtest: incomplete or temporary menu condition remains neutral: Burgers and fries
+ok 376 - incomplete or temporary menu condition remains neutral: Burgers and fries
+  ---
+  duration_ms: 0.6415
+  type: 'test'
+  ...
+# Subtest: incomplete or temporary menu condition remains neutral: Buffalo cauliflower
+ok 377 - incomplete or temporary menu condition remains neutral: Buffalo cauliflower
+  ---
+  duration_ms: 0.7504
+  type: 'test'
+  ...
+# Subtest: incomplete or temporary menu condition remains neutral: Wing sauce
+ok 378 - incomplete or temporary menu condition remains neutral: Wing sauce
+  ---
+  duration_ms: 0.3313
+  type: 'test'
+  ...
+# Subtest: incomplete or temporary menu condition remains neutral: Wings are sold out
+ok 379 - incomplete or temporary menu condition remains neutral: Wings are sold out
+  ---
+  duration_ms: 0.1346
+  type: 'test'
+  ...
+# Subtest: incomplete or temporary menu condition remains neutral: We do not serve wings on Mondays.
+ok 380 - incomplete or temporary menu condition remains neutral: We do not serve wings on Mondays.
+  ---
+  duration_ms: 0.7003
+  type: 'test'
+  ...
+# Subtest: fresh location-specific explicit denial is negative; stale, unmatched or third-party denial is not
+ok 381 - fresh location-specific explicit denial is negative; stale, unmatched or third-party denial is not
+  ---
+  duration_ms: 0.2728
+  type: 'test'
+  ...
+# Subtest: retrieved contradictory evidence is retained and allowed neutrally
+ok 382 - retrieved contradictory evidence is retained and allowed neutrally
+  ---
+  duration_ms: 0.1909
+  type: 'test'
+  ...
+# Subtest: model score/status alone never supplies a positive or negative source
+ok 383 - model score/status alone never supplies a positive or negative source
+  ---
+  duration_ms: 4.0908
+  type: 'test'
+  ...
+# Subtest: official menu failure falls back to attributed ordering menu
+ok 384 - official menu failure falls back to attributed ordering menu
+  ---
+  duration_ms: 33.9174
+  type: 'test'
+  ...
+# Subtest: additional official links survive first inaccessible menu and malformed links
+ok 385 - additional official links survive first inaccessible menu and malformed links
+  ---
+  duration_ms: 2.1812
+  type: 'test'
+  ...
+# Subtest: neutral on website failure: blocked
+ok 386 - neutral on website failure: blocked
+  ---
+  duration_ms: 0.6318
+  type: 'test'
+  ...
+# Subtest: neutral on website failure: timeout
+ok 387 - neutral on website failure: timeout
+  ---
+  duration_ms: 24.7089
+  type: 'test'
+  ...
+# Subtest: neutral on website failure: dns
+ok 388 - neutral on website failure: dns
+  ---
+  duration_ms: 32.2798
+  type: 'test'
+  ...
+# Subtest: neutral on website failure: missing
+ok 389 - neutral on website failure: missing
+  ---
+  duration_ms: 0.865
+  type: 'test'
+  ...
+# Subtest: neutral on website failure: empty
+ok 390 - neutral on website failure: empty
+  ---
+  duration_ms: 1.6552
+  type: 'test'
+  ...
+# Subtest: all discovered fallbacks fail without blocking eligibility
+ok 391 - all discovered fallbacks fail without blocking eligibility
+  ---
+  duration_ms: 1.8916
+  type: 'test'
+  ...
+# Subtest: third-party content for a different restaurant cannot supply positive evidence
+ok 392 - third-party content for a different restaurant cannot supply positive evidence
+  ---
+  duration_ms: 3.4469
+  type: 'test'
+  ...
+# Subtest: negative retrieval requires fresh full-page location evidence
+ok 393 - negative retrieval requires fresh full-page location evidence
+  ---
+  duration_ms: 1.3095
+  type: 'test'
+  ...
+# Subtest: installed approval policy with neutral score and unknown evidence
+ok 394 - installed approval policy with neutral score and unknown evidence
+  ---
+  duration_ms: 3.6709
+  type: 'test'
+  ...
+# Subtest: installed approval policy with neutral score and supports evidence
+ok 395 - installed approval policy with neutral score and supports evidence
+  ---
+  duration_ms: 0.2293
+  type: 'test'
+  ...
+# Subtest: installed approval policy with neutral score and unavailable evidence
+ok 396 - installed approval policy with neutral score and unavailable evidence
+  ---
+  duration_ms: 0.1353
+  type: 'test'
+  ...
+# Subtest: installed approval policy with neutral score and conflicting evidence
+ok 397 - installed approval policy with neutral score and conflicting evidence
+  ---
+  duration_ms: 0.114
+  type: 'test'
+  ...
+# Subtest: neutral unknown evidence is eligible with accepted legacy client logging and messaging
+ok 398 - neutral unknown evidence is eligible with accepted legacy client logging and messaging
+  ---
+  duration_ms: 154.1638
+  type: 'test'
+  ...
+# Subtest: Wingman is absent from the header and remains wired to the existing dialog
+ok 399 - Wingman is absent from the header and remains wired to the existing dialog
+  ---
+  duration_ms: 1.6819
+  type: 'test'
+  ...
+# Subtest: no matches offer Wingman with exact prefill: {}
+ok 400 - no matches offer Wingman with exact prefill: {}
+  ---
+  duration_ms: 71.1292
+  type: 'test'
+  ...
+# Subtest: no matches offer Wingman with exact prefill: {"locationMode":"radius"}
+ok 401 - no matches offer Wingman with exact prefill: {"locationMode":"radius"}
+  ---
+  duration_ms: 13.6369
+  type: 'test'
+  ...
+# Subtest: no matches offer Wingman with exact prefill: {"filteredEmpty":true}
+ok 402 - no matches offer Wingman with exact prefill: {"filteredEmpty":true}
+  ---
+  duration_ms: 13.0133
+  type: 'test'
+  ...
+# Subtest: no matches offer Wingman with exact prefill: {"savedView":"favorites","filteredEmpty":true}
+ok 403 - no matches offer Wingman with exact prefill: {"savedView":"favorites","filteredEmpty":true}
+  ---
+  duration_ms: 10.4778
+  type: 'test'
+  ...
+# Subtest: no matches offer Wingman with exact prefill: {"savedView":"want_to_try","filteredEmpty":true}
+ok 404 - no matches offer Wingman with exact prefill: {"savedView":"want_to_try","filteredEmpty":true}
+  ---
+  duration_ms: 6.8385
+  type: 'test'
+  ...
+# Subtest: no matches offer Wingman with exact prefill: {"savedView":"favorites"}
+ok 405 - no matches offer Wingman with exact prefill: {"savedView":"favorites"}
+  ---
+  duration_ms: 8.8214
+  type: 'test'
+  ...
+# Subtest: no matches offer Wingman with exact prefill: {"savedView":"want_to_try"}
+ok 406 - no matches offer Wingman with exact prefill: {"savedView":"want_to_try"}
+  ---
+  duration_ms: 7.4733
+  type: 'test'
+  ...
+# Subtest: saved guest state keeps its recovery action without Wingman
+ok 407 - saved guest state keeps its recovery action without Wingman
+  ---
+  duration_ms: 11.0532
+  type: 'test'
+  ...
+# Subtest: saved error state keeps its recovery action without Wingman
+ok 408 - saved error state keeps its recovery action without Wingman
+  ---
+  duration_ms: 17.5647
+  type: 'test'
+  ...
+# Subtest: Wingdex opens Wingman with the exact search and default launches clear it
+ok 409 - Wingdex opens Wingman with the exact search and default launches clear it
+  ---
+  duration_ms: 2.0825
+  type: 'test'
+  ...
+# Subtest: Wingman resets on opening, preserves edits while visible and never auto-searches
+ok 410 - Wingman resets on opening, preserves edits while visible and never auto-searches
+  ---
+  duration_ms: 1.7812
+  type: 'test'
+  ...
+1..410
+# tests 410
+# suites 0
+# pass 406
+# fail 0
+# cancelled 0
+# skipped 4
+# todo 0
+# duration_ms 5028.9824

@@ -4,6 +4,26 @@ import { mobileModule, hookRuntime } from './helpers/mobile-runtime.mjs';
 const id='11111111-1111-4111-8111-111111111111';
 const nodes=t=>!t?[]:Array.isArray(t)?t.flatMap(nodes):[t,...nodes(t.props?.children)];
 const flush=async()=>{for(let i=0;i<150;i++)await Promise.resolve();};
+
+test('real completion helper persists all gate keys before auth and survives fresh Home mounts', async()=>{
+ const values=new Map(), routes=[];
+ const storage={multiGet:async keys=>keys.map(k=>[k,values.get(k)||null]),multiSet:async entries=>entries.forEach(([k,v])=>values.set(k,v)),setItem:async(k,v)=>values.set(k,v)};
+ const loadGate=()=>{const runtime=hookRuntime();return {runtime,gate:mobileModule('hooks/useOnboardingGate.ts',{react:runtime.react,'@react-native-async-storage/async-storage':storage})};};
+ const first=loadGate();
+ assert.equal(await first.gate.hasCompletedOnboarding(),false);
+ const {createRequire}=await import('node:module');
+ const {finishV2}=createRequire(import.meta.url)('../lib/onboardingV2.js');
+ await finishV2({storage,markSeen:first.gate.markOnboardingSeen,account:true,entryPath:'find_rate',platform:'android',router:{replace:r=>routes.push(r),push:r=>{assert.equal(values.get('buffago:onboarding_done_v3'),'1');routes.push(r);}}});
+ assert.deepEqual(routes,['/(tabs)/home','/auth/login']);
+ for(const transition of ['auth cancellation','authenticated handoff','cold restart','signout','different-account signin']){
+   const fresh=loadGate();
+   fresh.runtime.render(fresh.gate.useOnboardingGate,{});await flush();
+   const state=fresh.runtime.render(fresh.gate.useOnboardingGate,{});
+   assert.equal(state.loading,false,transition);assert.equal(state.shouldShowIntro,false,transition);
+   fresh.runtime.unmount();
+ }
+ assert.equal(values.get('buffago:onboarding:complete'),'true');assert.equal(values.get('hasSeenIntro'),'true');
+});
 function harness({confirmation=false,saved=null,callback=false,provider='google',returnPath='/(tabs)/home',oauthOutcome='callback'}={}) {
  const runtime=hookRuntime(), values=new Map(), routes=[], events=[];
  const storage={getItem:async k=>values.get(k)||null,setItem:async(k,v)=>values.set(k,v),removeItem:async k=>values.delete(k),multiRemove:async keys=>keys.forEach(k=>values.delete(k))};
@@ -83,6 +103,13 @@ for(const provider of ['google','facebook']){
 }
 test('normal login and saved destination precedence remain intact',async()=>{
  for(const saved of [null,{destinationId:id,kind:'save',userId:'synthetic-account'}]){const h=harness({saved});if(saved)await h.intent.saveWingShotIntent(h.storage,{destinationId:id});h.render();h.fill();await h.button('auth.signin.native-action').props.onPress();await flush();assert.equal(saved?h.routes[0]?.pathname:h.routes[0],saved?'/(tabs)/ratings':'/(tabs)/home');h.runtime.unmount();}
+});
+
+test('duplicate signed-in notifications before and after handoff cannot replace uploader with Home',async()=>{
+ const h=harness();await h.intent.saveWingShotIntent(h.storage,{destinationId:id,restaurantName:'Wings'});
+ h.render();h.authenticate();h.authenticate();await flush();h.authenticate();await flush();
+ assert.equal(h.routes.length,1);assert.equal(h.routes[0]?.pathname,'/profile/wing-shots/submit');
+ assert.equal(h.routes[0]?.params.destinationId,id);h.runtime.unmount();
 });
 
 test('legacy import cannot replay nested V2 local preview payloads',async()=>{
