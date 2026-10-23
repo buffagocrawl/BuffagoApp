@@ -16,7 +16,7 @@ module.exports = ({ config }) => {
   name: "BuffaGo",
   slug: "buffago",
   scheme: "buffago",
-  version: "1.0.7",
+  version: "1.0.9",
 
   icon: "./assets/icon.png",
   splash: {
