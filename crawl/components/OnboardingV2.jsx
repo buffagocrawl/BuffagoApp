@@ -118,7 +118,7 @@ export default function OnboardingV2() {
         const flags = await loadPhotoWorkflowFlags(supabase);
         if (!flags.prompt || !flags.photo) throw new Error('Photos unavailable');
       } else if (!ENABLE_ONBOARDING_WING_SHOT_INVITE) return;
-      await saveWingShotIntent(AsyncStorage, { destinationId: preview?.payload?.destination_id, restaurantName: destination?.name || preview?.payload?.restaurant_name, userId: user && !user.is_anonymous ? user.id : null });
+      await saveWingShotIntent(AsyncStorage, { destinationId: preview?.payload?.destination_id, restaurantName: destination?.name || preview?.payload?.restaurant_name, previewId: preview?.preview_id, userId: user && !user.is_anonymous ? user.id : null });
       emit('onboarding_wing_shot_selected', { source: 'onboarding' }, preview?.payload?.destination_id);
       const route = user && !user.is_anonymous ? await claimWingShotIntent({ storage: AsyncStorage, client: supabase, userId: user.id }) : null;
       await finishV2({ markSeen: markOnboardingSeen, router, account: false, storage: AsyncStorage, entryPath: entryPath || 'find_rate', platform: Platform.OS });
@@ -201,10 +201,10 @@ export default function OnboardingV2() {
           </>}
           {step === 'rating' && <Text>Rate {destination?.name}</Text>}
           {step === 'result' && <>
-            <Text variant="headlineMedium">Nice! Your wing rating</Text><Text variant="titleLarge">{destination?.name || preview?.payload?.restaurant_name || 'Your restaurant'}</Text>
+            <Text variant="headlineMedium">Awesome! You just rated your first wings!</Text><Text variant="titleLarge">{destination?.name || preview?.payload?.restaurant_name || 'Your restaurant'}</Text>
             <Text style={{ fontSize: 40, fontWeight: '800' }}>{preview?.payload?.overall} / 10</Text>
             <Text variant="bodyLarge">Saved on this device only. This preview is not a public review and has not earned rewards. It stays here after sign-up; it is not automatically published or synced.</Text>
-            {photoAvailable ? <><Text variant="headlineMedium">Got a picture of those wings?</Text><Text variant="bodyLarge">Create a free account to share a Wing Shot, keep your favorites, and build your wing journey.</Text><Text variant="bodySmall">Upload availability is checked after sign-in. Wing Shots are reviewed before they appear in the gallery.</Text></> : <Text>{user && !user.is_anonymous ? 'Wing Shots are unavailable right now. You can still explore BuffaGo; your preview stays on this device.' : 'Create a free account to keep your favorites and build your wing journey. Your rating preview stays on this device.'}</Text>}
+            {photoAvailable ? <><Text variant="headlineMedium">Got a picture of those wings?</Text><Text variant="bodyLarge">Create your free BuffaGo account to save your rating and add a Wing Shot!</Text><Text variant="bodySmall">After sign-in, confirm saving your rating. Location and photo eligibility are checked before upload. Wing Shots are reviewed before appearing in the gallery.</Text></> : <Text>{user && !user.is_anonymous ? 'Wing Shots are unavailable right now. You can still explore BuffaGo; your preview stays on this device.' : 'Create a free account to keep your favorites and build your wing journey. Your rating preview stays on this device.'}</Text>}
 
           </>}
           {!!notice && <Text accessibilityRole="alert">{notice}</Text>}
@@ -214,7 +214,7 @@ export default function OnboardingV2() {
       {step === 'result' && <View style={{ paddingHorizontal: 24, paddingBottom: 16, gap: 10 }}>
             {!photoAvailable && (!user || user.is_anonymous) && <Button mode="contained" disabled={saving} contentStyle={{ minHeight: 48 }} onPress={() => finish(true)}>Create Free Account</Button>}
             {photoAvailable && <Button mode="contained" disabled={saving} accessibilityLabel={user && !user.is_anonymous ? 'Add a Wing Shot' : 'Create account and add a Wing Shot photo'} labelStyle={{ fontSize: 16 }} contentStyle={{ minHeight: 48 }} onPress={addPhoto}>{user && !user.is_anonymous ? 'Add a Wing Shot' : 'Create Account & Add Photo'}</Button>}
-            <Button mode="outlined" disabled={saving} labelStyle={{ fontSize: 16 }} contentStyle={{ minHeight: 48 }} onPress={() => finish()}>Explore BuffaGo</Button>
+            <Button mode="outlined" disabled={saving} labelStyle={{ fontSize: 16 }} contentStyle={{ minHeight: 48 }} onPress={() => finish()}>Continue to BuffaGo</Button>
       </View>}
       <RatingWizardDialog visible={step === 'rating'} destinationName={destination?.name}
         flowVariant={QUICK_RATING_FLOW_VARIANT} saving={saving} finalizeLabel="Save local preview"

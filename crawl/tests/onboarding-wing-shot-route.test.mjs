@@ -4,15 +4,15 @@ import {mobileModule,hookRuntime} from './helpers/mobile-runtime.mjs';
 const id='11111111-1111-4111-8111-111111111111';
 const nodes=t=>!t?[]:Array.isArray(t)?t.flatMap(nodes):[t,...nodes(t.props?.children)];
 const flush=async()=>{for(let i=0;i<70;i++)await Promise.resolve();};
-function setup(mode='enabled'){
+function setup(mode='enabled',handoff=false){
  const runtime=hookRuntime(),routes=[],events=[];let listener=()=>{},calls=0;
  const Component=mobileModule('app/profile/wing-shots/submit.jsx',{
-  react:runtime.react,'react/jsx-runtime':runtime.jsx,'expo-router':{useRouter:()=>({replace:r=>routes.push(r)}),useLocalSearchParams:()=>({source:'onboarding',destinationId:id,restaurantName:'Hint'})},
+  react:runtime.react,'react/jsx-runtime':runtime.jsx,'expo-router':{useRouter:()=>({replace:r=>routes.push(r)}),useLocalSearchParams:()=>({source:'onboarding',destinationId:id,restaurantName:'Hint',handoffId:handoff?'bound-handoff':''})},
   'react-native':{View:'view',ActivityIndicator:'spinner'},'react-native-paper':{Button:'button',Text:'text'},
-  '@react-native-async-storage/async-storage':{},'../../../components/wingShots/WingShotComposer':{WingShotComposer:'composer'},
+  '@react-native-async-storage/async-storage':{},'../../../components/wingShots/WingShotComposer':{WingShotComposer:'composer'},'../../../components/OnboardingRatingConfirmation':'confirmation',
   '../../../lib/supabase':{supabase:{auth:{getUser:async()=>({data:{user:{id:'account',is_anonymous:false}}}),onAuthStateChange:fn=>{listener=fn;return {data:{subscription:{unsubscribe(){}}}};}}}},
   '../../../lib/photoWorkflowFlags':{loadPhotoWorkflowFlags:async()=>{calls++;if(mode==='network')throw Error('offline');return {prompt:mode!=='disabled',photo:mode!=='disabled'};}},
-  '../../../lib/wingShotAuthIntent':{isWingShotDestinationId:()=>true,clearWingShotIntent:async()=>{},saveWingShotIntent:async()=>{},getWingShotHandoff:async()=>null,completeWingShotHandoff:async()=>{}},
+  '../../../lib/wingShotAuthIntent':{isWingShotDestinationId:()=>true,clearWingShotIntent:async()=>{},saveWingShotIntent:async()=>{},getWingShotHandoff:async()=>handoff?{userId:'account',destinationId:id,restaurantName:'Wings',previewId:id}:null,completeWingShotHandoff:async()=>{}},
   '../../../lib/analytics':{trackEvent:async e=>events.push(e)},
  }).default;
  const render=()=>runtime.render(Component,{});render();
@@ -33,3 +33,5 @@ test('authoritative flag timeout is bounded; failed and partial responses never 
  await assert.rejects(loadPhotoWorkflowFlags({rpc:async()=>({error:{code:'offline'}})},2),/could not load/);
  await assert.rejects(loadPhotoWorkflowFlags({rpc:async()=>({data:[]})},2),/could not load/);
 });
+
+test('bound preview handoff opens confirmation before any uploader',async()=>{const s=setup('enabled',true);await flush();const tree=nodes(s.render());assert.equal(tree.find(n=>n.type==='composer'),undefined);const confirm=tree.find(n=>n.type==='confirmation');assert.equal(confirm.props.context.previewId,id);assert.equal(confirm.props.handoffId,'bound-handoff');s.runtime.unmount();});

@@ -1,0 +1,5 @@
+
+C:\Users\Brand\repo\BuffagoApp\crawl\components\RatingWizardDialog.jsx
+  119:9  warning  'theme' is assigned a value but never used  no-unused-vars
+
+✖ 1 problem (0 errors, 1 warning)

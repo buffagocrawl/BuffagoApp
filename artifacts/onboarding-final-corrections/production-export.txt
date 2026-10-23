@@ -1,0 +1,97 @@
+node.exe : ★ eas-cli@25.3.0 is now available.
+At C:\Users\Brand\AppData\Roaming\npm\eas.ps1:24 char:5
++     & "node$exe"  "$basedir/node_modules/eas-cli/bin/run" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (★ eas-cli@25.3.0 is now available.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+To upgrade, run:
+npm install -g eas-cli
+Proceeding with outdated version.
+
+★ eas-cli@25.3.0 is now available.
+To upgrade, run:
+npm install -g eas-cli
+Proceeding with outdated version.
+
+Environment variables with visibility "Plain text" and "Sensitive" loaded from the "production" environment on EAS:
+EXPO_PUBLIC_GOOGLE_ANDROID_API_KEY, EXPO_PUBLIC_GOOGLE_API_KEY, EXPO_PUBLIC_GOOGLE_IOS_API_KEY,
+EXPO_PUBLIC_SUPABASE_ANON_KEY, EXPO_PUBLIC_SUPABASE_URL.
+Environment variables loaded from the "production" build profile "env" configuration: EXPO_PUBLIC_ENABLE_WING_JURY,
+EXPO_PUBLIC_ENABLE_SAVED_DESTINATIONS, EXPO_PUBLIC_ONBOARDING_V2, EXPO_PUBLIC_ONBOARDING_WING_SHOT_INVITE.
+
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Bytecode makes the app startup faster, disabling bytecode is highly discouraged and should only be used for debugging
+purposes.
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+» android: androidStatusBar.backgroundColor: Color conflicts with the splash.backgroundColor
+Starting Metro Bundler
+Android node_modules\expo-router\entry.js ▓▓▓▓░░░░░░░░░░░░ 26.2% (335/685)
+| (node:35028) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+| (Use `node --trace-warnings ...` to show where the warning was created)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 99.9% (2387/2387)
+Android Bundled 5023ms node_modules\expo-router\entry.js (2387 modules)
+
+› Assets (48):
+assets\Buffago-token.png (1.94 MB)
+assets\crawl-bg.png (2.59 MB)
+assets\images\buffago-logo.png (64.2 kB)
+assets\wing-user.png (2.01 MB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\AntDesign.ttf (130 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\Entypo.ttf (66.2 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\EvilIcons.ttf (13.5 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\Feather.ttf (55.6 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\FontAwesome.ttf (166 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\FontAwesome5_Brands.ttf (134 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\FontAwesome5_Regular.ttf (33.7 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\FontAwesome5_Solid.ttf (203 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\FontAwesome6_Brands.ttf (209 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\FontAwesome6_Regular.ttf (68 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\FontAwesome6_Solid.ttf (424 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\Fontisto.ttf (314 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\Foundation.ttf (57 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\Ionicons.ttf (390 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\MaterialCommunityIcons.ttf (1.31 MB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\MaterialIcons.ttf (357 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\Octicons.ttf (69.4 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\SimpleLineIcons.ttf (54.1 kB)
+node_modules\@expo\vector-icons\build\vendor\react-native-vector-icons\Fonts\Zocial.ttf (25.8 kB)
+node_modules\@react-navigation\elements\lib\module\assets\back-icon-mask.png (653 B)
+node_modules\@react-navigation\elements\lib\module\assets\back-icon.png (4 variations | 152 B)
+node_modules\@react-navigation\elements\lib\module\assets\clear-icon.png (4 variations | 425 B)
+node_modules\@react-navigation\elements\lib\module\assets\close-icon.png (4 variations | 235 B)
+node_modules\@react-navigation\elements\lib\module\assets\search-icon.png (4 variations | 599 B)
+node_modules\expo-router\assets\arrow_down.png (9.46 kB)
+node_modules\expo-router\assets\error.png (469 B)
+node_modules\expo-router\assets\file.png (138 B)
+node_modules\expo-router\assets\forward.png (188 B)
+node_modules\expo-router\assets\pkg.png (364 B)
+node_modules\expo-router\assets\sitemap.png (465 B)
+node_modules\expo-router\assets\unmatched.png (4.75 kB)
+tests\fixtures\native-visual\framing-landscape.png (16.9 kB)
+
+› android bundles (2):
+_expo/static/js/android/entry-5800f5c25b52e85d25464c2a6f0e2ef7.js (5.75 MB)
+_expo/static/js/android/entry-5800f5c25b52e85d25464c2a6f0e2ef7.js.map (18.1 MB)
+
+› Files (1):
+metadata.json (3.35 kB)
+
+Exported: C:\Users\Brand\repo\BuffagoApp\artifacts\onboarding-final-corrections\android-export
+{
+  "environment": "production",
+  "platform": "android",
+  "buildType": "app-bundle",
+  "flags": {
+    "EXPO_PUBLIC_ONBOARDING_V2": "true",
+    "EXPO_PUBLIC_ONBOARDING_WING_SHOT_INVITE": "true"
+  },
+  "bundle": "entry-5800f5c25b52e85d25464c2a6f0e2ef7.js",
+  "sha256": "028e74224c5c5e0cf4b148c851ecec4dba23e4b9c66b554f124ba145f77e5791",
+  "bundled": {
+    "ENABLE_ONBOARDING_V2": true,
+    "ENABLE_ONBOARDING_WING_SHOT_INVITE": true
+  },
+  "route": "ENABLE_ONBOARDING_V2 ? OnboardingV2 : OnboardingExperimentRoute"
+}

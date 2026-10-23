@@ -78,18 +78,6 @@ test('preview survives compatibility write failure and restores result on a late
   const restored=setup(saved); await flush(); restored.render(); await flush(); assert.ok(nodes(restored.render(),'button').some(n=>n.props.children==='Create Account & Add Photo'));
   s.runtime.unmount();restored.runtime.unmount();
 });
-test('slider maps min/max/midpoint, clamped taps, RTL and drag sequences across widths',()=>{
-  for(const width of [120,300,600]) {
-    assert.equal(slider.ratingScoreAtPosition(14,width),1);assert.equal(slider.ratingScoreAtPosition(width-14,width),10);
-    assert.equal(slider.ratingScoreAtPosition(width/2,width),6);
-    assert.equal(slider.ratingScoreAtPosition(-100,width),1);assert.equal(slider.ratingScoreAtPosition(width+100,width),10);
-    assert.equal(slider.ratingScoreAtPosition(14,width,true),10);assert.equal(slider.ratingScoreAtPosition(width-14,width,true),1);
-    const drag=[0,.25,.5,.75,1].map(f=>slider.ratingScoreAtPosition(14+(width-28)*f,width));
-    assert.deepEqual(drag,[1,3,6,8,10]);
-  }
-  assert.equal(slider.ratingScoreAtPosition(0,0),null);
-  assert.equal(require('../lib/quickRating.js').QUICK_RATING_STEPS[1].badLabel,'Forgettable');
-});
 test('V2 supersedes experiment and both auth import paths explicitly preserve V2 previews',()=>{
   const route=readFileSync(new URL('../app/onboarding.jsx',import.meta.url),'utf8');
   assert.match(route,/ENABLE_ONBOARDING_V2 \? <OnboardingV2 \/> : <OnboardingExperimentRoute \/>/);
@@ -103,23 +91,21 @@ function ratingRuntime() {
   const imports={react:runtime.react,'react/jsx-runtime':runtime.jsx,
     'react-native':{View:'view',Pressable:'pressable',ScrollView:'scroll',FlatList:'flatlist',StyleSheet:{create:s=>s},I18nManager:{get isRTL(){return rtl;}},PanResponder:{create:handlers=>({panHandlers:handlers})}},
     '@expo/vector-icons':{MaterialCommunityIcons:'icon'},'react-native-paper':{Button:'button',Dialog:Object.assign('dialog',{Content:'content',Actions:'actions'}),Portal:'portal',ProgressBar:'progress',Text:'text',useTheme:()=>({dark:false,colors:{onSurface:'#111',surface:'#fff'}})},
-    '../lib/ratingSlider':slider,'../lib/quickRating':require('../lib/quickRating.js')};
+    '@react-native-community/slider':'native-slider','../lib/quickRating':require('../lib/quickRating.js')};
   const module=mobileModule('components/RatingWizardDialog.jsx',imports);
   return {runtime,module,rtl:v=>{rtl=v;}};
 }
-test('shared slider dispatches tap, drag, RTL, and accessibility adjustments',()=>{
-  const {runtime,module,rtl}=ratingRuntime();let value=1;
+test('restored pepper slider uses original native integer interaction and appearance',()=>{
+  const {runtime,module}=ratingRuntime();let value=1;
   const render=()=>runtime.render(module.SliderRowPretty,{label:'Sauce',value,onChange:v=>{value=v;}});
-  const control=()=>nodes(render(),'view').find(n=>n.props.accessibilityRole==='adjustable');
-  let row=control();row.props.onLayout({nativeEvent:{layout:{width:300}}});
-  row.props.onPanResponderGrant({nativeEvent:{locationX:150}});assert.equal(value,6);
-  row.props.onPanResponderMove({nativeEvent:{locationX:286}});assert.equal(value,10);
-  row.props.onPanResponderRelease({nativeEvent:{locationX:14}});assert.equal(value,1);
-  control().props.onAccessibilityAction({nativeEvent:{actionName:'increment'}});assert.equal(value,2);
-  rtl(true);control().props.onPanResponderGrant({nativeEvent:{locationX:14}});assert.equal(value,10);
-  control().props.onAccessibilityAction({nativeEvent:{actionName:'increment'}});assert.equal(value,10);
-  runtime.unmount();
+  const control=()=>nodes(render(),'native-slider')[0];
+  assert.equal(control().props.minimumValue,1);assert.equal(control().props.maximumValue,10);assert.equal(control().props.step,1);
+  for(const score of [1,6,10,3]){control().props.onValueChange(score);assert.equal(value,score);assert.equal(control().props.value,score);}
+  assert.equal(control().props.minimumTrackTintColor,'transparent');
+  assert.equal(control().props.thumbTintColor,'rgba(255,255,255,0.001)');
+  const views=nodes(render(),'view');assert.ok(views.some(n=>n.props.style?.height===44));assert.ok(views.some(n=>n.props.style?.backgroundColor==='#050505'));runtime.unmount();
 });
+
 test('quick and full rating revisits keep selected scores and submit unchanged numbers',async()=>{
   for(const flowVariant of ['quick_onboarding','full_review']) {
     const {runtime,module}=ratingRuntime();const finalized=[];
@@ -172,7 +158,7 @@ test('disabled photo flags keep preview and Explore without advertising account 
   await nodes(s.render(),'rating')[0].props.onFinalize({scores:{overall:8,sauce:7,crispiness:6,meat:9}});
   s.render();await flush();const tree=s.render();
   assert.ok(!nodes(tree,'button').some(n=>n.props.children==='Create Account & Add Photo'));
-  await s.press('Explore BuffaGo');assert.deepEqual(s.routes,[['replace','/(tabs)/home']]);
+  await s.press('Continue to BuffaGo');assert.deepEqual(s.routes,[['replace','/(tabs)/home']]);
   assert.ok(s.data.has('buffago:guest_rating_preview:v1'));s.runtime.unmount();
 });
 

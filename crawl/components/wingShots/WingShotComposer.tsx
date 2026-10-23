@@ -8,7 +8,7 @@ import { supabase } from '../../lib/supabase';
 type Source = 'onboarding' | 'buffacoin' | 'profile' | 'home_cta';
 type Restaurant = { id: string; name: string | null; city: string | null };
 
-export function WingShotComposer({ source, onClose, destinationId, restaurantName, userId, onDestinationResolved }: { source: Source; onClose: () => void; destinationId?: string; restaurantName?: string; userId?: string; onDestinationResolved?: () => void | Promise<void> }) {
+export function WingShotComposer({ source, onClose, destinationId, restaurantName, userId, eligibleRatingId, onDestinationResolved }: { source: Source; onClose: () => void; destinationId?: string; restaurantName?: string; userId?: string; eligibleRatingId?: string; onDestinationResolved?: () => void | Promise<void> }) {
   const [query, setQuery] = useState((restaurantName || '').slice(0, 120));
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [selected, setSelected] = useState<Restaurant | null>(null);
@@ -17,6 +17,7 @@ export function WingShotComposer({ source, onClose, destinationId, restaurantNam
   const [editing, setEditing] = useState(false);
   const [notice, setNotice] = useState('');
   const [resolving, setResolving] = useState(Boolean(destinationId));
+  const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     let active = true;
     setSelected(null);
@@ -39,7 +40,7 @@ export function WingShotComposer({ source, onClose, destinationId, restaurantNam
     return () => { active = false; };
     // Resolution belongs to this destination, not a parent callback identity.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [destinationId, source]);
+  }, [destinationId, source, attempt]);
   const search = useCallback(async (value: string) => {
     setLoading(true);
     const normalized = value.trim();
@@ -51,9 +52,14 @@ export function WingShotComposer({ source, onClose, destinationId, restaurantNam
     setLoading(false);
   }, []);
 
-  useEffect(() => { if (!resolving && !selected) void search(query).catch(() => { setLoading(false); setNotice('Search is unavailable. Retry or explore.'); }); }, [query, search, resolving, selected]);
+  useEffect(() => { if (!eligibleRatingId && !resolving && !selected) void search(query).catch(() => { setLoading(false); setNotice('Search is unavailable. Retry or explore.'); }); }, [query, search, resolving, selected, eligibleRatingId]);
 
   if (resolving) return <View style={styles.picker}><Text>Opening restaurant...</Text><Pressable onPress={onClose} style={styles.cancel}><Text>Explore BuffaGo</Text></Pressable></View>;
+  if (eligibleRatingId && !selected) return <View style={styles.picker}>
+    <Text accessibilityRole="alert">Your rating is saved, but its restaurant could not be opened. Retry to add a photo to this rating, or continue to Home.</Text>
+    <Pressable onPress={() => setAttempt(value => value + 1)} style={styles.cancel}><Text>Retry restaurant</Text></Pressable>
+    <Pressable onPress={onClose} style={styles.cancel}><Text>Continue to BuffaGo</Text></Pressable>
+  </View>;
   if (!selected) {
     return (
       <View style={styles.picker} testID={`wing-shot-picker-${source}`}>
@@ -72,7 +78,7 @@ export function WingShotComposer({ source, onClose, destinationId, restaurantNam
       </View>
     );
   }
-  return <View style={{ flex: 1 }}><Text style={styles.resultName}>{selected.name || 'Restaurant'}</Text><WingShotFlow key={selected.id} visible={!editing} destinationId={selected.id} submissionSource={source} destinationName={selected.name || 'Restaurant'} onChangeRestaurant={() => { setSelected(null); setEditing(true); }} analyticsContext={{ screen: 'profile/wing-shots/submit', destinationId: selected.id, userId }} onClose={onClose} /></View>;
+  return <View style={{ flex: 1 }}><Text style={styles.resultName}>{selected.name || 'Restaurant'}</Text><WingShotFlow key={selected.id} visible={!editing} destinationId={selected.id} submissionSource={source} eligibleRatingId={eligibleRatingId} destinationName={selected.name || 'Restaurant'} onChangeRestaurant={eligibleRatingId ? undefined : () => { setSelected(null); setEditing(true); }} analyticsContext={{ screen: 'profile/wing-shots/submit', destinationId: selected.id, userId }} onClose={onClose} /></View>;
 }
 
 const styles = StyleSheet.create({

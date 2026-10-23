@@ -1,0 +1,710 @@
+TAP version 13
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 4 }
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 1 }
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 0 }
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 1 }
+# [cayenne-auth] submit_completed { outcome: 'error', duration_ms: 1 }
+# [cayenne-auth] submit_completed { outcome: 'session_received', duration_ms: 1 }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: real completion helper persists all gate keys before auth and survives fresh Home mounts
+ok 1 - real completion helper persists all gate keys before auth and survives fresh Home mounts
+  ---
+  duration_ms: 214.7726
+  type: 'test'
+  ...
+# Subtest: ordinary signin dismisses its modal to existing Home; photo handoff still replaces exactly once
+ok 2 - ordinary signin dismisses its modal to existing Home; photo handoff still replaces exactly once
+  ---
+  duration_ms: 452.7734
+  type: 'test'
+  ...
+# Subtest: actual login component signup preserves local preview and reaches fixed uploader
+ok 3 - actual login component signup preserves local preview and reaches fixed uploader
+  ---
+  duration_ms: 117.0706
+  type: 'test'
+  ...
+# Subtest: actual login component signin preserves local preview and reaches fixed uploader
+ok 4 - actual login component signin preserves local preview and reaches fixed uploader
+  ---
+  duration_ms: 76.8569
+  type: 'test'
+  ...
+# Subtest: actual login component confirmation preserves local preview and reaches fixed uploader
+ok 5 - actual login component confirmation preserves local preview and reaches fixed uploader
+  ---
+  duration_ms: 177.0867
+  type: 'test'
+  ...
+# Subtest: wrong password retry, double signup tap and explicit Explore do not lose preview or duplicate navigation
+ok 6 - wrong password retry, double signup tap and explicit Explore do not lose preview or duplicate navigation
+  ---
+  duration_ms: 218.6116
+  type: 'test'
+  ...
+# Subtest: actual login google session listener defers to OAuth callback, cancel and error permit retry
+ok 7 - actual login google session listener defers to OAuth callback, cancel and error permit retry
+  ---
+  duration_ms: 290.4062
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792715476190-1',
+#       destinationId: '11111111-1111-4111-8111-111111111111',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: actual google callback deep-link code exchange sends current user to original restaurant
+ok 8 - actual google callback deep-link code exchange sends current user to original restaurant
+  ---
+  duration_ms: 162.5683
+  type: 'test'
+  ...
+# Subtest: actual login facebook session listener defers to OAuth callback, cancel and error permit retry
+ok 9 - actual login facebook session listener defers to OAuth callback, cancel and error permit retry
+  ---
+  duration_ms: 193.8619
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792715476525-1',
+#       destinationId: '11111111-1111-4111-8111-111111111111',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: actual facebook callback deep-link code exchange sends current user to original restaurant
+ok 10 - actual facebook callback deep-link code exchange sends current user to original restaurant
+  ---
+  duration_ms: 140.7948
+  type: 'test'
+  ...
+# Subtest: normal login and saved destination precedence remain intact
+ok 11 - normal login and saved destination precedence remain intact
+  ---
+  duration_ms: 93.2263
+  type: 'test'
+  ...
+# Subtest: duplicate signed-in notifications before and after handoff cannot replace uploader with Home
+ok 12 - duplicate signed-in notifications before and after handoff cannot replace uploader with Home
+  ---
+  duration_ms: 45.5899
+  type: 'test'
+  ...
+# Subtest: legacy import cannot replay nested V2 local preview payloads
+ok 13 - legacy import cannot replay nested V2 local preview payloads
+  ---
+  duration_ms: 50.7875
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792715476847-1',
+#       destinationId: '11111111-1111-4111-8111-111111111111',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792715477002-1',
+#       destinationId: '11111111-1111-4111-8111-111111111111',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792715477157-1',
+#       destinationId: '11111111-1111-4111-8111-111111111111',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/(tabs)/ratings',
+#     params: {
+#       savedAction: 'save',
+#       savedDestinationId: '11111111-1111-4111-8111-111111111111',
+#       savedActionState: 'save',
+#       savedActionUserId: 'synthetic-account'
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# OAuth callback failed { code: 'callback_failed' }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: callback rejects arbitrary return-route injection and preserves saved-action priority
+ok 14 - callback rejects arbitrary return-route injection and preserves saved-action priority
+  ---
+  duration_ms: 599.3273
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792715477475-1',
+#       destinationId: '11111111-1111-4111-8111-111111111111',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# [auth/callback] processing started
+# OAuth callback failed { code: 'callback_failed' }
+# [auth/callback] processing started
+# [auth/callback] current user resolved { userId: 'synthetic-account' }
+# Subtest: actual google callback rejects anonymous user and permits retry without consuming Wing Shot
+ok 15 - actual google callback rejects anonymous user and permits retry without consuming Wing Shot
+  ---
+  duration_ms: 159.0733
+  type: 'test'
+  ...
+# [auth/callback] final route decision {
+#   finalRoute: {
+#     pathname: '/profile/wing-shots/submit',
+#     params: {
+#       source: 'onboarding',
+#       handoffId: '1792715477634-1',
+#       destinationId: '11111111-1111-4111-8111-111111111111',
+#       restaurantName: ''
+#     }
+#   },
+#   userId: 'synthetic-account'
+# }
+# Subtest: actual facebook callback rejects anonymous user and permits retry without consuming Wing Shot
+ok 16 - actual facebook callback rejects anonymous user and permits retry without consuming Wing Shot
+  ---
+  duration_ms: 162.5342
+  type: 'test'
+  ...
+# Subtest: Metro prunes generated Expo cache directories on Windows and POSIX without excluding app or QA fixture sources
+ok 17 - Metro prunes generated Expo cache directories on Windows and POSIX without excluding app or QA fixture sources
+  ---
+  duration_ms: 2.5696
+  type: 'test'
+  ...
+# Subtest: explicit confirmation reuses preview operation and trusts only canonical accepted receipt
+ok 18 - explicit confirmation reuses preview operation and trusts only canonical accepted receipt
+  ---
+  duration_ms: 196.5731
+  type: 'test'
+  ...
+# Subtest: missing preview, account switch, location denial and server rejection fail closed
+ok 19 - missing preview, account switch, location denial and server rejection fail closed
+  ---
+  duration_ms: 255.5177
+  type: 'test'
+  ...
+# Subtest: account changes while locating never submit; ineligible receipt stays accurately saved
+ok 20 - account changes while locating never submit; ineligible receipt stays accurately saved
+  ---
+  duration_ms: 46.2525
+  type: 'test'
+  ...
+# Subtest: confirmation requires tap, ignores double taps, links uploader only to eligible receipt, and cancels Home
+ok 21 - confirmation requires tap, ignores double taps, links uploader only to eligible receipt, and cancels Home
+  ---
+  duration_ms: 51.132
+  type: 'test'
+  ...
+# (node:36712) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/onboarding-single-owner.test.js is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to C:\\Users\\Brand\\repo\\BuffagoApp\\crawl\\package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: onboarding has one route owner and is not globally overlaid during auth hydration
+ok 22 - onboarding has one route owner and is not globally overlaid during auth hydration
+  ---
+  duration_ms: 0.7924
+  type: 'test'
+  ...
+# Subtest: welcome has two paths; explore completes and replaces with home without rating
+ok 23 - welcome has two paths; explore completes and replaces with home without rating
+  ---
+  duration_ms: 257.1951
+  type: 'test'
+  ...
+# Subtest: Wingman canonical selection uses shared rating; result is local and auth follows completion
+ok 24 - Wingman canonical selection uses shared rating; result is local and auth follows completion
+  ---
+  duration_ms: 113.5811
+  type: 'test'
+  ...
+# Subtest: pending Wingman result cannot open rating; manual review allows explore
+ok 25 - pending Wingman result cannot open rating; manual review allows explore
+  ---
+  duration_ms: 96.0818
+  type: 'test'
+  ...
+# Subtest: preview survives compatibility write failure and restores result on a later mount
+ok 26 - preview survives compatibility write failure and restores result on a later mount
+  ---
+  duration_ms: 139.3142
+  type: 'test'
+  ...
+# Subtest: V2 supersedes experiment and both auth import paths explicitly preserve V2 previews
+ok 27 - V2 supersedes experiment and both auth import paths explicitly preserve V2 previews
+  ---
+  duration_ms: 5.8166
+  type: 'test'
+  ...
+# Subtest: restored pepper slider uses original native integer interaction and appearance
+ok 28 - restored pepper slider uses original native integer interaction and appearance
+  ---
+  duration_ms: 116.8181
+  type: 'test'
+  ...
+# Subtest: quick and full rating revisits keep selected scores and submit unchanged numbers
+ok 29 - quick and full rating revisits keep selected scores and submit unchanged numbers
+  ---
+  duration_ms: 125.7831
+  type: 'test'
+  ...
+# Subtest: V2 location stays optional; returning users and disabled flag retain permission behavior
+ok 30 - V2 location stays optional; returning users and disabled flag retain permission behavior
+  ---
+  duration_ms: 42.6918
+  type: 'test'
+  ...
+# Subtest: existing restaurant search selects the same shared quick rating dialog
+ok 31 - existing restaurant search selects the same shared quick rating dialog
+  ---
+  duration_ms: 438.0283
+  type: 'test'
+  ...
+# Subtest: disabled photo flags keep preview and Explore without advertising account upload
+ok 32 - disabled photo flags keep preview and Explore without advertising account upload
+  ---
+  duration_ms: 59.7594
+  type: 'test'
+  ...
+# Subtest: guest invitation uses release contract without calling authenticated flags
+ok 33 - guest invitation uses release contract without calling authenticated flags
+  ---
+  duration_ms: 43.3985
+  type: 'test'
+  ...
+# Subtest: authenticated V2 result skips signup and opens same restaurant uploader directly
+ok 34 - authenticated V2 result skips signup and opens same restaurant uploader directly
+  ---
+  duration_ms: 47.8898
+  type: 'test'
+  ...
+# Subtest: post-auth definitive flags open same destination with existing composer; identity loss closes uploader
+ok 35 - post-auth definitive flags open same destination with existing composer; identity loss closes uploader
+  ---
+  duration_ms: 164.4991
+  type: 'test'
+  ...
+# Subtest: invite followed by disabled flags offers truthful retry and Explore, never uploader
+ok 36 - invite followed by disabled flags offers truthful retry and Explore, never uploader
+  ---
+  duration_ms: 53.8225
+  type: 'test'
+  ...
+# Subtest: invite followed by network flags offers truthful retry and Explore, never uploader
+ok 37 - invite followed by network flags offers truthful retry and Explore, never uploader
+  ---
+  duration_ms: 66.1358
+  type: 'test'
+  ...
+# Subtest: authoritative flag timeout is bounded; failed and partial responses never grant uploads
+ok 38 - authoritative flag timeout is bounded; failed and partial responses never grant uploads
+  ---
+  duration_ms: 34.7232
+  type: 'test'
+  ...
+# Subtest: bound preview handoff opens confirmation before any uploader
+ok 39 - bound preview handoff opens confirmation before any uploader
+  ---
+  duration_ms: 45.9763
+  type: 'test'
+  ...
+# Subtest: all password and OAuth session handoffs use validated one-time route, never preview rating ID
+ok 40 - all password and OAuth session handoffs use validated one-time route, never preview rating ID
+  ---
+  duration_ms: 4.5814
+  type: 'test'
+  ...
+# Subtest: no session and anonymous sessions preserve intent until actual current login
+ok 41 - no session and anonymous sessions preserve intent until actual current login
+  ---
+  duration_ms: 0.8696
+  type: 'test'
+  ...
+# Subtest: expiry, different bound account, stale screen and pseudo IDs fail safely
+ok 42 - expiry, different bound account, stale screen and pseudo IDs fail safely
+  ---
+  duration_ms: 1.2781
+  type: 'test'
+  ...
+# Subtest: composer verifies canonical ID through RLS before opening existing flow; lookup failures keep picker
+ok 43 - composer verifies canonical ID through RLS before opening existing flow; lookup failures keep picker
+  ---
+  duration_ms: 448.6896
+  type: 'test'
+  ...
+# Subtest: durable routed intent survives cold restart until destination acknowledgment, then cannot replay
+ok 44 - durable routed intent survives cold restart until destination acknowledgment, then cannot replay
+  ---
+  duration_ms: 12.4375
+  type: 'test'
+  ...
+# Subtest: failed verification retains intent; explicit sign-out and account switches clear private action
+ok 45 - failed verification retains intent; explicit sign-out and account switches clear private action
+  ---
+  duration_ms: 29.948
+  type: 'test'
+  ...
+# Subtest: route-supplied handoff identity and account cannot impersonate the bound handoff
+ok 46 - route-supplied handoff identity and account cannot impersonate the bound handoff
+  ---
+  duration_ms: 13.3112
+  type: 'test'
+  ...
+# Subtest: Home rating persistence is authenticated, server-authoritative, and idempotent
+ok 47 - Home rating persistence is authenticated, server-authoritative, and idempotent
+  ---
+  duration_ms: 0.9449
+  type: 'test'
+  ...
+# Subtest: only proximity-verified non-admin Home ratings become Wing Shot eligible
+ok 48 - only proximity-verified non-admin Home ratings become Wing Shot eligible
+  ---
+  duration_ms: 0.2471
+  type: 'test'
+  ...
+# Subtest: rating, provenance, operation receipt, and referral settlement share one transaction
+ok 49 - rating, provenance, operation receipt, and referral settlement share one transaction
+  ---
+  duration_ms: 0.172
+  type: 'test'
+  ...
+# Subtest: creates normalized durable rating verification receipts without raw coordinates
+ok 50 - creates normalized durable rating verification receipts without raw coordinates
+  ---
+  duration_ms: 2.0495
+  type: 'test'
+  ...
+# Subtest: receipt eligibility shape permits only verified in-person provenance
+ok 51 - receipt eligibility shape permits only verified in-person provenance
+  ---
+  duration_ms: 0.3439
+  type: 'test'
+  ...
+# Subtest: receipts are append-only and unavailable for direct client mutation
+ok 52 - receipts are append-only and unavailable for direct client mutation
+  ---
+  duration_ms: 0.5023
+  type: 'test'
+  ...
+# Subtest: canonical rating RPC rejects incomplete scores and preserves in-person validation
+ok 53 - canonical rating RPC rejects incomplete scores and preserves in-person validation
+  ---
+  duration_ms: 0.2814
+  type: 'test'
+  ...
+# Subtest: canonical RPC persists rating before provenance and excludes administrative bypass
+ok 54 - canonical RPC persists rating before provenance and excludes administrative bypass
+  ---
+  duration_ms: 0.2475
+  type: 'test'
+  ...
+# Subtest: failed rating cannot leave provenance because persistence and settlement share a transaction
+ok 55 - failed rating cannot leave provenance because persistence and settlement share a transaction
+  ---
+  duration_ms: 0.1366
+  type: 'test'
+  ...
+# Subtest: eligibility predicate fails closed for BuffaCoin incomplete or unverified ratings
+ok 56 - eligibility predicate fails closed for BuffaCoin incomplete or unverified ratings
+  ---
+  duration_ms: 0.2938
+  type: 'test'
+  ...
+# Subtest: owner eligibility RPC sanitizes results and treats absent provenance as unverified
+ok 57 - owner eligibility RPC sanitizes results and treats absent provenance as unverified
+  ---
+  duration_ms: 0.2592
+  type: 'test'
+  ...
+# Subtest: migration does not backfill legacy onboarding imported or direct ratings
+ok 58 - migration does not backfill legacy onboarding imported or direct ratings
+  ---
+  duration_ms: 0.5445
+  type: 'test'
+  ...
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 401, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 429, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 500, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 401, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 429, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 500, clone: [Function: clone] }
+# }
+# Subtest: whole-operation timeout, cancellation and stalled error body are bounded
+ok 59 - whole-operation timeout, cancellation and stalled error body are bounded
+  ---
+  duration_ms: 2044.6004
+  type: 'test'
+  ...
+# Subtest: search/add/select succeeds and repeated taps are suppressed: null
+ok 60 - search/add/select succeeds and repeated taps are suppressed: null
+  ---
+  duration_ms: 132.8884
+  type: 'test'
+  ...
+# Subtest: search/add/select succeeds and repeated taps are suppressed: signed-in
+ok 61 - search/add/select succeeds and repeated taps are suppressed: signed-in
+  ---
+  duration_ms: 110.0034
+  type: 'test'
+  ...
+# Subtest: HTTP 401 (null) exits loading and preserves restaurant for retry
+ok 62 - HTTP 401 (null) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 86.1202
+  type: 'test'
+  ...
+# Subtest: HTTP 429 (null) exits loading and preserves restaurant for retry
+ok 63 - HTTP 429 (null) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 67.6154
+  type: 'test'
+  ...
+# Subtest: HTTP 422 (null) exits loading and preserves restaurant for retry
+ok 64 - HTTP 422 (null) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 62.6741
+  type: 'test'
+  ...
+# Subtest: HTTP 500 (null) exits loading and preserves restaurant for retry
+ok 65 - HTTP 500 (null) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 66.6009
+  type: 'test'
+  ...
+# Subtest: HTTP 401 (signed-in) exits loading and preserves restaurant for retry
+ok 66 - HTTP 401 (signed-in) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 62.5906
+  type: 'test'
+  ...
+# Subtest: HTTP 429 (signed-in) exits loading and preserves restaurant for retry
+ok 67 - HTTP 429 (signed-in) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 87.3584
+  type: 'test'
+  ...
+# Subtest: HTTP 422 (signed-in) exits loading and preserves restaurant for retry
+ok 68 - HTTP 422 (signed-in) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 60.7933
+  type: 'test'
+  ...
+# Subtest: HTTP 500 (signed-in) exits loading and preserves restaurant for retry
+ok 69 - HTTP 500 (signed-in) exits loading and preserves restaurant for retry
+  ---
+  duration_ms: 49.8041
+  type: 'test'
+  ...
+# Subtest: 422 with stalled parsing exits loading and defers guest review locally
+ok 70 - 422 with stalled parsing exits loading and defers guest review locally
+  ---
+  duration_ms: 59.9205
+  type: 'test'
+  ...
+# runWingman failed: Error: Wingman took too long. Please try again; your details are still here.
+#     at Timeout.<anonymous> (evalmachine.<anonymous>:12:60)
+#     at listOnTimeout (node:internal/timers:588:17)
+#     at process.processTimers (node:internal/timers:523:7)
+# Subtest: search failure/timeout leaves loading
+ok 71 - search failure/timeout leaves loading
+  ---
+  duration_ms: 75.3124
+  type: 'test'
+  ...
+# verifyWingsAndAdd failed: Error: Wingman took too long. Please try again; your details are still here.
+#     at Timeout.<anonymous> (evalmachine.<anonymous>:12:60)
+#     at listOnTimeout (node:internal/timers:588:17)
+#     at process.processTimers (node:internal/timers:523:7)
+# Subtest: verification failure/timeout leaves loading
+ok 72 - verification failure/timeout leaves loading
+  ---
+  duration_ms: 74.0158
+  type: 'test'
+  ...
+# insertWingmanDestination failed: Error: Wingman took too long. Please try again; your details are still here.
+#     at Timeout.<anonymous> (evalmachine.<anonymous>:12:60)
+#     at listOnTimeout (node:internal/timers:588:17)
+#     at process.processTimers (node:internal/timers:523:7)
+# Subtest: insert failure/timeout leaves loading
+ok 73 - insert failure/timeout leaves loading
+  ---
+  duration_ms: 75.3205
+  type: 'test'
+  ...
+# Subtest: selection failure/timeout leaves loading
+ok 74 - selection failure/timeout leaves loading
+  ---
+  duration_ms: 92.9697
+  type: 'test'
+  ...
+# runWingman failed: Error: Network disconnected
+#     at file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/wingman-guest-onboarding.test.mjs:72:81
+#     at WingmanService.run (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/wingman-guest-onboarding.test.mjs:33:107)
+#     at Object.onPress (evalmachine.<anonymous>:445:47)
+#     at Object.press (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/wingman-guest-onboarding.test.mjs:45:154)
+#     at TestContext.<anonymous> (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/wingman-guest-onboarding.test.mjs:74:11)
+#     at Test.runInAsyncScope (node:async_hooks:214:14)
+#     at Test.run (node:internal/test_runner/test:1047:25)
+#     at Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+#     at Test.postRun (node:internal/test_runner/test:1173:19)
+#     at Test.run (node:internal/test_runner/test:1101:12)
+# load states failed: Wingman request cancelled.
+# runWingman failed: Error: Wingman request cancelled.
+#     at AbortSignal.cancel (evalmachine.<anonymous>:11:50)
+#     at [nodejs.internal.kHybridDispatch] (node:internal/event_target:827:20)
+#     at AbortSignal.dispatchEvent (node:internal/event_target:762:26)
+#     at runAbort (node:internal/abort_controller:486:10)
+#     at abortSignal (node:internal/abort_controller:457:3)
+#     at AbortController.abort (node:internal/abort_controller:505:5)
+#     at Object.cleanup (evalmachine.<anonymous>:76:40)
+#     at file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/helpers/mobile-runtime.mjs:45:44
+#     at Object.render (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/helpers/mobile-runtime.mjs:50:114)
+#     at Object.render (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/wingman-guest-onboarding.test.mjs:43:32)
+# runWingman failed: Error: Wingman request cancelled.
+#     at AbortSignal.cancel (evalmachine.<anonymous>:11:50)
+#     at [nodejs.internal.kHybridDispatch] (node:internal/event_target:827:20)
+#     at AbortSignal.dispatchEvent (node:internal/event_target:762:26)
+#     at runAbort (node:internal/abort_controller:486:10)
+#     at abortSignal (node:internal/abort_controller:457:3)
+#     at AbortController.abort (node:internal/abort_controller:505:5)
+#     at Object.cleanup (evalmachine.<anonymous>:76:40)
+#     at Object.unmount (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/helpers/mobile-runtime.mjs:51:58)
+#     at TestContext.<anonymous> (file:///C:/Users/Brand/repo/BuffagoApp/crawl/tests/wingman-guest-onboarding.test.mjs:86:42)
+#     at async Test.run (node:internal/test_runner/test:1054:7)
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 401, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 401, clone: [Function: clone] }
+# }
+# insertWingmanDestination failed: {
+#   message: 'HTTP error',
+#   context: { status: 401, clone: [Function: clone] }
+# }
+# Subtest: review failure/timeout leaves loading
+ok 75 - review failure/timeout leaves loading
+  ---
+  duration_ms: 68.4979
+  type: 'test'
+  ...
+# Subtest: network failure/timeout leaves loading
+ok 76 - network failure/timeout leaves loading
+  ---
+  duration_ms: 40.3187
+  type: 'test'
+  ...
+# Subtest: signed-in rejection writes a real suggestion and guest local save errors do not claim success
+ok 77 - signed-in rejection writes a real suggestion and guest local save errors do not claim success
+  ---
+  duration_ms: 79.3539
+  type: 'test'
+  ...
+# Subtest: dismiss/reopen and unmount cancel pending search and ignore late completion
+ok 78 - dismiss/reopen and unmount cancel pending search and ignore late completion
+  ---
+  duration_ms: 34.5786
+  type: 'test'
+  ...
+# Subtest: installed iOS build source: ordinary 401 clears loading; stalled error-body parsing reproduces persistent spinner
+ok 79 - installed iOS build source: ordinary 401 clears loading; stalled error-body parsing reproduces persistent spinner
+  ---
+  duration_ms: 138.1312
+  type: 'test'
+  ...
+# Subtest: pre-cancelled operations observe rejections and never start a request
+ok 80 - pre-cancelled operations observe rejections and never start a request
+  ---
+  duration_ms: 0.4653
+  type: 'test'
+  ...
+# Subtest: fixed 401 does not wait for a stalled error body
+ok 81 - fixed 401 does not wait for a stalled error body
+  ---
+  duration_ms: 29.4361
+  type: 'test'
+  ...
+# Subtest: actual onboarding selection advances despite stalled analytics and stops on storage failure/cancellation
+ok 82 - actual onboarding selection advances despite stalled analytics and stops on storage failure/cancellation
+  ---
+  duration_ms: 68.4137
+  type: 'test'
+  ...
+1..82
+# tests 82
+# suites 0
+# pass 82
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4662.1509

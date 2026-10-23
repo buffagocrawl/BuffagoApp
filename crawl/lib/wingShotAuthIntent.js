@@ -23,11 +23,12 @@ async function read(storage, now) {
   }
   return intent;
 }
-export function saveWingShotIntent(storage, { destinationId, restaurantName, userId = null }, now = Date.now()) {
+export function saveWingShotIntent(storage, { destinationId, restaurantName, previewId = null, userId = null }, now = Date.now()) {
   return exclusive(async () => {
     routed.clear();
     const intent = { version: 2, id: `${now}-${++sequence}`, source: 'onboarding',
       destinationId: uuid(destinationId) ? destinationId : null,
+      previewId: uuid(previewId) ? previewId : null,
       restaurantName: typeof restaurantName === 'string' ? restaurantName.trim().slice(0, 120) : '',
       createdAt: now, expiresAt: now + TTL, userId, handoff: 'pending' };
     await storage.setItem(KEY, JSON.stringify(intent));

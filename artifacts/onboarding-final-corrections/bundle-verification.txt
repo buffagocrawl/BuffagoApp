@@ -1,0 +1,34 @@
+★ eas-cli@25.3.0 is now available.
+To upgrade, run:
+npm install -g eas-cli
+Proceeding with outdated version.
+
+Environment variables with visibility "Plain text" and "Sensitive" loaded from the "production" environment on EAS: EXPO_PUBLIC_GOOGLE_ANDROID_API_KEY, EXPO_PUBLIC_GOOGLE_API_KEY, EXPO_PUBLIC_GOOGLE_IOS_API_KEY, EXPO_PUBLIC_SUPABASE_ANON_KEY, EXPO_PUBLIC_SUPABASE_URL.
+Environment variables loaded from the "production" build profile "env" configuration: EXPO_PUBLIC_ENABLE_WING_JURY, EXPO_PUBLIC_ENABLE_SAVED_DESTINATIONS, EXPO_PUBLIC_ONBOARDING_V2, EXPO_PUBLIC_ONBOARDING_WING_SHOT_INVITE.
+
+{
+  "environment": "production",
+  "platform": "android",
+  "buildType": "app-bundle",
+  "flags": {
+    "EXPO_PUBLIC_ONBOARDING_V2": "true",
+    "EXPO_PUBLIC_ONBOARDING_WING_SHOT_INVITE": "true"
+  },
+  "bundle": "entry-5800f5c25b52e85d25464c2a6f0e2ef7.js",
+  "sha256": "028e74224c5c5e0cf4b148c851ecec4dba23e4b9c66b554f124ba145f77e5791",
+  "bundled": {
+    "ENABLE_ONBOARDING_V2": true,
+    "ENABLE_ONBOARDING_WING_SHOT_INVITE": true
+  },
+  "route": "ENABLE_ONBOARDING_V2 ? OnboardingV2 : OnboardingExperimentRoute",
+  "sourceMatches": {
+    "components/RatingWizardDialog.jsx": true,
+    "components/OnboardingV2.jsx": true,
+    "components/OnboardingRatingConfirmation.jsx": true,
+    "lib/confirmOnboardingRating.js": true,
+    "lib/wingShotAuthIntent.js": true,
+    "components/wingShots/WingShotComposer.tsx": true,
+    "app/profile/wing-shots/submit.jsx": true,
+    "app/onboarding.jsx": true
+  }
+}

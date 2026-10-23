@@ -28,7 +28,9 @@
       "environment": "production",
       "env": {
         "EXPO_PUBLIC_ENABLE_WING_JURY": "true",
-        "EXPO_PUBLIC_ENABLE_SAVED_DESTINATIONS": "true"
+        "EXPO_PUBLIC_ENABLE_SAVED_DESTINATIONS": "true",
+        "EXPO_PUBLIC_ONBOARDING_V2": "true",
+        "EXPO_PUBLIC_ONBOARDING_WING_SHOT_INVITE": "true"
       }
     }
   },

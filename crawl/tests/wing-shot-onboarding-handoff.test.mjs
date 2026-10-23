@@ -32,20 +32,20 @@ import { hookRuntime } from './helpers/mobile-runtime.mjs';
 const nodes = tree => !tree ? [] : Array.isArray(tree) ? tree.flatMap(nodes) : [tree, ...nodes(tree.props?.children)];
 const flush = async()=>{for(let i=0;i<20;i++)await Promise.resolve();};
 test('composer verifies canonical ID through RLS before opening existing flow; lookup failures keep picker',async()=>{
-  for(const outcome of ['valid','missing','network','pseudo']) {
+  for(const outcome of ['valid','missing','network','pseudo','linked','linked-network']) {
     const runtime=hookRuntime();let lookups=0;
     const Composer=mobileModule('components/wingShots/WingShotComposer.tsx',{
       react:runtime.react,'react/jsx-runtime':runtime.jsx,
       'react-native':{FlatList:'list',Pressable:'button',StyleSheet:{create:x=>x},Text:'text',TextInput:'input',View:'view'},
       './WingShotFlow':{WingShotFlow:'flow'},'../../lib/wingShotAuthIntent':mobileModule('lib/wingShotAuthIntent.js',{}),
       '../../lib/analytics':{trackEvent:async()=>{}},
-      '../../lib/supabase':{supabase:{from:()=>({select(){return this;},order(){return this;},limit(){return this;},ilike(){return this;},then(resolve){return Promise.resolve({data:[]}).then(resolve);},eq(){lookups++;return this;},maybeSingle:async()=>outcome==='network'?Promise.reject(Error('offline')):{data:outcome==='valid'?{id,name:'Verified Wings'}:null}})}}
+      '../../lib/supabase':{supabase:{from:()=>({select(){return this;},order(){return this;},limit(){return this;},ilike(){return this;},then(resolve){return Promise.resolve({data:[]}).then(resolve);},eq(){lookups++;return this;},maybeSingle:async()=>outcome.includes('network')?Promise.reject(Error('offline')):{data:(outcome==='valid'||outcome==='linked')?{id,name:'Verified Wings'}:null}})}}
     }).WingShotComposer;
-    const props={source:'onboarding',destinationId:outcome==='pseudo'?'new:1':id,restaurantName:'Untrusted label',onClose:()=>{}};
+    const props={source:'onboarding',destinationId:outcome==='pseudo'?'new:1':id,restaurantName:'Untrusted label',eligibleRatingId:outcome.startsWith('linked')?id:undefined,onClose:()=>{}};
     runtime.render(Composer,props);await flush();const tree=runtime.render(Composer,props);
     const flow=nodes(tree).find(n=>n.type==='flow');
-    if(outcome==='valid'){assert.equal(flow.props.destinationId,id);assert.equal(flow.props.submissionSource,'onboarding');assert.equal(flow.props.eligibleRatingId,undefined);assert.ok(nodes(tree).some(n=>n.props?.children==='Verified Wings'));}
-    else {assert.equal(flow,undefined);assert.ok(nodes(tree).some(n=>n.type==='input'));}
+    if(outcome==='valid'||outcome==='linked'){assert.equal(flow.props.destinationId,id);assert.equal(flow.props.submissionSource,'onboarding');assert.equal(flow.props.eligibleRatingId,outcome==='linked'?id:undefined);if(outcome==='linked')assert.equal(flow.props.onChangeRestaurant,undefined);assert.ok(nodes(tree).some(n=>n.props?.children==='Verified Wings'));}
+    else {assert.equal(flow,undefined);if(outcome==='linked-network'){assert.equal(nodes(tree).some(n=>n.type==='input'),false);assert.ok(nodes(tree).some(n=>n.props?.children==='Retry restaurant'));}else assert.ok(nodes(tree).some(n=>n.type==='input'));}
     if(outcome==='pseudo')assert.equal(lookups,0);
     runtime.unmount();
   }

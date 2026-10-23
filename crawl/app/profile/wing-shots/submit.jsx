@@ -1,3 +1,4 @@
+import OnboardingRatingConfirmation from '../../../components/OnboardingRatingConfirmation';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
@@ -68,6 +69,7 @@ export default function WingShotSubmitScreen() {
     if (source === 'onboarding' && !handoffId) await saveWingShotIntent(AsyncStorage, { destinationId, restaurantName });
     router.replace('/auth/login');
   };
+  if (state === 'ready' && context?.previewId) return <OnboardingRatingConfirmation key={account.current} context={context} userId={account.current} handoffId={handoffId} onClose={close} />;
   if (state === 'ready' && context) return <WingShotComposer source={source} destinationId={context.destinationId} restaurantName={context.restaurantName}
     userId={account.current} onDestinationResolved={() => { if (handoffId) return completeWingShotHandoff(AsyncStorage, handoffId); }} onClose={close} />;
   return <View style={{ flex: 1, justifyContent: 'center', padding: 24, gap: 16 }}>
