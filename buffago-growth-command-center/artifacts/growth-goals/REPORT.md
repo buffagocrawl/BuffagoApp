@@ -1,6 +1,6 @@
-﻿# Growth & Goals delivery — 2026-10-29
+# Growth & Goals delivery — 2026-10-29
 
-Implementation is verified locally; Pi deployment and existing state-source integration remain blocked. This is not a claim of a live Pi deployment or completed state-data connection.
+Initial delivery record. The dashboard is now deployed with live state counts; see [the live deployment report](DEPLOYMENT.md) for the current status, source definitions, screenshot, verified refresh task and remaining target inputs.
 
 ## Scope and inspected implementation
 

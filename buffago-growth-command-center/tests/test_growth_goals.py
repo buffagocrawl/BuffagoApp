@@ -45,7 +45,7 @@ class GrowthGoalsTests(unittest.TestCase):
             path=Path(directory)/'feed.json'
             path.write_text(json.dumps({'schema_version':1,'exported_at':report()['generated_at'],'social':project_report(report())}))
             feed=PanelFeed(); feed.load(path)
-            self.assertFalse(feed.stale(datetime(2026,10,29,21,tzinfo=timezone.utc)))
+            self.assertFalse(feed.stale(datetime(2026,10,29,20,10,tzinfo=timezone.utc)))
             good=feed.data; path.write_text('{broken'); feed.load(path)
             self.assertIs(feed.data,good); self.assertTrue(feed.stale())
             self.assertEqual(feed.status,'Refresh failed')
@@ -158,3 +158,58 @@ class GoalSourceTests(unittest.TestCase):
             raw['social']['reels']=[{'platform':'instagram'}]
             path.write_text(json.dumps(raw)); feed.load(path)
             self.assertIs(feed.data,prior); self.assertTrue(feed.failed)
+
+class LiveAdapterTests(unittest.TestCase):
+    def test_live_state_aggregation_and_approved_photo_semantics(self):
+        from adapters.state_counts import collect_states
+        class Reader:
+            def rows(self, table):
+                return {'states':[{'state_id':1,'state_code':'CT'},{'state_id':2,'state_code':'NY'}],
+                  'destinations':[{'id':'one','state_id':1}],
+                  'destination_ratings':[{'destination_id':'one'}],
+                  'wing_media_submissions':[{'destination_id':'one','media_type':'photo','status':status,'withdrawn_at':withdrawn}
+                    for status,withdrawn in [('approved',None),('posted',None),('rejected',None),('approved','2026-01-01')]]}[table]
+        states=state_goals(collect_states(Reader()))
+        self.assertEqual([s['code'] for s in states],['CT','NY'])
+        self.assertEqual([m['current'] for m in states[0]['metrics']],[1,1,2])
+        self.assertTrue(all(m['target'] is None for s in states for m in s['metrics']))
+        self.assertNotIn('destination_id',json.dumps(states))
+
+    def test_forced_receiver_accepts_only_valid_cache(self):
+        from adapters.receive_growth import receive
+        from io import BytesIO
+        with TemporaryDirectory() as directory:
+            path=Path(directory)/'feed.json'
+            good={'schema_version':1,'exported_at':report()['generated_at'],'social':project_report(report())}
+            receive(BytesIO(json.dumps(good).encode()),path)
+            previous=path.read_bytes()
+            for raw in ({'schema_version':1},dict(good,secret='no')):
+                with self.assertRaises(ValueError): receive(BytesIO(json.dumps(raw).encode()),path)
+                self.assertEqual(previous,path.read_bytes())
+
+    def test_installed_merge_preserves_pipeline_and_local_methods(self):
+        from tools.stage_growth_goals import merge_app,merge_dashboard,methods
+        from pathlib import Path
+        root=Path(__file__).parents[1]
+        reference=(root/'ui/dashboard.py').read_text(encoding='utf-8')
+        # Simulate the inspected installed legacy hook without replacing it.
+        installed=reference.replace('        self.growth_feed = PanelFeed()\n','')
+        merged=merge_dashboard(installed,reference)
+        for name in ('_draw_tiles','_draw_charts','_draw_actions','_draw_activity','destroy','_draw_growth_engine'):
+            import ast
+            self.assertEqual(ast.dump(methods(installed,'Dashboard')[name]),ast.dump(methods(merged,'Dashboard')[name]))
+        original=(root/'app.py').read_text(encoding='utf-8')
+        hook='        self._growth_path = Path(os.getenv("BUFFAGO_GROWTH_GOALS_PATH", config.cache_path.parent / "growth-goals.json"))\n        self.root.after(200, self._refresh_growth_goals)\n'
+        original=original.replace(hook,'')
+        start=original.index('    def _refresh_growth_goals(');end=original.index('    def _leave_fullscreen(',start)
+        original=original[:start]+original[end:]
+        merged=merge_app(original)
+        for name in ('_fetch_in_background','_refresh_succeeded','_refresh_failed'):
+            self.assertEqual(ast.dump(methods(original,'Application')[name]),ast.dump(methods(merged,'Application')[name]))
+
+class DeliveryFreshnessTests(unittest.TestCase):
+    def test_delivery_stops_become_stale_before_daily_collection_does(self):
+        feed=PanelFeed()
+        feed.data={'social':project_report(report()),'exported_at':report()['generated_at']}
+        self.assertFalse(feed.stale(datetime(2026,10,29,20,20,tzinfo=timezone.utc)))
+        self.assertTrue(feed.stale(datetime(2026,10,29,20,31,tzinfo=timezone.utc)))

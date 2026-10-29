@@ -270,7 +270,5 @@ Reproduce a developer screenshot without starting any network worker:
 python tools/preview_growth_goals.py --feed <sanitized-projection.json> --output preview.png
 ```
 
-The preview defaults to the previously recorded Pi dimensions, 1920x1080, and
-labels the left-side business data as demo. Pillow is a development-only capture
-dependency. Live Pi deployment and its existing state-source mapping still need
-the access and inputs listed in the handoff.
+The preview defaults to Pi's verified 1920x1080 dimensions and labels the left-side business data as demo. Pillow is a development-only capture dependency.
+See [the live deployment report](artifacts/growth-goals/DEPLOYMENT.md) for the installed dashboard, real screenshot, all-state count sources, restricted upload task, login dependency and missing goal inputs.

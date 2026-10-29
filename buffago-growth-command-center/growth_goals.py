@@ -151,4 +151,6 @@ class PanelFeed:
     def stale(self, now=None):
         now = now or datetime.now(timezone.utc)
         stamp = moment((self.data or {}).get('social', {}).get('generated_at'))
-        return self.failed or stamp is None or (now-stamp).total_seconds() > 36*3600
+        exported = moment((self.data or {}).get('exported_at'))
+        delivery_old = exported is not None and (now-exported).total_seconds() > 30*60
+        return self.failed or stamp is None or delivery_old or (now-stamp).total_seconds() > 36*3600

@@ -4,6 +4,20 @@ import webbrowser
 from datetime import datetime, timezone
 from growth_goals import display, moment, public_link
 from ui import theme
+from ui.components import Painter
+
+
+class BusinessPainter(Painter):
+    def text(self, x, y, value, *args, **kwargs):
+        if isinstance(value, str) and value.endswith('% of restaurants'):
+            value = value.replace(' of restaurants', '')
+        return super().text(x, y, value, *args, **kwargs)
+
+
+def business_painter(canvas, width, height, scale):
+    painter = BusinessPainter(canvas, int(width * 0.71), height)
+    painter.scale = scale
+    return painter
 
 
 def text_stamp(value):
@@ -67,6 +81,8 @@ def details(dashboard):
     if not social.get('comparisons'):
         line('Insufficient history: need at least 3 measured posts in each mature cohort.')
     line('\nSTATE GOALS • all eligible states in source priority order')
+    line(data.get('state_order', 'Priority order unavailable'))
+    line('Photos count approved lifecycle contributions that have not been withdrawn. Targets are not set unless sourced.')
     for state in data.get('states', []):
         line('\n'+state['code']+' | Updated '+text_stamp(state['updated_at']))
         for m in state['metrics']:
@@ -108,7 +124,7 @@ def draw(d, p, now):
         for j, name in enumerate(('views', 'reach')):
             entry = reel['metrics'][name]
             p.text(cx+j*172, 289, name.title(), 12, theme.MUTED)
-            p.text(cx+j*172, 311, display(entry), 32 if entry['value'] is not None else 16, theme.TEXT, 'bold')
+            p.text(cx+j*172, 311, display(entry), 32 if entry['value'] is not None else 14, theme.TEXT, 'bold')
         for j, name in enumerate(('comments', 'shares', 'saves', 'likes_reactions')):
             label = 'Likes/reactions' if name=='likes_reactions' else name.title()
             p.text(cx, 363+j*25, label, 12, theme.MUTED)
@@ -121,6 +137,8 @@ def draw(d, p, now):
     d._card(p, x, 542, w, 270, fill=theme.PANEL, outline=theme.BORDER)
     p.text(x+18, 558, 'State goals', 22, theme.TEXT, 'bold')
     states = data.get('states', [])
+    if states:
+        p.text(x+w-18, 567, data.get('state_order', 'Priority order unavailable'), 12, theme.SUBTLE, anchor='ne')
     if not states:
         p.text(x+18, 605, 'State data not connected', 24, theme.TEXT, 'bold')
         p.text(x+18, 648, 'Coverage target: Not set', 17, theme.MUTED)
@@ -132,8 +150,9 @@ def draw(d, p, now):
         m = next((m for m in state['metrics'] if m['name']=='Restaurant coverage'), None)
         p.text(x+18, y, state['code'], 19, theme.ACCENT, 'bold')
         if m:
-            current = f"{m['current']:,.1f}" if m['current'] is not None else 'Unavailable'
-            target = f"{m['target']:,.1f}" if m['target'] is not None else 'Not set'
+            places = 1 if m['unit'] == 'restaurants per million residents' else 0
+            current = f"{m['current']:,.{places}f}" if m['current'] is not None else 'Unavailable'
+            target = f"{m['target']:,.{places}f}" if m['target'] is not None else 'Not set'
             p.text(x+78, y, f"{current} / {target} {m['unit']}", 15, theme.TEXT, 'bold')
             p.box(x+78, y+27, x+470, y+34, fill=theme.BORDER, outline=theme.BORDER)
             if m['fraction'] is not None:
@@ -142,6 +161,6 @@ def draw(d, p, now):
         else:
             p.text(x+78, y, 'Restaurant coverage: unavailable • Target: Not set', 14, theme.MUTED)
     if states:
-        p.text(x+18, 790, 'Updated '+text_stamp(states[0].get('updated_at'))+' ? Ratings & photos in details', 12, theme.SUBTLE)
+        p.text(x+18, 790, 'Updated '+text_stamp(states[0].get('updated_at'))+' | Ratings & photos in details', 12, theme.SUBTLE)
     p.text(x+18, 831, 'All Reels, collection details & all eligible states →', 15, theme.ACCENT, 'bold')
     d.tag_bind(d.find_all()[-1], '<Button-1>', lambda _e: details(d))

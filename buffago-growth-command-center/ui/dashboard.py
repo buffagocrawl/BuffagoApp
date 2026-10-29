@@ -13,7 +13,7 @@ from typing import Any
 from models import MarketingScore, MonthlyPoint, Snapshot, fmt_number
 from ui import theme
 from growth_goals import PanelFeed
-from ui.growth_goals_panel import draw as draw_growth_goals
+from ui.growth_goals_panel import draw as draw_growth_goals, business_painter
 from ui.components import Painter
 from missions import MissionStore, eastern_day, mission_for
 from ui.mission_panel import open_mission
@@ -447,8 +447,7 @@ class Dashboard(tk.Canvas):
         now = _utc_now()
         self._draw_sauce(p)
         self._draw_header(p, width, now)
-        left = Painter(self, int(width * 0.71), height)
-        left.scale = p.scale  # Retain the existing physical type sizes on the wall.
+        left = business_painter(self, width, height, p.scale)
         self._draw_tiles(left, s)
         self._draw_charts(left, s.monthly_history)
         self._draw_actions(left, s)

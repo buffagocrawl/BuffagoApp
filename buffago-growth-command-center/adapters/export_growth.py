@@ -130,13 +130,16 @@ def state_goals(raw):
             metrics.append(item)
         result.append({'code': code, 'updated_at': row.get('updated_at') if moment(row.get('updated_at')) else None,
                        'metrics': metrics})
-    return sorted(result, key=lambda r: (order.index(r['code']) if r['code'] in order else len(order), r['code']))
+    if order:
+        return sorted(result, key=lambda r: (order.index(r['code']) if r['code'] in order else len(order), r['code']))
+    return sorted(result, key=lambda r: (-next((m['current'] or 0 for m in r['metrics'] if m['name']=='Restaurant coverage'), 0), r['code']))
 
 
 def export(store, output, states=None):
     payload = {'schema_version': 1, 'exported_at': datetime.now(timezone.utc).isoformat(),
                'social': latest_report(store), 'publications': publication_results(store),
-               'states': state_goals(states or {})}
+               'states': state_goals(states or {}),
+               'state_order': 'Established priority order' if (states or {}).get('priority_states') else 'Largest catalogs; priority not set'}
     output = Path(output)
     temporary = output.with_suffix('.tmp')
     temporary.write_text(json.dumps(payload, allow_nan=False), encoding='utf-8')
