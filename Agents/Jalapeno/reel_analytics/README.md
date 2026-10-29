@@ -164,3 +164,25 @@ Only this analytics package, its entry point/tests, and the metrics workflow may
 change. Existing publisher controls and source/app records are outside its HTTP
 boundary. Live diagnostic/collection results are recorded in workflow summaries;
 detailed real metrics stay in private reports.
+
+## Read-only credential checks
+
+`read_only_credentials.py` calls only the publisher adapter's GET-only token,
+application-secret, pinned-account/link, required-permission and publishing-quota
+checks. Its HTTP session rejects mutations, upload hosts and redirects. It does
+not instantiate a publisher, access sources, or read/write a publication ledger.
+The analytics workflow runs it only in diagnostic mode, after the independent
+analytics diagnostic, even when that preceding diagnostic reports a failure.
+Only safe check results and permission names are printed.
+
+Do not use `guess_wing_spot_publish.py validate` as a strictly read-only credential
+check: that broader validation mode also creates private storage validation
+probes and screened candidate objects. Use the dedicated credential check and
+`reel_metrics.py diagnostic` instead.
+
+Re-running collection does not repair or overwrite an existing immutable
+observation in the same milestone/current-day window. A newer report can
+therefore still show an older observation's permission gap after permissions are
+fixed. Retain its original capture time and age; a later genuinely new window
+will produce a new observation. Diagnostic availability describes access now,
+not a rewritten historical measurement.

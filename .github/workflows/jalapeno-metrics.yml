@@ -44,6 +44,9 @@ jobs:
       - name: Install isolated analytics dependencies
         run: python -m pip install 'requests>=2.32,<3' 'pytest>=8,<10' 'tzdata>=2024.1' 'PyYAML>=6,<7'
       - name: Verify analytics behavior and mutation protections before any credentialed collection
-        run: python -B -m pytest Agents/Jalapeno/tests/test_reel_analytics.py -q -o cache_dir="$RUNNER_TEMP/analytics-tests-cache" --basetemp="$RUNNER_TEMP/analytics-tests"
+        run: python -B -m pytest Agents/Jalapeno/tests/test_reel_analytics.py Agents/Jalapeno/tests/test_read_only_credentials.py -q -o cache_dir="$RUNNER_TEMP/analytics-tests-cache" --basetemp="$RUNNER_TEMP/analytics-tests"
       - name: Read-only diagnostics or analytics-only collection (DST gated at 20:30 Eastern)
         run: python -B Agents/Jalapeno/reel_metrics.py "$METRICS_MODE"
+      - name: GET-only publishing credential validation without ledger probes
+        if: ${{ !cancelled() && env.METRICS_MODE == 'diagnostic' }}
+        run: python -B Agents/Jalapeno/read_only_credentials.py
