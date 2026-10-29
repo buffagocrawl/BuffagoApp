@@ -22,7 +22,7 @@ Manual dispatch defaults to plan. `validate` checks readiness without publishing
 There is no per-reel human approval gate in the automatic publisher.
 
 Existing secrets are reused by name: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY,
-META_LONG_LIVED_ACCESS_TOKEN, INSTAGRAM_BUSINESS_ACCOUNT_ID, FACEBOOK_PAGE_ID.
+META_LONG_LIVED_ACCESS_TOKEN, META_APP_SECRET, INSTAGRAM_BUSINESS_ACCOUNT_ID, FACEBOOK_PAGE_ID.
 META_GRAPH_API_VERSION is explicit (inspected repository setting: v25.0).
 New nonsecret identity pins GUESS_EXPECTED_INSTAGRAM_USERNAME and
 GUESS_EXPECTED_FACEBOOK_NAME must match the read-only provider results before
@@ -114,6 +114,10 @@ video_state=PUBLISHED, and bounded status reconciliation. The old Page `/videos`
 adapter is not used. Page access tokens are obtained in memory from the existing
 credential. Page/Instagram IDs, linkage, pinned names, publishing quota access
 and required permissions are checked by read-only calls before mutation.
+The same-app user token is debugged with the existing app secret in memory;
+invalid tokens or token/data-access expiration within 24 hours block readiness.
+An app-secret proof is supplied without logging it. A fresh one-hour Explorer
+token is therefore insufficient for activating a later nightly publication.
 The Facebook Login professional binding is verified through the Page's
 instagram_business_account relation, not an unsupported Basic Display field.
 

@@ -80,7 +80,7 @@ def run(mode, *, env=os.environ, now=None):
     ledger.check_private()
     if mode == "publish" and not (env.get("GUESS_EXPECTED_INSTAGRAM_USERNAME") and env.get("GUESS_EXPECTED_FACEBOOK_NAME")):
         raise MetaError("expected_account_names_must_be_pinned_before_activation")
-    graph = Graph(env["META_LONG_LIVED_ACCESS_TOKEN"], env["META_GRAPH_API_VERSION"])
+    graph = Graph(env["META_LONG_LIVED_ACCESS_TOKEN"], env["META_GRAPH_API_VERSION"], app_secret=env.get("META_APP_SECRET"))
     provider_problem = None
     try:
         identities, page_token = graph.validate(env["INSTAGRAM_BUSINESS_ACCOUNT_ID"], env["FACEBOOK_PAGE_ID"],

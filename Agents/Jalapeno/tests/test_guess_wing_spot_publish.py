@@ -7,6 +7,7 @@ import os
 import shutil
 import sys
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
@@ -241,8 +242,10 @@ def test_expired_credentials_are_redacted_and_no_automatic_post_retry():
 
 
 def test_provider_preflight_verifies_page_link_and_pinned_names():
-    graph = Graph("fake", "v25.0")
+    graph = Graph("fake", "v25.0", app_secret="fake-app-secret")
     def reply(method, path, **kwargs):
+        if path == "app": return {"id": "300"}
+        if path == "debug_token": return {"data": {"is_valid": True, "app_id": "300", "type": "USER", "expires_at": int(time.time()) + 60 * 86400}}
         if path == "200": return {"id": "200", "name": "BuffaGo", "access_token": "memory-only", "instagram_business_account": {"id": "100"}}
         if path == "100":
             assert kwargs["data"]["fields"] == "id,username"
@@ -255,6 +258,14 @@ def test_provider_preflight_verifies_page_link_and_pinned_names():
     assert "memory-only" not in json.dumps(identities)
     with pytest.raises(MetaError, match="mismatch"):
         graph.validate("100", "200", "wrong-account", "BuffaGo")
+
+
+def test_short_lived_user_token_cannot_activate_a_later_daily_post():
+    graph = Graph("fake", "v25.0", app_secret="fake-app-secret")
+    graph.call = lambda method, path, **kwargs: {"id": "300"} if path == "app" else {"data": {
+        "is_valid": True, "app_id": "300", "type": "USER", "expires_at": int(time.time()) + 3600}}
+    with pytest.raises(MetaError, match="expires_within_24_hours"):
+        graph.validate("100", "200", "buffago", "BuffaGo")
 
 
 @pytest.mark.parametrize("change,expected", [("vote", "votes_credit"), ("withdrawal", "record_changed"), ("asset", "asset_identity"), ("unavailable", "no_longer_eligible"), ("version", "screening_hash"), ("name", "votes_credit")])
