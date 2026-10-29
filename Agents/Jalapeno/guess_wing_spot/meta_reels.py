@@ -126,7 +126,15 @@ class Graph:
         granted = {p["permission"] for p in grants.get("data", []) if p.get("status") == "granted"}
         required = {"instagram_basic", "instagram_content_publish", "pages_read_engagement", "pages_manage_posts"}
         if not required.issubset(granted):
-            raise MetaError("required_publishing_permissions_missing")
+            raise MetaError("required_publishing_permissions_missing", diagnostic={
+                "endpoint": "me/permissions", "check": "required_publishing_permissions",
+                "http_status": 200, "meta_code": None, "meta_subcode": None,
+                "message": "Token is valid but required publishing grants are missing.",
+                "failure_category": "permissions", "missing_permissions": sorted(required - granted),
+                "verified_required_permissions": sorted(required & granted),
+                "token_validity": "passed", "app_secret_matching": "passed", "account_access_and_link": "passed",
+                "facebook_name": page["name"], "instagram_username": ig["username"],
+            })
         self.validation_check = "instagram_publishing_quota_access"
         self.call("GET", instagram_id + "/content_publishing_limit", token=page_token, data={"fields": "config,quota_usage"})
         return {"instagram": {"id": instagram_id, "username": ig["username"], "account_type": "professional_page_linked_facebook_login"},
