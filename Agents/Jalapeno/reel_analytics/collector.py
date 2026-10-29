@@ -47,7 +47,7 @@ def collect(store, meta, *, mode, now=None, run_key=None, clock=None):
     health = {"mode": mode, "discovered_posts": len(posts), "snapshots_collected": 0,
               "milestone_snapshots_collected": 0, "current_age_snapshots_collected": 0,
               "duplicates_skipped": 0, "too_young_for_milestones": 0,
-              "outside_recent_horizon": 0, "missing_metrics": {}, "errors": discovery_errors}
+              "outside_recent_horizon": 0, "missing_metrics": {}, "errors": list(discovery_errors)}
     ready, diagnostic_posts = [], []
     missing_counts = Counter()
     horizon = 90 if mode == "backfill" else 30
@@ -104,7 +104,9 @@ def collect(store, meta, *, mode, now=None, run_key=None, clock=None):
                       storage_mode="read_only" if mode == "diagnostic" else "analytics_only_immutable_create",
                       legacy_tables_accessed=False)
     if mode == "diagnostic":
-        return {"status": "diagnostic_passed" if len(ready) == len(posts) and not discovery_errors else "diagnostic_partial",
+        access_passed = len(ready) == len(posts) and not discovery_errors
+        status = ("diagnostic_passed_with_metric_gaps" if missing_counts else "diagnostic_passed") if access_passed else "diagnostic_partial"
+        return {"status": status,
                 "health": health, "posts": diagnostic_posts, "protection": protection}
     report = build_report(ready, observations(store), health, clock())
     report.update(protection=protection, storage=ANALYTICS, report_key="reports/" + run_key + ".json")

@@ -139,7 +139,7 @@ def test_young_posts_current_observations_readonly_diagnostic_and_partial_failur
     store = MemoryStore(readonly=True)
     before = copy.deepcopy(store.data)
     result = collect(store, FakeMeta(age=2), mode="diagnostic", now=NOW, clock=lambda: NOW)
-    assert result["status"] == "diagnostic_passed"
+    assert result["status"] == "diagnostic_passed_with_metric_gaps"  # Facebook saves are unsupported.
     assert result["health"]["too_young_for_milestones"] == 2 and store.data == before and not store.writes
     assert all(p["window_if_collected"].startswith("current-") for p in result["posts"])
     store = MemoryStore()
@@ -360,3 +360,17 @@ def test_existing_earlier_snapshot_is_not_reported_as_missed():
     collect(store, FakeMeta(age=170), mode="collect", now=NOW, clock=lambda: NOW, run_key="9.1")
     seven = [v for k, v in store.data.items() if k.endswith("_7d.json")]
     assert all(s["missed_historical_windows"] == ["72h"] for s in seven)
+
+
+def test_diagnostic_separates_readable_posts_from_metric_permission_gaps():
+    class PartialInsights(FakeMeta):
+        def insights(self, post):
+            values = all_metrics(post["platform"])
+            if post["platform"] == "facebook":
+                values["reach"] = {"value": None, "reason": "missing_permission:pages_manage_engagement"}
+                return values, {}, {"post_impressions_unique": "missing_permission:pages_manage_engagement"}
+            return values, {}, {}
+    store = MemoryStore(readonly=True)
+    result = collect(store, PartialInsights(age=2), mode="diagnostic", now=NOW, clock=lambda: NOW)
+    assert result["status"] == "diagnostic_passed_with_metric_gaps"
+    assert result["health"]["errors"] and store.writes == []
