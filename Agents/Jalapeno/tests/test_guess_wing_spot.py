@@ -284,12 +284,65 @@ def test_sharing_caption_preserves_guessing_credits_and_geography(state):
     hook, body = caption(group, selected)
     assert body.startswith(hook + "\nComment your restaurant guesses: 1, 2, 3.")
     assert body.count(PHOTO_SHARING_CTA) == 1
-    assert body.index("Photo 3:") < body.index(PHOTO_SHARING_CTA) < body.index("#BuffaGo")
+    assert body.index("Photo credits (plain text):") < body.index(PHOTO_SHARING_CTA) < body.index("#BuffaGo")
     assert "Link in bio" not in body and "@" not in body
     assert f"#Springfield{state}Food" in body
     for i, source in enumerate(selected, 1):
-        assert f"Photo {i}: {source.photo.credit}" in body
+        if source.photo.approval["attribution_preference"] != "anonymous":
+            assert f"Photo {i}: {source.photo.credit}" in body
         assert source.photo.destination["name"] not in body
+
+
+@pytest.mark.parametrize("preferences", [
+    ("anonymous", "anonymous", "anonymous"),
+    ("anonymous", "username", "anonymous"),
+    ("username", "anonymous", "display_name"),
+    ("username", "display_name", "username"),
+])
+def test_caption_anonymous_credits_follow_recorded_preferences(preferences):
+    data = snapshot()
+    for row, preference in zip(data.photos, preferences):
+        row["attribution_preference"] = preference
+    original = copy.deepcopy(data)
+    group, selected, _ = select(discover(photos(data))[0], [], "caption-attribution")
+    selected_before = copy.deepcopy(selected)
+    hook, body = caption(group, selected)
+    anonymous = [i for i, p in enumerate(selected, 1)
+                 if p.photo.approval["attribution_preference"] == "anonymous"]
+    if anonymous:
+        label = (f"Photo {anonymous[0]}" if len(anonymous) == 1 else
+                 "Photos" if len(anonymous) == len(selected) else
+                 "Photos " + ", ".join(map(str, anonymous)))
+        credit = "Anonymous community member" + ("s" if len(anonymous) > 1 else "")
+        assert f"{label}: {credit}" in body
+        assert body.count("Anonymous community member") == 1
+        assert "BuffaGo community" not in body
+    else:
+        assert "Anonymous community member" not in body
+    for i, source in enumerate(selected, 1):
+        if i not in anonymous:
+            assert f"Photo {i}: {source.photo.credit}" in body
+        else:
+            # On-screen attribution remains the existing mapped credit.
+            assert source.photo.credit == "BuffaGo community"
+    assert selected == selected_before and data == original
+    before, credits_and_after = body.split("Photo credits (plain text):\n")
+    _, after = credits_and_after.split("\n\n", 1)
+    assert before == f"{hook}\nComment your restaurant guesses: 1, 2, 3.\n\n"
+    from guess_wing_spot.captions import PHOTO_SHARING_CTA
+    assert after == f"{PHOTO_SHARING_CTA}\n\n#BuffaGo #SpringfieldMAFood #ChickenWings #WingChallenge"
+
+
+def test_caption_does_not_infer_anonymity_from_username_text():
+    data = snapshot()
+    for row in data.photos:
+        row["attribution_preference"] = "username"
+        data.users[row["user_id"]]["username"] = "BuffaGo community"
+    group, selected, _ = select(discover(photos(data))[0], [], "literal-credit")
+    _, body = caption(group, selected)
+    assert "Anonymous community member" not in body
+    for i in range(1, 4):
+        assert f"Photo {i}: BuffaGo community" in body
 
 
 def test_closing_cta_is_legible_with_three_visible_photos_and_safe_margins():
