@@ -23,6 +23,7 @@ def safe_meta_message(error):
     """Return fixed summaries only; provider messages may echo credentials."""
     message = str(error.get("message", "")).casefold()
     for fragment, summary in (
+        ("session has been invalidated", "Access-token session was invalidated by a password change or security action."),
         ("session has expired", "Access-token session has expired."),
         ("access token has expired", "Access token has expired."),
         ("appsecret_proof", "App-secret proof is missing or invalid."),
