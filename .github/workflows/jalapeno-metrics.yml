@@ -1,28 +1,28 @@
-name: Jalapeno Instagram Metrics
+name: Jalapeno Reel Analytics - Instagram and Facebook
 
 on:
   workflow_dispatch:
     inputs:
-      backfill:
-        description: Backfill missing 24h, 72h, and 7d metric windows
-        required: true
-        type: boolean
-        default: false
-      dry_run:
-        description: Load candidates without Meta calls or Supabase inserts
-        required: true
-        type: boolean
-        default: false
+      mode:
+        description: Safe collection, honest current-age backfill, or read-only diagnostics
+        type: choice
+        default: diagnostic
+        options: [diagnostic, collect, backfill]
   schedule:
-    - cron: "17 3 * * *"
+    - cron: '30 0 * * *'
+    - cron: '30 1 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: jalapeno-reel-analytics
+  cancel-in-progress: false
 
 jobs:
-  jalapeno-metrics:
+  analytics:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-        working-directory: Agents/Jalapeno
+    timeout-minutes: 35
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -30,69 +30,20 @@ jobs:
       META_LONG_LIVED_ACCESS_TOKEN: ${{ secrets.META_LONG_LIVED_ACCESS_TOKEN }}
       FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
       INSTAGRAM_BUSINESS_ACCOUNT_ID: ${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}
-      GITHUB_WORKFLOW_RUN_ID: ${{ github.run_id }}
-
+      META_GRAPH_API_VERSION: ${{ vars.META_GRAPH_API_VERSION }}
+      GUESS_EXPECTED_INSTAGRAM_USERNAME: ${{ vars.GUESS_EXPECTED_INSTAGRAM_USERNAME }}
+      GUESS_EXPECTED_FACEBOOK_NAME: ${{ vars.GUESS_EXPECTED_FACEBOOK_NAME }}
+      GITHUB_TOKEN: ${{ github.token }}
+      GITHUB_EVENT_SCHEDULE: ${{ github.event.schedule || '' }}
+      METRICS_MODE: ${{ github.event_name == 'schedule' && 'collect' || inputs.mode }}
     steps:
-      - name: Log GitHub trigger context
-        working-directory: .
-        run: |
-          set -euo pipefail
-
-          echo "github_event=${GITHUB_EVENT_NAME}"
-          echo "github_schedule=${GITHUB_EVENT_SCHEDULE:-}"
-          echo "current_utc=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-          echo "workflow_name=${GITHUB_WORKFLOW}"
-          echo "branch=${GITHUB_REF_NAME}"
-          echo "run_id=${GITHUB_RUN_ID}"
-          echo "sha=${GITHUB_SHA}"
-
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-
-      - name: Install Jalapeno dependencies
-        run: python -m pip install -r requirements.txt
-
-      - name: Validate required secrets
-        run: |
-          set -euo pipefail
-
-          required_vars=(
-            SUPABASE_URL
-            SUPABASE_SERVICE_ROLE_KEY
-            META_APP_SECRET
-            META_LONG_LIVED_ACCESS_TOKEN
-            FACEBOOK_PAGE_ID
-            INSTAGRAM_BUSINESS_ACCOUNT_ID
-          )
-
-          missing=()
-          for var_name in "${required_vars[@]}"; do
-            if [[ -z "${!var_name:-}" ]]; then
-              missing+=("${var_name}")
-            fi
-          done
-
-          if (( ${#missing[@]} > 0 )); then
-            printf 'Missing required GitHub secrets/env values for metrics: %s\n' "${missing[*]}" >&2
-            exit 1
-          fi
-
-      - name: Run Jalapeno metrics
-        run: |
-          set -euo pipefail
-
-          command=(python main.py --collect-metrics)
-          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && "${{ inputs.backfill }}" == "true" ]]; then
-            command+=(--metrics-backfill)
-          fi
-          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && "${{ inputs.dry_run }}" == "true" ]]; then
-            command+=(--metrics-dry-run)
-          fi
-
-          echo "command=${command[*]}"
-          "${command[@]}"
+          python-version: '3.12'
+      - name: Install isolated analytics dependencies
+        run: python -m pip install 'requests>=2.32,<3' 'pytest>=8,<10' 'tzdata>=2024.1' 'PyYAML>=6,<7'
+      - name: Verify analytics behavior and mutation protections before any credentialed collection
+        run: python -B -m pytest Agents/Jalapeno/tests/test_reel_analytics.py -q -o cache_dir="$RUNNER_TEMP/analytics-tests-cache" --basetemp="$RUNNER_TEMP/analytics-tests"
+      - name: Read-only diagnostics or analytics-only collection (DST gated at 20:30 Eastern)
+        run: python -B Agents/Jalapeno/reel_metrics.py "$METRICS_MODE"
