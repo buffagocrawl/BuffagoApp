@@ -82,6 +82,7 @@ def run(mode, *, env=os.environ, now=None):
         raise MetaError("expected_account_names_must_be_pinned_before_activation")
     graph = Graph(env["META_LONG_LIVED_ACCESS_TOKEN"], env["META_GRAPH_API_VERSION"], app_secret=env.get("META_APP_SECRET"))
     provider_problem = None
+    provider_diagnostic = None
     try:
         identities, page_token = graph.validate(env["INSTAGRAM_BUSINESS_ACCOUNT_ID"], env["FACEBOOK_PAGE_ID"],
                                                env.get("GUESS_EXPECTED_INSTAGRAM_USERNAME", ""), env.get("GUESS_EXPECTED_FACEBOOK_NAME", ""))
@@ -91,6 +92,7 @@ def run(mode, *, env=os.environ, now=None):
         # Readiness diagnostics can still prove storage/source/OCR readiness
         # while credentials are repaired. No claims, uploads or publish calls.
         provider_problem, identities, page_token = str(error), None, None
+        provider_diagnostic = error.diagnostic or {"check": getattr(graph, "validation_check", "configuration"), "failure_category": "local_validation", "message": str(error)}
     if mode == "validate":
         # Read-only provider checks plus a local OCR toolchain check. Storage
         # claims/write semantics are exercised by separate namespace probes.
@@ -108,6 +110,7 @@ def run(mode, *, env=os.environ, now=None):
                   "ledger": "existing_private_jalapeno_assets_namespace", "atomic_create": "verified"}
         if provider_problem:
             result["reason"] = provider_problem
+            result["provider_diagnostic"] = provider_diagnostic
         print(json.dumps(result))
         return result
     owner = ActionsOwner(env)

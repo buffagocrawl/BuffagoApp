@@ -239,6 +239,33 @@ def test_expired_credentials_are_redacted_and_no_automatic_post_retry():
     with pytest.raises(MetaError, match="expired_or_invalid_credentials") as result:
         Graph("fake", "v25.0", session).call("GET", "me")
     assert "SECRET" not in str(result.value)
+    assert result.value.diagnostic["http_status"] == 400
+    assert result.value.diagnostic["meta_code"] == 190
+    assert "SECRET" not in json.dumps(result.value.diagnostic)
+
+
+@pytest.mark.parametrize("message,category", [
+    ("Error validating access token: Session has expired. Bearer secret https://example.test/?access_token=secret", "token_validity"),
+    ("Invalid appsecret_proof provided. secret", "app_secret_matching"),
+    ("Authorization: secret arbitrary response", "token_validity"),
+])
+def test_safe_validation_diagnostics_never_echo_provider_text(message, category):
+    class Response:
+        status_code = 400
+        headers = {}
+        def json(self): return {"error": {"code": 190, "error_subcode": 463, "message": message}}
+    session = type("Session", (), {"request": lambda *a, **k: Response()})()
+    with pytest.raises(MetaError) as result:
+        Graph("secret", "v25.0", session, app_secret="app-secret").validate("123", "456", "", "")
+    diagnostic = result.value.diagnostic
+    assert diagnostic["endpoint"] == "app"
+    assert diagnostic["meta_subcode"] == 463
+    assert diagnostic["failure_category"] == category
+    assert diagnostic["check"] == "token_application_identity_and_app_secret_proof"
+    assert "https://" not in json.dumps(diagnostic)
+    assert "Authorization" not in json.dumps(diagnostic)
+    assert "Bearer" not in json.dumps(diagnostic)
+    assert message not in json.dumps(diagnostic)
 
 
 def test_provider_preflight_verifies_page_link_and_pinned_names():

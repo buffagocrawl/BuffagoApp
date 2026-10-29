@@ -13,9 +13,28 @@ import requests
 
 
 class MetaError(RuntimeError):
-    def __init__(self, reason, *, uncertain=False):
+    def __init__(self, reason, *, uncertain=False, diagnostic=None):
         super().__init__(reason)
         self.uncertain = uncertain
+        self.diagnostic = diagnostic
+
+
+def safe_meta_message(error):
+    """Return fixed summaries only; provider messages may echo credentials."""
+    message = str(error.get("message", "")).casefold()
+    for fragment, summary in (
+        ("session has expired", "Access-token session has expired."),
+        ("access token has expired", "Access token has expired."),
+        ("appsecret_proof", "App-secret proof is missing or invalid."),
+        ("app secret", "Application-secret authentication failed."),
+        ("cannot parse access token", "Access token could not be parsed."),
+        ("invalid oauth access token", "OAuth access token is invalid."),
+        ("permission", "Meta rejected the requested permission or access."),
+        ("unsupported get request", "Object is unavailable or inaccessible to this token."),
+    ):
+        if fragment in message:
+            return summary
+    return "Meta rejected the request; unrecognized provider message withheld."
 
 
 class Graph:
@@ -27,6 +46,8 @@ class Graph:
         self.session = session or requests.Session()
 
     def call(self, method, path, *, token=None, data=None, rupload=False, body=None):
+        # Labels never contain IDs, query strings, tokens, or provider URLs.
+        endpoint = path if path in {"app", "debug_token", "me/permissions"} else "account/content_publishing_limit" if path.endswith("/content_publishing_limit") else "account"
         if rupload:
             if not re.fullmatch(r"video-upload/v\d{2,3}\.0/\d+", path):
                 raise MetaError("untrusted_upload_path")
@@ -54,9 +75,16 @@ class Graph:
         if actual_version and actual_version != self.version:
             raise MetaError("provider_api_version_mismatch", uncertain=method != "GET")
         if response.status_code >= 400 or payload.get("error"):
-            code = (payload.get("error") or {}).get("code")
+            error = payload.get("error") or {}
+            code = error.get("code")
             reason = "expired_or_invalid_credentials" if code == 190 else "permission_denied" if code in (10, 200, 294) else "rate_limited" if code in (4, 17, 32, 613) else "provider_request_rejected"
-            raise MetaError(reason, uncertain=method != "GET" and response.status_code >= 500)
+            message = safe_meta_message(error)
+            category = "app_secret_matching" if "secret" in message else "token_validity" if code == 190 else "permissions" if code in (10, 200, 294) else "account_access" if endpoint.startswith("account") else "provider_request"
+            raise MetaError(reason, uncertain=method != "GET" and response.status_code >= 500,
+                            diagnostic={"endpoint": endpoint, "check": getattr(self, "validation_check", "provider_request"),
+                                        "http_status": response.status_code, "meta_code": code if type(code) is int else None,
+                                        "meta_subcode": error.get("error_subcode") if type(error.get("error_subcode")) is int else None,
+                                        "message": message, "failure_category": category})
         return payload
 
     def validate(self, instagram_id, page_id, expected_instagram, expected_page):
@@ -64,10 +92,12 @@ class Graph:
             raise MetaError("account_identifiers_missing")
         if not self.app_secret:
             raise MetaError("meta_app_secret_required_for_expiration_validation")
+        self.validation_check = "token_application_identity_and_app_secret_proof"
         app = self.call("GET", "app", data={"fields": "id"})
         app_id = str(app.get("id", ""))
         if not app_id.isdigit():
             raise MetaError("token_application_identity_unavailable")
+        self.validation_check = "token_validity_and_app_secret_matching"
         debug = self.call("GET", "debug_token", token=app_id + "|" + self.app_secret, data={"input_token": self.token}).get("data", {})
         if not debug.get("is_valid") or str(debug.get("app_id")) != app_id or debug.get("type") != "USER":
             raise MetaError("valid_same_app_user_access_token_required")
@@ -76,11 +106,13 @@ class Graph:
         if (expiry and expiry < time.time() + 86400) or (access_expiry and access_expiry < time.time() + 86400):
             raise MetaError("user_token_or_data_access_expires_within_24_hours")
         # Obtain the Page token in memory only; never serialize it in state.
+        self.validation_check = "facebook_page_access_and_instagram_link"
         page = self.call("GET", page_id, data={"fields": "id,name,access_token,instagram_business_account"})
         page_token = page.get("access_token") or self.token
         linked = str((page.get("instagram_business_account") or {}).get("id", ""))
         # The Facebook Login IG User reference does not expose Basic Display's
         # account_type. Page linkage is this API's professional-account proof.
+        self.validation_check = "linked_instagram_account_access"
         ig = self.call("GET", instagram_id, token=page_token, data={"fields": "id,username"})
         if (str(page.get("id")) != page_id or str(ig.get("id")) != instagram_id or linked != instagram_id
                 or (expected_instagram and ig.get("username", "").casefold() != expected_instagram.casefold())
@@ -88,11 +120,13 @@ class Graph:
             raise MetaError("configured_account_identity_or_link_mismatch")
         # Required grants are verified through /me/permissions, or, for a Page
         # token, through the source user token when supported. Fail closed.
+        self.validation_check = "required_publishing_permissions"
         grants = self.call("GET", "me/permissions")
         granted = {p["permission"] for p in grants.get("data", []) if p.get("status") == "granted"}
         required = {"instagram_basic", "instagram_content_publish", "pages_read_engagement", "pages_manage_posts"}
         if not required.issubset(granted):
             raise MetaError("required_publishing_permissions_missing")
+        self.validation_check = "instagram_publishing_quota_access"
         self.call("GET", instagram_id + "/content_publishing_limit", token=page_token, data={"fields": "config,quota_usage"})
         return {"instagram": {"id": instagram_id, "username": ig["username"], "account_type": "professional_page_linked_facebook_login"},
                 "facebook": {"id": page_id, "name": page["name"]}, "api_version": self.version,
