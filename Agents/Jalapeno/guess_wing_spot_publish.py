@@ -6,7 +6,7 @@ import sys
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("mode", choices=("validate", "publish"))
+    parser.add_argument("mode", choices=("validate", "publish", "live-test"))
     args = parser.parse_args()
     try:
         from guess_wing_spot.actions_runtime import run

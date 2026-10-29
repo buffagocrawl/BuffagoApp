@@ -7,7 +7,7 @@ from pathlib import Path
 import requests
 
 from .clock_gate import gate
-from .durable import Busy, DurableError, PrivateLedger
+from .durable import Busy, DurableError, PrivateLedger, LiveTestLedger
 from .meta_reels import Graph, MetaError, ReelPublisher
 from .screening import Screener
 from .sources import ReadOnlySources
@@ -69,16 +69,19 @@ def summarize(state, gate_result=None):
 
 
 def run(mode, *, env=os.environ, now=None):
+    live_test = mode == "live-test"
+    publishing = mode in {"publish", "live-test"}
     decision = gate(now, event=env.get("GITHUB_EVENT_NAME", "workflow_dispatch"), cron=env.get("GITHUB_EVENT_SCHEDULE", ""), mode=mode)
-    if mode == "publish" and (not decision["proceed"] or env.get("GUESS_WING_SPOT_ENABLED") != "true"):
+    if publishing and (not decision["proceed"] or env.get("GUESS_WING_SPOT_ENABLED") != "true"):
         return summarize({"status": "skipped_" + (decision["reason"] if not decision["proceed"] else "new_workflow_disabled"), "date": decision["date"]}, decision)
     # Read-only plan and preview retain the isolated original CLI and do not
     # instantiate this module's uploader/publisher in the workflow.
-    if mode not in {"publish", "validate"}:
+    if mode not in {"publish", "live-test", "validate"}:
         raise ValueError("publishing_runtime_has_no_plan_or_preview_mode")
-    ledger = PrivateLedger(env["SUPABASE_URL"], env["SUPABASE_SERVICE_ROLE_KEY"])
+    ledger_type = LiveTestLedger if live_test else PrivateLedger
+    ledger = ledger_type(env["SUPABASE_URL"], env["SUPABASE_SERVICE_ROLE_KEY"])
     ledger.check_private()
-    if mode == "publish" and not (env.get("GUESS_EXPECTED_INSTAGRAM_USERNAME") and env.get("GUESS_EXPECTED_FACEBOOK_NAME")):
+    if publishing and not (env.get("GUESS_EXPECTED_INSTAGRAM_USERNAME") and env.get("GUESS_EXPECTED_FACEBOOK_NAME")):
         raise MetaError("expected_account_names_must_be_pinned_before_activation")
     graph = Graph(env["META_LONG_LIVED_ACCESS_TOKEN"], env["META_GRAPH_API_VERSION"], app_secret=env.get("META_APP_SECRET"))
     provider_problem = None
@@ -160,7 +163,7 @@ def run(mode, *, env=os.environ, now=None):
             revalidate(repository, state, screener)
             publisher.publish(platform, state, persist, lambda: revalidate(repository, state, screener),
                               lambda: ledger.video_url(state["reel_id"]), media,
-                              lambda: gate(event="workflow_dispatch", mode="publish")["proceed"])
+                              lambda: gate(event="workflow_dispatch", mode=mode)["proceed"])
         except (MetaError, Busy) as error:
             state["platforms"][platform].update(reason=str(error), status="uncertain" if state["platforms"][platform].get("pending") else "blocked")
             persist()

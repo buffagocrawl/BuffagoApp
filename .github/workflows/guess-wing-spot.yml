@@ -10,7 +10,7 @@ on:
         description: Plan/preview are local-only; publish uses the private daily ledger.
         type: choice
         default: plan
-        options: [plan, preview, validate, publish]
+        options: [plan, preview, validate, publish, live-test]
 
 permissions:
   contents: read
@@ -41,7 +41,7 @@ jobs:
           from guess_wing_spot.clock_gate import gate
           mode = os.environ['REQUESTED_MODE']
           result = gate(event=os.environ['GITHUB_EVENT_NAME'], cron=os.environ['GITHUB_EVENT_SCHEDULE'], mode=mode)
-          proceed = result['proceed'] and (mode != 'publish' or (os.environ['GUESS_WING_SPOT_ENABLED'] == 'true' and os.environ['GITHUB_REF'] == 'refs/heads/main'))
+          proceed = result['proceed'] and (mode not in {'publish', 'live-test'} or (os.environ['GUESS_WING_SPOT_ENABLED'] == 'true' and os.environ['GITHUB_REF'] == 'refs/heads/main'))
           with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
               stream.write(f'proceed={str(proceed).lower()}\nmode={mode}\n')
           print({'proceed': proceed, 'mode': mode, 'date': result['date'], 'reason': result['reason']})
@@ -70,7 +70,7 @@ jobs:
 
   checks:
     needs: gate
-    if: needs.gate.outputs.proceed == 'true' && (needs.gate.outputs.mode == 'publish' || needs.gate.outputs.mode == 'validate')
+    if: needs.gate.outputs.proceed == 'true' && (needs.gate.outputs.mode == 'publish' || needs.gate.outputs.mode == 'live-test' || needs.gate.outputs.mode == 'validate')
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -101,5 +101,7 @@ jobs:
       - name: Read-only provider and private-storage validation
         run: python -B Agents/Jalapeno/guess_wing_spot_publish.py validate
       - name: Resume or publish this Eastern date, independently per platform
-        if: needs.gate.outputs.mode == 'publish'
-        run: python -B Agents/Jalapeno/guess_wing_spot_publish.py publish
+        if: needs.gate.outputs.mode == 'publish' || needs.gate.outputs.mode == 'live-test'
+        env:
+          PUBLISH_MODE: ${{ needs.gate.outputs.mode }}
+        run: python -B Agents/Jalapeno/guess_wing_spot_publish.py "$PUBLISH_MODE"

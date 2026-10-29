@@ -9,6 +9,8 @@ def gate(now=None, *, event="workflow_dispatch", cron="", mode="plan"):
     now = now or datetime.now(timezone.utc)
     local = now.astimezone(EASTERN)
     result = {"date": local.date().isoformat(), "proceed": True, "reason": "local_only"}
+    if mode == "live-test":
+        return {**result, "proceed": event == "workflow_dispatch", "reason": "isolated_manual_live_test"}
     if mode != "publish":
         return result
     if not time(18) <= local.time().replace(tzinfo=None) < time(21):

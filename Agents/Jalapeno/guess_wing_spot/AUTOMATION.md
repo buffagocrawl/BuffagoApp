@@ -150,3 +150,15 @@ without printing token values or rotating secrets. Future dates remain separate.
 6. If within 18:00–21:00 Eastern, dispatch one controlled publish for today's
    durable date. Otherwise wait for the next 19:30 scheduled trigger. Report
    actual run/post links only after they exist; never claim future success.
+
+
+## Isolated authorized live test
+
+Manual `live-test` mode uses `guess-wing-spot-live-test-v1/` in the same private
+bucket, with independent date claims, run bindings, state, history and generated
+outputs. It reads established exclusions and county mappings from the daily
+namespace. It retains source revalidation, pinned identities, the new enable
+control, main-branch Actions ownership and uncertain-outcome reconciliation.
+Only manual dispatch may use this mode; it can run outside the nightly window.
+Retries resume the same test for that Eastern date. It never consumes the daily
+19:30 slot. Normal publish scheduling and its 18:00?21:00 window are unchanged.
