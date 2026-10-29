@@ -360,3 +360,17 @@ def test_existing_earlier_snapshot_is_not_reported_as_missed():
     collect(store, FakeMeta(age=170), mode="collect", now=NOW, clock=lambda: NOW, run_key="9.1")
     seven = [v for k, v in store.data.items() if k.endswith("_7d.json")]
     assert all(s["missed_historical_windows"] == ["72h"] for s in seven)
+
+
+def test_diagnostic_separates_readable_posts_from_metric_permission_gaps():
+    class PartialInsights(FakeMeta):
+        def insights(self, post):
+            values = all_metrics(post["platform"])
+            if post["platform"] == "facebook":
+                values["reach"] = {"value": None, "reason": "missing_permission:pages_manage_engagement"}
+                return values, {}, {"post_impressions_unique": "missing_permission:pages_manage_engagement"}
+            return values, {}, {}
+    store = MemoryStore(readonly=True)
+    result = collect(store, PartialInsights(age=2), mode="diagnostic", now=NOW, clock=lambda: NOW)
+    assert result["status"] == "diagnostic_passed_with_metric_gaps"
+    assert result["health"]["errors"] and store.writes == []
