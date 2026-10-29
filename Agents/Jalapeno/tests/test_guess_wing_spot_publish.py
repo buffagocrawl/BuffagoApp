@@ -357,6 +357,20 @@ def test_storage_namespace_never_accepts_source_paths_or_unavailable_bucket():
         with pytest.raises(DurableError): ledger.check_private()
 
 
+def test_real_storage_missing_object_envelope_is_not_an_auth_failure():
+    ledger = PrivateLedger("https://example.supabase.co", "test")
+    class Missing:
+        status_code = 400
+        def json(self): return {"statusCode": "404", "error": "not_found"}
+    with patch.object(ledger, "request", return_value=Missing()):
+        assert ledger.get("screening/new-binding.json") is None
+    class Forbidden:
+        status_code = 400
+        def json(self): return {"statusCode": "403", "error": "unauthorized"}
+    with patch.object(ledger, "request", return_value=Forbidden()):
+        with pytest.raises(DurableError): ledger.get("screening/new-binding.json")
+
+
 def test_validate_reports_real_source_readiness_without_bypassing_bad_credentials():
     ledger = MemoryLedger()
     ledger.check_private = lambda: None
