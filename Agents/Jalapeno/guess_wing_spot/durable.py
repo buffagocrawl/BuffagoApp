@@ -145,3 +145,16 @@ class PrivateLedger:
                 response = self.request("DELETE", "object/" + self.BUCKET, json={"prefixes": [self.key("outputs/" + name)]})
                 if response.status_code != 200:
                     raise DurableError("generated_output_cleanup_failed")
+
+
+class LiveTestLedger(PrivateLedger):
+    """One resumable test per date, without claiming the scheduled daily slot."""
+    PREFIX = "guess-wing-spot-live-test-v1/"
+
+    def get_bytes(self, key):
+        if key in {"reviews.json", "county-map.json"}:
+            # Read shared exclusions without changing the authenticated session.
+            shared = object.__new__(PrivateLedger)
+            shared.origin, shared.session = self.origin, self.session
+            return PrivateLedger.get_bytes(shared, key)
+        return super().get_bytes(key)

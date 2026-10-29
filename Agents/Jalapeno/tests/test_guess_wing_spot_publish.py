@@ -469,3 +469,30 @@ def test_workflow_uses_new_gate_no_artifacts_or_old_enable_flag():
     assert "GUESS_WING_SPOT_ENABLED" in text
     assert "JALAPENO_AUTOMATION_ENABLED" not in text and "upload-artifact" not in text
     assert "wing_shots_main" not in text
+
+
+def test_live_test_is_manual_only_and_does_not_take_daily_slot():
+    from guess_wing_spot.durable import LiveTestLedger
+    noon = datetime(2026, 10, 29, 16, tzinfo=timezone.utc)
+    assert gate(noon, event="workflow_dispatch", mode="live-test")["proceed"]
+    assert not gate(noon, event="schedule", mode="live-test")["proceed"]
+    assert not gate(noon, event="workflow_dispatch", mode="publish")["proceed"]
+    daily = PrivateLedger("https://example.supabase.co", "private")
+    test = LiveTestLedger("https://example.supabase.co", "private")
+    for key in ("claims/2026-10-29/run/000001.json", "days/2026-10-29/states/000001.json", "history/2026-10-29.json", "outputs/test.mp4", "runs/123.json"):
+        assert daily.key(key) != test.key(key)
+    with patch.object(PrivateLedger, "request") as request:
+        request.return_value.status_code = 200
+        request.return_value.content = b"[]"
+        assert test.get("reviews.json") == []
+        assert "guess-wing-spot-v1/reviews.json" in request.call_args.args[1]
+        assert test.session.headers["Authorization"] == "Bearer private"
+
+
+def test_live_test_requires_enable_and_pinned_identity():
+    env = {"GUESS_WING_SPOT_ENABLED": "false"}
+    assert run("live-test", env=env)["status"] == "skipped_new_workflow_disabled"
+    env.update(GUESS_WING_SPOT_ENABLED="true", SUPABASE_URL="https://example.supabase.co", SUPABASE_SERVICE_ROLE_KEY="private")
+    with patch("guess_wing_spot.actions_runtime.LiveTestLedger.check_private"):
+        with pytest.raises(MetaError, match="expected_account_names"):
+            run("live-test", env=env)
