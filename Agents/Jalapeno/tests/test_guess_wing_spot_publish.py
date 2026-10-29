@@ -246,7 +246,7 @@ def test_provider_preflight_verifies_page_link_and_pinned_names():
         graph.validate("100", "200", "wrong-account", "BuffaGo")
 
 
-@pytest.mark.parametrize("change,expected", [("vote", "votes_credit"), ("withdrawal", "record_changed"), ("asset", "asset_identity"), ("unavailable", "no_longer_eligible"), ("version", "screening_hash")])
+@pytest.mark.parametrize("change,expected", [("vote", "votes_credit"), ("withdrawal", "record_changed"), ("asset", "asset_identity"), ("unavailable", "no_longer_eligible"), ("version", "screening_hash"), ("name", "votes_credit")])
 def test_fresh_prepublication_checks_every_selected_source(change, expected):
     ledger = MemoryLedger()
     class Screening:
@@ -264,6 +264,7 @@ def test_fresh_prepublication_checks_every_selected_source(change, expected):
     if change == "asset": repo.photo_bytes = lambda _: graphic()
     if change == "unavailable": repo.asset_available = lambda _: False
     if change == "version": screen.version = "v2"
+    if change == "name": repo.data.destinations[value["sources"][0]["destination_id"]]["name"] += " "
     with pytest.raises(MetaError, match=expected): revalidate(repo, value, screen)
 
 

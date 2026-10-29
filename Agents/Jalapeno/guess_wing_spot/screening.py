@@ -8,7 +8,7 @@ import tempfile
 from difflib import SequenceMatcher
 from pathlib import Path
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, __version__ as PILLOW_VERSION
 
 from .eligibility import credit_reveals_answer
 from .rendering import decode_photo
@@ -40,7 +40,7 @@ class Screener:
         self.ledger, self.executable = ledger, executable
         try:
             result = subprocess.run([executable, "--version"], capture_output=True, text=True, timeout=10, check=True)
-            self.version = VERSION + ":" + result.stdout.splitlines()[0]
+            self.version = VERSION + ":" + result.stdout.splitlines()[0] + ":pillow-" + PILLOW_VERSION
         except (OSError, subprocess.SubprocessError, IndexError):
             raise ValueError("local_ocr_unavailable") from None
 
@@ -50,8 +50,10 @@ class Screener:
         binding = hashlib.sha256((digest + self.version + repr(names) + photo.credit).encode()).hexdigest()
         key = "screening/" + binding + ".json"
         prior = self.ledger.get(key)
-        if prior:
+        if prior and prior.get("binding") == binding and prior.get("asset_sha256") == digest and prior.get("screening_version") == self.version:
             return prior
+        if prior:
+            raise ValueError("invalid_durable_screening_record")
         decision, reason = "passed", "no_name_clue_detected"
         image = decode_photo(data)
         if min(image.size) < 480:

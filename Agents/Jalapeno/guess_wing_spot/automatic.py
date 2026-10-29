@@ -70,7 +70,7 @@ def revalidate(repository, state, screener):
         raise MetaError("verified_county_mapping_changed")
     groups, _ = discover([by_id[i] for i in ids], state.get("county_mapping"))
     group = next((g for g in groups if g.key == state["geography"]["key"]), None)
-    if group is None:
+    if group is None or group.label != state["geography"]["label"]:
         raise MetaError("geography_no_longer_verified")
     placed = {p.photo.id: p for p in group.photos}
     data = []
@@ -78,6 +78,7 @@ def revalidate(repository, state, screener):
         current = by_id[saved["photo_id"]]
         if ({"likes": current.likes, "dislikes": current.dislikes, "neutral_excluded": current.neutral} != saved["votes"]
                 or current.credit != saved["credit"] or current.approval != saved["approval"]
+                or current.destination["name"] != saved["restaurant_answer"] or current.destination["id"] != saved["destination_id"]
                 or placed[current.id].physical_key != saved["physical_location_id"]
                 or placed[current.id].evidence != saved["geography_evidence"]):
             raise MetaError("source_votes_credit_approval_or_geography_changed")
