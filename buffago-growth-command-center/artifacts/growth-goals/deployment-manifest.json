@@ -1,0 +1,18 @@
+{
+  "backup": "/home/branden/growth-goals-backup-20261029T214931Z",
+  "files": {
+    "app.py": "6d7e55bf21847aa6fe1f461efbb034b4196e2253a1fac274977cde310187cbed",
+    "ui/dashboard.py": "c65cd446815c8a3f922d518900e74f4ed98bfb6ac33663a34eda050c905ff1c3",
+    "growth_goals.py": "960de03ded0046a59b19f718ab93a45670fda2e3eb35e3e5aecea52ba327f7e6",
+    "ui/growth_goals_panel.py": "a6e2eb782946e031c24218587f840f413c2dfa5bdc775389b3357d5b296f6321",
+    "adapters/receive_growth.py": "dd70d9dca82f84e35cf2caf1f2df88fa7dbf2db8e65eb301bcf24416b59b6aef"
+  },
+  "host": "192.168.4.40",
+  "hostname": "buffago-growth",
+  "screen": [
+    1920,
+    1080
+  ],
+  "windows_task": "Buffago Growth Goals Refresh",
+  "state_count": 50
+}
