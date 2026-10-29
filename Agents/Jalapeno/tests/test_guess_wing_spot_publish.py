@@ -23,7 +23,7 @@ from guess_wing_spot.durable import Busy, DurableError, PrivateLedger
 from guess_wing_spot.meta_reels import Graph, MetaError, ReelPublisher
 from guess_wing_spot.screening import Screener, clue, aliases
 from guess_wing_spot.automatic import prepare, revalidate
-from guess_wing_spot.actions_runtime import ActionsOwner, run
+from guess_wing_spot.actions_runtime import ActionsOwner, bind_run_date, run
 from test_guess_wing_spot import FakeRepository, snapshot
 
 
@@ -98,6 +98,14 @@ def test_immutable_state_revisions_survive_runner_and_conflicting_updates():
     assert ledger.latest("2026-10-29")["revision"] == 2
     with pytest.raises(Busy):
         ledger.save("2026-10-29", state)
+
+
+def test_rerun_on_later_eastern_date_cannot_become_an_extra_new_daily_post():
+    ledger = MemoryLedger()
+    assert bind_run_date(ledger, "123", "2026-10-29")
+    assert bind_run_date(ledger, "123", "2026-10-29")
+    assert not bind_run_date(ledger, "123", "2026-10-30")
+    assert bind_run_date(ledger, "124", "2026-10-30")
 
 
 def test_actions_claim_recovery_requires_completed_verified_attempt():

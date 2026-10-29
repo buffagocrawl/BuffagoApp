@@ -35,6 +35,8 @@ Existing **private** bucket `jalapeno-assets`, namespace `guess-wing-spot-v1/`:
 
 - `claims/<Eastern-date>/<run|instagram|facebook>/<sequence>.json`: atomic
   create-without-upsert claims. Concurrent creates have exactly one winner.
+- `runs/<GitHub-run-id>.json`: original Eastern date binding. A rerun after
+  that date has elapsed skips rather than creating another day's extra post.
 - `days/<date>/states/<revision>.json`: immutable complete state revisions,
   including daily reel selection, hashes, screening, provider IDs, intents,
   attempts, outcomes and safe errors. A completed date resumes its same reel.

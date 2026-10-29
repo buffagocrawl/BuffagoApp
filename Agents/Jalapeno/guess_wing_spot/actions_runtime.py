@@ -16,6 +16,18 @@ from .automatic import prepare, render_daily, revalidate
 WORKFLOW = ".github/workflows/guess-wing-spot.yml"
 
 
+def bind_run_date(ledger, run_id, date):
+    """A rerun cannot turn yesterday's run into an extra post for today."""
+    if not re.fullmatch(r"\d+", run_id):
+        raise DurableError("invalid_actions_run_identity")
+    key = "runs/" + run_id + ".json"
+    prior = ledger.get(key)
+    if prior is None:
+        ledger.create(key, {"eastern_date": date})
+        prior = ledger.get(key)
+    return prior is not None and prior.get("eastern_date") == date
+
+
 class ActionsOwner:
     def __init__(self, env=os.environ):
         self.env = env
@@ -100,6 +112,8 @@ def run(mode, *, env=os.environ, now=None):
         return result
     owner = ActionsOwner(env)
     date = decision["date"]
+    if not bind_run_date(ledger, env["GITHUB_RUN_ID"], date):
+        return summarize({"status": "skipped_original_run_date_elapsed", "date": date}, decision)
     ledger.claim(date, "run", owner.owner, owner.previous_finished)
     state = ledger.latest(date)
     screener = Screener(ledger)
