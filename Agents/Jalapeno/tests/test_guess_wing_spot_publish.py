@@ -7,6 +7,7 @@ import os
 import shutil
 import sys
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
@@ -23,7 +24,7 @@ from guess_wing_spot.durable import Busy, DurableError, PrivateLedger
 from guess_wing_spot.meta_reels import Graph, MetaError, ReelPublisher
 from guess_wing_spot.screening import Screener, clue, aliases
 from guess_wing_spot.automatic import prepare, revalidate
-from guess_wing_spot.actions_runtime import ActionsOwner, run
+from guess_wing_spot.actions_runtime import ActionsOwner, bind_run_date, run
 from test_guess_wing_spot import FakeRepository, snapshot
 
 
@@ -98,6 +99,14 @@ def test_immutable_state_revisions_survive_runner_and_conflicting_updates():
     assert ledger.latest("2026-10-29")["revision"] == 2
     with pytest.raises(Busy):
         ledger.save("2026-10-29", state)
+
+
+def test_rerun_on_later_eastern_date_cannot_become_an_extra_new_daily_post():
+    ledger = MemoryLedger()
+    assert bind_run_date(ledger, "123", "2026-10-29")
+    assert bind_run_date(ledger, "123", "2026-10-29")
+    assert not bind_run_date(ledger, "123", "2026-10-30")
+    assert bind_run_date(ledger, "124", "2026-10-30")
 
 
 def test_actions_claim_recovery_requires_completed_verified_attempt():
@@ -233,8 +242,10 @@ def test_expired_credentials_are_redacted_and_no_automatic_post_retry():
 
 
 def test_provider_preflight_verifies_page_link_and_pinned_names():
-    graph = Graph("fake", "v25.0")
+    graph = Graph("fake", "v25.0", app_secret="fake-app-secret")
     def reply(method, path, **kwargs):
+        if path == "app": return {"id": "300"}
+        if path == "debug_token": return {"data": {"is_valid": True, "app_id": "300", "type": "USER", "expires_at": int(time.time()) + 60 * 86400}}
         if path == "200": return {"id": "200", "name": "BuffaGo", "access_token": "memory-only", "instagram_business_account": {"id": "100"}}
         if path == "100":
             assert kwargs["data"]["fields"] == "id,username"
@@ -247,6 +258,14 @@ def test_provider_preflight_verifies_page_link_and_pinned_names():
     assert "memory-only" not in json.dumps(identities)
     with pytest.raises(MetaError, match="mismatch"):
         graph.validate("100", "200", "wrong-account", "BuffaGo")
+
+
+def test_short_lived_user_token_cannot_activate_a_later_daily_post():
+    graph = Graph("fake", "v25.0", app_secret="fake-app-secret")
+    graph.call = lambda method, path, **kwargs: {"id": "300"} if path == "app" else {"data": {
+        "is_valid": True, "app_id": "300", "type": "USER", "expires_at": int(time.time()) + 3600}}
+    with pytest.raises(MetaError, match="expires_within_24_hours"):
+        graph.validate("100", "200", "buffago", "BuffaGo")
 
 
 @pytest.mark.parametrize("change,expected", [("vote", "votes_credit"), ("withdrawal", "record_changed"), ("asset", "asset_identity"), ("unavailable", "no_longer_eligible"), ("version", "screening_hash"), ("name", "votes_credit")])
@@ -330,6 +349,33 @@ def test_unscreenable_and_low_resolution_fail_closed():
     assert s.inspect(photo, stream.getvalue())["reason"] == "resolution_below_screening_floor"
 
 
+def test_food_texture_ocr_is_not_equivalent_to_name_like_ambiguous_text():
+    from guess_wing_spot.eligibility import eligible_photos
+    photo = eligible_photos(snapshot(1), lambda _: True)[0][0]
+    photo.destination["name"] = "Example Hearth"
+    result = type("Result", (), {"stdout": "tesseract test", "returncode": 0})()
+    with patch("subprocess.run", return_value=result): screener = Screener(MemoryLedger())
+    result.stdout = "level\tconf\ttext\n5\t5\txqzxqz"
+    with patch("subprocess.run", return_value=result):
+        assert screener.inspect(photo, graphic())["decision"] == "passed"
+    with patch("subprocess.run", return_value=type("Result", (), {"stdout": "tesseract test", "returncode": 0})()):
+        screener = Screener(MemoryLedger())
+    result.stdout = "level\tconf\ttext\n5\t5\theartx"
+    with patch("subprocess.run", return_value=result):
+        assert screener.inspect(photo, graphic())["decision"] == "unreliable"
+
+
+def test_brand_anonymous_credit_is_not_mistaken_for_a_restaurant_alias():
+    from guess_wing_spot.eligibility import eligible_photos
+    photo = eligible_photos(snapshot(1), lambda _: True)[0][0]
+    photo.destination["name"] = "Buffalo Test Kitchen"
+    result = type("Result", (), {"stdout": "tesseract test", "returncode": 0})()
+    with patch("subprocess.run", return_value=result): screener = Screener(MemoryLedger())
+    result.stdout = ocr_tsv(["ordinary", "food"])
+    with patch("subprocess.run", return_value=result):
+        assert screener.inspect(photo, graphic())["decision"] == "passed"
+
+
 def test_preparation_tries_another_source_and_clean_skip():
     class Screening:
         def inspect(self, photo, data):
@@ -355,6 +401,20 @@ def test_storage_namespace_never_accepts_source_paths_or_unavailable_bucket():
         with pytest.raises(DurableError): ledger.key(key)
     with patch.object(ledger, "request", side_effect=DurableError("unavailable")):
         with pytest.raises(DurableError): ledger.check_private()
+
+
+def test_real_storage_missing_object_envelope_is_not_an_auth_failure():
+    ledger = PrivateLedger("https://example.supabase.co", "test")
+    class Missing:
+        status_code = 400
+        def json(self): return {"statusCode": "404", "error": "not_found"}
+    with patch.object(ledger, "request", return_value=Missing()):
+        assert ledger.get("screening/new-binding.json") is None
+    class Forbidden:
+        status_code = 400
+        def json(self): return {"statusCode": "403", "error": "unauthorized"}
+    with patch.object(ledger, "request", return_value=Forbidden()):
+        with pytest.raises(DurableError): ledger.get("screening/new-binding.json")
 
 
 def test_validate_reports_real_source_readiness_without_bypassing_bad_credentials():

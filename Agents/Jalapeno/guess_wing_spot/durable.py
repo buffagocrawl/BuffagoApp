@@ -52,6 +52,16 @@ class PrivateLedger:
                                 headers={"Cache-Control": "no-cache"})
         if response.status_code == 404:
             return None
+        if response.status_code == 400:
+            # Storage's current authenticated endpoint encodes a missing
+            # object as HTTP 400 with logical 404/not_found. Do not confuse
+            # this with permission/auth failures or unavailable storage.
+            try:
+                error = response.json()
+            except ValueError:
+                error = {}
+            if str(error.get("statusCode")) == "404" and error.get("error") == "not_found":
+                return None
         if response.status_code != 200:
             raise DurableError("private_read_failed")
         return response.content

@@ -22,7 +22,7 @@ Manual dispatch defaults to plan. `validate` checks readiness without publishing
 There is no per-reel human approval gate in the automatic publisher.
 
 Existing secrets are reused by name: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY,
-META_LONG_LIVED_ACCESS_TOKEN, INSTAGRAM_BUSINESS_ACCOUNT_ID, FACEBOOK_PAGE_ID.
+META_LONG_LIVED_ACCESS_TOKEN, META_APP_SECRET, INSTAGRAM_BUSINESS_ACCOUNT_ID, FACEBOOK_PAGE_ID.
 META_GRAPH_API_VERSION is explicit (inspected repository setting: v25.0).
 New nonsecret identity pins GUESS_EXPECTED_INSTAGRAM_USERNAME and
 GUESS_EXPECTED_FACEBOOK_NAME must match the read-only provider results before
@@ -35,6 +35,8 @@ Existing **private** bucket `jalapeno-assets`, namespace `guess-wing-spot-v1/`:
 
 - `claims/<Eastern-date>/<run|instagram|facebook>/<sequence>.json`: atomic
   create-without-upsert claims. Concurrent creates have exactly one winner.
+- `runs/<GitHub-run-id>.json`: original Eastern date binding. A rerun after
+  that date has elapsed skips rather than creating another day's extra post.
 - `days/<date>/states/<revision>.json`: immutable complete state revisions,
   including daily reel selection, hashes, screening, provider IDs, intents,
   attempts, outcomes and safe errors. A completed date resumes its same reel.
@@ -74,7 +76,7 @@ Do not add captions, source IDs, answers, raw provider responses, signed URLs,
 Tesseract (local, free) checks four rotations and two segmentation modes.
 Restaurant names are normalized into full-name and distinctive aliases;
 substring/fuzzy OCR matches and required-credit clues reject a source. Very
-small images, malformed OCR, timeouts and ambiguous low-confidence text reject
+small images, malformed OCR, timeouts and ambiguous low-confidence name-like text reject
 the source. Selection tries another eligible source, bounded to 12 trios, and
 skips safely if no three-location geography survives. Existing human exclusions
 are retained privately and checked by source hash. No watermark/credit is erased.
@@ -112,6 +114,10 @@ video_state=PUBLISHED, and bounded status reconciliation. The old Page `/videos`
 adapter is not used. Page access tokens are obtained in memory from the existing
 credential. Page/Instagram IDs, linkage, pinned names, publishing quota access
 and required permissions are checked by read-only calls before mutation.
+The same-app user token is debugged with the existing app secret in memory;
+invalid tokens or token/data-access expiration within 24 hours block readiness.
+An app-secret proof is supplied without logging it. A fresh one-hour Explorer
+token is therefore insufficient for activating a later nightly publication.
 The Facebook Login professional binding is verified through the Page's
 instagram_business_account relation, not an unsupported Basic Display field.
 

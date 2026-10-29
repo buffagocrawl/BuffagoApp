@@ -5,6 +5,8 @@ are reconciled by stored IDs and never automatically republished blindly.
 """
 import re
 import time
+import hashlib
+import hmac
 from datetime import datetime, timezone
 
 import requests
@@ -17,10 +19,11 @@ class MetaError(RuntimeError):
 
 
 class Graph:
-    def __init__(self, token, version, session=None):
+    def __init__(self, token, version, session=None, *, app_secret=None):
         if not token or not re.fullmatch(r"v\d{2,3}\.0", version):
             raise MetaError("missing_token_or_explicit_api_version")
         self.token, self.version = token, version
+        self.app_secret = app_secret
         self.session = session or requests.Session()
 
     def call(self, method, path, *, token=None, data=None, rupload=False, body=None):
@@ -34,6 +37,9 @@ class Graph:
                 raise MetaError("untrusted_graph_path")
             url = f"https://graph.facebook.com/{self.version}/{path}"
             headers = {"Authorization": "Bearer " + (token or self.token)}
+            data = dict(data or {})
+            if self.app_secret:
+                data["appsecret_proof"] = hmac.new(self.app_secret.encode(), (token or self.token).encode(), hashlib.sha256).hexdigest()
         try:
             response = self.session.request(method, url, headers=headers, params=data if method == "GET" else None,
                                             data=body if rupload else data if method != "GET" else None,
@@ -56,6 +62,19 @@ class Graph:
     def validate(self, instagram_id, page_id, expected_instagram, expected_page):
         if not all(re.fullmatch(r"\d+", x or "") for x in (instagram_id, page_id)):
             raise MetaError("account_identifiers_missing")
+        if not self.app_secret:
+            raise MetaError("meta_app_secret_required_for_expiration_validation")
+        app = self.call("GET", "app", data={"fields": "id"})
+        app_id = str(app.get("id", ""))
+        if not app_id.isdigit():
+            raise MetaError("token_application_identity_unavailable")
+        debug = self.call("GET", "debug_token", token=app_id + "|" + self.app_secret, data={"input_token": self.token}).get("data", {})
+        if not debug.get("is_valid") or str(debug.get("app_id")) != app_id or debug.get("type") != "USER":
+            raise MetaError("valid_same_app_user_access_token_required")
+        expiry = int(debug.get("expires_at", 0))
+        access_expiry = int(debug.get("data_access_expires_at", 0))
+        if (expiry and expiry < time.time() + 86400) or (access_expiry and access_expiry < time.time() + 86400):
+            raise MetaError("user_token_or_data_access_expires_within_24_hours")
         # Obtain the Page token in memory only; never serialize it in state.
         page = self.call("GET", page_id, data={"fields": "id,name,access_token,instagram_business_account"})
         page_token = page.get("access_token") or self.token
@@ -77,7 +96,8 @@ class Graph:
         self.call("GET", instagram_id + "/content_publishing_limit", token=page_token, data={"fields": "config,quota_usage"})
         return {"instagram": {"id": instagram_id, "username": ig["username"], "account_type": "professional_page_linked_facebook_login"},
                 "facebook": {"id": page_id, "name": page["name"]}, "api_version": self.version,
-                "permissions_verified": sorted(required)}, page_token
+                "permissions_verified": sorted(required), "user_token_expires_at": expiry,
+                "data_access_expires_at": access_expiry}, page_token
 
 
 class ReelPublisher:
