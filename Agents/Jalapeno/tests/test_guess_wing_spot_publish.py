@@ -338,6 +338,33 @@ def test_unscreenable_and_low_resolution_fail_closed():
     assert s.inspect(photo, stream.getvalue())["reason"] == "resolution_below_screening_floor"
 
 
+def test_food_texture_ocr_is_not_equivalent_to_name_like_ambiguous_text():
+    from guess_wing_spot.eligibility import eligible_photos
+    photo = eligible_photos(snapshot(1), lambda _: True)[0][0]
+    photo.destination["name"] = "Example Hearth"
+    result = type("Result", (), {"stdout": "tesseract test", "returncode": 0})()
+    with patch("subprocess.run", return_value=result): screener = Screener(MemoryLedger())
+    result.stdout = "level\tconf\ttext\n5\t5\txqzxqz"
+    with patch("subprocess.run", return_value=result):
+        assert screener.inspect(photo, graphic())["decision"] == "passed"
+    with patch("subprocess.run", return_value=type("Result", (), {"stdout": "tesseract test", "returncode": 0})()):
+        screener = Screener(MemoryLedger())
+    result.stdout = "level\tconf\ttext\n5\t5\theartx"
+    with patch("subprocess.run", return_value=result):
+        assert screener.inspect(photo, graphic())["decision"] == "unreliable"
+
+
+def test_brand_anonymous_credit_is_not_mistaken_for_a_restaurant_alias():
+    from guess_wing_spot.eligibility import eligible_photos
+    photo = eligible_photos(snapshot(1), lambda _: True)[0][0]
+    photo.destination["name"] = "Buffalo Test Kitchen"
+    result = type("Result", (), {"stdout": "tesseract test", "returncode": 0})()
+    with patch("subprocess.run", return_value=result): screener = Screener(MemoryLedger())
+    result.stdout = ocr_tsv(["ordinary", "food"])
+    with patch("subprocess.run", return_value=result):
+        assert screener.inspect(photo, graphic())["decision"] == "passed"
+
+
 def test_preparation_tries_another_source_and_clean_skip():
     class Screening:
         def inspect(self, photo, data):

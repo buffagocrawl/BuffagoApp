@@ -76,7 +76,7 @@ Do not add captions, source IDs, answers, raw provider responses, signed URLs,
 Tesseract (local, free) checks four rotations and two segmentation modes.
 Restaurant names are normalized into full-name and distinctive aliases;
 substring/fuzzy OCR matches and required-credit clues reject a source. Very
-small images, malformed OCR, timeouts and ambiguous low-confidence text reject
+small images, malformed OCR, timeouts and ambiguous low-confidence name-like text reject
 the source. Selection tries another eligible source, bounded to 12 trios, and
 skips safely if no three-location geography survives. Existing human exclusions
 are retained privately and checked by source hash. No watermark/credit is erased.

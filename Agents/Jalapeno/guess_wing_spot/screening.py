@@ -13,7 +13,7 @@ from PIL import Image, ImageOps, __version__ as PILLOW_VERSION
 from .eligibility import credit_reveals_answer
 from .rendering import decode_photo
 
-VERSION = "tesseract-name-clues-v1"
+VERSION = "tesseract-name-clues-v2"
 GENERIC = {"the", "and", "bar", "grill", "restaurant", "tavern", "pizza", "wings", "company", "sports", "famous", "of"}
 
 
@@ -58,7 +58,7 @@ class Screener:
         image = decode_photo(data)
         if min(image.size) < 480:
             decision, reason = "unreliable", "resolution_below_screening_floor"
-        elif credit_reveals_answer(photo.credit, photo.destination["name"]) or clue(re.findall(r"[a-z0-9]+", photo.credit.casefold()), names):
+        elif photo.credit != "BuffaGo community" and (credit_reveals_answer(photo.credit, photo.destination["name"]) or clue(re.findall(r"[a-z0-9]+", photo.credit.casefold()), names)):
             decision, reason = "suspicious", "required_credit_reveals_answer"
         else:
             try:
@@ -76,9 +76,13 @@ class Screener:
                             words = [re.sub(r"[^a-z0-9]", "", r.get("text", "").casefold()) for r in rows if float(r["conf"]) >= 15]
                             if clue(words, names):
                                 decision, reason = "suspicious", "restaurant_name_or_alias_detected"
-                            # Long low-confidence words could hide an answer.
-                            if decision == "passed" and any(len(re.sub(r"[^a-zA-Z]", "", r.get("text", ""))) >= 4 and 0 <= float(r["conf"]) < 15 for r in rows):
-                                decision, reason = "unreliable", "ambiguous_text_requires_another_source"
+                            # Dense OCR hallucinates words in textured food.
+                            # Low confidence is suspicious when name-like,
+                            # rather than a blanket rejection of wing photos.
+                            low = [re.sub(r"[^a-z0-9]", "", r.get("text", "").casefold()) for r in rows if 0 <= float(r["conf"]) < 15]
+                            targets = [re.sub(r"[^a-z0-9]", "", n) for n in names]
+                            if decision == "passed" and any(len(w) >= 4 and SequenceMatcher(None, w, n).ratio() >= 0.65 for w in low for n in targets):
+                                decision, reason = "unreliable", "ambiguous_name_like_text_requires_another_source"
             except (OSError, subprocess.SubprocessError, ValueError):
                 decision, reason = "unreliable", "ocr_did_not_complete_reliably"
         record = {"asset_sha256": digest, "screening_version": self.version, "binding": binding,
