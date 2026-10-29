@@ -5,6 +5,7 @@ import io
 import json
 import os
 import shutil
+import sys
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
@@ -14,6 +15,8 @@ from unittest.mock import patch
 import pytest
 import requests
 from PIL import Image, ImageDraw
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from guess_wing_spot.clock_gate import gate
 from guess_wing_spot.durable import Busy, DurableError, PrivateLedger
@@ -352,6 +355,24 @@ def test_storage_namespace_never_accepts_source_paths_or_unavailable_bucket():
         with pytest.raises(DurableError): ledger.key(key)
     with patch.object(ledger, "request", side_effect=DurableError("unavailable")):
         with pytest.raises(DurableError): ledger.check_private()
+
+
+def test_validate_reports_real_source_readiness_without_bypassing_bad_credentials():
+    ledger = MemoryLedger()
+    ledger.check_private = lambda: None
+    env = {"SUPABASE_URL": "https://example.supabase.co", "SUPABASE_SERVICE_ROLE_KEY": "test", "META_LONG_LIVED_ACCESS_TOKEN": "bad-test-token",
+           "META_GRAPH_API_VERSION": "v25.0", "INSTAGRAM_BUSINESS_ACCOUNT_ID": "100", "FACEBOOK_PAGE_ID": "200"}
+    candidate = {"status": "planned", "reel_id": "test-reel", "geography": {"label": "Example geography"}}
+    with patch("guess_wing_spot.actions_runtime.PrivateLedger", return_value=ledger), \
+         patch("guess_wing_spot.actions_runtime.Graph.validate", side_effect=MetaError("expired_or_invalid_credentials")), \
+         patch("guess_wing_spot.actions_runtime.Screener"), \
+         patch("guess_wing_spot.actions_runtime.ReadOnlySources"), \
+         patch("guess_wing_spot.actions_runtime.prepare", return_value=candidate), \
+         patch("guess_wing_spot.actions_runtime.ReelPublisher", side_effect=AssertionError("Validation attempted publication")):
+        result = run("validate", env=env)
+    assert result["status"] == "blocked" and result["reason"] == "expired_or_invalid_credentials"
+    assert result["source_screening"] == "passed" and result["accounts"] is None
+    assert not any(key.startswith("claims/") or key.startswith("outputs/") for key in ledger.data)
 
 
 def test_workflow_uses_new_gate_no_artifacts_or_old_enable_flag():
