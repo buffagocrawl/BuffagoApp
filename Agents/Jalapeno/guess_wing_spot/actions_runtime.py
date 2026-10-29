@@ -69,8 +69,16 @@ def run(mode, *, env=os.environ, now=None):
     if mode == "publish" and not (env.get("GUESS_EXPECTED_INSTAGRAM_USERNAME") and env.get("GUESS_EXPECTED_FACEBOOK_NAME")):
         raise MetaError("expected_account_names_must_be_pinned_before_activation")
     graph = Graph(env["META_LONG_LIVED_ACCESS_TOKEN"], env["META_GRAPH_API_VERSION"])
-    identities, page_token = graph.validate(env["INSTAGRAM_BUSINESS_ACCOUNT_ID"], env["FACEBOOK_PAGE_ID"],
-                                           env.get("GUESS_EXPECTED_INSTAGRAM_USERNAME", ""), env.get("GUESS_EXPECTED_FACEBOOK_NAME", ""))
+    provider_problem = None
+    try:
+        identities, page_token = graph.validate(env["INSTAGRAM_BUSINESS_ACCOUNT_ID"], env["FACEBOOK_PAGE_ID"],
+                                               env.get("GUESS_EXPECTED_INSTAGRAM_USERNAME", ""), env.get("GUESS_EXPECTED_FACEBOOK_NAME", ""))
+    except MetaError as error:
+        if mode != "validate":
+            raise
+        # Readiness diagnostics can still prove storage/source/OCR readiness
+        # while credentials are repaired. No claims, uploads or publish calls.
+        provider_problem, identities, page_token = str(error), None, None
     if mode == "validate":
         # Read-only provider checks plus a local OCR toolchain check. Storage
         # claims/write semantics are exercised by separate namespace probes.
@@ -83,9 +91,13 @@ def run(mode, *, env=os.environ, now=None):
         if candidate["status"] != "planned":
             raise MetaError("no_automatically_screened_trio_available")
         ledger.create("validation/" + candidate["reel_id"] + ".json", candidate)
-        print(json.dumps({"status": "validated", "accounts": identities, "screened_geography": candidate["geography"]["label"],
-                          "ledger": "existing_private_jalapeno_assets_namespace", "atomic_create": "verified"}))
-        return {"status": "validated", "accounts": identities}
+        result = {"status": "blocked" if provider_problem else "validated", "accounts": identities,
+                  "screened_geography": candidate["geography"]["label"], "source_screening": "passed",
+                  "ledger": "existing_private_jalapeno_assets_namespace", "atomic_create": "verified"}
+        if provider_problem:
+            result["reason"] = provider_problem
+        print(json.dumps(result))
+        return result
     owner = ActionsOwner(env)
     date = decision["date"]
     ledger.claim(date, "run", owner.owner, owner.previous_finished)
