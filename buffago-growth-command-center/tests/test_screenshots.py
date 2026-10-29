@@ -58,7 +58,7 @@ class DashboardTests(unittest.TestCase):
             self.dashboard.mission_store = MissionStore(Path(folder) / 'missions.json')
             try:
                 texts = self.render()
-                self.assertIn("MARKETING WEEKLY GOAL", texts)
+                self.assertIn("GROWTH & GOALS", texts)
                 open_mission(self.dashboard)
                 self.root.update()
                 window = next(w for w in self.dashboard.winfo_children() if isinstance(w, tk.Toplevel))
@@ -124,11 +124,8 @@ class DashboardTests(unittest.TestCase):
 
     def test_growth_engine_content_and_expiration(self):
         texts = self.render()
-        for expected in ('MARKETING SCORE', 'WHY THIS SCORE', 'MARKETING WEEKLY GOAL',
-                         'WEEKLY GOAL', 'NEXT STEP', 'WHAT TO DO', 'EXPECTED RESULT', 'TIMELINE', 'WHY'):
+        for expected in ('GROWTH & GOALS', 'Social performance', 'State goals'):
             self.assertIn(expected, texts)
-        for removed in ('CURRENT GOAL', 'RECOMMENDED STEPS', 'MARKETING INSIGHT'):
-            self.assertNotIn(removed, texts)
         self.assertIn("Launch one measurable acquisition test.", _fallback_move(Snapshot.from_payload({}).marketing))
         expired = Snapshot.from_payload({"growth_os": {"marketing_insight": {
             "title": "Expired", "body": "Old copy", "expires_at": "2026-10-01T00:00:00Z"}}}).growth_os.marketing_insight
@@ -191,7 +188,7 @@ class DashboardTests(unittest.TestCase):
         self.root.update()
         texts = [self.dashboard.itemcget(item, "text") for item in self.dashboard.find_all()
                  if self.dashboard.type(item) == "text"]
-        self.assertIn("MARKETING WEEKLY GOAL", texts)
+        self.assertIn("GROWTH & GOALS", texts)
 
     def test_action_tiles_use_static_red_alert_state(self):
         self.render()
@@ -227,14 +224,14 @@ class DashboardTests(unittest.TestCase):
                          and self.dashboard.itemcget(item, "text") == "PENDING RESTAURANTS")
             box = self.dashboard.bbox(label)
             self.assertLessEqual(box[2], 392 * width / 1600)
-            self.assertLessEqual(box[3], 707 * height / 900)
+            self.assertLessEqual(box[3], 735 * height / 900)
 
     def test_dashboard_fits_and_captures_supported_displays(self):
         try:
             from PIL import ImageGrab
         except ImportError:
             self.skipTest("Pillow is only required for developer screenshot capture")
-        output = BASE / "artifacts/operations-redesign"
+        output = BASE / "artifacts/growth-goals"
         output.mkdir(parents=True, exist_ok=True)
         for width, height in ((800, 480), (1280, 720), (1600, 900)):
             with self.subTest(size=(width, height)):
@@ -242,7 +239,7 @@ class DashboardTests(unittest.TestCase):
                 for title in ("Unique Device Opens", "Last 24 Hours", "Total Wing Ratings",
                               "Total Restaurants", "Total Users Created", "Monthly MAU", "Unique Mobile Devices",
                               "Wing Ratings", "New Accounts", "Jun", "Oct",
-                              "PENDING PHOTOS", "PENDING RESTAURANTS", "OPEN FEEDBACK", "OPEN WORK", "MARKETING SCORE",
+                              "PENDING PHOTOS", "PENDING RESTAURANTS", "OPEN FEEDBACK", "OPEN WORK", "GROWTH & GOALS",
                               "Growth & Business Health", "MONTHLY GROWTH TRENDS"):
                     self.assertIn(title, texts)
                 self.assertEqual(sum(text == "App-open tracking began in Jun 2026" for text in texts), 1)

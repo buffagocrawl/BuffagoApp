@@ -12,6 +12,8 @@ from typing import Any
 
 from models import MarketingScore, MonthlyPoint, Snapshot, fmt_number
 from ui import theme
+from growth_goals import PanelFeed
+from ui.growth_goals_panel import draw as draw_growth_goals
 from ui.components import Painter
 from missions import MissionStore, eastern_day, mission_for
 from ui.mission_panel import open_mission
@@ -75,6 +77,7 @@ class Dashboard(tk.Canvas):
         self.pack(fill="both", expand=True)
         self.snapshot: Snapshot | None = None
         self.local: dict[str, Any] = {}
+        self.growth_feed = PanelFeed()
         self.last_success: datetime | None = None
         self.stale = False
         self.status = "STARTING"
@@ -211,7 +214,7 @@ class Dashboard(tk.Canvas):
                          values: list[int | float | None], tracking: list[bool] | None) -> None:
         present = [float(value) for value in values if value is not None]
         if not present:
-            p.create_line(p.xy(x), p.xy(y + h - 3, "y"), p.xy(x + w), p.xy(y + h - 3, "y"),
+            self.create_line(p.xy(x), p.xy(y + h - 3, "y"), p.xy(x + w), p.xy(y + h - 3, "y"),
                           fill=theme.BORDER)
             return
         low, high = min(present), max(present)
@@ -444,8 +447,10 @@ class Dashboard(tk.Canvas):
         now = _utc_now()
         self._draw_sauce(p)
         self._draw_header(p, width, now)
-        self._draw_tiles(p, s)
-        self._draw_charts(p, s.monthly_history)
-        self._draw_actions(p, s)
-        self._draw_activity(p, s, now)
-        self._draw_growth_engine(p, s, now)
+        left = Painter(self, int(width * 0.71), height)
+        left.scale = p.scale  # Retain the existing physical type sizes on the wall.
+        self._draw_tiles(left, s)
+        self._draw_charts(left, s.monthly_history)
+        self._draw_actions(left, s)
+        self._draw_activity(left, s, now)
+        draw_growth_goals(self, p, now)

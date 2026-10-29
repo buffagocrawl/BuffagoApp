@@ -249,3 +249,28 @@ No deployment or production restart was performed during development. When ready
 ## Pending restaurants
 
 Action Required includes pending restaurant suggestions from the same queue Mango reviews, alongside photos, feedback and open work. See [restaurant review rollout](../docs/mango-restaurant-review.md). A missing backend field displays unavailable until the migration is applied.
+
+## Growth & Goals right panel
+
+The wall now uses its right half for social performance and state goals. See
+[the delivery and deployment handoff](artifacts/growth-goals/REPORT.md) for verified
+sources, missing state inputs, privacy checks and the current deployment blocker.
+
+`BUFFAGO_GROWTH_GOALS_PATH` points to a **sanitized local projection**, defaulting
+to `growth-goals.json` beside the snapshot cache. Pi checks it every minute and
+retains successful values on failures. Never point it at a raw private report or
+copy privileged credentials to Pi. The independent trusted-server adapter is
+`adapters/export_growth.py`; it reads private reports and publication ledgers,
+with no Meta calls, publishing, analytics writes, or production database changes.
+The existing phone-control API and its browser assets are unchanged.
+
+Reproduce a developer screenshot without starting any network worker:
+
+```text
+python tools/preview_growth_goals.py --feed <sanitized-projection.json> --output preview.png
+```
+
+The preview defaults to the previously recorded Pi dimensions, 1920x1080, and
+labels the left-side business data as demo. Pillow is a development-only capture
+dependency. Live Pi deployment and its existing state-source mapping still need
+the access and inputs listed in the handoff.

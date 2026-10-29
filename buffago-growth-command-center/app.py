@@ -94,6 +94,13 @@ class Application:
         self.last_success: datetime | None = None
         self._refreshing = False
         self._load_initial_state()
+        self._growth_path = Path(os.getenv("BUFFAGO_GROWTH_GOALS_PATH", config.cache_path.parent / "growth-goals.json"))
+        self.root.after(200, self._refresh_growth_goals)
+
+    def _refresh_growth_goals(self):
+        self.dashboard.growth_feed.load(self._growth_path)
+        self.dashboard.render()
+        self.root.after(60_000, self._refresh_growth_goals)
 
     def _leave_fullscreen(self, _event: tk.Event | None = None) -> None:
         """Leave kiosk mode and restore a normal, decorated desktop window."""
