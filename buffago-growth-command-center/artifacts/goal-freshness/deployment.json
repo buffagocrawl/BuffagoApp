@@ -1,0 +1,295 @@
+{
+  "backup": "/home/branden/pi-freshness-backup-20261030T141616Z",
+  "deployed_at": "2026-10-30T14:16:20.012167+00:00",
+  "source_commit": "736bddc42322c25a9e0018ebd251e6533395016e",
+  "rows": [
+    {
+      "code": "US",
+      "updated_at": "2026-10-30T14:15:42.702395+00:00",
+      "metrics": [
+        {
+          "name": "Restaurant coverage",
+          "current": 1228,
+          "target": 1400,
+          "unit": "restaurants",
+          "gap": 172,
+          "fraction": 0.8771428571428571,
+          "deadline": "2026-12-31"
+        },
+        {
+          "name": "Ratings",
+          "current": 101,
+          "target": 800,
+          "unit": "ratings",
+          "gap": 699,
+          "fraction": 0.12625,
+          "deadline": "2026-12-31"
+        },
+        {
+          "name": "Photos",
+          "current": 1,
+          "target": 250,
+          "unit": "photos",
+          "gap": 249,
+          "fraction": 0.004,
+          "deadline": "2026-12-31"
+        }
+      ],
+      "contribution_basis": "founder_excluded_v1",
+      "collection_started_at": "2026-10-30T14:15:40.665679+00:00",
+      "restaurants_collected_at": "2026-10-30T14:15:42.115073+00:00",
+      "label": "Nation"
+    },
+    {
+      "code": "CT",
+      "updated_at": "2026-10-30T14:15:42.702395+00:00",
+      "metrics": [
+        {
+          "current": 322,
+          "target": 250,
+          "unit": "restaurants",
+          "gap": 0,
+          "fraction": 1,
+          "name": "Restaurant coverage",
+          "deadline": "2026-12-31"
+        },
+        {
+          "current": 82,
+          "target": 450,
+          "unit": "ratings",
+          "gap": 368,
+          "fraction": 0.18222222222222223,
+          "name": "Ratings",
+          "deadline": "2026-12-31"
+        },
+        {
+          "current": 1,
+          "target": 90,
+          "unit": "photos",
+          "gap": 89,
+          "fraction": 0.011111111111111112,
+          "name": "Photos",
+          "deadline": "2026-12-31"
+        }
+      ],
+      "contribution_basis": "founder_excluded_v1",
+      "collection_started_at": "2026-10-30T14:15:40.665679+00:00",
+      "restaurants_collected_at": "2026-10-30T14:15:42.115073+00:00",
+      "proposed_targets": [
+        {
+          "name": "Restaurant coverage",
+          "value": 250,
+          "unit": "restaurants",
+          "deadline": "2026-12-31",
+          "status": "approved"
+        },
+        {
+          "name": "Ratings",
+          "value": 450,
+          "unit": "ratings",
+          "deadline": "2026-12-31",
+          "status": "approved"
+        },
+        {
+          "name": "Photos",
+          "value": 90,
+          "unit": "photos",
+          "deadline": "2026-12-31",
+          "status": "approved"
+        }
+      ],
+      "label": "Connecticut"
+    },
+    {
+      "code": "OH",
+      "updated_at": "2026-10-30T14:15:42.702395+00:00",
+      "metrics": [
+        {
+          "current": 103,
+          "target": 150,
+          "unit": "restaurants",
+          "gap": 47,
+          "fraction": 0.6866666666666666,
+          "name": "Restaurant coverage",
+          "deadline": "2026-12-31"
+        },
+        {
+          "current": 0,
+          "target": 50,
+          "unit": "ratings",
+          "gap": 50,
+          "fraction": 0.0,
+          "name": "Ratings",
+          "deadline": "2026-12-31"
+        },
+        {
+          "current": 0,
+          "target": 25,
+          "unit": "photos",
+          "gap": 25,
+          "fraction": 0.0,
+          "name": "Photos",
+          "deadline": "2026-12-31"
+        }
+      ],
+      "contribution_basis": "founder_excluded_v1",
+      "collection_started_at": "2026-10-30T14:15:40.665679+00:00",
+      "restaurants_collected_at": "2026-10-30T14:15:42.115073+00:00",
+      "proposed_targets": [
+        {
+          "name": "Restaurant coverage",
+          "value": 150,
+          "unit": "restaurants",
+          "deadline": "2026-12-31",
+          "status": "approved"
+        },
+        {
+          "name": "Ratings",
+          "value": 50,
+          "unit": "ratings",
+          "deadline": "2026-12-31",
+          "status": "approved"
+        },
+        {
+          "name": "Photos",
+          "value": 25,
+          "unit": "photos",
+          "deadline": "2026-12-31",
+          "status": "approved"
+        }
+      ],
+      "label": "Ohio"
+    },
+    {
+      "code": "NY",
+      "updated_at": "2026-10-30T14:15:42.702395+00:00",
+      "metrics": [
+        {
+          "current": 68,
+          "target": 100,
+          "unit": "restaurants",
+          "gap": 32,
+          "fraction": 0.68,
+          "name": "Restaurant coverage",
+          "deadline": "2026-12-31"
+        },
+        {
+          "current": 1,
+          "target": 60,
+          "unit": "ratings",
+          "gap": 59,
+          "fraction": 0.016666666666666666,
+          "name": "Ratings",
+          "deadline": "2026-12-31"
+        },
+        {
+          "current": 0,
+          "target": 35,
+          "unit": "photos",
+          "gap": 35,
+          "fraction": 0.0,
+          "name": "Photos",
+          "deadline": "2026-12-31"
+        }
+      ],
+      "contribution_basis": "founder_excluded_v1",
+      "collection_started_at": "2026-10-30T14:15:40.665679+00:00",
+      "restaurants_collected_at": "2026-10-30T14:15:42.115073+00:00",
+      "proposed_targets": [
+        {
+          "name": "Restaurant coverage",
+          "value": 100,
+          "unit": "restaurants",
+          "deadline": "2026-12-31",
+          "status": "approved"
+        },
+        {
+          "name": "Ratings",
+          "value": 60,
+          "unit": "ratings",
+          "deadline": "2026-12-31",
+          "status": "approved"
+        },
+        {
+          "name": "Photos",
+          "value": 35,
+          "unit": "photos",
+          "deadline": "2026-12-31",
+          "status": "approved"
+        }
+      ],
+      "label": "New York"
+    },
+    {
+      "code": "MA",
+      "updated_at": "2026-10-30T14:15:42.702395+00:00",
+      "metrics": [
+        {
+          "current": 40,
+          "target": 65,
+          "unit": "restaurants",
+          "gap": 25,
+          "fraction": 0.6153846153846154,
+          "name": "Restaurant coverage",
+          "deadline": "2026-12-31"
+        },
+        {
+          "current": 6,
+          "target": 80,
+          "unit": "ratings",
+          "gap": 74,
+          "fraction": 0.075,
+          "name": "Ratings",
+          "deadline": "2026-12-31"
+        },
+        {
+          "current": 0,
+          "target": 25,
+          "unit": "photos",
+          "gap": 25,
+          "fraction": 0.0,
+          "name": "Photos",
+          "deadline": "2026-12-31"
+        }
+      ],
+      "contribution_basis": "founder_excluded_v1",
+      "collection_started_at": "2026-10-30T14:15:40.665679+00:00",
+      "restaurants_collected_at": "2026-10-30T14:15:42.115073+00:00",
+      "proposed_targets": [
+        {
+          "name": "Restaurant coverage",
+          "value": 65,
+          "unit": "restaurants",
+          "deadline": "2026-12-31",
+          "status": "approved"
+        },
+        {
+          "name": "Ratings",
+          "value": 80,
+          "unit": "ratings",
+          "deadline": "2026-12-31",
+          "status": "approved"
+        },
+        {
+          "name": "Photos",
+          "value": 25,
+          "unit": "photos",
+          "deadline": "2026-12-31",
+          "status": "approved"
+        }
+      ],
+      "label": "Massachusetts"
+    }
+  ],
+  "preservation_verified": true,
+  "targets_unchanged": true,
+  "social_and_weekly_feed_unchanged": true,
+  "control_pid": "MainPID=482",
+  "feed_produced_at": "2026-10-30T14:15:45.317368+00:00",
+  "pi_refreshed_at": "2026-10-30T14:16:15.101403+00:00",
+  "hashes": {
+    "growth_goals.py": "dfd648512326284d53099a9c0b608d275967251293ebd2fd97fda995d328a515",
+    "state_geographies.py": "56781106a9df64b90a588dd4b47a5dfc3e2e16cb7984199b79273acae72be1f4",
+    "ui/growth_goals_panel.py": "82d71679c462a01a23c109224a9b5b26e4cc37ef4fbc32862be567104bf62b49"
+  }
+}
