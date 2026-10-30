@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "approved": false,
+  "approved_at": null,
+  "approved_by": null,
+  "priority_states": [],
+  "review_states": ["CT", "NY", "MA"],
+  "targets": {
+    "CT": [
+      {"name":"Restaurant coverage","value":250,"unit":"restaurants","status":"proposed","deadline":"2026-12-31"},
+      {"name":"Ratings","value":425,"unit":"ratings","status":"proposed","deadline":"2026-12-31"},
+      {"name":"Photos","value":83,"unit":"photos","status":"proposed","deadline":"2026-12-31"}
+    ],
+    "NY": [
+      {"name":"Restaurant coverage","value":100,"unit":"restaurants","status":"proposed","deadline":"2026-12-31"},
+      {"name":"Ratings","value":53,"unit":"ratings","status":"proposed","deadline":"2026-12-31"},
+      {"name":"Photos","value":30,"unit":"photos","status":"proposed","deadline":"2026-12-31"}
+    ],
+    "MA": [
+      {"name":"Restaurant coverage","value":60,"unit":"restaurants","status":"proposed","deadline":"2026-12-31"},
+      {"name":"Ratings","value":69,"unit":"ratings","status":"proposed","deadline":"2026-12-31"},
+      {"name":"Photos","value":21,"unit":"photos","status":"proposed","deadline":"2026-12-31"}
+    ]
+  }
+}

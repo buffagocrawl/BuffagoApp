@@ -2,7 +2,7 @@
 import tkinter as tk
 import webbrowser
 from datetime import datetime, timezone
-from growth_goals import display, moment, public_link
+from growth_goals import display, moment, public_link, eastern_stamp
 from ui import theme
 from ui.components import Painter
 
@@ -21,8 +21,7 @@ def business_painter(canvas, width, height, scale):
 
 
 def text_stamp(value):
-    parsed = moment(value)
-    return parsed.strftime('%b %d %H:%M UTC') if parsed else 'Unavailable'
+    return eastern_stamp(value)
 
 
 def details(dashboard):
@@ -49,13 +48,14 @@ def details(dashboard):
         body.tag_bind(tag, '<Button-1>', lambda _e, u=url: webbrowser.open(u))
     line('SOCIAL PERFORMANCE' + (' • STALE' if feed.stale() else ''))
     line('Report: '+text_stamp(social.get('generated_at')))
+    line('Pi refreshed: '+text_stamp(data.get('pi_refreshed_at')))
     line('Lifetime cumulative values at capture age; provider insights may lag 48 hours.')
     for r in social.get('reels', []):
         line('\n'+r['platform'].title()+(' • Live test' if r['live_test'] else ' • Nightly'))
         line('Published '+text_stamp(r['published_at'])+' | Captured '+text_stamp(r['captured_at']))
         line(f"Observation age: {r['age_hours']} hours | Window: {r['window']}")
         for name, entry in r['metrics'].items():
-            line(name.replace('_', '/').title()+': '+display(entry))
+            line(name.replace('_', '/').title()+': '+display(entry)+(' ('+entry['reason']+')' if entry.get('reason') else ''))
         link(r['url'])
     line('\nPUBLICATION LEDGER • read only')
     for r in data.get('publications', []):
@@ -80,13 +80,15 @@ def details(dashboard):
         line(f"{c['platform']} | {c['window']} | {c['metric']}: {c['change_fraction']:+.1%} | n={c['previous_n']} → {c['current_n']}")
     if not social.get('comparisons'):
         line('Insufficient history: need at least 3 measured posts in each mature cohort.')
-    line('\nSTATE GOALS • all eligible states in source priority order')
+    line('\nSTATE GOALS • all eligible states')
     line(data.get('state_order', 'Priority order unavailable'))
     line('Photos count approved lifecycle contributions that have not been withdrawn. Targets are not set unless sourced.')
     for state in data.get('states', []):
         line('\n'+state['code']+' | Updated '+text_stamp(state['updated_at']))
         for m in state['metrics']:
             line(f"{m['name']}: {m['current'] if m['current'] is not None else 'Unavailable'} / {m['target'] if m['target'] is not None else 'Not set'} {m['unit']} | Gap: {m['gap'] if m['gap'] is not None else 'Unavailable'}")
+        for proposal in state.get('proposed_targets', []):
+            line(f"Review only: {proposal['name']} {proposal['value']} {proposal['unit']} by {proposal['deadline']} ({proposal['status']})")
     if not data.get('states'):
         line('State report, eligible-state list, priority order and established targets are not connected.')
     line('\nReach is per post; it is never summed as unique people. No tracked installs.')
@@ -100,10 +102,14 @@ def draw(d, p, now):
     social = data.get('social', {})
     stale = feed.stale(now)
     p.label(x, 91, 'Growth & Goals')
-    p.text(x+w, 91, 'STALE' if stale and data else feed.status.upper(), 12, theme.ALERT if stale else theme.UP, 'bold', anchor='ne')
+    connected = feed.connectivity(now)
+    source_old = feed.source_stale(now)
+    badge = ('PI ONLINE' if connected else 'PI OFFLINE')+' | '+('SOURCE OLD' if source_old else 'SOURCE FRESH') if data else feed.status.upper()
+    p.text(x+w, 91, badge, 12, theme.ALERT if not connected or source_old else theme.UP, 'bold', anchor='ne')
     d._card(p, x, 120, w, 405, fill=theme.PANEL, outline=theme.BORDER)
     p.text(x+18, 137, 'Social performance', 22, theme.TEXT, 'bold')
-    p.text(x+18, 169, 'Report '+text_stamp(social.get('generated_at')), 12, theme.MUTED)
+    p.text(x+18, 169, 'Source '+text_stamp(social.get('generated_at')), 12, theme.MUTED)
+    p.text(x+18, 187, 'Pi sync '+text_stamp(data.get('pi_refreshed_at')), 10, theme.SUBTLE)
     health = social.get('health', {})
     p.text(x+w-18, 169, f"{health.get('errors', 0)} collection gaps" if data else 'Awaiting server feed', 12,
            theme.ALERT if health.get('errors') else theme.MUTED, anchor='ne')
@@ -120,6 +126,7 @@ def draw(d, p, now):
         published = moment(reel['published_at'])
         post_age = f'{max(0, (now-published).total_seconds()/3600):.1f}h' if published else 'unknown'
         p.text(cx, 258, f"Post {post_age} | Snapshot {age} | {reel['window']}", 12, theme.MUTED)
+        p.text(cx, 277, 'Captured '+text_stamp(reel.get('captured_at')), 9, theme.SUBTLE)
         # Primary numbers are large; lesser metrics stay compact.
         for j, name in enumerate(('views', 'reach')):
             entry = reel['metrics'][name]
@@ -154,9 +161,11 @@ def draw(d, p, now):
             current = f"{m['current']:,.{places}f}" if m['current'] is not None else 'Unavailable'
             target = f"{m['target']:,.{places}f}" if m['target'] is not None else 'Not set'
             p.text(x+78, y, f"{current} / {target} {m['unit']}", 15, theme.TEXT, 'bold')
-            p.box(x+78, y+27, x+470, y+34, fill=theme.BORDER, outline=theme.BORDER)
             if m['fraction'] is not None:
+                p.box(x+78, y+27, x+470, y+34, fill=theme.BORDER, outline=theme.BORDER)
                 p.box(x+78, y+27, x+78+int(392*m['fraction']), y+34, fill=theme.ACCENT, outline=theme.ACCENT)
+            else:
+                p.text(x+78, y+27, 'No approved target; no progress calculated', 11, theme.SUBTLE)
             p.text(x+w-18, y+25, f"Gap {m['gap']:,.1f}" if m['gap'] is not None else 'Gap unavailable', 12, theme.MUTED, anchor='ne')
         else:
             p.text(x+78, y, 'Restaurant coverage: unavailable • Target: Not set', 14, theme.MUTED)

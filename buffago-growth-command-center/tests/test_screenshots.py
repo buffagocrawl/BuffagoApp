@@ -237,7 +237,7 @@ class DashboardTests(unittest.TestCase):
             with self.subTest(size=(width, height)):
                 texts = self.render(width, height)
                 for title in ("Unique Device Opens", "Last 24 Hours", "Total Wing Ratings",
-                              "Total Restaurants", "Total Users Created", "Monthly MAU", "Unique Mobile Devices",
+                              "Total Restaurants", "Total Users Created", "Monthly MAU", "Instagram weekly views",
                               "Wing Ratings", "New Accounts", "Jun", "Oct",
                               "PENDING PHOTOS", "PENDING RESTAURANTS", "OPEN FEEDBACK", "OPEN WORK", "GROWTH & GOALS",
                               "Growth & Business Health", "MONTHLY GROWTH TRENDS"):

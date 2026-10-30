@@ -54,7 +54,7 @@ class WallRenderingTests(unittest.TestCase):
         shown[2]['unique_devices']=0
         self.render()
         items=self.wall.find_withtag('chart-value')
-        self.assertEqual(len(items),4*len(shown)-1)
+        self.assertEqual(len(items),3*len(shown)-1)
         texts=[self.wall.itemcget(i,'text') for i in items]
         self.assertIn('0',texts)
         self.assertNotIn('—',texts)
