@@ -4,6 +4,7 @@ import webbrowser
 from datetime import datetime, timezone
 from growth_goals import display, moment, public_link, eastern_stamp
 from ui import theme
+from state_geographies import wall_states
 from ui.components import Painter
 
 
@@ -143,33 +144,19 @@ def draw(d, p, now):
     p.text(x+18, 502, 'Lifetime at capture age • No comparable mature trend yet' if not social.get('comparisons') else 'Mature cohort comparisons available in details', 12, theme.SUBTLE)
     d._card(p, x, 542, w, 270, fill=theme.PANEL, outline=theme.BORDER)
     p.text(x+18, 558, 'State goals', 22, theme.TEXT, 'bold')
-    states = data.get('states', [])
-    if states:
-        p.text(x+w-18, 567, data.get('state_order', 'Priority order unavailable'), 12, theme.SUBTLE, anchor='ne')
-    if not states:
-        p.text(x+18, 605, 'State data not connected', 24, theme.TEXT, 'bold')
-        p.text(x+18, 648, 'Coverage target: Not set', 17, theme.MUTED)
-        p.text(x+18, 683, 'Need the existing state report, priority order and targets.', 14, theme.MUTED)
-        p.text(x+18, 721, 'Ratings and photos: unavailable by state', 14, theme.MUTED)
-        p.text(x+18, 758, 'Last updated: unavailable', 12, theme.SUBTLE)
-    for index, state in enumerate(states[:3]):
-        y = 603+index*62
-        m = next((m for m in state['metrics'] if m['name']=='Restaurant coverage'), None)
-        p.text(x+18, y, state['code'], 19, theme.ACCENT, 'bold')
-        if m:
-            places = 1 if m['unit'] == 'restaurants per million residents' else 0
-            current = f"{m['current']:,.{places}f}" if m['current'] is not None else 'Unavailable'
-            target = f"{m['target']:,.{places}f}" if m['target'] is not None else 'Not set'
-            p.text(x+78, y, f"{current} / {target} {m['unit']}", 15, theme.TEXT, 'bold')
-            if m['fraction'] is not None:
-                p.box(x+78, y+27, x+470, y+34, fill=theme.BORDER, outline=theme.BORDER)
-                p.box(x+78, y+27, x+78+int(392*m['fraction']), y+34, fill=theme.ACCENT, outline=theme.ACCENT)
-            else:
-                p.text(x+78, y+27, 'No approved target; no progress calculated', 11, theme.SUBTLE)
-            p.text(x+w-18, y+25, f"Gap {m['gap']:,.1f}" if m['gap'] is not None else 'Gap unavailable', 12, theme.MUTED, anchor='ne')
-        else:
-            p.text(x+78, y, 'Restaurant coverage: unavailable • Target: Not set', 14, theme.MUTED)
-    if states:
-        p.text(x+18, 790, 'Updated '+text_stamp(states[0].get('updated_at'))+' | Ratings & photos in details', 12, theme.SUBTLE)
+    states = wall_states(data.get('states', []))
+    p.text(x+w-18, 567, 'Targets: Not set', 13, theme.SUBTLE, anchor='ne')
+    columns = (x+315, x+505, x+720)
+    for cx, title in zip(columns, ('Restaurants', 'Rating records', 'Approved photos')):
+        p.text(cx, 596, title, 13, theme.MUTED, 'bold', anchor='ne')
+    for index, state in enumerate(states):
+        y = 624+index*32
+        p.text(x+18, y, state['label'], 16, theme.ACCENT, 'bold')
+        for cx, name, unit in zip(columns, ('Restaurant coverage', 'Ratings', 'Photos'), ('restaurants', 'ratings', 'photos')):
+            item = next((m for m in state['metrics'] if m['name'] == name and m['unit'] == unit), {})
+            current = item.get('current')
+            value = f'{current:,.0f}' if current is not None else 'Unavailable'
+            p.text(cx, y, value+' / Not set', 14, theme.TEXT, 'bold', anchor='ne')
+    p.text(x+18, 790, 'Nation: all 50 states | Targets unapproved; no progress calculated', 12, theme.SUBTLE)
     p.text(x+18, 831, 'All Reels, collection details & all eligible states →', 15, theme.ACCENT, 'bold')
     d.tag_bind(d.find_all()[-1], '<Button-1>', lambda _e: details(d))

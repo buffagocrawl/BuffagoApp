@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "approved": false,
+  "approved_at": null,
+  "approved_by": null,
+  "priority_states": [],
+  "review_states": [
+    "US",
+    "CT",
+    "OH",
+    "NY",
+    "MA"
+  ],
+  "baseline_observed_at": "2026-10-30T12:09:06.763195+00:00",
+  "targets": {
+    "US": [
+      {
+        "name": "Restaurant coverage",
+        "value": 1300,
+        "unit": "restaurants",
+        "status": "proposed",
+        "deadline": "2026-12-31"
+      },
+      {
+        "name": "Ratings",
+        "value": 700,
+        "unit": "ratings",
+        "status": "proposed",
+        "deadline": "2026-12-31"
+      },
+      {
+        "name": "Photos",
+        "value": 230,
+        "unit": "photos",
+        "status": "proposed",
+        "deadline": "2026-12-31"
+      }
+    ],
+    "CT": [
+      {
+        "name": "Restaurant coverage",
+        "value": 250,
+        "unit": "restaurants",
+        "status": "proposed",
+        "deadline": "2026-12-31"
+      },
+      {
+        "name": "Ratings",
+        "value": 425,
+        "unit": "ratings",
+        "status": "proposed",
+        "deadline": "2026-12-31"
+      },
+      {
+        "name": "Photos",
+        "value": 83,
+        "unit": "photos",
+        "status": "proposed",
+        "deadline": "2026-12-31"
+      }
+    ],
+    "OH": [
+      {
+        "name": "Restaurant coverage",
+        "value": 125,
+        "unit": "restaurants",
+        "status": "proposed",
+        "deadline": "2026-12-31"
+      },
+      {
+        "name": "Ratings",
+        "value": 40,
+        "unit": "ratings",
+        "status": "proposed",
+        "deadline": "2026-12-31"
+      },
+      {
+        "name": "Photos",
+        "value": 20,
+        "unit": "photos",
+        "status": "proposed",
+        "deadline": "2026-12-31"
+      }
+    ],
+    "NY": [
+      {
+        "name": "Restaurant coverage",
+        "value": 100,
+        "unit": "restaurants",
+        "status": "proposed",
+        "deadline": "2026-12-31"
+      },
+      {
+        "name": "Ratings",
+        "value": 53,
+        "unit": "ratings",
+        "status": "proposed",
+        "deadline": "2026-12-31"
+      },
+      {
+        "name": "Photos",
+        "value": 30,
+        "unit": "photos",
+        "status": "proposed",
+        "deadline": "2026-12-31"
+      }
+    ],
+    "MA": [
+      {
+        "name": "Restaurant coverage",
+        "value": 60,
+        "unit": "restaurants",
+        "status": "proposed",
+        "deadline": "2026-12-31"
+      },
+      {
+        "name": "Ratings",
+        "value": 69,
+        "unit": "ratings",
+        "status": "proposed",
+        "deadline": "2026-12-31"
+      },
+      {
+        "name": "Photos",
+        "value": 21,
+        "unit": "photos",
+        "status": "proposed",
+        "deadline": "2026-12-31"
+      }
+    ]
+  }
+}
