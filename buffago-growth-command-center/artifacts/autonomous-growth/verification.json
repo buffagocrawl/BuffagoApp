@@ -1,0 +1,94 @@
+{
+  "implementation_commit": "8927afc0734aea2f91b00031ed6f54242e093076",
+  "merge_commit": "74f67b5068fc67020a1c12901ec36ee4248a59b3",
+  "pr": "https://github.com/buffagocrawl/BuffagoApp/pull/41",
+  "host": "192.168.4.40",
+  "hostname": "buffago-growth",
+  "display": [
+    1920,
+    1080
+  ],
+  "windows_stopped": {
+    "last_run": "2026-10-30T00:21:57.0000000Z",
+    "last_result": 0,
+    "task": "Buffago Growth Goals Refresh",
+    "stopped_at": "2026-10-30T00:27:10.9620566Z",
+    "state": "Ready"
+  },
+  "windows_disabled_after_verification": {
+    "last_run": "2026-10-30T00:21:57.0000000Z",
+    "last_run_unchanged_during_proof": true,
+    "task": "Buffago Growth Goals Refresh",
+    "disabled_after_success": "2026-10-30T00:31:35.8681735Z",
+    "state": "Disabled"
+  },
+  "first_pi_pull": {
+    "pi_refreshed_at": "2026-10-30T00:30:08.976030+00:00",
+    "feed_produced_at": "2026-10-30T00:28:03.674733+00:00",
+    "source_collected_at": "2026-10-30T00:27:42.883524+00:00"
+  },
+  "network_outage": {
+    "network_isolated": true,
+    "last_good_unchanged": true,
+    "offline_flag": true,
+    "last_good_refresh": "2026-10-30T00:30:08.976030+00:00"
+  },
+  "network_recovery": {
+    "recovered": true,
+    "pi_refreshed_at": "2026-10-30T00:32:21.746873+00:00",
+    "source_collected_at": "2026-10-30T00:27:42.883524+00:00"
+  },
+  "final_pi_verification": {
+    "preservation_verified": true,
+    "targets_inactive": true,
+    "source_collected_at": "2026-10-30T00:27:42.883524+00:00",
+    "pi_refreshed_at": "2026-10-30T00:32:42.408362+00:00",
+    "cloud_produced_at": "2026-10-30T00:28:03.674733+00:00",
+    "state_count": 50
+  },
+  "source": {
+    "collection_run": "https://github.com/buffagocrawl/BuffagoApp/actions/runs/40979773526",
+    "publication_hashes_unchanged": true,
+    "historical_snapshots_immutable": true,
+    "history_first_day": "2026-09-07",
+    "history_last_day": "2026-10-29",
+    "daily_ranges": 53,
+    "complete_weeks": 7,
+    "current_week_partial": true,
+    "scope": "Account-wide Instagram views",
+    "definition": "instagram_account_views_v25_total_value_all_surfaces",
+    "timezone": "America/New_York",
+    "privacy_check": "passed",
+    "unchanged_workflows": [
+      ".github/workflows/guess-wing-spot.yml",
+      ".github/workflows/jalapeno-growth-loop.yml",
+      ".github/workflows/jalapeno-schedule.yml",
+      ".github/workflows/secret-scan.yml"
+    ]
+  },
+  "installed": {
+    "backup": "/home/branden/pi-autonomous-backup-20261030T002806Z",
+    "source_commit": "74f67b5068fc67020a1c12901ec36ee4248a59b3",
+    "files": {
+      "app.py": "5cc5c5e8a2f40d2b9d790b76795452fcd27180dda6c077bc5cd291ca0122c204",
+      "ui/dashboard.py": "933e84465e90705ac9c60dc7ccd0e961f367f931545b416183d82eb45367b16b",
+      "growth_goals.py": "f0721a444245d150ba1c9b329a0749beb4bffc599e7e5409e54490b1a8c43aab",
+      "ui/growth_goals_panel.py": "da5e369bb7696b302ccc029672092a26f97b421744309811bc89018b8920f6b1",
+      "ui/weekly_instagram.py": "e564fa2a4bbe7bc1c0b00fd4eab46e084b6144691654df134b6d77226814e467",
+      "state_goal_config.py": "8de7a974d49cebe549d3d7df4fea12ea3312fcea685bfd169c8f1a84a6398b3a",
+      "adapters/pull_feed.py": "043de875a97a6eb0a6ee1a869bd90de266bc836a92dece10cb74ba01b3f56cc5"
+    }
+  },
+  "feed_function": {
+    "name": "buffago-pi-feed",
+    "version": 1,
+    "authentication": "required fixed-feed-only bearer, private stored SHA-256",
+    "anonymous_http_status": 401,
+    "authenticated_http_status": 200
+  },
+  "existing_app_function_versions_unchanged": true,
+  "pi_credential_scope_verified": "43-character fixed-feed-only read capability; no broad Supabase or Meta keys",
+  "timer_enabled": true,
+  "automatic_timer_trigger": "2026-10-29 20:32:35 EDT",
+  "automatic_timer_pull": "2026-10-30T00:32:42.408362+00:00"
+}

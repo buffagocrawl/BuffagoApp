@@ -271,7 +271,7 @@ python tools/preview_growth_goals.py --feed <sanitized-projection.json> --output
 ```
 
 The preview defaults to Pi's verified 1920x1080 dimensions and labels the left-side business data as demo. Pillow is a development-only capture dependency.
-See [the live deployment report](artifacts/growth-goals/DEPLOYMENT.md) for the installed dashboard, real screenshot, all-state count sources, restricted upload task, login dependency and missing goal inputs.
+See [the current autonomous deployment report](artifacts/autonomous-growth/DEPLOYMENT.md) for the installed dashboard, real screenshot, all-state count sources, restricted upload task, login dependency and missing goal inputs.
 
 ## Autonomous feed and weekly Instagram views
 

@@ -1,14 +1,14 @@
-﻿# State-goal proposal — review only
+# State-goal proposal — review only
 
-Baseline observed 2026-10-29 20:05 EDT, from read-only production aggregates. No user-established state targets, priority order, or trusted population denominator were found in installed Pi configuration, the repository's goal/coverage documentation, or the inspected state schema. Every target below is newly proposed and remains inactive.
+Baseline observed 2026-10-29 20:28 EDT, from read-only production aggregates. No user-established state targets, priority order, or trusted population denominator were found in installed Pi configuration, the repository's goal/coverage documentation, or the inspected state schema. Every target below is newly proposed and remains inactive.
 
 | Proposed priority | Rationale | Metric / exact unit | Current baseline | Proposed target | Gap | Suggested deadline |
 |---|---|---|---:|---:|---:|---|
 | 1. Connecticut | Anchor the market with the strongest observed rating/photo contribution base; deepen an existing usable catalog before expanding. | Restaurant coverage / restaurants | 228 | 250 | 22 | 2026-12-31 ET |
 | Connecticut | Build repeat participation in that anchor market. | Ratings / contribution records | 325 | 425 | 100 | 2026-12-31 ET |
 | Connecticut | Improve the approved contribution base. | Photos / approved lifecycle photo-contribution records, not withdrawn | 58 | 83 | 25 | 2026-12-31 ET |
-| 2. New York | Neighboring expansion with Buffalo's relevance to the product category; a focused hypothesis, not a measured demand claim. | Restaurant coverage / restaurants | 67 | 100 | 33 | 2026-12-31 ET |
-| New York | Test participation alongside catalog expansion. | Ratings / contribution records | 23 | 53 | 30 | 2026-12-31 ET |
+| 2. New York | Neighboring expansion with Buffalo's relevance to the product category; a focused hypothesis, not a measured demand claim. | Restaurant coverage / restaurants | 68 | 100 | 32 | 2026-12-31 ET |
+| New York | Test participation alongside catalog expansion. | Ratings / contribution records | 24 | 53 | 29 | 2026-12-31 ET |
 | New York | Supply more approved contributions. | Photos / approved lifecycle photo-contribution records, not withdrawn | 20 | 30 | 10 | 2026-12-31 ET |
 | 3. Massachusetts | A neighboring, geographically coherent pilot with an existing contribution base; not selected simply by restaurant count. | Restaurant coverage / restaurants | 40 | 60 | 20 | 2026-12-31 ET |
 | Massachusetts | Test activity before broader acquisition effort. | Ratings / contribution records | 39 | 69 | 30 | 2026-12-31 ET |
