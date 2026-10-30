@@ -8,6 +8,7 @@ on:
       - 'Agents/Jalapeno/account_views_probe.py'
       - '.github/workflows/jalapeno-metrics.yml'
       - '.github/workflows/pi-growth-checks.yml'
+      - '.github/workflows/pi-dashboard-feed.yml'
 permissions:
   contents: read
 jobs:

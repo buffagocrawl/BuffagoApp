@@ -132,6 +132,9 @@ def state_goals(raw):
                        'metrics': metrics})
         if row.get('contribution_basis') == 'founder_excluded_v1':
             result[-1]['contribution_basis'] = 'founder_excluded_v1'
+        for stamp in ('collection_started_at', 'restaurants_collected_at'):
+            if moment(row.get(stamp)):
+                result[-1][stamp] = row[stamp]
     if order:
         return sorted(result, key=lambda r: (order.index(r['code']) if r['code'] in order else len(order), r['code']))
     return sorted(result, key=lambda r: r['code'])

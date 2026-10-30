@@ -2,7 +2,7 @@
 import tkinter as tk
 import webbrowser
 from datetime import datetime, timezone
-from growth_goals import display, moment, public_link, eastern_stamp
+from growth_goals import display, moment, public_link, eastern_stamp, goal_progress
 from ui import theme
 from state_geographies import wall_states
 from ui.components import Painter
@@ -83,10 +83,14 @@ def details(dashboard):
         line('Insufficient history: need at least 3 measured posts in each mature cohort.')
     line('\nSTATE GOALS • all eligible states')
     line(data.get('state_order', 'Priority order unavailable'))
+    line('Feed produced: '+text_stamp(data.get('exported_at'))+' | Pi refreshed: '+text_stamp(data.get('pi_refreshed_at')))
+    line('This is a native Tk display. Its minute repaint reads the local cache; it does not recollect database counts.')
     line('Community ratings and Community photos exclude founder accounts by actual author/submitter user ID. Restaurant counts and other business metrics are unchanged.')
     line('Community photos count approved lifecycle photo contributions that have not been withdrawn; not unique contributors or restaurants. Unknown authors are not inferred from attribution or linked ratings.')
     for state in data.get('states', []):
         line('\n'+state['code']+' | Updated '+text_stamp(state['updated_at']))
+        if state.get('collection_started_at'):
+            line('Database reads started '+text_stamp(state['collection_started_at'])+' | Restaurants read '+text_stamp(state.get('restaurants_collected_at')))
         for m in state['metrics']:
             label = {'Ratings':'Community ratings', 'Photos':'Community photos'}.get(m['name'],m['name'])
             line(f"{label}: {m['current'] if m['current'] is not None else 'Unavailable'} / {m['target'] if m['target'] is not None else 'Not set'} {m['unit']} | Gap: {m['gap'] if m['gap'] is not None else 'Unavailable'}")
@@ -169,9 +173,16 @@ def draw(d, p, now):
             target = item.get('target')
             target_text = f'{target:,.0f}' if target is not None else 'Not set'
             p.text(cx, y, value+' / '+target_text, 14, theme.TEXT, 'bold', anchor='ne')
-            fraction, gap = item.get('fraction'), item.get('gap')
-            progress = f'{fraction:.1%} | {gap:,.0f} remaining' if fraction is not None and gap is not None else 'Progress unavailable' if target is not None else 'No approved target'
-            p.text(cx, y+18, progress, 11, theme.MUTED, anchor='ne')
-    p.text(x+18, 799, 'Nation: all 50 states | Founder accounts excluded from community counts', 10, theme.SUBTLE)
+            fraction = item.get('fraction')
+            p.text(cx, y+18, goal_progress(item), 11, theme.MUTED, anchor='ne')
+            if fraction is not None:
+                p.box(cx-140, y+32, cx, y+34, fill=theme.BORDER, outline=theme.BORDER)
+                d.addtag_withtag('goal-progress-track', d.find_all()[-1])
+                p.box(cx-140, y+32, cx-140+140*min(1, max(0, fraction)), y+34,
+                      fill=theme.UP if current >= target else theme.ACCENT, outline=theme.BORDER)
+                d.addtag_withtag('goal-progress-fill', d.find_all()[-1])
+    stamps = [s.get('updated_at') for s in states if s.get('updated_at')]
+    collected = min(stamps) if stamps else None
+    p.text(x+18, 799, 'Counts '+text_stamp(collected)+' | 50 states | Community excludes founders', 10, theme.SUBTLE)
     p.text(x+18, 831, 'All Reels, collection details & all eligible states →', 15, theme.ACCENT, 'bold')
     d.tag_bind(d.find_all()[-1], '<Button-1>', lambda _e: details(d))

@@ -68,11 +68,13 @@ class StateReader:
 
 
 def collect_states(reader, excluded_user_ids):
+    started = datetime.now(timezone.utc).isoformat()
     states = reader.rows('states')
     excluded_user_ids = frozenset(excluded_user_ids)
     if not excluded_user_ids:
         raise ValueError('Private goal exclusions required')
     destinations = unique_rows(reader.rows('destinations'))
+    restaurants_read = datetime.now(timezone.utc).isoformat()
     destination_states = {r['id']: r['state_id'] for r in destinations}
     counts = Counter(r['state_id'] for r in destinations)
     ratings = Counter(destination_states.get(r['destination_id']) for r in unique_rows(reader.rows('destination_ratings'))
@@ -86,6 +88,7 @@ def collect_states(reader, excluded_user_ids):
     for state in states:
         sid = state['state_id']
         result.append({'code': state['state_code'].strip(), 'eligible': True, 'updated_at': stamp,
+                       'collection_started_at': started, 'restaurants_collected_at': restaurants_read,
                        'contribution_basis': COMMUNITY_BASIS,
                        'metrics': [{'name': name, 'current': current, 'target': None, 'unit': unit,
                                     'source': source} for name, current, unit, source in (
