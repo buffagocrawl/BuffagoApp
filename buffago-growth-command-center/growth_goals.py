@@ -112,6 +112,15 @@ def goal(current, target, unit):
             'fraction': min(1, current/target) if current is not None and target is not None and target > 0 else None}
 
 
+def goal_progress(item):
+    """Percentage text is uncapped; the existing fraction remains safe for bars."""
+    current, target, gap = item.get('current'), item.get('target'), item.get('gap')
+    if current is None or target is None or target <= 0 or gap is None:
+        return 'Progress unavailable' if target is not None else 'No approved target'
+    percent = current/target
+    return f'{percent:.1%} | Achieved | 0 left' if current >= target else f'{percent:.1%} | {gap:,.0f} remaining'
+
+
 class PanelFeed:
     """A failed/partial refresh cannot replace last successful, sanitized data."""
     def __init__(self):
@@ -193,4 +202,6 @@ class PanelFeed:
             reel = next((r for r in social.get('reels', []) if r.get('platform') == platform), None)
             if reel:
                 stamps.append(moment(reel.get('captured_at')))
-        return any(stamp is None or (now-stamp).total_seconds() > 36*3600 for stamp in stamps)
+        state_stamps = [moment(s.get('updated_at')) for s in (self.data or {}).get('states', [])]
+        counts_old = any(stamp is None or (now-stamp).total_seconds() > 30*60 for stamp in state_stamps)
+        return counts_old or any(stamp is None or (now-stamp).total_seconds() > 36*3600 for stamp in stamps)

@@ -99,9 +99,18 @@ class GeographyTests(unittest.TestCase):
             self.assertIn('Due Dec 31, 2026', text)
             self.assertIn('1,275 / 1,400', text)
             self.assertIn('91.1% | 125 remaining', text)
-            self.assertIn('100.0% | 0 remaining', text)
+            self.assertIn('159.4% | Achieved | 0 left', text)
             self.assertFalse(any('Not set' in t for t in text))
-            self.assertEqual(sum('remaining' in t for t in text), 15)
+            self.assertEqual(sum('remaining' in t or 'Achieved' in t for t in text), 15)
+            tracks = wall.find_withtag('goal-progress-track')
+            fills = wall.find_withtag('goal-progress-fill')
+            self.assertEqual(len(tracks),15)
+            self.assertEqual(len(fills),15)
+            for track, fill in zip(tracks,fills):
+                t,f = wall.coords(track),wall.coords(fill)
+                self.assertLessEqual(f[2]-f[0],t[2]-t[0])
+            # Nation ratings are over target in this fixture: full, never wider.
+            self.assertEqual(wall.coords(tracks[1]),wall.coords(fills[1]))
             for i in wall.find_all():
                 if wall.type(i) != 'text':
                     continue

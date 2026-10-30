@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import sys
+from datetime import datetime, timezone
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from adapters.export_growth import StorageReader, export, ANALYTICS, BUCKET
 from adapters.state_counts import StateReader, collect_states
@@ -38,6 +39,8 @@ def produce(env=os.environ):
     export(store, path, collect_states(reader, excluded))
     payload = json.loads(path.read_text(encoding='utf-8'))
     payload['weekly_instagram'] = newest_weekly(store)
+    # Production time is separate from database read completion and Pi delivery.
+    payload['exported_at'] = datetime.now(timezone.utc).isoformat()
     data = json.dumps(payload, allow_nan=False).encode()
     if any(identity.encode() in data for identity in excluded):
         raise ValueError('Private goal configuration in projection')

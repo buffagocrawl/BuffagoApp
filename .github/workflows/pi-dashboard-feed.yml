@@ -1,0 +1,30 @@
+name: Pi dashboard aggregate refresh
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/10 * * * *'
+
+permissions:
+  contents: read
+
+# Serialize with the existing analytics producer: an older collection must not
+# overwrite a newer feed. Never cancel an in-progress analytics collection.
+concurrency:
+  group: jalapeno-reel-analytics
+  cancel-in-progress: false
+
+jobs:
+  dashboard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Refresh only the sanitized dashboard aggregate feed
+        run: python -B buffago-growth-command-center/adapters/cloud_producer.py

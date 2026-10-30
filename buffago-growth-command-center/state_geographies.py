@@ -14,6 +14,9 @@ def wall_states(states):
     nation = {'code': 'US', 'updated_at': min((s.get('updated_at') or '' for s in rows), default=None), 'metrics': []}
     if complete and all(s.get('contribution_basis') == 'founder_excluded_v1' for s in rows):
         nation['contribution_basis'] = 'founder_excluded_v1'
+    for stamp in ('collection_started_at', 'restaurants_collected_at'):
+        if complete and all(s.get(stamp) for s in rows):
+            nation[stamp] = min(s[stamp] for s in rows)
     configured = next((s for s in states if s.get('code') == 'US'), {})
     for name, unit in METRIC_UNITS:
         values = [next((m.get('current') for m in s['metrics'] if m['name'] == name and m['unit'] == unit), None) for s in rows]
