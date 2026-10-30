@@ -16,7 +16,8 @@ def sync(env_file, identity, host, cache):
     failed = False
     try:
         store = StorageReader(os.environ['SUPABASE_URL'], os.environ['SUPABASE_SERVICE_ROLE_KEY'])
-        export(store, cache, collect_states(StateReader(store)))
+        reader = StateReader(store)
+        export(store, cache, collect_states(reader, reader.excluded_users()))
     except Exception:
         failed = True
         try:

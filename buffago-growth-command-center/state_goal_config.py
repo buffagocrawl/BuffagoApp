@@ -18,6 +18,12 @@ def apply_config(data, path):
     order = config.get('priority_states', []) if approved else config.get('review_states', [])
     # Nation is a dashboard-owned projection, never a cloud/app record.
     result['states'] = [s for s in result.get('states', []) if s.get('code') != 'US']
+    # Old cached totals cannot masquerade as community counts during rollout.
+    for state in result['states']:
+        if state.get('contribution_basis') != 'founder_excluded_v1':
+            for item in state['metrics']:
+                if item['name'] in ('Ratings', 'Photos'):
+                    item['current'] = None
     result['states'].append(wall_states(result['states'])[0])
     for state in result.get('states', []):
         proposals = config.get('targets', {}).get(state['code'], [])

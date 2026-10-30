@@ -33,10 +33,14 @@ def produce(env=os.environ):
         raise ValueError('Feed production requires reviewed main Actions code')
     store = StorageReader(env['SUPABASE_URL'], env['SUPABASE_SERVICE_ROLE_KEY'])
     path = Path(env.get('RUNNER_TEMP', '/tmp'))/'pi-dashboard-feed.json'
-    export(store, path, collect_states(StateReader(store)))
+    reader = StateReader(store)
+    excluded = reader.excluded_users()
+    export(store, path, collect_states(reader, excluded))
     payload = json.loads(path.read_text(encoding='utf-8'))
     payload['weekly_instagram'] = newest_weekly(store)
     data = json.dumps(payload, allow_nan=False).encode()
+    if any(identity.encode() in data for identity in excluded):
+        raise ValueError('Private goal configuration in projection')
     # Fixed object only. Never reuse the collector's immutable snapshot writer for upserts.
     request = Request(store.origin+'/storage/v1/object/'+BUCKET+'/'+FEED_KEY, data=data, method='POST',
         headers={'apikey': store.key, 'Authorization': 'Bearer '+store.key,

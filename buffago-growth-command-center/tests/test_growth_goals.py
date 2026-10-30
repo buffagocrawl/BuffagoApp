@@ -171,10 +171,10 @@ class LiveAdapterTests(unittest.TestCase):
             def rows(self, table):
                 return {'states':[{'state_id':1,'state_code':'CT'},{'state_id':2,'state_code':'NY'}],
                   'destinations':[{'id':'one','state_id':1}],
-                  'destination_ratings':[{'destination_id':'one'}],
-                  'wing_media_submissions':[{'destination_id':'one','media_type':'photo','status':status,'withdrawn_at':withdrawn}
-                    for status,withdrawn in [('approved',None),('posted',None),('rejected',None),('approved','2026-01-01')]]}[table]
-        states=state_goals(collect_states(Reader()))
+                  'destination_ratings':[{'id':'rating','destination_id':'one','user_id':'community'}],
+                  'wing_media_submissions':[{'id':str(i),'user_id':'community','destination_id':'one','media_type':'photo','status':status,'withdrawn_at':withdrawn}
+                    for i,(status,withdrawn) in enumerate([('approved',None),('posted',None),('rejected',None),('approved','2026-01-01')])]}[table]
+        states=state_goals(collect_states(Reader(), {'founder'}))
         self.assertEqual([s['code'] for s in states],['CT','NY'])
         self.assertEqual([m['current'] for m in states[0]['metrics']],[1,1,2])
         self.assertTrue(all(m['target'] is None for s in states for m in s['metrics']))

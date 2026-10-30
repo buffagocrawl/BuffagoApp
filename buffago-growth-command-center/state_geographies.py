@@ -12,6 +12,8 @@ def wall_states(states):
     complete = len(rows) == 50 and {s['code'] for s in rows} == STATE_CODES
     by_code = {s['code']: s for s in rows}
     nation = {'code': 'US', 'updated_at': min((s.get('updated_at') or '' for s in rows), default=None), 'metrics': []}
+    if complete and all(s.get('contribution_basis') == 'founder_excluded_v1' for s in rows):
+        nation['contribution_basis'] = 'founder_excluded_v1'
     configured = next((s for s in states if s.get('code') == 'US'), {})
     for name, unit in METRIC_UNITS:
         values = [next((m.get('current') for m in s['metrics'] if m['name'] == name and m['unit'] == unit), None) for s in rows]
