@@ -1,0 +1,20 @@
+# Five-geography Pi deployment
+
+Implementation head `28d491fd608d3d87bd91dd0c209bd13b958e711b`, merged through [PR #43](https://github.com/buffagocrawl/BuffagoApp/pull/43) as `86187718de8f58865ee87b39d7546d95e8324ed1`. Both normal CI checks passed; no protection bypass or force-push was used.
+
+State Goals displays exactly Nation, Connecticut, Ohio, New York and Massachusetts in that order. All three count metrics are visible in each row. Nation requires exactly one aggregate for every US state; it never sums just the featured four or re-adds a national row. Missing/duplicate states or missing/mismatched metric units yield unavailable national metrics. Existing source entity counts are aggregated independently, avoiding rating/photo join fan-out. The sanitized Pi feed's 1,120 / 472 / 145 national totals matched independent read-only database counts.
+
+Targets remain Not set in all 15 cells. No progress bars or invented gaps are rendered. See [the baseline and proposal](PROPOSAL.md) and separate `data/state-goals.proposed-20261231.json`, which is inactive and is not the active configuration path. Existing Pi-owned targets/proposals remain untouched.
+
+Verified Pi: `branden@192.168.4.40`, hostname `buffago-growth`, machine ID `d71f39addcc1453abc26818fe141f2b8`, Xwayland display 1920x1080. Used the established scoped SSH file installation and display-only systemd restart. Installed only `ui/growth_goals_panel.py`, `state_geographies.py` and the separate inactive proposal. Backup: `/home/branden/pi-five-geographies-backup-20261030T1215Z/ui/growth_goals_panel.py`.
+
+Preservation checks: original environment credentials, feed credentials, existing display/control/feed units and timer, app.py, models.py, config.py, ui/dashboard.py, ui/weekly_instagram.py, data/growth_config.json and Pi-owned data/state-goals.json retained their exact SHA-256 hashes. Control PID remained 482. The display, control and autonomous feed timer stayed active. Feed cache remained healthy and successfully refreshed on its existing timer. No cloud endpoint, producer workflow, publishing schedule, recovery trigger, production app record, database/schema/function, publication ledger, photo, vote or status was changed. No social publication was triggered.
+
+Validation: 128 Python dashboard tests; 3 feed endpoint checks; secret scan; diff check; Pi Python compilation; independent national database totals. The actual display capture and layout bounds are saved beside this report. `preview-1920x1080.png` is a separate developer preview with demo business data, not the deployed screenshot.
+
+Rollback: restore the backed-up renderer to its original path and restart only buffago-growth.service. The unused new helper/proposal can remain. Do not replace environment files, existing local data, units, feed architecture or publication history.
+The screenshot `pi-running-1920x1080.png` captures X11 pixels from the mapped running Pi Tk canvas, without reconstructing the UI. Its dimensions and row bounds passed on-device assertions; all 15 target cells read Not set, and Social Performance plus Instagram weekly views are present. Visually inspected the actual Linux rendering: all five rows and three metric columns fit without scrolling or overlap. The initial capture began before window geometry settled and was discarded; the delivered capture uses the settled 1920x1080 canvas.
+
+Installed source SHA-256 matches the merged Git blobs: state_geographies.py `a36f6063fafdf0b30566ddecaf77691e40e8327f8b79dd59c2385b8a4b5e4601`; ui/growth_goals_panel.py `0c8f1d8362ddedddbaae484bc09b35c4d2a701ce56358650e420f6342b2fcae0`. The renderer's initially uploaded mixed line endings were normalized to the exact merged blob after confirming decoded text equality; running behavior is identical.
+
+Latest observed autonomous pull: October 30 at 08:12:10 EDT, pi_refresh_failed=false. Existing timer last triggered at 08:12:01 EDT and remains enabled. The source feed's aggregate baselines match the independent 08:09 EDT production read; no producer or social collection dispatch was needed.
