@@ -1,5 +1,11 @@
 import unittest
+import json
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from state_geographies import STATE_CODES, wall_states, METRIC_UNITS
+from state_goal_config import apply_config
+
+APPROVED = Path(__file__).resolve().parents[1]/'data/state-goals.approved-20261231.json'
 
 
 class GeographyTests(unittest.TestCase):
@@ -25,6 +31,46 @@ class GeographyTests(unittest.TestCase):
         self.assertIsNone(wall_states(rows)[0]['metrics'][0]['current'])
         self.assertEqual(wall_states(rows)[0]['metrics'][1]['current'], 1275)
 
+    def test_approved_totals_calculations_deadline_and_refresh(self):
+        data = apply_config({'states': self.rows()}, APPROVED)
+        result = wall_states(data['states'])
+        self.assertEqual([s['code'] for s in result], ['US','CT','OH','NY','MA'])
+        self.assertEqual([[m['target'] for m in s['metrics']] for s in result],
+                         [[1400,800,250],[250,450,90],[150,50,25],[100,60,35],[65,80,25]])
+        national = result[0]['metrics']
+        self.assertEqual(national[0]['current'], 1275)
+        self.assertEqual(national[0]['gap'], 125)  # Total, never 1400 additional.
+        self.assertAlmostEqual(national[0]['fraction'], 1275/1400)
+        self.assertEqual(national[1]['gap'], 0)
+        self.assertEqual(national[1]['fraction'], 1)
+        self.assertTrue(all(m['deadline']=='2026-12-31' for s in result for m in s['metrics']))
+        updated = self.rows()
+        updated[0]['metrics'][0]['current'] += 10
+        refreshed = wall_states(apply_config({'states':updated}, APPROVED)['states'])
+        self.assertEqual(refreshed[0]['metrics'][0]['current'], 1285)
+        self.assertEqual(refreshed[0]['metrics'][0]['gap'], 115)
+        # Reapplying a local configuration cannot double-count Nation.
+        self.assertEqual(wall_states(apply_config(data, APPROVED)['states']), result)
+
+    def test_missing_national_data_does_not_invent_progress(self):
+        result = wall_states(apply_config({'states':self.rows()[:-1]}, APPROVED)['states'])
+        self.assertEqual(result[0]['metrics'][0]['target'], 1400)
+        self.assertIsNone(result[0]['metrics'][0]['current'])
+        self.assertIsNone(result[0]['metrics'][0]['fraction'])
+        self.assertIsNone(result[0]['metrics'][0]['gap'])
+
+    def test_approval_and_units_required_for_national_target_too(self):
+        config = json.loads(APPROVED.read_text())
+        with TemporaryDirectory() as folder:
+            path = Path(folder)/'goals.json'
+            config['approved'] = False
+            path.write_text(json.dumps(config))
+            self.assertIsNone(wall_states(apply_config({'states':self.rows()}, path)['states'])[0]['metrics'][0]['target'])
+            config['approved'] = True
+            config['targets']['US'][0]['unit'] = 'restaurants per million residents'
+            path.write_text(json.dumps(config))
+            self.assertIsNone(wall_states(apply_config({'states':self.rows()}, path)['states'])[0]['metrics'][0]['target'])
+
     def test_rendered_rows_fit_state_card_and_other_panels_remain(self):
         import tkinter as tk
         from ui.dashboard import Dashboard
@@ -44,5 +90,20 @@ class GeographyTests(unittest.TestCase):
             self.assertIn('Social performance', texts)
             self.assertIn('Instagram weekly views', texts)
             self.assertEqual(sum(wall.itemcget(i, 'text').endswith('/ Not set') for i in wall.find_all() if wall.type(i) == 'text'), 15)
+            wall.growth_feed.data = apply_config({'states':self.rows(),'social':{}}, APPROVED)
+            wall.render()
+            root.update()
+            text = [wall.itemcget(i,'text') for i in wall.find_all() if wall.type(i)=='text']
+            self.assertIn('Due Dec 31, 2026', text)
+            self.assertIn('1,275 / 1,400', text)
+            self.assertIn('91.1% | 125 remaining', text)
+            self.assertIn('100.0% | 0 remaining', text)
+            self.assertFalse(any('Not set' in t for t in text))
+            self.assertEqual(sum('remaining' in t for t in text), 15)
+            for i in wall.find_all():
+                if wall.type(i) != 'text':
+                    continue
+                box = wall.bbox(i)
+                self.assertTrue(0 <= box[0] < box[2] <= 1920 and 0 <= box[1] < box[3] <= 1080)
         finally:
             root.destroy()

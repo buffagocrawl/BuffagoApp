@@ -12,9 +12,14 @@ def wall_states(states):
     complete = len(rows) == 50 and {s['code'] for s in rows} == STATE_CODES
     by_code = {s['code']: s for s in rows}
     nation = {'code': 'US', 'updated_at': min((s.get('updated_at') or '' for s in rows), default=None), 'metrics': []}
+    configured = next((s for s in states if s.get('code') == 'US'), {})
     for name, unit in METRIC_UNITS:
         values = [next((m.get('current') for m in s['metrics'] if m['name'] == name and m['unit'] == unit), None) for s in rows]
         total = sum(values) if complete and all(number(v) is not None for v in values) else None
-        nation['metrics'].append({'name': name, **goal(total, None, unit)})
+        target = next((m for m in configured.get('metrics', []) if m['name'] == name and m['unit'] == unit), {})
+        metric = {'name': name, **goal(total, target.get('target'), unit)}
+        if target.get('deadline') is not None:
+            metric['deadline'] = target['deadline']
+        nation['metrics'].append(metric)
     return [dict(nation if code == 'US' else by_code.get(code, {'code': code, 'metrics': [], 'updated_at': None}), label=label)
             for code, label in FEATURED]

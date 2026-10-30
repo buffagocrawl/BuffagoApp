@@ -13,6 +13,7 @@ from ui.dashboard import Dashboard
 
 parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--feed')
+parser.add_argument('--goals', help='Dashboard-owned goals configuration to preview')
 parser.add_argument('--output', required=True)
 parser.add_argument('--width',type=int,default=1920)
 parser.add_argument('--height',type=int,default=1080)
@@ -24,7 +25,7 @@ root.geometry(f'{args.width}x{args.height}+0+0')
 dashboard=Dashboard(root)
 root.update()
 if args.feed:
-    dashboard.growth_feed.load(args.feed)
+    dashboard.growth_feed.load(args.feed, args.goals)
 payload=json.loads((Path(__file__).resolve().parents[1]/'data/demo_snapshot.json').read_text(encoding='utf-8'))
 dashboard.update_data(Snapshot.from_payload(payload),{},datetime.now(timezone.utc),False,'PREVIEW')
 dashboard.create_text(args.width/2,args.height*.072,text='Business data: demo • Social: server projection' if args.feed else 'Preview • demo business data',fill='#AAAAAA',font=('Arial',-12))

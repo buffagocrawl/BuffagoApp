@@ -89,7 +89,7 @@ def details(dashboard):
         for m in state['metrics']:
             line(f"{m['name']}: {m['current'] if m['current'] is not None else 'Unavailable'} / {m['target'] if m['target'] is not None else 'Not set'} {m['unit']} | Gap: {m['gap'] if m['gap'] is not None else 'Unavailable'}")
         for proposal in state.get('proposed_targets', []):
-            line(f"Review only: {proposal['name']} {proposal['value']} {proposal['unit']} by {proposal['deadline']} ({proposal['status']})")
+            line(f"Configuration: {proposal['name']} {proposal['value']} {proposal['unit']} by {proposal['deadline']} ({proposal['status']})")
     if not data.get('states'):
         line('State report, eligible-state list, priority order and established targets are not connected.')
     line('\nReach is per post; it is never summed as unique people. No tracked installs.')
@@ -145,18 +145,31 @@ def draw(d, p, now):
     d._card(p, x, 542, w, 270, fill=theme.PANEL, outline=theme.BORDER)
     p.text(x+18, 558, 'State goals', 22, theme.TEXT, 'bold')
     states = wall_states(data.get('states', []))
-    p.text(x+w-18, 567, 'Targets: Not set', 13, theme.SUBTLE, anchor='ne')
+    deadlines = {m.get('deadline') for s in states for m in s['metrics']
+                 if m.get('target') is not None and m.get('unit') in ('restaurants', 'ratings', 'photos')}
+    caption = 'Approved total targets' if deadlines else 'Targets: Not set'
+    if len(deadlines) == 1 and None not in deadlines:
+        try:
+            caption = 'Due '+datetime.strptime(next(iter(deadlines)), '%Y-%m-%d').strftime('%b %d, %Y')
+        except (ValueError, TypeError):
+            pass
+    p.text(x+w-18, 567, caption, 13, theme.SUBTLE, anchor='ne')
     columns = (x+315, x+505, x+720)
     for cx, title in zip(columns, ('Restaurants', 'Rating records', 'Approved photos')):
-        p.text(cx, 596, title, 13, theme.MUTED, 'bold', anchor='ne')
+        p.text(cx, 589, title, 13, theme.MUTED, 'bold', anchor='ne')
     for index, state in enumerate(states):
-        y = 624+index*32
-        p.text(x+18, y, state['label'], 16, theme.ACCENT, 'bold')
+        y = 614+index*36
+        p.text(x+18, y+6, state['label'], 16, theme.ACCENT, 'bold')
         for cx, name, unit in zip(columns, ('Restaurant coverage', 'Ratings', 'Photos'), ('restaurants', 'ratings', 'photos')):
             item = next((m for m in state['metrics'] if m['name'] == name and m['unit'] == unit), {})
             current = item.get('current')
             value = f'{current:,.0f}' if current is not None else 'Unavailable'
-            p.text(cx, y, value+' / Not set', 14, theme.TEXT, 'bold', anchor='ne')
-    p.text(x+18, 790, 'Nation: all 50 states | Targets unapproved; no progress calculated', 12, theme.SUBTLE)
+            target = item.get('target')
+            target_text = f'{target:,.0f}' if target is not None else 'Not set'
+            p.text(cx, y, value+' / '+target_text, 14, theme.TEXT, 'bold', anchor='ne')
+            fraction, gap = item.get('fraction'), item.get('gap')
+            progress = f'{fraction:.1%} | {gap:,.0f} remaining' if fraction is not None and gap is not None else 'Progress unavailable' if target is not None else 'No approved target'
+            p.text(cx, y+18, progress, 11, theme.MUTED, anchor='ne')
+    p.text(x+18, 799, 'Nation: all 50 states | Total targets include featured states', 10, theme.SUBTLE)
     p.text(x+18, 831, 'All Reels, collection details & all eligible states →', 15, theme.ACCENT, 'bold')
     d.tag_bind(d.find_all()[-1], '<Button-1>', lambda _e: details(d))
