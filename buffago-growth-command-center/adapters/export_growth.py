@@ -37,7 +37,7 @@ class StorageReader:
         if not allowed:
             raise ValueError('Read-only boundary')
         key = body['prefix'] if body else path.split(BUCKET + '/', 1)[1]
-        if '..' in key or not re.fullmatch(r'[A-Za-z0-9/_.-]+', key) or not (key.startswith(ANALYTICS+'reports/') or any(key.startswith(p+'days/') for p in PUBLICATIONS)):
+        if '..' in key or not re.fullmatch(r'[A-Za-z0-9/_.-]+', key) or not (key.startswith(ANALYTICS+'reports/') or key.startswith(ANALYTICS+'account-reports/') or any(key.startswith(p+'days/') for p in PUBLICATIONS)):
             raise ValueError('Outside report and publication namespaces')
         req = Request(self.origin+'/storage/v1/'+path,
                       data=json.dumps(body).encode() if body else None, method=method,
@@ -132,14 +132,14 @@ def state_goals(raw):
                        'metrics': metrics})
     if order:
         return sorted(result, key=lambda r: (order.index(r['code']) if r['code'] in order else len(order), r['code']))
-    return sorted(result, key=lambda r: (-next((m['current'] or 0 for m in r['metrics'] if m['name']=='Restaurant coverage'), 0), r['code']))
+    return sorted(result, key=lambda r: r['code'])
 
 
 def export(store, output, states=None):
     payload = {'schema_version': 1, 'exported_at': datetime.now(timezone.utc).isoformat(),
                'social': latest_report(store), 'publications': publication_results(store),
                'states': state_goals(states or {}),
-               'state_order': 'Established priority order' if (states or {}).get('priority_states') else 'Largest catalogs; priority not set'}
+               'state_order': 'Established priority order' if (states or {}).get('priority_states') else 'Alphabetical; priority not set'}
     output = Path(output)
     temporary = output.with_suffix('.tmp')
     temporary.write_text(json.dumps(payload, allow_nan=False), encoding='utf-8')

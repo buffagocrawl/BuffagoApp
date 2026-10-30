@@ -2,11 +2,18 @@
 from datetime import datetime, timezone
 import json
 import math
+import re
 from pathlib import Path
 from urllib.parse import urlsplit
+from zoneinfo import ZoneInfo
 
 METRICS = ('views', 'reach', 'comments', 'shares', 'saves', 'likes_reactions')
 UNITS = {'restaurants', 'restaurants per million residents', 'ratings', 'photos'}
+
+
+def eastern_stamp(value):
+    parsed = moment(value)
+    return parsed.astimezone(ZoneInfo('America/New_York')).strftime('%b %d %H:%M %Z') if parsed else 'Unavailable'
 
 
 def moment(value):
@@ -36,10 +43,12 @@ def metric(entry, platform, name):
     entry = entry if isinstance(entry, dict) else {}
     value = number(entry.get('value'))
     reason = str(entry.get('reason') or '')
+    reason = reason if re.fullmatch(r'[a-z0-9_,:.-]{1,160}', reason) else None
     if name == 'saves' and platform == 'facebook':
-        return {'value': None, 'status': 'Not available'}
-    return {'value': value, 'status': ('Permission needed' if 'permission' in reason else
-            'Not available' if 'unsupported' in reason else 'Unavailable') if value is None else 'Available'}
+        return {'value': None, 'status': 'Not available', 'reason': 'unsupported_by_documented_reel_api'}
+    return {'value': value, 'status': ('Permission needed' if 'permission' in (reason or '') else
+            'Not available' if 'unsupported' in (reason or '') else 'Unavailable') if value is None else 'Available',
+            'reason': reason if value is None else None}
 
 
 def display(entry):
@@ -110,7 +119,7 @@ class PanelFeed:
         self.failed = False
         self.status = 'Loading'
 
-    def load(self, path):
+    def load(self, path, goals_path=None):
         try:
             raw = json.loads(Path(path).read_text(encoding='utf-8'))
             if raw.get('schema_version') != 1 or not moment(raw.get('exported_at')):
@@ -140,9 +149,25 @@ class PanelFeed:
                     expected = goal(item.get('current'), item.get('target'), item.get('unit'))
                     if any(item.get(k) != v for k, v in expected.items()):
                         raise ValueError('Invalid goal units or progress')
+            weekly = raw.get('weekly_instagram')
+            if weekly is not None:
+                from datetime import date
+                if not isinstance(weekly, dict) or weekly.get('definition') != 'instagram_account_views_v25_total_value_all_surfaces' or weekly.get('scope') != 'Account-wide Instagram views' or weekly.get('timezone') != 'America/New_York' or not moment(weekly.get('captured_at')):
+                    raise ValueError('Unknown weekly metric scope')
+                rows = weekly.get('weeks')
+                if not isinstance(rows, list) or len(rows) > 8:
+                    raise ValueError('Invalid weekly history')
+                for row in rows:
+                    if date.fromisoformat(row['week_start']).weekday() != 0 or type(row.get('partial')) is not bool:
+                        raise ValueError('Invalid weekly boundaries')
+                    if row.get('value') is not None and number(row['value']) is None:
+                        raise ValueError('Invalid weekly views')
             # This file is already a server-side projection, never a private report.
+            if goals_path:
+                from state_goal_config import apply_config
+                raw = apply_config(raw, goals_path)
             self.data = raw
-            self.failed = raw.get('refresh_failed') is True
+            self.failed = raw.get('refresh_failed') is True or raw.get('pi_refresh_failed') is True
             self.status = 'Refresh failed' if self.failed else 'Connected'
         except (OSError, ValueError, TypeError, KeyError):
             self.failed, self.status = True, 'Refresh failed' if self.data else 'Data connection needed'
@@ -151,6 +176,21 @@ class PanelFeed:
     def stale(self, now=None):
         now = now or datetime.now(timezone.utc)
         stamp = moment((self.data or {}).get('social', {}).get('generated_at'))
-        exported = moment((self.data or {}).get('exported_at'))
+        exported = moment((self.data or {}).get('pi_refreshed_at') or (self.data or {}).get('exported_at'))
         delivery_old = exported is not None and (now-exported).total_seconds() > 30*60
         return self.failed or stamp is None or delivery_old or (now-stamp).total_seconds() > 36*3600
+
+    def connectivity(self, now=None):
+        now = now or datetime.now(timezone.utc)
+        stamp = moment((self.data or {}).get('pi_refreshed_at'))
+        return not self.failed and stamp is not None and (now-stamp).total_seconds() <= 30*60
+
+    def source_stale(self, now=None):
+        now = now or datetime.now(timezone.utc)
+        social = (self.data or {}).get('social', {})
+        stamps = [moment(social.get('generated_at'))]
+        for platform in ('instagram','facebook'):
+            reel = next((r for r in social.get('reels', []) if r.get('platform') == platform), None)
+            if reel:
+                stamps.append(moment(reel.get('captured_at')))
+        return any(stamp is None or (now-stamp).total_seconds() > 36*3600 for stamp in stamps)

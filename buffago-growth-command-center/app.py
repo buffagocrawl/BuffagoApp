@@ -98,7 +98,7 @@ class Application:
         self.root.after(200, self._refresh_growth_goals)
 
     def _refresh_growth_goals(self):
-        self.dashboard.growth_feed.load(self._growth_path)
+        self.dashboard.growth_feed.load(self._growth_path, self.config.cache_path.parent / 'state-goals.json')
         self.dashboard.render()
         self.root.after(60_000, self._refresh_growth_goals)
 

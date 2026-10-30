@@ -272,3 +272,49 @@ python tools/preview_growth_goals.py --feed <sanitized-projection.json> --output
 
 The preview defaults to Pi's verified 1920x1080 dimensions and labels the left-side business data as demo. Pillow is a development-only capture dependency.
 See [the live deployment report](artifacts/growth-goals/DEPLOYMENT.md) for the installed dashboard, real screenshot, all-state count sources, restricted upload task, login dependency and missing goal inputs.
+
+## Autonomous feed and weekly Instagram views
+
+The new Pi service/timer pulls only the dedicated authenticated `buffago-pi-feed`
+endpoint. The narrow opaque read credential is stored only in a new protected Pi
+configuration file; the endpoint checks its SHA-256 against a private analytics
+configuration object and reads only the fixed sanitized feed object. It cannot
+query app tables, call Meta, publish, mutate Storage or return raw reports. No
+public/signed private-report URL is used.
+
+The existing analytics Actions workflow remains the independent producer. Its
+cron expressions and all publisher/recovery controls are unchanged. After an
+analytics-only collection, it reads state aggregates and writes the fixed private
+`guess-wing-spot-analytics-v1/dashboard/feed.json` object. Pi's ten-minute timer
+needs no Windows process, key agent or transfer task. Cache writes are atomic;
+failed pulls retain original values and source/last-good refresh times, mark
+connectivity stale, and retry on the next timer. Source collection time and Pi
+refresh time are separate and use America/New_York timezone abbreviations.
+
+The single replaced chart is Unique Mobile Devices. Its replacement uses
+account-wide Instagram `views` from IG User `/insights`, `period=day`,
+`metric_type=total_value`, with each New York day's midnight epoch bounds passed
+as inclusive `since` and `until=next_midnight-1`. It is views gained across reels,
+posts and stories, not lifetime Reel views grouped by publication week. The last
+eight Monday-Sunday weeks are requested within Meta's documented 90-day user
+insight retention; only returned data is used. Empty data stays unavailable,
+explicit zero stays zero, and the current week is partial and is not plotted as
+an equivalent complete trend point. Retained daily values keep their original
+capture time. Provider data can lag. There is no inference of installs or unique
+people.
+
+Historical snapshots and milestone cohorts are unchanged. Separate append-only
+`latest-observations/` records refresh current per-post metrics on each collection;
+report rankings/comparisons still use the original immutable snapshots only.
+New successful observations supersede old permission gaps without rewriting them.
+Separate immutable `account-reports/` objects preserve daily range observations
+for weekly reporting. The independent dashboard writer may replace only its
+fixed sanitized current feed object.
+
+Official contracts inspected:
+- https://developers.facebook.com/docs/instagram-platform/instagram-graph-api/reference/ig-user/insights/
+- https://developers.facebook.com/docs/instagram-platform/insights/
+- https://supabase.com/docs/guides/storage/serving/downloads
+
+See `artifacts/autonomous-growth/STATE-GOAL-PROPOSAL.md` for inactive proposals and
+metric units. No proposed value is activated merely by installing the example.

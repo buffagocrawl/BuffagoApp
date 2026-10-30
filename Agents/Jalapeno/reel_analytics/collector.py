@@ -29,6 +29,21 @@ def observations(store):
             if re.fullmatch(r"(?:instagram|facebook)_\d+_[a-f0-9-]{36}_(?:24h|72h|7d|current-\d{4}-\d{2}-\d{2})\.json", n)]
 
 
+def latest_observations(store):
+    latest = {}
+    for name in store.names(ANALYTICS+'latest-observations/'):
+        if not re.fullmatch(r'(instagram|facebook)_\d+_\d+\.\d+\.json', name):
+            continue
+        row = store.read(ANALYTICS+'latest-observations/'+name)
+        if not row or not any(m.get('value') is not None for m in row.get('metrics', {}).values()):
+            continue
+        key = (row['platform'], row['media_id'])
+        stamp = datetime.fromisoformat(row['captured_at'])
+        if key not in latest or stamp > datetime.fromisoformat(latest[key]['captured_at']):
+            latest[key] = row
+    return latest
+
+
 def collect(store, meta, *, mode, now=None, run_key=None, clock=None):
     if mode not in {"diagnostic", "collect", "backfill"}:
         raise ValueError("invalid_analytics_mode")
@@ -66,9 +81,7 @@ def collect(store, meta, *, mode, now=None, run_key=None, clock=None):
                 health["too_young_for_milestones"] += 1
             window = snapshot_window(age, now)
             key = snapshot_key(post, window)
-            if mode != "diagnostic" and store.read(ANALYTICS + key) is not None:
-                health["duplicates_skipped"] += 1
-                continue
+            # Re-read current metrics even if the immutable historical window already exists.
             metrics, raw, failures = meta.insights(post)
             captured = clock()
             actual_age = (captured - datetime.fromisoformat(resolved["published_at"])).total_seconds() / 3600
@@ -90,11 +103,15 @@ def collect(store, meta, *, mode, now=None, run_key=None, clock=None):
                 diagnostic_posts.append({"platform": post["platform"], "age_hours": round(actual_age, 4),
                                          "window_if_collected": window, "missing_metrics": {
                                              k: v["reason"] for k, v in metrics.items() if v["value"] is None}})
-            elif store.create(snapshot_key(post, window), snapshot):
-                health["snapshots_collected"] += 1
-                health["milestone_snapshots_collected" if window in MILESTONES else "current_age_snapshots_collected"] += 1
             else:
-                health["duplicates_skipped"] += 1
+                if any(m.get('value') is not None for m in metrics.values()):
+                    store.create(f"latest-observations/{post['platform']}_{post['media_id']}_{run_key}.json", snapshot)
+                historical_key = snapshot_key(post, window)
+                if store.read(ANALYTICS+historical_key) is None and store.create(historical_key, snapshot):
+                    health["snapshots_collected"] += 1
+                    health["milestone_snapshots_collected" if window in MILESTONES else "current_age_snapshots_collected"] += 1
+                else:
+                    health["duplicates_skipped"] += 1
         except (MetaReadError, StorageError, ValueError, TypeError, KeyError) as error:
             reason = str(error) if isinstance(error, (MetaReadError, StorageError)) else "invalid_media_or_insight_response"
             health["errors"].append({"platform": post["platform"], "media_id": post["media_id"], "reason": reason})
@@ -109,6 +126,16 @@ def collect(store, meta, *, mode, now=None, run_key=None, clock=None):
         return {"status": status,
                 "health": health, "posts": diagnostic_posts, "protection": protection}
     report = build_report(ready, observations(store), health, clock())
+    latest = latest_observations(store)
+    present = {(r['platform'], r['media_id']) for r in report['recent_reels']}
+    for row in report['recent_reels']:
+        row['observation'] = latest.get((row['platform'], row['media_id']), row.get('observation'))
+    for key, row in latest.items():
+        if key not in present:
+            report['recent_reels'].append({k: row[k] for k in ('platform','media_id','reel_id','published_at','post_url','live_test')})
+            report['recent_reels'][-1]['geography'] = row.get('geography', {})
+            report['recent_reels'][-1]['observation'] = row
+    report['latest_observation_policy'] = 'Latest successful per post; historical milestones remain immutable.'
     report.update(protection=protection, storage=ANALYTICS, report_key="reports/" + run_key + ".json")
     report["markdown"] = markdown(report)
     store.create(report["report_key"], report)
@@ -149,6 +176,14 @@ def main(mode, env=os.environ):
     repo_visibility = visibility(env)
     result = collect(store, meta, mode=mode, now=now,
                      run_key=env.get("GITHUB_RUN_ID", "") + "." + env.get("GITHUB_RUN_ATTEMPT", ""))
+    if mode != 'diagnostic':
+        from .weekly import account_history
+        prior_days = []
+        for name in store.names(ANALYTICS+'account-reports/'):
+            if re.fullmatch(r'\d+\.\d+\.json', name):
+                prior_days.extend((store.read(ANALYTICS+'account-reports/'+name) or {}).get('days', []))
+        history = account_history(meta, datetime.now(timezone.utc), previous=prior_days)
+        store.create('account-reports/'+env['GITHUB_RUN_ID']+'.'+env['GITHUB_RUN_ATTEMPT']+'.json', history)
     # Public repository logs/summaries receive operational counts and permission
     # names ONLY. Full metrics, raw insights, IDs, geography and report stay private.
     health = result["health"]

@@ -47,7 +47,7 @@ class MemoryStore:
 
     def create(self, key, data):
         assert not self.readonly
-        assert key.startswith(("snapshots/", "reports/"))
+        assert key.startswith(("snapshots/", "reports/", "latest-observations/", "account-reports/"))
         with self.lock:
             key = ANALYTICS + key
             if key in self.data:

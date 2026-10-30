@@ -184,6 +184,7 @@ class MetaReader:
             page.get("name", "").casefold() != expected_page.casefold() or
             ig.get("username", "").casefold() != expected_ig.casefold()):
             raise MetaReadError("pinned_account_identity_or_link_mismatch")
+        self.ig_id = ig_id
         return {"api_version": self.version, "account_type": "professional_page_linked_facebook_login",
                 "identity_verified": True,
                 "permissions": {p: {"required": sorted(required), "missing": sorted(required - self.granted)}

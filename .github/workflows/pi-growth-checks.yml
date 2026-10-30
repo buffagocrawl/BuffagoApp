@@ -1,0 +1,29 @@
+name: Pi Growth and Analytics Checks
+on:
+  pull_request:
+    paths:
+      - 'buffago-growth-command-center/**'
+      - 'Agents/Jalapeno/reel_analytics/**'
+      - 'Agents/Jalapeno/tests/test_reel*'
+      - 'Agents/Jalapeno/account_views_probe.py'
+      - '.github/workflows/jalapeno-metrics.yml'
+      - '.github/workflows/pi-growth-checks.yml'
+permissions:
+  contents: read
+jobs:
+  scoped-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: sudo apt-get update -qq && sudo apt-get install --no-install-recommends -y python3-tk xvfb
+      - run: python -m pip install 'pytest==8.4.2' 'requests==2.32.5' 'PyYAML==6.0.3' 'Pillow==12.0.0' 'tzdata==2025.2'
+      - run: python -m pytest Agents/Jalapeno/tests/test_reel_analytics.py Agents/Jalapeno/tests/test_read_only_credentials.py Agents/Jalapeno/tests/test_reel_latest_weekly.py -q
+      - run: xvfb-run -a python -m unittest discover -s tests
+        working-directory: buffago-growth-command-center
+      - run: node --test buffago-growth-command-center/tests/feed_handler.test.mjs

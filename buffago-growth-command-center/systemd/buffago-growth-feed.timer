@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh the restricted Buffago dashboard feed every ten minutes
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec=10min
+RandomizedDelaySec=15s
+Unit=buffago-growth-feed.service
+
+[Install]
+WantedBy=timers.target

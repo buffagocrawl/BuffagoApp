@@ -14,6 +14,7 @@ from models import MarketingScore, MonthlyPoint, Snapshot, fmt_number
 from ui import theme
 from growth_goals import PanelFeed
 from ui.growth_goals_panel import draw as draw_growth_goals, business_painter
+from ui.weekly_instagram import draw as draw_weekly_instagram
 from ui.components import Painter
 from missions import MissionStore, eastern_day, mission_for
 from ui.mission_panel import open_mission
@@ -189,6 +190,9 @@ class Dashboard(tk.Canvas):
         for index, (title, field) in enumerate(items):
             x = 40 + index * 260
             self._card(p, x, 362, 250, 226, fill=theme.PANEL)
+            if field == 'unique_devices':
+                draw_weekly_instagram(self, p, x)
+                continue
             p.text(x + 14, 374, title, 11, theme.MUTED, "bold", width=220)
             values = [getattr(point, field) for point in points]
             current = next((value for value in reversed(values) if value is not None), None)
