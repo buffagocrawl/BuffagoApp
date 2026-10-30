@@ -1,14 +1,14 @@
-# December 31, 2026 targets ? proposal only
+# December 31, 2026 targets - proposal only
 
-Read-only production baselines observed October 30, 2026 at 08:09 EDT. Each cell below is **baseline ? proposed total**. No target has been approved or activated.
+Read-only production baselines observed October 30, 2026 at 08:09 EDT. Each cell below is **baseline -> proposed total**. No target has been approved or activated.
 
 | Geography | Restaurants | Rating records | Approved photo contributions |
 |---|---:|---:|---:|
-| Nation (all 50 states) | 1,120 ? 1,300 | 472 ? 700 | 145 ? 230 |
-| Connecticut | 228 ? 250 | 326 ? 425 | 58 ? 83 |
-| Ohio | 103 ? 125 | 7 ? 40 | 5 ? 20 |
-| New York | 68 ? 100 | 24 ? 53 | 20 ? 30 |
-| Massachusetts | 40 ? 60 | 39 ? 69 | 11 ? 21 |
+| Nation (all 50 states) | 1,120 -> 1,300 | 472 -> 700 | 145 -> 230 |
+| Connecticut | 228 -> 250 | 326 -> 425 | 58 -> 83 |
+| Ohio | 103 -> 125 | 7 -> 40 | 5 -> 20 |
+| New York | 68 -> 100 | 24 -> 53 | 20 -> 30 |
+| Massachusetts | 40 -> 60 | 39 -> 69 | 11 -> 21 |
 
 Connecticut deepens the contribution anchor. Ohio prioritizes participation in its existing catalog. New York and Massachusetts remain contained expansion pilots. National targets include these states; they are not added to them. The four states account for proposed increases of 96 restaurants, 191 ratings and 57 photos; the national proposal leaves increases of 84, 37 and 28 respectively across the other 46 states. These are planning recommendations, not a forecast from measured acquisition rates.
 
