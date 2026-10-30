@@ -1,0 +1,139 @@
+{
+  "dimensions": [
+    1920,
+    1080
+  ],
+  "labels": [
+    "Nation",
+    "Connecticut",
+    "Ohio",
+    "New York",
+    "Massachusetts"
+  ],
+  "row_bounds": [
+    [
+      981,
+      744,
+      1055,
+      767
+    ],
+    [
+      981,
+      787,
+      1112,
+      810
+    ],
+    [
+      981,
+      830,
+      1033,
+      853
+    ],
+    [
+      981,
+      874,
+      1086,
+      897
+    ],
+    [
+      981,
+      917,
+      1142,
+      940
+    ]
+  ],
+  "cells": [
+    {
+      "geography": "Nation",
+      "metric": "Restaurant coverage",
+      "current_target": "1,120 / 1,400",
+      "progress": "80.0% | 280 remaining"
+    },
+    {
+      "geography": "Nation",
+      "metric": "Ratings",
+      "current_target": "472 / 800",
+      "progress": "59.0% | 328 remaining"
+    },
+    {
+      "geography": "Nation",
+      "metric": "Photos",
+      "current_target": "145 / 250",
+      "progress": "58.0% | 105 remaining"
+    },
+    {
+      "geography": "Connecticut",
+      "metric": "Restaurant coverage",
+      "current_target": "228 / 250",
+      "progress": "91.2% | 22 remaining"
+    },
+    {
+      "geography": "Connecticut",
+      "metric": "Ratings",
+      "current_target": "326 / 450",
+      "progress": "72.4% | 124 remaining"
+    },
+    {
+      "geography": "Connecticut",
+      "metric": "Photos",
+      "current_target": "58 / 90",
+      "progress": "64.4% | 32 remaining"
+    },
+    {
+      "geography": "Ohio",
+      "metric": "Restaurant coverage",
+      "current_target": "103 / 150",
+      "progress": "68.7% | 47 remaining"
+    },
+    {
+      "geography": "Ohio",
+      "metric": "Ratings",
+      "current_target": "7 / 50",
+      "progress": "14.0% | 43 remaining"
+    },
+    {
+      "geography": "Ohio",
+      "metric": "Photos",
+      "current_target": "5 / 25",
+      "progress": "20.0% | 20 remaining"
+    },
+    {
+      "geography": "New York",
+      "metric": "Restaurant coverage",
+      "current_target": "68 / 100",
+      "progress": "68.0% | 32 remaining"
+    },
+    {
+      "geography": "New York",
+      "metric": "Ratings",
+      "current_target": "24 / 60",
+      "progress": "40.0% | 36 remaining"
+    },
+    {
+      "geography": "New York",
+      "metric": "Photos",
+      "current_target": "20 / 35",
+      "progress": "57.1% | 15 remaining"
+    },
+    {
+      "geography": "Massachusetts",
+      "metric": "Restaurant coverage",
+      "current_target": "40 / 65",
+      "progress": "61.5% | 25 remaining"
+    },
+    {
+      "geography": "Massachusetts",
+      "metric": "Ratings",
+      "current_target": "39 / 80",
+      "progress": "48.8% | 41 remaining"
+    },
+    {
+      "geography": "Massachusetts",
+      "metric": "Photos",
+      "current_target": "11 / 25",
+      "progress": "44.0% | 14 remaining"
+    }
+  ],
+  "deadline": "2026-12-31",
+  "social_and_weekly_graph_present": true
+}
