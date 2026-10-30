@@ -1,4 +1,6 @@
-﻿# Live Pi deployment — 2026-10-29
+> Historical deployment record. The current Windows-independent deployment is documented in [the autonomous deployment report](../autonomous-growth/DEPLOYMENT.md); the superseded Windows task is now disabled.
+
+# Live Pi deployment — 2026-10-29
 
 **Deployed to `branden@192.168.4.40`, hostname `buffago-growth`, at the existing `/opt/buffago-growth-command-center` installation.** Both display and control services are active. This supersedes the initial access blocker in REPORT.md. The screenshot `pi-running-1920x1080.png` captures the actual running Pi dashboard, with live business data and the sanitized live social/state feed.
 
