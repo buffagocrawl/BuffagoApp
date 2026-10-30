@@ -134,7 +134,12 @@ class DiscoveryAndRenderingTests(unittest.TestCase):
                 d.update_data(Snapshot(),{},None,False,'TEST'); root.update()
                 texts=[d.itemcget(i,'text') for i in d.find_all() if d.type(i)=='text']
                 self.assertIn('Permission needed',texts); self.assertIn('Not available',texts)
-                self.assertTrue(any('restaurants per million residents' in t for t in texts))
+                self.assertIn('Nation',texts)
+                self.assertIn('Connecticut',texts)
+                self.assertIn('Ohio',texts)
+                self.assertIn('New York',texts)
+                self.assertIn('Massachusetts',texts)
+                self.assertIn('Targets: Not set',texts)
                 for item in d.find_all():
                     box=d.bbox(item)
                     if box: self.assertTrue(0<=box[0] and 0<=box[1] and box[2]<=width and box[3]<=height, (width,height,d.itemcget(item,'text') if d.type(item)=='text' else '',box))

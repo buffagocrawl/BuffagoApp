@@ -70,5 +70,5 @@ def stage(installed, reference, target):
     (target/'app.py').write_text(merge_app((installed/'app.py').read_text(encoding='utf-8')), encoding='utf-8')
     (target/'ui/dashboard.py').write_text(merge_dashboard((installed/'ui/dashboard.py').read_text(encoding='utf-8'),
         (reference/'ui/dashboard.py').read_text(encoding='utf-8')), encoding='utf-8')
-    for name in ('growth_goals.py','ui/growth_goals_panel.py','ui/weekly_instagram.py','state_goal_config.py','adapters/pull_feed.py'):
+    for name in ('growth_goals.py','state_geographies.py','ui/growth_goals_panel.py','ui/weekly_instagram.py','state_goal_config.py','adapters/pull_feed.py'):
         shutil.copyfile(reference/name, target/name)
