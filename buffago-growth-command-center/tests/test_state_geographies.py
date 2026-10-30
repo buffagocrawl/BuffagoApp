@@ -10,7 +10,7 @@ APPROVED = Path(__file__).resolve().parents[1]/'data/state-goals.approved-202612
 
 class GeographyTests(unittest.TestCase):
     def rows(self):
-        return [{'code': code, 'updated_at': '2026-10-30T00:00:00Z', 'metrics':
+        return [{'code': code, 'contribution_basis':'founder_excluded_v1', 'updated_at': '2026-10-30T00:00:00Z', 'metrics':
                  [{'name': name, 'unit': unit, 'current': i+1} for name, unit in METRIC_UNITS]}
                 for i, code in enumerate(sorted(STATE_CODES))]
 
@@ -89,6 +89,8 @@ class GeographyTests(unittest.TestCase):
             self.assertLess(boxes[-1][3], 1080)
             self.assertIn('Social performance', texts)
             self.assertIn('Instagram weekly views', texts)
+            self.assertIn('Community ratings', texts)
+            self.assertIn('Community photos', texts)
             self.assertEqual(sum(wall.itemcget(i, 'text').endswith('/ Not set') for i in wall.find_all() if wall.type(i) == 'text'), 15)
             wall.growth_feed.data = apply_config({'states':self.rows(),'social':{}}, APPROVED)
             wall.render()

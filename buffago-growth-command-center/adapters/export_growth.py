@@ -130,6 +130,8 @@ def state_goals(raw):
             metrics.append(item)
         result.append({'code': code, 'updated_at': row.get('updated_at') if moment(row.get('updated_at')) else None,
                        'metrics': metrics})
+        if row.get('contribution_basis') == 'founder_excluded_v1':
+            result[-1]['contribution_basis'] = 'founder_excluded_v1'
     if order:
         return sorted(result, key=lambda r: (order.index(r['code']) if r['code'] in order else len(order), r['code']))
     return sorted(result, key=lambda r: r['code'])

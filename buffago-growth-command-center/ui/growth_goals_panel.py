@@ -83,11 +83,13 @@ def details(dashboard):
         line('Insufficient history: need at least 3 measured posts in each mature cohort.')
     line('\nSTATE GOALS • all eligible states')
     line(data.get('state_order', 'Priority order unavailable'))
-    line('Photos count approved lifecycle contributions that have not been withdrawn. Targets are not set unless sourced.')
+    line('Community ratings and Community photos exclude founder accounts by actual author/submitter user ID. Restaurant counts and other business metrics are unchanged.')
+    line('Community photos count approved lifecycle photo contributions that have not been withdrawn; not unique contributors or restaurants. Unknown authors are not inferred from attribution or linked ratings.')
     for state in data.get('states', []):
         line('\n'+state['code']+' | Updated '+text_stamp(state['updated_at']))
         for m in state['metrics']:
-            line(f"{m['name']}: {m['current'] if m['current'] is not None else 'Unavailable'} / {m['target'] if m['target'] is not None else 'Not set'} {m['unit']} | Gap: {m['gap'] if m['gap'] is not None else 'Unavailable'}")
+            label = {'Ratings':'Community ratings', 'Photos':'Community photos'}.get(m['name'],m['name'])
+            line(f"{label}: {m['current'] if m['current'] is not None else 'Unavailable'} / {m['target'] if m['target'] is not None else 'Not set'} {m['unit']} | Gap: {m['gap'] if m['gap'] is not None else 'Unavailable'}")
         for proposal in state.get('proposed_targets', []):
             line(f"Configuration: {proposal['name']} {proposal['value']} {proposal['unit']} by {proposal['deadline']} ({proposal['status']})")
     if not data.get('states'):
@@ -155,7 +157,7 @@ def draw(d, p, now):
             pass
     p.text(x+w-18, 567, caption, 13, theme.SUBTLE, anchor='ne')
     columns = (x+315, x+505, x+720)
-    for cx, title in zip(columns, ('Restaurants', 'Rating records', 'Approved photos')):
+    for cx, title in zip(columns, ('Restaurants', 'Community ratings', 'Community photos')):
         p.text(cx, 589, title, 13, theme.MUTED, 'bold', anchor='ne')
     for index, state in enumerate(states):
         y = 614+index*36
@@ -170,6 +172,6 @@ def draw(d, p, now):
             fraction, gap = item.get('fraction'), item.get('gap')
             progress = f'{fraction:.1%} | {gap:,.0f} remaining' if fraction is not None and gap is not None else 'Progress unavailable' if target is not None else 'No approved target'
             p.text(cx, y+18, progress, 11, theme.MUTED, anchor='ne')
-    p.text(x+18, 799, 'Nation: all 50 states | Total targets include featured states', 10, theme.SUBTLE)
+    p.text(x+18, 799, 'Nation: all 50 states | Founder accounts excluded from community counts', 10, theme.SUBTLE)
     p.text(x+18, 831, 'All Reels, collection details & all eligible states →', 15, theme.ACCENT, 'bold')
     d.tag_bind(d.find_all()[-1], '<Button-1>', lambda _e: details(d))

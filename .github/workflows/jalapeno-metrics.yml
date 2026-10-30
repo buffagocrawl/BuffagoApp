@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: Safe collection, honest current-age backfill, or read-only diagnostics
+        description: Analytics collection, backfill, diagnostics, or dashboard-only aggregate refresh
         type: choice
         default: diagnostic
-        options: [diagnostic, collect, backfill]
+        options: [diagnostic, collect, backfill, dashboard]
   schedule:
     - cron: '30 0 * * *'
     - cron: '30 1 * * *'
@@ -46,6 +46,7 @@ jobs:
       - name: Verify analytics behavior and mutation protections before any credentialed collection
         run: python -B -m pytest Agents/Jalapeno/tests/test_reel_analytics.py Agents/Jalapeno/tests/test_read_only_credentials.py Agents/Jalapeno/tests/test_reel_latest_weekly.py -q -o cache_dir="$RUNNER_TEMP/analytics-tests-cache" --basetemp="$RUNNER_TEMP/analytics-tests"
       - name: Read-only diagnostics or analytics-only collection (DST gated at 20:30 Eastern)
+        if: env.METRICS_MODE != 'dashboard'
         run: python -B Agents/Jalapeno/reel_metrics.py "$METRICS_MODE"
       - name: GET-only publishing credential validation without ledger probes
         if: ${{ !cancelled() && env.METRICS_MODE == 'diagnostic' }}
