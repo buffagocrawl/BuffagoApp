@@ -44,10 +44,11 @@ jobs:
           result = gate(event=os.environ['GITHUB_EVENT_NAME'], cron=os.environ['GITHUB_EVENT_SCHEDULE'], mode=mode)
           proceed = result['proceed'] and (mode not in {'publish', 'live-test'} or (os.environ['GUESS_WING_SPOT_ENABLED'] == 'true' and os.environ['GITHUB_REF'] == 'refs/heads/main'))
           reason = result['reason'] if not result['proceed'] or proceed else 'workflow_disabled_or_not_main'
+          publishing = proceed and mode in {'publish', 'live-test'}
           with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
               stream.write(f'proceed={str(proceed).lower()}\nmode={mode}\n')
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as stream:
-              stream.write(f"### Publication gate\n\nEastern date: {result['date']}\n\nRequested mode: {mode}\n\nPublishing will proceed: {'yes' if proceed else 'no'}\n\nGate reason: {reason}\n")
+              stream.write(f"### Publication gate\n\nEastern date: {result['date']}\n\nRequested mode: {mode}\n\nPublishing will proceed: {'yes' if publishing else 'no'}\n\nGate reason: {reason}\n")
           if mode == 'publish' and not proceed:
               print(f'::notice::Publishing skipped: {reason}')
           print({'proceed': proceed, 'mode': mode, 'date': result['date'], 'reason': reason})

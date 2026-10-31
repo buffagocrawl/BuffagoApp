@@ -588,13 +588,15 @@ def test_workflow_uses_new_gate_no_artifacts_or_old_enable_flag():
     assert "wing_shots_main" not in text
 
 
-@pytest.mark.parametrize('enabled,ref,instant,expected',[
-    ('true','refs/heads/main','2026-10-30T23:50:00Z','within_publication_window'),
-    ('false','refs/heads/main','2026-10-30T23:50:00Z','workflow_disabled_or_not_main'),
-    ('true','refs/heads/feature','2026-10-30T23:50:00Z','workflow_disabled_or_not_main'),
-    ('true','refs/heads/main','2026-10-31T06:08:00Z','outside_18_21_eastern'),
+@pytest.mark.parametrize('enabled,ref,instant,mode,expected,proceeds',[
+    ('true','refs/heads/main','2026-10-30T23:50:00Z','publish','within_publication_window',True),
+    ('false','refs/heads/main','2026-10-30T23:50:00Z','publish','workflow_disabled_or_not_main',False),
+    ('true','refs/heads/feature','2026-10-30T23:50:00Z','publish','workflow_disabled_or_not_main',False),
+    ('true','refs/heads/main','2026-10-31T06:08:00Z','publish','outside_18_21_eastern',False),
+    ('false','refs/heads/feature','2026-10-31T06:08:00Z','plan','local_only',True),
+    ('false','refs/heads/feature','2026-10-31T06:08:00Z','preview','local_only',True),
 ])
-def test_workflow_gate_outputs_summary_and_actual_skip_notice(tmp_path,capsys,enabled,ref,instant,expected):
+def test_workflow_gate_outputs_summary_and_actual_skip_notice(tmp_path,capsys,enabled,ref,instant,mode,expected,proceeds):
     import yaml
     text=(Path(__file__).resolve().parents[3]/'.github/workflows/guess-wing-spot.yml').read_text()
     workflow=yaml.safe_load(text)
@@ -602,14 +604,14 @@ def test_workflow_gate_outputs_summary_and_actual_skip_notice(tmp_path,capsys,en
     script=step['run'].split("python - <<'PY'\n",1)[1].rsplit('\nPY',1)[0]
     output,summary=tmp_path/'output',tmp_path/'summary'
     def frozen_gate(**kwargs):return gate(datetime.fromisoformat(instant.replace('Z','+00:00')),**kwargs)
-    with patch.dict(os.environ,{'REQUESTED_MODE':'publish','GITHUB_EVENT_NAME':'schedule','GITHUB_EVENT_SCHEDULE':RECOVERY_CRON,
+    with patch.dict(os.environ,{'REQUESTED_MODE':mode,'GITHUB_EVENT_NAME':'schedule','GITHUB_EVENT_SCHEDULE':RECOVERY_CRON,
                               'GUESS_WING_SPOT_ENABLED':enabled,'GITHUB_REF':ref,'GITHUB_OUTPUT':str(output),'GITHUB_STEP_SUMMARY':str(summary)}), \
          patch('guess_wing_spot.clock_gate.gate',side_effect=frozen_gate):
         exec(compile(script,'workflow-clock','exec'),{})
-    proceeds=expected=='within_publication_window'
-    assert output.read_text()==f'proceed={str(proceeds).lower()}\nmode=publish\n'
+    assert output.read_text()==f'proceed={str(proceeds).lower()}\nmode={mode}\n'
     body=summary.read_text()
-    assert expected in body and 'Eastern date:' in body and 'Requested mode: publish' in body
+    assert expected in body and 'Eastern date:' in body and f'Requested mode: {mode}' in body
+    assert f"Publishing will proceed: {'yes' if proceeds and mode=='publish' else 'no'}" in body
     logged=capsys.readouterr().out
     assert (f'::notice::Publishing skipped: {expected}' in logged) is not proceeds
 
