@@ -2,6 +2,7 @@
 import json
 import os
 import re
+from datetime import datetime
 from pathlib import Path
 
 import requests
@@ -51,6 +52,22 @@ class ActionsOwner:
         except (requests.RequestException, ValueError):
             return False
 
+    def original_scheduled_gate(self):
+        """Fail closed on delayed/rerun executions that never bound a ledger date."""
+        try:
+            response = requests.get(f"https://api.github.com/repos/{self.repo}/actions/runs/{self.env['GITHUB_RUN_ID']}",
+                                    headers={"Authorization": "Bearer " + self.env.get("GITHUB_TOKEN", ""), "Accept": "application/vnd.github+json"},
+                                    timeout=30, allow_redirects=False)
+            data = response.json()
+            created = datetime.fromisoformat(data["created_at"].replace("Z", "+00:00"))
+            if (response.status_code != 200 or str(data.get("id")) != self.env["GITHUB_RUN_ID"]
+                    or data.get("path") != WORKFLOW or data.get("event") != "schedule"
+                    or data.get("head_branch") != "main" or created.tzinfo is None):
+                raise ValueError()
+        except (requests.RequestException, ValueError, KeyError, TypeError, AttributeError):
+            raise DurableError("original_scheduled_run_unverifiable") from None
+        return gate(created, event="schedule", cron=self.env.get("GITHUB_EVENT_SCHEDULE", ""), mode="publish")
+
 
 def summarize(state, gate_result=None):
     platforms = {p: {k: v.get(k) for k in ("status", "reason", "post_url") if v.get(k)} for p, v in state.get("platforms", {}).items()}
@@ -58,6 +75,8 @@ def summarize(state, gate_result=None):
               "geography": state.get("geography", {}).get("label"), "platforms": platforms}
     if gate_result:
         result["time_gate"] = gate_result["reason"]
+    if result["status"].startswith("skipped_"):
+        print("::notice::Publishing skipped: " + result["status"][len("skipped_"):])
     print(json.dumps(result))
     path = os.environ.get("GITHUB_STEP_SUMMARY")
     if path:
@@ -118,6 +137,12 @@ def run(mode, *, env=os.environ, now=None):
         return result
     owner = ActionsOwner(env)
     date = decision["date"]
+    if not live_test and env.get("GITHUB_EVENT_NAME") == "schedule":
+        original = owner.original_scheduled_gate()
+        if original["date"] != date:
+            return summarize({"status": "skipped_original_run_date_elapsed", "date": date}, decision)
+        if not original["proceed"]:
+            return summarize({"status": "skipped_original_run_outside_publication_window", "date": date}, original)
     if not bind_run_date(ledger, env["GITHUB_RUN_ID"], date):
         return summarize({"status": "skipped_original_run_date_elapsed", "date": date}, decision)
     ledger.claim(date, "run", owner.owner, owner.previous_finished)

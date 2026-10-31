@@ -19,7 +19,7 @@ from PIL import Image, ImageDraw
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from guess_wing_spot.clock_gate import gate
+from guess_wing_spot.clock_gate import gate, RECOVERY_CRON
 from guess_wing_spot.durable import Busy, DurableError, PrivateLedger
 from guess_wing_spot.meta_reels import Graph, MetaError, ReelPublisher
 from guess_wing_spot.screening import Screener, clue, aliases
@@ -50,6 +50,38 @@ def test_manual_window_and_plan_preview_are_not_publication():
     assert gate(noon, mode="plan")["proceed"]
     assert gate(noon, mode="preview")["proceed"]
     assert gate(datetime(2026, 10, 29, 22, tzinfo=timezone.utc), mode="publish")["proceed"]
+
+
+@pytest.mark.parametrize("instant,proceed,reason", [
+    ("2026-10-30T23:30:00Z",True,"within_publication_window"),
+    ("2026-10-30T23:50:00Z",True,"within_publication_window"),
+    ("2026-10-31T00:10:00Z",True,"within_publication_window"),
+    ("2026-10-31T00:30:00Z",True,"within_publication_window"),
+    ("2026-10-31T00:50:00Z",True,"within_publication_window"),
+    ("2026-10-31T01:00:00Z",False,"outside_18_21_eastern"),
+    ("2026-11-02T00:30:00Z",True,"within_publication_window"),
+    ("2026-11-02T01:50:00Z",True,"within_publication_window"),
+    ("2026-11-02T02:00:00Z",False,"outside_18_21_eastern"),
+    ("2026-11-01T23:50:00Z",False,"before_1930_eastern"),
+    ("2026-10-31T06:08:00Z",False,"outside_18_21_eastern"),
+    ("2026-03-09T00:10:00Z",True,"within_publication_window"),
+    ("2026-03-09T01:00:00Z",False,"outside_18_21_eastern"),
+    ("2026-11-01T05:30:00Z",False,"outside_18_21_eastern"),
+    ("2026-11-01T06:30:00Z",False,"outside_18_21_eastern"),
+])
+def test_recovery_cron_dst_windows_and_overnight(instant,proceed,reason):
+    now=datetime.fromisoformat(instant.replace('Z','+00:00'))
+    result=gate(now,event='schedule',cron=RECOVERY_CRON,mode='publish')
+    assert result['proceed'] is proceed and result['reason']==reason
+    assert result['date']==now.astimezone(__import__('zoneinfo').ZoneInfo('America/New_York')).date().isoformat()
+
+
+def test_unknown_cron_and_manual_window_boundaries():
+    for instant in ('2026-10-30T23:50:00Z','2026-11-02T01:50:00Z'):
+        assert gate(datetime.fromisoformat(instant.replace('Z','+00:00')),event='schedule',cron='* * * * *',mode='publish')['reason']=='other_dst_trigger'
+    for instant,allowed in [('2026-10-30T21:59:59Z',False),('2026-10-30T22:00:00Z',True),
+                            ('2026-10-31T00:59:59Z',True),('2026-10-31T01:00:00Z',False)]:
+        assert gate(datetime.fromisoformat(instant.replace('Z','+00:00')),mode='publish')['proceed'] is allowed
 
 
 class MemoryLedger(PrivateLedger):
@@ -120,6 +152,87 @@ def test_actions_claim_recovery_requires_completed_verified_attempt():
         assert not owner.previous_finished("123.1")
     with pytest.raises(DurableError):
         ActionsOwner({**env, "GITHUB_REF": "refs/heads/other"})
+
+
+def scheduled_env(run_id='123'):
+    return {'GITHUB_ACTIONS':'true','GITHUB_REPOSITORY':'owner/repo','GITHUB_RUN_ID':run_id,'GITHUB_RUN_ATTEMPT':'1',
+            'GITHUB_REF':'refs/heads/main','GITHUB_WORKFLOW_REF':'owner/repo/.github/workflows/guess-wing-spot.yml@refs/heads/main',
+            'GITHUB_TOKEN':'test','GITHUB_EVENT_NAME':'schedule','GITHUB_EVENT_SCHEDULE':RECOVERY_CRON,
+            'GUESS_WING_SPOT_ENABLED':'true','SUPABASE_URL':'https://example.supabase.co','SUPABASE_SERVICE_ROLE_KEY':'test',
+            'META_LONG_LIVED_ACCESS_TOKEN':'test','META_GRAPH_API_VERSION':'v25.0',
+            'INSTAGRAM_BUSINESS_ACCOUNT_ID':'100','FACEBOOK_PAGE_ID':'200',
+            'GUESS_EXPECTED_INSTAGRAM_USERNAME':'example','GUESS_EXPECTED_FACEBOOK_NAME':'Example'}
+
+
+@pytest.mark.parametrize('created,allowed,date',[
+    ('2026-10-30T23:30:00Z',True,'2026-10-30'),
+    ('2026-10-31T06:08:00Z',False,'2026-10-31'),
+])
+def test_original_scheduled_run_time_is_read_only_and_window_checked(created,allowed,date):
+    data={'id':123,'created_at':created,'path':'.github/workflows/guess-wing-spot.yml','event':'schedule','head_branch':'main'}
+    response=type('Response',(),{'status_code':200,'json':lambda _:data})()
+    with patch('requests.get',return_value=response) as request:
+        result=ActionsOwner(scheduled_env()).original_scheduled_gate()
+    assert result['proceed'] is allowed and result['date']==date
+    assert request.call_args.args[0].endswith('/actions/runs/123')
+    assert request.call_args.kwargs['allow_redirects'] is False
+    with patch('requests.get',side_effect=requests.ConnectionError):
+        with pytest.raises(DurableError,match='original_scheduled_run_unverifiable'):
+            ActionsOwner(scheduled_env()).original_scheduled_gate()
+
+
+def test_recovery_runs_reuse_daily_reel_reconcile_partial_and_skip_completed(tmp_path):
+    ledger=MemoryLedger(); ledger.check_private=lambda:None
+    ledger.get_bytes=lambda key:b'generated-video'
+    ledger.video_url=lambda reel_id:'https://example.invalid/generated-video.mp4'
+    graph=FakeGraph()
+    graph.validate=lambda *args:({'instagram':{'id':'100'},'facebook':{'id':'200'}},'test-page-token')
+    graph.fb_status={'publishing_phase':{'status':'not_started'}}
+    candidate={**state(),'date':'2026-10-30','status':'planned','geography':{'label':'Example'}}
+    def rendered(repository, ledger, screener, value, workspace, logo):
+        value.update(status='ready',video_sha256=hashlib.sha256(b'generated-video').hexdigest())
+    with patch.dict(os.environ,{'GITHUB_STEP_SUMMARY':str(tmp_path/'test-summary')}), \
+         patch('guess_wing_spot.actions_runtime.PrivateLedger',return_value=ledger), \
+         patch('guess_wing_spot.actions_runtime.Graph',return_value=graph), \
+         patch('guess_wing_spot.actions_runtime.Screener'), \
+         patch('guess_wing_spot.actions_runtime.ReadOnlySources'), \
+         patch('guess_wing_spot.actions_runtime.prepare',return_value=candidate) as prepare_once, \
+         patch('guess_wing_spot.actions_runtime.render_daily',side_effect=rendered) as render_once, \
+         patch('guess_wing_spot.actions_runtime.revalidate') as fresh_sources, \
+         patch('guess_wing_spot.actions_runtime.ReelPublisher',side_effect=lambda *args:publisher(graph)), \
+         patch('guess_wing_spot.actions_runtime.gate',side_effect=lambda now=None,**kw:gate(now or datetime(2026,10,31,0,30,tzinfo=timezone.utc),**kw)), \
+         patch.object(ActionsOwner,'previous_finished',return_value=True), \
+         patch.object(ActionsOwner,'original_scheduled_gate',return_value={'date':'2026-10-30','proceed':True}):
+        first=run('publish',env=scheduled_env('123'),now=datetime(2026,10,30,23,30,tzinfo=timezone.utc))
+        assert first['status']=='partial_or_pending'
+        assert ledger.latest('2026-10-30')['platforms']['facebook']['pending']=='publish'
+        posts_before=len([c for c in graph.calls if c[0]=='POST'])
+        graph.fb_status={'publishing_phase':{'status':'complete'}}
+        second=run('publish',env=scheduled_env('124'),now=datetime(2026,10,31,0,10,tzinfo=timezone.utc))
+        third=run('publish',env=scheduled_env('125'),now=datetime(2026,10,31,0,30,tzinfo=timezone.utc))
+        assert second['status']==third['status']=='completed'
+        assert len([c for c in graph.calls if c[0]=='POST'])==posts_before
+        assert prepare_once.call_count==render_once.call_count==1
+        assert ledger.latest('2026-10-30')['reel_id']=='daily-reel'
+        assert fresh_sources.called
+
+
+@pytest.mark.parametrize('original',[
+    {'date':'2026-10-29','proceed':True},
+    {'date':'2026-10-30','proceed':False,'reason':'outside_18_21_eastern'},
+])
+def test_unbound_delayed_or_overnight_run_cannot_become_today_catchup(original,tmp_path,capsys):
+    ledger=MemoryLedger(); ledger.check_private=lambda:None
+    with patch.dict(os.environ,{'GITHUB_STEP_SUMMARY':str(tmp_path/'test-summary')}), \
+         patch('guess_wing_spot.actions_runtime.PrivateLedger',return_value=ledger), \
+         patch('guess_wing_spot.actions_runtime.Graph') as graph, \
+         patch.object(ActionsOwner,'original_scheduled_gate',return_value=original), \
+         patch('guess_wing_spot.actions_runtime.prepare',side_effect=AssertionError('No catch-up reel')):
+        graph.return_value.validate.return_value=({'instagram':{'id':'100'},'facebook':{'id':'200'}},'test')
+        result=run('publish',env=scheduled_env(),now=datetime(2026,10,30,23,50,tzinfo=timezone.utc))
+    assert result['status'].startswith('skipped_original_run_')
+    assert not ledger.data
+    assert '::notice::Publishing skipped: original_run_' in capsys.readouterr().out
 
 
 def state():
@@ -464,11 +577,43 @@ def test_validate_reports_real_source_readiness_without_bypassing_bad_credential
 
 def test_workflow_uses_new_gate_no_artifacts_or_old_enable_flag():
     text = (Path(__file__).resolve().parents[3] / ".github/workflows/guess-wing-spot.yml").read_text()
-    assert "30 23 * * *" in text and "30 0 * * *" in text
+    import yaml
+    workflow=yaml.safe_load(text)
+    triggers=workflow.get('on',workflow.get(True))
+    assert triggers['schedule']==[{'cron':RECOVERY_CRON}]
+    assert 'GITHUB_STEP_SUMMARY' in text and '::notice::Publishing skipped:' in text
     assert "cancel-in-progress: false" in text and "default: plan" in text
     assert "GUESS_WING_SPOT_ENABLED" in text
     assert "JALAPENO_AUTOMATION_ENABLED" not in text and "upload-artifact" not in text
     assert "wing_shots_main" not in text
+
+
+@pytest.mark.parametrize('enabled,ref,instant,mode,expected,proceeds',[
+    ('true','refs/heads/main','2026-10-30T23:50:00Z','publish','within_publication_window',True),
+    ('false','refs/heads/main','2026-10-30T23:50:00Z','publish','workflow_disabled_or_not_main',False),
+    ('true','refs/heads/feature','2026-10-30T23:50:00Z','publish','workflow_disabled_or_not_main',False),
+    ('true','refs/heads/main','2026-10-31T06:08:00Z','publish','outside_18_21_eastern',False),
+    ('false','refs/heads/feature','2026-10-31T06:08:00Z','plan','local_only',True),
+    ('false','refs/heads/feature','2026-10-31T06:08:00Z','preview','local_only',True),
+])
+def test_workflow_gate_outputs_summary_and_actual_skip_notice(tmp_path,capsys,enabled,ref,instant,mode,expected,proceeds):
+    import yaml
+    text=(Path(__file__).resolve().parents[3]/'.github/workflows/guess-wing-spot.yml').read_text()
+    workflow=yaml.safe_load(text)
+    step=next(s for s in workflow['jobs']['gate']['steps'] if s.get('id')=='clock')
+    script=step['run'].split("python - <<'PY'\n",1)[1].rsplit('\nPY',1)[0]
+    output,summary=tmp_path/'output',tmp_path/'summary'
+    def frozen_gate(**kwargs):return gate(datetime.fromisoformat(instant.replace('Z','+00:00')),**kwargs)
+    with patch.dict(os.environ,{'REQUESTED_MODE':mode,'GITHUB_EVENT_NAME':'schedule','GITHUB_EVENT_SCHEDULE':RECOVERY_CRON,
+                              'GUESS_WING_SPOT_ENABLED':enabled,'GITHUB_REF':ref,'GITHUB_OUTPUT':str(output),'GITHUB_STEP_SUMMARY':str(summary)}), \
+         patch('guess_wing_spot.clock_gate.gate',side_effect=frozen_gate):
+        exec(compile(script,'workflow-clock','exec'),{})
+    assert output.read_text()==f'proceed={str(proceeds).lower()}\nmode={mode}\n'
+    body=summary.read_text()
+    assert expected in body and 'Eastern date:' in body and f'Requested mode: {mode}' in body
+    assert f"Publishing will proceed: {'yes' if proceeds and mode=='publish' else 'no'}" in body
+    logged=capsys.readouterr().out
+    assert (f'::notice::Publishing skipped: {expected}' in logged) is not proceeds
 
 
 def test_live_test_is_manual_only_and_does_not_take_daily_slot():

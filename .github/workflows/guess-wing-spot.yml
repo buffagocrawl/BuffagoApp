@@ -2,8 +2,9 @@ name: Jalapeño — Guess the Wing Spot Reels
 
 on:
   schedule:
-    - cron: '30 23 * * *'
-    - cron: '30 0 * * *'
+    # Covers evening recovery attempts across both Eastern DST offsets.
+    # The Eastern clock gate filters extra UTC hours.
+    - cron: '10,30,50 23,0,1 * * *'
   workflow_dispatch:
     inputs:
       mode:
@@ -42,9 +43,15 @@ jobs:
           mode = os.environ['REQUESTED_MODE']
           result = gate(event=os.environ['GITHUB_EVENT_NAME'], cron=os.environ['GITHUB_EVENT_SCHEDULE'], mode=mode)
           proceed = result['proceed'] and (mode not in {'publish', 'live-test'} or (os.environ['GUESS_WING_SPOT_ENABLED'] == 'true' and os.environ['GITHUB_REF'] == 'refs/heads/main'))
+          reason = result['reason'] if not result['proceed'] or proceed else 'workflow_disabled_or_not_main'
+          publishing = proceed and mode in {'publish', 'live-test'}
           with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
               stream.write(f'proceed={str(proceed).lower()}\nmode={mode}\n')
-          print({'proceed': proceed, 'mode': mode, 'date': result['date'], 'reason': result['reason']})
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as stream:
+              stream.write(f"### Publication gate\n\nEastern date: {result['date']}\n\nRequested mode: {mode}\n\nPublishing will proceed: {'yes' if publishing else 'no'}\n\nGate reason: {reason}\n")
+          if mode == 'publish' and not proceed:
+              print(f'::notice::Publishing skipped: {reason}')
+          print({'proceed': proceed, 'mode': mode, 'date': result['date'], 'reason': reason})
           PY
 
   local:
