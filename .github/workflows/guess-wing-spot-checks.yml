@@ -1,0 +1,30 @@
+name: Guess the Wing Spot recovery checks
+
+on:
+  pull_request:
+    paths:
+      - 'Agents/Jalapeno/guess_wing_spot/**'
+      - 'Agents/Jalapeno/guess_wing_spot_publish.py'
+      - 'Agents/Jalapeno/tests/test_guess_wing_spot*.py'
+      - '.github/workflows/guess-wing-spot.yml'
+      - '.github/workflows/guess-wing-spot-checks.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  recovery-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'Pillow>=10.4,<13' 'requests>=2.32,<3' 'pytest>=8,<10' 'tzdata>=2024.1' 'PyYAML>=6,<7'
+      - run: sudo apt-get update -qq && sudo apt-get install --no-install-recommends -y ffmpeg tesseract-ocr fonts-dejavu-core
+      - name: Mock-only publishing recovery tests and synthetic local media integration
+        env:
+          GUESS_TEST_FFMPEG: ffmpeg
+          GUESS_TEST_FFPROBE: ffprobe
+        run: python -B -m pytest Agents/Jalapeno/tests/test_guess_wing_spot.py Agents/Jalapeno/tests/test_guess_wing_spot_publish.py -q
