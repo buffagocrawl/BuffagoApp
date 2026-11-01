@@ -105,4 +105,5 @@ class CommunityGoalsTests(unittest.TestCase):
             step=next(s for s in steps if name in s.get('run','') and not s['run'].startswith('python -B -m pytest'))
             self.assertIn("env.METRICS_MODE == 'diagnostic'",step['if'])
         producer=next(s for s in steps if 'adapters/cloud_producer.py' in s.get('run',''))
-        self.assertEqual(producer['if'],"env.METRICS_MODE != 'diagnostic'")
+        self.assertIn("env.METRICS_MODE == 'dashboard'",producer['if'])
+        self.assertIn("steps.collection.outputs.collection_status == 'collected'",producer['if'])

@@ -209,8 +209,10 @@ def test_recovery_runs_reuse_daily_reel_reconcile_partial_and_skip_completed(tmp
         posts_before=len([c for c in graph.calls if c[0]=='POST'])
         graph.fb_status={'publishing_phase':{'status':'complete'}}
         second=run('publish',env=scheduled_env('124'),now=datetime(2026,10,31,0,10,tzinfo=timezone.utc))
+        graph.validate=lambda *args:(_ for _ in ()).throw(MetaError('expired_or_invalid_credentials'))
         third=run('publish',env=scheduled_env('125'),now=datetime(2026,10,31,0,30,tzinfo=timezone.utc))
         assert second['status']==third['status']=='completed'
+        assert third['outcome']=='duplicate_complete'
         assert len([c for c in graph.calls if c[0]=='POST'])==posts_before
         assert prepare_once.call_count==render_once.call_count==1
         assert ledger.latest('2026-10-30')['reel_id']=='daily-reel'
@@ -603,12 +605,14 @@ def test_workflow_gate_outputs_summary_and_actual_skip_notice(tmp_path,capsys,en
     step=next(s for s in workflow['jobs']['gate']['steps'] if s.get('id')=='clock')
     script=step['run'].split("python - <<'PY'\n",1)[1].rsplit('\nPY',1)[0]
     output,summary=tmp_path/'output',tmp_path/'summary'
-    def frozen_gate(**kwargs):return gate(datetime.fromisoformat(instant.replace('Z','+00:00')),**kwargs)
+    def frozen_gate(now=None,**kwargs):return gate(datetime.fromisoformat(instant.replace('Z','+00:00')),**kwargs)
     with patch.dict(os.environ,{'REQUESTED_MODE':mode,'GITHUB_EVENT_NAME':'schedule','GITHUB_EVENT_SCHEDULE':RECOVERY_CRON,
-                              'GUESS_WING_SPOT_ENABLED':enabled,'GITHUB_REF':ref,'GITHUB_OUTPUT':str(output),'GITHUB_STEP_SUMMARY':str(summary)}), \
+                              'GUESS_WING_SPOT_ENABLED':enabled,'GITHUB_REF':ref,'GITHUB_OUTPUT':str(output),'GITHUB_STEP_SUMMARY':str(summary),
+                              'JALAPENO_SCHEDULER':'github','PUBLICATION_DATE':''}), \
          patch('guess_wing_spot.clock_gate.gate',side_effect=frozen_gate):
         exec(compile(script,'workflow-clock','exec'),{})
-    assert output.read_text()==f'proceed={str(proceeds).lower()}\nmode={mode}\n'
+    assert output.read_text().startswith(f'proceed={str(proceeds).lower()}\nmode={mode}\n')
+    assert 'audit_date=' in output.read_text()
     body=summary.read_text()
     assert expected in body and 'Eastern date:' in body and f'Requested mode: {mode}' in body
     assert f"Publishing will proceed: {'yes' if proceeds and mode=='publish' else 'no'}" in body
@@ -641,3 +645,84 @@ def test_live_test_requires_enable_and_pinned_identity():
     with patch("guess_wing_spot.actions_runtime.LiveTestLedger.check_private"):
         with pytest.raises(MetaError, match="expected_account_names"):
             run("live-test", env=env)
+
+
+@pytest.mark.parametrize('instant,date,slot,modes',[
+    ('2026-10-30T23:30:00Z','2026-10-30','19:30',['publish']),
+    ('2026-10-31T00:30:00Z','2026-10-30','20:30',['publish','collect']),
+    ('2026-10-31T01:10:00Z','2026-10-30','21:10',['collect']),
+    ('2026-10-31T01:15:00Z','2026-10-30','21:15',['health']),
+    ('2026-11-02T00:30:00Z','2026-11-01','19:30',['publish']),
+    ('2026-11-02T01:50:00Z','2026-11-01','20:50',['publish']),
+    ('2026-11-02T02:45:00Z','2026-11-01','21:45',['health']),
+    ('2026-11-02T07:08:00Z','2026-11-02','02:08',[]),
+])
+def test_pi_calendar_dispatch_uses_eastern_and_never_catches_up(instant,date,slot,modes):
+    from automation_scheduler import due
+    d,s,tasks=due(datetime.fromisoformat(instant.replace('Z','+00:00')))
+    assert (d,s)==(date,slot) and [m for _,m in tasks]==modes
+
+
+def test_pi_dispatch_fixed_scope_durable_intent_and_lost_response(tmp_path):
+    from automation_scheduler import dispatch
+    now=datetime(2026,11,2,0,30,tzinfo=timezone.utc)
+    calls=[]
+    def lost(request):
+        calls.append(request)
+        raise RuntimeError('private-token-must-not-leak')
+    result=dispatch(now,'github_pat_synthetic',tmp_path,send=lost)
+    assert result[0]['status']=='dispatch_outcome_unknown'
+    assert len(calls)==1
+    body=json.loads(calls[0].data)
+    assert body=={'ref':'main','inputs':{'mode':'publish','publication_date':'2026-11-01'}}
+    assert calls[0].full_url.endswith('/guess-wing-spot.yml/dispatches')
+    assert dispatch(now,'github_pat_synthetic',tmp_path,send=lost)[0]['status']=='attempt_already_recorded'
+    assert len(calls)==1
+    assert 'private-token' not in json.dumps(result)
+    assert 'github_pat_' not in ''.join(p.read_text() for p in tmp_path.iterdir())
+    with pytest.raises(ValueError):dispatch(now,'ghp_broad_classic',tmp_path,send=lost)
+
+
+@pytest.mark.parametrize('event,scheduler,date,instant,allowed,reason',[
+    ('schedule','pi','','2026-11-02T00:30:00Z',False,'inactive_github_scheduler'),
+    ('workflow_dispatch','github','2026-11-01','2026-11-02T00:30:00Z',False,'inactive_pi_scheduler'),
+    ('workflow_dispatch','pi','2026-11-01','2026-11-02T00:30:00Z',True,'within_publication_window'),
+    ('workflow_dispatch','pi','2026-11-01','2026-11-02T00:10:00Z',False,'before_1930_eastern'),
+    ('workflow_dispatch','pi','2026-11-01','2026-11-02T02:00:00Z',False,'outside_18_21_eastern'),
+    ('workflow_dispatch','pi','2026-10-31','2026-11-02T00:30:00Z',False,'original_run_date_elapsed'),
+])
+def test_authoritative_scheduler_and_dated_automatic_window(event,scheduler,date,instant,allowed,reason):
+    result=gate(datetime.fromisoformat(instant.replace('Z','+00:00')),event=event,cron=RECOVERY_CRON,
+                mode='publish',scheduler=scheduler,automatic_date=date)
+    assert result['proceed'] is allowed and result['reason']==reason
+
+
+@pytest.mark.parametrize('statuses,pending,enabled,hour,expected',[
+    (('published','published'),False,True,22,'daily_publication_complete'),
+    (('published','blocked'),False,True,22,'partial_daily_publication'),
+    (('uncertain','published'),True,True,22,'publication_unconfirmed_requires_reconciliation'),
+    (('not_recorded','not_recorded'),False,True,22,'missed_daily_publication'),
+    (('not_recorded','not_recorded'),False,False,22,'automation_disabled'),
+    (('not_recorded','not_recorded'),False,True,20,'publication_window_not_closed'),
+])
+def test_daily_health_is_ledger_based_not_a_skipped_attempt(statuses,pending,enabled,hour,expected):
+    from guess_wing_spot.health import assess
+    from zoneinfo import ZoneInfo
+    value={'platforms':{p:{'status':s,'pending':'publish' if pending else None} for p,s in zip(('instagram','facebook'),statuses)}}
+    result=assess(value,'2026-11-01',datetime(2026,11,1,hour,tzinfo=ZoneInfo('America/New_York')),enabled)
+    assert result['status']==expected
+
+
+def test_health_cannot_claim_mutate_or_call_providers():
+    from guess_wing_spot.health import HealthLedger
+    ledger=HealthLedger('https://example.supabase.co','test')
+    for method,path in [('POST','object/jalapeno-assets/guess-wing-spot-v1/claims/x'),
+                        ('DELETE','object/jalapeno-assets'),('POST','object/sign/jalapeno-assets/guess-wing-spot-v1/outputs/x')]:
+        with pytest.raises(DurableError,match='health_forbids_mutations'):
+            ledger.request(method,path)
+
+
+def test_closed_day_health_target_across_dst_and_midnight():
+    from guess_wing_spot.clock_gate import closed_publication_date
+    assert closed_publication_date(datetime(2026,11,1,7,30,tzinfo=timezone.utc))=='2026-10-31'
+    assert closed_publication_date(datetime(2026,11,2,2,15,tzinfo=timezone.utc))=='2026-11-01'

@@ -26,6 +26,8 @@ def test_latest_recovers_permissions_without_touching_history_or_comparable_coho
     assert fb['metrics']['views']['value']==0 and fb['metrics']['views']['reason'] is None
     assert fb['captured_at']==later.isoformat() and fb['age_hours']==3
     assert second['health']['duplicates_skipped']==2
+    assert second['health']['latest_observations_collected']==2
+    assert second['health']['latest_capture_at']==later.isoformat()
     assert second['rankings']==first['rankings']
 
 
@@ -71,7 +73,7 @@ def test_account_contract_is_daily_gained_views_with_inclusive_bounds_and_real_z
     assert result['scope']=='Account-wide Instagram views'
 
 
-def test_existing_publishing_and_analytics_cron_controls_are_unchanged():
+def test_publishing_and_analytics_scheduler_and_mutation_controls():
     import yaml
     root=Path(__file__).resolve().parents[3]
     w=yaml.safe_load((root/'.github/workflows/jalapeno-metrics.yml').read_text())
@@ -79,4 +81,28 @@ def test_existing_publishing_and_analytics_cron_controls_are_unchanged():
     assert trigger['schedule']==[{'cron':'30 0 * * *'},{'cron':'30 1 * * *'}]
     p=yaml.safe_load((root/'.github/workflows/guess-wing-spot.yml').read_text())
     trigger=p.get('on',p.get(True))
-    assert trigger['schedule']==[{'cron':'30 23 * * *'},{'cron':'30 0 * * *'}]
+    from guess_wing_spot.clock_gate import RECOVERY_CRON
+    assert trigger['schedule']==[{'cron':RECOVERY_CRON}]
+    assert p['concurrency']=={'group':'guess-wing-spot-daily','cancel-in-progress':False}
+    text=(root/'.github/workflows/guess-wing-spot.yml').read_text()
+    assert 'GUESS_WING_SPOT_ENABLED' in text and "refs/heads/main" in text
+    assert 'JALAPENO_AUTOMATION_ENABLED' not in text and 'upload-artifact' not in text
+
+
+def test_metrics_authority_and_dated_delayed_collection_do_not_rewrite_capture_times():
+    from reel_analytics.collector import schedule_gate
+    now=datetime(2026,11,2,8,tzinfo=timezone.utc)
+    assert not schedule_gate(now,'schedule','30 1 * * *','pi')
+    assert schedule_gate(now,'workflow_dispatch','','pi','2026-11-01')
+    assert not schedule_gate(now,'workflow_dispatch','','github','2026-11-01')
+    assert not schedule_gate(now,'workflow_dispatch','','pi','2026-11-04')
+
+
+def test_publishing_pr_checks_include_analytics_and_diagnostics():
+    import yaml
+    root=Path(__file__).resolve().parents[3]
+    workflow=yaml.safe_load((root/'.github/workflows/guess-wing-spot-checks.yml').read_text())
+    commands='\n'.join(s.get('run','') for s in workflow['jobs']['recovery-checks']['steps'])
+    for suite in ('test_reel_analytics.py','test_read_only_credentials.py','test_reel_latest_weekly.py'):
+        assert suite in commands
+    assert not workflow['jobs']['recovery-checks'].get('env')
