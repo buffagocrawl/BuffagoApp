@@ -1,0 +1,17 @@
+[Unit]
+Description=Dispatch dated Jalapeno automation to existing GitHub workflows
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=branden
+Group=branden
+ExecStart=/usr/bin/python3 /opt/buffago-jalapeno-scheduler/automation_scheduler.py
+StateDirectory=buffago-jalapeno-scheduler
+TimeoutStartSec=60
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+

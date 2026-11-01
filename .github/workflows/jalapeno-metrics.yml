@@ -8,6 +8,10 @@ on:
         type: choice
         default: diagnostic
         options: [diagnostic, collect, backfill, dashboard]
+      publication_date:
+        description: Eastern target date for automatic collection; actual capture times stay independent.
+        type: string
+        default: ''
   schedule:
     - cron: '30 0 * * *'
     - cron: '30 1 * * *'
@@ -36,6 +40,8 @@ jobs:
       GITHUB_TOKEN: ${{ github.token }}
       GITHUB_EVENT_SCHEDULE: ${{ github.event.schedule || '' }}
       METRICS_MODE: ${{ github.event_name == 'schedule' && 'collect' || inputs.mode }}
+      JALAPENO_SCHEDULER: ${{ vars.JALAPENO_SCHEDULER || 'github' }}
+      PUBLICATION_DATE: ${{ inputs.publication_date || '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -46,6 +52,7 @@ jobs:
       - name: Verify analytics behavior and mutation protections before any credentialed collection
         run: python -B -m pytest Agents/Jalapeno/tests/test_reel_analytics.py Agents/Jalapeno/tests/test_read_only_credentials.py Agents/Jalapeno/tests/test_reel_latest_weekly.py -q -o cache_dir="$RUNNER_TEMP/analytics-tests-cache" --basetemp="$RUNNER_TEMP/analytics-tests"
       - name: Read-only diagnostics or analytics-only collection (DST gated at 20:30 Eastern)
+        id: collection
         if: env.METRICS_MODE != 'dashboard'
         run: python -B Agents/Jalapeno/reel_metrics.py "$METRICS_MODE"
       - name: GET-only publishing credential validation without ledger probes
@@ -55,5 +62,5 @@ jobs:
         if: ${{ !cancelled() && env.METRICS_MODE == 'diagnostic' }}
         run: python -B Agents/Jalapeno/account_views_probe.py
       - name: Publish restricted sanitized Pi dashboard feed
-        if: env.METRICS_MODE != 'diagnostic'
+        if: ${{ !cancelled() && (env.METRICS_MODE == 'dashboard' || steps.collection.outputs.collection_status == 'collected') }}
         run: python -B buffago-growth-command-center/adapters/cloud_producer.py

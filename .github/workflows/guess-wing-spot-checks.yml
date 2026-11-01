@@ -4,8 +4,17 @@ on:
   pull_request:
     paths:
       - 'Agents/Jalapeno/guess_wing_spot/**'
+      - 'Agents/Jalapeno/automation_scheduler.py'
+      - 'Agents/Jalapeno/systemd/**'
       - 'Agents/Jalapeno/guess_wing_spot_publish.py'
       - 'Agents/Jalapeno/tests/test_guess_wing_spot*.py'
+      - 'Agents/Jalapeno/tests/test_reel*.py'
+      - 'Agents/Jalapeno/tests/test_read_only_credentials.py'
+      - 'Agents/Jalapeno/reel_analytics/**'
+      - 'Agents/Jalapeno/reel_metrics.py'
+      - 'Agents/Jalapeno/read_only_credentials.py'
+      - 'Agents/Jalapeno/account_views_probe.py'
+      - '.github/workflows/jalapeno-metrics.yml'
       - '.github/workflows/guess-wing-spot.yml'
       - '.github/workflows/guess-wing-spot-checks.yml'
 
@@ -27,4 +36,4 @@ jobs:
         env:
           GUESS_TEST_FFMPEG: ffmpeg
           GUESS_TEST_FFPROBE: ffprobe
-        run: python -B -m pytest Agents/Jalapeno/tests/test_guess_wing_spot.py Agents/Jalapeno/tests/test_guess_wing_spot_publish.py -q
+        run: python -B -m pytest Agents/Jalapeno/tests/test_guess_wing_spot.py Agents/Jalapeno/tests/test_guess_wing_spot_publish.py Agents/Jalapeno/tests/test_reel_analytics.py Agents/Jalapeno/tests/test_read_only_credentials.py Agents/Jalapeno/tests/test_reel_latest_weekly.py -q

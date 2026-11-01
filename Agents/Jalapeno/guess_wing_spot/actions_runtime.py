@@ -61,18 +61,20 @@ class ActionsOwner:
             data = response.json()
             created = datetime.fromisoformat(data["created_at"].replace("Z", "+00:00"))
             if (response.status_code != 200 or str(data.get("id")) != self.env["GITHUB_RUN_ID"]
-                    or data.get("path") != WORKFLOW or data.get("event") != "schedule"
+                    or data.get("path") != WORKFLOW or data.get("event") != self.env.get('GITHUB_EVENT_NAME','schedule')
                     or data.get("head_branch") != "main" or created.tzinfo is None):
                 raise ValueError()
         except (requests.RequestException, ValueError, KeyError, TypeError, AttributeError):
             raise DurableError("original_scheduled_run_unverifiable") from None
-        return gate(created, event="schedule", cron=self.env.get("GITHUB_EVENT_SCHEDULE", ""), mode="publish")
+        return gate(created, event=self.env.get('GITHUB_EVENT_NAME','schedule'), cron=self.env.get("GITHUB_EVENT_SCHEDULE", ""), mode="publish",
+                    scheduler=self.env.get('JALAPENO_SCHEDULER','github'),automatic_date=self.env.get('PUBLICATION_DATE',''))
 
 
 def summarize(state, gate_result=None):
     platforms = {p: {k: v.get(k) for k in ("status", "reason", "post_url") if v.get(k)} for p, v in state.get("platforms", {}).items()}
     result = {"status": state.get("status", "unknown"), "date": state.get("date"),
               "geography": state.get("geography", {}).get("label"), "platforms": platforms}
+    if state.get('outcome') in {'duplicate_complete','published','partial_or_pending'}: result['outcome']=state['outcome']
     if gate_result:
         result["time_gate"] = gate_result["reason"]
     if result["status"].startswith("skipped_"):
@@ -90,7 +92,8 @@ def summarize(state, gate_result=None):
 def run(mode, *, env=os.environ, now=None):
     live_test = mode == "live-test"
     publishing = mode in {"publish", "live-test"}
-    decision = gate(now, event=env.get("GITHUB_EVENT_NAME", "workflow_dispatch"), cron=env.get("GITHUB_EVENT_SCHEDULE", ""), mode=mode)
+    decision = gate(now, event=env.get("GITHUB_EVENT_NAME", "workflow_dispatch"), cron=env.get("GITHUB_EVENT_SCHEDULE", ""), mode=mode,
+                    scheduler=env.get('JALAPENO_SCHEDULER','github'),automatic_date=env.get('PUBLICATION_DATE',''))
     if publishing and (not decision["proceed"] or env.get("GUESS_WING_SPOT_ENABLED") != "true"):
         return summarize({"status": "skipped_" + (decision["reason"] if not decision["proceed"] else "new_workflow_disabled"), "date": decision["date"]}, decision)
     # Read-only plan and preview retain the isolated original CLI and do not
@@ -105,16 +108,15 @@ def run(mode, *, env=os.environ, now=None):
     graph = Graph(env["META_LONG_LIVED_ACCESS_TOKEN"], env["META_GRAPH_API_VERSION"], app_secret=env.get("META_APP_SECRET"))
     provider_problem = None
     provider_diagnostic = None
-    try:
-        identities, page_token = graph.validate(env["INSTAGRAM_BUSINESS_ACCOUNT_ID"], env["FACEBOOK_PAGE_ID"],
-                                               env.get("GUESS_EXPECTED_INSTAGRAM_USERNAME", ""), env.get("GUESS_EXPECTED_FACEBOOK_NAME", ""))
-    except MetaError as error:
-        if mode != "validate":
-            raise
-        # Readiness diagnostics can still prove storage/source/OCR readiness
-        # while credentials are repaired. No claims, uploads or publish calls.
-        provider_problem, identities, page_token = str(error), None, None
-        provider_diagnostic = error.diagnostic or {"check": getattr(graph, "validation_check", "configuration"), "failure_category": "local_validation", "message": str(error)}
+    identities, page_token = None, None
+    if mode == 'validate':
+        try:
+            identities, page_token = graph.validate(env["INSTAGRAM_BUSINESS_ACCOUNT_ID"], env["FACEBOOK_PAGE_ID"],
+                                                   env.get("GUESS_EXPECTED_INSTAGRAM_USERNAME", ""), env.get("GUESS_EXPECTED_FACEBOOK_NAME", ""))
+        except MetaError as error:
+            # No claims, uploads or publish calls during readiness diagnostics.
+            provider_problem = str(error)
+            provider_diagnostic = error.diagnostic or {"check": getattr(graph, "validation_check", "configuration"), "failure_category": "local_validation", "message": str(error)}
     if mode == "validate":
         # Read-only provider checks plus a local OCR toolchain check. Storage
         # claims/write semantics are exercised by separate namespace probes.
@@ -137,7 +139,7 @@ def run(mode, *, env=os.environ, now=None):
         return result
     owner = ActionsOwner(env)
     date = decision["date"]
-    if not live_test and env.get("GITHUB_EVENT_NAME") == "schedule":
+    if not live_test and (env.get("GITHUB_EVENT_NAME") == "schedule" or env.get('PUBLICATION_DATE')):
         original = owner.original_scheduled_gate()
         if original["date"] != date:
             return summarize({"status": "skipped_original_run_date_elapsed", "date": date}, decision)
@@ -147,6 +149,10 @@ def run(mode, *, env=os.environ, now=None):
         return summarize({"status": "skipped_original_run_date_elapsed", "date": date}, decision)
     ledger.claim(date, "run", owner.owner, owner.previous_finished)
     state = ledger.latest(date)
+    if state and all(state.get('platforms',{}).get(p,{}).get('status')=='published' for p in ('instagram','facebook')):
+        return summarize({**state,'status':'completed','outcome':'duplicate_complete'},decision)
+    identities, page_token = graph.validate(env["INSTAGRAM_BUSINESS_ACCOUNT_ID"], env["FACEBOOK_PAGE_ID"],
+                                           env.get("GUESS_EXPECTED_INSTAGRAM_USERNAME", ""), env.get("GUESS_EXPECTED_FACEBOOK_NAME", ""))
     screener = Screener(ledger)
     repository = ReadOnlySources(env["SUPABASE_URL"], env["SUPABASE_SERVICE_ROLE_KEY"])
     if not state or state.get("status", "").startswith("skipped"):
@@ -193,6 +199,7 @@ def run(mode, *, env=os.environ, now=None):
             state["platforms"][platform].update(reason=str(error), status="uncertain" if state["platforms"][platform].get("pending") else "blocked")
             persist()
     state["status"] = "completed" if all(p["status"] == "published" for p in state["platforms"].values()) else "partial_or_pending"
+    state['outcome']='published' if state['status']=='completed' else 'partial_or_pending'
     persist()
     # Retain generated media for at least seven days, including uncertain jobs.
     from datetime import date as calendar_date, timedelta

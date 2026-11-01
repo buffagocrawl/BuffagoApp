@@ -12,7 +12,17 @@ from .reporting import MILESTONES, build_report, engagement, markdown, snapshot_
 from .storage import ANALYTICS, Store, StorageError, discover
 
 
-def schedule_gate(now, event, cron):
+def schedule_gate(now, event, cron, scheduler='github', automatic_date=''):
+    if event=='schedule' and scheduler=='pi':
+        return False
+    if automatic_date:
+        from datetime import date
+        try:
+            requested=date.fromisoformat(automatic_date)
+            local_date=now.astimezone(ZoneInfo('America/New_York')).date()
+            return event=='workflow_dispatch' and scheduler=='pi' and 0<=(local_date-requested).days<=1
+        except (ValueError,TypeError):
+            return False
     if event != "schedule":
         return True
     local = now.astimezone(ZoneInfo("America/New_York"))
@@ -60,6 +70,7 @@ def collect(store, meta, *, mode, now=None, run_key=None, clock=None):
             return prior  # An identical run attempt cannot append new data.
     posts, discovery_errors = discover(store)
     health = {"mode": mode, "discovered_posts": len(posts), "snapshots_collected": 0,
+              "latest_observations_collected": 0, "latest_capture_at": None,
               "milestone_snapshots_collected": 0, "current_age_snapshots_collected": 0,
               "duplicates_skipped": 0, "too_young_for_milestones": 0,
               "outside_recent_horizon": 0, "missing_metrics": {}, "errors": list(discovery_errors)}
@@ -105,7 +116,9 @@ def collect(store, meta, *, mode, now=None, run_key=None, clock=None):
                                              k: v["reason"] for k, v in metrics.items() if v["value"] is None}})
             else:
                 if any(m.get('value') is not None for m in metrics.values()):
-                    store.create(f"latest-observations/{post['platform']}_{post['media_id']}_{run_key}.json", snapshot)
+                    if store.create(f"latest-observations/{post['platform']}_{post['media_id']}_{run_key}.json", snapshot):
+                        health['latest_observations_collected']+=1
+                        health['latest_capture_at']=captured.isoformat()
                 historical_key = snapshot_key(post, window)
                 if store.read(ANALYTICS+historical_key) is None and store.create(historical_key, snapshot):
                     health["snapshots_collected"] += 1
@@ -161,8 +174,11 @@ def visibility(env):
 def main(mode, env=os.environ):
     import json
     now = datetime.now(timezone.utc)
-    if not schedule_gate(now, env.get("GITHUB_EVENT_NAME", ""), env.get("GITHUB_EVENT_SCHEDULE", "")):
-        print('{"status":"skipped_other_dst_trigger_or_before_2030_eastern"}')
+    if not schedule_gate(now, env.get("GITHUB_EVENT_NAME", ""), env.get("GITHUB_EVENT_SCHEDULE", ""),env.get('JALAPENO_SCHEDULER','github'),env.get('PUBLICATION_DATE','')):
+        reason='inactive_github_scheduler' if env.get('GITHUB_EVENT_NAME')=='schedule' and env.get('JALAPENO_SCHEDULER')=='pi' else 'other_dst_trigger_early_or_invalid_automatic_date'
+        print(json.dumps({'status':'skipped','reason':reason,'fresh_collection':False}))
+        if env.get('GITHUB_OUTPUT'):
+            with open(env['GITHUB_OUTPUT'],'a') as stream: stream.write('collection_status=skipped\n')
         return 0
     readonly = mode == "diagnostic"
     if not readonly:
@@ -188,6 +204,9 @@ def main(mode, env=os.environ):
     # names ONLY. Full metrics, raw insights, IDs, geography and report stay private.
     health = result["health"]
     safe = {"status": result.get("status", "collected"), "mode": mode,
+            "latest_observations_collected":health.get('latest_observations_collected',0),
+            "latest_capture_at":health.get('latest_capture_at'),
+            "fresh_collection":mode!='diagnostic' and health.get('latest_observations_collected',0)>0,
             "discovered_posts": health["discovered_posts"], "snapshots_collected": health["snapshots_collected"],
             "milestone_snapshots_collected": health["milestone_snapshots_collected"],
             "current_age_snapshots_collected": health["current_age_snapshots_collected"],
@@ -196,6 +215,9 @@ def main(mode, env=os.environ):
             "permissions": identity["permissions"], "protection": result["protection"],
             "repository_visibility": repo_visibility, "report": result.get("report_key")}
     print(json.dumps(safe))
+    if env.get('GITHUB_OUTPUT'):
+        with open(env['GITHUB_OUTPUT'],'a') as stream:
+            stream.write('collection_status='+('diagnostic' if readonly else 'collected')+'\n')
     path = env.get("GITHUB_STEP_SUMMARY")
     if path:
         with open(path, "a", encoding="utf-8") as stream:
@@ -204,4 +226,7 @@ def main(mode, env=os.environ):
             else:
                 stream.write("### Jalapeño Reel analytics\n\n```json\n" + json.dumps(safe, indent=2) +
                              "\n```\n\nDetailed performance report retained in private Jalapeño storage. No artifact uploaded.\n")
+    if not readonly and health['discovered_posts']>0 and health.get('latest_observations_collected',0)==0:
+        print('::error::Analytics read completed without any new successful post observation; last-good values retained.')
+        return 1
     return 0 if result.get("status") != "diagnostic_partial" else 1

@@ -11,7 +11,11 @@ on:
         description: Plan/preview are local-only; publish uses the private daily ledger.
         type: choice
         default: plan
-        options: [plan, preview, validate, publish, live-test]
+        options: [plan, preview, validate, publish, live-test, health]
+      publication_date:
+        description: Eastern target date for dated automatic attempts or read-only health; blank for manual work.
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -27,6 +31,8 @@ jobs:
     outputs:
       proceed: ${{ steps.clock.outputs.proceed }}
       mode: ${{ steps.clock.outputs.mode }}
+      audit: ${{ steps.clock.outputs.audit }}
+      audit_date: ${{ steps.clock.outputs.audit_date }}
     steps:
       - uses: actions/checkout@v4
       - id: clock
@@ -35,18 +41,33 @@ jobs:
           REQUESTED_MODE: ${{ github.event_name == 'schedule' && 'publish' || inputs.mode }}
           GITHUB_EVENT_SCHEDULE: ${{ github.event.schedule || '' }}
           GUESS_WING_SPOT_ENABLED: ${{ vars.GUESS_WING_SPOT_ENABLED || 'false' }}
+          JALAPENO_SCHEDULER: ${{ vars.JALAPENO_SCHEDULER || 'github' }}
+          PUBLICATION_DATE: ${{ inputs.publication_date || '' }}
         run: |
           python - <<'PY'
           import os, sys
+          from datetime import datetime, timezone
           sys.path.insert(0, 'Agents/Jalapeno')
-          from guess_wing_spot.clock_gate import gate
+          from guess_wing_spot.clock_gate import gate, closed_publication_date
           mode = os.environ['REQUESTED_MODE']
-          result = gate(event=os.environ['GITHUB_EVENT_NAME'], cron=os.environ['GITHUB_EVENT_SCHEDULE'], mode=mode)
+          now = datetime.now(timezone.utc)
+          result = gate(now, event=os.environ['GITHUB_EVENT_NAME'], cron=os.environ['GITHUB_EVENT_SCHEDULE'], mode=mode, scheduler=os.environ.get('JALAPENO_SCHEDULER','github'), automatic_date=os.environ.get('PUBLICATION_DATE',''))
           proceed = result['proceed'] and (mode not in {'publish', 'live-test'} or (os.environ['GUESS_WING_SPOT_ENABLED'] == 'true' and os.environ['GITHUB_REF'] == 'refs/heads/main'))
           reason = result['reason'] if not result['proceed'] or proceed else 'workflow_disabled_or_not_main'
           publishing = proceed and mode in {'publish', 'live-test'}
+          audit = mode == 'health' or (mode == 'publish' and not proceed and os.environ['GITHUB_EVENT_NAME'] == 'schedule')
+          audit_date = os.environ.get('PUBLICATION_DATE') if mode == 'health' else closed_publication_date(now)
+          if mode == 'health' and not audit_date:
+              audit_date = closed_publication_date(now)
+          from datetime import date
+          try:
+              audit_date = date.fromisoformat(audit_date).isoformat()
+          except (TypeError, ValueError):
+              audit, audit_date = False, ''
+              if mode == 'health':
+                  proceed, reason = False, 'invalid_publication_date'
           with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
-              stream.write(f'proceed={str(proceed).lower()}\nmode={mode}\n')
+              stream.write(f'proceed={str(proceed).lower()}\nmode={mode}\naudit={str(audit).lower()}\naudit_date={audit_date}\n')
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as stream:
               stream.write(f"### Publication gate\n\nEastern date: {result['date']}\n\nRequested mode: {mode}\n\nPublishing will proceed: {'yes' if publishing else 'no'}\n\nGate reason: {reason}\n")
           if mode == 'publish' and not proceed:
@@ -93,6 +114,8 @@ jobs:
       GUESS_WING_SPOT_ENABLED: ${{ vars.GUESS_WING_SPOT_ENABLED || 'false' }}
       GITHUB_EVENT_SCHEDULE: ${{ github.event.schedule || '' }}
       GITHUB_TOKEN: ${{ github.token }}
+      JALAPENO_SCHEDULER: ${{ vars.JALAPENO_SCHEDULER || 'github' }}
+      PUBLICATION_DATE: ${{ inputs.publication_date || '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -112,3 +135,22 @@ jobs:
         env:
           PUBLISH_MODE: ${{ needs.gate.outputs.mode }}
         run: python -B Agents/Jalapeno/guess_wing_spot_publish.py "$PUBLISH_MODE"
+
+  health:
+    needs: gate
+    if: needs.gate.outputs.audit == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      GUESS_WING_SPOT_ENABLED: ${{ vars.GUESS_WING_SPOT_ENABLED || 'false' }}
+      PUBLICATION_DATE: ${{ needs.gate.outputs.audit_date }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'requests>=2.32,<3' 'tzdata>=2024.1'
+      - name: Verify daily platform ledger without claims, uploads or provider calls
+        run: python -B Agents/Jalapeno/guess_wing_spot_publish.py health
