@@ -4,6 +4,7 @@ from zoneinfo import ZoneInfo
 
 EASTERN = ZoneInfo("America/New_York")
 RECOVERY_CRON = "10,30,50 23,0,1 * * *"
+SCHEDULE_CRONS = tuple(f'{minute} {hour} * * *' for hour in (23,0,1) for minute in (10,30,50))
 
 
 def closed_publication_date(now):
@@ -26,11 +27,18 @@ def gate(now=None, *, event="workflow_dispatch", cron="", mode="plan", scheduler
             return {**result,'proceed':False,'reason':'inactive_pi_scheduler'}
         if automatic_date!=result['date']:
             return {**result,'proceed':False,'reason':'original_run_date_elapsed'}
+    if event=='schedule' and cron in SCHEDULE_CRONS:
+        minute,hour=map(int,cron.split()[:2])
+        slot=now.astimezone(timezone.utc).replace(hour=hour,minute=minute,second=0,microsecond=0)
+        if slot>now: slot-=timedelta(days=1)
+        planned=slot.astimezone(EASTERN)
+        if not time(19,30)<=planned.time().replace(tzinfo=None)<time(21):
+            return {**result,'proceed':False,'reason':'inactive_dst_trigger'}
     if not time(18) <= local.time().replace(tzinfo=None) < time(21):
         return {**result, "proceed": False, "reason": "outside_18_21_eastern"}
     if event == "schedule":
         expected = "30 23 * * *" if local.utcoffset().total_seconds() == -14400 else "30 0 * * *"
-        if cron not in {expected, RECOVERY_CRON}:
+        if cron not in {expected, RECOVERY_CRON, *SCHEDULE_CRONS}:
             return {**result, "proceed": False, "reason": "other_dst_trigger"}
         if local.time().replace(tzinfo=None) < time(19, 30):
             return {**result, "proceed": False, "reason": "before_1930_eastern"}

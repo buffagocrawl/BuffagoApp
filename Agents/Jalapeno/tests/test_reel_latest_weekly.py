@@ -81,8 +81,8 @@ def test_publishing_and_analytics_scheduler_and_mutation_controls():
     assert trigger['schedule']==[{'cron':'30 0 * * *'},{'cron':'30 1 * * *'}]
     p=yaml.safe_load((root/'.github/workflows/guess-wing-spot.yml').read_text())
     trigger=p.get('on',p.get(True))
-    from guess_wing_spot.clock_gate import RECOVERY_CRON
-    assert trigger['schedule']==[{'cron':RECOVERY_CRON}]
+    from guess_wing_spot.clock_gate import SCHEDULE_CRONS
+    assert trigger['schedule']==[{'cron':cron} for cron in SCHEDULE_CRONS]
     assert p['concurrency']=={'group':'guess-wing-spot-daily','cancel-in-progress':False}
     text=(root/'.github/workflows/guess-wing-spot.yml').read_text()
     assert 'GUESS_WING_SPOT_ENABLED' in text and "refs/heads/main" in text

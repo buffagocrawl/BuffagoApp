@@ -19,7 +19,7 @@ from PIL import Image, ImageDraw
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from guess_wing_spot.clock_gate import gate, RECOVERY_CRON
+from guess_wing_spot.clock_gate import gate, RECOVERY_CRON, SCHEDULE_CRONS
 from guess_wing_spot.durable import Busy, DurableError, PrivateLedger
 from guess_wing_spot.meta_reels import Graph, MetaError, ReelPublisher
 from guess_wing_spot.screening import Screener, clue, aliases
@@ -31,13 +31,13 @@ from test_guess_wing_spot import FakeRepository, snapshot
 @pytest.mark.parametrize("instant,cron,proceed,date,reason", [
     ("2026-07-01T23:30:00Z", "30 23 * * *", True, "2026-07-01", "within_publication_window"),
     ("2026-07-02T00:45:00Z", "30 23 * * *", True, "2026-07-01", "within_publication_window"),
-    ("2026-07-02T00:30:00Z", "30 0 * * *", False, "2026-07-01", "other_dst_trigger"),
+    ("2026-07-02T00:30:00Z", "30 0 * * *", True, "2026-07-01", "within_publication_window"),
     ("2026-01-02T00:30:00Z", "30 0 * * *", True, "2026-01-01", "within_publication_window"),
-    ("2026-01-01T23:30:00Z", "30 23 * * *", False, "2026-01-01", "other_dst_trigger"),
+    ("2026-01-01T23:30:00Z", "30 23 * * *", False, "2026-01-01", "inactive_dst_trigger"),
     ("2026-07-02T01:00:00Z", "30 23 * * *", False, "2026-07-01", "outside_18_21_eastern"),
     ("2026-07-01T23:29:00Z", "30 23 * * *", False, "2026-07-01", "before_1930_eastern"),
     ("2026-11-02T00:40:00Z", "30 0 * * *", True, "2026-11-01", "within_publication_window"),
-    ("2026-03-09T00:30:00Z", "30 0 * * *", False, "2026-03-08", "other_dst_trigger"),
+    ("2026-03-09T00:30:00Z", "30 0 * * *", True, "2026-03-08", "within_publication_window"),
 ])
 def test_eastern_dst_delays_dates_and_duplicate_cron(instant, cron, proceed, date, reason):
     value = gate(datetime.fromisoformat(instant.replace("Z", "+00:00")), event="schedule", cron=cron, mode="publish")
@@ -582,7 +582,7 @@ def test_workflow_uses_new_gate_no_artifacts_or_old_enable_flag():
     import yaml
     workflow=yaml.safe_load(text)
     triggers=workflow.get('on',workflow.get(True))
-    assert triggers['schedule']==[{'cron':RECOVERY_CRON}]
+    assert triggers['schedule']==[{'cron':cron} for cron in SCHEDULE_CRONS]
     assert 'GITHUB_STEP_SUMMARY' in text and '::notice::Publishing skipped:' in text
     assert "cancel-in-progress: false" in text and "default: plan" in text
     assert "GUESS_WING_SPOT_ENABLED" in text
@@ -726,3 +726,15 @@ def test_closed_day_health_target_across_dst_and_midnight():
     from guess_wing_spot.clock_gate import closed_publication_date
     assert closed_publication_date(datetime(2026,11,1,7,30,tzinfo=timezone.utc))=='2026-10-31'
     assert closed_publication_date(datetime(2026,11,2,2,15,tzinfo=timezone.utc))=='2026-11-01'
+
+
+@pytest.mark.parametrize('instant,cron,allowed,reason',[
+    ('2026-10-31T01:10:00Z','10 1 * * *',False,'inactive_dst_trigger'),
+    ('2026-11-01T23:50:00Z','50 23 * * *',False,'inactive_dst_trigger'),
+    ('2026-11-02T00:30:00Z','30 0 * * *',True,'within_publication_window'),
+    ('2026-11-02T02:07:00Z','30 0 * * *',False,'outside_18_21_eastern'),
+    ('2026-10-31T06:08:00Z','30 23 * * *',False,'outside_18_21_eastern'),
+])
+def test_identified_slot_distinguishes_deliberately_inactive_dst_from_late_active(instant,cron,allowed,reason):
+    result=gate(datetime.fromisoformat(instant.replace('Z','+00:00')),event='schedule',cron=cron,mode='publish')
+    assert result['proceed'] is allowed and result['reason']==reason
