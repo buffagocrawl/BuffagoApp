@@ -1,0 +1,26 @@
+{
+  "prior_immutable_objects_unchanged": 14,
+  "new_observations": 4,
+  "latest_capture_at": "2026-11-01T13:31:35.789651+00:00",
+  "report_generated_at": "2026-11-01T13:31:38.921677+00:00",
+  "feed_produced_at": "2026-11-01T13:32:05.245331+00:00",
+  "observation_timestamps": [
+    {
+      "platform": "facebook",
+      "captured_at": "2026-11-01T13:31:29.550712+00:00"
+    },
+    {
+      "platform": "instagram",
+      "captured_at": "2026-11-01T13:31:26.779285+00:00"
+    },
+    {
+      "platform": "facebook",
+      "captured_at": "2026-11-01T13:31:35.789651+00:00"
+    },
+    {
+      "platform": "instagram",
+      "captured_at": "2026-11-01T13:31:32.926285+00:00"
+    }
+  ],
+  "publication_history_unchanged": true
+}
