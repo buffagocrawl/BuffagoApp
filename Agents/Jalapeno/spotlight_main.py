@@ -22,8 +22,9 @@ def actions_identity(env, now):
             or env.get('GITHUB_WORKFLOW_REF') != repo + '/' + WORKFLOW + '@refs/heads/main'):
         raise DurableError('expected_main_actions_workflow_required')
 
-    def read_run(identifier):
-        response = requests.get(f'https://api.github.com/repos/{repo}/actions/runs/{identifier}',
+    def read_run(identifier, attempt=None):
+        path = identifier + ('/attempts/' + attempt if attempt else '')
+        response = requests.get(f'https://api.github.com/repos/{repo}/actions/runs/{path}',
                                 headers={'Authorization': 'Bearer ' + env.get('GITHUB_TOKEN', '')},
                                 timeout=30, allow_redirects=False)
         if response.status_code != 200:
@@ -40,8 +41,9 @@ def actions_identity(env, now):
     def previous_finished(prior):
         if not re.fullmatch(r'\d+\.\d+', prior):
             return False
-        prior_run = read_run(prior.split('.')[0])
-        return prior_run.get('status') == 'completed' and prior_run.get('path') == WORKFLOW
+        prior_run = read_run(*prior.split('.'))
+        return (prior_run.get('status') == 'completed' and prior_run.get('path') == WORKFLOW
+                and prior_run.get('head_branch') == 'main')
     return owner, previous_finished
 
 
@@ -90,6 +92,15 @@ def run(mode, env=os.environ, now=None):
         return {'status': 'recovery_exhausted', 'date': date}
     sources = Sources.from_environment(None)
     verifier = Verifier.configured(ledger, writable=True, now=now)
+    if state is None:
+        pool = candidates(sources.load(), sources.scores(), ledger.recent(now), now)
+        selected, image, verified = select(pool, sources, verifier)
+        if not selected:
+            state = {'date': date, 'revision': 0,
+                     'status': 'no_verified_candidate' if pool else 'no_eligible_candidate',
+                     'verification_counts': verifier.summary()}
+            ledger.save(date, state)
+            return {'status': state['status'], 'date': date, 'verification_counts': state['verification_counts']}
     # Reuse the existing account/link/token validation before any provider POST.
     if not env.get('GUESS_EXPECTED_INSTAGRAM_USERNAME') or not env.get('GUESS_EXPECTED_FACEBOOK_NAME'):
         raise DurableError('expected_account_names_required')
@@ -97,20 +108,14 @@ def run(mode, env=os.environ, now=None):
     _, token = graph.validate(env['INSTAGRAM_BUSINESS_ACCOUNT_ID'], env['FACEBOOK_PAGE_ID'],
                               env['GUESS_EXPECTED_INSTAGRAM_USERNAME'], env['GUESS_EXPECTED_FACEBOOK_NAME'])
     if state is None:
-        pool = candidates(sources.load(), sources.scores(), ledger.recent(now), now)
-        selected, image, verified = select(pool, sources, verifier)
-        state = {'date': date, 'revision': 0,
-                 'status': 'no_verified_candidate' if pool else 'no_eligible_candidate',
+        import hashlib
+        digest = hashlib.sha256(image).hexdigest()
+        ledger.create('outputs/' + digest + '.jpg', image, 'image/jpeg')
+        state = {'date': date, 'revision': 0, **selected, 'status': 'prepared',
+                 'image_digest': digest, 'caption': caption(selected, verified),
+                 'account_verification': verified[selected['destination_id']],
                  'verification_counts': verifier.summary()}
-        if selected:
-            import hashlib
-            digest = hashlib.sha256(image).hexdigest()
-            ledger.create('outputs/' + digest + '.jpg', image, 'image/jpeg')
-            state.update(selected, status='prepared', image_digest=digest, caption=caption(selected, verified),
-                         account_verification=verified[selected['destination_id']])
         ledger.save(date, state)
-        if not selected:
-            return {'status': state['status'], 'date': date, 'verification_counts': state['verification_counts']}
 
     def persist():
         ledger.save(date, state)

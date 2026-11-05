@@ -1,4 +1,6 @@
-# Official-brand investigation — PR #54, 2026-11-05
+# Official-brand investigation â€” PR #54, 2026-11-05
+
+Historical discovery snapshot. The [merge-readiness review](merge-readiness-2026-11-05.md) accepts 15 verified locations for the initial pilot; the earlier 23-location target is no longer a merge or pilot gate.
 
 This supersedes the coverage totals in the earlier discovery-continuation report. Publishing remains disabled (`COMMUNITY_SPOTLIGHT_ENABLED=false`). No source-record changes, manual handle mappings, publication, or merge occurred.
 
@@ -12,18 +14,18 @@ Three bounded writable preview runs finished the rechecks, including one initial
 
 ## Newly verified
 
-- **Nine-Eleven Tavern** — @nineeleventavern; [exact-location official evidence](https://www.nineeleventavern.com/).
-- **J Timothy's Tavern** — @jtimothys; [exact-location official evidence](https://jtimothys.com/).
-- **Taco Mac Duluth** — @tacomacofficial; [exact-location official evidence](https://tacomac.com/locations/3543-peachtree-industrial-blvd-duluth-ga-30096/).
-- **Sharky's Wings & Raw Bar** — @sharkyswingsclifton; [exact-location official evidence](https://www.sharkyswingsnj.com/east/).
-- **The Blind Rhino - Bridgeport** — @blindrhinobar; [exact-location official evidence](https://www.theblindrhino.com/location/black-rock/).
-- **The Bando** — @thebando_atl; [exact-location official evidence](https://www.thebandoatl.com/).
+- **Nine-Eleven Tavern** â€” @nineeleventavern; [exact-location official evidence](https://www.nineeleventavern.com/).
+- **J Timothy's Tavern** â€” @jtimothys; [exact-location official evidence](https://jtimothys.com/).
+- **Taco Mac Duluth** â€” @tacomacofficial; [exact-location official evidence](https://tacomac.com/locations/3543-peachtree-industrial-blvd-duluth-ga-30096/).
+- **Sharky's Wings & Raw Bar** â€” @sharkyswingsclifton; [exact-location official evidence](https://www.sharkyswingsnj.com/east/).
+- **The Blind Rhino - Bridgeport** â€” @blindrhinobar; [exact-location official evidence](https://www.theblindrhino.com/location/black-rock/).
+- **The Bando** â€” @thebando_atl; [exact-location official evidence](https://www.thebandoatl.com/).
 
 ## Safety and cache behavior
 
 Aliases are bound to the destination UUID, unchanged original source name, address, city, state, and exact official hostname (www/non-www equivalent only). Reviewed variants are accepted only in the homepage brand gate and official location-page/Restaurant JSON-LD name checks. Alias entries contain no handles. Exact street/unit/city/state/ZIP matching, source-city consistency, chain ambiguity and conflicting-handle rejection remain intact. Brand aliases cannot supply a missing address or copy a homepage account onto a location without an explicit profile link there.
 
-Alias contents participate in the destination fingerprint, invalidating affected cached failures while leaving unrelated caches usable. Seed changes retain their existing fingerprint invalidation behavior. Regression tests cover cached failure → fresh verification → cache reuse, mismatched source identities and official hosts, malformed rules, contradictory source cities, wrong addresses, multi-location ambiguity, conflicting accounts and exact-location JSON-LD.
+Alias contents participate in the destination fingerprint, invalidating affected cached failures while leaving unrelated caches usable. Seed changes retain their existing fingerprint invalidation behavior. Regression tests cover cached failure â†’ fresh verification â†’ cache reuse, mismatched source identities and official hosts, malformed rules, contradictory source cities, wrong addresses, multi-location ambiguity, conflicting accounts and exact-location JSON-LD.
 
 ## All 27 dispositions
 
@@ -76,7 +78,7 @@ A primary reason is the last observed failure, not proof that all prior gates pa
 
 ## Private preview and validation
 
-Regenerated `.tmp/spotlight-alias-final/photo.jpg`, `caption.txt` and `verification-report.json` remain ignored and private. Visually reviewed the 1080×1350 image: complete contained wing photo, readable 83.00/100 score and 2-rating count, no overlap. Caption includes Tomaselli's exact Providence address and verified **@tomasellisrestaurant**, attribution and download/try/rate CTA. This is a private preview, not live Instagram mention rendering evidence.
+Regenerated `.tmp/spotlight-alias-final/photo.jpg`, `caption.txt` and `verification-report.json` remain ignored and private. Visually reviewed the 1080Ã—1350 image: complete contained wing photo, readable 83.00/100 score and 2-rating count, no overlap. Caption includes Tomaselli's exact Providence address and verified **@tomasellisrestaurant**, attribution and download/try/rate CTA. This is a private preview, not live Instagram mention rendering evidence.
 
 Local relevant tests: **318 passed, 2 skipped** (local media-tool integration unavailable). `git diff --check` passes. Latest-head GitHub CI must pass before any merge; see PR checks for final run results.
 

@@ -3,6 +3,14 @@
 Instagram photo series at noon America/New_York on Monday, Wednesday, Friday,
 Saturday and Sunday. Independent of the evening guessing Reel and its Pi scheduler.
 
+## Accepted initial pilot pool
+
+The initial pool of **15 verified / 53 otherwise-eligible locations** is accepted
+for merge review and a limited pilot; 23 locations is not an acceptance gate.
+See [the merge-readiness review](merge-readiness-2026-11-05.md) for safety checks,
+Meta evidence, private preview, limitations and the approval boundary. Historical
+discovery reports retain their original measurements and former target for audit.
+
 ## Behavior
 
 - Select an approved, consented, moderated community photo with existing processed
@@ -19,12 +27,14 @@ Saturday and Sunday. Independent of the evening guessing Reel and its Pi schedul
   elapsed days of publication in this series. Evening Reels retain their own rules.
 - The full photo is contained on a 1080x1350 canvas with score/count footer.
   Restaurant name/location, factual description, contributor credit and download
-  CTA appear in the caption. Only the reviewed wing-shots-v1 consent contract is
+  CTA appear in the caption. The restaurant @mention is caption text only; no
+  Instagram photo tag (`user_tags`) is sent. Only the reviewed wing-shots-v1 consent contract is
   accepted. A verified restaurant Instagram handle is mandatory; selection tries
   another eligible photo/location when discovery fails. No invented tasting notes
   or inferred handles. A nonempty eligible pool without a renderable verified
   candidate records `no_verified_candidate` with private-state verification counts.
-- Empty eligible pools are recorded as no_eligible_candidate; no repeats or lower
+- Empty eligible pools are recorded as no_eligible_candidate before any Meta
+  credential validation; unverified pools likewise record their skip first; no repeats or lower
   threshold fallback. Plan reports only counts; no private artifacts reach logs.
 
 ## Durable safety and recovery
@@ -45,6 +55,7 @@ at :00, :20 and :40 resume the same dated state. At most three ordinary preparat
 publication attempts are allowed per date; pending intents remain read-only for
 reconciliation (claims are additionally capped at twelve). Main Actions workflow identity,
 original run creation window and run-date binding reject delayed next-day reruns.
+Recovery checks the exact previous Actions attempt, including same-run reruns.
 Read-only audits after the window report missed, pending, empty-pool, published or
 disabled status and a count of all older unresolved reservations. Failed audits
 require inspection of the private ledger; no provider IDs or captions are logged.

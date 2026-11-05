@@ -339,3 +339,103 @@ def test_recovery_budget_stops_before_provider_validation():
     with patch.object(spotlight_main, 'Ledger') as ledger, patch.object(spotlight_main, 'actions_identity', return_value=('123.1', lambda _: True)), patch.object(spotlight_main, 'bind_run_date', return_value=True), patch.object(spotlight_main, 'Graph', side_effect=AssertionError):
         ledger.return_value.latest.return_value = {'status': 'container_created', 'attempts': 3}
         assert spotlight_main.run('publish', env, NOW)['status'] == 'recovery_exhausted'
+
+
+def test_rerun_ownership_checks_completed_previous_attempt_not_running_latest():
+    env = {'GITHUB_ACTIONS': 'true', 'GITHUB_REF': 'refs/heads/main',
+           'GITHUB_REPOSITORY': 'owner/repo', 'GITHUB_RUN_ID': '123', 'GITHUB_RUN_ATTEMPT': '2',
+           'GITHUB_WORKFLOW_REF': 'owner/repo/' + spotlight_main.WORKFLOW + '@refs/heads/main'}
+    calls = []
+    def read(url, **kwargs):
+        calls.append(url)
+        result = {'path': spotlight_main.WORKFLOW, 'head_branch': 'main',
+                  'created_at': NOW.isoformat(),
+                  'status': 'completed' if url.endswith('/attempts/1') else 'in_progress'}
+        return type('Response', (), {'status_code': 200, 'json': lambda _: result})()
+    with patch.object(spotlight_main.requests, 'get', side_effect=read):
+        owner, finished = spotlight_main.actions_identity(env, NOW)
+        assert owner == '123.2' and finished('123.1')
+    assert calls[-1].endswith('/actions/runs/123/attempts/1')
+
+
+@pytest.mark.parametrize('previous', [
+    {'status': 'in_progress', 'head_branch': 'main', 'path': spotlight_main.WORKFLOW},
+    {'status': 'completed', 'head_branch': 'feature', 'path': spotlight_main.WORKFLOW},
+    {'status': 'completed', 'head_branch': 'main', 'path': 'another-workflow.yml'},
+])
+def test_prior_attempt_must_be_finished_expected_main_workflow(previous):
+    env = {'GITHUB_ACTIONS': 'true', 'GITHUB_REF': 'refs/heads/main',
+           'GITHUB_REPOSITORY': 'owner/repo', 'GITHUB_RUN_ID': '123', 'GITHUB_RUN_ATTEMPT': '2',
+           'GITHUB_WORKFLOW_REF': 'owner/repo/' + spotlight_main.WORKFLOW + '@refs/heads/main'}
+    current = {'path': spotlight_main.WORKFLOW, 'head_branch': 'main', 'created_at': NOW.isoformat()}
+    responses = [type('Response', (), {'status_code': 200, 'json': lambda _: current})(),
+                 type('Response', (), {'status_code': 200, 'json': lambda _: previous})()]
+    with patch.object(spotlight_main.requests, 'get', side_effect=responses):
+        _, finished = spotlight_main.actions_identity(env, NOW)
+        assert not finished('123.1')
+
+
+@pytest.mark.parametrize('eligible,expected', [(False, 'no_eligible_candidate'),
+                                             (True, 'no_verified_candidate')])
+def test_empty_or_unverified_pool_is_durable_skip_without_meta_credentials(eligible, expected):
+    env = {'SUPABASE_URL': 'https://test.invalid', 'SUPABASE_SERVICE_ROLE_KEY': 'private',
+           'COMMUNITY_SPOTLIGHT_ENABLED': 'true', 'GITHUB_RUN_ID': '123'}
+    with patch.object(spotlight_main, 'Ledger') as ledger, patch.object(spotlight_main, 'Sources') as sources, patch.object(spotlight_main, 'actions_identity', return_value=('123.1', lambda _: True)), patch.object(spotlight_main, 'bind_run_date', return_value=True), patch.object(spotlight_main, 'Graph', side_effect=AssertionError('unexpected Meta client')), patch.object(spotlight_main.Verifier, 'configured') as verifier:
+        ledger.return_value.latest.return_value = None
+        ledger.return_value.recent.return_value = []
+        sources.from_environment.return_value.load.return_value = snapshot(1)
+        sources.from_environment.return_value.scores.return_value = {uid(101): {'average': 90 if eligible else 80, 'count': 2}}
+        verifier.return_value.mapping.return_value = {}
+        verifier.return_value.summary.return_value = {'unresolved': 1} if eligible else {}
+        result = spotlight_main.run('publish', env, NOW)
+        assert result['status'] == expected
+        saved = ledger.return_value.save.call_args.args[1]
+        assert saved['status'] == expected and 'photo_id' not in saved
+        assert result['verification_counts'] == saved['verification_counts']
+        ledger.return_value.create.assert_not_called()  # no generated photo upload
+        ledger.return_value.image_url.assert_not_called()
+
+
+def test_caption_mention_does_not_create_instagram_photo_tag():
+    graph, state = Graph(), {'caption': 'Restaurant @restaurant'}
+    publish(graph, state)
+    create = next(c for c in graph.calls if c[1] == '111/media')
+    assert create[2]['data']['caption'] == state['caption']
+    assert set(create[2]['data']) == {'image_url', 'caption'}
+
+
+@pytest.mark.parametrize('change', ['consent', 'score', 'attribution', 'image'])
+def test_runtime_source_change_blocks_final_publication(change):
+    class Clock(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return NOW.astimezone(tz or timezone.utc)
+    env = {'SUPABASE_URL': 'https://test.invalid', 'SUPABASE_SERVICE_ROLE_KEY': 'private',
+           'COMMUNITY_SPOTLIGHT_ENABLED': 'true', 'GITHUB_RUN_ID': '123',
+           'GUESS_EXPECTED_INSTAGRAM_USERNAME': 'buffago', 'GUESS_EXPECTED_FACEBOOK_NAME': 'BuffaGo',
+           'META_LONG_LIVED_ACCESS_TOKEN': 'private', 'META_GRAPH_API_VERSION': 'v25.0',
+           'META_APP_SECRET': 'private', 'INSTAGRAM_BUSINESS_ACCOUNT_ID': '111', 'FACEBOOK_PAGE_ID': '444'}
+    original, altered = snapshot(1), snapshot(1)
+    if change == 'consent': altered.photos[0]['withdrawn_at'] = NOW.isoformat()
+    if change == 'attribution': altered.photos[0]['attribution_preference'] = 'username'
+    graph = Graph()
+    graph.validate = lambda *args: ({}, 'private')
+    def image(color):
+        data = io.BytesIO()
+        Image.new('RGB', (700, 600), color).save(data, 'JPEG')
+        return data.getvalue()
+    with patch.object(spotlight_main, 'Ledger') as ledger, patch.object(spotlight_main, 'Sources') as sources, patch.object(spotlight_main, 'Graph', return_value=graph), patch.object(spotlight_main, 'actions_identity', return_value=('123.1', lambda _: True)), patch.object(spotlight_main, 'bind_run_date', return_value=True), patch.object(spotlight_main, 'datetime', Clock), patch.object(spotlight_main.Verifier, 'configured') as verifier:
+        c = pool()[0]
+        verifier.return_value.mapping.return_value = {uid(101): {**c, 'verified': True, 'handle': 'restaurant', 'verified_at': NOW.isoformat(), 'official_source_url': 'https://restaurant.example/'}}
+        verifier.return_value.summary.return_value = {'verified': 1}
+        ledger.return_value.latest.return_value = None
+        ledger.return_value.recent.return_value = []
+        source = sources.from_environment.return_value
+        source.load.side_effect = [original, altered]
+        source.scores.side_effect = [{uid(101): {'average': 90, 'count': 2}},
+                                    {uid(101): {'average': 80 if change == 'score' else 90, 'count': 2}}]
+        source.asset_available.return_value = True
+        source.photo_bytes.side_effect = [image('orange'), image('red' if change == 'image' else 'orange')]
+        with pytest.raises(Exception, match='source_'):
+            spotlight_main.run('publish', env, NOW)
+    assert [c[1] for c in graph.calls if c[0] == 'POST'] == ['111/media']
