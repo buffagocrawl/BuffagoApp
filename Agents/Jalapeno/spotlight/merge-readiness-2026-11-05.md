@@ -1,4 +1,4 @@
-﻿# Merge readiness and limited pilot — PR #54
+# Merge readiness and limited pilot — PR #54
 
 Reviewed November 5, 2026 on `feature/noon-community-spotlights`. The starting working tree was clean. No applicable AGENTS.md exists in the repository ancestors or the affected Jalapeno/spotlight/tests and workflow paths. Existing agent-specific instructions elsewhere were not applied to unrelated directories. Only spotlight implementation, regression tests and review documentation were changed.
 

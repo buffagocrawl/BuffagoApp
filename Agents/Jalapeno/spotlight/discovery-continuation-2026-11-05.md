@@ -1,4 +1,4 @@
-ï»¿# PR #54 discovery continuation â€” 2026-11-05
+# PR #54 discovery continuation — 2026-11-05
 
 Historical discovery snapshot. The [merge-readiness review](merge-readiness-2026-11-05.md) accepts 15 verified locations for the initial pilot; the earlier 23-location target is no longer a merge or pilot gate.
 
@@ -35,7 +35,7 @@ Final primary reasons: 27 official-brand-unconfirmed, 10 HTTP 403, 3 location mi
 
 Final read-only artifacts: `.tmp/spotlight-continuation-final/{photo.jpg,caption.txt,verification-report.json}`. All 53 verification results were cache hits; cache writes were false. Private photos, captions and per-location reports remain ignored and are not uploaded to public CI artifacts.
 
-Visually reviewed the regenerated 1080Ã—1350 JPEG: the wing photo is contained with side margins; score **83.00/100** and **2 ratings** are readable with adequate contrast, without overlapping text. Caption identifies Tomaselli's at Rosario, its full Providence address, and verified **@tomasellisrestaurant**, followed by credit and the download/try/rate CTA. The handle is backed by exact-location official-site evidence. This review does not verify how Instagram will render a future live mention.
+Visually reviewed the regenerated 1080×1350 JPEG: the wing photo is contained with side margins; score **83.00/100** and **2 ratings** are readable with adequate contrast, without overlapping text. Caption identifies Tomaselli's at Rosario, its full Providence address, and verified **@tomasellisrestaurant**, followed by credit and the download/try/rate CTA. The handle is backed by exact-location official-site evidence. This review does not verify how Instagram will render a future live mention.
 
 Local workflow-equivalent tests: **299 passed, 2 skipped** (local media integration tools unavailable); `git diff --check` passed. Previously cancelled Guess the Wing Spot recovery run **42055393606** was rerun successfully, including CI's installed FFmpeg/Tesseract environment. Community spotlight checks and secret/public-config scan also passed on pre-continuation head `7e609b1`. Check the latest PR head's CI before merge; older-head results do not prove the pushed head.
 
