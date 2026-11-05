@@ -43,7 +43,7 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install 'Pillow==12.0.0' 'requests==2.32.5' 'pytest==9.0.2' 'PyYAML==6.0.3'
       - name: Mock-only source, rotation, schedule and provider recovery checks
-        run: python -m pytest Agents/Jalapeno/tests/test_community_spotlight.py -q
+        run: python -m pytest Agents/Jalapeno/tests/test_community_spotlight.py Agents/Jalapeno/tests/test_spotlight_verification.py -q
       - name: Plan, publish or audit this Eastern slot
         shell: bash
         run: |

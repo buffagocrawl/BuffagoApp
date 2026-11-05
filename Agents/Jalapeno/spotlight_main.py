@@ -4,14 +4,14 @@ import json
 import os
 import re
 from datetime import datetime, timezone
-from pathlib import Path
 
 import requests
 from guess_wing_spot.actions_runtime import bind_run_date
 from guess_wing_spot.durable import DurableError
 from guess_wing_spot.meta_reels import Graph
 from spotlight.core import (WORKFLOW, EASTERN, DAYS, Sources, Ledger, candidates,
-                            caption, render, PhotoPublisher, window)
+                            caption, render, handle, PhotoPublisher, window)
+from spotlight.verification import Verifier, select
 
 
 def actions_identity(env, now):
@@ -65,24 +65,31 @@ def run(mode, env=os.environ, now=None):
             status = (state or {}).get('status', 'missed')
         unresolved = [entry for entry in ledger.recent(now) if not entry.get('published_at')]
         return {'status': status, 'date': date, 'unresolved_count': len(unresolved),
+                'verification_counts': (state or {}).get('verification_counts', {}),
                 'action': 'inspect_private_ledger_before_retry' if unresolved else 'none'}
 
-    verified = json.loads(Path(__file__).with_name('spotlight').joinpath('verified_handles.json').read_text())
     if mode == 'plan':
         sources = Sources.from_environment(None)
         pool = candidates(sources.load(), sources.scores(), ledger.recent(now), now)
-        return {'status': 'planned' if pool else 'no_eligible_candidate', 'eligible_count': len(pool), 'date': date}
+        verifier = Verifier.configured(ledger, now=now)
+        verified_count = sum(bool(handle(row, verifier.mapping(row))) for row in
+                             {c['destination_id']: c for c in pool[:100]}.values())
+        return {'status': 'planned' if verified_count else 'no_verified_candidate' if pool else 'no_eligible_candidate',
+                'eligible_count': len(pool), 'verified_restaurant_count': verified_count,
+                'verification_counts': verifier.summary(), 'date': date}
 
     owner, previous_finished = actions_identity(env, now)
     if not bind_run_date(ledger, env['GITHUB_RUN_ID'], date):
         raise DurableError('run_bound_to_another_date')
     ledger.claim(date, 'run', owner, previous_finished)
     state = ledger.latest(date)
-    if state and state['status'] in {'published', 'no_eligible_candidate'}:
-        return {'status': state['status'], 'date': date}
+    if state and state['status'] in {'published', 'no_eligible_candidate', 'no_verified_candidate'}:
+        return {'status': state['status'], 'date': date,
+                'verification_counts': state.get('verification_counts', {})}
     if state and state.get('attempts', 0) >= 3 and not state.get('pending'):
         return {'status': 'recovery_exhausted', 'date': date}
     sources = Sources.from_environment(None)
+    verifier = Verifier.configured(ledger, writable=True, now=now)
     # Reuse the existing account/link/token validation before any provider POST.
     if not env.get('GUESS_EXPECTED_INSTAGRAM_USERNAME') or not env.get('GUESS_EXPECTED_FACEBOOK_NAME'):
         raise DurableError('expected_account_names_required')
@@ -91,24 +98,19 @@ def run(mode, env=os.environ, now=None):
                               env['GUESS_EXPECTED_INSTAGRAM_USERNAME'], env['GUESS_EXPECTED_FACEBOOK_NAME'])
     if state is None:
         pool = candidates(sources.load(), sources.scores(), ledger.recent(now), now)
-        selected, image = None, None
-        for candidate in pool:
-            if sources.asset_available(candidate['photo_id']):
-                try:
-                    image = render(sources.photo_bytes(candidate['photo_id']), candidate)
-                except ValueError:
-                    continue
-                selected = candidate
-                break
-        state = {'date': date, 'revision': 0, 'status': 'no_eligible_candidate'}
+        selected, image, verified = select(pool, sources, verifier)
+        state = {'date': date, 'revision': 0,
+                 'status': 'no_verified_candidate' if pool else 'no_eligible_candidate',
+                 'verification_counts': verifier.summary()}
         if selected:
             import hashlib
             digest = hashlib.sha256(image).hexdigest()
             ledger.create('outputs/' + digest + '.jpg', image, 'image/jpeg')
-            state.update(selected, status='prepared', image_digest=digest, caption=caption(selected, verified))
+            state.update(selected, status='prepared', image_digest=digest, caption=caption(selected, verified),
+                         account_verification=verified[selected['destination_id']])
         ledger.save(date, state)
         if not selected:
-            return {'status': state['status'], 'date': date}
+            return {'status': state['status'], 'date': date, 'verification_counts': state['verification_counts']}
 
     def persist():
         ledger.save(date, state)
@@ -119,7 +121,8 @@ def run(mode, env=os.environ, now=None):
     def revalidate():
         pool = candidates(sources.load(), sources.scores(), [], datetime.now(timezone.utc))
         current = next((c for c in pool if c['photo_id'] == state['photo_id']), None)
-        if (not current or caption(current, verified) != state['caption']
+        mapping = verifier.mapping(current) if current else {}
+        if (not current or not handle(current, mapping) or caption(current, mapping) != state['caption']
                 or not sources.asset_available(state['photo_id'])):
             raise DurableError('source_or_score_changed_before_publication')
         # The generated JPEG must still correspond to this exact source photo.

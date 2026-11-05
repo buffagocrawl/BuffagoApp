@@ -177,7 +177,9 @@ def test_disabled_publish_never_instantiates_clients():
 
 
 def test_read_only_plan_does_not_construct_provider_or_claim():
-    with patch.object(spotlight_main, 'Ledger') as ledger, patch.object(spotlight_main, 'Sources') as source, patch.object(spotlight_main, 'Graph', side_effect=AssertionError('provider')):
+    with patch.object(spotlight_main, 'Ledger') as ledger, patch.object(spotlight_main, 'Sources') as source, patch.object(spotlight_main, 'Graph', side_effect=AssertionError('provider')), patch.object(spotlight_main.Verifier, 'configured') as verifier:
+        verifier.return_value.mapping.return_value = {}
+        verifier.return_value.summary.return_value = {'unresolved': 1}
         source.from_environment.return_value.load.return_value = snapshot(1)
         source.from_environment.return_value.scores.return_value = {uid(101): {'average': 90, 'count': 2}}
         ledger.return_value.recent.return_value = []
@@ -214,7 +216,12 @@ def test_full_runtime_prepares_revalidates_and_publishes():
     Image.new('RGB', (700, 600), 'orange').save(image, 'JPEG')
     source.photo_bytes = lambda _: image.getvalue()
     revisions = []
-    with patch.object(spotlight_main, 'Ledger') as ledger, patch.object(spotlight_main, 'Sources') as sources, patch.object(spotlight_main, 'Graph', return_value=graph), patch.object(spotlight_main, 'actions_identity', return_value=('123.1', lambda _: True)), patch.object(spotlight_main, 'bind_run_date', return_value=True), patch.object(spotlight_main, 'datetime', Clock):
+    with patch.object(spotlight_main, 'Ledger') as ledger, patch.object(spotlight_main, 'Sources') as sources, patch.object(spotlight_main, 'Graph', return_value=graph), patch.object(spotlight_main, 'actions_identity', return_value=('123.1', lambda _: True)), patch.object(spotlight_main, 'bind_run_date', return_value=True), patch.object(spotlight_main, 'datetime', Clock), patch.object(spotlight_main.Verifier, 'configured') as verifier:
+        candidate = pool()[0]
+        record = {**candidate, 'verified': True, 'handle': 'restaurant', 'verified_at': NOW.isoformat(),
+                  'official_source_url': 'https://restaurant.example/contact'}
+        verifier.return_value.mapping.return_value = {uid(101): record}
+        verifier.return_value.summary.return_value = {'verified': 1}
         ledger.return_value.latest.return_value = None
         ledger.return_value.recent.return_value = []
         ledger.return_value.save.side_effect = lambda date, state: revisions.append(copy.deepcopy(state))

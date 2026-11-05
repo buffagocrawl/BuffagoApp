@@ -130,9 +130,12 @@ def candidates(snapshot, scores, history, now):
 
 def handle(candidate, verified):
     record = verified.get(candidate['destination_id'], {})
+    if not isinstance(record, dict):
+        return None
     username = record.get('handle', '')
-    # Evidence is manually reviewed and bound to the exact physical location.
-    if (record.get('verified') is True and record.get('verified_at')
+    # Evidence (manual or automatic) is bound to the exact physical location.
+    if (isinstance(username, str) and isinstance(record.get('official_source_url'), str)
+            and record.get('verified') is True and record.get('verified_at')
             and record.get('official_source_url', '').startswith('https://')
             and record.get('name') == candidate['name'] and record.get('city') == candidate['city']
             and record.get('state') == candidate['state']

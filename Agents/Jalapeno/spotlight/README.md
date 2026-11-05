@@ -20,7 +20,10 @@ Saturday and Sunday. Independent of the evening guessing Reel and its Pi schedul
 - The full photo is contained on a 1080x1350 canvas with score/count footer.
   Restaurant name/location, factual description, contributor credit and download
   CTA appear in the caption. Only the reviewed wing-shots-v1 consent contract is
-  accepted. No invented tasting notes or inferred handles.
+  accepted. A verified restaurant Instagram handle is mandatory; selection tries
+  another eligible photo/location when discovery fails. No invented tasting notes
+  or inferred handles. A nonempty eligible pool without a renderable verified
+  candidate records `no_verified_candidate` with private-state verification counts.
 - Empty eligible pools are recorded as no_eligible_candidate; no repeats or lower
   threshold fallback. Plan reports only counts; no private artifacts reach logs.
 
@@ -54,17 +57,72 @@ If a source changes, publishing fails closed for review of the existing containe
 
 ## Verified restaurant handles
 
-verified_handles.json is initially empty. Add entries keyed by exact destination
+Discovery is deterministic and uses no paid services, Meta API calls or LLMs.
+The inspected live source has 1,228 destinations with no website/social URL
+columns; `wing_destination_social_locations` exists but has zero rows. That table
+holds provider place IDs/confidence, not official website/location evidence, so a
+future row alone must not authorize an Instagram tag. No source table is modified.
+
+`website_sources.json` contains four search-discovered website hints keyed by
+destination UUID. These are not verified handles. For other locations, bounded
+public Bing search HTML finds possible official sites; search snippets/results
+never count as verification. Search anti-bot blocks or unavailable pages fail
+closed. Add official website/location URLs here to bypass unreliable search.
+
+The site's homepage title/H1/brand metadata must identify the restaurant, excluding
+known directories/social providers. The official page must match name, street and
+unit, city, state and ZIP with conservative abbreviation folding. Evidence comes
+from either exact-location Restaurant/LocalBusiness JSON-LD `sameAs`, or an
+Instagram profile link on a single-location page containing the complete address.
+Multi-location pages cannot lend a global footer account to a branch. Multiple
+handles on matching official evidence are `conflicting`; malformed/post URLs do
+not qualify. Location-data contradictions remain unresolved, including unit
+differences. The verifier does not change source data to make a match work.
+
+`verified_handles.json` preserves human-reviewed mappings. Add entries keyed by exact destination
 UUID only after checking an official restaurant source links to the Instagram
 account for that location. Include name, city, state and address exactly matching the source,
 handle without @, verified: true, verified_at (ISO date), official_source_url.
 Chain-wide accounts should only be used when the official location page explicitly
-identifies that account. Missing evidence means no tag. Review entries periodically.
+identifies that account. Missing evidence means the candidate is skipped.
+
+Durable private storage in `jalapeno-assets/community-spotlight-v1/instagram/`:
+
+- `cache/<destination-id>/<time>-<nonce>.json`: append-only results containing
+  destination, matched location, handle (only if verified), official evidence URLs,
+  verification/check/expiry times, method, reason and location/seed fingerprint.
+- `overrides/<destination-id>.json`: optional operator-owned mapping with the same
+  fields as a manual registry entry. Private overrides take priority over the repo
+  registry; both precede automatic cache/discovery. `{"verified":false}` blocks a
+  candidate explicitly. Automation never overwrites overrides or manual mappings.
+
+Verified automatic results expire after 30 days; unresolved/conflicting results
+after 7 days; unavailable sites after 1 day. Location/seed/version changes invalidate
+cache reuse. `deferred` means the shared run budget was exhausted and is never
+negative-cached. Subsequent writable runs can advance past cached failures.
+The private cache is shared across Actions runs; HTTP page caching is per process.
+Plan/default preview only read it; publication preparation or `--save-cache` writes
+new immutable verification records. Private writes are read back before reuse.
+Overlapping unexpired cache records with different handles remain conflicting;
+concurrent discovery cannot silently replace one handle with another. Human
+overrides can explicitly resolve or block a conflict.
+
+The fetcher allows public HTTPS port 443 only, rejects userinfo, local/private DNS
+answers and unsafe redirects, and pins the validated public IP while checking the
+original TLS hostname. It sends no source credentials/cookies and ignores proxy
+environment credentials. Redirects are restricted to the same host/www alias.
+Limits per run: 32 wire requests, 90-second budget plus bounded in-flight work,
+2 attempts/request, 2 redirects, 5-second DNS/connect/socket timeouts, 10-second
+page-read deadline and 2 MB/page. At most 3 search seeds and 4 location/contact
+pages per seed, with the shared budget taking priority. No JS, scripts, retrieved
+instructions, login forms or Meta endpoints are executed/contacted by discovery.
+Static parsing deliberately leaves some legitimate sites unresolved.
 
 ## Readiness and activation
 
 1. Merge this branch after the mock tests pass. Workflow is disabled by default.
-2. Run workflow_dispatch with mode=plan to inspect the eligible count read-only.
+2. Run workflow_dispatch with mode=plan to inspect eligible/verified counts and
+   verification statuses read-only. This works with publishing disabled.
 3. Check existing secrets: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY,
    META_LONG_LIVED_ACCESS_TOKEN, META_APP_SECRET, INSTAGRAM_BUSINESS_ACCOUNT_ID,
    FACEBOOK_PAGE_ID. Existing variables META_GRAPH_API_VERSION,
@@ -80,10 +138,20 @@ identifies that account. Missing evidence means no tag. Review entries periodica
 
 CLI: python Agents/Jalapeno/spotlight_main.py plan|health|publish
 
-Private local preview (no publication, no ledger writes): set PYTHONPATH to
+Private local discovery/preview (no publication, no ledger writes by default): set PYTHONPATH to
 Agents/Jalapeno, then run `python -m spotlight.preview --env-file
 Agents/Jalapeno/.env --output .tmp/spotlight-preview`. The ignored local directory
-contains photo.jpg and caption.txt; never attach these to public CI artifacts.
+contains photo.jpg, caption.txt and verification-report.json; never attach these
+to public CI artifacts. The report includes per-location outcomes and evidence,
+while stdout only reports aggregate counts. Default preview neither signs media
+URLs nor constructs a Meta client. Use a fresh ignored private output directory.
+If nothing verifies, the report is still written and exit status is 1.
+
+Optional `--save-cache` enables only private verification-cache writes, even while
+publishing is disabled. It does not claim a daily slot, mutate any source, upload
+the photo/caption or contact Meta. Omit it for the strictly read-only command.
+This option was used to validate real private cache persistence; a subsequent
+default preview verifies read-only reuse.
 
 Unknown create responses cannot be automatically identified safely. Unknown
 publish responses with a known container are queried for PUBLISHED before any
@@ -93,5 +161,6 @@ do not delete the ledger or replay POSTs to clear an alert. Reconciliation times
 use observation time conservatively, extending rather than shortening the cooldown.
 
 Tests: python -m pytest Agents/Jalapeno/tests/test_community_spotlight.py
+Agents/Jalapeno/tests/test_spotlight_verification.py
 Agents/Jalapeno/tests/test_guess_wing_spot.py
 Agents/Jalapeno/tests/test_guess_wing_spot_publish.py -q
