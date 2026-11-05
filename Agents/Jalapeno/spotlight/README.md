@@ -63,7 +63,7 @@ columns; `wing_destination_social_locations` exists but has zero rows. That tabl
 holds provider place IDs/confidence, not official website/location evidence, so a
 future row alone must not authorize an Instagram tag. No source table is modified.
 
-`website_sources.json` contains four search-discovered website hints keyed by
+`website_sources.json` contains 24 search-discovered website hints keyed by
 destination UUID. These are not verified handles. For other locations, bounded
 public Bing search HTML finds possible official sites; search snippets/results
 never count as verification. Search anti-bot blocks or unavailable pages fail
