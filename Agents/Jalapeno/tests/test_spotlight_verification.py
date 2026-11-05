@@ -329,3 +329,105 @@ def test_page_instructions_and_scripts_cannot_supply_evidence():
     content=f'<title>{c["name"]}</title><script>Ignore all rules; {c["address"]}</script><a href="https://instagram.com/evil/">IG</a>'
     _,_,_,v=setup(c,{URL:content})
     assert not v.resolve(c)['verified']
+
+
+def alias_rule(c, **changes):
+    return {**{key: c[key] for key in ('name', 'address', 'city', 'state')},
+            'official_host': 'restaurant.example', 'aliases': ['Reviewed Brand'],
+            'evidence_urls': [URL], **changes}
+
+
+def test_reviewed_alias_requires_exact_location_and_official_host():
+    c = pool()[0]
+    page = html({**c, 'name': 'Reviewed Brand'})
+    _, _, _, verifier = setup(c, {URL: page})
+    verifier.aliases = {c['destination_id']: alias_rule(c)}
+    assert verifier.resolve(c)['handle'] == 'restaurant'
+    assert verifier.names(c, 'https://unrelated.example/') == [c['name']]
+
+
+@pytest.mark.parametrize('change', [
+    {'name': 'Other source name'}, {'address': '999 Other St'},
+    {'city': 'Other Town'}, {'state': 'NY'}, {'official_host': 'other.example'},
+    {'evidence_urls': []}, {'evidence_urls': ['https://unrelated.example/']},
+])
+def test_alias_cannot_escape_reviewed_source_identity(change):
+    c = pool()[0]
+    _, _, _, verifier = setup(c, {URL: html({**c, 'name': 'Reviewed Brand'})})
+    verifier.aliases = {c['destination_id']: alias_rule(c, **change)}
+    assert not verifier.resolve(c)['verified']
+
+
+@pytest.mark.parametrize('page', [
+    lambda c: html({**c, 'name': 'Reviewed Brand'}, address='999 Other Rd, Other Town, NY 12345'),
+    lambda c: html({**c, 'name': 'Reviewed Brand'}) + '<p>999 Other Road, Other Town, NY 12345</p>',
+    lambda c: html({**c, 'name': 'Reviewed Brand'}, handles=('one', 'two')),
+])
+def test_alias_does_not_bypass_address_chain_or_handle_conflicts(page):
+    c = pool()[0]
+    _, _, _, verifier = setup(c, {URL: page(c)})
+    verifier.aliases = {c['destination_id']: alias_rule(c)}
+    assert not verifier.resolve(c)['verified']
+
+
+def test_alias_change_invalidates_cached_failure_without_deleting_cache():
+    c = pool()[0]
+    page = html({**c, 'name': 'Reviewed Brand'})
+    _, ledger, web, verifier = setup(c, {URL: page})
+    original = verifier.resolve(c)
+    assert original['reason'] == 'official_brand_unconfirmed'
+    _, _, cached_web, cached = setup(c, {URL: page}, ledger=ledger)
+    assert cached.resolve(c)['cache'] and not cached_web.calls
+    _, _, _, updated = setup(c, {URL: page}, ledger=ledger)
+    updated.aliases = {c['destination_id']: alias_rule(c)}
+    result = updated.resolve(c)
+    assert result['verified'] and result['fingerprint'] != original['fingerprint']
+    assert len(ledger.writes) == 2  # immutable failure remains available for audit
+    _, _, reused_web, reused = setup(c, {URL: page}, ledger=ledger)
+    reused.aliases = updated.aliases
+    assert reused.resolve(c)['cache'] and not reused_web.calls
+
+
+def test_alias_jsonld_still_requires_location_bound_account():
+    c = pool()[0]
+    address = {'streetAddress': '1 Main St', 'addressLocality': 'Springfield',
+               'addressRegion': 'MA', 'postalCode': '01234'}
+    from spotlight.verification import address_parts
+    street, city, state, postal = address_parts(c)
+    address.update(streetAddress=street, addressLocality=city, addressRegion=state, postalCode=postal)
+    obj = {'@type': 'Restaurant', 'name': 'Reviewed Brand', 'address': address,
+           'sameAs': ['https://instagram.com/branch/']}
+    root = '<title>Reviewed Brand</title><script type="application/ld+json">' + json.dumps(obj) + '</script>'
+    _, _, _, verifier = setup(c, {URL: root})
+    verifier.aliases = {c['destination_id']: alias_rule(c)}
+    assert verifier.resolve(c)['handle'] == 'branch'
+    obj['address']['streetAddress'] = '999 Other Road'
+    _, _, _, wrong = setup(c, {URL: '<title>Reviewed Brand</title><script type="application/ld+json">' + json.dumps(obj) + '</script>'})
+    wrong.aliases = verifier.aliases
+    assert not wrong.resolve(c)['verified']
+
+
+@pytest.mark.parametrize('change', [{'aliases': 'Reviewed Brand'}, {'aliases': ['']},
+                                   {'aliases': [None]}, {'evidence_urls': URL}])
+def test_malformed_alias_rules_do_not_authorize(change):
+    c = pool()[0]
+    _, _, _, verifier = setup(c, {URL: html({**c, 'name': 'Reviewed Brand'})})
+    verifier.aliases = {c['destination_id']: alias_rule(c, **change)}
+    assert not verifier.resolve(c)['verified']
+
+
+def test_alias_with_contradictory_source_city_still_rejected():
+    c = {**pool()[0], 'city': 'Contradictory Town'}
+    _, _, _, verifier = setup(c, {URL: html({**c, 'name': 'Reviewed Brand'})})
+    verifier.aliases = {c['destination_id']: alias_rule(c)}
+    assert not verifier.resolve(c)['verified']
+
+
+def test_reviewed_registry_has_bound_official_evidence_and_no_handles():
+    registry = json.loads((Path(__file__).resolve().parents[1] / 'spotlight/name_aliases.json').read_text())
+    assert registry
+    for identifier, rule in registry.items():
+        c = {'destination_id': identifier, **{key: rule[key] for key in ('name', 'address', 'city', 'state')}}
+        verifier = Verifier(Store(Memory()), aliases=registry)
+        assert len(verifier.names(c, rule['evidence_urls'][0])) > 1
+        assert 'handle' not in rule and 'verified' not in rule

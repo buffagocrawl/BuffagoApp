@@ -63,7 +63,7 @@ columns; `wing_destination_social_locations` exists but has zero rows. That tabl
 holds provider place IDs/confidence, not official website/location evidence, so a
 future row alone must not authorize an Instagram tag. No source table is modified.
 
-`website_sources.json` contains 24 search-discovered website hints keyed by
+`website_sources.json` contains 35 search-discovered website hints keyed by
 destination UUID. These are not verified handles. For other locations, bounded
 public Bing search HTML finds possible official sites; search snippets/results
 never count as verification. Search anti-bot blocks or unavailable pages fail
@@ -78,6 +78,20 @@ Multi-location pages cannot lend a global footer account to a branch. Multiple
 handles on matching official evidence are `conflicting`; malformed/post URLs do
 not qualify. Location-data contradictions remain unresolved, including unit
 differences. The verifier does not change source data to make a match work.
+
+`name_aliases.json` holds reviewed brand names for specific source restaurant UUIDs.
+Each rule binds the original name, address, city and state to an exact official
+host (including only its www alias), with official evidence URLs and review date.
+Aliases apply to homepage brand identification and location-page/JSON-LD names;
+they never supply an account, alter an address or authorize a chain footer.
+No fuzzy matching, automatic location-suffix removal or inferred aliases are used.
+A source identity mismatch, another host or malformed rule disables the alias.
+The complete alias rule participates in that destination's cache fingerprint,
+so adding/editing a rule rechecks stale failures without deleting private history.
+Unchanged destinations keep their existing cache fingerprints.
+
+See [the brand investigation](brand-investigation-2026-11-05.md) for all 27
+previous brand failures, reviewed evidence and remaining blockers.
 
 `verified_handles.json` preserves human-reviewed mappings. Add entries keyed by exact destination
 UUID only after checking an official restaurant source links to the Instagram

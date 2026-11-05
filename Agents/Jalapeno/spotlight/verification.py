@@ -127,16 +127,17 @@ def same_address(candidate, address):
             and norm(candidate['state']) == norm(state))
 
 
-def evidence(candidate, url, page):
+def evidence(candidate, url, page, names=None):
     """Only an exact-location object or a single-location page can supply links."""
     matches = []
+    names = names or [candidate['name']]
     for schema in page.schemas:
         for obj in objects(schema):
             types = obj.get('@type', [])
             types = [types] if isinstance(types, str) else types
             if (not isinstance(types, list) or not all(isinstance(t, str) for t in types)
                     or not set(types) & {'Restaurant', 'BarOrPub', 'FoodEstablishment', 'LocalBusiness'}
-                    or not name_matches(candidate['name'], obj.get('name', ''))
+                    or not any(name_matches(name, obj.get('name', '')) for name in names)
                     or not same_address(candidate, obj.get('address'))):
                 continue
             same_as = obj.get('sameAs', [])
@@ -156,7 +157,7 @@ def evidence(candidate, url, page):
     # contiguous complete address after conservative street abbreviation folding.
     text = norm(' '.join(page.text))
     expected = norm(' '.join((street, city, state, postal)))
-    if (not name_matches(candidate['name'], ' '.join(page.text))
+    if (not any(name_matches(name, ' '.join(page.text)) for name in names)
             or (' ' + expected + ' ') not in (' ' + text + ' ')
             or norm(candidate['city'].split(',')[0]) != norm(city)
             or norm(candidate['state']) != norm(state)):
@@ -204,16 +205,34 @@ class Store:
 
 
 class Verifier:
-    def __init__(self, store, manual=None, seeds=None, fetcher=None, now=None):
+    def __init__(self, store, manual=None, seeds=None, fetcher=None, now=None, aliases=None):
         self.store, self.manual, self.seeds = store, manual or {}, seeds or {}
         self.fetcher, self.now = fetcher or Fetcher(), now or datetime.now(timezone.utc)
         self.results = {}
+        self.aliases = aliases or {}
 
     @classmethod
     def configured(cls, ledger, writable=False, now=None):
         directory = Path(__file__).parent
         return cls(Store(ledger, writable), json.loads((directory/'verified_handles.json').read_text()),
-                   json.loads((directory/'website_sources.json').read_text()), now=now)
+                   json.loads((directory/'website_sources.json').read_text()), now=now,
+                   aliases=json.loads((directory/'name_aliases.json').read_text()))
+
+    def names(self, candidate, url):
+        """Reviewed aliases identify a brand, never an address or account."""
+        rule = self.aliases.get(candidate['destination_id'], {})
+        if (not isinstance(rule, dict)
+                or not isinstance(rule.get('aliases'), list)
+                or not rule['aliases']
+                or not all(isinstance(name, str) and name.strip() for name in rule['aliases'])
+                or not isinstance(rule.get('evidence_urls'), list)
+                or any(rule.get(key) != candidate[key] for key in ('name', 'address', 'city', 'state'))
+                or not allowed_site(url) or host_key(url) != rule.get('official_host')
+                or not rule.get('evidence_urls')
+                or not all(isinstance(link, str) and allowed_site(link) and host_key(link) == rule['official_host']
+                           for link in rule['evidence_urls'])):
+            return [candidate['name']]
+        return [candidate['name'], *rule.get('aliases', [])]
 
     def search(self, candidate):
         query = ' '.join((candidate['name'], candidate['address'], 'official restaurant website'))
@@ -241,7 +260,11 @@ class Verifier:
         manual = override if override is not None else self.manual.get(identifier)
         location = {key: candidate[key] for key in ('name', 'address', 'city', 'state')}
         seeds = list(dict.fromkeys([*candidate.get('website_urls', []), *self.seeds.get(identifier, [])]))[:3]
-        fingerprint = hashlib.sha256(json.dumps([VERSION, location, seeds], sort_keys=True).encode()).hexdigest()
+        # A reviewed alias change rechecks only this destination's cached results.
+        identity = [VERSION, location, seeds]
+        if identifier in self.aliases:
+            identity.append(self.aliases[identifier])
+        fingerprint = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
         base = {'destination_id': identifier, **location, 'matched_location': location,
                 'fingerprint': fingerprint, 'checked_at': self.now.isoformat(), 'verified': False,
                 'verification_version': VERSION}
@@ -272,7 +295,8 @@ class Verifier:
                     root_page = Page(root_html)
                     # A directory's restaurant detail page is insufficient:
                     # the site's own homepage must identify this restaurant.
-                    if not name_matches(candidate['name'], ' '.join(root_page.brand)):
+                    if not any(name_matches(name, ' '.join(root_page.brand))
+                               for name in self.names(candidate, root_url)):
                         errors.append('official_brand_unconfirmed')
                         continue
                     urls = [seed]
@@ -285,7 +309,7 @@ class Verifier:
                                 urls.append(target)
                     for target in urls[:4]:
                         final, html = self.fetcher.get(target)
-                        found, method = evidence(candidate, final, Page(html))
+                        found, method = evidence(candidate, final, Page(html), self.names(candidate, final))
                         if found:
                             handles.update(found)
                             methods.add(method)
