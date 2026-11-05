@@ -66,6 +66,8 @@ def read_environment(path: Path | None) -> dict[str, str]:
 
 
 class ReadOnlySources:
+    tables = TABLES
+
     def __init__(self, url: str, key: str, *, opener=None):
         parsed = urlsplit(url)
         if parsed.scheme != "https" or not parsed.netloc or parsed.path not in ("", "/") or parsed.query or parsed.fragment or parsed.username:
@@ -85,7 +87,7 @@ class ReadOnlySources:
         if method not in {"GET", "HEAD"}:
             raise SourceError("Only GET and HEAD are permitted")
         if path.startswith("rest/v1/"):
-            if path.removeprefix("rest/v1/") not in TABLES:
+            if path.removeprefix("rest/v1/") not in self.tables:
                 raise SourceError("Table or RPC endpoint is not allowlisted")
         elif not re.fullmatch(r"storage/v1/object/authenticated/wing-submissions/processed/[0-9a-f-]{36}/primary", path):
             raise SourceError("Storage endpoint is not an existing processed-photo path")
@@ -111,9 +113,9 @@ class ReadOnlySources:
             raise SourceError("Read-only request failed; connection unavailable") from None
 
     def rows(self, table: str, filters=None) -> list[dict]:
-        if table not in TABLES:
+        if table not in self.tables:
             raise SourceError("Table is not allowlisted")
-        order, columns = TABLES[table]
+        order, columns = self.tables[table]
         result = []
         while True:
             params = {"select": columns, "order": order + ".asc", "limit": 500, "offset": len(result), **(filters or {})}
