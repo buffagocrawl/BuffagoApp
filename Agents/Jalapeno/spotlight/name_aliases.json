@@ -1,0 +1,157 @@
+{
+  "0e059e25-5e2a-4626-ac46-60fa508bb839": {
+    "address": "385 Walnut St Ext, Agawam, MA 01001",
+    "aliases": [
+      "EB's Restaurant"
+    ],
+    "city": "Agawam, MA",
+    "evidence_urls": [
+      "https://www.ebsrestaurant.com/"
+    ],
+    "name": "E.B's Restaurant",
+    "official_host": "ebsrestaurant.com",
+    "reviewed_at": "2026-11-05",
+    "state": "MA"
+  },
+  "3288b2fb-86c6-48bf-aa20-5bce26001730": {
+    "address": "884 Oakland Park Ave, Columbus, OH 43224",
+    "aliases": [
+      "Fish Burger"
+    ],
+    "city": "Columbus",
+    "evidence_urls": [
+      "https://fishburgerusa.com/"
+    ],
+    "name": "FishBurger",
+    "official_host": "fishburgerusa.com",
+    "reviewed_at": "2026-11-05",
+    "state": "OH"
+  },
+  "43338b37-1a98-46c1-a7f6-75326cce5c40": {
+    "address": "37 Easton Ave, New Brunswick, NJ 08901",
+    "aliases": [
+      "30 Burgers"
+    ],
+    "city": "New Brunswick, NJ",
+    "evidence_urls": [
+      "https://www.30burgers.com/new-website/locations/30-burgers-new-brunswick"
+    ],
+    "name": "30 Burgers & Brews",
+    "official_host": "30burgers.com",
+    "reviewed_at": "2026-11-05",
+    "state": "NJ"
+  },
+  "57faf132-208a-40f8-a132-aa76c95e64c7": {
+    "address": "920 S Colony St, Wallingford, CT 06492",
+    "aliases": [
+      "Yellow King"
+    ],
+    "city": "Wallingford",
+    "evidence_urls": [
+      "https://www.yellowkingbrews.com/"
+    ],
+    "name": "Yellow King Brews",
+    "official_host": "yellowkingbrews.com",
+    "reviewed_at": "2026-11-05",
+    "state": "CT"
+  },
+  "68558bbd-9fe0-4fc4-8ff5-627a465d2dbc": {
+    "address": "3425 Fairfield Ave, Bridgeport, CT 06605",
+    "aliases": [
+      "The Blind Rhino"
+    ],
+    "city": "Bridgeport",
+    "evidence_urls": [
+      "https://www.theblindrhino.com/location/black-rock/"
+    ],
+    "name": "The Blind Rhino - Bridgeport",
+    "official_host": "theblindrhino.com",
+    "reviewed_at": "2026-11-05",
+    "state": "CT"
+  },
+  "750c4b0d-9cb5-4749-92f8-dde6443c32a4": {
+    "address": "3543 Peachtree Industrial Blvd, Duluth, GA 30096",
+    "aliases": [
+      "Taco Mac"
+    ],
+    "city": "Duluth",
+    "evidence_urls": [
+      "https://tacomac.com/locations/3543-peachtree-industrial-blvd-duluth-ga-30096/"
+    ],
+    "name": "Taco Mac Duluth",
+    "official_host": "tacomac.com",
+    "reviewed_at": "2026-11-05",
+    "state": "GA"
+  },
+  "c6bb6f8a-1a90-47f6-b8f6-56fa0e441a91": {
+    "address": "143 New Britain Ave, Plainville, CT 06062",
+    "aliases": [
+      "J. Timothy's Taverne"
+    ],
+    "city": "Plainville",
+    "evidence_urls": [
+      "https://jtimothys.com/"
+    ],
+    "name": "J Timothy's Tavern",
+    "official_host": "jtimothys.com",
+    "reviewed_at": "2026-11-05",
+    "state": "CT"
+  },
+  "d22243e8-d36e-4c48-9fbf-788e4cfc66b8": {
+    "address": "3050 M.L.K. Jr Dr SW Ste M, Atlanta, GA 30311",
+    "aliases": [
+      "TheBANDO"
+    ],
+    "city": "Atlanta",
+    "evidence_urls": [
+      "https://www.thebandoatl.com/"
+    ],
+    "name": "The Bando",
+    "official_host": "thebandoatl.com",
+    "reviewed_at": "2026-11-05",
+    "state": "GA"
+  },
+  "dee95cd2-2f25-49a6-a39a-b087a7a51a65": {
+    "address": "39 N Main St, Wallingford, CT 06492",
+    "aliases": [
+      "Archie Moore's"
+    ],
+    "city": "Wallingford",
+    "evidence_urls": [
+      "https://www.archiemoores.com/"
+    ],
+    "name": "Archie Moore's - Wallingford",
+    "official_host": "archiemoores.com",
+    "reviewed_at": "2026-11-05",
+    "state": "CT"
+  },
+  "feb7c255-51d0-4311-aef5-afe6a240a467": {
+    "address": "545 Highland Ave, Clifton, NJ 07011",
+    "aliases": [
+      "Sharky's",
+      "Sharky's East"
+    ],
+    "city": "Clifton, NJ",
+    "evidence_urls": [
+      "https://www.sharkyswingsnj.com/east/"
+    ],
+    "name": "Sharky's Wings & Raw Bar",
+    "official_host": "sharkyswingsnj.com",
+    "reviewed_at": "2026-11-05",
+    "state": "NJ"
+  },
+  "ff0409e3-f395-4aa0-9cb3-8c82bb5a9456": {
+    "address": "207 N Bay Ave, Beach Haven, NJ 08008",
+    "aliases": [
+      "The Chicken Or The Egg"
+    ],
+    "city": "Beach Haven, NJ",
+    "evidence_urls": [
+      "https://letschegg.com/"
+    ],
+    "name": "Chicken or the Egg Beach Haven",
+    "official_host": "letschegg.com",
+    "reviewed_at": "2026-11-05",
+    "state": "NJ"
+  }
+}
