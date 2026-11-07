@@ -12,6 +12,37 @@ Only after the scoped credential is verified, set the repository variable JALAPE
 
 ## Calendar
 
+### Community spotlight
+
+`COMMUNITY_SPOTLIGHT_SCHEDULER` defaults to `github`. Set it to `pi` after
+verifying the installed dispatcher and existing scoped credential. This makes
+GitHub scheduled **publishing** inactive; scheduled health, manual plan/health,
+and manual publication remain available. Keep `COMMUNITY_SPOTLIGHT_ENABLED=true`.
+The Pi dispatches `community-spotlight.yml` on main at 12:00, 12:20 and 12:40
+America/New_York on Monday, Wednesday, Friday, Saturday and Sunday, plus read-only
+health at 13:05 on those days. Dated dispatches require Pi ownership and the
+current Eastern date. Existing noon gates, original run identity, daily claims,
+three-attempt recovery bound, consent, scores, verified mentions and 30-day
+photo/location cooldowns remain enforced. No catch-up or extended hours.
+
+Durable filenames and records include workflow identity. Legacy unqualified
+records still suppress their original evening slots during an upgrade, but
+cannot suppress spotlight. Each slot writes intent before HTTP, including an
+fsync; uncertain responses and interrupted attempts are not resent that slot.
+Later bounded slots rely on the workflow's existing daily ledger for recovery.
+`--check` checks all three active workflow identities with GET only. A successful
+dispatch proves acceptance by GitHub, not execution or Instagram publication.
+
+Deploy only after verifying hostname `buffago-growth`; back up and replace only
+the dispatcher and its dedicated units, retaining the protected token and state.
+Run Python compilation, systemd unit/calendar validation and GET-only `--check`,
+then set spotlight ownership to Pi and reload/restart the dedicated timer.
+Verify installed hashes, enabled/active state and next Eastern slots. Validate
+Actions write permission with a `mode=health` dispatch using the existing Pi
+credential, never a test publication. Preserve dashboard units/settings.
+To roll spotlight scheduling back, remove its two Pi timer calendars before
+restoring `COMMUNITY_SPOTLIGHT_SCHEDULER=github`; retain all evening calendars.
+
 The native timer uses America/New_York, independently of the Pi OS default timezone. Publication slots: 19:30, 19:50, 20:10, 20:30, 20:50. Metrics slots: 20:30 and 21:10. Read-only daily ledger health: 21:15 and 21:45. Persistent=false prevents boot-time catch-up. The service exits outside exact slots and never polls continuously. A durable intent is written before each HTTP dispatch. An ambiguous response is never retried in the same slot; a subsequent slot can recover through the existing ledger. An accepted dispatch is not evidence of publication. GitHub runner availability can still delay execution past the strict 21:00 cutoff.
 
 The Pi token has no publication credentials. The stock workflows validate the scheduler authority/date again; publication cannot be shifted to another date by a delayed workflow. Existing manual publish keeps its 18:00-21:00 window; local plan/preview and isolated live tests remain separate.

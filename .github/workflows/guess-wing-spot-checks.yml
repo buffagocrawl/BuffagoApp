@@ -8,6 +8,12 @@ on:
       - 'Agents/Jalapeno/systemd/**'
       - 'Agents/Jalapeno/guess_wing_spot_publish.py'
       - 'Agents/Jalapeno/tests/test_guess_wing_spot*.py'
+      - 'Agents/Jalapeno/tests/test_automation_scheduler.py'
+      - 'Agents/Jalapeno/tests/test_community_spotlight.py'
+      - 'Agents/Jalapeno/tests/test_spotlight_verification.py'
+      - 'Agents/Jalapeno/spotlight_main.py'
+      - 'Agents/Jalapeno/spotlight/**'
+      - '.github/workflows/community-spotlight.yml'
       - 'Agents/Jalapeno/tests/test_reel*.py'
       - 'Agents/Jalapeno/tests/test_read_only_credentials.py'
       - 'Agents/Jalapeno/reel_analytics/**'
@@ -36,4 +42,4 @@ jobs:
         env:
           GUESS_TEST_FFMPEG: ffmpeg
           GUESS_TEST_FFPROBE: ffprobe
-        run: python -B -m pytest Agents/Jalapeno/tests/test_guess_wing_spot.py Agents/Jalapeno/tests/test_guess_wing_spot_publish.py Agents/Jalapeno/tests/test_reel_analytics.py Agents/Jalapeno/tests/test_read_only_credentials.py Agents/Jalapeno/tests/test_reel_latest_weekly.py -q
+        run: python -B -m pytest Agents/Jalapeno/tests/test_guess_wing_spot.py Agents/Jalapeno/tests/test_guess_wing_spot_publish.py Agents/Jalapeno/tests/test_reel_analytics.py Agents/Jalapeno/tests/test_read_only_credentials.py Agents/Jalapeno/tests/test_reel_latest_weekly.py Agents/Jalapeno/tests/test_automation_scheduler.py Agents/Jalapeno/tests/test_community_spotlight.py Agents/Jalapeno/tests/test_spotlight_verification.py -q

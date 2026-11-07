@@ -12,6 +12,10 @@ on:
         type: choice
         default: plan
         options: [plan, health, publish]
+      publication_date:
+        description: Pi automatic Eastern date (manual runs leave empty)
+        type: string
+        default: ''
 permissions:
   contents: read
   actions: read
@@ -24,6 +28,8 @@ jobs:
     timeout-minutes: 15
     env:
       COMMUNITY_SPOTLIGHT_ENABLED: ${{ vars.COMMUNITY_SPOTLIGHT_ENABLED || 'false' }}
+      COMMUNITY_SPOTLIGHT_SCHEDULER: ${{ vars.COMMUNITY_SPOTLIGHT_SCHEDULER || 'github' }}
+      PUBLICATION_DATE: ${{ inputs.publication_date }}
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       META_LONG_LIVED_ACCESS_TOKEN: ${{ secrets.META_LONG_LIVED_ACCESS_TOKEN }}

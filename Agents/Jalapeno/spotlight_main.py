@@ -51,6 +51,17 @@ def run(mode, env=os.environ, now=None):
     now = now or datetime.now(timezone.utc)
     date = now.astimezone(EASTERN).date().isoformat()
     enabled = env.get('COMMUNITY_SPOTLIGHT_ENABLED') == 'true'
+    if mode == 'publish':
+        scheduler = env.get('COMMUNITY_SPOTLIGHT_SCHEDULER', 'github')
+        automatic_date = env.get('PUBLICATION_DATE', '')
+        if scheduler not in {'github', 'pi'}:
+            return {'status': 'invalid_scheduler', 'date': date}
+        if env.get('GITHUB_EVENT_NAME') == 'schedule' and scheduler != 'github':
+            return {'status': 'inactive_github_scheduler', 'date': date}
+        if automatic_date and scheduler != 'pi':
+            return {'status': 'inactive_pi_scheduler', 'date': date}
+        if automatic_date and automatic_date != date:
+            return {'status': 'original_run_date_elapsed', 'date': date}
     if mode == 'publish' and (not enabled or not window(now)):
         return {'status': 'disabled' if not enabled else 'outside_noon_window', 'date': date}
     ledger = Ledger(env['SUPABASE_URL'], env['SUPABASE_SERVICE_ROLE_KEY'])

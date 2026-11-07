@@ -12,6 +12,8 @@ EASTERN = ZoneInfo('America/New_York')
 ORIGIN = 'https://api.github.com/repos/buffagocrawl/BuffagoApp/actions/workflows/'
 PUBLISH = 'guess-wing-spot.yml'
 METRICS = 'jalapeno-metrics.yml'
+SPOTLIGHT = 'community-spotlight.yml'
+SPOTLIGHT_DAYS = {0, 2, 4, 5, 6}
 PUBLISH_SLOTS = {'19:30', '19:50', '20:10', '20:30', '20:50'}
 
 
@@ -24,6 +26,11 @@ def due(now):
     local = now.astimezone(EASTERN)
     slot = local.strftime('%H:%M')
     tasks = []
+    if local.weekday() in SPOTLIGHT_DAYS:
+        if slot in {'12:00', '12:20', '12:40'}:
+            tasks.append((SPOTLIGHT, 'publish'))
+        if slot == '13:05':
+            tasks.append((SPOTLIGHT, 'health'))
     if slot in PUBLISH_SLOTS:
         tasks.append((PUBLISH, 'publish'))
     if slot in {'20:30', '21:10'}:
@@ -41,19 +48,25 @@ def dispatch(now, token, state_dir, *, send=None, dry_run=False):
     results = []
     for workflow, mode in tasks:
         if dry_run:
-            results.append({'mode':mode, 'status':'dry_run_no_dispatch'})
+            results.append({'workflow':workflow, 'mode':mode, 'status':'dry_run_no_dispatch'})
             continue
         state_dir = Path(state_dir)
         state_dir.mkdir(parents=True, exist_ok=True)
-        claim = state_dir/(date+'-'+slot.replace(':','')+'-'+mode+'.json')
+        legacy = state_dir/(date+'-'+slot.replace(':','')+'-'+mode+'.json')
+        claim = state_dir/(date+'-'+slot.replace(':','')+'-'+workflow+'-'+mode+'.json')
+        # Old records belonged only to the evening workflows. Retain their
+        # suppression during upgrades, without allowing them to block spotlight.
+        if workflow != SPOTLIGHT and legacy.exists():
+            results.append({'workflow':workflow, 'mode':mode, 'status':'attempt_already_recorded'})
+            continue
         try:
             stream = claim.open('x', encoding='utf-8')
         except FileExistsError:
-            results.append({'mode':mode, 'status':'attempt_already_recorded'})
+            results.append({'workflow':workflow, 'mode':mode, 'status':'attempt_already_recorded'})
             continue
         # Record intent before HTTP; a lost response never retries this same slot.
         with stream:
-            json.dump({'date':date,'slot':slot,'mode':mode,'status':'dispatch_intent'},stream)
+            json.dump({'date':date,'slot':slot,'workflow':workflow,'mode':mode,'status':'dispatch_intent'},stream)
             stream.flush(); os.fsync(stream.fileno())
         body = {'ref':'main','inputs':{'mode':mode,'publication_date':date}}
         request = Request(ORIGIN+workflow+'/dispatches', data=json.dumps(body).encode(), method='POST',
@@ -66,7 +79,7 @@ def dispatch(now, token, state_dir, *, send=None, dry_run=False):
             status = 'dispatch_http_'+str(error.code)
         except Exception:
             status = 'dispatch_outcome_unknown'
-        result = {'date':date,'slot':slot,'mode':mode,'status':status}
+        result = {'date':date,'slot':slot,'workflow':workflow,'mode':mode,'status':status}
         temporary = claim.with_suffix('.tmp')
         temporary.write_text(json.dumps(result),encoding='utf-8'); temporary.replace(claim)
         results.append(result)
@@ -85,7 +98,7 @@ def main():
         if not token.startswith('github_pat_') or any(c.isspace() for c in token):
             raise ValueError('fine_grained_dispatch_credential_required')
         if args.check:
-            for workflow in (PUBLISH,METRICS):
+            for workflow in (PUBLISH,METRICS,SPOTLIGHT):
                 request=Request(ORIGIN+workflow,headers={'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'})
                 with build_opener(NoRedirect()).open(request,timeout=20) as response:
                     data=json.load(response)
